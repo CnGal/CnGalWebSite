@@ -1,6 +1,6 @@
 <div style="display: flex;justify-content: center;align-items: center;">
   <!-- 在此处设置您的项目图标 -->
-  <img src="//app.cngal.org/_content/NewCngalWebSite.Shared/images/logo.png" height="50" style="margin-right: 20px;"/>
+  <img src="//app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" height="50" style="margin-right: 20px;"/>
   <span style="font-size: 35px;">CnGal资料站</span>
 </div>
 <p align="center"  style="margin-top: 10px;">
@@ -9,14 +9,14 @@
 </p>
 <span id="nav-1"></span>
 <p align="center">
-  <a href="https://github.com/misitebao/standard-repository/blob/main/LICENSE">
+  <a href="https://github.com/CnGal/CnGalWebSite/LICENSE">
     <img alt="GitHub" src="https://img.shields.io/github/license/misitebao/standard-repository?style=flat-square"/>
   </a>
   <a href="https://github.com/misitebao/standard-repository">
     <img alt="GitHub" src="https://cdn.jsdelivr.net/gh/misitebao/standard-repository@main/assets/badge_flat-square.svg"/>
   </a>
-  <a href="https://github.com/misitebao/standard-repository">
-    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/misitebao/standard-repository?style=flat-square"/>
+  <a href="https://github.com/CnGal/CnGalWebSite">
+    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/CnGal/CnGalWebSite?style=flat-square"/>
   </a>
 </p>
 
@@ -47,7 +47,6 @@
 - [Community Exchange](#community-exchange)
 - [Part Of Users](#part-of-users)
 - [Donators](#donators)
-- [Sponsors](#sponsors)
 - [Special Thanks](#special-thanks)
 - [License](#license)
 
@@ -250,18 +249,101 @@ CnGal资料站：https://www.cngal.org/
 <span id="nav-12"></span>
 
 ## Donators
+感谢这些项目的捐赠者：
 
+<a href="https://afdian.net/u/613de57082bb11e982ed52540025c377"><img src="https://pic1.afdiancdn.com/user/613de57082bb11e982ed52540025c377/avatar/2307c01d2a74aaf44583e5ebfe745c14_w2560_h1440_s1797.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="NTR天下第一" title="NTR天下第一"/></a>
+<a href="https://afdian.net/u/ad2d3d66a3f011eba1e052540025c377"><img src="https://pic1.afdiancdn.com/user/ad2d3d66a3f011eba1e052540025c377/avatar/b55149a56f8a80d4ed510f8efd1ea915_w562_h562_s50.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="雷之" title="雷之"/></a> 
+<a href="https://afdian.net/u/2c1c2e3eb4f011ea8d4452540025c377"><img src="https://pic1.afdiancdn.com/user/2c1c2e3eb4f011ea8d4452540025c377/avatar/f3ae53ff06d599d4215ddcb677a7bd40_w958_h958_s71.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="Zero就是零啊" title="Zero就是零啊"/></a> 
+<a href="https://afdian.net/u/f3d043f4831311e8b53152540025c377"><img src="https://pic1.afdiancdn.com/user/f3d043f4831311e8b53152540025c377/avatar/a2853ceb0f33559a8fe9be8077357cbd_w640_h640_s63.jpeg?imageView2/1/w/120/h/120" width="40" height="40" alt="mzy069" title="mzy069"/></a>
+<a href="https://afdian.net/u/c8299728395d11e89de552540025c377"><img src="https://pic1.afdiancdn.com/user/c8299728395d11e89de552540025c377/avatar/0ad90bd1e5c7ed5728378404bd593132_w465_h553_s281.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="Emiya" title="Emiya"/></a> 
+<a href="https://afdian.net/u/b35076f03a0711e8b8f152540025c377"><img src="https://pic1.afdiancdn.com/user/b35076f03a0711e8b8f152540025c377/avatar/634450a83053184f4cfc6e7850e165e0_w791_h793_s310.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="被炒的炒饭" title="被炒的炒饭"/></a>
+<a href="https://afdian.net/@wumingjianxia"><img src="https://pic1.afdiancdn.com/user/2309207c14fb11e9a0a552540025c377/avatar/2efcac67405bad1b031894c005159633_w204_h256_s11.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="无名剑侠" title="无名剑侠"/></a>
+<a href="https://afdian.net/u/172f8dfc2a4011eb8f5a52540025c377"><img src="https://pic1.afdiancdn.com/user/172f8dfc2a4011eb8f5a52540025c377/avatar/8fe4335592e6e7c41c8ef9653d7f6436_w1024_h576_s751.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="mem.wey" title="mem.wey"/></a>
+<a href="https://afdian.net/u/d666631cb54711ea9e5952540025c377"><img src="https://pic1.afdiancdn.com/user/d666631cb54711ea9e5952540025c377/avatar/01d1dfb98aa597b17820e53daac7a29c_w938_h938_s440.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="声控灯" title="声控灯"/></a>
+<a href="https://afdian.net/u/793e510cfadd11e88b6c52540025c377"><img src="https://pic1.afdiancdn.com/user/793e510cfadd11e88b6c52540025c377/avatar/3dcb4490deb7cd8711eda7f3c1617120_w640_h637_s43.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="隐_hermity" title="隐_hermity"/></a>
+<a href="https://afdian.net/u/94996d86268311eca29652540025c377"><img src="https://pic1.afdiancdn.com/user/94996d86268311eca29652540025c377/avatar/3b3cb21c816d7b0e39acfb3d5e6944e0_w1080_h1080_s89.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="陈炎西" title="陈炎西"/></a>
+<a href="https://afdian.net/u/a424d630273611eab69c52540025c377"><img src="https://pic1.afdiancdn.com/user/a424d630273611eab69c52540025c377/avatar/dba861b5911b5a7c43d0309ae6d26287_w2292_h1667_s315.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="小恸恸" title="小恸恸"/></a>
+<a href="https://afdian.net/@skt_studio"><img src="https://pic1.afdiancdn.com/user/0e803d96b55611eaa0d152540025c377/avatar/9d55484978aa2eff4bebe6c1c640570e_w587_h587_s127.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="毕业后咖啡时间 SKT STUDIO" title="毕业后咖啡时间 SKT STUDIO"/></a>
+<a href="https://afdian.net/u/a0d140fe493e11e8906652540025c377"><img src="https://pic1.afdiancdn.com/user/a0d140fe493e11e8906652540025c377/avatar/88ffc6a9234986cc34ef55f4b64ad796_w551_h583_s93.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="巴格拉季昂亲王" title="巴格拉季昂亲王"/></a>
+<a href="https://afdian.net/@mycngal"><img src="https://pic1.afdiancdn.com/user/175f8396b50011eab95a52540025c377/avatar/63a0e5f753914e4afbce3d8a99c9c64f_w1080_h1080_s197.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="莫言国G" title="莫言国G"/></a>
+<a href="https://afdian.net/u/699e8f367b4d11eaa21d52540025c377"><img src="https://pic1.afdiancdn.com/user/699e8f367b4d11eaa21d52540025c377/avatar/be9628b3769d4acc0312fbae4adfafbe_w361_h392_s12.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="慕寒幻夜" title="慕寒幻夜"/></a>
+<a href="https://afdian.net/@xiaopu2049"><img src="https://pic1.afdiancdn.com/user/1feecc3cbaf611eab2c652540025c377/avatar/ead4082f1cd23194249a76002f3b9b98_w798_h615_s752.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="SP-time制作组" title="SP-time制作组"/></a>
+<a href="https://afdian.net/u/7604edbcbd2c11eab24f52540025c377"><img src="https://pic1.afdiancdn.com/user/7604edbcbd2c11eab24f52540025c377/avatar/7265e65e21f308ffea37938d2823916b_w1250_h1600_s1494.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="星辰" title="星辰"/></a>
+<a href="https://afdian.net/u/4320fc62df0d11eab52d52540025c377"><img src="https://pic1.afdiancdn.com/user/4320fc62df0d11eab52d52540025c377/avatar/8bbdd37bb86edfa434cd16b7c4cf049b_w1920_h1200_s340.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="CnG天下第一" title="CnG天下第一"/></a>
+<a href="https://afdian.net/u/8b3a03ccb51911ea82b652540025c377"><img src="https://pic1.afdiancdn.com/user/8b3a03ccb51911ea82b652540025c377/avatar/8ef64a1bf04d2d3150a574942b0cf08c_w617_h656_s618.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="墨小菊天下第一" title="墨小菊天下第一"/></a>
+<a href="https://afdian.net/u/3d760d0cfd6211eaa74f52540025c377"><img src="https://pic1.afdiancdn.com/user/3d760d0cfd6211eaa74f52540025c377/avatar/a36ec7f7d47da20e2f08b6528406972b_w376_h377_s40.jpeg?imageView2/1/w/120/h/120" width="40" height="40" alt="十六夜" title="十六夜"/></a>
+
+<details>
+  <summary>点我 打开/关闭 捐赠者列表</summary>
+
+- [NTR天下第一](https://afdian.net/u/613de57082bb11e982ed52540025c377)
+- [kyatana](https://afdian.net/u/e9d4ccf6b4b911ea907652540025c377)
+- [雷之](https://afdian.net/u/ad2d3d66a3f011eba1e052540025c377)
+- [Zero就是零啊](https://afdian.net/u/2c1c2e3eb4f011ea8d4452540025c377)
+- [mzy069](https://afdian.net/u/f3d043f4831311e8b53152540025c377)
+- [Emiya](https://afdian.net/u/c8299728395d11e89de552540025c377)
+- [被炒的炒饭](https://afdian.net/u/b35076f03a0711e8b8f152540025c377)
+- [无名剑侠](https://afdian.net/@wumingjianxia)
+- [mem.wey](https://afdian.net/u/172f8dfc2a4011eb8f5a52540025c377)
+- [声控灯](https://afdian.net/u/d666631cb54711ea9e5952540025c377)
+- [隐_hermity](https://afdian.net/u/793e510cfadd11e88b6c52540025c377)
+- [真恋寄语枫秋](https://afdian.net/u/660987cef20a11eb95c052540025c377)
+- [陈炎西](https://afdian.net/u/94996d86268311eca29652540025c377)
+- [小恸恸](https://afdian.net/u/a424d630273611eab69c52540025c377)
+- [毕业后咖啡时间 SKT STUDIO](https://afdian.net/@skt_studio)
+- [击落夫飞艇](https://afdian.net/u/f88ff312b69c11eab5bb52540025c377)
+- [巴格拉季昂亲王](https://afdian.net/u/a0d140fe493e11e8906652540025c377)
+- [莫言国G](https://afdian.net/@mycngal)
+- [慕寒幻夜](https://afdian.net/u/699e8f367b4d11eaa21d52540025c377)
+- [SP-time制作组](https://afdian.net/@xiaopu2049)
+- [星辰](https://afdian.net/u/7604edbcbd2c11eab24f52540025c377)
+- [音速灰行的起子](https://afdian.net/u/a355a938becf11eaa23652540025c377)
+- [蹦蹦的笨](https://afdian.net/u/e273d0b0c44a11ea9df252540025c377)
+- [CnG天下第一](https://afdian.net/u/4320fc62df0d11eab52d52540025c377)
+- [綦](https://afdian.net/u/e5e533aad92611eba30152540025c377)
+- [墨小菊天下第一](https://afdian.net/u/8b3a03ccb51911ea82b652540025c377)
+- [爱发电用户_C8K6](https://afdian.net/u/ffd8a6d8b50611ea87fc52540025c377)
+- [老张](https://afdian.net/u/d1d17100c6b511eaa13252540025c377)
+- [十六夜](https://afdian.net/u/3d760d0cfd6211eaa74f52540025c377)
+- [大K](https://afdian.net/u/3c41a268c79a11ebaf1052540025c377)
+</details>
 <!-- 在这里填写捐赠者名单 -->
 
-<span id="nav-13"></span>
 
-## Sponsors
+<!-- ## 赞助商
 
-<!-- 在这里填写赞助商名单 -->
+在这里填写赞助商名单
 
-<span id="nav-14"></span>
+<span id="nav-14"></span> -->
 
 ## Special Thanks
+
+感谢不愿透露姓名的热心人士提供的词库
+
+感谢半年以来参与资料站补全计划，一同编辑资料表和提供参考资料的小伙伴们：
+
+<img src="https://pic1.afdiancdn.com/user/613de57082bb11e982ed52540025c377/avatar/2307c01d2a74aaf44583e5ebfe745c14_w2560_h1440_s1797.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="NTR天下第一" title="NTR天下第一"/>
+<img src="https://app.cngal.org/images/Users/Sliots.jpg" width="40" height="40" alt="Sliots" title="Sliots"/>
+<img src="https://app.cngal.org/images/Users/巴格拉季昂亲王.jpg" width="40" height="40" alt="亲王" title="亲王"/>
+<img src="https://app.cngal.org/images/Users/zhl.jpg" width="40" height="40" alt="声控zhl灯" title="声控zhl灯"/>
+<img src="https://app.cngal.org/images/Users/捡垃圾的垃圾佬.jpg" width="40" height="40" alt="捡垃圾的垃圾佬" title="捡垃圾的垃圾佬"/>
+<img src="https://pic.cngal.top/images/2021/11/05/35e3e59e0876.jpg" width="40" height="40" alt="沙雕の方块" title="沙雕の方块"/>
+<img src="https://app.cngal.org/images/Users/昊晨.jpg" width="40" height="40" alt="昊晨" title="昊晨"/>
+<img src="https://app.cngal.org/images/Users/百变一点也不怪.jpg" width="40" height="40" alt="百变一点也不怪" title="百变一点也不怪"/>
+<img src="https://app.cngal.org/images/Users/柳知萧.jpg" width="40" height="40" alt="柳知萧" title="柳知萧"/>
+<img src="https://app.cngal.org/images/Users/磁爆步兵杨永信.jpg" width="40" height="40" alt="磁爆步兵杨永信" title="磁爆步兵杨永信"/>
+<img src="https://app.cngal.org/images/Users/Chr_.png" width="40" height="40" alt="Chr_" title="Chr_"/>
+<img src="https://app.cngal.org/images/Users/Pink Paul.jpg" width="40" height="40" alt="Pink Paul" title="Pink Paul"/>
+<img src="https://app.cngal.org/images/Users/快乐的老鼠宝宝.jpg" width="40" height="40" alt="快乐的老鼠宝宝" title="快乐的老鼠宝宝"/>
+<img src="https://app.cngal.org/images/Users/深盾亲王欧根.jpg" width="40" height="40" alt="深盾亲王欧根" title="深盾亲王欧根"/>
+<img src="https://app.cngal.org/images/Users/隐(不看动漫的死宅).jpg" width="40" height="40" alt="隐" title="隐"/>
+<img src="https://app.cngal.org/images/Users/祢梨.jpg" width="40" height="40" alt="祢梨" title="祢梨"/>
+<img src="https://app.cngal.org/images/Users/绫光.jpg" width="40" height="40" alt="绫光" title="绫光"/>
+<img src="https://app.cngal.org/images/Users/Grayson Kun.jpg" width="40" height="40" alt="Grayson Kun" title="Grayson Kun"/>
+
+九州人士，Sliots，亲王，zhl，隐，捡垃圾的垃圾佬，CriAngel，沙雕の方块，昊晨，我不姓高abc，百变一点也不怪，柳知萧，磁爆步兵杨永信，月骨✾ۖ͡琉璃ೄ೨，zhl，原味葱油饼干，Chr_，Pink Paul，快乐的老鼠宝宝，七海无涯，深盾亲王欧根，Grayson Kun，祢梨，ええと，绫光
+
+
 
 <!-- 在这里填写特别感谢名单，可以是任何人或事物。 -->
 
@@ -270,3 +352,14 @@ CnGal资料站：https://www.cngal.org/
 ## License
 
 [License MIT](LICENSE)
+
+
+
+
+
+
+
+
+
+
+

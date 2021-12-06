@@ -14,47 +14,47 @@
         if (ToolHelper.IsSSR)
         {
             //读取是否提示
-            var isNotShowTip = await _localStorage.GetItemAsync<bool>("isNotShowWASMTip");
-            if (isNotShowTip == false)
-            {
-                SwalOption op = null;
+            /* var isNotShowTip = await _localStorage.GetItemAsync<bool>("isNotShowWASMTip");
+             if (isNotShowTip == false)
+             {
+                 SwalOption op = null;
 
-                op = new SwalOption()
-                {
-                    Category = SwalCategory.Success,
-                    Title = "这里是一些编辑指引",
-                    Content = "网站目前还很脆弱，不要长时间放置在后台，不然你的编辑可能会被吃掉哦；在编辑之前请查看公告区的对应编辑规范，不然也会被吃掉哦",
-                    ShowClose = false
-                };
-                op.ButtonTemplate = new RenderFragment(builder =>
-                {
+                 op = new SwalOption()
+                 {
+                     Category = SwalCategory.Success,
+                     Title = "这里是一些编辑指引",
+                     Content = "网站目前还很脆弱，不要长时间放置在后台，不然你的编辑可能会被吃掉哦；在编辑之前请查看公告区的对应编辑规范，不然也会被吃掉哦",
+                     ShowClose = false
+                 };
+                 op.ButtonTemplate = new RenderFragment(builder =>
+                 {
 
-                    builder.OpenComponent<Button>(0);
-                    builder.AddAttribute(2, nameof(Button.Text), "不再提示");
-                    builder.AddAttribute(3, nameof(Button.Color), Color.Primary);
-                    builder.AddAttribute(4, "class", "me-4");
-                    builder.AddAttribute(5, nameof(Button.IsOutline), true);
-                    builder.AddAttribute(6, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async () =>
-                    {
-                        await _localStorage.SetItemAsync("isNotShowWASMTip", true);
-                        await op.Close();
-                    }));
-                    builder.CloseComponent();
-                    builder.OpenComponent<Button>(1);
-                    builder.AddAttribute(1, nameof(Button.Text), "我知道了");
-                    builder.AddAttribute(3, nameof(Button.Color), Color.Success);
-                    builder.AddAttribute(4, nameof(Button.IsOutline), false);
-                    builder.AddAttribute(5, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async () =>
-                    {
-                        await op.Close();
-                    }));
-                    builder.CloseComponent();
-                });
-                await SwalService.Show(op);
-            }
+                     builder.OpenComponent<Button>(0);
+                     builder.AddAttribute(2, nameof(Button.Text), "不再提示");
+                     builder.AddAttribute(3, nameof(Button.Color), Color.Primary);
+                     builder.AddAttribute(4, "class", "me-4");
+                     builder.AddAttribute(5, nameof(Button.IsOutline), true);
+                     builder.AddAttribute(6, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async () =>
+                     {
+                         await _localStorage.SetItemAsync("isNotShowWASMTip", true);
+                         await op.Close();
+                     }));
+                     builder.CloseComponent();
+                     builder.OpenComponent<Button>(1);
+                     builder.AddAttribute(1, nameof(Button.Text), "我知道了");
+                     builder.AddAttribute(3, nameof(Button.Color), Color.Success);
+                     builder.AddAttribute(4, nameof(Button.IsOutline), false);
+                     builder.AddAttribute(5, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async () =>
+                     {
+                         await op.Close();
+                     }));
+                     builder.CloseComponent();
+                 });
+                 await SwalService.Show(op);
+             }*/
             //获取一次性代码
 
-            /*try
+            try
             {
                 var Model = await Http.GetFromJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/GetOneTimeCode");
                 NavigationManager.NavigateTo("https://app.cngal.org/account/loginfromssr?Code=" + Model.Code + "&ReturnUrl=" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
@@ -62,7 +62,7 @@
             catch(Exception ex)
             {
                 ErrorHandler.ProcessError(ex, "尝试跳转APP模式失败");
-            }*/
+            }
             //跳转
         }
     }

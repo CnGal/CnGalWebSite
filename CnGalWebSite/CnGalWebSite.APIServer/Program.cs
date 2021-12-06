@@ -19,6 +19,12 @@ namespace CnGalWebSite.APIServer
                 {
                     builder.AddCommandLine(args);//设置添加命令行
                 })
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.AddJsonFile("BackUp/ServerSetting.json",
+                        optional: true,
+                        reloadOnChange: true);
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

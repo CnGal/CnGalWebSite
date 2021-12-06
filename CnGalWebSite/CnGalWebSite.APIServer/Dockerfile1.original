@@ -7,7 +7,7 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["CnGalWebSite/CnGalWebSite.APIServer/CnGalWebSite.APIServer.csproj", "CnGalWebSite/CnGalWebSite.APIServer/"]
-COPY ["CnGalWebSite/CnGalWebSite.DataModel/CnGalWebSite.DataModel.csproj", "CnGalWebSite/CnGalWebSite.DataModel/"]
+COPY ["CnGalWebSite/CnGalWebSite.Shared/CnGalWebSite.Shared.csproj", "CnGalWebSite/CnGalWebSite.Shared/"]
 RUN dotnet restore "CnGalWebSite/CnGalWebSite.APIServer/CnGalWebSite.APIServer.csproj"
 COPY . .
 WORKDIR "/src/CnGalWebSite/CnGalWebSite.APIServer"

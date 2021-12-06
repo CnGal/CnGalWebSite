@@ -1,14 +1,14 @@
 version: '3.4'
 
 services:
-  newcngalwebsite.apiserver:
+  cngalwebsite.apiserver:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "80"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-  newcngalwebsite.server:
+  cngalwebsite.server:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:

@@ -3,10 +3,10 @@
   <PropertyGroup Label="Globals">
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
-    <ProjectGuid>8be5929c-068b-4716-bd0f-dced8b7c45c3</ProjectGuid>
+    <ProjectGuid>8c05ff93-54b4-4128-8e03-bac78cda6caa</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
-    <DockerServiceName>newcngalwebsite.apiserver</DockerServiceName>
+    <DockerServiceName>cngalwebsite.apiserver</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
