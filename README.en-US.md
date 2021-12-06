@@ -1,8 +1,12 @@
-<div style="display: flex;justify-content: center;align-items: center;">
+<div align="center">
   <!-- 在此处设置您的项目图标 -->
-  <img src="//app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" height="50" style="margin-right: 20px;"/>
-  <span style="font-size: 35px;">CnGal资料站</span>
+  <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" height="70"/>
+
+# CnGal资料站
+
 </div>
+
+<span id="nav-1"></span>
 <p align="center"  style="margin-top: 10px;">
 <!-- 在这里填写您的项目口标语，最好是一个简短的句子。 -->
     愿每一个CnGal创作者的作品都能不被忘记
@@ -33,22 +37,23 @@
 <details open="open">
   <summary>Click me to Open/Close the directory listing</summary>
 
-- [Internationalization](#internationalization)
-- [Table of Contents](#table-of-contents)
-- [Introductions](#introductions)
-  - [Official Website](#official-website)
-  - [Background](#background)
-- [Graphic Demo](#graphic-demo)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Getting Started](#getting-started)
-- [Maintainer](#maintainer)
-- [Contributors](#contributors)
-- [Community Exchange](#community-exchange)
-- [Part Of Users](#part-of-users)
-- [Donators](#donators)
-- [Special Thanks](#special-thanks)
-- [License](#license)
+- [CnGal资料站](#cngal资料站)
+  - [Internationalization](#internationalization)
+  - [Table of Contents](#table-of-contents)
+  - [Introductions](#introductions)
+    - [Official Website](#official-website)
+    - [Background](#background)
+  - [Graphic Demo](#graphic-demo)
+  - [Features](#features)
+  - [Architecture](#architecture)
+  - [Getting Started](#getting-started)
+  - [Maintainer](#maintainer)
+  - [Contributors](#contributors)
+  - [Community Exchange](#community-exchange)
+  - [Part Of Users](#part-of-users)
+  - [Donators](#donators)
+  - [Special Thanks](#special-thanks)
+  - [License](#license)
 
 </details>
 
