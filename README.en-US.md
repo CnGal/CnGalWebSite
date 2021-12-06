@@ -112,7 +112,7 @@ PWA应用：https://app.cngal.org/
 
 ## Graphic Demo
 
-![主页](https://pic.cngal.top/images/2021/12/06/QQ20211206195920.png)
+![主页](https://app.cngal.org/images/Users/主页.png)
 <!-- 把你项目的demo放在这里，可以是具体的访问地址、图片截图、Gif或者视频等。 -->
 
 <span id="nav-5"></span>
@@ -217,7 +217,7 @@ SDK：.Net 6.0
 ## Maintainer
 Thanks to the maintainers of these projects:
 <!-- 这里填写项目作者的相关信息 -->
-<a href="https://github.com/LittleFish-233"><img src="https://pic.cngal.top/images/2021/11/05/35e3e59e0876.jpg" width="40" height="40" alt="沙雕の方块" title="沙雕の方块"/></a>
+<a href="https://github.com/LittleFish-233"><img src="https://app.cngal.org/images/Users/沙雕方块.jpg" width="40" height="40" alt="沙雕の方块" title="沙雕の方块"/></a>
 
 <details>
   <summary>Click me to Open/Close the maintainer listing</summary>
@@ -332,7 +332,7 @@ CnGal资料站：https://www.cngal.org/
 <img src="https://app.cngal.org/images/Users/巴格拉季昂亲王.jpg" width="40" height="40" alt="亲王" title="亲王"/>
 <img src="https://app.cngal.org/images/Users/zhl.jpg" width="40" height="40" alt="声控zhl灯" title="声控zhl灯"/>
 <img src="https://app.cngal.org/images/Users/捡垃圾的垃圾佬.jpg" width="40" height="40" alt="捡垃圾的垃圾佬" title="捡垃圾的垃圾佬"/>
-<img src="https://pic.cngal.top/images/2021/11/05/35e3e59e0876.jpg" width="40" height="40" alt="沙雕の方块" title="沙雕の方块"/>
+<img src="https://app.cngal.org/images/Users/沙雕方块.jpg" width="40" height="40" alt="沙雕の方块" title="沙雕の方块"/>
 <img src="https://app.cngal.org/images/Users/昊晨.jpg" width="40" height="40" alt="昊晨" title="昊晨"/>
 <img src="https://app.cngal.org/images/Users/百变一点也不怪.jpg" width="40" height="40" alt="百变一点也不怪" title="百变一点也不怪"/>
 <img src="https://app.cngal.org/images/Users/柳知萧.jpg" width="40" height="40" alt="柳知萧" title="柳知萧"/>
