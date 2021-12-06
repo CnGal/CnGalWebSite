@@ -112,7 +112,7 @@ PWA应用：https://app.cngal.org/
 
 ## 图形演示
 
-![主页](https://pic.cngal.top/images/2021/12/06/QQ20211206195920.png)
+![主页](https://app.cngal.org/images/Users/主页.png)
 <!-- 把你项目的demo放在这里，可以是具体的访问地址、图片截图、Gif或者视频等。 -->
 
 <span id="nav-5"></span>
@@ -217,7 +217,7 @@ SDK：.Net 6.0
 ## 维护者
 感谢这些项目的维护者：
 <!-- 这里填写项目作者的相关信息 -->
-<a href="https://github.com/LittleFish-233"><img src="https://pic.cngal.top/images/2021/11/05/35e3e59e0876.jpg" width="40" height="40" alt="沙雕の方块" title="沙雕の方块"/></a>
+<a href="https://github.com/LittleFish-233"><img src="https://app.cngal.org/images/Users/沙雕方块.jpg" width="40" height="40" alt="沙雕の方块" title="沙雕の方块"/></a>
 
 <details>
   <summary>点我 打开/关闭 维护者列表</summary>
@@ -327,24 +327,7 @@ CnGal资料站：https://www.cngal.org/
 
 感谢半年以来参与资料站补全计划，一同编辑资料表和提供参考资料的小伙伴们：
 
-<img src="https://pic1.afdiancdn.com/user/613de57082bb11e982ed52540025c377/avatar/2307c01d2a74aaf44583e5ebfe745c14_w2560_h1440_s1797.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="NTR天下第一" title="NTR天下第一"/>
-<img src="https://app.cngal.org/images/Users/Sliots.jpg" width="40" height="40" alt="Sliots" title="Sliots"/>
-<img src="https://app.cngal.org/images/Users/巴格拉季昂亲王.jpg" width="40" height="40" alt="亲王" title="亲王"/>
-<img src="https://app.cngal.org/images/Users/zhl.jpg" width="40" height="40" alt="声控zhl灯" title="声控zhl灯"/>
-<img src="https://app.cngal.org/images/Users/捡垃圾的垃圾佬.jpg" width="40" height="40" alt="捡垃圾的垃圾佬" title="捡垃圾的垃圾佬"/>
-<img src="https://pic.cngal.top/images/2021/11/05/35e3e59e0876.jpg" width="40" height="40" alt="沙雕の方块" title="沙雕の方块"/>
-<img src="https://app.cngal.org/images/Users/昊晨.jpg" width="40" height="40" alt="昊晨" title="昊晨"/>
-<img src="https://app.cngal.org/images/Users/百变一点也不怪.jpg" width="40" height="40" alt="百变一点也不怪" title="百变一点也不怪"/>
-<img src="https://app.cngal.org/images/Users/柳知萧.jpg" width="40" height="40" alt="柳知萧" title="柳知萧"/>
-<img src="https://app.cngal.org/images/Users/磁爆步兵杨永信.jpg" width="40" height="40" alt="磁爆步兵杨永信" title="磁爆步兵杨永信"/>
-<img src="https://app.cngal.org/images/Users/Chr_.png" width="40" height="40" alt="Chr_" title="Chr_"/>
-<img src="https://app.cngal.org/images/Users/Pink Paul.jpg" width="40" height="40" alt="Pink Paul" title="Pink Paul"/>
-<img src="https://app.cngal.org/images/Users/快乐的老鼠宝宝.jpg" width="40" height="40" alt="快乐的老鼠宝宝" title="快乐的老鼠宝宝"/>
-<img src="https://app.cngal.org/images/Users/深盾亲王欧根.jpg" width="40" height="40" alt="深盾亲王欧根" title="深盾亲王欧根"/>
-<img src="https://app.cngal.org/images/Users/隐(不看动漫的死宅).jpg" width="40" height="40" alt="隐" title="隐"/>
-<img src="https://app.cngal.org/images/Users/祢梨.jpg" width="40" height="40" alt="祢梨" title="祢梨"/>
-<img src="https://app.cngal.org/images/Users/绫光.jpg" width="40" height="40" alt="绫光" title="绫光"/>
-<img src="https://app.cngal.org/images/Users/Grayson Kun.jpg" width="40" height="40" alt="Grayson Kun" title="Grayson Kun"/>
+<img src="https://pic1.afdiancdn.com/user/613de57082bb11e982ed52540025c377/avatar/2307c01d2a74aaf44583e5ebfe745c14_w2560_h1440_s1797.jpg?imageView2/1/w/120/h/120" width="40" height="40" alt="NTR天下第一" title="NTR天下第一"/> <img src="https://app.cngal.org/images/Users/Sliots.jpg" width="40" height="40" alt="Sliots" title="Sliots"/> <img src="https://app.cngal.org/images/Users/巴格拉季昂亲王.jpg" width="40" height="40" alt="亲王" title="亲王"/> <img src="https://app.cngal.org/images/Users/zhl.jpg" width="40" height="40" alt="声控zhl灯" title="声控zhl灯"/> <img src="https://app.cngal.org/images/Users/捡垃圾的垃圾佬.jpg" width="40" height="40" alt="捡垃圾的垃圾佬" title="捡垃圾的垃圾佬"/> <img src="https://app.cngal.org/images/Users/沙雕方块.jpg" width="40" height="40" alt="沙雕の方块" title="沙雕の方块"/> <img src="https://app.cngal.org/images/Users/昊晨.jpg" width="40" height="40" alt="昊晨" title="昊晨"/> <img src="https://app.cngal.org/images/Users/百变一点也不怪.jpg" width="40" height="40" alt="百变一点也不怪" title="百变一点也不怪"/> <img src="https://app.cngal.org/images/Users/柳知萧.jpg" width="40" height="40" alt="柳知萧" title="柳知萧"/> <img src="https://app.cngal.org/images/Users/磁爆步兵杨永信.jpg" width="40" height="40" alt="磁爆步兵杨永信" title="磁爆步兵杨永信"/> <img src="https://app.cngal.org/images/Users/Chr_.png" width="40" height="40" alt="Chr_" title="Chr_"/> <img src="https://app.cngal.org/images/Users/Pink Paul.jpg" width="40" height="40" alt="Pink Paul" title="Pink Paul"/> <img src="https://app.cngal.org/images/Users/快乐的老鼠宝宝.jpg" width="40" height="40" alt="快乐的老鼠宝宝" title="快乐的老鼠宝宝"/> <img src="https://app.cngal.org/images/Users/深盾亲王欧根.jpg" width="40" height="40" alt="深盾亲王欧根" title="深盾亲王欧根"/> <img src="https://app.cngal.org/images/Users/隐(不看动漫的死宅).jpg" width="40" height="40" alt="隐" title="隐"/> <img src="https://app.cngal.org/images/Users/祢梨.jpg" width="40" height="40" alt="祢梨" title="祢梨"/> <img src="https://app.cngal.org/images/Users/绫光.jpg" width="40" height="40" alt="绫光" title="绫光"/> <img src="https://app.cngal.org/images/Users/Grayson Kun.jpg" width="40" height="40" alt="Grayson Kun" title="Grayson Kun"/>
 
 九州人士，Sliots，亲王，zhl，隐，捡垃圾的垃圾佬，CriAngel，沙雕の方块，昊晨，我不姓高abc，百变一点也不怪，柳知萧，磁爆步兵杨永信，月骨✾ۖ͡琉璃ೄ೨，zhl，原味葱油饼干，Chr_，Pink Paul，快乐的老鼠宝宝，七海无涯，深盾亲王欧根，Grayson Kun，祢梨，ええと，绫光
 
