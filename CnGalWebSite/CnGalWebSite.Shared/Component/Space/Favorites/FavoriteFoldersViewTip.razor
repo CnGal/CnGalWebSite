@@ -1,0 +1,97 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+
+@if (ViewOnFavoriteFolderId!=0)
+{
+    <FavoriteObjectsViewTip Input="FavoriteObjectInput" OnClickUrl="OnClickUrl" OnReturn="OnReturn" Title="@Title" Id="ViewOnFavoriteFolderId" IsCurrentUser="IsCurrentUser" ></FavoriteObjectsViewTip>
+}
+else
+{
+<div class=" rounded shadow  bg-opacity rounded ps-3 pe-3 pt-3 pb-3 mb-2" style="display: flex; flex-direction: row; justify-content: space-between;">
+    <h5 class="fw-bold font-color" style="margin-bottom:auto;margin-top:auto;"><i class="fa fa-folder-open"></i>&nbsp;&nbsp;收藏夹</h5>
+    @if (IsCurrentUser)
+    {
+        <Button @onclick="OnManage" class="btn-sm" Color="Color.Dark" IsOutline="true" Size="Size.Small" Icon="fa fa-pencil-square" style="float: right">
+            &nbsp;管理
+        </Button>
+    }
+
+</div>
+    @if (Model != null && Model.Favorites != null)
+    {
+        foreach (var item in Model.Favorites)
+        {
+            <FavoriteFolderInforViewTip Model="item" OnClickLayout="OnClickFolder"></FavoriteFolderInforViewTip>
+        }
+    }
+}
+
+@code {
+
+    public FavoriteFoldersViewModel Model { get; set; }
+
+    public PagedSortedAndFilterInput FavoriteObjectInput { get; set; } = new PagedSortedAndFilterInput();
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    [Parameter]
+    public string UserId { get; set; }
+    [Parameter]
+    public bool IsCurrentUser { get; set; }
+
+    public long ViewOnFavoriteFolderId { get; set; }
+    public string Title { get; set; }
+
+    public async Task Refresh(string id)
+    {
+        UserId = id;
+        await OnInitializedAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(UserId))
+            {
+                return;
+            }
+            Model = await Http.GetFromJsonAsync<FavoriteFoldersViewModel>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/" + UserId);
+
+            StateHasChanged();
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取收藏夹列表失败");
+        }
+    }
+
+    public void OnClickFolder(FavoriteFolderAloneModel model)
+    {
+        ViewOnFavoriteFolderId = model.Id;
+        FavoriteObjectInput.FilterText = model.Id.ToString();
+        Title = model.Name;
+        StateHasChanged();
+    }
+
+    public void OnReturn()
+    {
+        ViewOnFavoriteFolderId = 0;
+        StateHasChanged();
+    }
+    public async Task OnManage()
+    {
+        await OnClickUrl.InvokeAsync(new NavigateModel
+        {
+            Title = "管理收藏夹列表",
+            Icon = "fa fa-folder-open",
+            Url = "/space/EditSpaceFavoriteFolders/" + UserId
+        });
+    }
+}

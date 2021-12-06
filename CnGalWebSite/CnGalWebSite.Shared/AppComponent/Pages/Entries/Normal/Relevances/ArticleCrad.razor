@@ -1,0 +1,15 @@
+﻿<a class="a-font-color" style="display:flex;" href="@("/articles/index/"+Model.ArticleId)">
+    <div>
+        <img src="@Model.Image" alt="@Model.Title" style=" width: 130px;">
+    </div>
+    <div class="ms-3" style=" display: flex; flex-direction: column;justify-content: space-between;">
+        <div style=" font-size: larger; -webkit-line-clamp: 1;" class="home-card-name-text">@Model.Title</div>
+        <div class="home-card-name-text" style="font-size: 12px; color: gray;">@Model.Description</div>
+    </div>
+</a>
+
+@code {
+    [Parameter]
+    public ArticleCardModel Model { get; set; }
+
+}

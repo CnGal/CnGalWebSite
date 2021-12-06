@@ -1,0 +1,22 @@
+﻿<div>
+    <div style="font-size:large">
+        @Model.Name
+    </div>
+    <div style="font-size: x-small; color: gray; white-space: break-spaces;" class="mt-2"> 
+        @((Model.PubishTime??Model.CreateTime).ToString("yyyy-MM-dd HH:mm")+ "    阅读 "+ @Model.ReaderCount +"    点赞 " +@Model.ThumbsUpCount + "    评论 "+ @Model.CommentCount)
+    </div>
+    <div class="bg-main mt-3" style="height:2px;width:50px" >
+
+    </div>
+    <div class="mt-3">
+        <AuthorCard UserId="@UserInfor.Id" UserName="@UserInfor.UserName" Image="@UserInfor.PhotoPath" Ranks="@UserInfor.Ranks" Text="@("积分 "+UserInfor.Integral)" />
+
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public UserInforViewModel UserInfor { get; set; } = new UserInforViewModel { Ranks = new List<RankViewModel>() };
+    [Parameter]
+    public ArticleViewModel Model { get; set; }
+}

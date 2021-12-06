@@ -1,0 +1,59 @@
+﻿@inject ToastService ToastService
+@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+<div style="display: flex; flex-direction: column;">
+    <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="@Title" Url="@Url" ShowButton="IsShowRefresh" UrlName="@(IsShowRefresh?"换一批":"查看更多")" OnClick="Refresh" Icon="fa fa-refresh" />
+    <div class="row m-0">
+        @foreach (var item in Items)
+        {
+            <div class="col-6 mb-2 ps-1 pe-1 mt-1">
+                <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@item"></CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard>
+            </div>
+        }
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel> Items { get; set; } = new List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>();
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Url { get; set; }
+    [Parameter]
+    public string API { get; set; }
+    [Parameter]
+    public string Type { get; set; }
+
+    [Parameter]
+    public bool IsShowRefresh { get; set; }
+    [Parameter]
+    public int maxCount { get; set; } = 6;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Items.AddRange(await GetHomeCards(API, Type,false)??new List<Normal.Cards.MainImageCardModel>());
+    }
+    private async Task Refresh()
+    {
+        var temp = await GetHomeCards(API, Type, true);
+        if(temp==null)
+        {
+            return;
+        }
+        Items.AddRange(temp);
+        if(Items.Count>=6)
+        {
+            Items.RemoveRange(0, maxCount);
+        }
+        StateHasChanged();
+    }
+
+    private async Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>>
+            GetHomeCards(string apiUrl, string type, bool isRefresh)
+    {
+        return await _dataCacheService.GetHomePageListCardMode(apiUrl, type,maxCount, isRefresh);
+    }
+}

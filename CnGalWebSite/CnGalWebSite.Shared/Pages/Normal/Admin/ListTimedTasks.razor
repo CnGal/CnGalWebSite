@@ -1,0 +1,405 @@
+﻿@page "/admin/listtimedtasks"
+@attribute [Authorize(Roles = "Admin")]
+@inject IAuthService AuthService
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+
+<TitleTip></TitleTip>
+
+<div class="">
+    <div class="" style="padding-right: 0;padding-left: 0;">
+        <div class="  rounded shadow  bg-opacity p-3">
+            <h3 class="fw-bold text-center">定时任务版块</h3>
+            <p class="text-center" style="color: gray;margin-top:20px">
+                <i class="fa fa-pause fa-fw "></i>
+                <span class="article-infor-text">@(InforModel.IsPasue + "个任务暂停")</span>&nbsp;&nbsp;&nbsp;
+
+                <i class="fa fa-close fa-fw "></i>
+                <span class="article-infor-text">@(InforModel.IsLastFail + "个任务失败")</span>
+                @if (IsSmallScreen)
+                {
+                    <br />
+                }
+                else
+                {
+                    <span>&nbsp; &nbsp; &nbsp;</span>
+                }
+
+                <i class="fa fa-paper-plane fa-fw "></i>
+                <span class="article-infor-text">@(InforModel.IsRuning + "个任务正在运行")</span>&nbsp;&nbsp;&nbsp;
+
+                <i class="fa fa-chrome fa-fw "></i>
+                <span class="article-infor-text">@("总计"+InforModel.All + "个定时任务")</span>
+
+            </p>
+        </div>
+
+        <div class="mt-3" style="padding-right: 0;padding-left: 0;">
+            <div class=" rounded shadow -lg p-4 bg-opacity">
+                <Table TItem="ListTimedTaskAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
+                       ShowExtendButtons="true" ExtendButtonColumnWidth="270" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+                       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+                    <TableToolbarTemplate>
+                        <TableToolbarButton TItem="ListTimedTaskAloneModel" Color="Color.Success" Icon="fa fa-plus" Text="添加"
+                                            OnClickCallback="@(async (IEnumerable<ListTimedTaskAloneModel> e)=> {await OnEditModel(new ListTimedTaskAloneModel());})" IsAsync="true" />
+                        <TableToolbarButton TItem="ListTimedTaskAloneModel" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" OnClickCallback="OnRunClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListTimedTaskAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="取消暂停" OnClickCallback="OnPauseClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListTimedTaskAloneModel" Color="Color.Success" Icon="fa fa-pause" Text="暂停" OnClickCallback="OnUnPauseClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListTimedTaskAloneModel" Color="Color.Danger" Icon="fa fa-close" Text="删除" OnClickCallback="OnDeleteClick" IsAsync="true" />
+
+                    </TableToolbarTemplate>
+                    <TableColumns>
+                        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
+                        <TableColumn @bind-Field="@context.Name" Searchable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+                        <TableColumn @bind-Field="@context.IsPause" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+                        <TableColumn @bind-Field="@context.IsRuning" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+                        <TableColumn @bind-Field="@context.IsLastFail" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+                        <TableColumn @bind-Field="@context.Type" Sortable="true" Width="200" />
+                        <TableColumn @bind-Field="@context.Parameter" Sortable="true" Width="200" AllowTextWrap="true" />
+                        <TableColumn @bind-Field="@context.ExecuteType" AllowTextWrap="true" Width="200" />
+
+                        <TableColumn @bind-Field="@context.IntervalTime" Sortable="true" Width="150" />
+
+                        <TableColumn @bind-Field="@context.EveryTime" Searchable="true" Sortable="true" Width="170" />
+                        <TableColumn @bind-Field="@context.LastExecutedTime" Searchable="true" Sortable="true" Width="170" />
+                    </TableColumns>
+                    <RowButtonTemplate>
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-pencil" Text="编辑" IsAsync="true" OnClickCallback="@(() =>  OnEditModel( context))" />
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" IsAsync="true" OnClickCallback="@(() => OnRowRunClick( new int[] { context.Id } ,true))" />
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-comments-o" Text="切换运行状态" IsAsync="true" OnClickCallback="@(() => OnRowEditIsPauseClick(new int[] { context.Id }, !context.IsPause, true))" />
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-close" Text="删除" IsAsync="true" OnClickCallback="@(() =>  OnRowDeleteClick(new int[] { context.Id } ,true))" />
+                    </RowButtonTemplate>
+                </Table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+@code {
+    [NotNull]
+    private Table<ListTimedTaskAloneModel>? TableRows { get; set; }
+    private List<ListTimedTaskAloneModel> SelectedRows { get; set; } = new();
+
+    public ListTimedTasksInforViewModel InforModel { get; set; } = new ListTimedTasksInforViewModel();
+    public ListTimedTasksViewModel ListModel { get; set; } = new ListTimedTasksViewModel { TimedTasks = new List<ListTimedTaskAloneModel>() };
+
+    private ListTimedTaskAloneModel searchModel { get; set; } = new ListTimedTaskAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    #region 获取屏幕大小
+
+    /// <summary>
+    /// 获得/设置 IJSRuntime 实例
+    /// </summary>
+    [Inject]
+    [System.Diagnostics.CodeAnalysis.NotNull]
+    public IJSRuntime? JSRuntime { get; set; }
+
+
+
+    public bool IsSmallScreen { get; set; }
+    public bool IsNormalScreen { get; set; }
+    public bool IsLargeScreen { get; set; }
+
+
+    private JSInterop<ListTimedTasks>? Interop { get; set; }
+    /// <summary>
+    /// OnAfterRenderAsync 方法
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            Interop = new JSInterop<ListTimedTasks>(JSRuntime);
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
+        }
+    }
+
+    /// <summary>
+    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
+    /// </summary>
+    /// <returns></returns>
+    [JSInvokable]
+    public void SetCollapsed(int width)
+    {
+        if (IsSmallScreen != (width < 768))
+        {
+            IsSmallScreen = width < 768;
+
+            StateHasChanged();
+        }
+        if (IsNormalScreen != (width >= 768 && width < 2000))
+        {
+            IsNormalScreen = width >= 768 && width < 2000;
+
+            StateHasChanged();
+        }
+        if (IsLargeScreen != (width >= 2000))
+        {
+            IsLargeScreen = width >= 2000;
+
+            StateHasChanged();
+        }
+    }
+    #endregion
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            InforModel = await Http.GetFromJsonAsync<ListTimedTasksInforViewModel>(ToolHelper.WebApiPath + "api/timedtasks/listtimedtasks");
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取定时任务数据");
+        }
+
+    }
+
+    private async Task<QueryData<ListTimedTaskAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<TimedTasksPagesInfor>(ToolHelper.WebApiPath + "api/timedtasks/GetTimedTaskList", new TimedTasksPagesInfor { SearchModel = searchModel, Options = options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListTimedTaskAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取定时任务列表");
+            return new QueryData<ListTimedTaskAloneModel>();
+        }
+    }
+
+
+    private async Task OnRowEditIsPauseClick(int[] ids, bool isPause, bool showMessage)
+    {
+        string tempString = isPause == true ? "暂停" : "取消暂停";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<PauseTimedTaskModel>(ToolHelper.WebApiPath + "api/timedtasks/PauseTimedTask", new PauseTimedTaskModel { Ids = ids, IsPause = isPause });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "定时任务失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "定时任务成功", tempString + "定时任务成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "定时任务失败");
+        }
+    }
+
+    private async Task OnPauseClick(IEnumerable<ListTimedTaskAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改定时任务运行状态", "请选中定时任务");
+            return;
+        }
+
+        await OnRowEditIsPauseClick(items.Select(s => s.Id).ToArray(), true, false);
+
+        await ToastService.Success("取消暂停定时任务成功", "取消暂停定时任务成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnUnPauseClick(IEnumerable<ListTimedTaskAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改定时任务运行状态", "请选中定时任务");
+            return;
+        }
+
+        await OnRowEditIsPauseClick(items.Select(s => s.Id).ToArray(), false, false);
+
+        await ToastService.Success("暂停定时任务成功", "暂停定时任务成功");
+        await TableRows.QueryAsync();
+    }
+
+    private async Task OnRowDeleteClick(int[] ids, bool showMessage)
+    {
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<DeleteTimedTaskModel>(ToolHelper.WebApiPath + "api/timedtasks/DeleteTimedTask", new DeleteTimedTaskModel { Ids = ids });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("删除定时任务失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success("删除定时任务成功", "删除定时任务成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "删除定时任务失败");
+        }
+    }
+
+    private async Task OnDeleteClick(IEnumerable<ListTimedTaskAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有删除定时任务", "请选中定时任务");
+            return;
+        }
+
+        await OnRowDeleteClick(items.Select(s => s.Id).ToArray(), false);
+
+        await ToastService.Success("删除定时任务成功", "删除定时任务成功");
+        await TableRows.QueryAsync();
+    }
+
+
+    private async Task OnRowRunClick(int[] ids, bool showMessage)
+    {
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<RunTimedTaskModel>(ToolHelper.WebApiPath + "api/timedtasks/RunTimedTask", new RunTimedTaskModel { Ids = ids });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("执行定时任务失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success("执行定时任务成功", "执行定时任务成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "执行定时任务失败");
+        }
+    }
+
+    private async Task OnRunClick(IEnumerable<ListTimedTaskAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有执行定时任务", "请选中定时任务");
+            return;
+        }
+
+        await OnRowRunClick(items.Select(s => s.Id).ToArray(), false);
+
+        await ToastService.Success("执行定时任务成功", "执行定时任务成功");
+        await TableRows.QueryAsync();
+    }
+
+    [Inject]
+    [NotNull]
+    private DialogService? DialogService { get; set; }
+
+    public async Task OnEditModel(ListTimedTaskAloneModel item)
+    {
+        var model = Utility.GenerateEditorItems<ListTimedTaskAloneModel>();
+        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
+        //item.Data = Foo.GenerateHobbys(Localizer);
+        var option = new EditDialogOption<ListTimedTaskAloneModel>()
+        {
+            Title = item.Id == 0 ? "添加定时任务" : "编辑定时任务",
+            Model = item,
+            Items = model,
+            OnCloseAsync = () =>
+            {
+                //Trace.Log("关闭按钮被点击");
+                return Task.CompletedTask;
+            },
+            OnSaveAsync = async context =>
+            {
+                // Trace.Log("保存按钮被点击");
+                var editModel = (ListTimedTaskAloneModel)context.Model;
+                await EditData(editModel);
+                return true;
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
+    }
+
+    public async Task EditData(ListTimedTaskAloneModel model)
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<ListTimedTaskAloneModel>(ToolHelper.WebApiPath + (model.Id == 0 ? "api/timedtasks/AddTimedTask" : "api/timedtasks/UpdateTimedTaskData"), model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("保存数据失败", obj.Error);
+            }
+            else
+            {
+
+                await ToastService.Success("保存数据成功", "保存数据成功，不会留下审核记录和编辑记录");
+                await TableRows.QueryAsync();
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "保存数据失败");
+        }
+    }
+    #region 释放实例
+    private async ValueTask DisposeAsyncCore()
+    {
+        if (Interop != null)
+        {
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
+            Interop.Dispose();
+            Interop = null;
+        }
+    }
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore();
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

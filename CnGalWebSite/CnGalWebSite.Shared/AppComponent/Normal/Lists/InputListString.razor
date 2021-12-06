@@ -1,0 +1,28 @@
+﻿<CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="@Title" ShowButton="true" UrlName="添加" OnClick="OnAddinfor" Icon="fa fa-plus"/>
+<div class="row">
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        int temp = i;
+        <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mt-2">
+            <AutoComplete Items="@AutoCompleteItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model[temp].DisplayName" placeholder="唯一名称" />
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<RelevancesModel> Model { get; set; }
+    [Parameter]
+    public IEnumerable<string> AutoCompleteItems { get; set; }
+
+
+    [Parameter]
+    public string Title { get; set; }
+
+    private Task OnAddinfor()
+    {
+        Model.Add(new RelevancesModel());
+        return Task.CompletedTask;
+    }
+
+}

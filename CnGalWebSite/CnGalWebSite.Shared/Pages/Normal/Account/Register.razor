@@ -1,0 +1,170 @@
+﻿@page "/account/register/{*ReturnUrl}"
+@page "/account/register/"
+@inject IAuthService AuthService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+@inject ToastService? ToastService
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+
+<TitleTip></TitleTip>
+<CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
+
+
+
+<div class="rounded  rounded shadow  bg-opacity  p-3">
+    <h2 class="mb-4 text-center">注册新用户</h2>
+    <div  class="form-group col-12 mt-4  mb-0">
+
+        <div class="row">
+            <div class="form-group col-12  col-sm-12">
+                <BootstrapInput @bind-Value="Model.Email" type="email" ShowLabel="true"/>
+            </div>
+            <div class="form-group col-12  col-sm-12">
+                <BootstrapInput @bind-Value="Model.Name" ShowLabel="true"/>
+            </div>
+            <div class="form-group col-12">
+                <BootstrapInput @bind-Value="Model.Password" type="password" ShowLabel="true"/>
+            </div>
+            <div class="form-group col-12">
+                <BootstrapInput @bind-Value="Model.ConfirmPassword" type="password" ShowLabel="true"/>
+            </div>
+            <div class="form-group col-12">
+                <a href="/articles/index/225" class="link-primary">CnGal资料站隐私协议</a>
+            </div>
+            <div class="form-group col-6">
+                <Button Color="Color.Primary"  IsOutline="true" style="width:100%" @onclick="@(()=>OnLogin())">登录</Button>
+            </div>
+            <div class="form-group col-6">
+                <Button Color="Color.Primary"  IsAsync="true" style="width:100%" OnClick="HandleRegistration">注册</Button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string ReturnUrl { get; set; }
+
+    private int widgetId = -1;
+
+    private DotNetObjectReference<Register> objRef;
+
+    private RegisterModel Model = new RegisterModel();
+
+    bool isSuccess = true;
+
+    string Challenge = "";
+    string Validate = "";
+    string Seccode = "";
+    bool IsInitGeetest = false;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    private async Task HandleRegistration()
+    {
+        try
+        {
+            var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode");
+
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeAsync<string>("initGeetestBindCAPTCHA", objRef, geetestCodeModel.Gt, geetestCodeModel.Challenge, geetestCodeModel.Success);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "初始化极验人机验证失败");
+            return;
+        }
+        isSuccess = true;
+        int count = 0;
+        while (isSuccess)
+        {
+            /*if (count > 5)
+            {
+                isSuccess = false;
+            }*/
+            await Task.Delay(500);
+            count++;
+        }
+    }
+
+    private async Task<bool> InitGeetest()
+    {
+        //初始化人机验证
+        try
+        {
+            //获取词条信息
+            var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode");
+
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeAsync<string>("initGeetestBindCAPTCHA", objRef, geetestCodeModel.Gt, geetestCodeModel.Challenge, geetestCodeModel.Success);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "初始化极验人机验证失败");
+            return false;
+        }
+    }
+
+
+    [JSInvokable]
+    public async Task OnChecked(string challenge, string validate, string seccode)
+    {
+        try
+        {
+            Model.Challenge = challenge;
+            Model.Validate = validate;
+            Model.Seccode = seccode;
+
+
+            var result = await AuthService.Register(Model);
+
+            if (result.Successful)
+            {
+                _dataCacheService.UserName = Model.Name;
+                NavigationManager.NavigateTo(Provider,"/account/ConfirmEmailRegister/" + ReturnUrl, "验证邮箱", "fa-at");
+            }
+            else
+            {
+                await ToastService.Error("注册失败","参数错误 "+ result.Error);
+                isSuccess = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "注册失败");
+            isSuccess = false;
+        }
+    }
+
+    [JSInvokable]
+    public Task OnCancel()
+    {
+        isSuccess = false;
+        return Task.CompletedTask;
+    }
+
+
+    private async void OnLogin()
+    {
+        try
+        {
+            NavigationManager.NavigateTo(Provider,"/account/login/" + ReturnUrl, "登入", "fa fa-sign-in");
+        }
+        catch
+        {
+            await ToastService.Error("尝试导航失败", "请尝试刷新页面");
+        }
+    }
+    public void Dispose()
+    {
+        objRef?.Dispose();
+    }
+}

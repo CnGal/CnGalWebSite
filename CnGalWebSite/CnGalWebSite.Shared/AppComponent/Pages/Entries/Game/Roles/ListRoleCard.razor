@@ -1,0 +1,29 @@
+﻿<div class="row m-0">
+    @foreach (var item in Items)
+    {
+        <div class="col-6 pe-1 p-0 mb-3">
+            <RoleCard Model="item" />
+
+        </div>
+    }
+</div>
+
+@code {
+    public List<RoleCardModel> Items { get; set; } = new List<RoleCardModel>();
+    [Parameter]
+    public List<RoleInforModel> Model { get; set; } = new List<RoleInforModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        foreach(var item in Model)
+        {
+            Items.Add(new RoleCardModel
+            {
+                CV = item.CV,
+                Image = item.ImagePath,
+                Name = item.Name,
+                EntryId=item.Id,
+            });
+        }
+    }
+}

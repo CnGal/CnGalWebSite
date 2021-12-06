@@ -1,0 +1,135 @@
+﻿@page "/entries/news/{Id}"
+
+
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService ToastService
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+@inject IJSRuntime JS
+@inject DialogService DialogService
+@inject IDataCacheService _dataCatcheService
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@(Model.Name + " - 全部动态")" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+}
+
+
+<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.HeadBar Title="全部动态" />
+
+<div style="margin-top: 45px; width: 100%;margin-bottom:65px; ">
+    @if (isReady)
+    {
+        if (isNotFound)
+        {
+            <CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard EntryName="@Id" Type="未找到词条" />
+        }
+        else
+        {
+            <div>
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ListNewsCard Model="News" />
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+    }
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+
+    bool isReady = false;
+    bool isNotFound = false;
+
+    public EntryIndexViewModel Model { get; set; } = new EntryIndexViewModel
+    {
+        ArticleRelevances = new List<ArticleInforTipViewModel>(),
+        EntryRelevances = new List<EntryInforTipViewModel>(),
+        OtherRelevances = new List<RelevancesKeyValueModel>(),
+        Information = new List<InformationsModel>(),
+        Pictures = new List<PicturesViewModel>(),
+        Tags = new List<TagsViewModel>(),
+        MainPage = "# 123",
+        Type = EntryType.Staff,
+        StaffGames = new List<StaffGameModel>(),
+        GroupGames = new List<EntryInforTipViewModel>()
+
+    };
+    public List<CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCardModel> News = new List<CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCardModel>();
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    public bool IsAdmin { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await authenticationStateTask;
+        IsAdmin = user.User.IsInRole("Admin");
+
+        isReady = false;
+        isNotFound = false;
+        //获取词条信息
+        var model = await _dataCatcheService.EntryIndexPageCatche.GetCatche(Id);
+        if (model == null)
+        {
+            Model = new EntryIndexViewModel
+            {
+                ArticleRelevances = new List<ArticleInforTipViewModel>(),
+                EntryRelevances = new List<EntryInforTipViewModel>(),
+                OtherRelevances = new List<RelevancesKeyValueModel>(),
+                Information = new List<InformationsModel>(),
+                Pictures = new List<PicturesViewModel>(),
+                Tags = new List<TagsViewModel>(),
+                MainPage = "# 123",
+                Type = EntryType.Staff,
+                StaffGames = new List<StaffGameModel>(),
+                GroupGames = new List<EntryInforTipViewModel>()
+
+            };
+            isNotFound = true;
+            isReady = true;
+            StateHasChanged();
+            return;
+        }
+
+        Model = model;
+        //判断如果名称为空则返回主页
+        if (string.IsNullOrWhiteSpace(Model.Name))
+        {
+            NavigationManager.NavigateTo("/home");
+        }
+
+        foreach (var item in Model.NewsOfEntry)
+        {
+            News.Add(new CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCardModel
+            {
+                Image = item.Image,
+                GroupId = item.GroupId,
+                Text = item.Title,
+                Time = item.HappenedTime,
+                Title = item.GroupName,
+                Type = item.NewsType,
+                Url = item.Link,
+                IsNeedLayout = false
+            });
+        }
+        isReady = true;
+        StateHasChanged();
+
+
+    }
+}

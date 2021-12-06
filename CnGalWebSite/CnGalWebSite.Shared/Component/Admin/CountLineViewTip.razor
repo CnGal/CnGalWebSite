@@ -1,0 +1,73 @@
+﻿@inject ToastService ToastService
+@inject HttpClient Http
+@implements IDisposable
+
+@if(isReady)
+{
+    <div class="card h-100  rounded shadow  bg-opacity p-4" style="border:0px">
+        <div style="height:100%">
+            <Chart ChartType="@(Stacked?ChartType.Bar:ChartType.Line)" OnInitAsync="@OnInit" @ref="LineChart" />
+        </div>
+    </div>
+    
+}
+
+@code {
+    [Parameter]
+    public string Url { get; set; }
+    [Parameter]
+    public bool Stacked { get; set; }
+    bool isReady = false;
+    ChartDataSource result =  new ChartDataSource();
+    [NotNull]
+    private Chart LineChart { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            var temp = await Http.GetStringAsync(Url);
+            Newtonsoft.Json.Linq.JObject obj = Newtonsoft.Json.Linq.JObject.Parse(temp);
+            result = obj.ToObject<ChartDataSource>();
+            if (Stacked)
+            {
+                result.Options.X.Stacked = true;
+                result.Options.Y.Stacked = true;
+            }
+            isReady = true;
+            StateHasChanged();
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取图表数据失败");
+        }
+    }
+
+    private Task<ChartDataSource> OnInit()
+    {
+        try
+        {
+            if (result == null)
+            {
+                result = new ChartDataSource();
+            }
+            return Task.FromResult(result);
+        }
+        catch
+        {
+            return Task.FromResult(result);
+        }
+    }
+    public void Dispose()
+    {
+        if (LineChart != null)
+        {
+            LineChart.Dispose();
+        }
+        GC.SuppressFinalize(this);
+    }
+}
+

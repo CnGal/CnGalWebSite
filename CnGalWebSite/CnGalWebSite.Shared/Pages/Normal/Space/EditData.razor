@@ -1,0 +1,16 @@
+﻿@page "/space/editdata/{Id}"
+@attribute [Authorize]
+
+@inject IDataCacheService _dataCacheService
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Space.EditData Id="@Id" ></CnGalWebSite.Shared.Pages.Apps.Space.EditData>
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Space.EditData Id="@Id" ></CnGalWebSite.Shared.Pages.Webs.Space.EditData>
+}
+@code{
+    [Parameter]
+    public string Id { get; set; }
+}

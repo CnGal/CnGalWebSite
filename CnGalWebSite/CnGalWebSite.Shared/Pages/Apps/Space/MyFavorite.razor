@@ -1,0 +1,41 @@
+﻿@page "/space/myfavorite"
+
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService ToastService
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+@inject IJSRuntime JS
+@inject DialogService DialogService
+@inject IDataCacheService _dataCatcheService
+
+@if (string.IsNullOrWhiteSpace(_dataCatcheService.UserInfor.UserName) == false)
+{
+    <TitleTip Title="@(_dataCatcheService.UserInfor.UserName + " - CnGal 中文galgame资料站")" Description="@_dataCatcheService.UserInfor.PersonalSignature" Image="@_dataCatcheService.UserInfor.PhotoPath"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+}
+
+<CnGalWebSite.Shared.AppComponent.Pages.Users.MyFavorites.ListFavoriteFolder UserId="@_dataCatcheService.UserInfor.Id" IsCurrentUser="true" OnClickUrl="OnClickUrl" />
+@code{
+
+    protected override async Task OnInitializedAsync()
+    {
+
+
+    }
+    public async void OnClickUrl(NavigateModel model)
+    {
+        try
+        {
+            NavigationManager.NavigateTo(model.Url);
+        }
+        catch
+        {
+            await ToastService.Error("导航失败", "请尝试刷新页面");
+        }
+    }
+
+}

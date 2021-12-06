@@ -1,0 +1,86 @@
+﻿@inject SwalService SwalService
+@inject HttpClient Http
+@inject ToastService ToastService
+@inject NavigationManager NavigationManager
+
+<div>
+    <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="@Model.Title" UrlName="编辑" Url="@(Model.State==EditState.locked? "":Model.Link)" />
+    <div style="font-size: xx-small;">
+        <div >@Model.Describe</div>
+        <div class="mt-2" style="display:flex;">
+            <div style=" word-break: keep-all; border-radius: 4px; color: white; height: fit-content;" class="@(Model.Color+"  ps-1 pe-1")">@Model.State.GetDisplayName()</div>
+            <div class="ms-2">
+                @if (Model.State == EditState.None)
+                {
+                    <div>此部分还没有任何内容，你可以尝试添加</div>
+                }
+                else if (Model.State == EditState.Normal)
+                {
+                    <div>词条的完善需要你的一份力量，可以试试编辑这一部分</div>
+
+                }
+                else if (Model.State == EditState.Preview)
+                {
+                    <div>
+                        你的编辑正在等待审核，你可以
+                        <a class="fw-bold" @onclick="OnRevoke">撤销编辑</a>
+                    </div>
+                }
+                else if (Model.State == EditState.locked)
+                {
+                    <div>该部分已经被另一名用户编辑</div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EditButtonLineModel Model { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    private async Task OnRevoke()
+    {
+        //确认
+        var op = new SwalOption()
+        {
+            Title = "确认撤销编辑",
+            Content = "撤销编辑后会删除数据，无法恢复，请谨慎操作",
+            IsConfirm = true,
+            Category = SwalCategory.Warning,
+        };
+        var ret = await SwalService.ShowModal(op);
+        if (ret == false)
+        {
+            return;
+        }
+        //上传
+        try
+        {
+            var result = await Http.PostAsJsonAsync<RevokeExamineModel>(ToolHelper.WebApiPath + "api/entries/RevokeExamine", new RevokeExamineModel { Id = Model.Id, ExamineType = Model.Operation });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("撤销审核请求失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("撤销审核请求成功", "撤销审核请求成功");
+                //修改各部分编辑状态
+                Model.State = EditState.Normal;
+                StateHasChanged();
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "撤销审核请求失败");
+        }
+    }
+
+}

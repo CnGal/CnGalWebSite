@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  newcngalwebsite.apiserver:
+    image: ${DOCKER_REGISTRY-}newcngalwebsiteapiserver
+    build:
+      context: .
+      dockerfile: NewCngalWebSite/NewCngalWebSite.APIServer/Dockerfile
+
+  newcngalwebsite.server:
+    image: ${DOCKER_REGISTRY-}newcngalwebsiteserver
+    build:
+      context: .
+      dockerfile: NewCngalWebSite/NewCngalWebSite.Server/Dockerfile
+

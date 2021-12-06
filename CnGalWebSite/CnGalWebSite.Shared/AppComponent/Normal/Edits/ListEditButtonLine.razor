@@ -1,0 +1,34 @@
+﻿<div>
+    @foreach (var item in Items)
+    {
+        <div class="mb-4">
+            <EditButtonLine Model="item" />
+        </div>
+    }
+</div>
+
+@code {
+
+    public List<EditButtonLineModel> Items { get; set; } = new List<EditButtonLineModel>();
+
+    [Parameter]
+    public Dictionary<Operation, EditState> Model { get; set; } = new Dictionary<Operation, EditState>();
+    [Parameter]
+    public List<ExaminedNormalListModel> Examines { get; set; } = new List<ExaminedNormalListModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        foreach(var item in Model)
+        {
+            Items.Add(new EditButtonLineModel
+            {
+                State = item.Value == EditState.Normal ? (Examines.Any(s => s.Operation == item.Key) ? EditState.Normal : EditState.None) : item.Value,
+                EditCount = Examines.Count(s => s.Operation == item.Key),
+                Id =long.Parse( Examines.FirstOrDefault()?.RelatedId),
+                LastEditTime = Examines.Where(s => s.Operation == item.Key).OrderByDescending(s => s.ApplyTime).FirstOrDefault()?.ApplyTime,
+                Operation = item.Key
+            });
+        }
+
+    }
+}

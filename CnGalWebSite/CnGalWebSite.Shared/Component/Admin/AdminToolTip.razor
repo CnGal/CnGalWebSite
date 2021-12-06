@@ -1,0 +1,22 @@
+﻿
+    <div class="card h-100  rounded shadow  bg-opacity p-4" style="border:0px">
+        <div style="height:100%">
+            <h2 class="fw-bold h4">@Title</h2>
+            <p class="" style="color: gray;margin-top:20px">
+                @BriefIntroduction
+            </p>
+
+        </div>
+        <div class="card-footer" style="background-color: transparent; border: 0px; padding: 0px">
+            <Button style="width: 100px" @onclick="OnToolClick" IsAsync="true" Color="Color.Success" IsOutline="true">启动任务</Button>
+        </div>
+    </div>
+
+@code { [Parameter]
+            public EventCallback OnToolClick { get; set; }
+
+            [Parameter]
+            public string Title { get; set; }
+            [Parameter]
+            public string BriefIntroduction { get; set; }
+    }

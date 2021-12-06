@@ -1,0 +1,181 @@
+﻿@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject ToastService ToastService
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+
+@if (IsFrist)
+{
+    <Button Color="Color.Dark" IsOutline="false" IsDisabled="true" Icon="fa fa-spin fa-spinner" Text="获取验证码"></Button>
+}
+else
+{
+    @if (isPost)
+    {
+        <Button Color="Color.Dark" IsOutline="false" IsDisabled="true" Text="@("重新发送（"+seconds.ToString()+"秒）")"></Button>
+    }
+    else
+    {
+        <Button Color="Color.Dark" IsOutline="true" Text="获取验证码" @onclick="OnVerification" IsAsync="true" @ref="button1"></Button>
+    }
+}
+
+
+
+@code {
+    [Parameter]
+    public string Email { get; set; }
+    [Parameter]
+    public string LoginKey { get; set; }
+    [Parameter]
+    public string UserName { get; set; }
+    [Parameter]
+    public DataModel.Models.SMSType SmsType { get; set; }
+    [Parameter]
+    public SendType SendType { get; set; }
+
+    private bool isPost { get; set; }
+
+    private bool IsSuccess { get; set; }
+
+    public int seconds { get; set; }
+    [Parameter]
+    public bool IsFrist { get; set; } = true;
+    Button button1;
+
+
+    System.Threading.Timer mytimer;
+    private DotNetObjectReference<PostVerificationCode> objRef;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+
+            if (IsFrist == true)
+            {
+                await OnVerification();
+            }
+            else
+            {
+                isPost = true;
+                seconds = 60;
+                //启动定时器
+                mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000);
+
+                StateHasChanged();
+            }
+        }
+    }
+
+    public async Task OnVerification()
+    {
+        try
+        {
+            var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode");
+
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeAsync<string>("initGeetestBindCAPTCHA", objRef, geetestCodeModel.Gt, geetestCodeModel.Challenge, geetestCodeModel.Success);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "初始化极验人机验证失败");
+            return;
+        }
+        IsSuccess = true;
+        int count = 0;
+        while (IsSuccess)
+        {
+            /*if (count > 5)
+            {
+                isSuccess = false;
+            }*/
+            await Task.Delay(500);
+            count++;
+        }
+    }
+
+
+
+    [JSInvokable]
+    public async Task OnChecked(string challenge, string validate, string seccode)
+    {
+
+        //尝试获取验证码
+        try
+        {
+            var result = await Http.PostAsJsonAsync<PostVerificationCodeModel>(ToolHelper.WebApiPath + "api/account/PostVerificationCode", new PostVerificationCodeModel { Mail = Email, Challenge = challenge, Validate = validate, Seccode = seccode, UserName = UserName, LoginKey = LoginKey, SMSType = SmsType, SendType = SendType });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == true)
+            {
+                IsFrist = false;
+                isPost = true;
+                seconds = 60;
+                //启动定时器
+                mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000);
+
+                StateHasChanged();
+            }
+            else
+            {
+                await ToastService.Error("发送验证码失败", obj.Error);
+                IsFrist = false;
+                isPost = false;
+                IsSuccess = false;
+                StateHasChanged();
+
+                return;
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "发送验证码失败");
+            IsFrist = false;
+            isPost = false;
+            IsSuccess = false;
+            StateHasChanged();
+            return;
+        }
+
+    }
+
+
+    public async void Send(object o)
+    {
+        await InvokeAsync(() =>
+        {
+
+            seconds--;
+            if (seconds <= 0)
+            {
+                isPost = false;
+                mytimer.Dispose();
+            }
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        mytimer?.Dispose();
+        objRef?.Dispose();
+    }
+
+    [JSInvokable]
+    public Task OnCancel()
+    {
+        IsFrist = false;
+        isPost = false;
+        IsSuccess = false;
+        return Task.CompletedTask;
+    }
+}

@@ -1,0 +1,107 @@
+﻿<div style="display: flex; flex-wrap: wrap; flex-direction: column;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+        @if (IsReady)
+        {
+            @for (int i = 0; i < AfterTreatmentDate.Count;)
+            {
+                int currentMonth = AfterTreatmentDate[i].Key.AddDays(6).Month;
+                int temp = i;
+                while (AfterTreatmentDate[temp].Key.AddDays(6).Month == currentMonth)
+                {
+                    if (temp + 7 > AfterTreatmentDate.Count)
+                        break;
+                    temp += 7;
+                }
+                if (AfterTreatmentDate[temp].Key.Month != currentMonth)
+                {
+                    temp -= 7;
+                }
+                if (counter == 12)
+                {
+                    //temp += 6;
+                }
+                int temp_b = i;
+                int temp_a = temp + 6;
+                <div class="mt-1 mb-1" style="display:flex">
+                    <CalendarHeatMapMonth Begin="AfterTreatmentDate[temp_b].Key" CountLeve="CountLeve" End="AfterTreatmentDate[temp_a].Key"
+                                          Model="AfterTreatmentDate.Where(s => s.Key >= AfterTreatmentDate[temp_b].Key && s.Key <= AfterTreatmentDate[temp_a].Key).ToList()" ShowTip="ShowTip"></CalendarHeatMapMonth>
+                </div>
+                i = temp + 7;
+                counter++;
+            }
+
+        }
+
+    </div>
+    @if (ShowTip)
+    {
+        <CalendarHeatMapCountTip></CalendarHeatMapCountTip>
+    }
+
+</div>
+
+
+@code {
+    [Parameter]
+    public List<KeyValuePair<DateTime, int>> BeforeTreatmentDate { get; set; }
+    [Parameter]
+    public bool ShowTip { get; set; }=true;
+
+    public List<KeyValuePair<DateTime, int>> AfterTreatmentDate { get; set; } = new List<KeyValuePair<DateTime, int>>();
+
+    public bool IsReady = false;
+    public double CountLeve = 1;
+    int counter = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsReady = false;
+
+        //先遍历数据添加空数据到集合中
+        BeforeTreatmentDate = BeforeTreatmentDate.Where(s => s.Key.Year == DateTime.Now.Year).ToList();
+        DateTime begin = DateTime.Today.AddDays(-DateTime.Today.DayOfYear + 1);
+        DateTime end = begin.AddDays(DateTime.IsLeapYear(DateTime.Now.Year) ? 365 : 364);
+
+        if (begin.DayOfWeek != DayOfWeek.Monday)
+        {
+            DateTime begin_ = begin.AddDays(-(int)begin.DayOfWeek + 1);
+            for (DateTime temp = begin_; temp < begin; temp = temp.AddDays(1))
+            {
+                AfterTreatmentDate.Add(new KeyValuePair<DateTime, int>(temp, -1));
+            }
+        }
+        if (end.DayOfWeek != DayOfWeek.Sunday)
+        {
+            DateTime end_ = end.AddDays((7 - (int)end.DayOfWeek));
+            for (DateTime temp = end.AddDays(1); temp <= end_; temp = temp.AddDays(1))
+            {
+                AfterTreatmentDate.Add(new KeyValuePair<DateTime, int>(temp, -1));
+            }
+        }
+
+        for (DateTime i = begin; i <= end; i = i.AddDays(1))
+        {
+            KeyValuePair<DateTime, int> temp = BeforeTreatmentDate.FirstOrDefault(s => s.Key == i);
+            if (temp.Key == default(KeyValuePair<DateTime, int>).Key)
+            {
+                AfterTreatmentDate.Add(new KeyValuePair<DateTime, int>(i, 0));
+            }
+            else
+            {
+                AfterTreatmentDate.Add(temp);
+            }
+        }
+
+        //排序
+        AfterTreatmentDate.Sort((KeyValuePair<DateTime, int> a, KeyValuePair<DateTime, int> b) => { return a.Key > b.Key ? 1 : (a.Key < b.Key ? -1 : 0); });
+
+        CountLeve = (double)AfterTreatmentDate.Max(s => s.Value) / 4;
+        if (CountLeve == 0)
+        {
+            CountLeve = 1;
+        }
+
+        IsReady = true;
+        StateHasChanged();
+    }
+}

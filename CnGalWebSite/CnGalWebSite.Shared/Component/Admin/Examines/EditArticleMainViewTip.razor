@@ -1,0 +1,23 @@
+﻿<div class="row row-cols-1 row-cols-md-3">
+    <ExaminesPartViewImageTip Name="主图" Path="@Model.MainPicture"></ExaminesPartViewImageTip>
+    <ExaminesPartViewImageTip Name="背景图" Path="@Model.BackgroundPicture"></ExaminesPartViewImageTip>
+    <ExaminesPartViewImageTip Name="小背景图" Path="@Model.SmallBackgroundPicture"></ExaminesPartViewImageTip>
+
+</div>
+<div class="row">
+    <ExaminesPartViewInforTip DispalyName="类型" DispalyValue="@Model.Type.GetDisplayName()"></ExaminesPartViewInforTip>
+    <ExaminesPartViewInforTip DispalyName="显示名称" DispalyValue="@Model.DisplayName"></ExaminesPartViewInforTip>
+    <ExaminesPartViewInforTip DispalyName="唯一名称" DispalyValue="@Model.Name"></ExaminesPartViewInforTip>
+    <ExaminesPartViewInforTip DispalyName="简介" DispalyValue="@Model.BriefIntroduction"></ExaminesPartViewInforTip>
+    <ExaminesPartViewInforTip DispalyName="原文作者" DispalyValue="@Model.OriginalAuthor"></ExaminesPartViewInforTip>
+    <ExaminesPartViewInforTip DispalyName="原文链接" DispalyValue="@Model.OriginalLink"></ExaminesPartViewInforTip>
+    <ExaminesPartViewInforTip DispalyName="原文发布时间" DispalyValue="@(Model.PubishTime.ToString("yyy-MM-dd")??"")"></ExaminesPartViewInforTip>
+    @if (Model.Type == ArticleType.News)
+    {
+        <ExaminesPartViewInforTip DispalyName="动态真实发生时间" DispalyValue="@Model.RealNewsTime?.ToString("yyyy-MM-dd")"></ExaminesPartViewInforTip>
+    }
+</div>
+@code {
+    [Parameter]
+    public ArticleMain Model { get; set; } = new ArticleMain();
+}

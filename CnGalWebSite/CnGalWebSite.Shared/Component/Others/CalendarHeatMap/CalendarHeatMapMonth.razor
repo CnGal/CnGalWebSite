@@ -1,0 +1,67 @@
+﻿<div>
+    <p class="ContributionCalendar-font  text-center">@Month</p>
+    <div style="display:flex">
+        @for (DateTime item = Begin; item < End; item = item.AddDays(7))
+        {
+            <div style="display: flex; flex-direction: column;">
+                <CalendarHeatMapWeek Begin="item" CountLeve="CountLeve" End="item.AddDays(6)" Model="Model.Where(s=>s.Key>=item&&s.Key<=item.AddDays(6)).ToList()" ShowTip="ShowTip"></CalendarHeatMapWeek>
+
+            </div>
+
+        }
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public List<KeyValuePair<DateTime, int>> Model { get; set; }
+    [Parameter]
+    public DateTime Begin { get; set; }
+    [Parameter]
+    public DateTime End { get; set; }
+    [Parameter]
+    public double CountLeve { get; set; }
+    [Parameter]
+    public bool ShowTip { get; set; } = true;
+
+    public string Month { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Month = GetMonth(Model[Model.Count / 2].Key.Month);
+        StateHasChanged();
+    }
+    public string GetMonth(int month)
+    {
+        switch (month)
+        {
+            case 1:
+                return "一月";
+            case 2:
+                return "二月";
+            case 3:
+                return "三月";
+            case 4:
+                return "四月";
+            case 5:
+                return "五月";
+            case 6:
+                return "六月";
+            case 7:
+                return "七月";
+            case 8:
+                return "八月";
+            case 9:
+                return "九月";
+            case 10:
+                return "十月";
+            case 11:
+                return "十一月";
+            case 12:
+                return "十二月";
+        }
+        return "";
+    }
+}

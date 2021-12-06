@@ -1,0 +1,34 @@
+﻿@inherits LayoutComponentBase
+<style>
+    .center {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+    }
+    body {
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+    .left-bottom {
+        height: 161px;
+        width: 287px;
+        margin: 40px;
+        display: flex;
+        align-items: end;
+        justify-content: start;
+    }
+</style>
+<div id="web_bg" style="background-image: url(//app.cngal.org/_content/CnGalWebSite.Shared/images/backgroundmin.png)" class="d-none bg-d-lg-block"></div>
+<div id="web_bg" style="background-image: url(//app.cngal.org/_content/CnGalWebSite.Shared/images/oppsitebackground.png)" class=" d-none d-sm-block"></div>
+<div class="p-3 center">
+    <div style="max-width: 450px; width: 100%;">
+        @Body
+    </div>
+
+</div>
+@code {
+
+}

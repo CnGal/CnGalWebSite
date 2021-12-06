@@ -1,0 +1,54 @@
+﻿@inject ToastService ToastService
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IServiceProvider Provider
+@inject IJSRuntime JS
+
+
+<div @onclick="OnClickNews"  style="cursor:pointer;">
+    <div class="@(Model.IsNeedLayout?"rounded shadow-sm p-2 bg-opacity":"")" style="cursor: pointer;display:flex; ">
+        <div style="display: flex;align-items: center;">
+            <img class="shadow-sm" src="@Model.Image" style="height: 50px;width: 50px;border-radius: 50%;" />
+        </div>
+        <div class="comment-tx-div" style=" flex: 1 1 auto; width: 0;">
+            <div class="new-row-warp no-margin">
+                <div class="comment-tag me-2 bg-main">@Model.Type</div>
+                <div class="comment-username a-font-color me-2">@Model.Title</div>
+                <div class="comment-username" style="color:gray">@Model.Time.ToTimeFromNowString()</div>
+            </div>
+            <div class="comment-time text-truncate" style="width: 100%;">@Model.Text</div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public NewsThumbnailCardModel Model { get; set; }
+    #region 新建标签页
+    public async void OpenNewPage(string url)
+    {
+        await JS.InvokeAsync<string>("openNewPage", url);
+    }
+    #endregion
+    public async Task OnClickNews()
+    {
+
+        try
+        {
+            await JS.InvokeAsync<string>("trackEvent", "动态", "点击", Model.Title, "1", "click");
+        }
+        catch (Exception exc)
+        {
+
+        }
+
+        if (Model.IsOutLink)
+        {
+            OpenNewPage(Model.Url);
+        }
+        else
+        {
+            NavigationManager.NavigateTo(Provider, Model.Url, Model.Title, "fa fa-newspaper-o");
+        }
+    }
+}

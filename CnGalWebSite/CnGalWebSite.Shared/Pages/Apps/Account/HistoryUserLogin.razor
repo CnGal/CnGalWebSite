@@ -1,0 +1,139 @@
+﻿@page "/account/apps/historyuserlogin/{*ReturnUrl}"
+
+@inject HttpClient Http
+@inject SwalService SwalService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<TitleTip></TitleTip>
+<CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
+
+
+
+@if (IsConfirmed == false)
+{
+    <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="验证身份" />
+    <div class="p-3" style="margin-top:45px">
+        <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadCard Text="十分抱歉呐，网站翻新后我们需要重新验证你的身份哦，不过没关系，我们已经向你的邮箱发送了一封验证邮件，请在下方填写其中的验证码。如果没有在收件箱找到邮件，还请检查一下垃圾箱" />
+        <div  class="form-group col-12 mt-4 ps-4 pe-4  mb-0">
+
+            <div class="row">
+                <div class="form-group col">
+                    <BootstrapInput @bind-Value="Model.NumToken" ShowLabel="true"/>
+                </div>
+                <div class="form-group col-auto" style=" display: flex; align-items: flex-end;">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Account.PostVerificationCode UserName="@_dataCacheService.UserName" IsFrist="false"></CnGalWebSite.Shared.AppComponent.Pages.Account.PostVerificationCode>
+                </div>
+                <div class="form-group col-12">
+                    <Button Color="Color.Dark"  IsAsync="true" style="width:100%" OnClick="ConfirmNumToken">验证</Button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="设置密码" />
+    <div class="p-3" style="margin-top:45px">
+        <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadCard Text="身份验证通过了，恭喜恭喜，为了确保阁下的安全，还请重新设置密码" />
+        <div   class="form-group col-12 mt-4 ps-4 pe-4  mb-0">
+
+            <div class="row">
+                <div class="form-group col-12  col-sm-12">
+                    <BootstrapInput @bind-Value="Model.Password" type="password" ShowLabel="true"/>
+                </div>
+                <div class="form-group col-12  col-sm-12">
+                    <BootstrapInput @bind-Value="Model.ConfirmPassword" type="password" ShowLabel="true"/>
+                </div>
+                <div class="form-group col-12">
+                    <Button Color="Color.Dark"  IsAsync="true" style="width:100%" OnClick="ConfirmPassword">确定</Button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public string ReturnUrl { get; set; }
+
+    private HistorUserChangePasswordModel Model = new HistorUserChangePasswordModel();
+    bool IsConfirmed = false;
+    bool isReady = false;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    private async Task ConfirmNumToken()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<CheckVerificationCodeModel>(ToolHelper.WebApiPath + "api/account/CheckVerificationCode", new CheckVerificationCodeModel { Num = Model.NumToken });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("验证码错误", obj.Error);
+                return;
+            }
+            else
+            {
+                IsConfirmed = true;
+                StateHasChanged();
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "检查验证码失败");
+        }
+    }
+
+    private async Task ConfirmPassword()
+    {
+        try
+        {
+            //填充其他字段以通过验证
+            Model.UserName = _dataCacheService.UserName;
+
+            var result = await Http.PostAsJsonAsync<HistorUserChangePasswordModel>(ToolHelper.WebApiPath + "api/account/HistorUserChangePassword", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("验证身份失败", obj.Error);
+                if (obj.Error == "验证码错误")
+                {
+                    IsConfirmed = false;
+                    StateHasChanged();
+                }
+
+            }
+            else
+            {
+                await SwalService.ShowModal(new SwalOption()
+                {
+                    IsConfirm = true,
+                    Category = SwalCategory.Success,
+                    Title = "验证身份成功",
+                    Content = "验证身份成功，密码已重置，请重新登入"
+                });
+                // await ToastService.Success("验证身份成功", "验证身份成功，请登入");
+                NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/account/apps/login/" : ToolHelper.Base64DecodeUrl(ReturnUrl));
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "验证身份失败");
+        }
+    }
+
+}

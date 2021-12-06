@@ -1,0 +1,126 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@implements IDisposable
+
+<div  class=" rounded shadow  bg-opacity rounded h-100 ps-4 pe-4 pt-3 pb-3">
+    @if(isReady)
+    {
+        <div class="row" style="padding-right: 0;padding-left: 0;">
+            <div class="@(IsTransverse?"col-5":"col-12" )">
+                <div>
+                    <Chart ChartType="ChartType.Pie" OnInitAsync="@OnPieInit" @ref="PieChart" />
+                </div>
+            </div>
+            <div class="@(IsTransverse?"col-7":"col-12" )">
+                <Chart ChartType="ChartType.Bar" OnInitAsync="@OnBarInit" @ref="BarChart" />
+            </div>
+
+        </div>
+    }
+
+</div>
+
+@code {
+    [NotNull]
+    private Chart? PieChart { get; set; }
+    [NotNull]
+    private Chart? BarChart { get; set; }
+
+    [Parameter]
+    public bool IsTransverse { get; set; }
+
+    bool isReady = false;
+    public PerfectionLevelOverviewModel Model { get; set; } = new PerfectionLevelOverviewModel();
+    private IEnumerable<string> PerfectionLeveStrings { get; set; } = new List<string>() {"已完善" , "待完善", "急需完善" };
+    private IEnumerable<string> DataStrings { get; set; } = new List<string>() { "平均数", "众数", "中位数","标准差" };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<PerfectionLevelOverviewModel>(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLevelOverview");
+            isReady = true;
+            StateHasChanged();
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取完善度概览失败");
+        }
+    }
+
+    private Task<ChartDataSource> OnPieInit()
+    {
+        try
+        {
+
+
+            var ds = new ChartDataSource();
+
+            ds.Options.Title = "全站完善度概览";
+
+            ds.Labels = PerfectionLeveStrings;
+            List<object> temp = new List<object>();
+
+            temp.Add(Model.ExcellentCount);
+            temp.Add(Model.GoodCount);
+            temp.Add(Model.ToBeImprovedCount);
+
+            ds.Data.Add(new ChartDataset()
+            {
+                Label = "全站完善度概览",
+                Data = temp
+            });
+            return Task.FromResult(ds);
+
+        }
+        catch
+        {
+            return null;
+        }
+
+    }
+    private Task<ChartDataSource> OnBarInit()
+    {
+        try
+        {
+            var ds = new ChartDataSource();
+
+            ds.Options.Title = "统计数值";
+
+            ds.Labels = DataStrings;
+            List<object> temp = new List<object>();
+
+            temp.Add(Model.AverageValue);
+            temp.Add(Model.Mode);
+            temp.Add(Model.Median);
+            temp.Add(Model.StandardDeviation);
+
+            ds.Data.Add(new ChartDataset()
+            {
+                Label = "统计数值",
+                Data = temp
+            });
+            return Task.FromResult(ds);
+
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public void Dispose()
+    {
+        if (BarChart != null)
+        {
+            BarChart.Dispose();
+        }
+        if (PieChart != null)
+        {
+            PieChart.Dispose();
+        }
+        GC.SuppressFinalize(this);
+    }
+}

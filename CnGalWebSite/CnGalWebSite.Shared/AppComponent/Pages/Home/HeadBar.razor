@@ -1,0 +1,75 @@
+﻿@inject NavigationManager NavigationManager
+
+
+<div class="shadow apps-headbar-layout">
+    <div style="display: flex; height: 45px; flex-direction: row; align-items: center;" class="ms-2 me-2">
+        <div class="me-2" @onclick="OpenDra">
+            <img src="@Model.Image" style="height: 28px;width: 28px;border-radius: 50%;" alt="头像">
+        </div>
+        <div style="width: 100%;display: flex;flex-direction: row;background-color: #F1F1F1;border-radius: 15px;height: 28px;" class="me-2" @onclick="OnClickSearch">
+            <div style="display: flex; flex-direction: column; justify-content: center;" class="ms-2">
+                <i class="fa fa-search fa-fw" style=" font-size: 18px; font-weight: 100;"></i>
+            </div>
+        </div>
+        <div style=" display: contents; " @onclick="OnClickMessage">
+            <i class="fa fa-envelope-o fa-fw " style="font-size: 20px; margin-right: 7px;"></i>
+            @if (Model.UnreadedMessages.Count > 0)
+            {
+                <Badge Color="Color.Success" style=" margin-top: -21px; float: inherit; margin-left: -13px; padding: 2.5px; "><span style="padding: 0 2px;">@(Model.UnreadedMessages.Count.ToString())</span></Badge>
+            }
+        </div>
+        <div style=" display: flex;  flex-direction: column; justify-content: center;" class="" @onclick="OnClickEdit">
+            <i class="fa fa-pencil fa-fw " style=" font-size: 20px;"></i>
+        </div>
+    </div>
+</div>
+<style>
+    .drawer-wrapper.is-open {
+        z-index: 12000;
+    }
+</style>
+
+<Drawer Placement="Placement.Left" IsOpen="@IsOpen" IsBackdrop="true" Width="240px" OnClickBackdrop="CloseDra">
+    <NavDrawer></NavDrawer>
+</Drawer>
+
+@code {
+
+    [Parameter]
+    public HeadBarModel Model { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private bool IsOpen { get; set; }
+
+    private Task OpenDra()
+    {
+        IsOpen = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task CloseDra()
+    {
+        IsOpen = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+    private async Task OnClickMessage()
+    {
+       var user= await authenticationStateTask;
+        NavigationManager.NavigateTo(user.User.Identity.IsAuthenticated ? "/home/messagecenter" : "/account/apps/login");
+        
+    }
+    private Task OnClickSearch()
+    {
+        NavigationManager.NavigateTo("/home/search");
+        return Task.CompletedTask;
+    }
+
+    private async Task OnClickEdit()
+    {
+        var user = await authenticationStateTask;
+        NavigationManager.NavigateTo(user.User.Identity.IsAuthenticated?"/home/editlist":"/account/apps/login");
+    }
+}

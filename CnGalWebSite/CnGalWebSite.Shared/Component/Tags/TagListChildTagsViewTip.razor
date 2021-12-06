@@ -1,0 +1,56 @@
+﻿
+<div class="shadow rounded bg-opacity mb-1">
+    <div class=" ps-4 pe-4 mb-3">
+        <div style="display: block;">
+            <h2 class="fw-bold pt-3 m-0 font-color h4"><i class="fa fa-tags"></i>&nbsp;&nbsp;子标签</h2>
+        </div>
+    </div>
+
+    @if (IsEdit == true)
+    {
+        <div class="pb-1">
+            @switch (EditState)
+            {
+                case EditState.locked:
+                    <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                    break;
+                case EditState.Normal:
+                    <AlertTip Title="编辑子标签" Type="@(Model.Count==0?AlertTip.AlertTipType.Blank: AlertTip.AlertTipType.Editable)" Url="@("/tags/EditChildTags/" + Id)"></AlertTip>
+                    break;
+            }
+        </div>
+    }
+    @if (EditState == EditState.Preview)
+    {
+        <div class="pb-1">
+            <AlertTip Title="编辑子标签" Type="AlertTip.AlertTipType.preview" Url="@("/tags/EditChildTags/" + Id)" ExamineType="Operation.EditTagChildTags" OnClickRevoke="OnClickRevoke"></AlertTip>
+        </div>
+    }
+
+    <div class="row m-0 ps-3 pe-3">
+        @foreach (var item in Model)
+        {
+
+            <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mt-2">
+                <TabLink Text="@item.Name" Url="@("/tags/index/"+item.Id)" Icon="fa fa-tag">@item.Name</TabLink>
+                <hr />
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<TagInforTipViewModel> Model { get; set; } = new List<TagInforTipViewModel>();
+    [Parameter]
+    public bool IsNormalScreen { get; set; }
+    [Parameter]
+    public bool IsEdit { get; set; }
+    [Parameter]
+    public EditState EditState { get; set; }
+    [Parameter]
+    public EventCallback<Operation> OnClickRevoke { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+
+}

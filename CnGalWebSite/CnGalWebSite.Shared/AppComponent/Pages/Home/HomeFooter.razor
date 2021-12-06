@@ -1,0 +1,68 @@
+﻿<div class="shadow apps-footer-layout">
+    <div style="display: flex; flex-direction: row; align-items: center;" class="ms-2 me-2 mt-2 mb-1">
+            <CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine Model="Model"></CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine>
+    </div>
+</div>
+@code {
+
+    [Parameter]
+    public int DefaultIndex { get; set; }
+    [Parameter]
+    public int RandomIndex { get; set; }
+    [Parameter]
+    public EventCallback<int> OnTabClick { get; set; }
+
+    private CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel Model = new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel { Items = new List<CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel>() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model.Items.AddRange(new List<CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel>
+    {
+
+            new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+            {
+                DefaultIndex=DefaultIndex,
+                Icon="fa-home",
+                Index=0,
+                OnTabClick=OnTabClick,
+                RandomIndex=RandomIndex,
+                Text="主页",
+                Type=CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Bottom,
+                ClassNames="col-3"
+            },
+            new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+            {
+                DefaultIndex=DefaultIndex,
+                Icon="fa-codepen",
+                Index=1,
+                OnTabClick=OnTabClick,
+                RandomIndex=RandomIndex,
+                Text="词条",
+                Type=CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Bottom,
+                ClassNames="col-3"
+            },
+            new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+            {
+                DefaultIndex=DefaultIndex,
+                Icon="fa-newspaper-o",
+                Index=2,
+                OnTabClick=OnTabClick,
+                RandomIndex=RandomIndex,
+                Text="文章",
+                Type=CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Bottom,
+                ClassNames="col-3"
+            },
+            new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+            {
+                DefaultIndex=DefaultIndex,
+                Icon="fa-cubes",
+                Index=3,
+                OnTabClick=OnTabClick,
+                RandomIndex=RandomIndex,
+                Text="综合",
+                Type=CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Bottom,
+                ClassNames="col-3"
+            }
+        });
+    }
+}

@@ -1,0 +1,14 @@
+﻿<div>
+    @foreach (var item in Model)
+    {
+        <div class="mb-3">
+            <EntryCard Model="item" />
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<EntryInforTipViewModel> Model { get; set; }
+
+}

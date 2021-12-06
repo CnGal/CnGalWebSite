@@ -1,0 +1,13 @@
+﻿<div>
+    @{ bool isFirstBadge = true;}
+    @foreach (var item in Names)
+    {
+        <TagButton Name="@item" IsFrist="isFirstBadge"></TagButton>
+        isFirstBadge = false;
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<string> Names { get; set; } = new List<string>();
+}

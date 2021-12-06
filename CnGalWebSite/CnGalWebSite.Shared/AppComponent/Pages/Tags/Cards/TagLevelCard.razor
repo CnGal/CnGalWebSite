@@ -1,0 +1,27 @@
+﻿<div style="display:flex;">
+    @foreach (var item in TagList)
+    {
+        if (TagList.IndexOf(item) == TagList.Count - 1)
+        {
+            break;
+        }
+        <div class="breadcrumb-item">
+            <TabLink Url="@("/tags/index/"+item.Value)" Icon="fa fa-tag" Text="@item.Key">@item.Key</TabLink>
+        </div>
+        if (TagList.IndexOf(item) != TagList.Count - 1)
+        {
+            <div style="color:gray;">
+                ->
+            </div>
+        }
+    }
+    @if (TagList.Count != 0)
+    {
+        <div style="color:gray;">@TagList[TagList.Count - 1].Key</div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<KeyValuePair<string, int>> TagList { get; set; }
+}

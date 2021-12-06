@@ -1,0 +1,25 @@
+﻿@page "/entries/editimages/{Id}"
+@attribute [Authorize]
+
+@inject IDataCacheService _dataCacheService
+
+<MakeSureInWASMTip></MakeSureInWASMTip>
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Entries.EditImages Id="@Id" />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Entries.EditImages Id="@Id" />
+}
+
+@code{
+    [Parameter]
+    public string Id { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        //清空当前缓存
+        _dataCacheService.EntryIndexPageCatche.Clean(Id);
+    }
+}

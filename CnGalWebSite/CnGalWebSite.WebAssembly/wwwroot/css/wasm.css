@@ -1,0 +1,10 @@
+﻿
+.d-wasm {
+    display: none;
+}
+
+@media (min-width: 576px) {
+    .d-wasm-sm-block {
+        display: block !important;
+    }
+}

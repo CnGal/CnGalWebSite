@@ -1,0 +1,162 @@
+﻿@inject DialogService DialogService
+@inject ToastService ToastService
+@inject IAppHelper _appHelper;
+
+<div class="mb-3">
+    <InputFile class="form-control form-control-lg d-none" id="@Id" OnChange="OnInputFileChange"></InputFile>
+</div>
+<div class="card text-black" style="background-color:transparent;">
+    <img src="@(string.IsNullOrWhiteSpace(ImagePath)?"_content/CnGalWebSite.Shared/images/default/app.png":ImagePath)" class="card-img" alt="...">
+    <div class="card-img-overlay">
+        @if (Type == ImageAspectType.None)
+        {
+            @if (IsMustCropper)
+            {
+                <div class="d-ssr">
+                    <label for="@Id" class="btn btn-success mb-4"><i class="fa fa-upload" aria-hidden="true"></i> @Text</label>
+                </div>
+
+
+                <div class="d-wasm">
+
+                    <ButtonUpload TValue="string" Accept="image/gif, image/jpeg, image/jpg, image/png" IsSingle="true" BrowserButtonIcon="fa fa-upload"
+                                  OnChange="@OnCardUploadMain" OnDelete="@(fileName => Task.FromResult(true))" BrowserButtonText="@Text" ShowLabel="false"></ButtonUpload>
+
+                </div>
+
+
+
+            }
+            else
+            {
+                <ImageUpLoadButton OnUploadedImage="OnUploaded" Text="@Text"></ImageUpLoadButton>
+            }
+        }
+        else
+        {
+            <div class="d-ssr">
+                <label for="@Id" class="btn btn-success mb-4"><i class="fa fa-upload" aria-hidden="true"></i> @Text</label>
+            </div>
+
+            <div class="d-wasm">
+
+                <ButtonUpload TValue="string" Accept="image/gif, image/jpeg, image/jpg, image/png" IsSingle="true" BrowserButtonIcon="fa fa-upload"
+                              OnChange="@OnCardUploadMain" OnDelete="@(fileName => Task.FromResult(true))" BrowserButtonText="@Text" ShowLabel="false"></ButtonUpload>
+
+            </div>
+
+        }
+
+
+    </div>
+</div>
+@code {
+    [Parameter]
+    public ImageAspectType Type { get; set; }
+    public EntryType entryType_;
+    [Parameter]
+    public EntryType EntryType_
+    {
+        get { return entryType_; }
+        set
+        {
+            if (value == EntryType.Game || value == EntryType.ProductionGroup)
+            {
+                Type = ImageAspectType._16_9;
+            }
+            else
+            {
+                Type = ImageAspectType.None;
+            }
+            entryType_ = value;
+        }
+    }
+    [Parameter]
+    public bool IsMainImage { get; set; }
+    [Parameter]
+    public string ImagePath { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ImagePathChanged { get; set; }
+
+    [Parameter]
+    public bool IsMustCropper { get; set; }
+    [Parameter]
+    public string Text { get; set; } = "上传图片";
+
+
+    [Parameter]
+    public EventCallback<string> OnUploadedImage { get; set; }
+
+    public string Id = "input" + new Random().Next();
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private async void OnInputFileChange(InputFileChangeEventArgs args)
+    {
+        //设置裁剪比例
+        if (IsMainImage)
+        {
+            if (EntryType_ == EntryType.Game || EntryType_ == EntryType.ProductionGroup)
+            {
+                Type = ImageAspectType._16_9;
+            }
+            else
+            {
+                Type = ImageAspectType.None;
+            }
+        }
+        var option = new DialogOption()
+        {
+            Title = "裁剪图片",
+            ShowCloseButton = false
+        };
+        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<ImageCropperViewTip>(new Dictionary<string, object>
+        {
+            [nameof(ImageCropperViewTip.Type)] = Type,
+            [nameof(ImageCropperViewTip.file)] = args.File,
+            [nameof(ImageCropperViewTip.Id)] = Id,
+            [nameof(ImageCropperViewTip.OnUploadedImage)] = EventCallback.Factory.Create<string>(this, async (url) => await OnUploaded(url)),
+            [nameof(ImageCropperViewTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
+
+        }).Render();
+        await DialogService.Show(option);
+    }
+
+    public async Task OnUploaded(string url)
+    {
+        ImagePath = url;
+        StateHasChanged();
+        await OnUploadedImage.InvokeAsync(url);
+        await ImagePathChanged.InvokeAsync(url);
+    }
+
+    private async Task OnCardUploadMain(UploadFile file)
+    {
+        try
+        {
+            //判断类型
+            string url = "api/files/postfile";
+            url += Type.GetDisplayName();
+
+            List<UploadResult> obj = await _appHelper.UploadFilesAsync(new List<IBrowserFile> { file.File }, 15 * 1024 * 1024, 1, ToolHelper.WebApiPath + url);
+            if (obj[0].Uploaded == true)
+            {
+                ImagePath = obj[0].FileURL;
+                await OnUploadedImage.InvokeAsync(obj[0].FileURL);
+                await ImagePathChanged.InvokeAsync(obj[0].FileURL);
+
+                StateHasChanged();
+            }
+            else
+            {
+                await ToastService.Error("图片上传失败", $"<{file.FileName}> " + obj[0].Error);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "图片上传失败", "图片大小超过1MB","将图片压缩后再上传，大图可上传到相册");
+        }
+    }
+}

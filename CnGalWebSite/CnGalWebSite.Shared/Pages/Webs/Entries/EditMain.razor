@@ -1,0 +1,240 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+
+}
+
+<div class="">
+    <div class="" style="padding-right: 0;padding-left: 0;">
+        <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
+        <AlertTip Type="AlertTip.AlertTipType.EntryStandard"></AlertTip>
+        @if (isReady == false)
+        {
+            <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+                <h3 class="text-truncate mb-4 fw-bold">编辑词条主要信息</h3>
+                <h5 class=" mb-4 fw-bold">当前词条：（Id:）</h5>
+                <hr>
+
+                <div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                </div>
+            </div>
+        }
+        else
+        {
+
+            @if (Model.Type == EntryType.Staff)
+            {
+                <div class="alert alert-danger  rounded shadow  rounded" role="alert">
+                    这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
+                </div>
+            }
+            else
+            {
+
+            } <ValidateForm Model="@Model" ValidateAllProperties="true" class="form-group mt-4" @ref="ComplexForm">
+
+                <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-3">
+                    <h3 class="text-truncate mb-4 fw-bold">编辑词条主要信息</h3>
+                    <h5 class="mb-4 fw-bold">当前词条：@Model.Name（Id:@Model.Id）</h5>
+                    <hr />
+
+                    <div class="row">
+                        <div class=" col-12 col-md-6  col-lg-3 mt-2">
+                            <ImageCropperButton ImagePath="@Model.MainPicturePath" OnUploadedImage="OnCardUpload1" EntryType_="Model.Type" IsMainImage="true"
+                                                Text="上传主图" IsMustCropper="true"></ImageCropperButton>
+                        </div>
+                        <div class=" col-12 col-md-6  col-lg-3 mt-2">
+                            <ImageCropperButton ImagePath="@Model.ThumbnailPath" OnUploadedImage="OnCardUpload2" Type="ImageAspectType._1_1" Text="上传缩略图"></ImageCropperButton>
+                        </div>
+                        <div class=" col-12 col-md-6  col-lg-3 mt-2">
+                            <ImageCropperButton ImagePath="@Model.BackgroundPicturePath" OnUploadedImage="OnCardUpload3" Type="ImageAspectType.None" Text="上传大背景"></ImageCropperButton>
+                        </div>
+                        <div class=" col-12 col-md-6  col-lg-3 mt-2">
+                            <ImageCropperButton ImagePath="@Model.SmallBackgroundPicturePath" OnUploadedImage="OnCardUpload4" Type="ImageAspectType.None" Text="上传小背景"></ImageCropperButton>
+                        </div>
+                    </div>
+
+                    <div class="row  mt-4">
+                        <div class="form-group col-12  col-sm-6">
+                            <Select @bind-Value="Model.Type"></Select>
+                        </div>
+
+                        <AuthorizeView Roles="Admin">
+                            <Authorized>
+                                <div class="form-group col-12  col-sm-6">
+                                    <BootstrapInput @bind-Value="Model.Name" />
+                                </div>
+                                <div class="form-group col-12">
+                                    <AlertTip Type="AlertTip.AlertTipType.CreateDisambig"></AlertTip>
+                                </div>
+                                <div class="form-group col-12  col-sm-6">
+                                    <BootstrapInput @bind-Value="Model.DisplayName" />
+                                </div>
+                                <div class="form-group col-12  col-sm-6">
+                                    <BootstrapInput @bind-Value="Model.AnotherName" />
+                                </div>
+                            </Authorized>
+                            <NotAuthorized>
+                                <div class="form-group col-12  col-sm-6">
+                                    <BootstrapInput @bind-Value="Model.Name" IsDisabled="true" />
+                                </div>
+                                <div class="form-group col-12">
+                                    <AlertTip Type="AlertTip.AlertTipType.NoChangeName"></AlertTip>
+                                </div>
+                                <div class="form-group col-12  col-sm-6">
+                                    <BootstrapInput @bind-Value="Model.DisplayName" />
+                                </div>
+                                <div class="form-group col-12  col-sm-6">
+                                    <BootstrapInput @bind-Value="Model.AnotherName" />
+                                </div>
+                            </NotAuthorized>
+                        </AuthorizeView>
+
+
+
+                        <div class="form-group col-12">
+                            <BootstrapInput @bind-Value="Model.BriefIntroduction" />
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class="rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
+                    <div>
+                        <BootstrapBlazor.Components.Textarea @bind-Value="Model.Note" />
+                        <Button class="mt-3" style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
+                    </div>
+                </div>
+            </ValidateForm>
+        }
+
+
+    </div>
+</div>
+@code {
+
+
+    [Parameter]
+    public string Id { get; set; }
+    public EditMainViewModel Model { get; set; } = new EditMainViewModel();
+    private bool isReady = false;
+    [NotNull]
+    private ValidateForm? ComplexForm { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+#if DEBUG
+        //Thread.Sleep(10000);
+#endif
+        try
+        {
+            //获取词条信息
+            Model = await Http.GetFromJsonAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/editmain/" + Id);
+            isReady = true;
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑词条主要信息失败");
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        //上传
+        try
+        {
+            //处理数据
+            if (string.IsNullOrWhiteSpace(Model.Name))
+            {
+                ComplexForm.SetError<EditMainViewModel>(f => f.Name, "必须填写词条名称");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(Model.DisplayName))
+            {
+                ComplexForm.SetError<EditMainViewModel>(f => f.DisplayName, "必须填写词条显示名称");
+                return;
+            }
+
+            var result = await Http.PostAsJsonAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/editmain", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                if (obj.Error == "该词条的名称与其他词条重复")
+                {
+                    ComplexForm.SetError<EditMainViewModel>(f => f.Name, "已经存在该名称的词条");
+                }
+                await ToastService.Error("保存词条主要信息失败", obj.Error ?? "请上传图片");
+            }
+            else
+            {
+                await ToastService.Success("保存成功", "保存词条主要信息成功，等待审核通过");
+                NavigationManager.NavigateTo(Provider,"/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "保存词条主要信息失败");
+        }
+    }
+    private Task OnCardUpload1(string url)
+    {
+        Model.MainPicturePath = url;
+        Model.MainPicture = url;
+        return Task.CompletedTask;
+    }
+    private Task OnCardUpload2(string url)
+    {
+        Model.ThumbnailPath = url;
+        Model.Thumbnail = url;
+        return Task.CompletedTask;
+    }
+
+
+    private Task OnCardUpload3(string url)
+    {
+        Model.BackgroundPicture = url;
+        Model.BackgroundPicturePath = url;
+        return Task.CompletedTask;
+    }
+    private Task OnCardUpload4(string url)
+    {
+        Model.SmallBackgroundPicture = url;
+        Model.SmallBackgroundPicturePath = url;
+        return Task.CompletedTask;
+    }
+
+
+
+}

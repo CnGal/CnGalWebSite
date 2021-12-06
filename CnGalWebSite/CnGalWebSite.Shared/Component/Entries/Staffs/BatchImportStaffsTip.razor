@@ -1,0 +1,44 @@
+﻿@inject ToastService ToastService
+
+<style>
+    .modal-footer {
+        display: none;
+    }
+</style>
+<div>
+    <p style="font-size: initial;">
+        按照下方例子整理Staff文本后输入可以批量导入Staff信息<br />
+        其中“、”“，”“，”和“:”“：”都可作分隔符，如果Staff名称中包含分隔符，请单独录入<br />
+        请把有分类的Staff放到最后<br />
+        <br />
+        主催：小明<br />
+        配音：小红、小亮、小李<br />
+        主题曲：<br />
+        作词：小红<br />
+        作曲：小刚<br />
+    </p>
+    <Textarea @bind-Value="Text" DisplayText="Staff文本" rows="10"></Textarea>
+    <div class="mt-3" style="display: flex; justify-content: space-between;">
+        <Button Color="Color.Danger" Icon="fa fa-close" @onclick="@(()=>OnClickClose.InvokeAsync())" IsAsync="true" Text="放弃导入"></Button>
+        <Button Color="Color.Success" Icon="fa fa-check" class="me-1" @onclick="OnImport" IsAsync="true" Text="确认导入"></Button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<List<StaffModel>> OnAddStaffs { get; set; }
+    [Parameter]
+    public EventCallback OnClickClose { get; set; }
+
+    public string Text { get; set; }
+
+    public async Task OnImport()
+    {
+        if (string.IsNullOrWhiteSpace(Text))
+        {
+            await ToastService.Error("批量导入失败", "请输入Staff文本");
+        }
+        await OnAddStaffs.InvokeAsync(ToolHelper.GetStaffsFromString(Text));
+        await OnClickClose.InvokeAsync();
+    }
+}

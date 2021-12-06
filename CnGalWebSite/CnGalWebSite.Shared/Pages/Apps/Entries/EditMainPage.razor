@@ -1,0 +1,112 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject NavigationManager NavigationManager
+
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+}
+
+<link rel="stylesheet" href="https://static.cngal.top/_content/BootstrapBlazor.Markdown/css/bootstrap.blazor.markdown.min.css" media="none" onload="this.media='all'" />
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
+
+
+<div style=" margin-top: 45px; width: 100%;margin-bottom:65px;">
+    @if (isReady == false)
+    {
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+    }
+    else
+    {
+
+        <div class="ps-3 pe-3 pt-2 mb-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑介绍" />
+
+            @if (isReady == true)
+            {
+                <MarkdownEditorTip Context="@Model.Context" @ref="markdownEditorTip"></MarkdownEditorTip>
+
+            }
+        </div>
+    }
+
+</div>
+
+<CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.EditFooter OnSubmit="OnSubmit" />
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    public EditMainPageViewModel Model { get; set; } = new EditMainPageViewModel();
+
+    bool isReady = false;
+    [NotNull]
+    private MarkdownEditorTip? markdownEditorTip;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取词条信息
+            Model = await Http.GetFromJsonAsync<EditMainPageViewModel>(ToolHelper.WebApiPath + "api/entries/editmainpage/" + Id);
+
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑词条主页失败");
+        }
+    }
+
+    private async Task OnSubmit(string text)
+    {
+        //上传
+        try
+        {
+            Model.Context = await markdownEditorTip.GetContext();
+            if (string.IsNullOrWhiteSpace(Model.Context))
+            {
+                Model.Context = "";
+            }
+            //检查文本长度
+            if (Model.Context.Length > 100000)
+            {
+                await ToastService.Error("文本长度超过上限", "强烈建议使用链接显示图片，内嵌图片会导致性能严重下降。请控制文本量，额外的文字可以移动到关联文章中");
+                return;
+            }
+
+
+            Model.Note = text;
+
+            var result = await Http.PostAsJsonAsync<EditMainPageViewModel>(ToolHelper.WebApiPath + "api/entries/editmainpage", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("保存词条主页失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("保存成功", "保存词条主页成功，等待审核通过");
+                NavigationManager.NavigateTo("/entries/index/" + Model.Id);
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "保存词条主页失败");
+        }
+    }
+}

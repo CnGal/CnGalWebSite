@@ -1,0 +1,77 @@
+﻿@inject IAppHelper _appHelper
+@inject ToastService? ToastService
+@inject IJSRuntime JS
+@inject HttpClient Http
+
+<ImageUpLoadButton OnUploadedImage="UpLoaded"></ImageUpLoadButton>
+<div class="row">
+    @for (int i = 0; i < images.Count; i++)
+    {
+        <div class="col-6 col-md-6 col-lg-4 col-xl-3 col-xxl-2 col mb-3">
+            <div class="card ps-3 pt-2 pb-2 pe-3 h-100" style="background-color:transparent">
+                <div class="h-100">
+                    <div style="display: flex; justify-content: center;">
+                        <img src="@images[i].ImagePath" style="width: 100%;background-color:transparent" alt="...">
+                    </div>
+                    <div class=" mt-2">
+                        <p class="text-center" style="font-size: inherit; word-break: break-word; ">
+                            @images[i].ImagePath
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+@code {
+    public List<UploadFile> DefaultFormatFileList { get; set; } = new List<UploadFile>();
+
+    [Parameter]
+    public EventCallback<string> OnUploadedImage { get; set; }
+
+    [Parameter]
+    public List<ImagesUploadAloneModel> images { get; set; } = new List<ImagesUploadAloneModel>();
+   
+    public async Task<string> UpLoaded(string url)
+    {
+        DefaultFormatFileList.Add(new UploadFile
+        {
+            PrevUrl = url,
+            FileName = url
+        });
+        //添加到数据模型中
+        images.Add(new ImagesUploadAloneModel
+        {
+            Image = url,
+            ImagePath = url
+        });
+
+        await OnUploadedImage.InvokeAsync(url);
+
+        StateHasChanged();
+
+        return url;
+    }
+    protected override Task OnInitializedAsync()
+    {
+        //获取主页中原有的图片
+
+        foreach (var item in images)
+        {
+            DefaultFormatFileList.Add(new UploadFile
+            {
+                PrevUrl = item.ImagePath,
+                FileName = item.Image
+            });
+        }
+        return Task.CompletedTask;
+    }
+
+    private async Task OpenNewPage(string Url)
+    {
+        await JS.InvokeAsync<string>("openNewPage", Url);
+    }
+}

@@ -1,0 +1,12 @@
+﻿<div class="w-100 h-100 shadow-sm rounded bg-opacity pt-3 pb-3" style="display: flex; flex-direction: column; align-items: center;">
+    <i class="@("fa fa-fw font-color "+Model.Icon+" "+Model.IconColor)" style=" font-size: 45px;"></i>
+    <div class="mt-2" style="font-size: initial;">@Model.Title</div>
+    <div style="color:gray;">@Model.Text</div>
+    <Button Color="@Model.ButtonColor" ButtonStyle="ButtonStyle.Round" Size="Size.ExtraSmall" Text="@Model.ButtonText" class="mt-2 ps-2 pe-2" OnClick="@(()=> { if (!Model.IsCompleted) Model.OnCompleting.InvokeAsync(); })"/>
+</div>
+
+@code {
+    [Parameter]
+    public TaskCardModel Model { get; set; }
+
+}

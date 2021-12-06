@@ -1,0 +1,36 @@
+﻿<div style="display:flex;flex-direction: row;justify-content: space-between;" class="mb-2 mt-2">
+    <div style="display:flex;">
+        <div class="bg-main me-2" style=" width: 5px;  border-radius: 2px;"></div>
+        <h2 class="font-color m-0" style=" display: flex; align-items: center; font-size: large; font-weight: bolder;">@Title</h2>
+    </div>
+    <div class="font-color ms-3" style=" font-size: smaller; font-weight: bolder; display: flex; flex-direction: column; margin-bottom: 3px; justify-content: flex-end; white-space: break-spaces;">@Subtitle</div>
+
+    @if (string.IsNullOrWhiteSpace(Url) == false)
+    {
+        <a href="@Url" class="bg-main ps-2 pe-1 me-1" style="color: white; display: flex; flex-direction: row; align-items: center; border-radius: 7px; font-size: 12px; margin-top: 5px;">
+            <div>@UrlName</div>
+            <i class="fa fa-angle-double-right fa-fw "></i>
+        </a>
+    }
+    @if (ShowButton)
+    {
+        <Button Text="@UrlName" Icon="@Icon" Color="Color.Dark" Size="Size.ExtraSmall" @onclick="OnClick" IsAsync="true" class="me-1 ps-2 pe-2" style="height: fit-content;"/>
+    }
+
+</div>
+@code {
+    [Parameter]
+    public string Url { get; set; }
+    [Parameter]
+    public string UrlName { get; set; } = "查看更多";
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Icon { get; set; }
+    [Parameter]
+    public string Subtitle { get; set; }
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+    [Parameter]
+    public bool ShowButton { get; set; }
+}

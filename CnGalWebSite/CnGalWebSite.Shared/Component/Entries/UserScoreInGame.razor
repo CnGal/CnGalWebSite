@@ -1,0 +1,118 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+<div class="card h-100  rounded shadow  bg-opacity p-4 mb-3" style="border:0px">
+    @if (Model.IsCurrentUserPlayed)
+    {
+
+    <div class="row">
+
+        <div class="form-group col-4 col-xl-6">
+            <p>演出</p>
+        </div>
+        <div class="form-group col-8  col-xl-6">
+            <Rate @bind-Value="@Model.ShowSocreCurrent" />
+        </div>
+
+        <div class="form-group col-4  col-xl-6">
+            <p>系统</p>
+        </div>
+        <div class="form-group col-8  col-xl-6">
+            <Rate @bind-Value="@Model.SystemSocreCurrent" />
+        </div>
+
+        <div class="form-group col-4  col-xl-6">
+            <p>作画</p>
+        </div>
+        <div class="form-group col-8  col-xl-6">
+            <Rate @bind-Value="@Model.PaintSocreCurrent" />
+        </div>
+
+        <div class="form-group col-4  col-xl-6">
+            <p>剧本</p>
+        </div>
+        <div class="form-group col-8 col-xl-6">
+            <Rate @bind-Value="@Model.ScriptSocreCurrent" />
+        </div>
+
+        <div class="form-group col-4 col-xl-6">
+            <p>配音</p>
+        </div>
+        <div class="form-group col-8 col-xl-6">
+            <Rate @bind-Value="@Model.CVSocreCurrent" />
+        </div>
+    </div>
+
+                <Button IsOutline="true" Icon="fa fa-star-o" Color="Color.Success" @onclick="OnPostScore" Text="  评分"></Button> }
+            else
+            {
+<Button IsOutline="true" Icon="fa fa-plus" Color="Color.Success" @onclick="OnAddGame" Text="  我玩过此游戏"></Button>}
+
+</div>
+
+
+@code { [Parameter]
+    public PlayedGameInforModel Model { get; set; } = new PlayedGameInforModel();
+
+    public async Task OnAddGame()
+    {
+        //上传
+        try
+        {
+            var result = await Http.PostAsJsonAsync<AddGameToPlayedModel>(ToolHelper.WebApiPath + "api/playedgame/AddGameToPlayedList", new AddGameToPlayedModel { GameId = Model.Id });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("添加已玩游戏失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("添加已玩游戏成功", "添加已玩游戏成功");
+                Model.IsCurrentUserPlayed = true;
+                Model.PlayedCount++;
+                StateHasChanged();
+            }
+        }
+        catch
+        {
+            await ToastService.Error("添加已玩游戏失败", "发生了未预料的异常，请联系开发人员");
+        }
+    }
+
+    public async Task OnPostScore()
+    {
+        //上传
+        try
+        {
+            var result = await Http.PostAsJsonAsync<ScoreGameModel>(ToolHelper.WebApiPath + "api/playedgame/ScoreGame", new ScoreGameModel { GameId = Model.Id, ShowSocre = Model.ShowSocreCurrent, CVSocre = Model.CVSocreCurrent, SystemSocre = Model.SystemSocreCurrent, ScriptSocre = Model.ScriptSocreCurrent, PaintSocre = Model.PaintSocreCurrent });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("为游戏评分失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("为游戏评分成功", "为游戏评分成功");
+                Model.IsCurrentUserPlayed = true;
+            }
+        }
+        catch
+        {
+            await ToastService.Error("为游戏评分失败", "发生了未预料的异常，请联系开发人员");
+        }
+    }
+    public Task OnScoreClick()
+    {
+        Model.IsCurrentUserScored = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+
+}

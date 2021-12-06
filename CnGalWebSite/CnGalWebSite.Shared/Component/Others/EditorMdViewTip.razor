@@ -1,0 +1,46 @@
+﻿@inject IJSRuntime JS
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+<div style="height:800px">
+    <div id="editor">
+    </div>
+</div>
+@code {
+    [Parameter]
+    public string Context { get; set; }
+
+    public async Task<string> GetContext()
+    {
+        if (isLoaded)
+        {
+            Context = await JS.InvokeAsync<string>("getEditorMdContext");
+        }
+        return Context;
+    }
+    public async Task AddContext(string context)
+    {
+        if (isLoaded)
+        {
+            await JS.InvokeAsync<string>("addEditorMdContext", context);
+        }
+        Context += context;
+    }
+    bool isLoaded = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            //初始化编辑器
+            await JS.InvokeAsync<string>("initEditorMd", Context);
+            isLoaded = true;
+        }
+    }
+}

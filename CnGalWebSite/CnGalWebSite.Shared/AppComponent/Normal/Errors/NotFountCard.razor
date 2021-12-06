@@ -1,0 +1,50 @@
+﻿    <div class="pt-4">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <img src="//app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;">
+
+            @if (Type == "未找到词条")
+            {
+                <div class="text-center mt-4">
+                    找不到这个词条哦......不过你可以在这里
+                    <TabLink Text="创建词条" Url="@(string.IsNullOrWhiteSpace(EntryName) ?"/entries/establishentry":"/entries/establishentry?Name="+EntryName)" Icon="fa fa-pencil-square" class="alert-link">创建</TabLink>
+                    呢~
+                </div>
+            }
+            else if (Type == "未找到文章")
+            {
+                <div class="text-center mt-4">
+                    找不到这个文章哦......不过你可以在这里
+                    <TabLink Text="创建词条" Url="@(string.IsNullOrWhiteSpace(EntryName) ?"/articles/createarticle":"/articles/createarticle?Name="+EntryName)" Icon="fa fa-pencil-square" class="alert-link">发表</TabLink>
+                    呢~
+                </div>
+            }
+            else if (Type == "未找到周边")
+            {
+                <div class="text-center mt-4">
+                    找不到这个周边哦......不过你可以在这里
+                    <TabLink Text="创建周边" Url="@(string.IsNullOrWhiteSpace(EntryName) ?"/peripheries/createperiphery":"/peripheries/createperiphery?Name="+EntryName)" Icon="fa fa-pencil-square" class="alert-link">创建</TabLink>
+                    呢~
+                </div>
+            }
+            else if (Type == "未找到编辑记录")
+            {
+                <div class="text-center mt-4">
+                    找不到你的编辑记录哦......赶快去编辑吧
+                </div>
+            }
+            else if (Type == "未找到消息")
+            {
+                <div class="text-center mt-4">
+                    你还没有收到消息哦
+                </div>
+            }
+        </div>
+    </div>
+
+@code {
+    [Parameter]
+    public string EntryName { get; set; }
+    [Parameter]
+    public string Type { get; set; }
+
+}

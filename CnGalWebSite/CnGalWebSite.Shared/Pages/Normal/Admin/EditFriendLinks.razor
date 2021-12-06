@@ -1,0 +1,140 @@
+﻿@page "/admin/editfriendlinks"
+@attribute [Authorize(Roles = "Admin")]
+
+@inject HttpClient Http
+@inject IRoleService _roleService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+
+<TitleTip></TitleTip>
+
+
+<div class="">
+    <div class="" style="padding-right: 0; padding-left: 0">
+        <div class=" rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+            <h3 class="text-truncate mb-4 fw-bold">
+                编辑友情链接
+            </h3>
+            <hr />
+            <p>上传要使用图片</p>
+            @if (isReady == false)
+            {
+
+                <div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                </div>
+            }
+            else
+            {
+                <EditFriendLinksListViewTip Images="Model.FriendLinks"></EditFriendLinksListViewTip>
+
+                    <hr class="mt-4" />
+
+                    <div class="form-group row mt-4">
+                        <div class="col-sm-10">
+                            <Button style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
+                        </div>
+                    </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@code {
+    public int currentPage { get; set; } = 1;
+    public string SearchString { get; set; } = "";
+    bool isReady = false;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    public EditFriendLinksViewModel Model { get; set; } = new EditFriendLinksViewModel
+    {
+        FriendLinks = new List<FriendLinkModel>()
+    };
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<EditFriendLinksViewModel>(ToolHelper.WebApiPath + "api/admin/editfriendlinks");
+
+            StateHasChanged();
+            isReady = true;
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取友情链接信息");
+        }
+
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+
+            //检查
+            for (int i = 0; i < Model.FriendLinks.Count; i++)
+            {
+                if (string.IsNullOrWhiteSpace(Model.FriendLinks[i].ImagePath))
+                {
+                    await ToastService.Error("编辑友情链接失败", "请输入图片链接");
+                    return;
+                }
+                if (Model.FriendLinks[i].ImagePath == "background.png")
+                {
+                    await ToastService.Error("编辑友情链接失败", "不能使用默认图片");
+                    return;
+                }
+                if (string.IsNullOrWhiteSpace(Model.FriendLinks[i].Link))
+                {
+                    await ToastService.Error("编辑友情链接失败", "请输入链接");
+                    return;
+                }
+                if (string.IsNullOrWhiteSpace(Model.FriendLinks[i].Name))
+                {
+                    await ToastService.Error("编辑友情链接失败", "请输入名称");
+                    return;
+                }
+            }
+            var result = await Http.PostAsJsonAsync<EditFriendLinksViewModel>(ToolHelper.WebApiPath + "api/admin/editfriendlinks", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("编辑友情链接失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("编辑友情链接成功", "编辑友情链接成功");
+                NavigationManager.NavigateTo(Provider,"/admin/managehome", "管理主页布局", "fa fa-keyboard-o");
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "编辑友情链接失败");
+        }
+    }
+
+
+}
+

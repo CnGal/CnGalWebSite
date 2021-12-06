@@ -1,0 +1,73 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject DialogService DialogService
+
+<div class="shadow apps-footer-layout">
+    <div style="display: flex; height: 45px; flex-direction: row; align-items: center;" class="ms-2 me-2">
+        <CnGalWebSite.Shared.AppComponent.Normal.Buttons.CommentRelyButton Type="Type" RelyCallBack="RelyCallBack" ObjectId="@ObjectId" Describe="@InputDescribe" />
+        <CnGalWebSite.Shared.AppComponent.Normal.Buttons.FavoriteButton Id="@EntryId" Type="FavoriteObjectType.Entry" />
+        <CnGalWebSite.Shared.AppComponent.Normal.Buttons.ShareButton Text="@BriefIntroduction" Image="@Image"  Title="@EntryName"/>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int EntryId { get; set; }
+
+    public long CommentId { get; set; }
+
+    public string ObjectId { get; set; }
+
+    public string InputDescribe { get; set; } = "戳这里留下些什么......";
+
+    public CommentType Type { get; set; }= CommentType.CommentEntries;
+
+    [Parameter]
+    public string EntryName { get; set; }
+    [Parameter]
+    public string BriefIntroduction { get; set; }
+    [Parameter]
+    public string Image { get; set; }
+    [Parameter]
+    public EventCallback RelyCallBack { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await UnRelyComment();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UnRelyComment();
+    }
+
+    public Task RelyComment(string userName,long commentId)
+    {
+        count = 0;
+        ObjectId = commentId.ToString();
+        Type = CommentType.ReplyComment;
+        InputDescribe = "回复" + userName + "......";
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    int count = 0;
+    public Task UnRelyComment()
+    {
+        count++;
+        if(count<2)
+        {
+            return Task.CompletedTask;
+        }
+        ObjectId = EntryId.ToString();
+        Type = CommentType.CommentEntries;
+        InputDescribe = "戳这里留下些什么......";
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+}

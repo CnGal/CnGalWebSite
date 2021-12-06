@@ -1,0 +1,18 @@
+﻿@page "/space/index/{Id}/{DefaultIndex}"
+@page "/space/index/{Id}"
+
+@inject IDataCacheService _dataCacheService
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Space.Index Id="@Id" DefaultIndex="@DefaultIndex"></CnGalWebSite.Shared.Pages.Apps.Space.Index>
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Space.Index Id="@Id" DefaultIndex="@DefaultIndex"></CnGalWebSite.Shared.Pages.Webs.Space.Index>
+}
+@code{
+    [Parameter]
+    public string Id { get; set; }
+    [Parameter]
+    public string DefaultIndex { get; set; }
+}

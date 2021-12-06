@@ -1,0 +1,155 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+<TitleTip Title="@ScreeningConditions"></TitleTip>
+
+
+<div class="container" style="padding-right: 0; padding-left: 0">
+    <div class="row article-layout-center">
+        <div class="col-12">
+            <AlertTip Type="AlertTip.AlertTipType.PubulishArticle"></AlertTip>
+        </div>
+        <div class="col-12 col-md-12 col-lg-3 mb-4">
+            <div class=" rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3">
+
+                <h4 class="fw-bold mb-3">文章</h4>
+                <h5>
+                    <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("感想"))">感想</button>
+                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(()=>OnCondited("访谈"))">访谈</button>
+                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(()=>OnCondited("攻略"))">攻略</button>
+                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(()=>OnCondited("动态"))">动态</button>
+                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(()=>OnCondited("评测"))">评测</button>
+                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(()=>OnCondited("周边"))">周边</button>
+                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(()=>OnCondited("公告"))">公告</button>
+                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(()=>OnCondited("杂谈"))">杂谈</button>
+                </h5>
+                <hr />
+                <h4 class="fw-bold mt-4 mb-3">排序</h4>
+                <h5>
+                    <button type="button" class="badge-btn btn  btn-success" @onclick="@(()=>OnSorting("最后编辑时间"))">最后编辑时间</button>
+                    <button type="button" class="badge-btn btn  btn-success" @onclick="@(()=>OnSorting("发布时间"))">发布时间</button>
+                    <button type="button" class="badge-btn btn  btn-success" @onclick="@(()=>OnSorting("热度"))">热度</button>
+                </h5>
+                <hr />
+                <BootstrapBlazor.Components.Search Items="ArticleItems" IsLikeMatch="true" PlaceHolder="可以搜索哦~" OnSearch="@OnSearch"></BootstrapBlazor.Components.Search>
+            </div>
+        </div>
+        <div class="col-12  col-md-12 col-lg-9 mb-4">
+            <ArticleHomeListView Input="Input" @ref="articleHomeListView"></ArticleHomeListView>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    public PagedSortedAndFilterInput Input { get; set; } = new PagedSortedAndFilterInput { Sorting = "CreateTime desc" };
+    [Parameter]
+
+    public string Sorting { get { return null; } set { if (string.IsNullOrWhiteSpace(value) == false) OnSorting(value); } }
+    [Parameter]
+
+    public string ScreeningConditions { get { return null; } set { if (string.IsNullOrWhiteSpace(value) == false) OnCondited(value); } }
+
+    [NotNull]
+    private ArticleHomeListView? articleHomeListView { get; set; }
+    private IEnumerable<string> ArticleItems { get; set; } = new string[1] { "" };
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取所有文章
+            ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有文章名称列表失败");
+        }
+    }
+
+    private async Task OnCondited(string name)
+    {
+        Input.ScreeningConditions = name;
+        if (articleHomeListView != null)
+        {
+            await articleHomeListView.virtualize.RefreshDataAsync();
+
+        }
+    }
+
+    private async Task OnSorting(string name)
+    {
+        switch (name)
+        {
+            case "发布时间":
+                if (articleHomeListView.Input.Sorting == "CreateTime desc")
+                {
+                    articleHomeListView.Input.Sorting = "CreateTime";
+                }
+                else
+                {
+                    articleHomeListView.Input.Sorting = "CreateTime desc";
+                }
+
+                break;
+            case "最后编辑时间":
+                if (articleHomeListView.Input.Sorting == "LastEditTime desc")
+                {
+                    articleHomeListView.Input.Sorting = "LastEditTime";
+                }
+                else
+                {
+                    articleHomeListView.Input.Sorting = "LastEditTime desc";
+                }
+                break;
+            case "热度":
+                if (articleHomeListView.Input.Sorting == "ReaderCount desc")
+                {
+                    articleHomeListView.Input.Sorting = "ReaderCount";
+                }
+                else
+                {
+                    articleHomeListView.Input.Sorting = "ReaderCount desc";
+                }
+                break;
+        }
+        if (articleHomeListView != null)
+        {
+            await articleHomeListView.virtualize.RefreshDataAsync();
+
+        }
+    }
+    public async void OnClickUrl(NavigateModel model)
+    {
+        try
+        {
+            NavigationManager.NavigateTo(Provider,model.Url, model.Title, model.Icon);
+        }
+        catch
+        {
+            await ToastService.Error("导航失败", "请尝试刷新页面");
+        }
+    }
+
+    private async Task OnSearch(string text)
+    {
+        try
+        {
+            NavigationManager.NavigateTo(Provider,"/home/search/文章/Id desc/" + text, "搜索", "fa fa-search");
+        }
+        catch
+        {
+            await ToastService.Error("导航失败", "请重试");
+        }
+    }
+}
+

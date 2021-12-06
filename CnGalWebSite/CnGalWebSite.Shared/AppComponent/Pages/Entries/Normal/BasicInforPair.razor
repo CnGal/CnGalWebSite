@@ -1,0 +1,40 @@
+﻿<div style="@(Model.MultipleLines?"display: flex; flex-wrap: wrap;":"display: flex; ")">
+    @if (Model.IsLink == false)
+    {
+        <div style="color: gray; word-break: keep-all;">@(Model.Name + "：")</div>
+        <div class="@(Model.MultipleLines?"":"text-truncate")">@(Model.Value)</div>
+    }
+    else
+    {
+        <div style="color: gray; word-break: keep-all;">@(Model.Name + "：")</div>
+        if (Model.IsOutLink == false)
+        {
+            @foreach (var item in names)
+            {
+                <a class="@(Model.MultipleLines?"":"text-truncate")" href="@(string.IsNullOrWhiteSpace(Model.Url)?( "entries/index/"+ToolHelper.Base64EncodeName(item)):Model.Url)">@item</a><div>&nbsp;</div>
+            }
+        }
+        else
+        {
+            <a class="@(Model.MultipleLines?"":"text-truncate")" target="@(Model.IsOutLink?"_blank":"") " href="@(string.IsNullOrWhiteSpace(Model.Url)?Model.Value:Model.Url)">@Model.Value</a><div>&nbsp;</div>
+        }
+
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public BasicInforPairModel Model { get; set; }
+
+    List<string> names = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(string.IsNullOrWhiteSpace(Model.Value))
+        {
+            return;
+        }
+        names = Model.Value.Replace("，", ",").Replace("、", ",").Split(",").ToList();
+    }
+}

@@ -1,0 +1,83 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject NavigationManager NavigationManager
+
+
+<TitleTip Title="@ScreeningConditions"></TitleTip>
+
+<CnGalWebSite.Shared.AppComponent.Pages.Articles.Homes.HeadCard Title="@ScreeningConditions" OnTabClick="@OnSorting" OnChangeType="@ChangeDisplayMode" Sorting="@Sorting" />
+<div style="margin-top: 130px; width: 100%; ">
+    <div class="ms-3 me-3">
+        <CnGalWebSite.Shared.AppComponent.Pages.Articles.Homes.ListSearchResult Sorting="@Sorting" ScreeningConditions="@ScreeningConditions" @ref="listSearchResult" />
+    </div>
+</div>
+
+
+@code {
+    public PagedSortedAndFilterInput Input { get; set; } = new PagedSortedAndFilterInput { Sorting = "LastEditTime desc" };
+
+    [Parameter]
+    public string Sorting { get; set; }
+
+    [Parameter]
+    public string ScreeningConditions { get; set; }
+
+    CnGalWebSite.Shared.AppComponent.Pages.Articles.Homes.ListSearchResult listSearchResult;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Sorting))
+        {
+            Sorting = "Id desc";
+        }
+    }
+
+    private async Task OnSorting(int index)
+    {
+
+        switch (index)
+        {
+            case 1:
+                if (listSearchResult.Sorting == "CreateTime desc")
+                {
+                    listSearchResult.Sorting = "CreateTime";
+                }
+                else
+                {
+                    listSearchResult.Sorting = "CreateTime desc";
+                }
+
+                break;
+            case 0:
+                if (listSearchResult.Sorting == "LastEditTime desc")
+                {
+                    listSearchResult.Sorting = "LastEditTime";
+                }
+                else
+                {
+                    listSearchResult.Sorting = "LastEditTime desc";
+                }
+                break;
+            case 2:
+                if (listSearchResult.Sorting == "ReaderCount desc")
+                {
+                    listSearchResult.Sorting = "ReaderCount";
+                }
+                else
+                {
+                    listSearchResult.Sorting = "ReaderCount desc";
+                }
+                break;
+        }
+        await listSearchResult.RefreshDataAsync();
+    }
+
+    public async Task ChangeDisplayMode(DisplayMode type)
+    {
+
+        await listSearchResult.ChangeDisplayMode(type);
+    }
+}

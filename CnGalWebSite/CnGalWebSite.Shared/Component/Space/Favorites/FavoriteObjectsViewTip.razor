@@ -1,0 +1,115 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+<div class=" rounded shadow  bg-opacity rounded ps-3 pe-3 pt-3 pb-3 mb-2" style="display: flex; flex-direction: row; justify-content: space-between;">
+    <h5 class="fw-bold font-color" style="margin-bottom:auto;margin-top:auto;"><i class="fa fa-folder-open"></i>&nbsp;&nbsp;@Title</h5>
+    <div class="float: right">
+        @if (IsCurrentUser)
+        {
+            <Button @onclick="OnManage" class="btn-sm me-2" Color="Color.Dark" IsOutline="true" Size="Size.Small" Icon="fa fa-pencil-square">
+                &nbsp;管理
+            </Button>
+
+        }
+        <Button @onclick="OnReturn" class="btn-sm" Color="Color.Dark" IsOutline="true" Size="Size.Small" Icon="fa fa-rotate-left">
+            &nbsp;返回
+        </Button>
+    </div>
+   
+
+</div>
+
+@if (is404 == true)
+{
+    <NotFoundTip IsNeedLayput="true"></NotFoundTip>
+}
+
+<div>
+
+    <Virtualize ItemsProvider="@LoadArticles" @ref="virtualize">
+        @if (context.entry != null)
+        {
+            <EntryInforViewTip Model="context.entry" ColorNum="main"></EntryInforViewTip>
+
+        }
+        else if (context.article != null)
+        {
+            <ArticleInforViewTip Model="context.article"></ArticleInforViewTip>
+        }
+        else if (context.periphery != null)
+        {
+            <PeripheryInforViewTip Model="context.periphery"></PeripheryInforViewTip>
+        }
+    </Virtualize>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public PagedSortedAndFilterInput Input { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public bool IsCurrentUser { get; set; }
+
+    [NotNull]
+    public Virtualize<FavoriteObjectAloneViewModel>? virtualize { get; set; }
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+    [Parameter]
+    public EventCallback OnReturn { get; set; }
+
+    private bool is404 = false;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private async Task<PagedResultDto<FavoriteObjectAloneViewModel>> OnGetNewItems()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<PagedSortedAndFilterInput>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteObjectList", Input);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<PagedResultDto<FavoriteObjectAloneViewModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取收藏夹内容");
+            return new PagedResultDto<FavoriteObjectAloneViewModel> { Data = new List<FavoriteObjectAloneViewModel>() };
+        }
+    }
+
+    private async ValueTask<ItemsProviderResult<FavoriteObjectAloneViewModel>> LoadArticles(ItemsProviderRequest request)
+    {
+        Input.CurrentPage = request.StartIndex;
+        Input.MaxResultCount = request.Count;
+        var articles = await OnGetNewItems();
+
+        if (is404 != (articles.TotalCount == 0))
+        {
+            is404 = (articles.TotalCount == 0);
+            StateHasChanged();
+        }
+
+        return new ItemsProviderResult<FavoriteObjectAloneViewModel>(articles.Data, articles.TotalCount);
+    }
+
+    public async Task RefreshDataAsync()
+    {
+        await virtualize.RefreshDataAsync();
+    }
+    public async Task OnManage()
+    {
+        await OnClickUrl.InvokeAsync(new NavigateModel
+        {
+            Title = "管理收藏夹",
+            Icon = "fa fa-folder-open",
+            Url = "/space/EditSpaceFavoriteObjects/" + Id + "/" + ToolHelper.Base64EncodeName(Title)
+        });
+    }
+}

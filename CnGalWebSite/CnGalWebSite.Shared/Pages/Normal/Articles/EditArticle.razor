@@ -1,0 +1,25 @@
+﻿@page "/articles/editarticle/{id}"
+@attribute [Authorize]
+
+@inject IDataCacheService _dataCacheService
+
+<MakeSureInWASMTip></MakeSureInWASMTip>
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Articles.EditArticle Id="@Id" />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Articles.EditArticle Id="@Id" />
+}
+
+@code{
+    [Parameter]
+    public string Id { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        //清空当前缓存
+        _dataCacheService.ArticleIndexPageCatche.Clean(Id);
+    }
+}

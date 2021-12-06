@@ -1,0 +1,49 @@
+﻿@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject ToastService ToastService
+
+<div style="display: flex; flex-direction: column; align-items: center; cursor:pointer" @onclick="OnClick">
+    @switch (Type)
+    {
+        case ThirdPartyLoginType.Microsoft:
+            <i class="fa fa-windows fa-3x"></i>
+            <p class="m-0">微软</p>
+            break;
+        case ThirdPartyLoginType.GitHub:
+            <img src="/_content/CnGalWebSite.Shared/images/Github.png" style="width:50px;height:50px;border-radius:50%" />
+            <p class="m-0">Github</p>
+            break;
+        case ThirdPartyLoginType.Gitee:
+            <img src="/_content/CnGalWebSite.Shared/images/Gitee.png" style="width:50px;height:50px;border-radius:50%" />
+            <p class="m-0">Gitee</p>
+            break;
+        case ThirdPartyLoginType.QQ:
+            <img src="/_content/CnGalWebSite.Shared/images/QQ.png" style="width:50px;height:50px;border-radius:50%" />
+            <p class="m-0">QQ</p>
+            break;
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public ThirdPartyLoginType Type { get; set; }
+    [Parameter]
+    public EventCallback OnRedirecting { get; set; }
+    [Parameter]
+    public string ReturnUrl { get; set; }
+
+    public async Task OnClick()
+    {
+        try
+        {
+           await OnRedirecting.InvokeAsync();
+            NavigationManager.NavigateTo(ToolHelper.GetThirdPartyLoginUrl(ReturnUrl, Type));
+        }
+        catch
+        {
+            await ToastService.Error("导航失败", "请尝试刷新页面");
+        }
+    }
+
+}

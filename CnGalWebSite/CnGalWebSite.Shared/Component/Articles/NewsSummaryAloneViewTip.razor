@@ -1,0 +1,31 @@
+﻿<div class="shadow p-3">
+    <TabLink Url="@(Model.GroupId==-1?("/space/index/"+Model.UserId):( "/entries/index/"+Model.GroupId+"/10"))" Icon="fa fa-codepen" Text="@Model.GroupName" class="a-font-color mb-3" style=" display: flex; align-items: center; ">
+        <img src="@Model.GroupImage" style="height:50px;width:50px;border-radius:50%;" />
+        <div class="ms-3" style="font-size: x-large; font-weight: bold;">@Model.GroupName</div>
+    </TabLink>
+    <Collapse>
+        <CollapseItems>
+            @{ bool isFrist = true;}
+            @foreach (var item in Model.Articles)
+            {
+
+
+
+                    <CollapseItem Text="@item.DisplayName" IsCollapsed="true">
+                        <NewsSummaryAloneTip Model="item"/>
+                    </CollapseItem>
+
+                    @if(isFrist)
+                    {
+                        isFrist = false;
+                    }
+            }
+
+        </CollapseItems>
+    </Collapse>
+</div>
+
+@code {
+    [Parameter]
+    public NewsSummaryAloneViewModel Model { get; set; }
+}

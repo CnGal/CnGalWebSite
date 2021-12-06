@@ -1,0 +1,59 @@
+﻿@page "/home/themes/setlighting"
+
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+@inject IJSRuntime JS
+
+<TitleTip Title="设置主题模式"></TitleTip>
+
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="设置主题模式" />
+<div style=" margin-top: 45px; width: 100%;margin-bottom:65px;">
+    <div class="ms-3 me-3 pt-2">
+        <CnGalWebSite.Shared.AppComponent.Normal.Links.ListIconText Model="Model" ClassName="mb-4" />
+    </div>
+</div>
+
+@code {
+    private List<AppComponent.Normal.Links.IconTextModel> Model = new List<AppComponent.Normal.Links.IconTextModel>();
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+            Model.AddRange(new List<AppComponent.Normal.Links.IconTextModel>
+    {
+                new AppComponent.Normal.Links.IconTextModel
+                {
+                    Text="深色",
+                    OnClick = EventCallback.Factory.Create(this, async () => await SetDark(true)),
+                },
+                new AppComponent.Normal.Links.IconTextModel
+                {
+                    Text="明亮",
+                    OnClick = EventCallback.Factory.Create(this, async () => await SetDark(false)),
+                }
+            });
+
+    }
+    public async void OnClickBack()
+    {
+        await JS.InvokeAsync<string>("goback");
+    }
+
+    public async Task SetDark(bool isDark)
+    {
+        _dataCacheService.ThemeSetting.IsDark = isDark;
+        await _dataCacheService.SavaTheme.InvokeAsync();
+        await ToastService.Success("设置主题模式成功", "成功设置" + (isDark ? "暗色模式" : "亮色模式"));
+        OnClickBack();
+    }
+
+}

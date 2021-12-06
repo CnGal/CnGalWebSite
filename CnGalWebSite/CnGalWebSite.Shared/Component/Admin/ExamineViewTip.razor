@@ -1,0 +1,182 @@
+﻿@inject IJSRuntime JS
+
+
+<div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3">
+    <h3 class="fw-bold mb-4">@Title</h3>
+    <div class="row" style="padding-right: 0; padding-left: 0">
+        <div class="col-12 col-md-12 col-lg-8 mb-4">
+            <h5 class="fw-bold mb-4">@(Model.isExamined?"当前差异概览":"编辑概览")</h5>
+            <div class="tui-editor-contents" style=" white-space: break-spaces;">
+                @((MarkupString)Model.editOverview)
+            </div>
+        </div>
+        <div class="col-12 col-md-12 col-lg-4 pt-3 mb-4">
+            <Timeline Items="CustomerTimelineItems" />
+            <AuthorizeView Roles="Admin">
+                <ListSensitiveWordsViewTip Model="Model.SensitiveWords"></ListSensitiveWordsViewTip>
+            </AuthorizeView>
+        </div>
+        @if (string.IsNullOrWhiteSpace(Model.note) == false)
+        {
+            <div class="col-12 col-md-12 col-lg-4 pt-3">
+                <h5 class="fw-bold mb-4">备注</h5>
+                <h6>@Model.note</h6>
+            </div>
+        }
+        @if (string.IsNullOrWhiteSpace(Model.comments) == false)
+        {
+            <div class="col-12 col-md-12 col-lg-4 pt-3">
+                <h5 class="fw-bold mb-4">批注</h5>
+                <h6>@Model.comments</h6>
+            </div>
+        }
+
+
+    </div>
+</div>
+@if (Model.operation != Operation.PubulishComment)
+{
+    <div class="row mt-2" style="padding-right: 0; padding-left: 0">
+        <div class="col-12 col-md-12 col-lg-6">
+            <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mt-3">
+                <h5 class="fw-bold mb-4">@(Model.isExamined? "编辑后" : "修改前")</h5>
+                @if (Model.operation == Operation.EstablishMain)
+                {
+                    <EstablishMainViewTip Model="Model.beforeModel"></EstablishMainViewTip>
+                }
+                else if (Model.operation == Operation.EditArticleMain)
+                {
+                    <EditArticleMainViewTip Model="Model.beforeModel"></EditArticleMainViewTip>
+                }
+                else if (Model.operation == Operation.EditPeripheryMain)
+                {
+                    <EditPeripheryMainViewTip Model="Model.beforeModel"></EditPeripheryMainViewTip>
+                }
+                else if (Model.operation == Operation.EditTagMain)
+                {
+                    <EditTagMainViewTip Model="Model.beforeModel"></EditTagMainViewTip>
+                }
+                else if (Model.operation == Operation.EstablishAddInfor)
+                {
+                    <EstablishAddInforViewTip Model="Model.beforeModel"></EstablishAddInforViewTip>
+                }
+                else if (Model.operation == Operation.EstablishImages || Model.operation == Operation.EditPeripheryImages)
+                {
+                    <EstablishImagesViewTip Model="Model.beforeModel"></EstablishImagesViewTip>
+                }
+                else if (Model.operation == Operation.EstablishRelevances || Model.operation == Operation.EstablishTags || Model.operation == Operation.EditArticleRelevanes || Model.operation == Operation.EditPeripheryRelatedEntries || Model.operation == Operation.EditTagChildEntries || Model.operation == Operation.EditTagChildTags)
+                {
+                    <EstablishRelevancesViewTip Model="Model.beforeModel"></EstablishRelevancesViewTip>
+                }
+
+                else if (Model.operation == Operation.EditTag)
+                {
+                    <EditTagViewTip Model="Model.beforeModel"></EditTagViewTip>
+                }
+                else if (Model.operation == Operation.DisambigMain)
+                {
+                    <DisambigMainViewTip Model="Model.beforeModel"></DisambigMainViewTip>
+                }
+                else if (Model.operation == Operation.DisambigRelevances)
+                {
+                    <DisambigRelevancesViewTip Model="Model.beforeModel" OnClickUrl="OnClickUrl"></DisambigRelevancesViewTip>
+                }
+                else if (Model.operation == Operation.EditUserMain)
+                {
+                    <EditUserMainViewTip Model="Model.beforeModel"></EditUserMainViewTip>
+                }
+                @if (string.IsNullOrWhiteSpace(Model.beforeText) == false)
+                {
+                    <div class="tui-editor-contents">
+                        @((MarkupString)Model.beforeText)
+                    </div>
+
+                }
+
+            </div>
+        </div>
+        <div class="col-12 col-md-12 col-lg-6">
+            <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mt-3">
+                <h5 class="fw-bold mb-4">@(Model.isExamined? "当前状态" : "修改后")</h5>
+                @if (Model.operation == Operation.EstablishMain)
+                {
+                    <EstablishMainViewTip Model="Model.afterModel"></EstablishMainViewTip>
+                }
+                else if (Model.operation == Operation.EditArticleMain)
+
+                {
+                    <EditArticleMainViewTip Model="Model.afterModel"></EditArticleMainViewTip>
+                }
+                else if (Model.operation == Operation.EditPeripheryMain)
+                {
+                    <EditPeripheryMainViewTip Model="Model.afterModel"></EditPeripheryMainViewTip>
+                }
+                else if (Model.operation == Operation.EditTagMain)
+                {
+                    <EditTagMainViewTip Model="Model.afterModel"></EditTagMainViewTip>
+                }
+                else if (Model.operation == Operation.EstablishAddInfor)
+                {
+                    <EstablishAddInforViewTip Model="Model.afterModel"></EstablishAddInforViewTip>
+                }
+                else if (Model.operation == Operation.EstablishImages || Model.operation == Operation.EditPeripheryImages)
+                {
+                    <EstablishImagesViewTip Model="Model.afterModel"></EstablishImagesViewTip>
+                }
+                else if (Model.operation == Operation.EstablishRelevances || Model.operation == Operation.EstablishTags || Model.operation == Operation.EditArticleRelevanes || Model.operation == Operation.EditPeripheryRelatedEntries || Model.operation == Operation.EditTagChildEntries || Model.operation == Operation.EditTagChildTags)
+                {
+                    <EstablishRelevancesViewTip Model="Model.afterModel"></EstablishRelevancesViewTip>
+                }
+
+                else if (Model.operation == Operation.EditTag)
+                {
+                    <EditTagViewTip Model="Model.afterModel"></EditTagViewTip>
+                }
+                else if (Model.operation == Operation.DisambigMain)
+                {
+                    <DisambigMainViewTip Model="Model.afterModel"></DisambigMainViewTip>
+                }
+                else if (Model.operation == Operation.DisambigRelevances)
+                {
+                    <DisambigRelevancesViewTip Model="Model.afterModel" OnClickUrl="OnClickUrl"></DisambigRelevancesViewTip>
+                }
+                else if (Model.operation == Operation.EditUserMain)
+                {
+                    <EditUserMainViewTip Model="Model.afterModel"></EditUserMainViewTip>
+                }
+                @if (string.IsNullOrWhiteSpace(Model.afterText) == false)
+                {
+                    <div class="tui-editor-contents">
+                        @((MarkupString)Model.afterText)
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public ExaminedViewModel Model { get; set; } = new ExaminedViewModel();
+    [Parameter]
+    public List<TimelineItem> CustomerTimelineItems { get; set; } = new List<TimelineItem>();
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        try
+        {
+            await JS.InvokeAsync<string>("highlightAllCode");
+        }
+        catch
+        {
+
+        }
+    }
+}

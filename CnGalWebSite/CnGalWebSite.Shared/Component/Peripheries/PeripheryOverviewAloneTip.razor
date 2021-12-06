@@ -1,0 +1,21 @@
+﻿<TabLink Url="@("/peripheries/index/"+Model.Id)" Icon="fa-shopping-basket" Text="@Model.Name" class="a-font-color">
+    <div class=" bg-opacity" style="cursor: pointer ">
+        <div class="h-100">
+            <img src="@Model.Image" class="card-img-top" style=" width: 170px; height: auto;" alt="@Model.Name" />
+            <div style="color: white; margin-top: -26px;">
+                <div class="ps-2">
+                    <i class="fa fa-shopping-basket fa-fw "></i>
+                    <span class="article-infor-text">@Model.CollectedCount</span>
+                </div>
+            </div>
+        </div>
+        <div class="mb-2" style="padding: 0px; padding: 0px; padding-top: 0.5rem; ">
+            <span style="font-size: 15px;" class="home-card-name-text">@Model.Name</span>
+        </div>
+    </div>
+</TabLink>
+
+@code {
+    [Parameter]
+    public PeripheryOverviewModel Model { get; set; }
+}

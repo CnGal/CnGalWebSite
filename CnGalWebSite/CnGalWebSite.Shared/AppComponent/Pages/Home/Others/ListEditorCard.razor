@@ -1,0 +1,100 @@
+﻿@inject HttpClient Http
+@inject ToastService ToastService
+
+
+<div class="" style="display: flex; flex-direction: column;">
+    <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="最新编辑" ShowButton="true" UrlName="刷新" OnClick="GetNewRandomList" Icon="fa fa-refresh" />
+
+
+    <div class="row h-100 m-0 mt-1">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var item = Model[i];
+        <div class="mb-3 ps-1 pe-1 col-12">
+            <div class="bg-opacity p-2 rounded shadow-sm">
+                @{
+                    string name = item.RelatedName + " 编辑记录";
+                    string context = string.IsNullOrWhiteSpace(item.RelatedName) ? ("Id：" + item.RelatedId) : item.RelatedName;
+                }
+                @if (item.Type == ExaminedNormalListModelType.Entry)
+                {
+                    <TabLink Text="@item.RelatedName" Url="@("/entries/index/"+@item.RelatedId)" Icon="fa fa-codepen">
+                        <div>
+                            <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
+                                                 Text="@("对 "+context+" "+item.Operation.GetDisplayName())"></UserRankTextViewTip>
+                        </div>
+                    </TabLink>
+                }
+                else if (item.Type == ExaminedNormalListModelType.Article)
+                {
+                    <TabLink Text="@item.RelatedName" Url="@("/articles/index/"+@item.RelatedId)" Icon="fa fa-newspaper-o">
+                        <div>
+                            <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
+                                                 Text="@("对 "+context+" "+item.Operation.GetDisplayName())"></UserRankTextViewTip>
+                        </div>
+                    </TabLink>
+                }
+                else if (item.Type == ExaminedNormalListModelType.Tag)
+                {
+                    <TabLink Text="@item.RelatedName" Url="@("/tags/index/"+item.RelatedId)" Icon="fa fa-tag">
+                        <div>
+                            <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
+                                                 Text="@("对 "+context+" "+item.Operation.GetDisplayName())"></UserRankTextViewTip>
+                        </div>
+                    </TabLink>
+                }
+                else if (item.Type == ExaminedNormalListModelType.Disambig)
+                {
+                    <TabLink Text="@item.RelatedName" Url="@("/disambigs/index/"+@item.RelatedId)" Icon="fa fa-tag">
+                        <div>
+                            <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
+                                                 Text="@("对 "+context+" "+item.Operation.GetDisplayName())"></UserRankTextViewTip>
+                        </div>
+                    </TabLink>
+                }
+                else if (item.Type == ExaminedNormalListModelType.Periphery)
+                {
+                    <TabLink Text="@item.RelatedName" Url="@("/peripheries/index/"+@item.RelatedId)" Icon="fa fa-tag">
+                        <div>
+                            <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
+                                                 Text="@("对 "+context+" "+item.Operation.GetDisplayName())"></UserRankTextViewTip>
+                        </div>
+                    </TabLink>
+                }
+            </div>
+         
+        </div>
+        }
+    </div>
+</div>
+
+@code {
+    int ItemNum = 4;
+
+    public List<ExaminedNormalListModel> Model { get; set; } = new List<ExaminedNormalListModel>();
+  
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<List<ExaminedNormalListModel>>(ToolHelper.WebApiPath + "api/perfections/GetRecentlyEditList");
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取近期编辑列表失败");
+        }
+    }
+
+
+    public async Task GetNewRandomList()
+    {
+        await OnInitializedAsync();
+    }
+
+
+
+}

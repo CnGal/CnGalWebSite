@@ -1,0 +1,24 @@
+﻿
+<div class="card h-100  rounded shadow  bg-opacity p-4" style="border:0px">
+    <div style="height:100%">
+        <h4 class="fw-bold mb-4">@Title</h4>
+        <div class="row real-time-p " >
+            @foreach (var item in Context)
+            {
+                <p class="col-6">
+                    @item.Key：@item.Value
+                </p>
+
+            }
+        </div>
+       
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public Dictionary<string, string> Context { get; set; }
+}
+

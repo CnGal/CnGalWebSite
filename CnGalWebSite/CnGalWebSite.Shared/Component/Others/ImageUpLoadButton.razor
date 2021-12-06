@@ -1,0 +1,89 @@
+﻿@inject IAppHelper _appHelper
+@inject ToastService? ToastService
+@inject IJSRuntime JS
+@inject HttpClient Http
+
+    <div class="">
+        <input id="@up_to_chevereto" type="file" accept="image/*" multiple="multiple" class="up_to_chevereto"/>
+        <label for="@up_to_chevereto" id="@up_img_label" class="btn btn-success mb-4"><i class="fa fa-cloud-upload" aria-hidden="true"></i> @Text</label>
+    </div>
+
+@code {
+    [Parameter]
+    public EventCallback<string> OnUploadedImage { get; set; }
+    [Parameter]
+    public string Text { get; set; } = "上传图片到图床";
+
+    private DotNetObjectReference<ImageUpLoadButton> objRef;
+
+    public int RandomNum = new Random().Next();
+
+    public string up_to_chevereto => "up_to_chevereto" + RandomNum;
+    public string up_img_label => "up_img_label" + RandomNum;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            try
+            {
+                objRef = DotNetObjectReference.Create(this);
+                await JS.InvokeAsync<string>("initUploadButton",objRef, "#"+up_to_chevereto, "#" + up_img_label);
+            }
+            catch (Exception exc)
+            {
+
+            }
+        }
+    }
+
+
+    [JSInvokable]
+    public async Task<string> UpLoaded(string item)
+    {
+        string[] temp = item.Split("||");
+        string url = temp[0];
+        long size = 0;
+        try
+        {
+            size = long.Parse(temp[1]);
+        }
+        catch { }
+
+        //向用户文件管理添加信息
+        try
+        {
+            ImageInforTipViewModel model = new ImageInforTipViewModel
+            {
+                FileName = url,
+                FileSize = size,
+            };
+
+            var result = await Http.PostAsJsonAsync<ImageInforTipViewModel>(ToolHelper.WebApiPath + "api/files/AddUserLoadedFileInfor", model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("保存上传文件信息失败", obj.Error);
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "保存上传文件信息失败");
+        }
+
+        await OnUploadedImage.InvokeAsync(url);
+
+        return url;
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+    }
+}

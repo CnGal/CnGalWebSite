@@ -1,0 +1,20 @@
+﻿@page "/entries/establishentry"
+@attribute [Authorize]
+@inject IDataCacheService _dataCacheService
+
+<MakeSureInWASMTip></MakeSureInWASMTip>
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Entries.EstablishEntry Name="@Name" />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Entries.EstablishEntry Name="@Name"  />
+}
+
+@code{
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string Name { get; set; }
+}

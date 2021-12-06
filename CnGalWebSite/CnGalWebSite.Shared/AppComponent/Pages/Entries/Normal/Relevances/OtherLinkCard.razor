@@ -1,0 +1,88 @@
+﻿
+<a class="a-font-color" target="_blank" href="@Model.Url">
+    <div>
+        @{
+            string imageStr = Model.Image;
+            if (string.IsNullOrWhiteSpace(imageStr))
+            {
+                //尝试匹配标题
+                if (Model.Title == "萌娘百科")
+                {
+                    imageStr = "_content/CnGalWebSite.Shared/images/Moegirl.png";
+                }
+                else if (Model.Title == "Bangumi")
+                {
+                    imageStr = "_content/CnGalWebSite.Shared/images/Bangumi.png";
+                }
+                else if (Model.Title == "百度百科")
+                {
+                    imageStr = "_content/CnGalWebSite.Shared/images/BaiDuWiki.png";
+                }
+                else if (Model.Title == "2DFan")
+                {
+                    imageStr = "_content/CnGalWebSite.Shared/images/2DFan.png";
+                }
+                else if (Model.Title == "VNDB")
+                {
+                    imageStr = "_content/CnGalWebSite.Shared/images/VNDB.png";
+                }
+                else if (Model.Title == "App Store")
+                {
+                    imageStr = "_content/CnGalWebSite.Shared/images/AppStore.png";
+                }
+                else if (Model.Title == "Google Play")
+                {
+                    imageStr = "_content/CnGalWebSite.Shared/images/GooglePlay.png";
+                }
+                else if (Model.Title == "方块游戏")
+                {
+                    imageStr = "_content/CnGalWebSite.Shared/images/CraftGame.png";
+                }
+                else if (Model.Title == "DLsite")
+                {
+                    imageStr = "_content/CnGalWebSite.Shared/images/DLsite.png";
+                }
+                else if (Model.Title == "维基百科")
+                {
+                    imageStr = "_content/CnGalWebSite.Shared/images/Wiki.png";
+                }
+                else if (Model.Title == "TapTap")
+                {
+                    imageStr = "_content/CnGalWebSite.Shared/images/TapTap.png";
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(imageStr))
+            {
+                <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <div style="  font-size: larger;" class="">@Model.Title</div>
+                    <div class="home-card-name-text" style="font-size: 12px; color: gray;">
+                        @Model.Description
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div style="display: flex;">
+                    <div style="display: flex; flex-direction: column; justify-content: center;">
+                        <img style=" width: 60px;" src="@imageStr">
+                    </div>
+                    <div class="ms-3" style="display: flex; flex-direction: column; justify-content: center; flex: 1 1 auto; width: 0;">
+                        <div style="  font-size: larger;" class="">@Model.Title</div>
+                        <div class="home-card-name-text" style="font-size: 12px; color: gray;word-break:break-all;">
+                            @Model.Description
+                        </div>
+                    </div>
+                </div>
+
+            }
+        }
+    </div>
+
+
+</a>
+
+@code {
+    [Parameter]
+    public OtherLinkCardModel Model { get; set; }
+}

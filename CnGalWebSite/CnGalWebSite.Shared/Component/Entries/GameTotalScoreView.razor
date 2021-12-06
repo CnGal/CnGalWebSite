@@ -1,0 +1,59 @@
+﻿<div class="card h-100  rounded shadow  bg-opacity p-4 mb-3" style="border:0px">
+    <div>
+        <div class="row mt-2" style="padding-right: 0;padding-left: 0;">
+            <div class="col-12 col-md-12 col-lg-12 col-xl-8 mt-1 mb-2  d-none d-sm-block">
+                <Chart OnInitAsync="@OnInit" @ref="LineChart" />
+            </div>
+            <div class="col-12 col-md-12 col-lg-12 col-xl-4 mt-1 mb-2">
+                <Chart ChartType="ChartType.Pie" OnInitAsync="@OnPieInit" @ref="PieChart" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [NotNull]
+    private Chart? LineChart { get; set; }
+    [NotNull]
+    private Chart? PieChart { get; set; }
+    [NotNull]
+    private Chart? PieChartFile { get; set; }
+    [Parameter]
+    public PlayedGameInforModel Model { get; set; } = new PlayedGameInforModel();
+
+    private Task<ChartDataSource> OnInit()
+    {
+        var ds = new ChartDataSource();
+        ds.Options.Y.Title = "比例分数";
+
+        ds.Options.Title = "比例分数";
+
+        ds.Labels = new string[] { "配音", "作画", "剧本", "演出", "系统" };
+        double[] score = new double[] { Model.CVSocreProportion, Model.PaintSocreProportion, Model.ScriptSocreProportion, Model.ShowSocreProportion, Model.SystemSocreProportion };
+
+        ds.Data.Add(new ChartDataset()
+        {
+            Label = "比例分数",
+            Data =score.Cast<object>()
+        });
+        return Task.FromResult(ds);
+    }
+
+    private Task<ChartDataSource> OnPieInit()
+    {
+        var ds = new ChartDataSource();
+
+        ds.Options.Title = "比例分数";
+
+        ds.Labels = new string[] { "配音", "作画", "剧本", "演出", "系统" };
+        double[] score = new double[] { Model.CVSocreProportion, Model.PaintSocreProportion, Model.ScriptSocreProportion, Model.ShowSocreProportion, Model.SystemSocreProportion };
+
+        ds.Data.Add(new ChartDataset()
+        {
+            Label = "审核状态",
+            Data = score.Cast<object>()
+        });
+        return Task.FromResult(ds);
+    }
+
+}

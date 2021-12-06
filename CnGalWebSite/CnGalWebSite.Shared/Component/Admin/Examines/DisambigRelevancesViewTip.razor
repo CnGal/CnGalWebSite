@@ -1,0 +1,24 @@
+﻿<div class="row">
+
+        @foreach (var item in Model)
+        {
+            <div class="col-12">
+                @if (item.article != null)
+                {
+                    <ArticleInforViewTip Model="@item.article" OnClickUrl="OnClickUrl"></ArticleInforViewTip>
+                }
+                else if (item.entry != null)
+                {
+                    <EntryInforViewTip Model="@item.entry" OnClickUrl="OnClickUrl"></EntryInforViewTip>
+                }
+
+            </div>}
+</div>
+
+@code {
+    [Parameter]
+    public List<DisambigAloneModel> Model { get; set; } = new List<DisambigAloneModel>();
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+
+}

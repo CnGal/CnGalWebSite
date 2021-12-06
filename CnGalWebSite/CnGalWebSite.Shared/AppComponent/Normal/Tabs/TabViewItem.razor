@@ -1,0 +1,36 @@
+﻿
+<li class="@("nav-item "+Model.ClassNames)" style=" display: flex; justify-content: center;" role="presentation">
+    <a class="@("text-center rounded  tab-"+Model.Type.ToString()+"-color"+(IsSelected?" active ":""))"
+       style="cursor:pointer;width:100%"
+       id="@("pills"+Model.RandomIndex+"-"+Model.Index.ToString()+"-tab")"
+       data-bs-toggle="pill"
+       href="@("#pills"+Model.RandomIndex+"-"+Model.Index.ToString())"
+       role="tab"
+       aria-controls="@("pills"+Model.RandomIndex+"-"+Model.Index.ToString())"
+       aria-selected="@(IsSelected.ToString())"
+       @onclick="@(()=>Model.OnTabClick.InvokeAsync(Model.Index))">
+        @if (Model.Type == TableItemType.Bottom)
+        {
+            <i class="@("fa fa-fw fa-lg  li-user-space-small-icon "+Model.Icon)"></i>
+            <div class="li-user-space-small-text">@Model.Text</div>
+
+        }
+        else if (Model.Type == TableItemType.Pivot)
+        {
+            <div class="li-user-space-small-text">@Model.Text</div>
+            <div class="line w-100 mt-2" style="height:2px"></div>
+        }
+        else
+        {
+            <div class="line ps-2 pe-2">@Model.Text</div>
+        }
+    </a>
+</li>
+
+
+@code {
+    [Parameter]
+    public TabViewItemModel Model { get; set; }
+
+    private bool IsSelected => Model.Index == Model.DefaultIndex;
+}

@@ -1,0 +1,168 @@
+﻿<div class="mb-3">
+    <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3">
+        @if (EntryView.IsEdit == true)
+        {
+            @switch (EntryView.InforState)
+            {
+                case EditState.locked:
+                    <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                    break;
+                case EditState.Normal:
+                    @if (EntryView.Information.Count == 0)
+                    {
+                        <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditAddInfor/"+@EntryView.Id)"></AlertTip>
+                    }
+                    else
+                    {
+                        <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditAddInfor/"+@EntryView.Id)"></AlertTip>
+
+                    }
+
+                    break;
+            }
+        }
+        @if (EntryView.Information.Count == 0&&EntryView.InforState != EditState.Preview&&EntryView.IsEdit == false)
+        {
+            <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditAddInfor/"+@EntryView.Id)"></AlertTip>
+        }
+        @if (EntryView.InforState == EditState.Preview)
+        {
+            <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditAddInfor/" + @EntryView.Id)" ExamineType="Operation.EstablishAddInfor" OnClickRevoke="OnClickRevoke"></AlertTip>
+        }
+        @{bool isFirst = true;}
+        @foreach (var item in EntryView.Information)
+        {
+            if (isFirst == true)
+            {
+                isFirst = false;
+            }
+            else
+            {
+                <hr />
+            }
+            <h2 class="fw-bold mb-3 h4" style=" font-size: 21px;">@item.Modifier</h2>
+            <div class="row mt-2" style="padding-right: 0; padding-left: 0">
+                @foreach (var infor in item.Informations)
+                {
+
+
+                    <div class="col-12 col-md-12 col-lg-6 @(IsLargeScreen?" col-xl-12":"")">
+                        @if (infor.DisplayName == "官网")
+                        {
+                            <h6 style="word-wrap:break-word;word-break:break-all;">
+                                官网：<a target="_blank"
+                                      href="@infor.DisplayValue">@infor.DisplayValue</a>
+                                </h6>
+                            }
+                            else if (item.Modifier == "相关网站")
+                            {
+                                string temp = infor.DisplayName + "：";
+
+                                <h6 style="word-wrap:break-word;word-break:break-all;">@temp<a href="@infor.DisplayValue" target="_blank">@infor.DisplayValue</a></h6>
+
+                            }
+                            else
+                            {
+                                string temp = infor.DisplayName + "：" + infor.DisplayValue;
+                                <h6 style="word-wrap:break-word;word-break:break-all;">@temp</h6>
+                            }
+
+                    </div>
+
+                }
+            </div>
+        }
+        <div>
+            @{ bool isFirstBadge = true;}
+            @foreach (var item in EntryView.Tags)
+            {
+                <button type="button" class="badge-btn btn btn-primary m-1  @(isFirstBadge ? "ms-0" : "")"
+                        @onclick="@(() =>  OnNavigateTo("/tags/index/"+ToolHelper.Base64EncodeName(item.Name), item.Name, "fa fa-tag"))">
+                    @item.Name
+                </button>
+                isFirstBadge = false;
+            }
+            @if (EntryView.IsEdit == true)
+            {
+                @switch (EntryView.TagState)
+                {
+                    case EditState.locked:
+                        <button type="button" class="badge-btn btn btn-secondary m-1 @(isFirstBadge ? "ms-0" : "")">
+                            锁定
+                        </button>
+                        break;
+                    case EditState.Preview:
+                        <button type="button" class="badge-btn btn btn-warning m-1 @(isFirstBadge ? "ms-0" : "")"
+                                @onclick="@(() =>OnNavigateTo("/entries/EditTags/" + EntryView.Id, "编辑标签", "fa fa-edit"))">
+                            预览
+                        </button>
+                        break;
+                    case EditState.Normal:
+                        @if (EntryView.Tags.Count == 0)
+                        {
+                            <button type="button" class="badge-btn btn btn-success m-1 @(isFirstBadge ? "ms-0" : "")"
+                                    @onclick="@(() =>OnNavigateTo("/entries/EditTags/" + EntryView.Id, "编辑标签", "fa fa-edit"))">
+                                添加
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="badge-btn btn btn-primary m-1  @(isFirstBadge ? "ms-0" : "")"
+                                    @onclick="@(() =>OnNavigateTo("/entries/EditTags/" + EntryView.Id, "编辑标签", "fa fa-edit"))">
+                                编辑
+                            </button>
+                        }
+
+                        break;
+                }
+            }
+            else
+            {
+                @if (EntryView.Tags.Count == 0)
+                {
+                    <button type="button" class="badge-btn btn btn-success m-1 @(isFirstBadge ? "ms-0" : "")"
+                            @onclick="@(() => OnNavigateTo("/entries/EditTags/" + EntryView.Id, "编辑标签", "fa fa-edit"))">
+                        添加
+                    </button>
+                }
+            }
+
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel EntryView { get; set; }
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+
+    [Parameter]
+    public bool IsLargeScreen { get; set; }
+    [Parameter]
+    public EventCallback<Operation> OnClickRevoke { get; set; }
+    public async Task OnNavigateTo(string url,string title,string icon)
+    {
+        await OnClickUrl.InvokeAsync(new NavigateModel
+        {
+            Url =url,
+            Title = title,
+            Icon =icon
+        });
+    }
+    public async Task OnClick(string name)
+    {
+        await  OnClickUrl.InvokeAsync(new NavigateModel
+        {
+            Url = "/entries/index/A" + ToolHelper.Base64EncodeName(name),
+            Title = name,
+            Icon = "fa fa-codepen"
+        });
+    }
+
+}

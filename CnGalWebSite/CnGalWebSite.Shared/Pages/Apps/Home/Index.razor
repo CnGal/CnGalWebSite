@@ -1,0 +1,134 @@
+﻿@inject ToastService ToastService
+@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+<TitleTip></TitleTip>
+
+
+<CnGalWebSite.Shared.AppComponent.Pages.Home.HeadBar Model="Model" />
+
+
+<div style="margin-top: 55px; width: 100%;margin-bottom:65px; ">
+    <div class="ms-2 me-2">
+        <div class="mt-3 mb-3 p-0">
+            <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCarousel />
+
+            <div class="tab-content" id="@("pills" + randomIndex + "-tabContent")">
+                <div class="@("tab-pane fade" + (defaultIndex == 0 ? " show active " : "") )" id="@("pills" + randomIndex + "-0")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-0-tab")">
+                    <div>
+                        <CnGalWebSite.Shared.AppComponent.Pages.Home.Index />
+                    </div>
+                </div>
+                <div class="@("tab-pane fade" + (defaultIndex == 1 ? " show active " : "") )" id="@("pills" + randomIndex + "-1")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-1-tab")">
+                    <div>
+                        <CnGalWebSite.Shared.AppComponent.Pages.Entries.Index />
+                    </div>
+                </div>
+                <div class="@("tab-pane fade" + (defaultIndex == 2 ? " show active " : "") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
+                    <div>
+                        <CnGalWebSite.Shared.AppComponent.Pages.Articles.Home />
+                    </div>
+                </div>
+                <div class="@("tab-pane fade" + (defaultIndex == 3 ? " show active " : "") )" id="@("pills" + randomIndex + "-3")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-3-tab")">
+                    <div>
+                       <CnGalWebSite.Shared.AppComponent.Pages.Home.Others.Index/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<CnGalWebSite.Shared.AppComponent.Pages.Home.HomeFooter OnTabClick="OnTabClick" DefaultIndex="defaultIndex" RandomIndex="randomIndex" />
+
+
+
+
+
+@code {
+    public CnGalWebSite.Shared.AppComponent.Pages.Home.HeadBarModel Model = new AppComponent.Pages.Home.HeadBarModel();
+
+    private int defaultIndex { get; set; } = 0;
+    [Parameter]
+    public string DefaultIndex
+    {
+        get
+        {
+            return defaultIndex.ToString();
+        }
+        set
+        {
+            try
+            {
+                defaultIndex = int.Parse(value);
+            }
+            catch
+            {
+                defaultIndex = 0;
+            }
+        }
+
+    }
+    public int TabIndexNum = 0;
+    public int randomIndex = new Random().Next();
+    string userId = "";
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated)
+        {
+            foreach (var item in user.User.Claims)
+            {
+                if (item.Type == "image")
+                {
+                    Model.Image = item.Value;
+                }
+                else if (item.Type == "userid")
+                {
+                    userId = item.Value;
+                }
+            }
+            await GetUserUnreadedMessages();
+        }
+        else
+        {
+            if (_dataCacheService.UserInfor != null)
+            {
+                Model.Image = _dataCacheService.UserInfor.PhotoPath;
+                userId = _dataCacheService.UserInfor.Id;
+                await GetUserUnreadedMessages();
+            }
+
+        }
+
+
+    }
+
+    public async Task GetUserUnreadedMessages()
+    {
+        if (string.IsNullOrWhiteSpace(userId) == false)
+        {
+            try
+            {
+                Model.UnreadedMessages = await Http.GetFromJsonAsync<UserUnReadedMessagesModel>(ToolHelper.WebApiPath + "api/space/GetUserUnReadedMessages/" + userId);
+                StateHasChanged();
+            }
+            catch
+            {
+                Model.UnreadedMessages = new UserUnReadedMessagesModel();
+            }
+        }
+
+    }
+
+
+    public async Task OnTabClick(int index)
+    {
+
+        TabIndexNum = index;
+    }
+}

@@ -1,0 +1,20 @@
+﻿@page "/articles/createarticle"
+@attribute [Authorize]
+
+@inject IDataCacheService _dataCacheService
+
+<MakeSureInWASMTip></MakeSureInWASMTip>
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Articles.CreateArticle />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Articles.CreateArticle />
+}
+
+@code{
+
+
+}

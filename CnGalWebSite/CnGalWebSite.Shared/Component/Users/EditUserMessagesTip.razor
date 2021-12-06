@@ -1,0 +1,252 @@
+﻿@inject IAuthService AuthService
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+<div class="">
+        <div class="mb-4" style="padding-right: 0;padding-left: 0;">
+            <div class=" rounded shadow -lg p-4 bg-opacity">
+                <h3 class="fw-bold">@Title</h3>
+                <h5 class="text-truncate mb-4 fw-bold">@Subtitle</h5>
+                <hr />
+                <Table TItem="ListMessageAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
+                       ShowExtendButtons="true" ExtendButtonColumnWidth="200" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+                       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+                    <TableToolbarTemplate>
+                        <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Info" Icon="fa fa-plus" Text="发送消息" OnClickCallback="@((IEnumerable<ListMessageAloneModel> items)=> { return PostMessage(); })" IsAsync="true" />
+                        <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Success" Icon="fa fa-database" Text="已读" OnClickCallback="OnReadedClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Primary" Icon="fa fa-pencil-square-o" Text="未读" OnClickCallback="OnNotReadedClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Danger" Icon="fa fa-close" Text="删除" OnClickCallback="OnDeleteClick" IsAsync="true" />
+
+                    </TableToolbarTemplate>
+                    <TableColumns>
+                        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
+                        <TableColumn @bind-Field="@context.Type" Searchable="true" Sortable="true" Width="100" />
+                        <TableColumn @bind-Field="@context.Title" Sortable="true" Searchable="true" Width="200" />
+                        <TableColumn @bind-Field="@context.Text" Searchable="true" AllowTextWrap="true" Width="300" />
+
+                        <TableColumn @bind-Field="@context.PostTime" Sortable="true" AllowTextWrap="true" Width="120" />
+                        <TableColumn @bind-Field="@context.ApplicationUserId" Sortable="true" Searchable="true" AllowTextWrap="true" Width="160" />
+                        <TableColumn @bind-Field="@context.Rank" Sortable="true" Searchable="true" AllowTextWrap="true" Width="100" />
+                        <TableColumn @bind-Field="@context.Link" Sortable="true" Searchable="true" AllowTextWrap="true" Width="200" />
+                        <TableColumn @bind-Field="@context.AdditionalInfor" Sortable="true" Searchable="true" Width="130" AllowTextWrap="true" />
+                        <TableColumn @bind-Field="@context.LinkTitle" Sortable="true" Searchable="true" AllowTextWrap="true" Width="160" />
+                        <TableColumn @bind-Field="@context.Image" Sortable="true" Searchable="true" AllowTextWrap="true" Width="160" />
+                        <TableColumn @bind-Field="@context.IsReaded" Sortable="true" Searchable="true" ComponentType="@typeof(Switch)" Width="110" />
+                    </TableColumns>
+                    <RowButtonTemplate>
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickCallback="@(() => LookLink( context.Link , context.LinkTitle))" />
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-comments-o" Text="切换状态" IsAsync="true" OnClickCallback="@(() => OnRowEditIsReadedClick(new long[] { context.Id }, !context.IsReaded, true))" />
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-close" Text="删除" IsAsync="true" OnClickCallback="@(() =>  OnRowDeleteClick(new long[] { context.Id },true))" />
+                    </RowButtonTemplate>
+                </Table>
+            </div>
+        </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Subtitle { get; set; }
+
+    [NotNull]
+    private Table<ListMessageAloneModel>? TableRows { get; set; }
+    private List<ListMessageAloneModel> SelectedRows { get; set; } = new();
+
+    public ListMessagesInforViewModel InforModel { get; set; } = new ListMessagesInforViewModel();
+    public ListMessagesViewModel ListModel { get; set; } = new ListMessagesViewModel { Messages = new List<ListMessageAloneModel>() };
+
+    private ListMessageAloneModel SearchModelUser { get; set; } = new ListMessageAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    private async Task<QueryData<ListMessageAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+            SearchModelUser.ApplicationUserId = Id;
+
+            var result = await Http.PostAsJsonAsync<MessagesPagesInfor>(ToolHelper.WebApiPath + "api/space/GetMessagesListNormal", new MessagesPagesInfor { SearchModel = SearchModelUser, Options = options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListMessageAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取消息列表");
+            return new QueryData<ListMessageAloneModel>();
+        }
+    }
+
+    private Task LookLink(string link, string name)
+    {
+        if (string.IsNullOrWhiteSpace(link) == false)
+        {
+            NavigationManager.NavigateTo(Provider,link, name, "fa fa-star-o");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private async Task OnRowEditIsReadedClick(long[] ids, bool isReaded, bool showMessage)
+    {
+        string tempString = isReaded == true ? "设置用户消息已读" : "设置用户消息未读";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditMessageIsReadedModel>(ToolHelper.WebApiPath + "api/space/UserEditMessageIsReaded", new EditMessageIsReadedModel { Ids = ids, IsReaded = isReaded });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "成功", tempString + "成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "失败");
+        }
+    }
+
+    private async Task OnReadedClick(IEnumerable<ListMessageAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改用户留言状态", "请选中用户");
+            return;
+        }
+
+        await OnRowEditIsReadedClick(items.Select(s => s.Id).ToArray(), true, false);
+
+        await ToastService.Success("开启用户评论成功", "开启用户评论成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnNotReadedClick(IEnumerable<ListMessageAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改用户留言状态", "请选中用户");
+            return;
+        }
+
+        await OnRowEditIsReadedClick(items.Select(s => s.Id).ToArray(), false, false);
+
+        await ToastService.Success("关闭用户评论成功", "关闭用户评论成功");
+        await TableRows.QueryAsync();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="item"></param>
+    private async Task OnRowDeleteClick(long[] ids, bool showMessage)
+    {
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<DeleteMessagesModel>(ToolHelper.WebApiPath + "api/space/UserDeleteMessages", new DeleteMessagesModel { Ids = ids });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("删除消息失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success("删除消息成功", "删除消息成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "删除消息失败");
+        }
+    }
+
+    private async Task OnDeleteClick(IEnumerable<ListMessageAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有删除消息", "请选中消息");
+            return;
+        }
+
+        await OnRowDeleteClick(items.Select(s => s.Id).ToArray(), false);
+
+        await ToastService.Success("删除消息成功", "删除消息成功");
+        await TableRows.QueryAsync();
+    }
+
+    [Inject]
+    [NotNull]
+    private DialogService? DialogService { get; set; }
+    public async Task PostMessage()
+    {
+        ListMessageAloneModel model = new ListMessageAloneModel
+        {
+            PostTime = DateTime.Now.ToCstTime(),
+            ApplicationUserId = Id,
+            Image="default/user.png"
+        };
+        var items = Utility.GenerateEditorItems<ListMessageAloneModel>();
+
+        var option = new EditDialogOption<ListMessageAloneModel>()
+        {
+            Title = "发送消息",
+            Model = model,
+            Items = items,
+            OnCloseAsync = () =>
+            {
+                //Trace.Log("关闭按钮被点击");
+                return Task.CompletedTask;
+            },
+            OnSaveAsync = async context =>
+            {
+
+                var result = await Http.PostAsJsonAsync<ListMessageAloneModel>(ToolHelper.WebApiPath + "api/space/PostMessages", (ListMessageAloneModel)context.Model);
+                string jsonContent = result.Content.ReadAsStringAsync().Result;
+                var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+                if (obj.Successful == false)
+                {
+                    await ToastService.Error( "发送消息失败", obj.Error);
+                }
+                else
+                {
+
+                    await ToastService.Success("发送消息成功", "发送消息成功");
+                    await TableRows.QueryAsync();
+                }
+
+                return true;
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
+    }
+}

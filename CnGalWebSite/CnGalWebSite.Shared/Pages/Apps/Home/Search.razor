@@ -1,0 +1,75 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject NavigationManager NavigationManager
+
+
+<TitleTip></TitleTip>
+
+<CnGalWebSite.Shared.AppComponent.Pages.Home.Search.HeadCard SearchText="@FilterText" OnTabClick="OnScreeningConditions" OnChangeType="ChangeDisplayMode" ScreeningConditions="@ScreeningConditions" OnSearch="OnSearch" />
+<div style="margin-top: 130px; width: 100%;">
+    <div class="ms-3 me-3">
+        <CnGalWebSite.Shared.AppComponent.Pages.Home.Search.ListSearchResult Sorting="@Sorting" ScreeningConditions="@ScreeningConditions" @ref="listSearchResult" FilterText="@FilterText" />
+    </div>
+</div>
+
+
+@code {
+    public PagedSortedAndFilterInput Input { get; set; } = new PagedSortedAndFilterInput { Sorting = "LastEditTime desc" };
+
+    [Parameter]
+    public string Sorting { get; set; }
+
+    [Parameter]
+    public string ScreeningConditions { get; set; }
+
+    [Parameter]
+    public string FilterText { get; set; }
+
+    CnGalWebSite.Shared.AppComponent.Pages.Home.Search.ListSearchResult listSearchResult;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Sorting))
+        {
+            Sorting = "Id desc";
+        }
+        if (string.IsNullOrWhiteSpace(ScreeningConditions))
+        {
+            ScreeningConditions = "全部";
+        }
+
+    }
+
+    private async Task OnScreeningConditions(int index)
+    {
+
+        switch (index)
+        {
+            case 0:
+                listSearchResult.ScreeningConditions = "全部";
+                break;
+            case 1:
+                listSearchResult.ScreeningConditions = "词条";
+                break;
+            case 2:
+                listSearchResult.ScreeningConditions = "文章";
+                break;
+        }
+        await listSearchResult.RefreshDataAsync();
+    }
+
+    public async Task ChangeDisplayMode(DisplayMode type)
+    {
+
+        await listSearchResult.ChangeDisplayMode(type);
+    }
+
+    public async Task OnSearch(string text)
+    {
+        FilterText=listSearchResult.FilterText = text;
+        await listSearchResult.RefreshDataAsync();
+    }
+}

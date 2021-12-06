@@ -1,0 +1,74 @@
+﻿
+
+<div style="display: flex; flex-wrap: wrap; justify-content: center;">
+        @Text1
+        <u>
+            <a rel="@Text2" href="@Text3" target="_blank" class="word-warp-break" style="color: white;">@Text4</a>
+        </u>
+        &nbsp; @Text5
+</div>
+@code {
+    public string Text1 { get; set; }
+    public string Text2 { get; set; }
+    public string Text3 { get; set; }
+    public string Text4 { get; set; }
+    public string Text5 { get; set; }
+
+    public int Index { get; set; }
+
+    private System.Threading.Timer mytimer;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            //启动定时器
+            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 6);
+
+        }
+    }
+    public async void Send(object o)
+    {
+        try
+        {
+            await InvokeAsync(() =>
+            {
+                Index++;
+                Index = Index % 2;
+
+
+                Text1 = Index switch
+                {
+                    0 => "欢迎加入CnGal玩家交流群：",
+                    1 => "CnGal资料站编辑者交流与BUG反馈群：",
+                };
+                Text2 = Index switch
+                {
+                    0 => "点击链接加入群聊【CnGal资料站】",
+                    1 => "点击链接加入群聊【CnGal-NewType反馈群】",
+                };
+                Text3 = Index switch
+                {
+                    0 => "https://jq.qq.com/?_wv=1027&k=mG6qNvyg",
+                    1 => "https://jq.qq.com/?_wv=1027&k=JzuI1IkF",
+                };
+                Text4 = Index switch
+                {
+                    0 => "128446539",
+                    1 => "761794704",
+                };
+                Text5 = Index switch
+                {
+                    0 => "",
+                    1 => "欢迎加入",
+                };
+                StateHasChanged();
+            });
+        }
+        catch
+        {
+
+        }
+    }
+
+}

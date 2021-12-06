@@ -1,0 +1,31 @@
+﻿
+<div class="mt-2">
+
+    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Staff.Game.ListGameCard Model="Games" />
+
+</div>
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public int TabIndex { get; set; }
+    public List<Game.GameCardModel> Games = new List<Game.GameCardModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        foreach (var item in Model.StaffGames)
+        {
+            Games.Add(new Game.GameCardModel
+            {
+                BriefIntroduction=item.BriefIntroduction,
+                Image=item.Image,
+                Link=item.Link,
+                Name=item.Name,
+                Positions=item.Positions
+            });
+        }
+       
+    }
+
+}

@@ -1,0 +1,21 @@
+﻿@page "/tags/createtag"
+
+
+@attribute [Authorize]
+
+@inject IDataCacheService _dataCacheService
+
+<MakeSureInWASMTip></MakeSureInWASMTip>
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Tags.CreateTag />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Tags.CreateTag />
+}
+
+@code{
+
+}

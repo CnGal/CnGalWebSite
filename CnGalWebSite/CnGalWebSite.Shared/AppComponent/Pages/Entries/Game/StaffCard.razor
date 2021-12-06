@@ -1,0 +1,40 @@
+﻿
+<div>
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            @if (string.IsNullOrWhiteSpace(item.Modifier) == false)
+            {
+                <h5 class=" fw-bold col-12 mb-2 mt-3" style=" font-size: larger; ">
+                    @item.Modifier
+                </h5>
+            }
+
+            @foreach (var infor in item.StaffList)
+            {
+
+                <div class="col-12" style=" display: flex; ">
+                    <span style=" word-break: keep-all; ">
+                        @infor.Modifier：
+                    </span>
+                    <div>
+                        @foreach (var temp in infor.Names)
+                        {
+                            <a href="@("/entries/index/" +ToolHelper.Base64EncodeName(temp.RealName))"
+                               class=" mb-2 me-2 "
+                               style="transition: all .6s ease; margin-top: 5px;">@temp.DisplayName</a>
+                        }
+
+                    </div>
+                </div>
+            }
+        }
+
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+        public List<StaffInforModel> Model { get; set; }
+}

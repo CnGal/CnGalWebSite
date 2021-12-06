@@ -1,0 +1,111 @@
+﻿
+
+<TitleTip Title="关于我们"></TitleTip>
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="关于我们" />
+
+<div style=" margin-top: 45px; width: 100%;margin-bottom:65px;">
+
+<CnGalWebSite.Shared.AppComponent.Pages.Home.About.HeadCard Version="1.0" LastUpdateTime="2021/12/4 15:34"/>
+    <div style="display: flex; flex-direction: row; align-items: center;" class="ms-3 me-3 pt-4 mb-2">
+        <CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine Model="TabItems" />
+    </div>
+
+    <div class="ms-3 me-3">
+        <div class="mt-3 mb-3" style="padding-right: 0;padding-left: 0;">
+            <div class="tab-content" id="@("pills" + randomIndex + "-tabContent")">
+                <div class="@("tab-pane fade" + (defaultIndex == 0 ? " show active " : "") )" id="@("pills" + randomIndex + "-0")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-0-tab")">
+                    <div>
+                        <CnGalWebSite.Shared.AppComponent.Pages.Home.About.BasicInfor/>
+                    </div>
+                </div>
+                <div class="@("tab-pane fade" + (defaultIndex == 1 ? " show active " : "") )" id="@("pills" + randomIndex + "-1")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-1-tab")">
+                    <div>
+                        <CnGalWebSite.Shared.AppComponent.Pages.Home.About.UpdateInfor></CnGalWebSite.Shared.AppComponent.Pages.Home.About.UpdateInfor>
+                    </div>
+                </div>
+                <div class="@("tab-pane fade" + (defaultIndex == 2 ? " show active " : "") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
+                    <div class="pt-2">
+                        <CnGalWebSite.Shared.AppComponent.Pages.Home.About.QuoteInfor></CnGalWebSite.Shared.AppComponent.Pages.Home.About.QuoteInfor>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private int defaultIndex { get; set; } = 0;
+    [Parameter]
+    public string DefaultIndex
+    {
+        get
+        {
+            return defaultIndex.ToString();
+        }
+        set
+        {
+            try
+            {
+                defaultIndex = int.Parse(value);
+            }
+            catch
+            {
+                defaultIndex = 0;
+            }
+        }
+
+    }
+    public int TabIndexNum = 0;
+    public int randomIndex = new Random().Next();
+    bool isReady = false;
+    private CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel TabItems = new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel { Items = new List<CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel>() };
+    protected override async Task OnInitializedAsync()
+    {
+
+        int count = 3;
+        TabItems.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = defaultIndex,
+            Index = 0,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnTabClick(a)),
+            RandomIndex = randomIndex,
+            Text = "详情",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Pivot,
+            ClassNames = $"col-{12 / count} p-0"
+        });
+        TabItems.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = defaultIndex,
+            Index = 1,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnTabClick(a)),
+            RandomIndex = randomIndex,
+            Text = "更新日志",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Pivot,
+            ClassNames = $"col-{12 / count} p-0"
+        });
+        TabItems.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = defaultIndex,
+            Index = 2,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnTabClick(a)),
+            RandomIndex = randomIndex,
+            Text = "引用项目",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Pivot,
+            ClassNames = $"col-{12 / count} p-0"
+        });
+
+
+        isReady = true;
+        StateHasChanged();
+    }
+    public Task OnTabClick(int index)
+    {
+
+        TabIndexNum = index;
+        return Task.CompletedTask;
+    }
+}

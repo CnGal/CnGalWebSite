@@ -1,0 +1,56 @@
+﻿@inject ToastService ToastService
+@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+<div style="display: flex; flex-direction: column;">
+    <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="最新动态" Url="/articles/home?ScreeningConditions=动态" />
+
+    <div class="row m-0">
+        @foreach (var item in Items)
+        {
+            <div class="col-12 mb-2 ps-1 pe-1 mt-1">
+                <CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCard Model="@item"></CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCard>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    public int ItemNum { get; set; } = 3;
+    public bool IsSmallScreen { get; set; } = true;
+    public bool IsNormalScreen { get; set; }
+    public bool IsLargeScreen { get; set; }
+    public bool IsXLargeScreen { get; set; }
+
+    public List<CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCardModel> Items { get; set; } = new List<Normal.Cards.NewsThumbnailCardModel>();
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+            try
+            {
+                var model =await _dataCacheService.HomePageNewsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeNewsView",true);
+
+                foreach (var item in model.Take(3))
+                {
+                    Items.Add(new Normal.Cards.NewsThumbnailCardModel
+                    {
+                        GroupId = item.GroupId,
+                        Image = item.Image,
+                        Text = item.Text,
+                        Time = item.Time,
+                        Title = item.Title,
+                        Type = item.Type,
+                        Url =item.Link??( "/articles/index/" + item.ArticleId),
+                        IsOutLink=!string.IsNullOrWhiteSpace(item.Link)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取动态列表失败");
+            }
+    }
+}

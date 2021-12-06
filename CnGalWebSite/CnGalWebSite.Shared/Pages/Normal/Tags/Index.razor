@@ -1,0 +1,21 @@
+﻿
+@page "/tags/index/{Id}/{DefaultIndex}"
+@page "/tags/index/{Id}"
+
+@inject IDataCacheService _dataCacheService
+
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Tags.Index Id="@Id" DefaultIndex="@DefaultIndex" />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Tags.Index Id="@Id" />
+}
+@code{
+    [Parameter]
+    public string Id { get; set; }
+    [Parameter]
+    public string DefaultIndex { get; set; }
+}

@@ -1,0 +1,75 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IJSRuntime JS
+@inject IDataCacheService _dataCacheService
+
+<div class="mb-2">
+    <BootstrapBlazor.Components.Carousel Images="@Images" IsFade="true" OnClick="OnClick" class="h-100 rounded shadow-sm"></BootstrapBlazor.Components.Carousel>
+</div>
+
+@code {
+    private List<string> Images = new List<string>();
+    private List<DataModel.Model.Carousel> Carousels { get; set; } = new List<DataModel.Model.Carousel>();
+
+    public bool IsSmallScreen { get; set; }
+    public bool IsNormalScreen { get; set; }
+    public bool IsLargeScreen { get; set; } = true;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+
+    #region 新建标签页
+    public async void OpenNewPage(string url)
+    {
+        await JS.InvokeAsync<string>("openNewPage", url);
+    }
+    #endregion
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+
+            Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView",true);
+
+            //序列化轮播图
+            if (Carousels != null)
+            {
+                Images = new List<string>();
+                foreach (var item in Carousels)
+                {
+                    Images.Add(item.Image);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取轮播图列表失败");
+        }
+    }
+
+
+    private async Task OnClick(string imageUrl)
+    {
+        //查找图片对应的Link
+        foreach (var item in Carousels)
+        {
+            if (item.Image == imageUrl)
+            {
+                try
+                {
+                    await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", $"【{item.Id}】{item.Link}", "1", "click");
+                }
+                catch (Exception exc)
+                {
+
+                }
+                OpenNewPage(item.Link);
+            }
+        }
+    }
+
+}

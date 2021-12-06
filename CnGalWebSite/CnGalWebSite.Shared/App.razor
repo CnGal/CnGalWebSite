@@ -1,0 +1,71 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService _localStorage
+@using Microsoft.Extensions.Logging
+
+<BootstrapBlazorRoot>
+    <ErrorHandler @ref="errorHandler" >
+        <ErrorLogger  ShowToast="false"  >
+            @if (_dataCacheService.IsApp == false)
+            {
+                <CascadingAuthenticationState>
+                    <Router AppAssembly="@typeof(MainLayout).Assembly" PreferExactMatches="@true">
+                        <Found Context="routeData">
+                            <AuthorizeRouteView RouteData="@routeData"
+                                                DefaultLayout="@typeof(MainLayout)">
+                                <NotAuthorized>
+                                    <NotAuthorizedTipView IsNeedLayput="true"></NotAuthorizedTipView>
+                                </NotAuthorized>
+                                <Authorizing>
+                                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                                </Authorizing>
+                            </AuthorizeRouteView>
+                        </Found>
+                        <NotFound>
+                            <LayoutView Layout="@typeof(AccountLayout)">
+                                <NotFoundError></NotFoundError>
+                            </LayoutView>
+                        </NotFound>
+                    </Router>
+
+                </CascadingAuthenticationState>
+            }
+            else if (_dataCacheService.IsApp == true)
+            {
+                <CascadingAuthenticationState>
+                    <Router AppAssembly="@typeof(MobileLayout).Assembly" PreferExactMatches="@true">
+                        <Found Context="routeData">
+                            <AuthorizeRouteView RouteData="@routeData"
+                                                DefaultLayout="@typeof(MobileLayout)">
+                                <NotAuthorized>
+                                    <NotAuthorizedTipView IsNeedLayput="true"></NotAuthorizedTipView>
+                                </NotAuthorized>
+                                <Authorizing>
+                                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(MobileLayout)" />
+                                </Authorizing>
+                            </AuthorizeRouteView>
+                        </Found>
+                        <NotFound>
+                            <LayoutView Layout="@typeof(MobileLayout)">
+                                <NotFoundError></NotFoundError>
+                            </LayoutView>
+                        </NotFound>
+                    </Router>
+
+                </CascadingAuthenticationState>
+            }
+
+        </ErrorLogger>
+    </ErrorHandler>
+</BootstrapBlazorRoot>
+
+
+@code{
+    ErrorHandler errorHandler;
+    public void OnErrorHandleAsync(ILogger logger, Exception ex)
+    {
+        errorHandler.ProcessError(ex, "发生未经捕获的异常", "代码里有Bug");
+    }
+
+}
+

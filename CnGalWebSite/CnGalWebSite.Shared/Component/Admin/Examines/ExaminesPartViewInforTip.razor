@@ -1,0 +1,15 @@
+﻿<div class="col-12 col-md-12 col-lg-6 pt-2 mt-4">
+    <div class="card " style="background-color:transparent">
+        <div class="row p-3">
+            <label class="col-sm-4 fw-bold">@DispalyName</label>
+            <label class="col-sm-8">@DispalyValue</label>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string DispalyName { get; set; }
+    [Parameter]
+    public string DispalyValue { get; set; }
+}

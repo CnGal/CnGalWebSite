@@ -1,0 +1,68 @@
+﻿@inject ToastService ToastService
+
+@inject HttpClient Http
+<style>
+    .modal-footer {
+        display: none;
+    }
+</style>
+
+<div>
+    @if (isReady)
+    {
+        <CheckboxList TValue="IEnumerable<long>" @bind-Value="@Value1" Items="@Items1" ShowLabel="true" DisplayText="选择要移动到的收藏夹" IsVertical="true"></CheckboxList>
+
+    }
+
+    <div class="mt-3" style="display: flex; justify-content: space-between;">
+        <Button Color="Color.Danger" Icon="fa fa-close" @onclick="@(()=>OnClickClose.InvokeAsync())" IsAsync="true" Text="放弃"></Button>
+        <Button Color="Color.Success" Icon="fa fa-check" class="me-1" @onclick="OnFavorited" IsAsync="true" Text="移动"></Button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnClickClose { get; set; }
+    [Parameter]
+    public EventCallback<(IEnumerable<long>, List<KeyValuePair<FavoriteObjectType, long>>)> OnFavorite { get; set; }
+
+    [Parameter]
+    public List<KeyValuePair<FavoriteObjectType, long>> ObjectIds { get; set; }
+    [Parameter]
+    public FavoriteFoldersViewModel UserFavoriteInfor { get; set; }
+
+
+    [NotNull]
+    private List<SelectedItem>? Items1 { get; set; } = new List<SelectedItem>();
+
+    public string Text { get; set; }
+    private IEnumerable<long> Value1 { get; set; }
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //序列化收藏夹
+        foreach (var item in UserFavoriteInfor.Favorites)
+        {
+            Items1.Add(new SelectedItem
+            {
+                Text = item.Name,
+                Value = item.Id.ToString()
+            });
+        }
+        isReady = true;
+        StateHasChanged();
+    }
+
+
+    public async Task OnFavorited()
+    {
+        if(Value1==null ||Value1.Any()==false)
+        {
+            await ToastService.Error("请选择要移动到的收藏夹", "请选择要移动到的收藏夹");
+            return;
+        }
+        await OnFavorite.InvokeAsync((Value1, ObjectIds));
+        await OnClickClose.InvokeAsync();
+    }
+}

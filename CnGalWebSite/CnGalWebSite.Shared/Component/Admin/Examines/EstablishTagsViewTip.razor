@@ -1,0 +1,11 @@
+﻿
+<div>
+    @foreach (var item in Model)
+    {
+<span class="badge bg-primary m-1">@item.Name</span>}
+</div>
+@code {
+    [Parameter]
+
+    public List<CnGalWebSite.DataModel.Model.Tag> Model { get; set; } = new List<CnGalWebSite.DataModel.Model.Tag>();
+}

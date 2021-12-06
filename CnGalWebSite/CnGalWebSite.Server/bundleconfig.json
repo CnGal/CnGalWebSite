@@ -1,0 +1,61 @@
+﻿[
+  {
+    "outputFileName": "wwwroot/styles/bundle-css.css",
+    "inputFiles": [
+      "wwwroot/css/app.css",
+      //"wwwroot/css/github-markdown.css",
+      "wwwroot/css/calendar-heatMap.css",
+      "wwwroot/css/site.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/styles/cover-default.min.css",
+    "inputFiles": [
+      "wwwroot/css/cover-default.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/styles/mouse.min.css",
+    "inputFiles": [
+      "wwwroot/css/mouse.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/styles/dark-cover.min.css",
+    "inputFiles": [
+      "wwwroot/css/dark-cover.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/styles/pc.min.css",
+    "inputFiles": [
+      "wwwroot/css/github-markdown.css",
+      "wwwroot/css/pc.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/styles/github-markdown.min.css",
+    "inputFiles": [
+      "wwwroot/css/github-markdown.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/styles/Lighting-mode.min.css",
+    "inputFiles": [
+      "wwwroot/css/Lighting-mode.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/styles/show-background.min.css",
+    "inputFiles": [
+      "wwwroot/css/show-background.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/scripts/bundle-js.js",
+    "inputFiles": [
+      "wwwroot/js/mouse.js",
+      "wwwroot/js/tools-inline.js"
+    ]
+  }
+]

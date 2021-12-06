@@ -1,0 +1,102 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject NavigationManager NavigationManager
+
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+
+}
+
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
+
+<div style=" margin-top: 45px; width: 100%;margin-bottom:65px;">
+
+    @if (isReady == false)
+    {
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+    }
+    else
+    {
+
+        <div class="ps-3 pe-3 pt-2 mb-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑相册" />
+            <div class="mt-4">
+                <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListImage Images="Model.Images" @ref="ImagesListEditorView"></CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListImage>
+
+            </div>
+        </div>
+    }
+
+</div>
+<CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.EditFooter OnSubmit="OnSubmit" />
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    public EditImagesViewModel Model { get; set; } = new EditImagesViewModel();
+    bool isReady = false;
+    [NotNull]
+    private CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListImage? ImagesListEditorView;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取词条信息
+            Model = await Http.GetFromJsonAsync<EditImagesViewModel>(ToolHelper.WebApiPath + "api/entries/editimages/" + Id);
+
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑词条相册失败");
+        }
+
+    }
+
+    private async Task OnSubmit(string text)
+    {
+        try
+        {
+            //复制数据
+            Model.Images = ImagesListEditorView.Images;
+
+            Model.Note = text;
+
+            var result = await Http.PostAsJsonAsync<EditImagesViewModel>(ToolHelper.WebApiPath + "api/entries/editimages", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("保存词条图片失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("保存成功", "保存词条图片成功，等待审核通过");
+                NavigationManager.NavigateTo("/entries/index/" + Model.Id);
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "保存词条图片失败");
+        }
+    }
+
+}

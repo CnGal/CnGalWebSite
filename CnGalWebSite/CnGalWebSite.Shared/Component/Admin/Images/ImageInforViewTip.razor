@@ -1,0 +1,43 @@
+﻿<div class="col-12 col-md-6 col-xl-4 col-xxl-3 col mb-3">
+    <div class="card ps-3 pt-2 pb-2 pe-3 h-100" style="background-color:transparent">
+        <div class="h-100">
+            <div>
+                <img src="@Model.FileName" class="card-img" alt="...">
+            </div>
+            <div class=" mt-2">
+                <p class="text-center" style="font-size: medium; word-break: break-word; ">
+                    @(Model.FileName ?? "")
+                </p>
+            </div>
+            <p class="text-center" style="color: gray;">
+                <i class="fa fa-calendar fa-fw"></i>
+                <span class="article-home-infor-text">@Model.UploadTime.ToString("yyyy-MM-dd HH:mm")&nbsp;&nbsp;&nbsp;</span>
+
+                <i class="fa fa-database fa-fw"></i>
+                <span class="article-home-infor-text">@(((double)Model.FileSize/(1024*1024)).ToString("0.00")) MB&nbsp;&nbsp;&nbsp;</span>
+
+                <i class="fa fa-user fa-fw" @onclick="OnClickUser"></i>
+                <span class="article-home-infor-text" @onclick="OnClickUser">@Model.UserName&nbsp;&nbsp;&nbsp;</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public ImageInforTipViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+
+    public Task OnClickUser()
+    {
+        OnClickUrl.InvokeAsync(new NavigateModel
+        {
+            Url = "/space/index/" + Model.UserId,
+            Title = Model.UserName,
+            Icon = "fa fa-star-o"
+        });
+        return Task.CompletedTask;
+    }
+}

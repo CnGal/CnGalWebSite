@@ -1,0 +1,123 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+<TitleTip></TitleTip>
+<MakeSureInWASMTip></MakeSureInWASMTip>
+<link rel="stylesheet" href="https://static.cngal.top/_content/BootstrapBlazor.Markdown/css/bootstrap.blazor.markdown.min.css" media="none" onload="this.media='all'" />
+
+<div class="">
+
+    <div class="alert alert-success  rounded shadow  rounded" role="alert">
+        可以在这里随便写一写自己想说的话，这个页面会占据最大的版面
+    </div>
+
+    @if (isReady == false)
+    {
+        <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+            <h3 class="text-truncate mb-4 fw-bold">编辑主页</h3>
+            <hr>
+
+            <div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+            <h3 class="text-truncate mb-4 fw-bold">编辑主页</h3>
+            <hr class="mb-4" />
+
+
+            <MarkdownEditorTip Context="@Model.MainPage" @ref="markdownEditorTip"></MarkdownEditorTip>
+            <div class="mt-4">
+                <Button class="m-1" style="width: 100px" @onclick="@(()=> OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
+            </div>
+
+
+        </div>
+    }
+
+</div>
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    public EditUserMainPageViewModel Model { get; set; }
+    bool isReady = false;
+
+    [NotNull]
+    private MarkdownEditorTip? markdownEditorTip;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<EditUserMainPageViewModel>(ToolHelper.WebApiPath + "api/space/editmainpage");
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑用户主页失败");
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        //上传
+        try
+        {
+            Model.MainPage = await markdownEditorTip.GetContext();
+            if (string.IsNullOrWhiteSpace(Model.MainPage))
+            {
+                Model.MainPage = "";
+            }
+
+            //检查文本长度
+            if (Model.MainPage.Length > 100000)
+            {
+                await ToastService.Error("文本长度超过上限", "强烈建议使用链接显示图片，内嵌图片会导致性能严重下降。请控制文本量，额外的文字可以移动到关联文章中");
+                return;
+            }
+            var result = await Http.PostAsJsonAsync<EditUserMainPageViewModel>(ToolHelper.WebApiPath + "api/space/editmainpage", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("保存用户主页失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("保存成功", "保存用户主页成功，等待审核通过");
+                NavigationManager.NavigateTo(Provider,"/space/index/" + Model.Id, "个人空间", "fa fa-star-o");
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "保存用户主页失败");
+        }
+    }
+}

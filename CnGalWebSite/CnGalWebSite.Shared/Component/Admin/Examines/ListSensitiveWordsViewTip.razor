@@ -1,0 +1,16 @@
+﻿@if(Model!=null&&Model.Count!=0)
+{
+    <div>
+        <p class="fw-bold mt-4 mb-3 h5 text-danger">此编辑包含以下敏感词</p>
+        @foreach(var item in Model)
+        {
+            <p class="m-0 mb-2">@item</p>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<string> Model { get; set; } = new List<string>();
+
+}

@@ -1,0 +1,41 @@
+﻿@page "/account/logout"
+@inject IAuthService AuthService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject ToastService ToastService
+@inject IDataCacheService _dataCacheService
+
+<TitleTip></TitleTip>
+<CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await authenticationStateTask;
+            var user = authState.User;
+            if (user.Identity.IsAuthenticated)
+            {
+                await AuthService.Logout();
+
+                NavigationManager.NavigateTo("/account/login");
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/home/index");
+
+
+            }
+
+        }
+        catch
+        {
+            await ToastService.Error("尝试导航失败", "请尝试刷新页面");
+        }
+    }
+}

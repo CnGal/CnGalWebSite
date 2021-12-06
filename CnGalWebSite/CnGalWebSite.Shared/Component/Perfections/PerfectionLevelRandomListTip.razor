@@ -1,0 +1,60 @@
+﻿@inject HttpClient Http
+@inject ToastService ToastService
+
+
+<div class=" rounded shadow  bg-opacity rounded h-100  pt-3 pb-3" style="display: flex; flex-direction: column;">
+    <div class="ps-4 pe-4">
+        <Button @onclick="GetNewRandomList" class="btn-sm" Color="Color.Dark" IsOutline="true" Size="Size.Small" Icon="fa fa-refresh" style="float: right" IsAsync="true">
+            &nbsp;换一组
+        </Button>
+        <h2 class="fw-bold mb-3 font-color h4"><i class="@TitleIcon"></i>&nbsp;&nbsp;@Title</h2>
+    </div>
+
+    <div class="row h-100 ps-2 pe-2">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var item =Model[i];
+            <div class="@(IsTransverse?"col-6":"col-12" )">
+                <NormalPerfectionInforTipView Model="@item"></NormalPerfectionInforTipView>
+            </div>
+        }
+    </div>
+</div>
+   
+@code {
+    int ItemNum = 4;
+
+    public List<PerfectionInforTipViewModel> Model { get; set; } = new List<PerfectionInforTipViewModel>();
+
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string TitleIcon { get; set; }
+    [Parameter]
+    public PerfectionLevel Level { get; set; }
+    [Parameter]
+    public bool IsTransverse { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<List<PerfectionInforTipViewModel>>(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLevelRadomList/"+(int)Level);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取随机词条完善度列表失败");
+        }
+    }
+
+
+    public async Task GetNewRandomList()
+    {
+        await OnInitializedAsync();
+    }
+
+
+
+}

@@ -1,0 +1,107 @@
+﻿@inject ImagesLargeViewService ImagesLargeViewService
+
+
+@if(isOpen)
+{
+<style>
+    body {
+        overflow: hidden;
+    }
+</style>
+    <div class="largeimage-bg">
+        <div class="largeimage-layout">
+            <a class="pe-3 largeimage-btn-close" @onclick="OnClose" ><i class="fa fa-close"></i></a>
+            <div class="d-flex p-3 largeimage-layout-in">
+                <a class="largeimage-btn-left" @onclick="OnMoveLeft"><i class="fa fa-chevron-left"></i></a>
+                <div class="ps-3 pe-3 largeimage-layout-img">
+                    <a href="@Model.Pictures[Model.Index].Url" target="_blank" class="largeimage-a ">
+                        <img class="largeimage-img" src="@Model.Pictures[Model.Index].Url" alt="@Model.Pictures[Model.Index].Note"/>
+                    </a>
+                </div>
+                <a class="largeimage-btn-left" @onclick="OnMoveRight"><i class="fa fa-chevron-right"></i></a>
+            </div>
+            <p class="text-center m-0" style="line-break: anywhere; font-size: medium;color:white">@Model.Pictures[Model.Index].Note</p>
+            
+            <p class="text-center mb-0" style=" line-break: anywhere; font-size: x-large; font-weight: bold; color: white;">@((Model.Index+1).ToString()+" / "+Model.Pictures.Count.ToString())</p>
+
+        </div>
+
+    </div>
+    }
+
+
+@code {
+
+    [Parameter]
+    public ImagesLargeViewModel Model { get; set; } = new ImagesLargeViewModel();
+
+    private bool isOpen = false;
+
+    /// <summary>
+    /// OnInitialized 方法
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        ImagesLargeViewService.Register(this, ViewLargeImages);
+    }
+
+    /// <summary>
+    /// 设置网站 Title 方法
+    /// </summary>
+    /// <param name="title"></param>
+    /// <returns></returns>
+    private ValueTask ViewLargeImages(ImagesLargeViewModel model)
+    {
+        if(model.Pictures==null||model.Pictures.Count==0)
+        {
+            return ValueTask.CompletedTask;
+        }
+        Model = model;
+        isOpen = true;
+        StateHasChanged();
+        return ValueTask.CompletedTask;
+    }
+
+    public Task OnMoveLeft()
+    {
+        Model.Index = (Model.Index - 1) < 0 ? (Model.Pictures.Count-1) : (Model.Index - 1);
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public Task OnMoveRight()
+    {
+        Model.Index = (Model.Index + 1) >= Model.Pictures.Count ? 0 : (Model.Index + 1);
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public Task OnClose()
+    {
+        isOpen = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Dispose 方法
+    /// </summary>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            ImagesLargeViewService.UnRegister(this);
+        }
+    }
+
+    /// <summary>
+    /// Dispose 方法
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+}

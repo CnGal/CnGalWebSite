@@ -1,0 +1,47 @@
+﻿@inject ExamineService _examineService
+
+<div>
+    <div class="row">
+        @foreach(var item in Examines.Data)
+        {
+            <TabLink Icon="fa fa-pencil" Url="@("/home/examined/" +item.Id)" Text="@(item.RelatedName + " 编辑记录")" class="a-font-color col-12 col-lg-6">
+               <div class="rounded shadow bg-opacity mb-3 p-3 ">
+                    <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks"
+                           Text="@("于 "+item.ApplyTime.ToString("yyyy年M月d日 HH:mm")+" "+item.Operation.GetDisplayName())"></UserRankTextViewTip>
+                </div>
+            </TabLink>
+        }
+    </div>
+
+    <PageDtoTip CurrentPage="Examines.CurrentPage" ShowBtnCount="1" TotalPages="Examines.TotalPages" IsSmallScreen="IsSmallScreen" OnPageChanged="OnPage"></PageDtoTip>
+</div>
+
+@code {
+    public PagedResultDto<ExaminedNormalListModel> Examines { get; set; } = new PagedResultDto<ExaminedNormalListModel> { Data = new List<ExaminedNormalListModel>(), CurrentPage = 1, TotalCount = 0 };
+
+    [Parameter]
+    public List<ExaminedNormalListModel> Model { get; set; }
+
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OnPage(1);
+    }
+
+    private Task OnPage(int pageIndex)
+    {
+        //计算词条分页信息
+        CnGalWebSite.DataModel.Application.Examines.Dtos.GetExamineInput input = new CnGalWebSite.DataModel.Application.Examines.Dtos.GetExamineInput();
+        input.CurrentPage  = pageIndex;
+        input.MaxResultCount = 10;
+        input.Sorting = "Id desc";
+        input.ScreeningConditions = "全部";
+        var dtos = _examineService.GetPaginatedResult(input, Model, ExamineService.GetExaminePagedType.Entry);
+        Examines.Data = dtos.Data.ToList();
+        Examines = dtos;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

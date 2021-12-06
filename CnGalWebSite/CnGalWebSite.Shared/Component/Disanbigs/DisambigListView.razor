@@ -1,0 +1,69 @@
+﻿@inject IAuthService AuthService
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+<div class="">
+    <div class="mb-4" style="padding-right: 0;padding-left: 0;">
+        <div class=" rounded shadow -lg p-4 bg-opacity">
+            <h3 class="fw-bold">@Title</h3>
+            <h5 class="text-truncate mb-4 fw-bold">@Subtitle</h5>
+            <hr />
+            <Table TItem="ListDisambigAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
+                   ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+                   ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+                <TableColumns>
+                    <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
+                    <TableColumn @bind-Field="@context.Name" Searchable="true" Sortable="true" Width="100" />
+                    <TableColumn @bind-Field="@context.BriefIntroduction" Sortable="true" Width="400" />
+                    <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+                </TableColumns>
+                <RowButtonTemplate>
+                    <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickCallback="@(() => { NavigationManager.NavigateTo(Provider,"/disambigs/index/" + context.Id, context.Name, "fa fa-key");return Task.CompletedTask; })" />
+                </RowButtonTemplate>
+            </Table>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Subtitle { get; set; }
+    [Parameter]
+    public CommentType Type { get; set; }
+
+
+    [NotNull]
+    private Table<ListDisambigAloneModel>? TableRows { get; set; }
+    private List<ListDisambigAloneModel> SelectedRows { get; set; } = new();
+
+    public ListCommentsInforViewModel InforModel { get; set; } = new ListCommentsInforViewModel();
+    public ListDisambigsViewModel ListModel { get; set; } = new ListDisambigsViewModel { Disambigs = new List<ListDisambigAloneModel>() };
+
+    private ListDisambigAloneModel searchModel { get; set; } = new ListDisambigAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private async Task<QueryData<ListDisambigAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<DisambigsPagesInfor>(ToolHelper.WebApiPath + "api/disambigs/GetDisambigListNormal", new DisambigsPagesInfor { SearchModel = searchModel, Options = options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListDisambigAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取消歧义页列表");
+            return new QueryData<ListDisambigAloneModel>();
+        }
+    }
+}

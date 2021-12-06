@@ -1,0 +1,1541 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+@inject IDataCacheService _dataCatcheService
+
+@inject DialogService DialogService
+
+@if (string.IsNullOrWhiteSpace(EntryView.Name) == false)
+{
+    <TitleTip Title="@(EntryView.Name)" Description="@EntryView.BriefIntroduction" Image="@EntryView.MainPicture"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+}
+
+@{bool isFirst = true;}
+@if (string.IsNullOrWhiteSpace(EntryView.SmallBackgroundPicture) == false)
+{
+    <div id="web_bg" style="background-image: url(@EntryView.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
+}
+@if (string.IsNullOrWhiteSpace(EntryView.BackgroundPicture) == false)
+{
+    <div id="web_bg" style="background-image: url(@EntryView.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
+}
+@if (isNotFound == true)
+{
+    int temp = 0;
+    <NotFoundEntry IsNeedLayput="true" EntryName="@(int.TryParse(Id,out temp)?"":ToolHelper.Base64DecodeName(Id))"></NotFoundEntry>
+}
+else
+{
+    <div class="row">
+        <div class=" @(IsLargeScreen && (EntryView.Type == EntryType.Game || EntryView.Type == EntryType.ProductionGroup) ? "col-xl-12 col-xxl-9" : "col-lg-12")">
+            @if (isReady == false)
+            {
+                <div class="  rounded shadow  bg-opacity pt-3">
+
+                    <div class="row mt-2 ms-2 me-2" style="padding-right: 0;padding-left: 0;">
+                        <div class="col-12 col-md-12 col-lg-5 mt-1 mb-4">
+                            <SkeletonAvatar Round="false" />
+                        </div>
+
+                        <div class="col-12 col-md-12 col-lg-6 mt-1 mb-2">
+                            <SkeletonParagraph />
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3">
+                        <SkeletonParagraph />
+
+                    </div>
+                </div>
+
+
+                <div class=" mt-3">
+                    <div class="  rounded shadow  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                        <SkeletonParagraph />
+                    </div>
+                </div>
+                <div class="mt-3" style="padding-right: 0;padding-left: 0;">
+                    <div class="  rounded shadow  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                        <SkeletonParagraph />
+                        <div class="mt-2">
+                        </div>
+                        <SkeletonParagraph />
+                        <div class="mt-2">
+                        </div>
+                        <SkeletonParagraph />
+                    </div>
+                </div>
+            }
+            else
+            {
+                @if (EntryView.IsHidden == true)
+                {
+                    <div class="alert alert-info  rounded shadow  rounded" role="alert">
+                        当前词条处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+                    </div>
+
+                }
+                @if (EntryView.DisambigId != 0)
+                {
+                    <AlertTip Title="@EntryView.DisambigName" Type="AlertTip.AlertTipType.EntryDisPlayDisambigTip" Url="@("/disambigs/index/" + @EntryView.DisambigId)"></AlertTip>
+                }
+                @if (EntryView.Type == EntryType.Staff)
+                {
+                    <div class="alert alert-danger  rounded shadow  rounded" role="alert">
+                        这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
+                    </div>
+                }
+                @if (EntryView.Type == EntryType.Game || EntryView.Type == EntryType.ProductionGroup)
+                {
+                    <div class="  rounded shadow  bg-opacity rounded  ps-4 pe-4 pt-3  mb-3">
+
+                        @if (EntryView.IsEdit == true)
+                        {
+
+                            @switch (EntryView.MainState)
+                            {
+                                case EditState.locked:
+                                    <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                                    break;
+                                case EditState.Normal:
+                                    <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditMain/" + @EntryView.Id)"></AlertTip>
+                                    break;
+                            }
+                        }
+                        @if (EntryView.MainState == EditState.Preview)
+                        {
+                            <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditMain/" + @EntryView.Id)" ExamineType="Operation.EstablishMain" OnClickRevoke="OnRevoke"></AlertTip>
+                        }
+
+                        <div class="row" style="padding-right: 0;padding-left: 0;">
+                            <div class="col-12 col-md-12 col-lg-5 pt-1 pb-4">
+                                <img style="width:100%;height:auto;" src="@EntryView.MainPicture" alt="@EntryView.Name">
+
+                            </div>
+                            <div class="col-12 col-md-12 col-lg-7 pt-1 pb-2">
+                                <h1 class="fw-bold h3">@EntryView.Name</h1>
+                                <div class="h4">
+
+                                    @if (string.IsNullOrWhiteSpace(EntryView.ProductionGroup) == false)
+                                    {
+                                        string[] productions = EntryView.ProductionGroup.Replace(",", "、").Replace("，", "、").Split('、');
+                                        <span class="badge  bg-title-pr  bg-title-color-pr  me-2">
+                                            制作组
+                                        </span>
+                                        @foreach (var temp in productions)
+                                        {
+                                            <TabLink Text="@temp" Url="@("/entries/index/" + ToolHelper.Base64EncodeName(temp))" Icon="fa fa-pencil-square"
+                                                     class="btn me-2 bg-title-pb bg-context-pr">@temp</TabLink>
+                                                }
+                                    }
+                                </div>
+                                <div class="h4" style="margin-top:-5px;margin-bottom:15px">
+                                    @if (string.IsNullOrWhiteSpace(EntryView.Publisher) == false)
+                                    {
+                                        string[] publishers = EntryView.Publisher.Replace(",", "、").Replace("，", "、").Split('、');
+                                        <span class="badge bg-title-pr bg-title-color-pb  me-2">
+                                            发行商
+                                        </span>
+                                        @foreach (var temp in publishers)
+                                        {
+                                            <TabLink Text="@temp" Url="@("/entries/index/" + ToolHelper.Base64EncodeName(temp))" Icon="fa fa-pencil-square"
+                                                     class="btn me-2 bg-title-pb bg-context-pb">@temp</TabLink>
+                                                }
+                                    }
+
+                                </div>
+                                <h6 style="font-size:15px;">@EntryView.BriefIntroduction</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    if (IsLargeScreen == false)
+                    {
+                        @if (IsSmallScreen)
+                        {
+                            <div class="row">
+                                <div class="col-12 ">
+                                    <EntrySteamInforTip EntryId="@EntryView.Id" SteamId="EntryView.SteamId" OnOpenNewPage="OpenNewPage" EntryName="@EntryView.Name"
+                                                        IsNormalScreen="false" IsOutSide="true" IsHiddenLink="@EntryView.IsEdit"></EntrySteamInforTip>
+                                </div>
+
+                                @if (EntryView.IsEdit == true && EntryView.Type == EntryType.Game)
+                                {
+                                    <div class="col-12  mb-3">
+                                        <EntryPerfectionInforTipView EntryId="@EntryView.Id" IsNormalScreen="true"></EntryPerfectionInforTipView>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            @if (EntryView.IsEdit == true && EntryView.Type == EntryType.Game)
+                            {
+                                @if (EntryView.SteamId > 0)
+                                {
+                                    <div class="row">
+                                        <div class="col-12 col-lg-6">
+                                            <EntrySteamInforTip EntryId="@EntryView.Id" SteamId="EntryView.SteamId" OnOpenNewPage="OpenNewPage" EntryName="@EntryView.Name"
+                                                                IsNormalScreen="false" IsOutSide="true" IsHiddenLink="@EntryView.IsEdit"></EntrySteamInforTip>
+                                        </div>
+
+                                        <div class="col-12 col-lg-6 mb-3">
+                                            <EntryPerfectionInforTipView EntryId="@EntryView.Id" IsNormalScreen="true"></EntryPerfectionInforTipView>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="row">
+
+                                        <div class="col-12 mb-3">
+                                            <EntryPerfectionInforTipView EntryId="@EntryView.Id" IsNormalScreen="true"></EntryPerfectionInforTipView>
+                                        </div>
+                                    </div>
+                                }
+
+
+                            }
+                            else
+                            {
+                                <EntrySteamInforTip EntryId="@EntryView.Id" SteamId="EntryView.SteamId" OnOpenNewPage="OpenNewPage" EntryName="@EntryView.Name"
+                                                    IsNormalScreen="@IsNormalScreen" IsOutSide="true" IsHiddenLink="@EntryView.IsEdit"></EntrySteamInforTip>
+                            }
+
+                        }
+                        <EntryBasicInforTip EntryView="EntryView" IsLargeScreen="false" OnClickUrl="OnClickUrl" OnClickRevoke="OnRevoke"></EntryBasicInforTip>
+                    }
+                    if (IsNormalScreen == true)
+                    {
+                        <EntryStaffInforTip EntryView="EntryView" IsLargeScreen="false"></EntryStaffInforTip>
+                    }
+                }
+                else
+                {
+                    <div class="  rounded shadow  bg-opacity ps-4 pe-4 pt-3 mb-3">
+                        @if (EntryView.IsEdit == true)
+                        {
+
+                            @switch (EntryView.MainState)
+                            {
+                                case EditState.locked:
+                                    <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                                    break;
+                                case EditState.Normal:
+                                    <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditMain/" + @EntryView.Id)"></AlertTip>
+                                    break;
+
+                            }
+                        }
+                        @if (EntryView.MainState == EditState.Preview)
+                        {
+                            <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditMain/" + @EntryView.Id)" ExamineType="Operation.EstablishMain" OnClickRevoke="OnRevoke"></AlertTip>
+                        }
+
+
+
+                        <div class="row" style="padding-right: 0;padding-left: 0;">
+                            <div class="col-12 col-md-4 col-lg-3 mt-1 mb-4">
+                                <img style="width:100%;height:auto;" src="@EntryView.MainPicture">
+                            </div>
+                            <div class="col-12 col-md-8 col-lg-9 mt-1 mb-4">
+                                <h3 class="fw-bold">@EntryView.Name</h3>
+                                <h6>@EntryView.BriefIntroduction</h6>
+                                <hr />
+                                @if (EntryView.IsEdit == true)
+                                {
+                                    @switch (EntryView.InforState)
+                                    {
+                                        case EditState.locked:
+                                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                                            break;
+                                        case EditState.Normal:
+                                            @if (EntryView.Information.Count == 0)
+                                            {
+                                                <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
+                                            }
+                                            else
+                                            {
+                                                <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
+                                            }
+
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    @if (EntryView.Information.Count == 0)
+                                    {
+                                        <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
+                                    }
+                                }
+                                @if (EntryView.InforState == EditState.Preview)
+                                {
+                                    <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditAddInfor/" + @EntryView.Id)" ExamineType="Operation.EstablishAddInfor" OnClickRevoke="OnRevoke"></AlertTip>
+                                }
+
+
+                                @{ isFirst = true;}
+                                @foreach (var item in EntryView.Information)
+                                {
+                                    if (isFirst == true)
+                                    {
+                                        isFirst = false;
+                                    }
+                                    else
+                                    {
+                                        <hr />
+                                    }
+                                    <h5 class="fw-bold mb-2">@item.Modifier</h5>
+                                    <div class="row mt-2" style="padding-right: 0; padding-left: 0">
+                                        @foreach (var infor in item.Informations)
+                                        {
+                                            if (item.Modifier == "相关网站")
+                                            {
+                                                <div class="col-12 col-md-12 col-lg-12">
+                                                    <h6 style="word-wrap:break-word;word-break:break-all;">@(infor.DisplayName + "：")<a href="@infor.DisplayValue" target="_blank">@infor.DisplayValue</a></h6>
+                                                </div>
+                                            }
+                                            else if (item.Modifier == "STAFF")
+                                            {
+
+                                            }
+                                            else
+                                            {
+                                                string temp = infor.DisplayName + "：" + infor.DisplayValue;
+                                                <div class="col-12 col-md-12 col-lg-12">
+                                                    <h6 style="word-wrap:break-word;word-break:break-all;">@temp</h6>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                }
+                                <div>
+                                    @{ bool isFirstBadge = true;}
+                                    @foreach (var item in EntryView.Tags)
+                                    {
+                                        <button type="button" class="badge-btn btn btn-primary m-1  @(isFirstBadge ? "ms-0" : "")"
+                                                @onclick="@(() => { NavigationManager.NavigateTo(Provider,"/tags/index/" + ToolHelper.Base64EncodeName(item.Name), item.Name, "fa fa-tag"); })">
+                                            @item.Name
+                                        </button>
+                                        isFirstBadge = false;
+                                    }
+                                    @if (EntryView.IsEdit == true)
+                                    {
+                                        @switch (EntryView.TagState)
+                                        {
+                                            case EditState.locked:
+                                                <button type="button" class="badge-btn btn btn-secondary m-1 @(isFirstBadge ? "ms-0" : "")">
+                                                    锁定
+                                                </button>
+                                                break;
+                                            case EditState.Preview:
+                                                <button type="button" class="badge-btn btn btn-warning m-1 @(isFirstBadge ? "ms-0" : "")"
+                                                        @onclick="@(() => { NavigationManager.NavigateTo(Provider,"/entries/EditTags/" + EntryView.Id, "编辑标签", "fa fa-edit"); })">
+                                                    预览
+                                                </button>
+                                                break;
+                                            case EditState.Normal:
+                                                @if (EntryView.Tags.Count == 0)
+                                                {
+                                                    <button type="button" class="badge-btn btn btn-success m-1 @(isFirstBadge ? "ms-0" : "")"
+                                                            @onclick="@(() => { NavigationManager.NavigateTo(Provider,"/entries/EditTags/" + EntryView.Id, "编辑标签", "fa fa-edit"); })">
+                                                        添加
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button" class="badge-btn btn btn-primary m-1  @(isFirstBadge ? "ms-0" : "")"
+                                                            @onclick="@(() => { NavigationManager.NavigateTo(Provider,"/entries/EditTags/" + EntryView.Id, "编辑标签", "fa fa-edit"); })">
+                                                        编辑
+                                                    </button>
+                                                }
+
+                                                break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @if (EntryView.Tags.Count == 0)
+                                        {
+                                            <button type="button" class="badge-btn btn btn-success m-1 @(isFirstBadge ? "ms-0" : "")"
+                                                    @onclick="@(() => { NavigationManager.NavigateTo(Provider,"/entries/EditTags/" + EntryView.Id, "编辑标签", "fa fa-edit"); })">
+                                                添加
+                                            </button>
+                                        }
+                                    }
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <EntryTabViewTip Type="EntryView.Type" IsEdit="EntryView.IsEdit" RandomIndex="randomIndex" IsHidden="EntryView.IsHidden"
+                                 OnTabClick="OnTabClick" IsSmallScreen="IsSmallScreen" IsFavorited="IsUserFavorited" DefaultIndex="defaultIndex"></EntryTabViewTip>
+
+                <div class="mt-3 mb-3" style="padding-right: 0;padding-left: 0;">
+                    <div class="tab-content" id="@("pills" + randomIndex + "-tabContent")">
+                        <div class="@("tab-pane fade"+(defaultIndex==0?" show active ":"") )" id="@("pills" + randomIndex + "-0")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-0-tab")">
+                            <div>
+
+                                <div class="  rounded shadow  ps-4 pe-4 pt-3 pb-3 bg-opacity">
+
+                                    @if (EntryView.IsEdit == true)
+                                    {
+                                        @switch (EntryView.MainPageState)
+                                        {
+                                            case EditState.locked:
+                                                <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                                                break;
+                                            case EditState.Normal:
+                                                @if (string.IsNullOrWhiteSpace(EntryView.MainPage) == true)
+                                                {
+                                                    <AlertTip Title="编辑词条主页" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditMainPage/" + @EntryView.Id)"></AlertTip>
+                                                }
+                                                else
+                                                {
+                                                    <AlertTip Title="编辑词条主页" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditMainPage/" + @EntryView.Id)"></AlertTip>
+
+                                                }
+
+                                                break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @if (string.IsNullOrWhiteSpace(EntryView.MainPage) == true && EntryView.MainPageState != EditState.locked)
+                                        {
+                                            <AlertTip Title="编辑词条主页" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditMainPage/" + @EntryView.Id)"></AlertTip>
+                                        }
+                                    }
+                                    @if (EntryView.MainPageState == EditState.Preview)
+                                    {
+                                        <AlertTip Title="编辑词条主页" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditMainPage/" + @EntryView.Id)" ExamineType="Operation.EstablishMainPage" OnClickRevoke="OnRevoke"></AlertTip>
+                                    }
+
+
+                                    <div class="tui-editor-contents" style="margin-bottom:0px">
+                                        @((MarkupString)EntryView.MainPage)
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="@("tab-pane fade"+(defaultIndex==1?" show active ":"") )" id="@("pills" + randomIndex + "-1")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-1-tab")">
+                            <div>
+                                <div class="  rounded shadow  ps-4 pe-4 pt-3 pb-3 bg-opacity">
+                                    @if (EntryView.IsEdit == true)
+                                    {
+                                        @switch (EntryView.ImagesState)
+                                        {
+                                            case EditState.locked:
+                                                <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                                                break;
+                                            case EditState.Normal:
+                                                @if (EntryView.Pictures.Count == 0)
+                                                {
+                                                    <AlertTip Title="编辑词条图片" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditImages/" + @EntryView.Id)"></AlertTip>
+                                                }
+                                                else
+                                                {
+                                                    <AlertTip Title="编辑词条图片" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditImages/" + @EntryView.Id)"></AlertTip>
+                                                }
+
+                                                break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @if (EntryView.Pictures.Count == 0 && EntryView.ImagesState != EditState.locked)
+                                        {
+                                            <AlertTip Title="编辑词条图片" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditImages/" + @EntryView.Id)"></AlertTip>
+                                        }
+                                    }
+                                    @if (EntryView.ImagesState == EditState.Preview)
+                                    {
+                                        <AlertTip Title="编辑词条图片" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditImages/" + @EntryView.Id)" ExamineType="Operation.EstablishImages" OnClickRevoke="OnRevoke"></AlertTip>
+                                    }
+
+
+                                    @if (TabIndexNum == 1)
+                                    {
+                                        <EntryImageListViewTip Model="EntryView.Pictures"></EntryImageListViewTip>
+                                    }
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="@("tab-pane fade"+(defaultIndex==2?" show active ":"") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
+                            <div>
+                                @if (EntryView.IsEdit == true)
+                                {
+                                    @switch (EntryView.RelevancesState)
+                                    {
+                                        case EditState.locked:
+                                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                                            break;
+                                        case EditState.Normal:
+                                            @if (EntryView.Roles.Count == 0)
+                                            {
+                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            }
+                                            else
+                                            {
+                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            }
+
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    @if (EntryView.Roles.Count == 0 && EntryView.RelevancesState != EditState.locked)
+                                    {
+                                        <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                    }
+                                }
+                                @if (EntryView.RelevancesState == EditState.Preview)
+                                {
+                                    <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"></AlertTip>
+                                }
+
+                                <EntryGameRevelanceRoleListViewTip Model="EntryView.Roles"></EntryGameRevelanceRoleListViewTip>
+
+                            </div>
+                        </div>
+                        <div class="@("tab-pane fade"+(defaultIndex==3?" show active ":"") )" id="@("pills" + randomIndex + "-3")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-3-tab")">
+                            <div>
+                                @if (EntryView.IsEdit == true)
+                                {
+                                    @switch (EntryView.RelevancesState)
+                                    {
+                                        case EditState.locked:
+                                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                                            break;
+                                        case EditState.Normal:
+                                            @if (EntryView.ArticleRelevances.Count == 0 && EntryView.EntryRelevances.Count == 0 && EntryView.OtherRelevances.Count == 0)
+                                            {
+                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            }
+                                            else
+                                            {
+                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            }
+
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    @if (EntryView.ArticleRelevances.Count == 0 && EntryView.EntryRelevances.Count == 0 && EntryView.OtherRelevances.Count == 0 && EntryView.RelevancesState != EditState.locked)
+                                    {
+                                        <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                    }
+                                }
+                                @if (EntryView.RelevancesState == EditState.Preview)
+                                {
+                                    <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"></AlertTip>
+                                }
+
+                                <EntryRelevancesNormalListViewTip Articles="EntryView.ArticleRelevances"
+                                                                  Entries="EntryView.EntryRelevances"></EntryRelevancesNormalListViewTip>
+
+                            </div>
+                        </div>
+                        <div class="@("tab-pane fade"+(defaultIndex==4?" show active ":"") )" id="@("pills" + randomIndex + "-4")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-4-tab")">
+                            <div>
+                                <EntryExaminesViewTip Model="@EntryView.Examines" IsSmallScreen="IsSmallScreen"></EntryExaminesViewTip>
+                            </div>
+                        </div>
+                        <div class="@("tab-pane fade"+(defaultIndex==10?" show active ":"") )" id="@("pills" + randomIndex + "-10")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-10-tab")">
+                            <div>
+
+                                <div class="  rounded shadow  ps-4 pe-4 pt-3 pb-3 bg-opacity">
+                                    @if (EntryView.IsEdit == true)
+                                    {
+                                        @switch (EntryView.RelevancesState)
+                                        {
+                                            case EditState.locked:
+                                                <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                                                break;
+                                            case EditState.Preview:
+                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                                break;
+                                            case EditState.Normal:
+                                                @if (AlternateTimelineItems.Count == 0)
+                                                {
+                                                    <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                                }
+                                                else
+                                                {
+                                                    <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                                }
+
+                                                break;
+                                        }
+                                        <EntryAddNewsTip EntryName="@EntryView.Name"></EntryAddNewsTip>
+                                    }
+                                    else
+                                    {
+                                        @if (AlternateTimelineItems.Count == 0 && EntryView.RelevancesState != EditState.locked)
+                                        {
+                                            <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                        }
+                                    }
+                                    @if (EntryView.RelevancesState == EditState.Preview)
+                                    {
+                                        <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"></AlertTip>
+                                    }
+
+                                    @if (AlternateTimelineItems.Count > 0)
+                                    {
+                                        <Timeline Items="AlternateTimelineItems" IsAlternate="!((IsSmallScreen) || (EntryView.NewsOfEntry.Count < 3))" />
+
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="@("tab-pane fade"+(defaultIndex==12?" show active ":"") )" id="@("pills" + randomIndex + "-12")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-12-tab")">
+                            <div>
+                                <AuthorizeView Roles="Admin">
+                                    <AlertTip Title="管理词条评论" Type="AlertTip.AlertTipType.EntryComment" Url="@("/entries/editentrycomments/" + @EntryView.Id)"></AlertTip>
+                                </AuthorizeView>
+                                @if (EntryView.CanComment)
+                                {
+                                    <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="true" IsSmallScreen="IsSmallScreen" RelyCallBack="OnRely" IsAdmin="IsAdmin" CanDeleted="CanDeleted" DeletedCallBack="OnDeleted"></CommentListView>
+                                    <ReplyCommentTip IsChild="false" ObjectId="@Id.ToString()" Type="CommentType.CommentEntries" RelyCallBack="OnRely" IsAdmin="IsAdmin"></ReplyCommentTip>
+                                }
+                                else
+                                {
+                                    <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
+                                }
+
+                            </div>
+                        </div>
+
+                        <div class="@("tab-pane fade"+(defaultIndex==14?" show active ":"") )" id="@("pills" + randomIndex + "-14")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-14-tab")">
+                            <div>
+
+                                @if (EntryView.IsEdit == true)
+                                {
+                                    @switch (EntryView.RelevancesState)
+                                    {
+                                        case EditState.locked:
+                                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                                            break;
+                                        case EditState.Preview:
+                                            <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            break;
+                                        case EditState.Normal:
+                                            @if (EntryView.StaffGames.Count == 0)
+                                            {
+                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            }
+                                            else
+                                            {
+                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            }
+
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    @if (EntryView.StaffGames.Count == 0 && EntryView.RelevancesState != EditState.locked)
+                                    {
+                                        <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                    }
+                                }
+                                @if (EntryView.RelevancesState == EditState.Preview)
+                                {
+                                    <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"></AlertTip>
+                                }
+
+                                @if (EntryView.StaffGames.Count > 0)
+                                {
+                                    <EntryStaffRelevanceGameListView Model="EntryView.StaffGames" />
+
+                                }
+                            </div>
+                        </div>
+                        <div class="@("tab-pane fade"+(defaultIndex==15?" show active ":"") )" id="@("pills" + randomIndex + "-15")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-15-tab")">
+                            <div>
+
+                                @if (EntryView.IsEdit == true)
+                                {
+                                    @switch (EntryView.RelevancesState)
+                                    {
+                                        case EditState.locked:
+                                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                                            break;
+                                        case EditState.Preview:
+                                            <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            break;
+                                        case EditState.Normal:
+                                            @if (EntryView.GroupGames.Count == 0)
+                                            {
+                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            }
+                                            else
+                                            {
+                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            }
+
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    @if (EntryView.GroupGames.Count == 0 && EntryView.RelevancesState != EditState.locked)
+                                    {
+                                        <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                    }
+                                }
+
+                                @if (EntryView.RelevancesState == EditState.Preview)
+                                {
+                                    <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"></AlertTip>
+                                }
+
+                                @if (EntryView.GroupGames.Count > 0)
+                                {
+                                    <EntryGroupRelevanceGameListView Model="EntryView.GroupGames" />
+
+                                }
+                            </div>
+                        </div>
+                        <div class="@("tab-pane fade"+(defaultIndex==16?" show active ":"") )" id="@("pills" + randomIndex + "-16")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-16-tab")">
+                            <div>
+
+                                @if (EntryView.IsEdit == true)
+                                {
+                                    @switch (EntryView.RelevancesState)
+                                    {
+                                        case EditState.locked:
+                                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                                            break;
+                                        case EditState.Preview:
+                                            <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            break;
+                                        case EditState.Normal:
+                                            @if (EntryView.OtherRelevances.Count == 0)
+                                            {
+                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            }
+                                            else
+                                            {
+                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                            }
+
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    @if (EntryView.OtherRelevances.Count == 0 && EntryView.RelevancesState != EditState.locked)
+                                    {
+                                        <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
+                                    }
+                                }
+
+                                @if (EntryView.RelevancesState == EditState.Preview)
+                                {
+                                    <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"></AlertTip>
+                                }
+
+                                @if (EntryView.OtherRelevances.Count > 0)
+                                {
+                                    <AlertTip Type="AlertTip.AlertTipType.OtherLink"></AlertTip>
+                                    <EntryRelevanceOtherListViewTip Others="EntryView.OtherRelevances" />
+                                }
+
+                            </div>
+                        </div>
+                        <div class="@("tab-pane fade"+(defaultIndex==17?" show active ":"") )" id="@("pills" + randomIndex + "-17")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-17-tab")">
+                            <div>
+                                @if (EntryView.IsEdit == true)
+                                {
+                                    @switch (EntryView.InforState)
+                                    {
+                                        case EditState.locked:
+                                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                                            break;
+                                        case EditState.Preview:
+                                            <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
+                                            break;
+                                        case EditState.Normal:
+                                            @if (EntryView.Staffs.Count == 0)
+                                            {
+                                                <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
+                                            }
+                                            else
+                                            {
+                                                <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
+                                            }
+
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    @if (EntryView.Staffs.Count == 0 && EntryView.InforState != EditState.locked)
+                                    {
+                                        <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
+                                    }
+                                }
+
+                                @if (EntryView.InforState == EditState.Preview)
+                                {
+                                    <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"></AlertTip>
+                                }
+
+                                @if (EntryView.Staffs.Count > 0)
+                                {
+                                    <EntryStaffInforTip IsSmallScreen="IsSmallScreen" EntryView="EntryView" IsLargeScreen="false"></EntryStaffInforTip>
+                                }
+                            </div>
+                        </div>
+                        <div class="@("tab-pane fade"+(defaultIndex==20?" show active ":"") )" id="@("pills" + randomIndex + "-20")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-20-tab")">
+                            <div class=" rounded shadow  bg-opacity ps-4 pe-4 pt-3 mb-3">
+                                <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (IsLargeScreen && (EntryView.Type == EntryType.Game || EntryView.Type == EntryType.ProductionGroup))
+        {
+            <div class="col-xl-12 col-xxl-3">
+                @if (isReady)
+                {
+                    @if (EntryView.IsEdit == true && EntryView.Type == EntryType.Game)
+                    {
+                        <EntryPerfectionInforTipView EntryId="@EntryView.Id"></EntryPerfectionInforTipView>
+                    }
+                    @if (EntryView.SteamId != 0)
+                    {
+
+                        <EntrySteamInforTip EntryId="@EntryView.Id" SteamId="EntryView.SteamId" OnOpenNewPage="OpenNewPage" EntryName="@EntryView.Name" IsOutSide="true" IsHiddenLink="@EntryView.IsEdit"></EntrySteamInforTip>
+                    }
+                    <EntryBasicInforTip EntryView="EntryView" IsLargeScreen="true" OnClickRevoke="OnRevoke" OnClickUrl="OnClickUrl"></EntryBasicInforTip>
+                    <EntryStaffInforTip EntryView="EntryView" IsLargeScreen="true"></EntryStaffInforTip>
+                }
+                else
+                {
+                    <div class="  rounded shadow  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                        <SkeletonParagraph />
+                        <div class="mt-2">
+                        </div>
+                        <SkeletonParagraph />
+                        <div class="mt-2">
+                        </div>
+                        <SkeletonParagraph />
+                    </div>
+                }
+
+            </div>
+        }
+    </div>
+}
+
+
+
+@code {
+    private string id = "";
+    [Parameter]
+    public string Id
+    {
+        get
+        {
+            return id;
+        }
+        set
+        {
+            id = value;
+            steamInfor = null;
+            TabIndexNum = 0;
+            randomIndex = random.Next();
+            if (isFirstLoad == false)
+            {
+                OnReLoad();
+            }
+
+
+        }
+    }
+    private int defaultIndex { get; set; } = 0;
+    [Parameter]
+    public string DefaultIndex
+    {
+        get
+        {
+            return defaultIndex.ToString();
+        }
+        set
+        {
+            try
+            {
+                defaultIndex = int.Parse(value);
+            }
+            catch
+            {
+                defaultIndex = 0;
+            }
+        }
+    }
+
+    public string MainPageHtml { get; set; }
+
+    public string steam { get; set; }
+    public int currentPage { get; set; } = 1;
+    public string NoticeCard { get; set; } = "";
+    bool isReady = false;
+    bool isNotFound = false;
+    bool isFirstLoad = true;
+    public string CurrentUserRank { get; set; }
+    Random random = new Random();
+    public int randomIndex = 0;
+
+    public EntryIndexViewModel EntryView { get; set; } = new EntryIndexViewModel
+    {
+        ArticleRelevances = new List<ArticleInforTipViewModel>(),
+        EntryRelevances = new List<EntryInforTipViewModel>(),
+        OtherRelevances = new List<RelevancesKeyValueModel>(),
+        Information = new List<InformationsModel>(),
+        Pictures = new List<PicturesViewModel>(),
+        Tags = new List<TagsViewModel>(),
+        MainPage = "# 123",
+        Type = EntryType.Staff,
+        StaffGames = new List<StaffGameModel>(),
+        GroupGames = new List<EntryInforTipViewModel>()
+
+    };
+
+    public SteamInfor steamInfor { get; set; } = new SteamInfor();
+    public int TabIndexNum = 0;
+    private readonly List<TimelineItem> AlternateTimelineItems = new List<TimelineItem>();
+    public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
+
+    public PlayedGameInforModel GameInforModel { get; set; } = new PlayedGameInforModel();
+
+    public bool IsUserFavorited { get; set; }
+    public FavoriteFoldersViewModel UserFavoriteInfor { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    #region 新建标签页
+
+    public async void OpenNewPage(string url)
+    {
+        await JS.InvokeAsync<string>("openNewPage", url);
+    }
+
+    #endregion
+
+
+    #region 获取屏幕大小
+
+    /// <summary>
+    /// 获得/设置 IJSRuntime 实例
+    /// </summary>
+    [Inject]
+    [System.Diagnostics.CodeAnalysis.NotNull]
+    public IJSRuntime? JSRuntime { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    public bool IsSmallScreen { get; set; }
+    public bool IsNormalScreen { get; set; }
+    public bool IsLargeScreen { get; set; } = true;
+    public bool IsAdmin { get; set; } = false;
+    public bool CanDeleted { get; set; }
+    string LastLookName = "";
+
+    private JSInterop<Index>? Interop { get; set; }
+    /// <summary>
+    /// OnAfterRenderAsync 方法
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+
+            isFirstLoad = false;
+
+            Interop = new JSInterop<Index>(JSRuntime);
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
+
+            //获取用户收藏夹相关信息 只需要获取一次
+            var userState = await authenticationStateTask;
+            var user = userState.User;
+            if (user.Identity.IsAuthenticated)
+            {
+                string userId = string.Empty;
+                foreach (var item in user.Claims)
+                {
+                    if (item.Type == "userid")
+                    {
+                        userId = item.Value;
+                    }
+                }
+                await GetUserFavoriteInfor(userId);
+
+            }
+
+            await OnAfterRenderAsync_();
+        }
+
+    }
+
+    /// <summary>
+    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
+    /// </summary>
+    /// <returns></returns>
+    [JSInvokable]
+    public void SetCollapsed(int width)
+    {
+        if (IsSmallScreen != (width < 1100))
+        {
+            IsSmallScreen = width < 1100;
+            StateHasChanged();
+        }
+        if (IsNormalScreen != (width >= 1100 && width < 1800))
+        {
+            IsNormalScreen = width >= 1100 && width < 1800;
+            StateHasChanged();
+        }
+        if (IsLargeScreen != (width >= 1800))
+        {
+            IsLargeScreen = width >= 1800;
+            StateHasChanged();
+        }
+    }
+
+
+    #endregion
+
+    async Task OnReLoad()
+    {
+        await OnInitializedAsync();
+        await OnAfterRenderAsync_();
+    }
+
+    async Task OnAfterRenderAsync_()
+    {
+
+        //记录数据
+        if (EntryView.Name != LastLookName && EntryView.Name != "CnGal_中文GalGame资料站")
+        {
+            LastLookName = EntryView.Name;
+
+            try
+            {
+                await JS.InvokeAsync<string>("trackEvent", "词条", "浏览", EntryView.Name, "1", "look");
+            }
+            catch (Exception exc)
+            {
+
+            }
+        }
+        //语法高亮
+        try
+        {
+            await JS.InvokeAsync<string>("highlightAllCode");
+        }
+        catch
+        {
+
+        }
+
+        //获取评分
+        /* if (EntryView.Type == EntryType.Game)
+         {
+             await GetPlayedGameInforAsync();
+         }*/
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isReady = false;
+            isNotFound = false;
+            //获取词条信息
+            EntryView = await _dataCatcheService.EntryIndexPageCatche.GetCatche(Id);
+            //判断如果名称为空则返回主页
+            if (string.IsNullOrWhiteSpace(EntryView.Name))
+            {
+                NavigationManager.NavigateTo(Provider, "/entries/home", "词条", "fa fa-codepen");
+            }
+
+            var userState = await authenticationStateTask;
+            var user = userState.User;
+            if (user.IsInRole("Admin"))
+            {
+                IsAdmin = true;
+                CanDeleted = true;
+            }
+
+            //获取评论
+            try
+            {
+                await OnCommentPageClick(1);
+            }
+            catch
+            {
+                await ToastService.Error("获取词条评论列表失败", "请在确保网络正常后联系开发人员");
+            }
+            //获取是否被收藏
+            if (user.Identity.IsAuthenticated)
+            {
+                await GetUserIsFavorited();
+            }
+            //初始化动态时间线
+            InitNewsTimeLine();
+            isReady = true;
+            StateHasChanged();
+
+        }
+        catch (Exception exc)
+        {
+            isNotFound = true;
+            isReady = true;
+            StateHasChanged();
+        }
+
+    }
+
+    public async Task GetUserIsFavorited()
+    {
+        try
+        {
+            var userFavoriteInfor = await Http.GetFromJsonAsync<IsObjectInUserFavoriteFolderResult>(ToolHelper.WebApiPath + "api/favorites/IsObjectInUserFavoriteFolder/" + EntryView.Id + "/" + FavoriteObjectType.Entry);
+
+            if (userFavoriteInfor != null)
+            {
+                IsUserFavorited = userFavoriteInfor.Result;
+
+                StateHasChanged();
+            }
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "判断该词条是否被收藏失败");
+        }
+    }
+    public async Task GetUserFavoriteInfor(string id)
+    {
+        try
+        {
+            UserFavoriteInfor = await Http.GetFromJsonAsync<FavoriteFoldersViewModel>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/" + id);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取用户收藏夹失败");
+        }
+    }
+
+    public async Task GetSteamInfor()
+    {
+        //继续尝试获取steam信息
+        if (EntryView.SteamId != 0)
+        {
+            try
+            {
+                steamInfor = await Http.GetFromJsonAsync<SteamInfor>(ToolHelper.WebApiPath + "api/steam/Getsteaminfor/" + EntryView.SteamId + "/" + EntryView.Id);
+            }
+            catch
+            {
+                steamInfor = null;
+            }
+
+        }
+
+    }
+
+    public Color GetColor(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                return Color.Primary;
+            case 1:
+                return Color.Info;
+            case 2:
+                return Color.Success;
+            case 3:
+                return Color.Warning;
+            default:
+                return Color.Danger;
+        }
+    }
+    public void InitNewsTimeLine()
+    {
+        int next = 0;
+        AlternateTimelineItems.Clear();
+        foreach (var item in EntryView.NewsOfEntry)
+        {
+            AlternateTimelineItems.Add(new TimelineItem
+            {
+                Color = GetColor((next++) % 4),
+                Component = BootstrapDynamicComponent.CreateComponent<CnGalWebSite.Shared.Component.Entries.TimeLinePart>(new Dictionary<string, object>
+                {
+                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.Title)] = item.Title,
+                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.BriefIntroduction)] = item.BriefIntroduction,
+                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.HappenedTime)] = item.HappenedTime,
+                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.Link)] = item.Link,
+                }),
+                Description = item.HappenedTime.ToString("yyyy-MM-dd")
+            });
+        }
+    }
+
+    private void UnEdit()
+    {
+        EntryView.IsEdit = false;
+    }
+    private void Edit()
+    {
+        EntryView.IsEdit = true;
+    }
+
+    private async void UnHidden()
+    {
+        try
+        {
+
+            var result = await Http.PostAsJsonAsync<HiddenEntryModel>(ToolHelper.WebApiPath + "api/entries/HiddenEntry", new HiddenEntryModel { Ids = new int[] { EntryView.Id }, IsHidden = false });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("显示词条失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("显示词条成功", "显示词条成功，离开此页面后可以请在后台恢复词条状态");
+                EntryView.IsHidden = false;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "显示词条失败");
+        }
+    }
+    private async void Hidden()
+    {
+        try
+        {
+
+            var result = await Http.PostAsJsonAsync<HiddenEntryModel>(ToolHelper.WebApiPath + "api/entries/HiddenEntry", new HiddenEntryModel { Ids = new int[] { EntryView.Id }, IsHidden = true });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("隐藏词条失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("隐藏词条成功", "隐藏词条成功，离开此页面后可以请在后台恢复词条状态");
+                EntryView.IsHidden = true;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "隐藏词条失败");
+        }
+    }
+
+
+
+    public async void ViewAtOther(string url, string name)
+    {
+        if (string.IsNullOrWhiteSpace(url) == false)
+        {
+            NavigationManager.NavigateTo(Provider, url, name, "fa fa-link");
+        }
+        else
+        {
+            await ToastService.Error("该词条不存在", "无法找到词条：" + name + "，你也可以亲自创建该词条哦");
+        }
+    }
+
+    public void OnEntryClick(string name)
+    {
+
+        NavigationManager.NavigateTo(Provider, "/entries/index/" + ToolHelper.Base64EncodeName(name), name, "fa fa-codepen");
+    }
+
+    public async Task OnTabClick(int index)
+    {
+        if (index == 5)
+        {
+            OpenNewPage(steam);
+        }
+        else if (index == 6)
+        {
+            Edit();
+        }
+        else if (index == 7)
+        {
+            UnEdit();
+        }
+        else if (index == 8)
+        {
+            UnHidden();
+        }
+        else if (index == 9)
+        {
+
+            Hidden();
+        }
+        else if (index == 11)
+        {
+            NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        }
+        else if (index == 18)
+        {
+            await OnFavoriteClick();
+
+        }
+        else if (index == 19)
+        {
+            await OnUnFavoriteClick();
+        }
+        else
+        {
+            TabIndexNum = index;
+        }
+    }
+
+    private async Task OnCommentPageClick(int pageIndex)
+    {
+        try
+        {
+            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)CommentType.CommentEntries + "/" + EntryView.Id + "/" + pageIndex + "/8");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取评论列表失败");
+        }
+    }
+    private async Task OnRely()
+    {
+        await OnCommentPageClick(ListComments.CurrentPage);
+    }
+    private async Task OnDeleted()
+    {
+        await OnCommentPageClick(ListComments.CurrentPage);
+    }
+    public async Task GetPlayedGameInforAsync()
+    {
+        try
+        {
+            //获取词条信息
+            GameInforModel = await Http.GetFromJsonAsync<PlayedGameInforModel>(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameInfor/" + EntryView.Id);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取评分信息失败");
+        }
+
+    }
+    public async void OnClickUrl(NavigateModel model)
+    {
+        try
+        {
+            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
+        }
+        catch
+        {
+            await ToastService.Error("导航失败", "请尝试刷新页面");
+        }
+    }
+
+    [Inject]
+    [NotNull]
+    private SwalService? SwalService { get; set; }
+    private async Task OnRevoke(Operation operation)
+    {
+        //确认
+        var op = new SwalOption()
+        {
+            Title = "确认撤销编辑",
+            Content = "撤销编辑后会删除数据，无法恢复，请谨慎操作",
+            IsConfirm = true,
+            Category = SwalCategory.Warning,
+        };
+        var ret = await SwalService.ShowModal(op);
+        if (ret == false)
+        {
+            return;
+        }
+        //上传
+        try
+        {
+            var result = await Http.PostAsJsonAsync<RevokeExamineModel>(ToolHelper.WebApiPath + "api/entries/RevokeExamine", new RevokeExamineModel { Id = EntryView.Id, ExamineType = operation });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("撤销审核请求失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("撤销审核请求成功", "撤销审核请求成功");
+                //修改各部分编辑状态
+                switch (operation)
+                {
+                    case Operation.EstablishMain:
+                        EntryView.MainState = EditState.Normal;
+                        break;
+                    case Operation.EstablishMainPage:
+                        EntryView.MainPageState = EditState.Normal;
+                        break;
+                    case Operation.EstablishAddInfor:
+                        EntryView.InforState = EditState.Normal;
+                        break;
+                    case Operation.EstablishRelevances:
+                        EntryView.RelevancesState = EditState.Normal;
+                        break;
+                    case Operation.EstablishImages:
+                        EntryView.ImagesState = EditState.Normal;
+                        break;
+                    case Operation.EstablishTags:
+                        EntryView.TagState = EditState.Normal;
+                        break;
+                }
+                Id = id;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "撤销审核请求失败");
+        }
+    }
+
+    private async Task OnFavoriteClick()
+    {
+        //检查是否存在默认收藏夹
+        if (UserFavoriteInfor == null || UserFavoriteInfor.Favorites == null || UserFavoriteInfor.Favorites.Count == 0)
+        {
+            await ToastService.Error("收藏词条失败", "无法获取收藏夹信息");
+        }
+
+        var favoriteFolderIds = UserFavoriteInfor.Favorites.Where(s => s.IsDefault == true).Select(s => s.Id).ToArray();
+        if (favoriteFolderIds.Length == 0)
+        {
+            //没有默认收藏夹 进入选择收藏夹界面
+
+            var option = new DialogOption()
+            {
+                Title = "选择收藏夹",
+                ShowCloseButton = false
+            };
+            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<ChooseFavoriteFolderTip>(new Dictionary<string, object>
+            {
+                [nameof(ChooseFavoriteFolderTip.UserFavoriteInfor)] = UserFavoriteInfor,
+                [nameof(ChooseFavoriteFolderTip.ObjectId)] = (long)EntryView.Id,
+                [nameof(ChooseFavoriteFolderTip.Type)] = FavoriteObjectType.Entry,
+                [nameof(ChooseFavoriteFolderTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
+                [nameof(ChooseFavoriteFolderTip.OnFavorite)] = EventCallback.Factory.Create(this, async () => { IsUserFavorited = true; StateHasChanged(); }),
+            }).Render();
+            await DialogService.Show(option);
+        }
+        else
+        {
+            //直接添加到默认收藏夹
+            try
+            {
+                var result = await Http.PostAsJsonAsync<AddFavoriteObjectViewModel>(ToolHelper.WebApiPath + "api/favorites/AddFavoriteObject", new AddFavoriteObjectViewModel { FavoriteFolderIds = favoriteFolderIds, ObjectId = EntryView.Id, Type = FavoriteObjectType.Entry });
+                string jsonContent = result.Content.ReadAsStringAsync().Result;
+                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                //判断结果
+                if (obj.Successful == false)
+                {
+                    await ToastService.Error("收藏词条失败", obj.Error);
+                }
+                else
+                {
+                    await ToastService.Success("收藏词条成功", "收藏词条成功");
+                    IsUserFavorited = true;
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "收藏词条失败");
+            }
+        }
+    }
+    private async Task OnUnFavoriteClick()
+    {
+
+        try
+        {
+            var result = await Http.PostAsJsonAsync<UnFavoriteObjectsModel>(ToolHelper.WebApiPath + "api/favorites/UnFavoriteObjects", new UnFavoriteObjectsModel { ObjectId = EntryView.Id, Type = FavoriteObjectType.Entry });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("取消收藏词条失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("取消收藏词条成功", "取消收藏词条成功");
+                IsUserFavorited = false;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "取消收藏词条失败");
+        }
+
+    }
+    #region 释放实例
+    private async ValueTask DisposeAsyncCore()
+    {
+        if (Interop != null)
+        {
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
+            Interop.Dispose();
+            Interop = null;
+        }
+    }
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore();
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

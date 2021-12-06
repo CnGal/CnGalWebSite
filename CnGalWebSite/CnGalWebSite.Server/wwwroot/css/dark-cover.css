@@ -1,0 +1,668 @@
+﻿.layout.is-page .layout-header {
+    background-color: #1F1F1F !important;
+}
+
+.layout.is-page .layout-side {
+    background-color: #1F1F1F !important;
+}
+
+body {
+    color: #d3d3d3;
+    background-color: #303030;
+}
+
+.tabs-border-card > .tabs-header {
+    background-color: #262626;
+    margin: 0;
+}
+
+.tabs .tabs-body {
+    background-color: transparent;
+}
+
+.bg-opacity {
+    background-color: #242424;
+}
+
+.card {
+    border: 1px solid rgba(255,255,255,.125);
+}
+
+.layout.is-page .layout-footer {
+    background-color: #1F1F1F !important;
+}
+
+.drawer {
+    background-color: #303030;
+}
+
+.page-layout-demo-option > p {
+    background: transparent;
+}
+
+.page-layout-demo-option {
+    border: 1px solid rgba(255,255,255,.125);
+}
+
+.layout.is-page .layout-right, .layout.is-page .layout-main {
+    background-color: #303030;
+}
+
+.tui-editor-contents p {
+    color: #D3D3D3;
+}
+
+
+.table-fixed-column .table .fixed {
+    background-color:var(--active-color);
+}
+
+.table {
+    color: white;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    --bs-table-accent-bg: gray;
+    color: white;
+}
+
+.table-hover > tbody > tr:hover {
+    color: white;
+    --bs-table-accent-bg: #1F1F1F;
+}
+
+.page-link:hover {
+    color: white;
+    background-color: gray;
+    border-color: gray;
+}
+
+.page-link {
+    color: gray;
+    background-color: var(--active-color);
+    border: 1px solid gray;
+}
+
+.page-item.active .page-link {
+    color: #fff;
+    background-color: gray;
+    border-color: gray;
+}
+
+.page-link:focus {
+    color: white;
+    background-color: gray;
+}
+
+.table tbody tr.active, .table tbody tr.active:hover td, .table-row.active {
+    background-color: transparent;
+}
+
+.table thead th.sortable:hover, .table thead th.filterable:hover {
+    background-color: #1F1F1F;
+}
+
+.rounded .shadow .tabs .tabs-body {
+    background-color: transparent;
+}
+
+.tui-editor-contents h1, .tui-editor-contents h2, .tui-editor-contents h3, .tui-editor-contents h4, .tui-editor-contents h5, .tui-editor-contents h6 {
+    color: white;
+}
+
+.tui-editor-contents dir, .tui-editor-contents menu, .tui-editor-contents ol, .tui-editor-contents ul {
+    color: #D3D3D3;
+}
+
+.article-home-tag {
+    background-color: gray;
+}
+
+.article-operation-color-1 {
+    background-color: transparent;
+}
+
+.article-operation-color-2 {
+    background-color: transparent;
+}
+
+.article-operation-color-3 {
+    background-color: transparent;
+}
+
+.article-operation-color-4 {
+    background-color: transparent;
+}
+
+.comment-reply-layout-btn {
+    background-color: transparent;
+}
+
+.comment-reply-layout-btn-color {
+    border-color: white;
+    color: white;
+}
+
+    .comment-reply-layout-btn-color:hover {
+        border-color: gray;
+        color: white;
+        background-color: gray;
+    }
+
+.comment-reply-color {
+    border-color: gray;
+    color: white;
+    background-color: gray;
+}
+
+    .comment-reply-color:hover {
+        border-color: gray;
+        color: gray;
+        background-color: transparent;
+    }
+
+.page-dto-part-color {
+    border-color: white;
+    color: white;
+    background-color: transparent;
+}
+
+.page-dto-part-color-active {
+    border-color: #2F2F2F;
+    color: white;
+    background-color: #2F2F2F;
+}
+
+.page-dto-part-color:hover {
+    border-color: gray;
+    color: white;
+    background-color: gray;
+}
+
+.page-dto-btn-color {
+    border-color: white;
+    color: white;
+    background-color: transparent;
+}
+
+    .page-dto-btn-color:hover {
+        border-color: gray;
+        color: white;
+        background-color: gray;
+    }
+
+.message-link-color {
+    border-color: white;
+    color: white;
+    background-color: transparent;
+}
+
+    .message-link-color:hover {
+        border-color: gray;
+        color: white;
+        background-color: gray;
+    }
+
+.tabs-border-card {
+    background: black;
+}
+
+.comment-tag {
+    background-color: gray;
+    color: white;
+}
+
+.modal-content {
+    background-color: #1F1F1F;
+}
+
+.list-group-item {
+    color: white;
+    border: 1px solid rgba(255,255,255,.125);
+}
+
+.card-footer {
+    background-color: transparent !important;
+}
+
+.toast-header {
+    border-bottom: 1px solid rgba(0,0,0,.05);
+    background-color: rgba(0,0,0,.85);
+}
+
+.toast {
+    background-color: rgba(0,0,0,.85);
+}
+
+.skeleton-content.active .skeleton-row, .skeleton-content.active .skeleton-avatar {
+    background: linear-gradient( 90deg,#535353 25%,gray 37%,#535353 63%);
+    background-size: 400% 100%;
+}
+
+.timeline .timeline-item-content {
+    color: white;
+}
+
+.tabs-border-card > .tabs-header .tabs-item.active {
+    color: white;
+    background-color: gray;
+    border-right-color: gray;
+    border-left-color: gray;
+}
+
+.tabs .tabs-nav-wrap .nav-link-bar.left {
+    border: 1px solid transparent;
+}
+
+.tabs .tabs-nav-wrap .nav-link-bar {
+    background-color: transparent;
+}
+
+.tabs-border-card.tabs-top .tabs-header {
+    border-bottom: 1px solid transparent;
+}
+
+.tabs-item:hover {
+    color: white;
+}
+
+.tabs-border-card > .tabs-header .tabs-item:not(.active):hover {
+    background-color: #111111;
+}
+
+.tabs-border-card > .tabs-header .tabs-item {
+    border: 0px solid transparent;
+}
+
+.tabs .tabs-nav-wrap .nav-link-bar.right {
+    border: 0px;
+}
+
+.tabs .tabs-nav-wrap .nav-link-bar {
+    border: 0px;
+}
+
+.dropdown-menu {
+    color: white;
+    background-color: #1F1F1F;
+}
+
+.dropdown-item {
+    color: white;
+}
+
+.tabs-item {
+    color: white;
+}
+
+.rounded shadow .tabs-item:hover {
+    color: #409eff;
+}
+
+#components-reconnect-modal {
+    background-color: black !important;
+}
+
+#blazor-error-ui {
+    color: black;
+}
+
+.auto-complete .select-dropdown .dropdown-list {
+    color: white;
+    background-color: #1F1F1F;
+}
+
+.real-time-p {
+    color: white;
+}
+
+.table-row .table-cell label:not(.form-checkbox) {
+    color: white;
+}
+
+.btn-outline-dark:active {
+    color: #212529;
+    background-color: white;
+    border-color: white;
+}
+
+.btn-outline-dark:hover {
+    color: #212529;
+    background-color: white;
+    border-color: white;
+}
+
+.btn-outline-dark {
+    color: white;
+    border-color: white;
+}
+
+.btn-dark:hover {
+    color:var(--active-color);
+    background-color:   var(--active-color);
+    border-color:  var(--active-color);
+}
+.btn-dark {
+    color:  white;
+    border-color:  var(--active-color);
+     background-color: var(--active-color);
+}
+.btn-dark.disabled, .btn-dark:disabled {
+    color: #fff;
+    background-color:  var(--active-color);
+    border-color:  var(--active-color);
+}
+
+
+.article-tag-text-color-large {
+    color: gray;
+}
+
+.article-tag-color-large {
+    border-color: gray;
+    color: white;
+    background-color: gray;
+}
+
+    .article-tag-color-large:hover {
+        border-color: gray;
+        color: gray;
+        background-color: transparent;
+    }
+
+.CodeMirror-sizer {
+    color: white;
+}
+.CodeMirror
+{
+    background: transparent;
+}
+
+.ContributionCalendar-color-x {
+    background-color: transparent
+}
+
+.ContributionCalendar-color-0 {
+    background-color: #1F1F1F
+}
+
+.ContributionCalendar-color-1 {
+    background-color: #0E4429
+}
+
+.ContributionCalendar-color-2 {
+    background-color: #006D32
+}
+
+.ContributionCalendar-color-3 {
+    background-color: #26A641
+}
+
+.ContributionCalendar-color-4 {
+    background-color: #39D353
+}
+.layout.is-page .layout-side {
+    box-shadow: 0 14px 28px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.22);
+}
+.editormd .CodeMirror-sizer {
+    color: #333333;
+}
+.editormd .CodeMirror-scroll {
+    background-color: white;
+}
+.tab-color {
+    color: white;
+    background-color: transparent;
+    transition: all .6s ease;
+}
+
+    .tab-color.active {
+        background-color: white !important;
+        color: #2f2f2f !important;
+    }
+
+    .tab-color:hover {
+        background-color: white !important;
+        color: #2f2f2f !important;
+    }
+.bg-title-color-main {
+    color: white;
+    background-color: gray;
+}
+
+.bg-color-main {
+    color: gray;
+}
+
+.tab-color {
+    color: white;
+    background-color: transparent;
+    transition: all .6s ease;
+}
+
+    .tab-color.active {
+        background-color: gray !important;
+        color: white !important;
+    }
+
+    .tab-color:hover {
+        background-color: gray !important;
+        color: white !important;
+    }
+
+.steam-infor-price {
+    width: 50px;
+    border-radius: 4px;
+    text-align-last: center;
+    border: 1px solid gray;
+    transition: all .6s ease;
+    color: gray;
+}
+
+    .steam-infor-price:hover {
+        background-color: gray;
+        border: 1px solid gray;
+        color: white;
+    }
+
+.steam-infor-cut {
+    width: 50px;
+    border-radius: 4px;
+    background-color: gray;
+    text-align-last: center;
+    transition: all .6s ease;
+    border: 1px solid gray;
+    color: white;
+}
+
+    .steam-infor-cut:hover {
+        background-color: transparent;
+        border: 1px solid gray;
+        color: gray;
+    }
+
+.a-font-color {
+    color: #d3d3d3;
+     transition: all .6s ease;
+}
+
+    .a-font-color:hover {
+        color: white;
+    }
+
+.steam-font-color {
+    color: gray;
+    transition: all .6s ease;
+}
+
+    .steam-font-color:hover {
+        color: white;
+    }
+
+.form-control {
+    background-color: transparent !important;
+    color: white !important;
+}
+
+.form-control:focus {
+    background-color: transparent;
+    color: white;
+}
+
+#web_bg {
+    display: none;
+}
+.div-shadow {
+    box-shadow: 0 0.5rem 1rem rgba(255, 255,255, 0.15) !important;
+    transition: all .6s ease;
+    background-color: #303030;
+    cursor: pointer;
+}
+
+    .div-shadow:hover {
+        box-shadow: 0 1rem 3rem rgba(255, 255, 255, 0.18) !important;
+    }
+.menu .nav .dropdown-menu .nav-link:not(.disabled):hover, .menu .nav .dropdown-menu .nav-link.active, .menu .submenu .nav-link.active, .menu .submenu .nav-link:not(.disabled):hover, .cascade .dropdown-item:not(.disabled):hover, .cascade .dropdown-item.active, .cascade .nav .nav-link:not(.disabled):hover, .cascade .nav .nav-link.active {
+    background-color: gray;
+    color: white;
+}
+.swal2-title {
+    color: white;
+}
+.swal2-content {
+    color: white;
+}
+.dropdown-menu.show {
+    border: 0;
+}
+.accordion-item {
+    background-color: #1F1F1F;
+}
+.btn:hover {
+    color: white;
+}
+
+.accordion-button {
+    background-color: #303030;
+    color: #d3d3d3;
+}
+.accordion-button:not(.collapsed) {
+    color: white;
+    background-color: #1F1F1F;
+}
+
+/*移动端界面样式*/
+.apps-headbar-layout{
+     background-color: #242424;
+     color:gray;
+}
+.apps-footer-layout{
+     background-color:#242424;
+}
+
+.links-icontext-text{
+    color:#d3d3d3;
+}
+.links-icontext-i{
+    color:#d3d3d3;
+}
+input.form-control{
+    border: 1px solid var(--bs-secondary) !important;;
+}
+
+/*Tab栏样式*/
+
+.tab-color {
+    color: white;
+    background-color:transparent;
+    transition: all .6s ease;
+}
+
+.tab-color.active {
+    background-color: var(--main-color) !important;
+    color: white !important;
+}
+
+.tab-color:hover {
+    background-color:var(--main-color) !important;
+    color: white !important;
+}
+.tab-Bottom-color {
+    color:gray;
+    background-color: transparent;
+    transition: all .6s ease;
+}
+
+.tab-Bottom-color.active {
+    color:#d3d3d3 !important;
+}
+
+.tab-Bottom-color:hover {
+    color:#d3d3d3 !important; 
+}
+
+
+.tab-Pivot-color {
+    color:gray;
+    background-color: transparent;
+    transition: all .6s ease;
+}
+
+.tab-Pivot-color.active {
+    color:#d3d3d3 !important;
+}
+
+.tab-Pivot-color:hover {
+    color:#d3d3d3 !important;
+}
+.tab-Pivot-color .line{
+    background-color: transparent;
+    transition: all .6s ease;
+}
+.tab-Pivot-color.active .line {
+    background-color:#d3d3d3 !important;
+}
+.tab-Pivot-color:hover .line{
+    background-color:#d3d3d3 !important;
+}
+.tab-Pivot-color.active {
+    color:#d3d3d3 !important;
+}
+
+.tab-Badge-color .line{
+    border-radius: 5px;
+    word-break: keep-all;
+    background: #F0F0F0;
+    color: gray;
+    transition: all .6s ease;
+}
+.tab-Badge-color.active .line {
+    background-color:var(--main-color) !important;
+    color:white;
+}
+.tab-Badge-color:hover .line{
+    background-color:var(--main-color) !important;
+    color:white;
+}
+
+.bg-title-color-main {
+    color: white;
+    background-color: var(--main-color);
+}
+
+.bg-context-main:hover {
+    color: white;
+    background-color: var(--main-color);
+}
+
+.bg-context-main {
+    color:white  !important;
+    border-color: var(--main-color);
+}
+
+.bg-color-main {
+    color: var(--main-color);
+}
+.bg-main {
+    background-color: var(--active-color);
+}

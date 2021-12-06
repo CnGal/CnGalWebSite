@@ -1,0 +1,104 @@
+﻿.wasm-loading-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -10;
+    width: 100%;
+    height: 100%;
+    zoom: 1;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -o-background-size: cover;
+    animation-name: wasm-loading-animation;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-duration: 10s;
+}
+
+@keyframes wasm-loading-animation {
+    0% {
+        -webkit-transform: scale(1);
+        background-image: url(/_content/CnGalWebSite.Shared/images/CnGal6th.png)
+    }
+
+    45% {
+        -webkit-transform: scale(1.2);
+        background-image: url(/_content/CnGalWebSite.Shared/images/CnGal6th.png)
+    }
+
+    55% {
+        -webkit-transform: scale(1.2);
+        background-image: url(/_content/CnGalWebSite.Shared/images/CnGal5th.png)
+    }
+
+    100% {
+        -webkit-transform: scale(1);
+        background-image: url(/_content/CnGalWebSite.Shared/images/CnGal5th.png)
+    }
+}
+
+.wasm-loading-layout {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: fixed;
+    bottom: 15%;
+}
+
+.wasm-loading-logo {
+    height: 50px;
+    margin-top: auto;
+    margin-right: 15px;
+    margin-bottom: auto;
+}
+
+.wasm-loading-font {
+    font-size: xxx-large;
+    color: gray;
+    margin: 0px;
+}
+
+.wasm-loading-shadow {
+    display: flex;
+    padding: 10px 20px;
+    transition: all .6s ease;
+    box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%) !important;
+}
+@keyframes wasm-loading-animation-s {
+    0% {
+        -webkit-transform: scale(1);
+        background-image: url(/_content/CnGalWebSite.Shared/images/CnGal6thMin.png)
+    }
+
+    45% {
+        -webkit-transform: scale(1.2);
+        background-image: url(/_content/CnGalWebSite.Shared/images/CnGal6thMin.png)
+    }
+
+    55% {
+        -webkit-transform: scale(1.2);
+        background-image: url(/_content/CnGalWebSite.Shared/images/CnGal5thMin.png)
+    }
+
+    100% {
+        -webkit-transform: scale(1);
+        background-image: url(/_content/CnGalWebSite.Shared/images/CnGal5thMin.png)
+    }
+}
+
+@media(max-width: 576px) {
+    .wasm-loading-image {
+        animation-name: wasm-loading-animation-s !important;
+    }
+    .wasm-loading-font {
+        font-size: xx-large !important;
+    }
+    .wasm-loading-logo {
+        height: 40px !important;
+    }
+}

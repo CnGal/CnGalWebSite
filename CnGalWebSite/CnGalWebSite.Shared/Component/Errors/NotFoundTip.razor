@@ -1,0 +1,12 @@
+﻿<div class="@(IsNeedLayput?" rounded shadow  ps-4 pe-4 pt-3 pb-3 mb-3 bg-opacity":"") ">
+    <div style="width: 100%;">
+        <img src="//app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;margin-left: 15%;margin-right: 15%;">
+        <h4 class="text-center mt-4 fw-lighter">这里似乎没有东西呢......</h4>
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public bool IsNeedLayput { get; set; }
+}

@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31710.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.WebAssembly", "CnGalWebSite\CnGalWebSite.WebAssembly\CnGalWebSite.WebAssembly.csproj", "{4BEE7B32-53CD-4950-8994-CF74F1B41122}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Shared", "CnGalWebSite\CnGalWebSite.Shared\CnGalWebSite.Shared.csproj", "{2388DCE4-CDD6-49E1-BD1A-34AB700D633B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.APIServer", "CnGalWebSite\CnGalWebSite.APIServer\CnGalWebSite.APIServer.csproj", "{FCD2BF67-8361-4E30-AD2A-4ED7CECB2C69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.HistoryData", "CnGalWebSite\CnGalWebSite.HistoryData\CnGalWebSite.HistoryData.csproj", "{E3A01311-91E8-4EB3-AB05-47B3AF61AE2E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Server", "CnGalWebSite\CnGalWebSite.Server\CnGalWebSite.Server.csproj", "{7A6DC2C5-6B3B-47D5-8064-92BFF9F74D95}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.DataModel", "CnGalWebSite\CnGalWebSite.DataModel\CnGalWebSite.DataModel.csproj", "{99C37FB0-59D6-465B-9EC6-B7AA29D51522}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4BEE7B32-53CD-4950-8994-CF74F1B41122}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BEE7B32-53CD-4950-8994-CF74F1B41122}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BEE7B32-53CD-4950-8994-CF74F1B41122}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BEE7B32-53CD-4950-8994-CF74F1B41122}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2388DCE4-CDD6-49E1-BD1A-34AB700D633B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2388DCE4-CDD6-49E1-BD1A-34AB700D633B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2388DCE4-CDD6-49E1-BD1A-34AB700D633B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2388DCE4-CDD6-49E1-BD1A-34AB700D633B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCD2BF67-8361-4E30-AD2A-4ED7CECB2C69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCD2BF67-8361-4E30-AD2A-4ED7CECB2C69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCD2BF67-8361-4E30-AD2A-4ED7CECB2C69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCD2BF67-8361-4E30-AD2A-4ED7CECB2C69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3A01311-91E8-4EB3-AB05-47B3AF61AE2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3A01311-91E8-4EB3-AB05-47B3AF61AE2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3A01311-91E8-4EB3-AB05-47B3AF61AE2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3A01311-91E8-4EB3-AB05-47B3AF61AE2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A6DC2C5-6B3B-47D5-8064-92BFF9F74D95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A6DC2C5-6B3B-47D5-8064-92BFF9F74D95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A6DC2C5-6B3B-47D5-8064-92BFF9F74D95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A6DC2C5-6B3B-47D5-8064-92BFF9F74D95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99C37FB0-59D6-465B-9EC6-B7AA29D51522}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99C37FB0-59D6-465B-9EC6-B7AA29D51522}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99C37FB0-59D6-465B-9EC6-B7AA29D51522}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99C37FB0-59D6-465B-9EC6-B7AA29D51522}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {10135AC3-E570-42BD-A319-B0268E299C9D}
+	EndGlobalSection
+EndGlobal

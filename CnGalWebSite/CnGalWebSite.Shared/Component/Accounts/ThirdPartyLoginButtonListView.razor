@@ -1,0 +1,30 @@
+﻿<style>
+    .thirdlogin-font-color {
+        color: #009ef7;
+    }
+    .divider.divider-horizontal .divider-text.is-center {
+        color: white;
+        background-color: #009ef7;
+        border-radius: 7.6px;
+        padding-bottom: 2px;
+    }
+    .divider {
+        background-color: #009ef7;
+    }
+</style>
+
+<div class="thirdlogin-font-color" style="display:flex;flex-direction: column;">
+    <Divider Text="其他登入方式" Alignment="Alignment.Center"></Divider>
+    <div class="mt-2" style="display: flex; flex-direction: row; justify-content: space-around;">
+        <ThirdPartyLoginButton ReturnUrl="@ReturnUrl" Type="ThirdPartyLoginType.Gitee" OnRedirecting="OnRedirecting"></ThirdPartyLoginButton>
+        <ThirdPartyLoginButton ReturnUrl="@ReturnUrl" Type="ThirdPartyLoginType.QQ" OnRedirecting="OnRedirecting"></ThirdPartyLoginButton>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string ReturnUrl { get; set; }
+    [Parameter]
+    public EventCallback OnRedirecting { get; set; }
+
+}

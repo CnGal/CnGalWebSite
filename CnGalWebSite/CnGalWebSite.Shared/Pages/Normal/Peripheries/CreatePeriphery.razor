@@ -1,0 +1,20 @@
+﻿@page "/peripheries/createperiphery"
+
+@attribute [Authorize]
+
+@inject IDataCacheService _dataCacheService
+
+<MakeSureInWASMTip></MakeSureInWASMTip>
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Peripheries.CreatePeriphery  />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Peripheries.CreatePeriphery />
+}
+
+@code{
+
+}

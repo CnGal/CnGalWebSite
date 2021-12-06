@@ -1,0 +1,235 @@
+﻿@inject IJSRuntime JSRuntime;
+@inject IAppHelper _appHelper;
+@inject ToastService ToastService
+
+<style>
+    .modal-footer {
+        display: none;
+    }
+</style>
+<div class="card" style="border:0px;background-color:transparent;">
+    <div class="card-body py-0">
+        <Cropper CropperHeight="300" InitCropWidth="200" InitCropHeight="200" MaxCropedHeight="1080" MaxCropedWidth="1920"
+                 @ref="cropper"
+                 AspectRatio="AspectRatio"
+                 RequireAspectRatio="@IsAspectRatioEnabled"
+                 InputId="@Id"
+                 ImageFile="file"
+                 @bind-Ratio="ratio"
+                 OnSizeChanged="HandleCropSizeChanged"
+                 AnimeGifEnable="true"></Cropper>
+    </div>
+    <div class="mt-1 text-center justify-content-center">
+        @if (cropper != null)
+        {
+            <Slider Value="@((int)ratio)" ValueChanged="OnRatioChange"></Slider>
+        }
+    </div>
+    <div class="mt-1 flex-column">
+        <div class="input-group">
+            <div class="input-group-text">
+                <input @bind="IsAspectRatioEnabled" class="form-check-input mt-0" type="checkbox" value="" aria-label="Checkbox for following text input">
+            </div>
+            <span class="input-group-text">长宽比</span>
+            <input @onchange="OnAspectWidthChanged" value="@AspectWidth" type="number" class="form-control" placeholder="输入长度">
+            <span class="input-group-text fw-bold">:</span>
+            <input @onchange="OnAspectHeightChanged" value="@AspectHeight" type="number" class="form-control" placeholder="输入宽度">
+        </div>
+
+    </div>
+
+    <div class="mt-3" style="display: flex; justify-content: space-between;">
+        <Button Color="Color.Danger" Icon="fa fa-close" @onclick="CancelCropAsync" IsAsync="true" Text="放弃裁剪"></Button>
+        <Button Color="Color.Success" Icon="fa fa-check" class="me-1" @onclick="DoneCrop" IsAsync="true" Text="确认裁剪"></Button>
+
+    </div>
+
+</div>
+@code {
+
+    private ImageAspectType _Type;
+    [Parameter]
+    public ImageAspectType Type
+    {
+        get
+        {
+            return _Type;
+        }
+        set
+        {
+            switch (value)
+            {
+                case ImageAspectType._1_1:
+                    AspectWidth = 1;
+                    AspectHeight = 1;
+                    AspectRatio = AspectHeight / AspectWidth;
+                    break;
+                case ImageAspectType._16_9:
+                    AspectWidth = 460;
+                    AspectHeight = 215;
+                    AspectRatio = AspectHeight / AspectWidth;
+                    break;
+                case ImageAspectType._9_16:
+                    AspectWidth = 9;
+                    AspectHeight = 16;
+                    AspectRatio = AspectHeight / AspectWidth;
+                    break;
+                case ImageAspectType._4_1A2:
+                    AspectWidth = 40;
+                    AspectHeight = 12;
+                    AspectRatio = AspectHeight / AspectWidth;
+                    break;
+                case ImageAspectType.None:
+                    IsAspectRatioEnabled = false;
+                    break;
+            }
+            _Type = value;
+        }
+    }
+
+    [Parameter]
+    public EventCallback<string> OnUploadedImage { get; set; }
+    [Parameter]
+    public EventCallback OnClickClose { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private Cropper cropper;
+    [Parameter]
+    public IBrowserFile file { get; set; }
+
+
+    private string PreviewImagePath { get; set; }
+    private string ImageBase64String { get; set; }
+
+    private readonly string prompt = "Image cropped! Parsing to base64...";
+
+    private bool ShowCroper { get; set; } = false;
+
+    private bool IsAspectRatioEnabled { get; set; } = true;
+
+    private double AspectRatio { get; set; } = 1d;
+
+    private double ratio = 1;
+
+    private double AspectWidth { get; set; } = 1;
+
+
+
+    private void OnAspectWidthChanged(ChangeEventArgs eventArgs)
+    {
+        try
+        {
+            AspectWidth = double.Parse((string)eventArgs.Value);
+
+            AspectRatio = AspectHeight / AspectWidth;
+        }
+        catch
+        {
+
+        }
+    }
+
+    private double AspectHeight { get; set; } = 1;
+
+    private void OnAspectHeightChanged(ChangeEventArgs eventArgs)
+    {
+        try
+        {
+            AspectHeight = double.Parse((string)eventArgs.Value);
+
+            AspectRatio = AspectHeight / AspectWidth;
+
+        }
+        catch
+        {
+
+        }
+    }
+
+    private Task OnRatioChange(int args)
+    {
+        ratio = (double)args / 10;
+        return Task.CompletedTask;
+    }
+
+    private void OnInputFileChange(InputFileChangeEventArgs args)
+    {
+        PreviewImagePath = null;
+        file = args.File;
+        ShowCroper = true;
+    }
+
+    private double CropCurrentWidth { get; set; }
+    private double CropCurrentHeight { get; set; }
+    private void HandleCropSizeChanged((double, double) cropSize)
+    {
+        CropCurrentWidth = cropSize.Item1;
+        CropCurrentHeight = cropSize.Item2;
+    }
+
+    private async Task DoneCrop()
+    {
+        //获取结果
+        ImageCroppedResult args = await cropper.GetCropedResult();
+        //转化为字节流
+        try
+        {
+            //上传
+            var obj = await _appHelper.UploadFilesAsync(await args.GetBase64Async(), Type);
+            if (obj[0].Uploaded == true)
+            {
+
+                PreviewImagePath = obj[0].FileURL;
+            }
+            else
+            {
+                await ToastService.Error("图片上传失败", $"<{file.Name}> " + obj[0].Error);
+                return;
+            }
+        }
+        catch(Exception exc)
+        {
+            await ToastService.Error("图片上传失败", "图片上传失败，超过1MB的图片请上传到相册，请检查网络正常后联系管理员");
+            return;
+        }
+        //回调
+        await OnUploadedImage.InvokeAsync(PreviewImagePath);
+        await OnClickClose.InvokeAsync();
+
+
+        args.Dispose();
+    }
+
+    private async Task CancelCropAsync()
+    {
+        try
+        {
+            List<UploadResult> obj = await _appHelper.UploadFilesAsync(new List<IBrowserFile> { file }, 15 * 1024 * 1024, 1, ToolHelper.WebApiPath + "api/files/postfile" + Type.GetDisplayName());
+            if (obj[0].Uploaded == true)
+            {
+
+                PreviewImagePath = obj[0].FileURL;
+                StateHasChanged();
+            }
+            else
+            {
+                await ToastService.Error("图片上传失败", $"<{file.Name}> " + obj[0].Error);
+            }
+        }
+        catch
+        {
+            await ToastService.Error("图片上传失败", "图片上传失败，超过1MB的图片请上传到相册，请检查网络正常后联系管理员");
+        }
+        //回调
+        if (string.IsNullOrWhiteSpace(PreviewImagePath) == false)
+        {
+            await OnUploadedImage.InvokeAsync(PreviewImagePath);
+
+        }
+        await OnClickClose.InvokeAsync();
+
+    }
+
+}

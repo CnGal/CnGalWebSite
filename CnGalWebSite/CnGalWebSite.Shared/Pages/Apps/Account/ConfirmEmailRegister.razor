@@ -1,0 +1,81 @@
+﻿@page "/account/apps/ConfirmEmailRegister/{*ReturnUrl}"
+
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+@inject ToastService? ToastService
+@inject ILocalStorageService _localStorage
+@inject IDataCacheService _dataCacheService
+
+@inject IAuthService AuthService
+
+<TitleTip></TitleTip>
+<CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="验证电子邮箱" />
+
+<div class="p-3" style="margin-top:45px">
+    <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadCard Text="我们已经向你的电子邮箱发送了一封验证邮件，请在下方填写其中的验证码。如果没有在收件箱找到邮件，请检查垃圾箱"/>
+    <div class="form-group mt-4 ps-4 pe-4  mb-0">
+
+        <div class="row">
+            <div class="form-group col">
+                <BootstrapInput @bind-Value="Model.NumToken" ShowLabel="true"/>
+            </div>
+            <div class="form-group col-auto" style=" display: flex; align-items: flex-end;">
+                <CnGalWebSite.Shared.AppComponent.Pages.Account.PostVerificationCode UserName="@_dataCacheService.UserName" IsFrist="false"/>
+            </div>
+            <div class="form-group col-12">
+                <Button Color="Color.Dark" IsAsync="true" style="width:100%" OnClick="HandleConfirm">验证</Button>
+            </div>
+        </div>
+    </div>
+
+</div>
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    [Parameter]
+    public string ReturnUrl { get; set; }
+
+    private ConfirmEmailRegisterModel Model = new ConfirmEmailRegisterModel();
+
+
+    private async Task HandleConfirm()
+    {
+
+        try
+        {
+            Model.UserName = _dataCacheService.UserName;
+            var result = await AuthService.ConfirmEmailRegister(Model);
+
+            if (result.Successful)
+            {
+                if (await AuthService.Login(result.Token) == false)
+                {
+                    await ToastService.Success("出现一个错误", "验证邮件成功，但是尝试登入失败");
+                }
+                //保存令牌
+                _dataCacheService.LoginKey = result.LoginKey;
+                //尝试保存在本地
+                await _localStorage.SetItemAsStringAsync("LoginKey", result.LoginKey);
+
+                await ToastService.Success("验证邮箱成功", "验证邮箱成功");
+                NavigationManager.NavigateTo("/account/apps/ChooseVerificationMethod/" + ReturnUrl);
+                //NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ToolHelper.Base64DecodeUrl(ReturnUrl));
+            }
+            else
+            {
+                await ToastService.Error("验证邮箱失败", result.Error);
+
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "验证邮箱失败");
+        }
+
+    }
+
+}

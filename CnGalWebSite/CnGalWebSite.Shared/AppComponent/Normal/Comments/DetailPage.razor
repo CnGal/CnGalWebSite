@@ -1,0 +1,79 @@
+﻿@page "/comments/index"
+
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@inject IJSRuntime JS
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="评论详情" />
+
+<div style="margin-top: 45px; width: 100%;margin-bottom:65px; " @onclick="@(() => detailFooter.UnRelyComment())">
+        <div class="shadow-sm pb-3 pt-1 ps-3 pe-3">
+            <AloneCard Model="_dataCacheService.DetailComment" CanDeleted="IsAdmin" OnRelying="@((a)=>detailFooter.RelyComment(a.UserName,a.CommentId))" DeletedCallBack="@OnClickBack" />
+        </div>
+        <div class="ms-3 me-3 ">
+            @foreach (var item in Items)
+            {
+                @if (Items.IndexOf(item) != 0)
+                {
+                    <hr class="mt-4 mb-4" />
+                }
+        <div>
+                <AloneCard Model="@item.Key" CanDeleted="IsAdmin" OnRelying="@((a)=>detailFooter.RelyComment(a.UserName,a.CommentId))" DeletedCallBack="@(()=>RefreshComment(item))" ParentCommentUserName="@item.Value" />
+        </div>
+            }
+
+        </div>
+</div>
+<DetailFooter @ref="detailFooter"  RelyCallBack="OnClickBack"
+              CommentId="@_dataCacheService.DetailComment.Id"/>
+
+@code {
+
+    public DetailFooter detailFooter;
+    public CnGalWebSite.Shared.AppComponent.Normal.Comments.ListComment comments;
+
+    public List<KeyValuePair<CommentViewModel, string>> Items { get; set; } = new List<KeyValuePair<CommentViewModel, string>>();
+
+    public bool IsAdmin { get; set; }
+        [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await authenticationStateTask;
+        IsAdmin = user.User.IsInRole("Admin");
+        foreach (var item in _dataCacheService.DetailComment.InverseParentCodeNavigation)
+        {
+            InitComment(item, "");
+        }
+
+        Items = Items.OrderByDescending(s => s.Key.CommentTime).Take(5).ToList();
+    }
+
+    public async void OnClickBack()
+    {
+        await JS.InvokeAsync<string>("goback");
+    }
+
+    public void InitComment(CommentViewModel model, string parent)
+    {
+        Items.Add(new KeyValuePair<CommentViewModel, string>(model, parent));
+        foreach (var item in model.InverseParentCodeNavigation)
+        {
+            InitComment(item, model.UserName);
+        }
+    }
+
+    public Task RefreshComment(KeyValuePair<CommentViewModel, string> item)
+    {
+        Items.Remove(item);
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+}

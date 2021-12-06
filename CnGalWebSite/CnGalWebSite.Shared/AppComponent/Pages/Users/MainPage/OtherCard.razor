@@ -1,0 +1,108 @@
+﻿@implements IDisposable
+
+<style>
+    .chart-loading{
+    display: none;
+    }
+</style>
+<div>
+    <div class="mt-1">
+        <div class="mb-3  pt-2">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑概览" />
+            <div class="mt-3">
+                <CalendarHeatmapTip BeforeTreatmentDate="Model.EditCountList"></CalendarHeatmapTip>
+            </div>
+        </div>
+        <div class="mb-3  pt-2">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="审核概览" />
+            <div class="mt-3">
+
+                <Chart ChartType="ChartType.Pie" OnInitAsync="@OnPieInit" @ref="PieChart" />
+            </div>
+        </div>
+        <div class="mb-3  pt-2">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="文件空间概览" />
+            <div class="mt-3">
+
+                <Chart ChartType="ChartType.Pie" OnInitAsync="@OnPieInitFile" @ref="PieChartFile" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public PersonalSpaceViewModel Model { get; set; }
+    private IEnumerable<string> ExamineState { get; set; } = new List<string>() { "未通过", "已通过", "待审核" };
+
+    [NotNull]
+    private Chart? PieChart { get; set; }
+    [NotNull]
+    private Chart? PieChartFile { get; set; }
+
+    private Task<ChartDataSource> OnPieInit()
+    {
+        var ds = new ChartDataSource();
+
+        ds.Labels = ExamineState;
+        List<object> temp = new List<object>();
+
+        temp.Add(Model.UnpassedExamineCount);
+        temp.Add(Model.PassedExamineCount);
+        temp.Add(Model.PassingExamineCount);
+
+        ds.Data.Add(new ChartDataset()
+        {
+            Label = "审核状态",
+            Data = temp
+        });
+        return Task.FromResult(ds);
+    }
+
+    private Task<ChartDataSource> OnPieInitFile()
+    {
+        var ds = new ChartDataSource();
+
+
+        double tempUsed = ((double)Model.UsedFilesSpace / 1024 / 1024);
+        double tempUnUsed = ((double)(Model.TotalFilesSpace - Model.UsedFilesSpace) / 1024 / 1024);
+        List<string> FileSpace = new List<string>();
+        string tempStr = "已使用 " + tempUsed.ToString("0.0") + "MB";
+        FileSpace.Add(tempStr);
+        tempStr = "未使用 " + tempUnUsed.ToString(".0") + "MB";
+        FileSpace.Add(tempStr);
+
+        ds.Labels = FileSpace;
+
+        List<object> temp = new List<object>();
+
+        temp.Add(tempUsed);
+        temp.Add(tempUnUsed);
+
+
+
+        ds.Data.Add(new ChartDataset()
+        {
+            Label = "文件储存状态",
+            Data = temp
+        });
+        return Task.FromResult(ds);
+    }
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+        if (PieChart != null)
+        {
+            PieChart.Dispose();
+        }
+        if (PieChartFile != null)
+        {
+            PieChartFile.Dispose();
+        }
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

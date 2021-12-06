@@ -1,0 +1,21 @@
+﻿@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+<h2 class="h4" @onclick="ViewAt" style="cursor: pointer;">@Title</h2>
+<p @onclick="ViewAt" style="cursor: pointer;">@BriefIntroduction</p>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string BriefIntroduction { get; set; }
+    [Parameter]
+    public string Link { get; set; }
+    [Parameter]
+    public DateTime HappenedTime { get; set; }
+
+    public void ViewAt()
+    {
+        NavigationManager.NavigateTo(Provider,Link, Title, "fa fa-newspaper-o");
+    }
+}

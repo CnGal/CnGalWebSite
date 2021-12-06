@@ -1,0 +1,65 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+
+@if (is404 == true)
+{
+    <NotFoundTip IsNeedLayput="true"></NotFoundTip>
+}
+
+<div>
+    <div class="row">
+        <Virtualize ItemsProvider="@LoadImages" @ref="virtualize">
+            <ImageInforViewTip Model="context" OnClickUrl="OnClickUrl"></ImageInforViewTip>
+        </Virtualize>
+    </div>
+  
+</div>
+
+
+
+@code {
+    [Parameter]
+    public PagedSortedAndFilterInput Input { get; set; } = new PagedSortedAndFilterInput();
+    [NotNull]
+    public Virtualize<ImageInforTipViewModel>? virtualize { get; set; }
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+
+    private bool is404 = false;
+
+
+    private async Task<PagedResultDto<ImageInforTipViewModel>> OnGetNewItems()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<PagedSortedAndFilterInput>(ToolHelper.WebApiPath + "api/files/GetFileList", Input);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<PagedResultDto<ImageInforTipViewModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception exc)
+        {
+            await ToastService.Error("无法获取图片列表", "未知错误，请在确保网络正常后联系开发人员");
+            return new PagedResultDto<ImageInforTipViewModel> { Data = new List<ImageInforTipViewModel>() };
+        }
+    }
+
+    private async ValueTask<ItemsProviderResult<ImageInforTipViewModel>> LoadImages(ItemsProviderRequest request)
+    {
+        Input.CurrentPage = request.StartIndex;
+        Input.MaxResultCount = request.Count;
+        var articles = await OnGetNewItems();
+
+        if (is404 != (articles.TotalCount == 0))
+        {
+            is404 = (articles.TotalCount == 0);
+            StateHasChanged();
+        }
+
+        return new ItemsProviderResult<ImageInforTipViewModel>(articles.Data, articles.TotalCount);
+    }
+
+    public async Task RefreshDataAsync()
+    {
+        await virtualize.RefreshDataAsync();
+    }
+}

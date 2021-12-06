@@ -1,0 +1,31 @@
+﻿@page "/account/giteelogin"
+
+@inject IDataCacheService _dataCacheService
+
+
+<TitleTip></TitleTip>
+<CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
+
+
+@if (_dataCacheService.IsApp == false)
+{
+    <ThirdPartyLoginTip Code="@Code" ReturnUrl="@State" Type="type"></ThirdPartyLoginTip>
+
+}
+
+
+@code {
+    [Parameter]
+    public string ParameterStr { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Code { get; set; }
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string State { get; set; }
+
+    public ThirdPartyLoginType type { get; set; } = ThirdPartyLoginType.Gitee;
+
+
+}

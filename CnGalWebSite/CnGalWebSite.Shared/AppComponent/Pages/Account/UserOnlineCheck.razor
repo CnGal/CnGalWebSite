@@ -1,0 +1,76 @@
+﻿@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+@inject ToastService? ToastService
+
+@inject IAuthService AuthService
+@inject SwalService SwalService
+@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Title" />
+<div class="p-3" style="margin-top:45px">
+    <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadCard Text="@Subtitle" />
+
+    <div class="row mt-4 ps-4 pe-4">
+        <div class="form-group col-12">
+            <Button Color="Color.Dark" style="width:100%" Text=" 登入现有账户" IsOutline="true" Icon="fa fa-sign-in" Size="Size.None" @onclick="OnClickLogin"></Button>
+        </div>
+        <div class="form-group col-12">
+            <Button Color="Color.Dark" style="width:100%" Text=" 创建新的账户" IsOutline="true" Icon="fa fa-user-plus" Size="Size.None" @onclick="OnClickRegister"></Button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnPassed { get; set; }
+    [Parameter]
+    public string ReturnUrl { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Subtitle { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await authenticationStateTask;
+            var user = authState.User;
+            if (user.Identity.IsAuthenticated)
+            {
+                await OnPassed.InvokeAsync();
+                return;
+            }
+        }
+        catch
+        {
+            await SwalService.ShowModal(new SwalOption()
+            {
+                IsConfirm = true,
+                Category = SwalCategory.Error,
+                Title = "尝试验证身份失败",
+                Content = "无法连接到服务器，请确保网络正常后联系开发人员"
+            });
+            NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ToolHelper.Base64DecodeUrl(ReturnUrl));
+        }
+    }
+
+    private Task OnClickLogin()
+    {
+        _dataCacheService.IsOnThirdPartyLogin = false;
+        NavigationManager.NavigateTo("/account/apps/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        return Task.CompletedTask;
+    }
+
+    private Task OnClickRegister()
+    {
+        _dataCacheService.IsOnThirdPartyLogin = false;
+        NavigationManager.NavigateTo("/account/apps/register/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        return Task.CompletedTask;
+    }
+}

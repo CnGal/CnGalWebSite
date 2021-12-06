@@ -1,0 +1,26 @@
+﻿@page "/tags/editmain/{Id}"
+
+@attribute [Authorize]
+
+@inject IDataCacheService _dataCacheService
+
+<MakeSureInWASMTip></MakeSureInWASMTip>
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Tags.EditMain Id="@Id" />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Tags.EditMain Id="@Id" />
+}
+
+@code{
+    [Parameter]
+    public string Id { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        //清空当前缓存
+        _dataCacheService.TagIndexPageCatche.Clean(Id);
+    }
+}

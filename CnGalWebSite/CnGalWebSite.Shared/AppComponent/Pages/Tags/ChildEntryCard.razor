@@ -1,0 +1,17 @@
+﻿<div>
+    <div class="mt-1">
+
+        <div class="mb-3  pt-2">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="子词条" />
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Pages.Tags.Cards.ListEntryCard Model="@Model.ChildrenEntries" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public TagIndexViewModel Model { get; set; }
+}

@@ -1,0 +1,29 @@
+﻿@if (Model.IsSplitLine)
+{
+    <hr class="m-0" />
+}
+else
+{
+    @if (string.IsNullOrWhiteSpace(Model.Icon))
+    {
+        <a href="@Model.Url" target="@(Model.IsOutLink?"_blank":"")" style=" display: flex; flex-direction: row; align-items: center; justify-content: space-between; color: gray; font-size: 16px; " @onclick="Model.OnClick">
+            <div class="text-truncate me-2 links-icontext-text">@Model.Text</div>
+            <i class="fa fa-fw fa-chevron-right links-icontext-text"></i>
+        </a>
+    }
+    else
+    {
+
+        <a href="@Model.Url" target="@(Model.IsOutLink?"_blank":"")" style=" display: flex; flex-direction: row; align-items: center; " @onclick="Model.OnClick">
+            <i class="@("fa fa-fw fa-lg links-icontext-i "+Model.Icon)"></i>
+            <div class="ms-3 links-icontext-text">@Model.Text</div>
+        </a>
+    }
+}
+
+
+@code {
+    [Parameter]
+    public IconTextModel Model { get; set; }
+
+}

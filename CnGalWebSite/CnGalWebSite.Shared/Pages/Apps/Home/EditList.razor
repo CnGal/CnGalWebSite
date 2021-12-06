@@ -1,0 +1,59 @@
+﻿@page "/home/editlist"
+
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<TitleTip Title="设置"></TitleTip>
+
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="创建" />
+<div style=" margin-top: 45px; width: 100%;">
+    <div class="ms-3 me-3 pt-2">
+        <CnGalWebSite.Shared.AppComponent.Normal.Links.ListIconText Model="Model" ClassName="mb-4" />
+    </div>
+</div>
+
+@code {
+    private List<AppComponent.Normal.Links.IconTextModel> Model = new List<AppComponent.Normal.Links.IconTextModel>();
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated)
+        {
+            Model.AddRange(new List<AppComponent.Normal.Links.IconTextModel>
+            {
+                new AppComponent.Normal.Links.IconTextModel
+                {
+                    Text="创建词条",
+                    Url="/entries/establishentry"
+                },
+                  new AppComponent.Normal.Links.IconTextModel
+                {
+                    Text="创建标签",
+                    Url="/tags/createtag"
+                },
+                    new AppComponent.Normal.Links.IconTextModel
+                {
+                    Text="创建周边",
+                    Url="/peripheries/createperiphery"
+                },
+                new AppComponent.Normal.Links.IconTextModel
+                {
+                    Text="发表文章",
+                    Url="/articles/createarticle"
+                }
+            });
+        }
+
+    }
+}

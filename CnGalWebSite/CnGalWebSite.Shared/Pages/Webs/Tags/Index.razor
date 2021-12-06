@@ -1,0 +1,226 @@
+﻿
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject IDataCacheService _dataCatcheService
+
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@Model.Name"></TitleTip>
+}
+
+<div class="">
+    <div class="" style="padding-right: 0; padding-left: 0">
+        <div class="alert alert-success  rounded shadow  rounded" role="alert">
+            没有找到想要的标签？ 你可以在这<a class="alert-link" @onclick="OnCreate">创建</a>任何符合规范的标签
+        </div>
+
+        <div class=" rounded shadow  bg-opacity rounded pt-3 ps-3 pe-3 mb-3" style=" padding-bottom: 1px; font-size: larger;">
+            <TagHeadNavTip TagList="Model.Taglevels" />
+        </div>
+        <div class=" rounded shadow  bg-opacity rounded p-4 pb-0 mb-4">
+            @if (Model.IsEdit == true)
+            {
+
+                @switch (Model.MainState)
+                {
+                    case EditState.locked:
+                        <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                        break;
+                    case EditState.Normal:
+                        <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.Editable" Url="@("/tags/EditMain/" + Model.Id)"></AlertTip>
+                        break;
+                }
+            }
+            @if (Model.MainState == EditState.Preview)
+            {
+                <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/tags/EditMain/" + Model.Id)" ExamineType="Operation.EditTagMain" OnClickRevoke="OnRevoke"></AlertTip>
+            }
+
+            <div class="row" style="padding-right: 0;padding-left: 0;">
+                <div class="col-12 col-md-12 col-lg-5 col-xxl-3 pt-1 pb-4">
+                    <img style="width:100%;height:auto;" src="@Model.MainPicture" alt="@Model.Name">
+                </div>
+                <div class="col-12 col-md-12 col-lg-7 col-xxl-9 pt-1 pb-2">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; flex-direction: row; align-items: center;">
+                        <h1 class="fw-bold h3">@Model.Name</h1>
+                        @if (Model.IsEdit)
+                        {
+                            <Button Color="Color.Primary" IsOutline="true" Text="退出编辑" Size="Size.Small" Icon="fa fa-sign-out" @onclick="OnUnEdit"
+                                    style="float: right"></Button>
+                        }
+                        else
+                        {
+                            <Button Color="Color.Success" IsOutline="true" Text="编辑" Size="Size.Small" Icon="fa fa-pencil" @onclick="OnEdit"
+                                    style="float: right"></Button>
+                        }
+                    </div>
+                    <h6 style="font-size:15px;">@Model.BriefIntroduction</h6>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.ChildrenTags.Count != 0 || Model.IsEdit)
+        {
+            <div class="">
+                <TagListChildTagsViewTip Model="Model.ChildrenTags" IsNormalScreen="true" EditState="Model.ChildTagsState" IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" />
+            </div>
+        }
+        @if (Model.ChildrenEntries.Count != 0 || Model.IsEdit)
+        {
+            <div class="">
+                <TagListChildEntriesViewTip Model="Model.ChildrenEntries" IsNormalScreen="true" EditState="Model.ChildEntriesState" IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" />
+            </div>
+        }
+
+    </div>
+</div>
+
+@code {
+    private string id = "";
+    [Parameter]
+    public string Id
+    {
+        get
+        {
+            return id;
+        }
+        set
+        {
+            id = value;
+            OnInitializedAsync();
+
+        }
+    }
+
+    bool isReady = false;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public TagIndexViewModel Model { get; set; } = new TagIndexViewModel();
+    string LastLookName = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+
+            //记录数据
+            if (Model.Name != LastLookName && string.IsNullOrWhiteSpace(Model.Name))
+            {
+                LastLookName = Model.Name;
+                try
+                {
+                    await JS.InvokeAsync<string>("trackEvent", "标签", "浏览", Model.Name, "1", "look");
+                }
+                catch (Exception exc)
+                {
+
+                }
+            }
+        }
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isReady = false;
+            StateHasChanged();
+            //获取标签信息
+            Model = await _dataCatcheService.TagIndexPageCatche.GetCatche(Id);
+            //判断标签名称是否为空 为空则跳转到主页
+            if (string.IsNullOrWhiteSpace(Model.Name))
+            {
+                NavigationManager.NavigateTo(Provider, "/home", "主页", "fa fa-home");
+            }
+
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取标签失败");
+        }
+
+    }
+
+    private void OnCreate()
+    {
+        NavigationManager.NavigateTo(Provider, "/tags/createtag", "创建标签", "fa fa-pencil");
+    }
+
+    private void OnEdit()
+    {
+        Model.IsEdit = true;
+        StateHasChanged();
+    }
+    private void OnUnEdit()
+    {
+        Model.IsEdit = false;
+        StateHasChanged();
+    }
+
+    [Inject]
+    [NotNull]
+    private SwalService? SwalService { get; set; }
+    private async Task OnRevoke(Operation operation)
+    {
+        //确认
+        var op = new SwalOption()
+        {
+            Title = "确认撤销编辑",
+            Content = "撤销编辑后会删除数据，无法恢复，请谨慎操作",
+            IsConfirm = true,
+            Category = SwalCategory.Warning,
+        };
+        var ret = await SwalService.ShowModal(op);
+        if (ret == false)
+        {
+            return;
+        }
+        //上传
+        try
+        {
+            var result = await Http.PostAsJsonAsync<RevokeExamineModel>(ToolHelper.WebApiPath + "api/tags/RevokeExamine", new RevokeExamineModel { Id = Model.Id, ExamineType = operation });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("撤销审核请求失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("撤销审核请求成功", "撤销审核请求成功");
+                //修改各部分编辑状态
+                switch (operation)
+                {
+                    case Operation.EditTagMain:
+                        Model.MainState = EditState.Normal;
+                        break;
+                    case Operation.EditTagChildTags:
+                        Model.ChildTagsState = EditState.Normal;
+                        break;
+                    case Operation.EditTagChildEntries:
+                        Model.ChildEntriesState = EditState.Normal;
+                        break;
+                }
+                Id = id;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "撤销审核请求失败");
+        }
+    }
+}
+

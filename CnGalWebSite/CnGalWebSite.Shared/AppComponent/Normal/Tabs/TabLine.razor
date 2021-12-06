@@ -1,0 +1,17 @@
+﻿
+<ul class="row nav w-100 m-0" style="@Styles" id="pills-tab" role="tablist">
+
+    @foreach (var item in Model.Items)
+    {
+        <TabViewItem Model="item"></TabViewItem>
+    }
+</ul>
+
+@code {
+    [Parameter]
+    public TabLineModel Model { get; set; }
+
+    [Parameter]
+    public string Styles { get; set; }
+
+}

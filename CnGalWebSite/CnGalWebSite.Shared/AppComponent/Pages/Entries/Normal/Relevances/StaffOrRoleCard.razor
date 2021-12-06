@@ -1,0 +1,26 @@
+﻿<a href="@("/entries/index/"+Model.EntryId)" style="display: flex; align-items: center; flex-direction: column; justify-content: center; " class="a-font-color bg-opacity shadow-sm h-100 p-2" >
+    <img src="@Model.Image" alt="@Model.Name" style="height:50px;width:50px;border-radius:50%;" />
+    <div class="mt-2" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="text-center">@Model.Name</div>
+        @if (Model.InforModel==null)
+        {
+            <div  class="text-center">@Model.Description</div>
+        }
+        else
+        {
+    <div style="display: flex; flex-wrap: wrap;">
+        <div style=" word-break: keep-all;">@(Model.InforModel.Modifier+"：")</div>
+        @foreach (var item in Model.InforModel.Contents)
+        {
+            <a href="@("entries/index/"+ToolHelper.Base64EncodeName(item))">@item</a>
+        }
+    </div>
+        }
+    </div>
+</a>
+
+@code {
+
+    [Parameter]
+    public StaffOrRoleCardModel Model { get; set; }
+}

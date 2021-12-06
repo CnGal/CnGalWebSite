@@ -1,0 +1,230 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+
+}
+
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="创建周边" />
+
+<div style=" margin-top: 45px; width: 100%;margin-bottom:65px;">
+    <ValidateForm Model="@Model" ValidateAllProperties="true" @ref="ComplexForm">
+        <div class="ps-3 pe-3 pt-2 mb-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑主要信息" />
+
+            <div class="row">
+                <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
+                    <ImageCropperButton @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
+                </div>
+                <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
+                    <ImageCropperButton @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图"></ImageCropperButton>
+                </div>
+                <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
+                    <ImageCropperButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图"></ImageCropperButton>
+                </div>
+                <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
+                    <ImageCropperButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图"></ImageCropperButton>
+                </div>
+            </div>
+
+            <div class="form-group mt-4">
+                <div class="row">
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.Name" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.DisplayName" />
+                    </div>
+
+                    <div class="form-group col-12  col-sm-6">
+                        <Select @bind-Value="Model.Type" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.Category" />
+                    </div>
+                    <div class="form-group col-12">
+                        <Textarea @bind-Value="Model.BriefIntroduction" rows="3" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.Author" />
+                    </div>
+                    <div class="form-group col-12 col-sm-6">
+                        <BootstrapInput @bind-Value="Model.Material" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.Size" />
+                    </div>
+                    <div class="form-group col-12 col-sm-6">
+                        <BootstrapInput @bind-Value="Model.Brand" />
+                    </div>
+                    <div class="form-group col-12 col-sm-6">
+                        <BootstrapInput @bind-Value="Model.Price" />
+                    </div>
+                    <div class="form-group col-12">
+                        <BootstrapInput @bind-Value="Model.SaleLink" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.IndividualParts" />
+                    </div>
+                    <div class="form-group col-12 col-sm-6">
+                        <Switch @bind-Value="Model.IsReprint" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <Switch @bind-Value="Model.IsAvailableItem" />
+                    </div>
+                    @if (Model.Type == PeripheryType.SetorAlbumEtc)
+                    {
+                        <div class="form-group col-12 col-sm-6">
+                            <BootstrapInputNumber @bind-Value="Model.PageCount" />
+                        </div>
+                    }
+                    @if (Model.Type == PeripheryType.Ost)
+                    {
+                        <div class="form-group col-12 col-sm-6">
+                            <BootstrapInputNumber @bind-Value="Model.SongCount" />
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </ValidateForm>
+    <div class="ps-3 pe-3 pt-2 mb-3">
+        <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑相册" />
+        <div class="mt-4">
+            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListImage Images="Model.Images" @ref="ImagesListEditorView" />
+
+        </div>
+    </div>
+    <div class="ps-3 pe-3 pt-2 mb-3">
+
+        <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑关联词条" />
+        <div class="mt-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色" />
+        </div>
+        <div class="mt-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryStaffItems" Model="Model.Staffs" Title="STAFF" />
+        </div>
+        <div class="mt-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏" />
+        </div>
+        <div class="mt-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组" />
+        </div>
+    </div>
+    <div class="ps-3 pe-3 pt-2 mb-3">
+
+        <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑关联周边" />
+        <div class="mt-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@PeripheryItems" Model="Model.Peripheries" Title="周边" />
+        </div>
+        <div class="mt-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryStaffItems" Model="Model.Staffs" Title="STAFF" />
+        </div>
+        <div class="mt-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏" />
+        </div>
+        <div class="mt-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组" />
+        </div>
+    </div>
+</div>
+<CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.EditFooter OnSubmit="OnSubmit" />
+
+
+@code {
+    private CreatePeripheryViewModel Model { get; set; } = new CreatePeripheryViewModel();
+
+    [NotNull]
+    private ValidateForm? ComplexForm { get; set; }
+
+    private bool isReady = false;
+    private IEnumerable<string> EntryGameItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> EntryRoleItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> EntryGroupItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> EntryStaffItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> PeripheryItems { get; set; } = new string[1] { "" };
+
+    private CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListImage ImagesListEditorView;
+    private bool IsOnlyNeedPublishTime { get; set; } = true;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取所有词条
+            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
+            EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1");
+            EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2");
+            EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3");
+
+            PeripheryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/peripheries/GetAllPeripheries");
+
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            //处理数据
+            if (string.IsNullOrWhiteSpace(Model.Name))
+            {
+                await ToastService.Error("创建周边失败", "请填写所有必填项目");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(Model.MainPicture))
+            {
+                await ToastService.Error("创建周边失败", "周边必须上传主图");
+                return;
+            }
+            if (Model.Staffs.Count == 0 && Model.Games.Count == 0 && Model.Groups.Count == 0 && Model.Roles.Count == 0)
+            {
+                await ToastService.Error("创建周边失败", "周边至少需要关联一个词条");
+                return;
+            }
+
+            Model.Images = ImagesListEditorView.Images;
+
+            var result = await Http.PostAsJsonAsync<CreatePeripheryViewModel>(ToolHelper.WebApiPath + "api/peripheries/CreatePeriphery", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+
+                await ToastService.Error("创建周边失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("创建周边成功", "创建周边成功，等待审核通过");
+                NavigationManager.NavigateTo(Provider, "/peripheries/index/" + obj.Error, Model.Name, "fa fa-newspaper-o");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "创建周边失败");
+        }
+    }
+}

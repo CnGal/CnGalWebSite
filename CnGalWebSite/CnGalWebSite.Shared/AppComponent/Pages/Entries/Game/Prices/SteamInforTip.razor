@@ -1,0 +1,110 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+
+@if (IsReady)
+{
+    <TabLink target="_blank" Url="@("https://store.steampowered.com/app/" + SteamId)" class="a-font-color">
+        <div class="">
+
+            @if (isSuccess)
+            {
+                <div class="row m-0 p-0 steam-infor-layout">
+                    <div class="col-auto  ps-1 p-0">
+                        <img class="img-fluid" src="_content/CnGalWebSite.Shared/images/Steam.png" style="width: 40px;border-radius:50%">
+                    </div>
+                    <div class="col-2 p-0 fw-bold" style="font-size:large;">
+                        Steam
+                    </div>
+                    <div class="row col-8 p-0">
+                        <div>
+                            <div class="d-flex steam-infor-row">
+                                <div class="me-1" style=" font-size: xx-small; ">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;当前
+                                </div>
+                                <div class="steam-infor-price me-1 text-center" style=" font-size: xx-small; ">@SteamInfor.PriceNowString</div>
+                                <div class="steam-infor-cut me-1 text-center" style=" font-size: xx-small; ">@(SteamInfor.PriceNow==0?"FREE":( SteamInfor.CutNow==0?"SALE": "-"+SteamInfor.CutNow+"%"))</div>
+                            </div>
+                        </div>
+                        @if (SteamInfor.PriceLowest != 0)
+                        {
+                            <div class="mt-2">
+                                <div class="d-flex steam-infor-row">
+                                    <div class="me-1" style=" font-size: xx-small; " title="@SteamInfor.LowestTime.ToString("yyyy年M月d日")">
+                                        <i class="fa fa-info-circle"></i>&nbsp;史低
+                                    </div>
+                                    <div class="steam-infor-price me-1 text-center" style=" font-size: xx-small; ">@SteamInfor.PriceLowestString</div>
+                                    <div class="steam-infor-cut me-1 text-center" style=" font-size: xx-small; ">@("-"+SteamInfor.CutLowest+"%")</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+        <div class="row m-0 p-0 steam-infor-layout">
+            <div class="col-auto  ps-1 p-0">
+                <img class="img-fluid" src="_content/CnGalWebSite.Shared/images/Steam.png" style="width: 40px;border-radius:50%">
+            </div>
+            <div class="col-2 p-0 fw-bold" style="font-size:large;">
+                Steam
+            </div>
+            <div class="row col-7 p-0">
+                <div>
+                    <div class="d-flex steam-infor-row">
+                        <div class="me-1" style=" font-size: xx-small; ">
+                            &nbsp;&nbsp;&nbsp;&nbsp;当前
+                        </div>
+                        <div class="steam-infor-price me-1 text-center" style=" font-size: xx-small; ">¥ 0</div>
+                        <div class="steam-infor-cut me-1 text-center" style=" font-size: xx-small; ">未发售</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            }
+        </div>
+    </TabLink>
+}
+@code {
+    public SteamInfor SteamInfor { get; set; } = new SteamInfor();
+
+    [Parameter]
+    public int SteamId { get; set; }
+    [Parameter]
+    public int EntryId { get; set; }
+    [Parameter]
+    public string EntryName { get; set; }
+
+    public bool isSuccess = false;
+    public bool IsReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (SteamId == 0 || EntryId == 0)
+            {
+                return;
+            }
+            SteamInfor = await Http.GetFromJsonAsync<SteamInfor>(ToolHelper.WebApiPath + "api/steam/Getsteaminfor/" + SteamId + "/" + EntryId);
+            if (SteamInfor.PriceNow < 0)
+            {
+                isSuccess = false;
+            }
+            else
+            {
+                isSuccess = true;
+            }
+            IsReady = true;
+            StateHasChanged();
+        }
+        catch (Exception exc)
+        {
+            isSuccess = false;
+            IsReady = true;
+            StateHasChanged();
+            //await ToastService.Error("获取Steam信息失败", "请检查SteamId『"+SteamId+"』是否有效");
+        }
+
+    }
+}

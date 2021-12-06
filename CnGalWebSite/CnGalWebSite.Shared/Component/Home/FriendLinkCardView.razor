@@ -1,0 +1,60 @@
+﻿
+@if (IsSmallScreen)
+{
+    <TabLink Icon="@Icon" Url="@Url" Text="@Name" class="a-font-color" target="_blank">
+        <div class="card h-100 " style="background-color: transparent; border: 0px; cursor: pointer ">
+            <img src="@Image" class="card-img-top" alt="@Name" />
+            <div class="card-body" style="padding: 0px; padding: 0px; padding-top: 0.5rem; padding-left: 0.4rem; padding-right: 0.4rem;">
+                <span class="home-card-name-text">@Name</span>
+              
+            </div>
+        </div>
+    </TabLink>
+
+}
+else
+{
+    if (IsRole)
+    {
+        <TabLink Icon="@Icon" Url="@Url" Text="@Name" class="a-font-color"  target="_blank">
+            <div class="card h-100 " style="background-color: transparent; border: 0px; cursor: pointer">
+                <img src="@Image" class="card-img-top" alt="@Name" style="border-radius:50%" />
+                <div class="card-body" style="padding: 0px; padding-top: 0.5rem;">
+                    <p class="m-0 text-center home-card-name-text" style="font-size:16px">@Name</p>
+                 
+                </div>
+            </div>
+        </TabLink>
+
+    }
+    else
+    {
+        <TabLink Icon="@Icon" Url="@Url" Text="@Name" class="a-font-color"  target="_blank">
+            <div class="card h-100 " style="background-color: transparent; border: 0px; cursor: pointer">
+                <img src="@Image" class="card-img-top" alt="@Name" />
+                <div class="card-body" style="padding: 0px; padding-top: 0.5rem;">
+                    <span class="home-card-name-text">@Name</span>
+                
+                </div>
+            </div>
+        </TabLink>
+
+    }
+}
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public string Image { get; set; }
+    [Parameter]
+    public string Url { get; set; }
+    [Parameter]
+    public string Icon { get; set; }
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
+    [Parameter]
+    public bool IsRole { get; set; }
+}

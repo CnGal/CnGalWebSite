@@ -1,0 +1,235 @@
+﻿@page "/account/apps/login/{*ReturnUrl}"
+@page "/account/apps/login/"
+
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+@inject ToastService ToastService
+@inject IJSRuntime JS
+@inject HttpClient Http
+@implements IDisposable
+@inject IDataCacheService _dataCacheService
+
+@inject WebClientService? ClientService
+@inject IAppHelper? _appHelper
+
+<TitleTip></TitleTip>
+<CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
+
+@if (isReady)
+{
+    <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="登录" />
+    <div class="p-3" style="margin-top:45px">
+       <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadCard/>
+        <div  class="form-group col-12 mt-4 ps-4 pe-4  mb-0">
+            <div class="row">
+
+                <div class="form-group col-12  col-sm-12">
+                    <BootstrapInput @bind-Value="Model.UserName" PlaceHolder="推荐使用邮箱登入" ShowLabel="true"/>
+                </div>
+                <div class="form-group col-12">
+                    <BootstrapInput @bind-Value="Model.Password" PlaceHolder="请输入密码" type="password" ShowLabel="true"/>
+                </div>
+                <div class="form-group col-12">
+                    <a style="float:right" href="/account/apps/forgetpassword">忘记密码</a>
+
+                    <div style="display:flex">
+                        <Checkbox @bind-Value="Model.RememberMe" ShowAfterLabel="true" ShowLabel="false"></Checkbox>&nbsp;记住我
+                    </div>
+                </div>
+                <div class="form-group col-6 mt-4">
+                    <Button Color="Color.Dark"  IsOutline="true" style="width:100%" @onclick="@(()=>OnRegister())">注册</Button>
+                </div>
+                <div class="form-group col-6 mt-4">
+                    <Button Color="Color.Dark"  IsAsync="true" style="width:100%" Id="Login_button" OnClick="HandleLogin">登录</Button>
+                </div>
+                @if (_dataCacheService.IsOnThirdPartyLogin)
+                {
+                    <CnGalWebSite.Shared.AppComponent.Pages.Account.ListThirdPartyLogin ReturnUrl="@ReturnUrl" />
+                }
+            </div>
+        </div>
+    </div>
+
+}
+
+@code {
+    [Parameter]
+    public string ReturnUrl { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private DotNetObjectReference<Login> objRef;
+
+    bool isReady = false;
+    private int widgetId = -1;
+    private LoginModel Model = new LoginModel();
+    private string Rememer
+    {
+        get
+        {
+            return Model.RememberMe.ToString();
+        }
+        set
+        {
+            Model.RememberMe = bool.Parse(value);
+        }
+    }
+
+    bool isSuccess = true;
+    [Inject]
+    [NotNull]
+    private SwalService? SwalService { get; set; }
+
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            //判断是否已经登录
+            if (await AuthService.IsLogin())
+            {
+                NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ToolHelper.Base64DecodeUrl(ReturnUrl));
+                return;
+            }
+
+
+            //服务端登入跳转到客户端
+            try
+            {
+                if (ToolHelper.IsSSR == true)//&& IsSmallScreen == false)
+                {
+
+                    /*NavigationManager.NavigateTo("https://app.cngal.org/account/loginfromssr?ReturnUrl=" + ReturnUrl);
+                    return;*/
+                    //NavigationManager.NavigateTo("/account/loginfromssr/" + ReturnUrl);
+
+                }
+                else
+                {
+                    isReady = true;
+                    StateHasChanged();
+                }
+
+            }
+            catch(Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "尝试跳转客户端模式失败");
+            }
+
+            isReady = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+
+        try
+        {
+            var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode");
+
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeAsync<string>("initGeetestBindCAPTCHA", objRef, geetestCodeModel.Gt, geetestCodeModel.Challenge, geetestCodeModel.Success);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "初始化极验人机验证失败");
+            return;
+        }
+        isSuccess = true;
+        int count = 0;
+        while (isSuccess)
+        {
+            /*if (count > 5)
+            {
+                isSuccess = false;
+            }*/
+            await Task.Delay(500);
+            count++;
+        }
+    }
+
+
+    [JSInvokable]
+    public async Task OnChecked(string challenge, string validate, string seccode)
+    {
+        try
+        {
+            Model.Challenge = challenge;
+            Model.Validate = validate;
+            Model.Seccode = seccode;
+
+            Model.isNeedVerification = false;
+
+            //判断是否需要验证
+            /* string country;
+             if (ToolHelper.IsSSR)
+             {
+                 //await ClientService.RetrieveRemoteInfo();
+                 //country = ClientService.City;
+
+             }
+             else
+             {
+                country=await  _appHelper.GetIPCountiy("67.220.90.13");
+             }*/
+
+
+            var result = await AuthService.Login(Model);
+
+            switch (result.Code)
+            {
+                case LoginResultCode.OK:
+                    NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ToolHelper.Base64DecodeUrl(ReturnUrl));
+                    break;
+                case LoginResultCode.HistoricalUser:
+                    _dataCacheService.UserName = result.ErrorInfor;
+                    NavigationManager.NavigateTo("/account/apps/historyuserlogin/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+                    break;
+                case LoginResultCode.FailedRealNameValidation:
+                    await AuthService.Login(result.Token);
+                    NavigationManager.NavigateTo("/account/apps/ChooseVerificationMethod/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+                    break;
+                case LoginResultCode.FailedEmailValidation:
+                    _dataCacheService.UserName = result.ErrorInfor;
+                    NavigationManager.NavigateTo("/account/apps/ConfirmEmailRegister/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+                    break;
+                default:
+                    await ToastService.Error("登入失败", result.ErrorDescribe);
+                    isSuccess = false;
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "登入失败");
+            isSuccess = false;
+        }
+    }
+    [JSInvokable]
+    public Task OnCancel()
+    {
+        isSuccess = false;
+        return Task.CompletedTask;
+    }
+
+    private void OnRegister()
+    {
+        NavigationManager.NavigateTo("/account/apps/register/" + ReturnUrl);
+    }
+
+    #region 释放实例
+    public void Dispose()
+    {
+        if (objRef != null)
+        {
+            objRef?.Dispose();
+        }
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}
+

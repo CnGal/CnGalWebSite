@@ -1,0 +1,149 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@if (!isReady)
+{
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+}
+else
+{
+    <Table TItem="StaffInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
+           OnQueryAsync="@OnQueryStaffAsync" SearchModel="@SearchModelStaff" ShowSearch="true" ShowLoading="true"
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
+        <TableColumns>
+            <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" />
+            <TableColumn @bind-Field="@context.GameName" Filterable="true" Sortable="true" Searchable="true" />
+            <TableColumn @bind-Field="@context.Subcategory" Filterable="true" Sortable="true" Searchable="true" />
+            <TableColumn @bind-Field="@context.PositionOfficial" Filterable="true" Sortable="true" Searchable="true" />
+            <TableColumn @bind-Field="@context.NicknameOfficial" Filterable="true" Sortable="true" Searchable="true" />
+            <TableColumn @bind-Field="@context.PositionGeneral" Filterable="true" Sortable="true" />
+            <TableColumn @bind-Field="@context.Role" Filterable="true" Sortable="true" Searchable="true" />
+            <TableColumn @bind-Field="@context.SubordinateOrganization" Filterable="true" Sortable="true" Searchable="true" />
+        </TableColumns>
+    </Table>
+
+}
+
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 1000 };
+
+    private bool isReady = false;
+    public StaffInforListViewModel ModelStaff { get; set; } = new StaffInforListViewModel
+    {
+        StaffInfors = new List<StaffInforTableModel>()
+    };
+    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<StaffInforTableModel>, string, SortOrder, IEnumerable<StaffInforTableModel>>> SortLambdaCacheStaff = new();
+    private StaffInforTableModel SearchModelStaff { get; set; } = new StaffInforTableModel();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
+            ModelStaff = await Http.GetFromJsonAsync<StaffInforListViewModel>(ToolHelper.WebApiPath + "api/tables/GetStaffInforList");
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取STAFF信息汇总表格");
+        }
+    }
+    private Task<QueryData<StaffInforTableModel>> OnQueryStaffAsync(QueryPageOptions options)
+    {
+
+        IEnumerable<StaffInforTableModel> items = ModelStaff.StaffInfors;
+        // 处理高级搜索
+        if (!string.IsNullOrWhiteSpace(SearchModelStaff.GameName))
+        {
+            items = items.Where(item => item.GameName?.Contains(SearchModelStaff.GameName, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchModelStaff.PositionOfficial))
+        {
+            items = items.Where(item => item.PositionOfficial?.Contains(SearchModelStaff.PositionOfficial, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchModelStaff.NicknameOfficial))
+        {
+            items = items.Where(item => item.NicknameOfficial?.Contains(SearchModelStaff.NicknameOfficial, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchModelStaff.SubordinateOrganization))
+        {
+            items = items.Where(item => item.SubordinateOrganization?.Contains(SearchModelStaff.SubordinateOrganization, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchModelStaff.Role))
+        {
+            items = items.Where(item => item.Role?.Contains(SearchModelStaff.Role, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+        if (!string.IsNullOrWhiteSpace(SearchModelStaff.Subcategory))
+        {
+            items = items.Where(item => item.Subcategory?.Contains(SearchModelStaff.Subcategory, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        // 处理 Searchable=true 列与 SeachText 模糊搜索
+        if (options.Searchs.Any())
+        {
+            items = items.Where(options.Searchs.GetFilterFunc<StaffInforTableModel>(FilterLogic.Or));
+        }
+        else
+        {
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.GameName?.Contains(options.SearchText) ?? false)
+                             || (item.PositionOfficial?.Contains(options.SearchText) ?? false)
+                             || (item.NicknameOfficial?.Contains(options.SearchText) ?? false)
+                             || (item.SubordinateOrganization?.Contains(options.SearchText) ?? false)
+                             || (item.Role?.Contains(options.SearchText) ?? false));
+            }
+        }
+        // 过滤
+        var isFiltered = false;
+        if (options.Filters.Any())
+        {
+            items = items.Where(options.Filters.GetFilterFunc<StaffInforTableModel>());
+            isFiltered = true;
+        }
+
+        // 排序
+        var isSorted = false;
+        if (!string.IsNullOrWhiteSpace(options.SortName))
+        {
+            // 外部未进行排序，内部自动进行排序处理
+            var invoker = SortLambdaCacheStaff.GetOrAdd(typeof(StaffInforTableModel), key => LambdaExtensions.GetSortLambda<StaffInforTableModel>().Compile());
+            items = invoker(items, options.SortName, options.SortOrder);
+            isSorted = true;
+        }
+
+        // 设置记录总数
+        var total = items.Count();
+
+        // 内存分页
+        items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
+
+        return Task.FromResult(new QueryData<StaffInforTableModel>()
+        {
+            Items = items,
+            TotalCount = total,
+            IsSorted = isSorted,
+            IsFiltered = isFiltered
+        });
+    }
+
+}

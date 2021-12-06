@@ -1,0 +1,89 @@
+﻿@inject ToastService ToastService
+
+@inject HttpClient Http
+    <style>
+        .modal-footer {
+            display: none;
+        }
+    </style>
+
+<div>
+    @if (isReady)
+    {
+         <Scroll class="scroll-demo" Height="400px">
+              <Collapse>
+                <CollapseItems>
+                    @if(Model.Any(s=>s.Level==PerfectionCheckLevel.High))
+                    {
+                        <CollapseItem Text="急需完善" IsCollapsed="false">
+                           @foreach(var item in Model.Where(s=>s.Level==PerfectionCheckLevel.High))
+                            {
+                                <PerfectionCheckAloneViewTip Model="@item"></PerfectionCheckAloneViewTip>
+                            }
+                        </CollapseItem>
+
+                    }
+                    <CollapseItem Text="待完善" IsCollapsed="Model.Any(s=>s.Level==PerfectionCheckLevel.High)">
+                        @foreach(var item in Model.Where(s=>s.Level!=PerfectionCheckLevel.High&&s.Level!=PerfectionCheckLevel.None))
+                            {
+                                <PerfectionCheckAloneViewTip Model="@item"></PerfectionCheckAloneViewTip>
+                            }
+                    </CollapseItem>
+                    <CollapseItem Text="已完善">
+                        @foreach(var item in Model.Where(s=>s.Level==PerfectionCheckLevel.None))
+                            {
+                                <PerfectionCheckAloneViewTip Model="@item"></PerfectionCheckAloneViewTip>
+                            }
+                    </CollapseItem>
+                </CollapseItems>
+            </Collapse>
+        </Scroll>
+    }
+    else
+    {
+        <div>
+            <h3 class="mb-3 text-center">正在加载</h3>
+            <div class="d-flex" style="justify-content: center;">
+                <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
+            </div>
+        </div>
+
+    }
+
+    <div class="mt-3" style="display: flex; justify-content: space-between;">
+        <Button Color="Color.Success" Icon="fa fa-check" @onclick="@(()=>OnEditorialGuidelines.InvokeAsync())" IsAsync="true" Text="查看编辑指引"></Button>
+        <Button Color="Color.Primary" Icon="fa fa-close" class="me-1" @onclick="@(()=>OnClickClose.InvokeAsync())" IsAsync="true" Text="关闭"></Button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnClickClose { get; set; }
+    [Parameter]
+    public EventCallback OnEditorialGuidelines { get; set; }
+    [Parameter]
+    public long PerfectionId { get; set; }
+    [Parameter]
+    public List<PerfectionCheckViewModel> Model { get; set; } = new List<PerfectionCheckViewModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public string Text { get; set; }
+    private IEnumerable<long> Value1 { get; set; }
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<List<PerfectionCheckViewModel>>(ToolHelper.WebApiPath + "api/perfections/GetEntryPerfectionCheckList/" + PerfectionId);
+            isReady = true;
+            StateHasChanged();
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取词条完善度明细列表失败");
+        }
+    }
+}

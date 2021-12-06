@@ -1,0 +1,23 @@
+﻿<a href="@("/entries/index/"+Model.EntryId)" style=" display: flex; " class="a-font-color">
+    <img src="@Model.Image" alt="@Model.Name" style="height:50px;width:50px;border-radius:50%;"/>
+    <div class="ms-2" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>@Model.Name</div>
+        @if(string.IsNullOrEmpty(Model.CV))
+            {
+                <div>无配音</div>
+            }
+            else
+            {
+                <div style="display:flex;">
+                    <div>CV：</div>
+                    <a href="@("entries/index/"+ToolHelper.Base64EncodeName(Model.CV))">@Model.CV</a>
+                </div>
+            }
+    </div>
+</a>
+
+@code {
+
+    [Parameter]
+    public RoleCardModel Model { get; set; }
+}

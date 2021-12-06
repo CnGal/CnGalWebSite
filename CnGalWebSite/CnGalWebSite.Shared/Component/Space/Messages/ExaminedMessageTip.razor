@@ -1,0 +1,44 @@
+﻿
+<div class="div-shadow  rounded ps-4 pe-4 pt-3 pb-3 mb-3 bg-opacity" style=" font-size: 16px; font-weight: 300; cursor: default">
+    <div class="new-row-warp no-margin">
+        <div>
+            <img class=" shadow -sm" src="@Model.Image"
+                 style="height: 60px;width: 60px;border-radius: 50%;" />
+        </div>
+        <div class="comment-tx-div">
+            <div class="new-row-warp no-margin">
+                <div class="comment-username me-2">@Model.Title</div>
+                <div class="comment-tag">@Model.Rank</div>
+            </div>
+            <div class="comment-time">@Model.PostTime.ToString("yyy-MM-dd H:mm")</div>
+        </div>
+        <div class="mt-2 col-12 no-padding">
+            <div class="tui-editor-contents">
+                @((MarkupString)Model.Text)
+            </div>
+        </div>
+        <div class="col-12 no-padding">
+            <button class="message-link message-link-color" style="float: right;" @onclick="OnClick">查看</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public CnGalWebSite.DataModel.Model.Message Model { get; set; }
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+
+    public void OnClick()
+    {
+        if (string.IsNullOrWhiteSpace(Model.Link) == false)
+        {
+            OnClickUrl.InvokeAsync(new NavigateModel
+            {
+                Url = Model.Link,
+                Title = Model.LinkTitle,
+                Icon = "fa fa-link"
+            });
+        }
+    }
+}

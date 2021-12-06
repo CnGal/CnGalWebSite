@@ -1,0 +1,28 @@
+﻿@inject IJSRuntime JS
+
+<div class="@((IsShadow?"shadow-sm":"")+" apps-headbar-layout")">
+    <div style="display: flex; height: 45px; flex-direction: row; align-items: center;" class="ms-2 me-2">
+        <div style=" display: flex; flex-direction: column; justify-content: center;" class="me-2" @onclick="OnClickBack">
+            <i class="fa fa-chevron-left fa-fw " style=" font-size: 17px;"></i>
+        </div>
+        <div style=" width: 100%; font-size: 16px; text-align: center; margin-right: 30px; " class="text-truncate">
+            @Title
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public bool IsShadow { get; set; }
+
+    public async void OnClickBack()
+    {
+        await JS.InvokeAsync<string>("goback");
+    }
+
+
+}
+

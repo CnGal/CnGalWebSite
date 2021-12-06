@@ -1,0 +1,46 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject DialogService DialogService
+
+<TabLink Icon="fa fa-codepen" Url="@("/entries/index/"+Model.EntryId)" Text="@Model.EntryName" class="a-font-color">
+    <div class="bg-opacity p-2 rounded shadow-sm">
+        <div class="a-font-color h-100" style="display:flex;">
+            <div style="display: flex;align-items: center;">
+                <div class="swal2-icon m-0 me-1 @("border-"+color)" style="height: 3em; width: 3em; display: flex;align-items: center;">
+                    <div class="@("text-"+color)">@Model.Grade.ToString("0.0")</div>
+                </div>
+            </div>
+            <div class="comment-tx-div">
+                <div class="new-row-warp no-margin">
+                    <div class="@("comment-tag me-2 bg-"+color)">@Model.Level.GetDisplayName()</div>
+                    <div class="comment-username me-2">@Model.EntryName</div>
+                    <div class="comment-username" style="color:gray;">@(Model.LastEditTime.ToTimeFromNowString()+"编辑")</div>
+                </div>
+                <div class="comment-time">@("有"+Model.DefectCount+"个项目待完善，总计"+Model.EditCount+"次编辑")</div>
+            </div>
+        </div>
+    </div>
+</TabLink>
+
+
+@code {
+
+    [Parameter]
+    public PerfectionInforTipViewModel Model { get; set; } = new PerfectionInforTipViewModel();
+
+    string color = "success";
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            color = ToolHelper.GetEntryPerfectionLevelColor(Model.Level);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取词条完善度信息失败");
+        }
+    }
+}

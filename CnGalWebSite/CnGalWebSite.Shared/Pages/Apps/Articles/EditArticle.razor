@@ -1,0 +1,286 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject NavigationManager NavigationManager
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+}
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
+<link rel="stylesheet" href="https://static.cngal.top/_content/BootstrapBlazor.Markdown/css/bootstrap.blazor.markdown.min.css" media="none" onload="this.media='all'" />
+
+<div style=" margin-top: 45px; width: 100%;margin-bottom:65px;">
+    @if (isReady == false)
+    {
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+    }
+    else
+    {
+        <ValidateForm Model="@Model" ValidateAllProperties="true" @ref="ComplexForm">
+            <div class="ps-3 pe-3 pt-2 mb-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑主要信息" />
+
+                <div class="row">
+                    <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
+                        <ImageCropperButton ImagePath="@Model.MainPicturePath" OnUploadedImage="OnCardUploadMain" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
+                        <ImageCropperButton ImagePath="@Model.BackgroundPicturePath" OnUploadedImage="OnCardUploadBack" Type="ImageAspectType.None" Text="上传大背景图"></ImageCropperButton>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
+                        <ImageCropperButton ImagePath="@Model.SmallBackgroundPicturePath" OnUploadedImage="OnCardUploadSmall" Type="ImageAspectType.None" Text="上传小背景图"></ImageCropperButton>
+                    </div>
+                </div>
+
+                <div class="form-group mt-4">
+                    <div class="row">
+                        <div class="form-group col-12  col-sm-6">
+                            <Select @bind-Value="Model.Type"></Select>
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Name" />
+                        </div>
+
+                        <div class="form-group col-12  col-sm-6">
+                            <div class="mb-3">
+                                <AlertTip Type="AlertTip.AlertTipType.CreateDisambig"></AlertTip>
+                            </div>
+                            <BootstrapInput @bind-Value="Model.DisplayName" />
+                        </div>
+                        <div class="form-group col-12">
+                            <BootstrapInput @bind-Value="Model.BriefIntroduction" />
+                        </div>
+                        <div class="form-group col-12">
+                            <hr />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.OriginalAuthor" />
+                        </div>
+
+                        <div class="form-group col-12  col-sm-6">
+                            <DateTimePicker @bind-Value="@Model.PubishTime" ViewModel="DatePickerViewModel.DateTime" />
+                        </div>
+                        <div class="form-group col-12">
+                            <BootstrapInput @bind-Value="Model.OriginalLink" />
+                        </div>
+
+                        @if (Model.Type == ArticleType.News)
+                        {
+                            <div class="form-group col-12">
+                                <hr />
+                            </div>
+                            <div class="col-12">
+                                <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+                                    请选择该动态发生时的真实时间，我们会据此生成时间轴
+                                </div>
+                            </div>
+                            <div class="form-group col-12 col-sm-6">
+                                <Switch @bind-Value="IsOnlyNeedPublishTime" ShowLabel="true" DisplayText="动态发生时间与发布日期一致" />
+                            </div>
+                            @if (IsOnlyNeedPublishTime)
+                            {
+                                <div class="form-group col-12  col-sm-6">
+                                    <DateTimePicker @bind-Value="@Model.PubishTime" ViewModel="DatePickerViewModel.DateTime" IsDisabled="true"  DisplayText="动态发生时间"/>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="form-group col-12  col-sm-6">
+                                    <DateTimePicker @bind-Value="@Model.RealNewsTime" ViewModel="DatePickerViewModel.DateTime" />
+                                </div>
+                            }
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.NewsType"></BootstrapInput>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+
+            </div>
+        </ValidateForm>
+        <div class="ps-3 pe-3 pt-2 mb-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑正文" />
+            <div class="mt-3">
+                @if (isReady == true)
+                {
+                    <MarkdownEditorTip Context="@Model.Context" @ref="markdownEditorTip"></MarkdownEditorTip>
+                }
+
+            </div>
+
+
+        </div>
+
+        <div class="ps-3 pe-3 pt-2 mb-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑关联信息" />
+
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="出场角色"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryStaffItems" Model="Model.staffs" Title="STAFF"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@ArticleItems" Model="Model.articles" Title="文章"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListOtherLink Model="Model.others" Title="自定义链接"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListOtherLink>
+
+            </div>
+
+        </div>
+
+    }
+
+</div>
+<CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.EditFooter OnSubmit="OnSubmit" />
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    private EditArticleViewModel Model { get; set; } = new EditArticleViewModel
+    {
+        Roles = new List<RelevancesModel>(),
+        articles = new List<RelevancesModel>(),
+        Groups = new List<RelevancesModel>(),
+        Games = new List<RelevancesModel>(),
+        others = new List<RelevancesModel>(),
+        staffs = new List<RelevancesModel>()
+    };
+    [NotNull]
+    private ValidateForm? ComplexForm { get; set; }
+    private bool IsOnlyNeedPublishTime { get; set; } = true;
+
+    private bool isReady = false;
+
+    [NotNull]
+    private MarkdownEditorTip? markdownEditorTip;
+    private IEnumerable<string> EntryGameItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> EntryRoleItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> EntryGroupItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> EntryStaffItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> ArticleItems { get; set; } = new string[1] { "" };
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取文章信息
+            Model = await Http.GetFromJsonAsync<EditArticleViewModel>(ToolHelper.WebApiPath + "api/articles/editarticle/" + Id);
+            //获取所有词条
+            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
+            EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1");
+            EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2");
+            EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3");
+            //获取所有文章
+            ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
+
+            isReady = true;
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑文章信息失败");
+        }
+    }
+
+    private async Task OnSubmit(string text)
+    {
+        try
+        {
+            Model.Context = await markdownEditorTip.GetContext();
+            //处理数据
+            if (string.IsNullOrWhiteSpace(Model.Name) || string.IsNullOrWhiteSpace(Model.BriefIntroduction) || string.IsNullOrWhiteSpace(Model.DisplayName))
+            {
+                await ToastService.Error("编辑文章失败", "请填写所有必填项目");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(Model.Context) && Model.Type != ArticleType.News)
+            {
+                await ToastService.Error("编辑文章失败", "必须输入文章正文");
+                return;
+            }
+            //检查文本长度
+            if (Model.Context != null && Model.Context.Length > 100000)
+            {
+                await ToastService.Error("文本长度超过上限", "强烈建议使用链接显示图片，内嵌图片会导致性能严重下降。请控制文本量，额外的文字可以移动到关联文章中");
+                return;
+            }
+            //调整时间
+            Model.PubishTime = Model.PubishTime.AddHours(Model.PubishTime.Hour < 12 ? (12 - Model.PubishTime.Hour) : 0);
+            if (Model.RealNewsTime != null)
+            {
+                Model.RealNewsTime = Model.RealNewsTime.Value.AddHours(Model.RealNewsTime.Value.Hour < 12 ? (12 - Model.RealNewsTime.Value.Hour) : 0);
+            }
+
+            Model.Note = text;
+
+            var result = await Http.PostAsJsonAsync<EditArticleViewModel>(ToolHelper.WebApiPath + "api/articles/editarticle", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                if (obj.Error == "该文章的名称与其他文章重复")
+                {
+                    ComplexForm.SetError<EditArticleViewModel>(f => f.Name, "已经存在该名称的文章");
+                }
+                await ToastService.Error("编辑文章失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("编辑文章成功", "编辑文章成功，等待审核通过");
+                NavigationManager.NavigateTo("/articles/index/" + obj.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "编辑文章失败");
+        }
+    }
+
+    private Task OnCardUploadMain(string url)
+    {
+        Model.MainPicturePath = url;
+        Model.MainPicture = url;
+        return Task.CompletedTask;
+    }
+
+    private Task OnCardUploadBack(string url)
+    {
+        Model.BackgroundPicturePath = url;
+        Model.BackgroundPicture = url;
+        return Task.CompletedTask;
+    }
+    private Task OnCardUploadSmall(string url)
+    {
+        Model.SmallBackgroundPicturePath = url;
+        Model.SmallBackgroundPicture = url;
+        return Task.CompletedTask;
+    }
+
+}

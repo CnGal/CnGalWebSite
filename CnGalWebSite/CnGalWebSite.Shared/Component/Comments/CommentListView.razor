@@ -1,0 +1,128 @@
+﻿
+@if (Comments.TotalCount == 0)
+{
+    if (IsShowNotFound)
+    {
+        <CnGalWebSite.Shared.Component.Errors.NotFoundTip IsNeedLayput="true"></CnGalWebSite.Shared.Component.Errors.NotFoundTip>
+    }
+}
+else
+{
+    @for (int i=0;i< Comments.Data.Count;i++)
+    {
+        int temp = i;
+       <CommentPartTip Model="Comments.Data[temp]" IsChild="false" CurrentUserRank="@CurrentUserRank" RelyCallBack="OnRely" IsSmallScreen="IsSmallScreen"
+                       IsAdmin="IsAdmin" DeletedCallBack="OnDelete" CanDeleted="CanDeleted"></CommentPartTip>
+    }
+    <PageDtoTip CurrentPage="Comments.CurrentPage" ShowBtnCount="1" TotalPages="Comments.TotalPages" IsSmallScreen="IsSmallScreen" OnPageChanged="OnPage"></PageDtoTip>
+}
+
+
+
+@code {
+    [Parameter]
+    public PagedResultDto<CommentViewModel> Comments {
+        get;
+        set;
+    }
+
+    [Parameter]
+    public EventCallback<int> OnPageChanged { get; set; }
+
+    [Parameter]
+    public string CurrentUserRank { get; set; }
+    [Parameter]
+    public bool IsAdmin { get; set; }
+    [Parameter]
+    public bool CanDeleted { get; set; }
+    [Parameter]
+    public EventCallback RelyCallBack { get; set; }
+
+    [Parameter]
+    public EventCallback DeletedCallBack { get; set; }
+    [Parameter]
+    /// <summary>
+    /// 是否小屏幕
+    /// </summary>
+    public bool IsSmallScreen { get; set; }
+
+    [Parameter]
+    /// <summary>
+    /// 是否展示空白提示
+    /// </summary>
+    public bool IsShowNotFound { get; set; }
+
+
+    private bool shouldRender;
+    private long LastCommentId = 0;
+
+    protected override void OnParametersSet()
+    {
+        if (Comments.TotalCount > 0)
+        {
+
+            if (LastCommentId == PlusId())
+            {
+                shouldRender = false;
+            }
+            else
+            {
+                shouldRender = true;
+                LastCommentId = PlusId();
+            }
+
+        }
+        else
+        {
+            if (LastCommentId != 0)
+            {
+                shouldRender = true;
+                LastCommentId = 0;
+            }
+            else
+            {
+                shouldRender = false;
+            }
+        }
+    }
+
+    protected override bool ShouldRender() => shouldRender;
+
+    public async Task OnPage(int index)
+    {
+        await OnPageChanged.InvokeAsync(index);
+    }
+
+    public async Task OnRely()
+    {
+        await RelyCallBack.InvokeAsync();
+    }
+    public async Task OnDelete ()
+    {
+        await RelyCallBack.InvokeAsync();
+    }
+
+    private long PlusId()
+    {
+        long result = 0;
+        foreach(var item in Comments.Data)
+        {
+            result += PlusCommentId(item);
+        }
+
+        return result;
+    }
+
+    //递归计算评论Id的和
+    private long PlusCommentId(CommentViewModel index)
+    {
+        long sum = 0;
+        sum += index.Id;
+
+        foreach(var item in index.InverseParentCodeNavigation)
+        {
+            sum += PlusCommentId(item);
+        }
+        return sum;
+    }
+}

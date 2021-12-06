@@ -1,0 +1,16 @@
+﻿using BootstrapBlazor.Components;
+using CnGalWebSite.DataModel.Application.Dtos;
+using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Files;
+using System.Threading.Tasks;
+
+namespace CnGalWebSite.APIServer.Application.Files
+{
+    public interface IFileService
+    {
+        Task<PagedResultDto<ImageInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input);
+
+        Task<QueryData<ListFileAloneModel>> GetPaginatedResult(QueryPageOptions options, ListFileAloneModel searchModel);
+
+    }
+}

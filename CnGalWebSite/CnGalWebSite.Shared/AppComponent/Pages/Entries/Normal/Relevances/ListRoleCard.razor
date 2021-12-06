@@ -1,0 +1,14 @@
+﻿<div>
+    @foreach (var item in Model)
+    {
+        <div class="mb-3">
+            <RoleCard Model="item" />
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<RoleCardModel> Model { get; set; }
+
+}

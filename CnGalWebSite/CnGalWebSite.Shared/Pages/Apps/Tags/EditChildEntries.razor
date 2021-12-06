@@ -1,0 +1,110 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+
+}
+
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
+
+
+<div style=" margin-top: 45px; width: 100%;margin-bottom:65px;">
+
+    @if (isReady == false)
+    {
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+    }
+    else
+    {
+        <div class="ps-3 pe-3 pt-2 mb-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑子词条" />
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryItems" Model="Model.Entries" Title="子词条" />
+
+            </div>
+        </div>
+
+
+
+
+
+    }
+
+</div>
+
+<CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.EditFooter OnSubmit="OnSubmit" />
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private EditTagChildEntriesViewModel Model { get; set; } = new EditTagChildEntriesViewModel();
+
+    private bool isReady = false;
+    private IEnumerable<string> EntryItems { get; set; } = new string[1] { "" };
+
+
+    private ImagesListEditorViewTip ImagesListEditorView;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取所有词条
+            EntryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList");
+
+            Model = await Http.GetFromJsonAsync<EditTagChildEntriesViewModel>(ToolHelper.WebApiPath + "api/tags/EditChildEntries/" + Id);
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑标签子词条失败");
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            //处理数据
+            /*   if (Model.Name == "游戏" || Model.Name == "角色" || Model.Name == "STAFF" || Model.Name == "制作组")
+               {
+                   await ToastService.Error("编辑标签失败", "四个顶级标签不能关联子词条");
+                   return;
+               }*/
+
+            var result = await Http.PostAsJsonAsync<EditTagChildEntriesViewModel>(ToolHelper.WebApiPath + "api/tags/EditChildEntries", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("编辑标签子词条失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("编辑标签子词条成功", "编辑标签子词条成功，等待审核通过");
+                NavigationManager.NavigateTo(Provider, "/tags/index/" + Model.Id, Model.Name, "fa fa-tag");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "编辑标签子词条失败");
+        }
+    }
+}

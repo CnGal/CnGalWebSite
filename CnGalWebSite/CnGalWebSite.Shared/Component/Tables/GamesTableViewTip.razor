@@ -1,0 +1,158 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@if (!isReady)
+{
+<SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+}
+else
+{
+<Table TItem="BasicInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
+       OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelBasic" ShowSearch="true" ShowLoading="true"
+       ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
+       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
+    <TableColumns>
+        <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true" Fixed="true" />
+        <TableColumn @bind-Field="@context.IssueTime" FormatString="yyyy-MM-dd" Sortable="true" DefaultSort="true" Width="200" AllowTextWrap="true" />
+        <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" AllowTextWrap="true" />
+        <TableColumn @bind-Field="@context.ProductionGroup" Filterable="true" Sortable="true" Searchable="true" Width="200" AllowTextWrap="true" />
+
+        <TableColumn @bind-Field="@context.Original" Filterable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+        <TableColumn @bind-Field="@context.GamePlatforms" Filterable="true" Sortable="true" Searchable="true" Width="200" AllowTextWrap="true" />
+        <TableColumn @bind-Field="@context.Engine" Filterable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+        <TableColumn @bind-Field="@context.Publisher" Filterable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+        <TableColumn @bind-Field="@context.GameNickname" Filterable="true" Sortable="true" Searchable="true" Width="200" AllowTextWrap="true" />
+        <TableColumn @bind-Field="@context.Tags" Filterable="true" Sortable="true" Searchable="true" Width="200" AllowTextWrap="true" />
+        <TableColumn @bind-Field="@context.IssueMethod" Filterable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+        <TableColumn @bind-Field="@context.OfficialWebsite" Filterable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+        <TableColumn @bind-Field="@context.SteamId" Filterable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+        <TableColumn @bind-Field="@context.QQgroupGame" Filterable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+    </TableColumns>
+    <RowButtonTemplate>
+        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickCallback="@(() => OnLook(context.RealId, context.Name))" />
+    </RowButtonTemplate>
+
+</Table>
+}
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 1000 };
+    public BasicInforListViewModel ModelBasic { get; set; } = new BasicInforListViewModel
+    {
+        BasicInfors = new List<BasicInforTableModel>()
+    };
+    private bool isReady = false;
+    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<BasicInforTableModel>, string, SortOrder, IEnumerable<BasicInforTableModel>>> SortLambdaCacheBasic = new();
+    private BasicInforTableModel SearchModelBasic { get; set; } = new BasicInforTableModel();
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
+            ModelBasic = await Http.GetFromJsonAsync<BasicInforListViewModel>(ToolHelper.WebApiPath + "api/tables/GetBasicInforList");
+            isReady = true;
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取基础信息汇总表格");
+        }
+    }
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+
+    public async Task OnLook(long id, string name)
+    {
+        await OnClickUrl.InvokeAsync(new NavigateModel
+        {
+            Url = "/entries/index/" + id,
+            Title = name,
+            Icon = "fa fa-link"
+        });
+    }
+    private Task<QueryData<BasicInforTableModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        IEnumerable<BasicInforTableModel> items = ModelBasic.BasicInfors;
+        // 处理高级搜索
+        if (!string.IsNullOrWhiteSpace(SearchModelBasic.Name))
+        {
+            items = items.Where(item => item.Name?.Contains(SearchModelBasic.Name, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchModelBasic.ProductionGroup))
+        {
+            items = items.Where(item => item.ProductionGroup?.Contains(SearchModelBasic.ProductionGroup, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+        if (!string.IsNullOrWhiteSpace(SearchModelBasic.GameNickname))
+        {
+            items = items.Where(item => item.GameNickname?.Contains(SearchModelBasic.GameNickname, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+        if (!string.IsNullOrWhiteSpace(SearchModelBasic.GamePlatforms))
+        {
+            items = items.Where(item => item.GamePlatforms?.Contains(SearchModelBasic.GamePlatforms, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+        if (!string.IsNullOrWhiteSpace(SearchModelBasic.Tags))
+        {
+            items = items.Where(item => item.Tags?.Contains(SearchModelBasic.Tags, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        // 处理 Searchable=true 列与 SeachText 模糊搜索
+        if (options.Searchs.Any())
+        {
+            items = items.Where(options.Searchs.GetFilterFunc<BasicInforTableModel>(FilterLogic.Or));
+        }
+        else
+        {
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
+                             || (item.ProductionGroup?.Contains(options.SearchText) ?? false)
+                             || (item.GameNickname?.Contains(options.SearchText) ?? false)
+                             || (item.Tags?.Contains(options.SearchText) ?? false)
+                             || (item.GamePlatforms?.Contains(options.SearchText) ?? false));
+            }
+        }
+        // 过滤
+        var isFiltered = false;
+        if (options.Filters.Any())
+        {
+            items = items.Where(options.Filters.GetFilterFunc<BasicInforTableModel>());
+            isFiltered = true;
+        }
+
+        // 排序
+        var isSorted = false;
+        if (!string.IsNullOrWhiteSpace(options.SortName))
+        {
+            // 外部未进行排序，内部自动进行排序处理
+            var invoker = SortLambdaCacheBasic.GetOrAdd(typeof(BasicInforTableModel), key => LambdaExtensions.GetSortLambda<BasicInforTableModel>().Compile());
+            items = invoker(items, options.SortName, options.SortOrder);
+            isSorted = true;
+        }
+
+        // 设置记录总数
+        var total = items.Count();
+
+        // 内存分页
+        items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
+
+        return Task.FromResult(new QueryData<BasicInforTableModel>()
+        {
+            Items = items,
+            TotalCount = total,
+            IsSorted = isSorted,
+            IsFiltered = isFiltered
+        });
+    }
+}

@@ -1,0 +1,46 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+
+<CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="可选标签" />
+<div class="mt-3" style="width:300px">
+    <Search IgnoreCase="true" IsLikeMatch="true" PlaceHolder="搜索标签" Items="Items" OnSearch="@OnSearch"></Search>
+</div>
+<ul class="list-group list-group-flush mb-2">
+    @for (int i = 0; i < SearchResult.Count; i++)
+    {
+        <li class="list-group-item" style="background-color: transparent;">@(i+1) . @SearchResult[i]  </li>
+    }
+</ul>
+
+@code {
+    private List<string> SearchResult = new List<string>();
+    private IEnumerable<string> Items { get; set; } = new string[1] { "" };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取所有标签
+            Items = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags");
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有标签名称列表失败");
+        }
+    }
+    private async Task OnSearch(string str)
+    {
+        try
+        {
+            str = ToolHelper.Base64EncodeName(str);
+            SearchResult = (await Http.GetFromJsonAsync<IEnumerable<string>>(ToolHelper.WebApiPath + "api/tags/searchtag/" + str)).ToList();
+            StateHasChanged();
+        }
+        catch(Exception   ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法找到指定标签");
+        }
+    }
+}

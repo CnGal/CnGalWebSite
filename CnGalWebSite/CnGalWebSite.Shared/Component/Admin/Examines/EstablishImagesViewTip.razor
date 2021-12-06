@@ -1,0 +1,14 @@
+﻿
+<div class="row">
+    @foreach (var item in Model)
+    {
+<div class=" col-12 col-md-6 col-lg-6 mt-2 mb-2">
+    <div class="card text-black">
+        <img src="@item.Url" class="card-img" alt="...">
+    </div>
+</div>}
+</div>
+
+@code { [Parameter]
+    public List<EntryPicture> Model { get; set; } = new List<EntryPicture>();
+}

@@ -1,0 +1,18 @@
+﻿
+<img src="@Model.MainPicture" alt="@Model.Name" style="width:100%" />
+<div class="m-3 mb-2">
+    <div class="">
+        <div style=" font-size: larger; ">@Model.Name</div>
+        <div style=" font-size: smaller;color:gray; " class="mt-1 mb-2">@Model.BriefIntroduction</div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PeripheryViewModel Model { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+}

@@ -1,0 +1,178 @@
+﻿@inject IJSRuntime JS
+@inject ToastService? ToastService
+@inject HttpClient Http
+
+
+@switch (Type)
+{
+    case AlertTipType.Blocked:
+        <div class="alert alert-secondary  rounded shadow  rounded" role="alert">
+            该部分已经被另一名用户修改，在审核结束前会一直处于锁定状态
+        </div>
+        break;
+    case AlertTipType.preview:
+        <div class="alert alert-warning  rounded shadow  rounded " role="alert">
+            你的编辑目前在审核中，你的修改不会显示给其他用户，在此期间你可以<TabLink Text="@Title" Url="@Url" Icon="fa fa-edit" class="alert-link">重新编辑</TabLink>或<a class="alert-link" @onclick="@(()=>{ OnClickRevoke.InvokeAsync(ExamineType); })">撤销编辑</a>
+        </div>
+        break;
+    case AlertTipType.Blank:
+        <div class="alert alert-success  rounded shadow  rounded" role="alert">
+            此部分还没有任何内容，你可以尝试<TabLink Text="@Title" Url="@Url" Icon="fa fa-edit" class="alert-link">添加</TabLink>
+        </div>
+        break;
+    case AlertTipType.Editable:
+        <div class="alert alert-primary  rounded shadow  rounded" role="alert">
+            词条的完善需要你的一份力量，可以试试<TabLink Text="@Title" Url="@Url" Icon="fa fa-edit" class="alert-link">编辑</TabLink>这一部分
+        </div>
+        break;
+    case AlertTipType.PubulishEntry:
+        <div class="alert alert-success  rounded shadow  rounded" role="alert">
+            没有找到想要的词条？ 你可以在这<TabLink Text="创建词条" Url="/entries/establishentry" Icon="fa fa-pencil-square" class="alert-link">创建</TabLink>任何符合规范的词条
+        </div>
+        break;
+    case AlertTipType.PubulishArticle:
+        <div class="alert alert-success  rounded shadow  rounded" role="alert">
+            没有找到想要的文章？ 你可以在这<TabLink Text="发表文章" Url="/articles/createarticle" Icon="fa fa-pencil-square" class="alert-link">发表</TabLink>攻略、访谈、感想、动态......
+        </div>
+        break;
+    case AlertTipType.EntryStandard:
+        <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+            在编辑词条前请先<TabLink Text="词条规范" Url="/articles/index/2" Icon="fa fa-newspaper-o" class="alert-link">阅读《词条规范》</TabLink>，我们不会审核通过不符合规范的词条
+        </div>
+        break;
+    case AlertTipType.ArticleStandard:
+        <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+            在发表文章前请先<TabLink Text="文章规范" Url="/articles/index/2" Icon="fa fa-newspaper-o" class="alert-link">阅读《文章规范》</TabLink>，我们不会审核通过不符合规范的文章
+        </div>
+        break;
+    case AlertTipType.PeripheryStandard:
+        <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+            在创建周边前请先<TabLink Text="周边规范" Url="/articles/index/253" Icon="fa fa-newspaper-o" class="alert-link">阅读《周边规范》</TabLink>，我们不会审核通过不符合规范的周边
+        </div>
+        break;
+    case AlertTipType.TagStandard:
+        <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+            在创建标签前请先<TabLink Text="标签规范" Url="/articles/index/254" Icon="fa fa-newspaper-o" class="alert-link">阅读《标签规范》</TabLink>，我们不会审核通过不符合规范的标签
+        </div>
+        break;
+    case AlertTipType.Reward:
+        <div class="alert alert-success  rounded shadow  rounded" role="alert">
+            我们鼓励用户创建编辑词条、文章，也设置了<TabLink Text="积分规则" Url="/articles/index/4" Icon="fa fa-newspaper-o" class="alert-link">奖励</TabLink>，十分感谢你为CnGal资料站做出的贡献
+        </div>
+        break;
+    case AlertTipType.EntryComment:
+        <div class="alert alert-success  rounded shadow  rounded" role="alert">
+            需要规范讨论区秩序？在这里<TabLink Text="@Title" Url="@Url" Icon="fa fa-newspaper-o" class="alert-link">管理评论</TabLink>
+        </div>
+        break;
+    case AlertTipType.ScoreTip:
+        <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+            本评分仅供参考，只反映游戏各维度差异，无法比较不同游戏的优劣
+        </div>
+        break;
+    case AlertTipType.SpacePlayedTip:
+        <div class="alert alert-success  rounded shadow  rounded" role="alert">
+            你可以在游戏词条的评分页面添加已经游玩过的游戏
+        </div>
+        break;
+    case AlertTipType.EditUserSteamId:
+        <div class="alert alert-warning  rounded shadow  rounded" role="alert" style="margin:0px">
+            我们会使用你的SteamId来导入关联游戏，在这里查阅<TabLink Text="@Title" Url="/articles/index/5" Icon="fa fa-newspaper-o" class="alert-link">如何获取SteamId</TabLink>
+        </div>
+        break;
+    case AlertTipType.MarkdownTip:
+        <div class="alert alert-warning  rounded shadow  rounded d-wasm mb-4" role="alert" style="margin:0px">
+            当前Markdown编辑器还有很多小问题，为了提供更好的体验，请<a @onclick="@NavigateToWASM"
+                                               class="alert-link">切换到客户端模式下</a>进行编辑
+        </div>
+        break;
+    case AlertTipType.CreateDisambig:
+        <div class="alert alert-warning  rounded shadow  rounded mb-0" role="alert">
+            与其他词条名称相近？试试<TabLink Text="创建消歧义页面" Url="/disambigs/createdisambig" Icon="fa fa-pencil" class="alert-link">创建</TabLink>消歧义页面
+        </div>
+        break;
+    case AlertTipType.EntryDisPlayDisambigTip:
+        <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+            该有一个词条关联的消歧义页面，点击<TabLink Text="@Title" Url="@Url" Icon="fa fa-key" class="alert-link">查看</TabLink>
+        </div>
+        break;
+    case AlertTipType.ArticleDisPlayDisambigTip:
+        <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+            该有一个文章关联的消歧义页面，点击<TabLink Text="@Title" Url="@Url" Icon="fa fa-key" class="alert-link">查看</TabLink>
+        </div>
+        break;
+    case AlertTipType.OtherLink:
+        <div class="alert alert-warning rounded shadow  rounded" role="alert">
+            <strong>以下为外部链接，与本站没有任何从属关系，本站亦不对其安全性负责</strong>
+        </div>
+        break;
+    case AlertTipType.UploadImageTip:
+        <div class="alert alert-warning  rounded shadow  rounded d-wasm mb-4" role="alert" style="margin:0px">
+            当前位于服务端模式下，不能进行图片上传，为了提供更好的体验，请切换到<a @onclick="@NavigateToWASM"
+                                                 class="alert-link">客户端模式</a>下进行编辑
+        </div>
+        break;
+    case AlertTipType.SpaceComment:
+        <div class="alert alert-success  rounded shadow  rounded" role="alert">
+            需要规范留言区秩序？在这里<TabLink Text="@Title" Url="@Url" Icon="fa fa-newspaper-o" class="alert-link">管理留言</TabLink>
+        </div>
+        break;
+    case AlertTipType.NoChangeName:
+        <div class="alert alert-warning  rounded shadow  rounded mb-0" role="alert">
+            与其他词条名称相近？试试<TabLink Text="创建消歧义页面" Url="/disambigs/createdisambig" Icon="fa fa-pencil" class="alert-link">创建</TabLink>消歧义页面。词条名称有误？尽量修改显示名称，如果确实需要修改唯一名称，
+            <TabLink Text="@Title" Url="https://jq.qq.com/?_wv=1027&k=mG6qNvyg" Icon="fa fa-newspaper-o" class="alert-link" target="_blank">请单击此处加群商讨</TabLink>
+        </div>
+        break;
+}
+
+
+@code {
+
+    public enum AlertTipType
+    {
+        Blank,
+        Editable,
+        Blocked,
+        preview,
+        PubulishEntry,
+        PubulishArticle,
+        EntryStandard,
+        ArticleStandard,
+        PeripheryStandard,
+        TagStandard,
+        Reward,
+        EntryComment,
+        ScoreTip,
+        SpacePlayedTip,
+        EditUserSteamId,
+        MarkdownTip,
+        CreateDisambig,
+        EntryDisPlayDisambigTip,
+        ArticleDisPlayDisambigTip,
+        OtherLink,
+        UploadImageTip,
+        SpaceComment,
+        NoChangeName,
+    }
+
+    [Parameter]
+    public AlertTipType Type { get; set; } = AlertTipType.Blank;
+    [Parameter]
+    public string Url { get; set; } = "/";
+    [Parameter]
+    public string Title { get; set; } = "/";
+    [Parameter]
+    public Operation ExamineType { get; set; }
+
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+
+    [Parameter]
+    public EventCallback<Operation> OnClickRevoke { get; set; }
+
+    public async Task NavigateToWASM()
+    {
+        await JS.InvokeAsync<string>("openNewPage", "https://app.cngal.org/");
+    }
+
+}

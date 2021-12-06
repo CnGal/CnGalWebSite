@@ -1,0 +1,43 @@
+﻿
+<div class="pb-1">
+    <div class="mb-3  rounded shadow  bg-opacity mb-3 ps-3 pe-3">
+        <h2 class="fw-bold pt-3 pb-3 m-0 font-color h4"><i class="fa fa-shopping-basket"></i>&nbsp;&nbsp;周边合集</h2>
+    </div>
+    @foreach (var item in Model)
+    {
+        <div class=" rounded shadow  bg-opacity mb-3 ps-3 pt-3 pb-1 pe-3">
+            <PeripheryOverViewTip Model="item" />
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<GameOverviewPeripheriesModel> Model { get; set; } = new List<GameOverviewPeripheriesModel>();
+
+    public Task CollectionChanged(bool collected, long id)
+    {
+        foreach (var item in Model)
+        {
+            foreach (var infor in item.Peripheries)
+            {
+                if (infor.Id == id)
+                {
+                    infor.IsCollected = collected;
+                    if (collected)
+                    {
+                        infor.CollectedCount++;
+                    }
+                    else
+                    {
+                        infor.CollectedCount--;
+                    }
+                }
+            }
+        }
+
+        StateHasChanged();
+
+        return Task.CompletedTask;
+    }
+}

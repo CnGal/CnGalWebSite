@@ -1,0 +1,147 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@if (!isReady)
+{
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+}
+else
+{
+    <Table TItem="GroupInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
+           OnQueryAsync="@OnQueryGroupAsync" SearchModel="@SearchModelGroup" ShowSearch="true" ShowLoading="true"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
+        <TableColumns>
+            <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true" Fixed="true" />
+            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" AllowTextWrap="true" />
+            <TableColumn @bind-Field="@context.AnotherNameGroup" Filterable="true" Sortable="true" Searchable="true" Width="200" AllowTextWrap="true" />
+
+            <TableColumn @bind-Field="@context.QQgroupGroup" Filterable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickCallback="@(() =>OnLook(context.RealId,context.Name))" />
+        </RowButtonTemplate>
+
+    </Table>
+
+}
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 1000 };
+
+    private bool isReady = false;
+    public GroupInforListViewModel ModelGroup { get; set; } = new GroupInforListViewModel
+    {
+        GroupInfors = new List<GroupInforTableModel>()
+    };
+    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<GroupInforTableModel>, string, SortOrder, IEnumerable<GroupInforTableModel>>> SortLambdaCacheGroup = new();
+    private GroupInforTableModel SearchModelGroup { get; set; } = new GroupInforTableModel();
+
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+
+    public async Task OnLook(long id, string name)
+    {
+        await OnClickUrl.InvokeAsync(new NavigateModel
+        {
+            Url = "/entries/index/" + id,
+            Title = name,
+            Icon = "fa fa-link"
+        });
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
+            ModelGroup = await Http.GetFromJsonAsync<GroupInforListViewModel>(ToolHelper.WebApiPath + "api/tables/GetGroupInforList");
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取制作组信息汇总表格");
+        }
+    }
+
+    private Task<QueryData<GroupInforTableModel>> OnQueryGroupAsync(QueryPageOptions options)
+    {
+
+        IEnumerable<GroupInforTableModel> items = ModelGroup.GroupInfors;
+        // 处理高级搜索
+        if (!string.IsNullOrWhiteSpace(SearchModelGroup.Name))
+        {
+            items = items.Where(item => item.Name?.Contains(SearchModelGroup.Name, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchModelGroup.AnotherNameGroup))
+        {
+            items = items.Where(item => item.AnotherNameGroup?.Contains(SearchModelGroup.AnotherNameGroup, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchModelGroup.QQgroupGroup))
+        {
+            items = items.Where(item => item.QQgroupGroup?.Contains(SearchModelGroup.QQgroupGroup, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        // 处理 Searchable=true 列与 SeachText 模糊搜索
+        if (options.Searchs.Any())
+        {
+            items = items.Where(options.Searchs.GetFilterFunc<GroupInforTableModel>(FilterLogic.Or));
+        }
+        else
+        {
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
+                             || (item.AnotherNameGroup?.Contains(options.SearchText) ?? false)
+                             || (item.QQgroupGroup?.Contains(options.SearchText) ?? false));
+            }
+        }
+        // 过滤
+        var isFiltered = false;
+        if (options.Filters.Any())
+        {
+            items = items.Where(options.Filters.GetFilterFunc<GroupInforTableModel>());
+            isFiltered = true;
+        }
+
+        // 排序
+        var isSorted = false;
+        if (!string.IsNullOrWhiteSpace(options.SortName))
+        {
+            // 外部未进行排序，内部自动进行排序处理
+            var invoker = SortLambdaCacheGroup.GetOrAdd(typeof(GroupInforTableModel), key => LambdaExtensions.GetSortLambda<GroupInforTableModel>().Compile());
+            items = invoker(items, options.SortName, options.SortOrder);
+            isSorted = true;
+        }
+
+        // 设置记录总数
+        var total = items.Count();
+
+        // 内存分页
+        items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
+
+        return Task.FromResult(new QueryData<GroupInforTableModel>()
+        {
+            Items = items,
+            TotalCount = total,
+            IsSorted = isSorted,
+            IsFiltered = isFiltered
+        });
+    }
+
+}

@@ -1,0 +1,24 @@
+﻿<div>
+    <nav aria-label="breadcrumb" style="background-color: transparent">
+        <ol class="breadcrumb" style="background-color: transparent">
+            @foreach(var item in TagList)
+            {
+                if(TagList.IndexOf(item)==TagList.Count-1)
+                {
+                    break;
+                }
+                <li class="breadcrumb-item">
+                    <TabLink Url="@("/tags/index/"+item.Value)" Icon="fa fa-tag" Text="@item.Key">@item.Key</TabLink>
+                </li>
+            }
+            @if (TagList.Count != 0)
+            {
+                <li class="breadcrumb-item active" aria-current="page">@TagList[TagList.Count - 1].Key</li>
+            }
+        </ol>
+    </nav>
+</div>
+@code {
+    [Parameter]
+    public List<KeyValuePair<string, int>> TagList { get; set; }
+}

@@ -1,0 +1,119 @@
+﻿@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject ToastService? ToastService
+
+<style>
+    .search {
+        width: 100%;
+    }
+    input.form-control {
+        background-color: #F1F1F1;
+        border: 0;
+    }
+</style>
+<div class="shadow-sm apps-headbar-layout" style=" position: fixed; top: 0;width:100%;z-index:10000;">
+    <div style="display: flex; height: 45px; flex-direction: row; align-items: center;" class="ms-2 mt-1 me-3">
+        <div style=" display: flex; flex-direction: column; justify-content: center;" class="me-2" @onclick="OnClickBack">
+            <i class="fa fa-chevron-left fa-fw " style=" font-size: 17px;"></i>
+        </div>
+        <BootstrapBlazor.Components.Search IsAutoFocus="true"
+                                           class="" placeholder="可以搜索哦~" @bind-Value="@SearchText" Items="Items" IsLikeMatch="true" OnSearch="@((a)=>OnSearch.InvokeAsync(a))"></BootstrapBlazor.Components.Search>
+    </div>
+    <div style="display: flex; flex-direction: row; align-items: center;" class="ms-3 me-3 pt-2 mb-2">
+        <CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine Model="Model" Styles="display: flex;flex-direction: row; overflow-x: auto;flex-wrap: nowrap;width: fit-content;"></CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine>
+    </div>
+    <div style=" display: flex; flex-direction: row; justify-content: flex-end; " class="ms-3 me-3 mb-2">
+        <CnGalWebSite.Shared.AppComponent.Normal.Buttons.DisplayModeButton OnChangeType="OnChangeType" />
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string SearchText { get; set; }
+    [Parameter]
+    public string ScreeningConditions { get; set; }
+
+    public async void OnClickBack()
+    {
+        await JS.InvokeAsync<string>("goback");
+    }
+
+    [Parameter]
+    public EventCallback<int> OnTabClick { get; set; }
+    [Parameter]
+    public EventCallback<DisplayMode> OnChangeType { get; set; }
+    [Parameter]
+    public EventCallback<string> OnSearch { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    private IEnumerable<string> Items { get; set; } = new string[1] { "" };
+
+    public int DefaultIndex { get; set; }
+    public int RandomIndex { get; set; }
+    private CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel Model = new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel { Items = new List<CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel>() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Items = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList");
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取搜索结果");
+        }
+        if (string.IsNullOrWhiteSpace(ScreeningConditions) == false)
+        {
+            if (ScreeningConditions.Contains("全部"))
+            {
+                DefaultIndex = 0;
+            }
+            else if (ScreeningConditions.Contains("词条"))
+            {
+                DefaultIndex = 1;
+            }
+            else if (ScreeningConditions.Contains("文章"))
+            {
+                DefaultIndex = 2;
+            }
+
+        }
+        Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = DefaultIndex,
+            Index = 0,
+            OnTabClick = OnTabClick,
+            RandomIndex = RandomIndex,
+            Text = "全部",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+        Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = DefaultIndex,
+            Index = 1,
+            OnTabClick = OnTabClick,
+            RandomIndex = RandomIndex,
+            Text = "词条",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        }); Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = DefaultIndex,
+            Index = 2,
+            OnTabClick = OnTabClick,
+            RandomIndex = RandomIndex,
+            Text = "文章",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+
+
+    }
+
+}
+

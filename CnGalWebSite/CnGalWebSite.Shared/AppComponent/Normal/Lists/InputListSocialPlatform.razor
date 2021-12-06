@@ -1,0 +1,96 @@
+﻿@inject DialogService DialogService
+@inject ToastService ToastService
+<CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="@Title" ShowButton="true" UrlName="添加" OnClick="AddOther" Icon="fa fa-plus" />
+<div class="row mt-3">
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        int temp = i;
+        <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3">
+            <div class="card p-3 pt-2" style="background-color:transparent">
+                <div class="row">
+                    <div class="col mt-2" style="padding-right:0px;">
+                        <p class="text-truncate text-center" style="font-size:.875rem">
+                            @Model[i].Name：@Model[i].Link
+                        </p>
+                    </div>
+                    <div class="col-12 d-flex" style="justify-content: space-between;">
+                        <Button IsOutline="true" Size="Size.Small" Color="Color.Danger" Icon="fa fa-trash-o" @onclick="@(()=> DeleteOther(temp))" Text="删除"></Button>
+                        <Button IsOutline="true" Size="Size.Small" Color="Color.Success" Icon="fa fa-pencil" @onclick="@(()=> EditOther(temp))" Text="编辑" class="ms-1"></Button>
+                    </div>
+
+                </div>
+            </div>
+        </div>}
+</div>
+
+@code {
+    [Parameter]
+    public List<SocialPlatform> Model { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+
+    public async Task DeleteOther(int i)
+    {
+        Model.RemoveAt(i);
+        StateHasChanged();
+        await ToastService.Success("删除成功", "成功删除相关网站");
+    }
+    public async Task EditOther(int i)
+    {
+        var items = Utility.GenerateEditorItems<SocialPlatform>();
+        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
+        //item.Data = Foo.GenerateHobbys(Localizer);
+
+        var option = new EditDialogOption<SocialPlatform>()
+        {
+            Title = "编辑相关网站",
+            Model = Model[i],
+            Items = items,
+            OnCloseAsync = () =>
+            {
+                //Trace.Log("关闭按钮被点击");
+                return Task.CompletedTask;
+            },
+            OnSaveAsync = async context =>
+            {
+                // Trace.Log("保存按钮被点击");
+                Model[i] = (SocialPlatform)context.Model;
+                StateHasChanged();
+                await ToastService.Success("修改成功", "成功修改相关网站");
+                return true;
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
+    }
+    public async Task AddOther()
+    {
+        SocialPlatform model = new SocialPlatform();
+        var items = Utility.GenerateEditorItems<SocialPlatform>();
+
+        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
+        //item.Data = Foo.GenerateHobbys(Localizer);
+
+        var option = new EditDialogOption<SocialPlatform>()
+        {
+            Title = "添加相关网站",
+            Model = model,
+            Items = items,
+            OnCloseAsync = () =>
+            {
+                //Trace.Log("关闭按钮被点击");
+                return Task.CompletedTask;
+            },
+            OnSaveAsync = async context =>
+            {
+                // Trace.Log("保存按钮被点击");
+                Model.Add((SocialPlatform)context.Model);
+                StateHasChanged();
+                await ToastService.Success("添加成功", "成功添加相关网站");
+                return true;
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
+    }
+}

@@ -1,0 +1,16 @@
+﻿<div class="col mb-4">
+    <div class="card h-100" style="background-color:transparent">
+        <div class="card-body">
+            <h5 class="card-title fw-bold">@Name</h5>
+        </div>
+        <img src="@Path" class="card-img-top" alt="@Name" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public string Path { get; set; }
+}
+

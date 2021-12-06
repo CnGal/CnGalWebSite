@@ -1,0 +1,87 @@
+﻿<div style="font-size: initial;" class="row">
+
+    <div class="col-12 col-md-6">
+        类型：@Model.Type.GetDisplayName()
+    </div>
+    @if (string.IsNullOrWhiteSpace(Model.Size) == false)
+    {
+        <div class="col-12 col-md-6">
+            尺寸：@Model.Size
+        </div>
+    }
+    @if (string.IsNullOrWhiteSpace(Model.Brand) == false)
+    {
+        <div class="col-12 col-md-6">
+            品牌：@Model.Brand
+        </div>
+    }
+    @if (string.IsNullOrWhiteSpace(Model.Author) == false)
+    {
+        <div class="col-12 col-md-6">
+            作者：@Model.Author
+        </div>
+    }
+    @if (string.IsNullOrWhiteSpace(Model.Material) == false)
+    {
+        <div class="col-12 col-md-6">
+            材质：@Model.Material
+        </div>
+    }
+    @if (string.IsNullOrWhiteSpace(Model.IndividualParts) == false)
+    {
+        <div class="col-12 col-md-6">
+            单独部件数量：@Model.IndividualParts
+        </div>
+    }
+    @if (string.IsNullOrWhiteSpace(Model.Price) == false)
+    {
+        <div class="col-12 col-md-6">
+            价格：@Model.Price
+        </div>
+    }
+
+    <div class="col-12 col-md-6">
+        是否再版：@(Model.IsReprint?"是":"否")
+    </div>
+
+    <div class="col-12 col-md-6">
+        是否为可用物品：@(Model.IsAvailableItem ? "是":"否")
+    </div>
+
+    @if (Model.Type == PeripheryType.SetorAlbumEtc)
+    {
+        @if (Model.PageCount != 0)
+        {
+            <div class="col-12 col-md-6">
+                页数：@Model.PageCount
+            </div>
+        }
+    }
+    @if (Model.Type == PeripheryType.Ost)
+    {
+        @if (Model.SongCount != 0)
+        {
+            <div class="col-12 col-md-6">
+                歌曲数：@Model.SongCount
+            </div>
+        }
+    }
+    @if (string.IsNullOrWhiteSpace(Model.SaleLink) == false)
+    {
+        <div class="col-12">
+            贩售链接：<a href="@Model.SaleLink" style="word-break: break-all;">@Model.SaleLink</a>
+        </div>
+    }
+    @if (string.IsNullOrWhiteSpace(Model.SaleLink) == false)
+    {
+        <div class="col-12">
+            简介：@Model.BriefIntroduction
+        </div>
+    }
+
+</div>
+@code {
+    [Parameter]
+    public PeripheryViewModel Model { get; set; }
+
+}

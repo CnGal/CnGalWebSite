@@ -1,0 +1,307 @@
+﻿@page "/admin/listperipheries"
+@attribute [Authorize(Roles = "Admin")]
+
+@inject HttpClient Http
+@inject IRoleService _roleService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+
+<TitleTip></TitleTip>
+
+
+<div class="">
+    <div class="" style="padding-right: 0;padding-left: 0;">
+        <div class="  rounded shadow  bg-opacity p-3">
+            <h3 class="fw-bold text-center">周边版块</h3>
+            <p class="text-center" style="color: gray;margin-top:20px">
+                <i class="fa fa-commenting-o fa-fw "></i>
+                <span class="article-infor-text">@(InforModel.Hiddens + "个隐藏周边")</span>&nbsp;&nbsp;&nbsp;
+                <i class="fa fa-star fa-fw "></i>
+                <span class="article-infor-text">@("总计"+InforModel.All + "个周边")</span>
+
+            </p>
+        </div>
+
+        <div class="mt-3" style="padding-right: 0;padding-left: 0;">
+            <div class=" rounded shadow -lg p-4 bg-opacity">
+                <Table TItem="ListPeripheryAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelArticle" ShowSearch="true" @ref="TableRows"
+                       ShowExtendButtons="true" ExtendButtonColumnWidth="340" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+                       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+                    <TableToolbarTemplate>
+                        <TableToolbarButton TItem="ListPeripheryAloneModel" Color="Color.Primary" Icon="fa fa-arrow-up" Text="增权重" OnClickCallback="OnPriorityUpClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListPeripheryAloneModel" Color="Color.Success" Icon="fa fa-arrow-down" Text="降权重" OnClickCallback="OnPriorityDownClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListPeripheryAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListPeripheryAloneModel" Color="Color.Success" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListPeripheryAloneModel" Color="Color.Primary" Icon="fa fa-comments" Text="开启评论" OnClickCallback="OnCanCommentClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListPeripheryAloneModel" Color="Color.Success" Icon="fa fa-comments-o" Text="关闭评论" OnClickCallback="OnCanNotCommentClick" IsAsync="true" />
+                    </TableToolbarTemplate>
+                    <TableColumns>
+                        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
+                        <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" AllowTextWrap="true" Width="200" />
+                        <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" AllowTextWrap="true" Width="400" />
+                        <TableColumn @bind-Field="@context.Author" Sortable="true" Searchable="true" Width="120" AllowTextWrap="true" />
+                        <TableColumn @bind-Field="@context.Material" Sortable="true" Searchable="true" Width="120" AllowTextWrap="true" />
+                        <TableColumn @bind-Field="@context.ReaderCount" Sortable="true" Width="80" />
+                        <TableColumn @bind-Field="@context.CollectedCount" Sortable="true" Width="80" />
+                        <TableColumn @bind-Field="@context.CommentCount" Sortable="true" Width="80" />
+
+                        <TableColumn @bind-Field="@context.LastEditTime" Sortable="true" Width="120" FormatString="yyyy-MM-dd" />
+
+                        <TableColumn @bind-Field="@context.Priority" Sortable="true" Width="120" />
+                        <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+                        <TableColumn @bind-Field="@context.CanComment" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+
+                    </TableColumns>
+                    <RowButtonTemplate>
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickCallback="@(() => OnRowLookClick( context.Id , context.Name))" />
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClickCallback="@(() => OnRowEditPriorityClick(new long[] { context.Id }, 1 , true))" />
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClickCallback="@(() => OnRowEditPriorityClick(new long[] { context.Id }, - 1 , true))" />
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-unlink" Text="切换显示" IsAsync="true" OnClickCallback="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, !context.IsHidden, true))" />
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-comments-o" Text="开关评论" IsAsync="true" OnClickCallback="@(() => OnRowEditCanCommentClick(new long[] { context.Id }, !context.CanComment, true))" />
+                    </RowButtonTemplate>
+                </Table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    [NotNull]
+    private Table<ListPeripheryAloneModel>? TableRows { get; set; }
+    private List<ListPeripheryAloneModel> SelectedRows { get; set; } = new();
+
+
+    public ListRanksInforViewModel InforModel { get; set; } = new ListRanksInforViewModel();
+    public ListPeripheriesViewModel ListModel { get; set; } = new ListPeripheriesViewModel { Peripheries = new List<ListPeripheryAloneModel>() };
+
+    private ListPeripheryAloneModel SearchModelArticle { get; set; } = new ListPeripheryAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+#if DEBUG
+        //Thread.Sleep(10000);
+#endif
+        try
+        {
+            InforModel = await Http.GetFromJsonAsync<ListRanksInforViewModel>(ToolHelper.WebApiPath + "api/admin/listperipheries");
+
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取周边数据");
+        }
+
+    }
+
+    private async Task<QueryData<ListPeripheryAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<PeripheriesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetPeripheryList", new PeripheriesPagesInfor { SearchModel = SearchModelArticle, Options = options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListPeripheryAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取周边列表");
+            return new QueryData<ListPeripheryAloneModel>();
+        }
+    }
+    private async Task OnRowEditPriorityClick(long[] ids, int plusPriority, bool showMessage)
+    {
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditPeripheryPriorityViewModel>(ToolHelper.WebApiPath + "api/peripheries/EditPeripheryPriority", new EditPeripheryPriorityViewModel { Ids = ids, PlusPriority = plusPriority });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("修改周边权重失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success("修改周边权重成功", "修改周边权重成功");
+                    await TableRows.QueryAsync();
+                }
+
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "修改周边权重失败");
+        }
+
+    }
+
+
+    private async Task OnPriorityUpClick(IEnumerable<ListPeripheryAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改周边权重", "请选中周边");
+            return;
+        }
+
+        await OnRowEditPriorityClick(items.Select(s => s.Id).ToArray(), 1, false);
+        await ToastService.Success("修改周边权重成功", "修改周边权重成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnPriorityDownClick(IEnumerable<ListPeripheryAloneModel> items)
+    {
+
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改周边权重", "请选中周边");
+            return;
+        }
+
+        await OnRowEditPriorityClick(items.Select(s => s.Id).ToArray(), -1, false);
+
+        await ToastService.Success("修改周边权重成功", "修改周边权重成功");
+        await TableRows.QueryAsync();
+    }
+
+    private async Task OnRowEditIsHiddenClick(long[] ids, bool isHidden, bool showMessage)
+    {
+        string tempString = isHidden == true ? "隐藏" : "显示";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<HiddenPeripheryModel>(ToolHelper.WebApiPath + "api/peripheries/HiddenPeriphery", new HiddenPeripheryModel { Ids = ids, IsHidden = isHidden });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "周边失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "周边成功", tempString + "周边成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "周边失败");
+        }
+    }
+
+    private async Task OnHiddenClick(IEnumerable<ListPeripheryAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改周边显示状态", "请选中周边");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), true, false);
+
+        await ToastService.Success("隐藏周边成功", "隐藏周边成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnUnHiddenClick(IEnumerable<ListPeripheryAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改周边显示状态", "请选中周边");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), false, false);
+
+        await ToastService.Success("显示周边成功", "显示周边成功");
+        await TableRows.QueryAsync();
+    }
+
+    public Task OnRowLookClick(long id, string name)
+    {
+        NavigationManager.NavigateTo(Provider, "/peripheries/index/" + id, name, "fa fa-newspaper-o");
+        return Task.CompletedTask;
+    }
+
+
+    private async Task OnRowEditCanCommentClick(long[] ids, bool canComment, bool showMessage)
+    {
+        string tempString = canComment == true ? "启用周边评论" : "关闭周边评论";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditPeripheryCanCommentModel>(ToolHelper.WebApiPath + "api/comments/EditPeripheryCanComment", new EditPeripheryCanCommentModel { Ids = ids, CanComment = canComment });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "成功", tempString + "成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "失败");
+        }
+    }
+
+    private async Task OnCanCommentClick(IEnumerable<ListPeripheryAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改周边评论状态", "请选中周边");
+            return;
+        }
+
+        await OnRowEditCanCommentClick(items.Select(s => s.Id).ToArray(), true, false);
+
+        await ToastService.Success("开启周边评论成功", "开启周边评论成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnCanNotCommentClick(IEnumerable<ListPeripheryAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改周边评论状态", "请选中周边");
+            return;
+        }
+
+        await OnRowEditCanCommentClick(items.Select(s => s.Id).ToArray(), false, false);
+
+        await ToastService.Success("关闭周边评论成功", "关闭周边评论成功");
+        await TableRows.QueryAsync();
+    }
+
+
+
+}
+

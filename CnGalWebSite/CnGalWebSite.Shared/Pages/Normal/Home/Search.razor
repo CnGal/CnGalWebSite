@@ -1,0 +1,24 @@
+﻿@page "/home/search/{ScreeningConditions}/{SearchString}/{FilterText}"
+@page "/home/search/{ScreeningConditions}/{SearchString}"
+@page "/home/search/{ScreeningConditions}"
+@page "/home/search"
+
+@inject IDataCacheService _dataCacheService
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Home.Search ScreeningConditions="@ScreeningConditions" Sorting="@SearchString" FilterText="@FilterText" />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Home.Search ScreeningConditions="@ScreeningConditions" SearchString="@SearchString" FilterText="@FilterText" />
+}
+@code{
+
+    [Parameter]
+    public string ScreeningConditions { get; set; }
+    [Parameter]
+    public string SearchString { get; set; }
+    [Parameter]
+    public string FilterText { get; set; }
+}

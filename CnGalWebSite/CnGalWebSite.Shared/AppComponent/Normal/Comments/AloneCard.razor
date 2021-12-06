@@ -1,0 +1,122 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject NavigationManager NavigationManager
+
+
+<div class="mt-4">
+    <div>
+        <CnGalWebSite.Shared.AppComponent.Normal.Ranks.UserRank UserId="@Model.ApplicationUserId" UserName="@Model.UserName" Image="@Model.UserImage" Ranks="@Model.Ranks" />
+
+        @if (string.IsNullOrWhiteSpace(ParentCommentUserName))
+        {<div class=" " style=" margin-left: 42px">
+                <CnGalWebSite.Shared.AppComponent.Normal.Texts.MarkdownView Text="@Model.Text" />
+            </div>
+        }
+        else
+        {
+    <div style=" margin-left: 42px">
+        <div class="mt-2 col-12" style="display: flex;">
+            <a style=" max-width:150px;" href="@("/space/index/"+Model.ApplicationUserId)">@("回复 "+ParentCommentUserName+"：")</a>
+            <CnGalWebSite.Shared.AppComponent.Normal.Texts.MarkdownView Text="@Model.Text" ClassName="comment-markdown" />
+        </div>
+
+    </div>
+        }
+
+        <div class="mt-2" style="color: gray; display: flex; justify-content: space-between; margin-left: 42px;">
+
+            <div style="font-size:smaller">@Model.CommentTime.ToTimeFromNowString()</div>
+
+            <AuthorizeView>
+                <Authorized>
+                    <div style="display:flex;">
+                        <div @onclick="@(()=>OnRelying.InvokeAsync(new RelyCallBackModel { CommentId = Model.Id, UserName = Model.UserName }))">
+                            <i class="fa  fa-comment-o"></i>
+                        </div>
+                        @if (CanDeleted)
+                        {
+                            <div @onclick="OnDeleteClick" class="ms-3">
+                                <i class="fa  fa-trash-o"></i>
+                            </div>
+                        }
+                    </div>
+
+                </Authorized>
+            </AuthorizeView>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public CommentViewModel Model { get; set; }
+
+
+    [Parameter]
+    public EventCallback<RelyCallBackModel> OnRelying { get; set; }
+
+    [Parameter]
+    public string ParentCommentUserName { get; set; }
+
+    [Parameter]
+    public bool CanDeleted { get; set; }
+
+
+    [Parameter]
+    public EventCallback DeletedCallBack { get; set; }
+
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private string ObjectId
+    {
+        get
+        {
+            return Model.Id.ToString();
+        }
+    }
+
+
+    int count = 0;
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="item"></param>
+    private async Task OnDeleteClick()
+    {
+
+        //调用API
+        try
+        {
+            count++;
+            if (count < 2)
+            {
+                await ToastService.Error("你确定要删除这条评论吗？", "确认删除请再次点击删除按钮");
+                return;
+            }
+
+            var result = await Http.PostAsJsonAsync<DeleteCommentModel>(ToolHelper.WebApiPath + "api/comments/UserDeleteComment", new DeleteCommentModel { Ids = new long[] { Model.Id } });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("删除评论失败", obj.Error);
+            }
+            else
+            {
+
+                await ToastService.Success("删除评论成功", "删除评论成功");
+                await DeletedCallBack.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "删除评论失败");
+        }
+    }
+}

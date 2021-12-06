@@ -1,0 +1,41 @@
+﻿<TabLink Icon="fa fa-newspaper-o" Url="@("/articles/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
+    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 mb-3">
+        <div class="row mb-2">
+            <div class="col-12 col-xl-4 pt-3">
+                <img class="img-fluid" src="@Model.MainImage">
+            </div>
+            <div class="col-12 col-xl-8 pt-3">
+                <header>
+                    <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
+                    <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                </header>
+                <div class="article-home-text">
+                    @Model.BriefIntroduction
+                </div>
+            </div>
+        </div>
+        <p class="" style="color: gray;">
+            <i class="fa fa-calendar fa-fw"></i>
+            <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+
+            <i class="fa fa-commenting-o fa-fw"></i>
+            <span class="article-home-infor-text">@(Model.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
+
+            <i class="fa fa-eye fa-fw d-none d-sm-inline"></i>
+            <span class="article-home-infor-text d-none d-sm-inline">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
+
+            <i class="fa fa-thumbs-o-up fa-fw d-none d-sm-inline"></i>
+            <span class="article-home-infor-text d-none d-sm-inline">@(Model.ThumbsUpCount)人点赞&nbsp;&nbsp;&nbsp;</span>
+
+            <i class="fa fa-user fa-fw"></i>
+            <span class="article-home-infor-text">@Model.CreateUserName&nbsp;&nbsp;&nbsp;</span>
+        </p>
+        <div style="height: 1px;"></div>
+    </div>
+</TabLink>
+   
+
+    @code {
+        [Parameter]
+        public ArticleInforTipViewModel Model { get; set; }
+    }

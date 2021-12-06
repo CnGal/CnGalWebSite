@@ -1,0 +1,26 @@
+﻿<h2 class="h4 mt-3">@Model.Modifier</h2>
+<div class="row">
+    @foreach (var item in Model.Pictures)
+    {
+        <div class=" col-12 col-md-6 col-lg-6 mt-2 mb-2" >
+            <div class=" h-100">
+                <div class="card text-black" style="background-color:transparent">
+                    <img src="@item.Url" class="card-img" alt="..." @onclick="@(()=>OnImage(item))" style="cursor:pointer">
+                </div>
+                <p class="text-center mt-2" style="font-size: medium; word-break: break-word; ">@item.Note</p>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public PicturesViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback<PicturesAloneViewModel> OnClickImage { get; set; }
+
+    public async Task OnImage(PicturesAloneViewModel model)
+    {
+        await OnClickImage.InvokeAsync(model);
+    }
+}

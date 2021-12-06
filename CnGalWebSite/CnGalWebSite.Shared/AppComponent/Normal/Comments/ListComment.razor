@@ -1,0 +1,94 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+@if (isReady)
+{
+    @if (Model.Count != 0)
+    {
+        <style>
+            .comment-markdown p {
+                word-break: break-all;
+                margin-bottom: 0px;
+            }
+        </style>
+        <div>
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="全部评论" />
+        </div>
+
+        @foreach (var item in Model)
+        {
+            @if (Model.IndexOf(item) != 0)
+            {
+                <hr class="mt-4 mb-4" />
+            }
+            <AloneCard CanDeleted="CanDeleted" Model="item" DeletedCallBack="Refresh" OnRelying="OnRelying" />
+            @if (item.InverseParentCodeNavigation.Count != 0)
+            {
+                <div style="margin-left:42px;" @onclick="@(()=>OnClickDetail(item))">
+                    <RelyCard Model="item.InverseParentCodeNavigation" />
+
+                </div>
+            }
+
+        }
+    }
+}
+else
+{
+    <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+}
+
+
+
+@code {
+
+    [Parameter]
+    public CommentType Type { get; set; }
+    [Parameter]
+    public long ObjectId { get; set; }
+    [Parameter]
+    public string UserId { get; set; }
+    [Parameter]
+    public bool CanDeleted { get; set; }
+
+    [Parameter]
+    public EventCallback<RelyCallBackModel> OnRelying { get; set; }
+
+    bool isReady = false;
+
+    public List<CommentViewModel> Model { get; set; } = new List<CommentViewModel>();
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            isReady = false;
+            StateHasChanged();
+            var model = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)Type + "/" + (UserId??ObjectId.ToString()) + "/1/100");
+            Model = model.Data;
+            isReady = true;
+            StateHasChanged();
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取评论列表失败");
+        }
+    }
+
+    public Task OnClickDetail(CommentViewModel item)
+    {
+        _dataCacheService.DetailComment = item;
+        NavigationManager.NavigateTo("/comments/index");
+        return Task.CompletedTask;
+    }
+}

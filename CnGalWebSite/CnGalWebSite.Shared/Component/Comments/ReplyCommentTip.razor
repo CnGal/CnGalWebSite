@@ -1,0 +1,117 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@using System.Text.Json
+@inject SwalService SwalService
+<div class=" ps-4 pe-4 pt-3 pb-3 mb-3 @(IsChild ? "comment-layout-child" : "comment-layout")  comment-layout-transition div-shadow rounded  bg-opacity"  style="cursor:default">
+    <div class="new-row-warp no-margin">
+        <AuthorizeView>
+            <Authorized>
+                @foreach (var item in context.User.Claims)
+                {
+                    if (item.Type == "image")
+                    {
+                        image = item.Value;
+                    }
+                    else if (item.Type == "userid")
+                    {
+                        userId = item.Value;
+                    }
+                }
+                @{userName = context.User.Identity.Name;}
+                <UserRankTextViewTip UserId="@userId" UserName="@userName" Image="@image" Text="@DateTime.Now.ToCstTime().ToString("yyyy年M月d日 H:mm")"></UserRankTextViewTip>
+
+                <Textarea class="col-12 mt-3 comment-rely-textarea" style="height: 120px; width: 100%;" placeholder="还不快点说点什么呀~" @bind-Value="@Text"></Textarea>
+
+                <div class="col-12 no-padding mt-2">
+                    <button class="comment-reply-layout-btn comment-reply-layout-btn-color" @onclick="OnComment">发表评论</button>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="col-12 no-padding mt-2">
+                    <button class="comment-reply-layout-btn comment-reply-layout-btn-color" @onclick="OnLoginClick">登入后发表评论</button>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+
+    </div>
+
+</div>
+@code {
+
+    [Parameter]
+    public bool IsChild { get; set; }
+
+    [Parameter]
+    public string CurrentUserRank { get; set; }
+
+    [Parameter]
+    public bool IsAdmin { get; set; }
+
+    [Parameter]
+    public CommentType Type { get; set; }
+
+    [Parameter]
+    public string ObjectId { get; set; }
+
+    [Parameter]
+    public EventCallback RelyCallBack { get; set; }
+
+    string image = "";
+    string userId = "";
+    string userName = "";
+
+    protected override bool ShouldRender() => false;
+
+    public string Text { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async void OnComment()
+    {
+        //上传
+        try
+        {
+            if (string.IsNullOrWhiteSpace(Text))
+            {
+                await ToastService.Error("发表评论失败", "你还什么都没说呢，我们不能发表空的评论哦");
+                return;
+            }
+            var result = await Http.PostAsJsonAsync<PublishCommentModel>(ToolHelper.WebApiPath + "api/comments/PublishComment", new PublishCommentModel { ObjectId = ObjectId, Text = Text, Type = Type });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("发表评论失败", obj.Error);
+            }
+            else
+            {
+                if(IsAdmin)
+                {
+                    await ToastService.Success("发表评论成功", "发表评论成功");
+                }
+                else
+                {
+                    await SwalService.Show(new SwalOption()
+                    {
+                        Category = SwalCategory.Success,
+                        Title = "评论成功",
+                        Content="评论将会在审核后发布"
+                    });
+                }
+
+                await RelyCallBack.InvokeAsync();
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "发表评论失败");
+        }
+    }
+    public void OnLoginClick()
+    {
+        NavigationManager.NavigateTo("/account/login/"+ ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+    }
+}

@@ -1,0 +1,94 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+
+@if (is404 == true)
+{
+    <CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard Type="未找到编辑记录"></CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard>
+}
+
+@if (isReady)
+{
+<div class="pt-2">
+    <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑记录"/>
+    <div class="mt-3">
+        <Virtualize ItemsProvider="@LoadEntries" @ref="virtualize" OverscanCount="4">
+          
+            <ItemContent>
+                <div class="mb-2">
+                    <EditRecordCard Model="context" />
+
+                </div>
+            </ItemContent>
+            <Placeholder>
+                <SkeletonParagraph />
+                <div class="mt-2"/>
+            </Placeholder>
+        </Virtualize>
+
+    </div>
+</div>
+
+}
+
+
+
+@code {
+
+    public PagedSortedAndFilterInput Input { get; set; }
+    [NotNull]
+    public Virtualize<ExaminedNormalListModel>? virtualize { get; set; }
+
+    public int MaxResultCount { get; set; } = 20;
+
+    public int CurrentPage { get; set; } = 1;
+
+
+    [Parameter]
+    public string UserId { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private bool is404 = false;
+    bool isReady = true;
+
+    private async Task<PagedResultDto<ExaminedNormalListModel>> OnGetNewItems()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<GetExamineInput>(ToolHelper.WebApiPath + "api/space/GetUserEditRecord", new GetExamineInput { CurrentPage = CurrentPage, MaxResultCount = MaxResultCount, UserId = UserId, IsVisual = true });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<PagedResultDto<ExaminedNormalListModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取编辑记录列表");
+            return new PagedResultDto<ExaminedNormalListModel> { Data = new List<ExaminedNormalListModel>(),TotalCount=-1 };
+        }
+    }
+
+    private async ValueTask<ItemsProviderResult<ExaminedNormalListModel>> LoadEntries(ItemsProviderRequest request)
+    {
+        CurrentPage = request.StartIndex;
+        MaxResultCount = request.Count;
+        var entries = await OnGetNewItems();
+
+        if (is404 != (entries.TotalCount == -1))
+        {
+            is404 = (entries.TotalCount == -1);
+            entries.TotalCount = 0;
+
+            StateHasChanged();
+        }
+
+        return new ItemsProviderResult<ExaminedNormalListModel>(entries.Data, entries.TotalCount);
+    }
+
+    public async Task RefreshDataAsync()
+    {
+
+        await virtualize.RefreshDataAsync();
+        StateHasChanged();
+    }
+
+}

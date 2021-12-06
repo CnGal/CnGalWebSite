@@ -1,0 +1,109 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IDataCacheService _dataCacheService
+
+@if (is404 == true)
+{
+    <CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard Type="未找到词条"></CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard>
+}
+
+@if (isReady)
+{
+    <div class="row">
+
+        <Virtualize ItemsProvider="@LoadEntries" @ref="virtualize" OverscanCount="20">
+            @if (Type == DisplayMode.Image)
+            {
+                <div class="col-6 mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new AppComponent.Normal.Cards.MainImageCardModel { CommentCount=context.CommentCount, Image=context.MainImage, Name=context.DisplayName, ReadCount=context.ReaderCount, Url="/articles/index/"+context.Id})" />
+
+                </div>
+
+            }
+            else
+            {
+                <div class="col-12 mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ArticleCrad Model="@(new Entries.Normal.Relevances.ArticleCardModel { Description=context.BriefIntroduction, Image=context.MainImage, ArticleId=context.Id, Title=context.DisplayName})" />
+                </div>
+            }
+        </Virtualize>
+    </div>
+
+}
+
+
+
+@code {
+
+    public PagedSortedAndFilterInput Input { get; set; }
+    [NotNull]
+    public Virtualize<ArticleInforTipViewModel>? virtualize { get; set; }
+
+    public int MaxResultCount { get; set; } = 20;
+
+    public int CurrentPage { get; set; } = 1;
+    [Parameter]
+    public string Sorting { get; set; }
+
+    [Parameter]
+    public string ScreeningConditions { get; set; }
+
+    private DisplayMode Type;
+
+    private bool is404 = false;
+    bool isReady = true;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private async Task<PagedResultDto<ArticleInforTipViewModel>> OnGetNewItems()
+    {
+        try
+        {
+            Type = _dataCacheService.ThemeSetting.ListDisplayMode;
+
+            var result = await Http.PostAsJsonAsync<PagedSortedAndFilterInput>(ToolHelper.WebApiPath + "api/articles/GetArticleHomeList", new PagedSortedAndFilterInput { CurrentPage = CurrentPage, MaxResultCount = MaxResultCount, ScreeningConditions = ScreeningConditions, Sorting = Sorting });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<PagedResultDto<ArticleInforTipViewModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取词条列表");
+            return new PagedResultDto<ArticleInforTipViewModel> { Data = new List<ArticleInforTipViewModel>() };
+        }
+    }
+
+    private async ValueTask<ItemsProviderResult<ArticleInforTipViewModel>> LoadEntries(ItemsProviderRequest request)
+    {
+        CurrentPage = request.StartIndex;
+        MaxResultCount = request.Count;
+        var entries = await OnGetNewItems();
+
+        if (is404 != (entries.TotalCount == 0))
+        {
+            is404 = (entries.TotalCount == 0);
+            StateHasChanged();
+        }
+
+        return new ItemsProviderResult<ArticleInforTipViewModel>(entries.Data, entries.TotalCount);
+    }
+
+    public async Task RefreshDataAsync()
+    {
+
+        await virtualize.RefreshDataAsync();
+        StateHasChanged();
+    }
+    public async Task ChangeDisplayMode(DisplayMode type)
+    {
+        _dataCacheService.ThemeSetting.ListDisplayMode=Type = type;
+        await _dataCacheService.SavaTheme.InvokeAsync();
+
+        isReady = false;
+        StateHasChanged();
+
+
+        isReady = true;
+        StateHasChanged();
+    }
+
+}

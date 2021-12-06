@@ -1,0 +1,23 @@
+﻿@page "/entries/home/{Modifier}/{Sorting}"
+@page "/entries/home/{Modifier}"
+@page "/entries/home"
+@page "/entries"
+
+
+@inject IDataCacheService _dataCacheService
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Entries.Home ScreeningConditions="@Modifier" Sorting="@Sorting" />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Entries.Home Modifier="@Modifier" />
+}
+@code{
+
+    [Parameter]
+    public string Modifier { get; set; }
+    [Parameter]
+    public string Sorting { get; set; }
+}

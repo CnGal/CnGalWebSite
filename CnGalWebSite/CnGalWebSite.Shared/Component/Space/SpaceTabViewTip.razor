@@ -1,0 +1,85 @@
+﻿@if (IsSmallSreeen)
+{<div class=" rounded shadow  bg-opacity">
+     <ul class="row nav" style="margin:0px" id="pills-tab" role="tablist">
+         <EntryTabAloneTip Icon="fa-home" Index="1" OnTabClick="OnClick" Text="介绍" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
+         @if (IsCurrentUser)
+         {
+             <EntryTabAloneTip Icon="fa-calendar-check-o " Index="0" OnTabClick="OnClick" Text="签到" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
+
+         }
+
+         <EntryTabAloneTip Icon="fa-comments-o" Index="6" OnTabClick="OnClick" Text="留言" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
+
+         @if (IsCurrentUser)
+         {
+             <EntryTabAloneTip Icon="fa-envelope-o" Index="5" OnTabClick="OnClick" Text="消息" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
+         }
+         <EntryTabAloneTip Icon="fa-book" Index="7" OnTabClick="OnClick" Text="文章" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
+         @if (IsCurrentUser || IsShowFavorites)
+         {
+             <EntryTabAloneTip Icon="fa-folder-open" Index="10" OnTabClick="OnClick" Text="收藏" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
+         }
+         <EntryTabAloneTip Icon="fa-shopping-basket" Index="11" OnTabClick="OnClick" Text="周边" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
+
+         <EntryTabAloneTip Icon=" fa-pencil" Index="4" OnTabClick="OnClick" Text="编辑记录" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
+         <EntryTabAloneTip Icon="fa-line-chart" Index="2" OnTabClick="OnClick" Text="概览" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
+         <EntryTabAloneTip Icon="fa-drivers-license-o" Index="3" OnTabClick="OnClick" Text="资料" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
+     </ul>
+    </div>
+}
+else
+{
+    <div class=" rounded shadow  bg-opacity">
+        <ul class="list-group list-group-flush nav" id="pills-tab" role="tablist">
+            <SpaceTabAloneTip Icon="fa-home" Index="1" OnTabClick="OnClick" Text="介绍" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
+            @if (IsCurrentUser)
+            {
+                <SpaceTabAloneTip Icon="fa-calendar-check-o " Index="0" OnTabClick="OnClick" Text="签到" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
+
+
+            }
+
+
+            <SpaceTabAloneTip Icon="fa-comments-o" Index="6" OnTabClick="OnClick" Text="留言" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
+            @if (IsCurrentUser)
+            {
+                <SpaceTabAloneTip Icon="fa-envelope-o" Index="5" OnTabClick="OnClick" Text="消息" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
+            }
+            <SpaceTabAloneTip Icon="fa-book" Index="7" OnTabClick="OnClick" Text="文章" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
+            @if (IsCurrentUser || IsShowFavorites)
+            {
+                <SpaceTabAloneTip Icon="fa-folder-open" Index="10" OnTabClick="OnClick" Text="收藏" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
+            }
+            <SpaceTabAloneTip Icon="fa-shopping-basket" Index="11" OnTabClick="OnClick" Text="周边" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
+            <SpaceTabAloneTip Icon="fa-pencil" Index="4" OnTabClick="OnClick" Text="编辑记录" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
+            <SpaceTabAloneTip Icon="fa-line-chart" Index="2" OnTabClick="OnClick" Text="概览" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
+            <SpaceTabAloneTip Icon="fa-drivers-license-o" Index="3" OnTabClick="OnClick" Text="资料" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
+        </ul>
+    </div>
+
+}
+
+
+
+@code {
+    [Parameter]
+    public EventCallback<int> OnTabClick { get; set; }
+
+    [Parameter]
+    public bool IsSmallSreeen { get; set; } = false;
+
+    [Parameter]
+    public bool IsCurrentUser { get; set; } = false;
+    [Parameter]
+    public bool IsShowFavorites { get; set; } = false;
+    [Parameter]
+    public int DefaultIndex { get; set; }
+
+    [Parameter]
+    public int RandomIndex { get; set; }
+
+    public void OnClick(int index)
+    {
+        OnTabClick.InvokeAsync(index);
+    }
+}

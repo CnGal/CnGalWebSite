@@ -1,0 +1,36 @@
+﻿<TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
+    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 h-100 pb-1">
+        <div class="row mb-2">
+            <div class="pt-3" style="width: 50%; margin-right: auto; margin-left: auto;">
+                <img class="img-fluid" src="@Model.ImagePath" style=" border-radius: 50%;">
+            </div>
+            <div class="col-12 pt-2">
+                <header style=" display: flex; justify-content: center;">
+                    <h5 class="fw-bold" style=" margin-bottom: 0px; margin-left: 5px; margin-top: 1px;">@Model.Name</h5>
+                </header>
+                <div class="article-home-text pt-1" style="text-align: center;">
+                    @Model.BriefIntroduction
+                </div>
+            </div>
+        </div>
+        @if (string.IsNullOrWhiteSpace(Model.CV) == false)
+        {
+
+            <div class="h4 mt-2" style="margin-bottom: 0.1rem; display: flex; justify-content: center;">
+                <span class="badge  fw-bold  bg-title  @("bg-title-color-"+ColorNum)  me-2" style="margin-top: 5px; margin-bottom: 8px; height: 35px; ">
+                    配音
+                </span>
+                <TabLink Text="@Model.Name" Url="@("/entries/index/" + ToolHelper.Base64EncodeName(Model.CV))" Icon="fa fa-codepen"
+                         class="@("btn mb-2 me-2  bg-context-"+ColorNum)" style="transition: all .6s ease; margin-top: 5px;">@Model.CV</TabLink>
+                    </div>
+         }
+    </div>
+</TabLink>
+
+
+    @code {
+        [Parameter]
+        public RoleInforModel Model { get; set; }
+        [Parameter]
+        public string ColorNum { get; set; }
+    }

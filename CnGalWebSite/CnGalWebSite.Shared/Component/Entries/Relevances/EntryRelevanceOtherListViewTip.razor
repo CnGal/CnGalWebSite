@@ -1,0 +1,14 @@
+﻿<div class="row">
+    @for (int i = 0; i < Others.Count; i++)
+    {
+        <div class="col-12 col-lg-6  mb-3 ">
+            <RelevanceOtherTip Model="Others[i]"/>
+        </div>
+    }
+
+</div>
+@code {
+
+    [Parameter]
+    public List<RelevancesKeyValueModel> Others { get; set; }
+}

@@ -1,0 +1,83 @@
+﻿@inject ToastService? ToastService
+
+<ImageUpLoadButton OnUploadedImage="AddImage"></ImageUpLoadButton>
+<div class="row">
+    @for (int i = 0; i < Images.Count; i++)
+    {
+        int temp = i;
+        <div class="col-12 col-md-6 col-xl-4 col-xxl-3 col mb-3">
+            <div class="card ps-3 pt-2 pb-2 pe-3 h-100" style="background-color:transparent">
+                <div class="h-100">
+                    <div>
+                        <img src="@Images[i].ImagePath" class="card-img" alt="...">
+                    </div>
+                    <div class=" mt-2">
+                        <p class="text-center" style="font-size: medium; word-break: break-word; ">
+                            @(Images[i].Link??"")
+                        </p>
+                    </div>
+
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <Button Color="Color.Success" IsOutline="true" Size="Size.Small" Icon="fa fa-pencil" Text="编辑" ButtonType="ButtonType.Button" @onclick="@(()=> EditImage(temp))"></Button>
+                    <Button Color="Color.Danger" IsOutline="true" Size="Size.Small" Icon="fa fa-trash-o" Text="删除" ButtonType="ButtonType.Button" @onclick="@(()=> DeleteImage(temp))"></Button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<CarouselModel> Images { get; set; } = new List<CarouselModel>();
+
+    [Inject]
+    [NotNull]
+    private DialogService? DialogService { get; set; }
+
+    public async Task DeleteImage(int i)
+    {
+        Images.RemoveAt(i);
+        StateHasChanged();
+        await ToastService.Success("删除成功", "成功删除图片");
+    }
+    public async Task EditImage(int i)
+    {
+        var items = Utility.GenerateEditorItems<CarouselModel>();
+        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
+        //item.Data = Foo.GenerateHobbys(Localizer);
+
+        var option = new EditDialogOption<CarouselModel>()
+        {
+            Title = "编辑图片",
+            Model = Images[i],
+            Items = items,
+            OnCloseAsync = () =>
+            {
+            //Trace.Log("关闭按钮被点击");
+            return Task.CompletedTask;
+            },
+            OnSaveAsync = async context =>
+            {
+            // Trace.Log("保存按钮被点击");
+            Images[i] = (CarouselModel)context.Model;
+                StateHasChanged();
+                await ToastService.Success("修改成功", "成功修改图片");
+                return true;
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
+    }
+    public Task AddImage(string url)
+    {
+        Images.Add(new CarouselModel
+        {
+            ImagePath = url,
+            Link = ""
+        });
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+}

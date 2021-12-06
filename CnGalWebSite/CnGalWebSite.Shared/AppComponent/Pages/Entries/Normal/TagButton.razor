@@ -1,0 +1,13 @@
+﻿@inject NavigationManager NavigationManager
+
+<button type="button" class="btn btn-dark m-1  btn-xs  @(IsFrist ? "ms-0" : "")"
+        @onclick="@(() =>  NavigationManager.NavigateTo("/tags/index/"+ToolHelper.Base64EncodeName(Name)))">
+    @Name
+</button>
+
+@code {
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public bool IsFrist { get; set; }
+}

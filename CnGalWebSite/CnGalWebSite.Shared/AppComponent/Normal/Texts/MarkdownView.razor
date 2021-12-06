@@ -1,0 +1,40 @@
+﻿@inject IJSRuntime JS
+
+
+<style>
+    .tui-editor-contents img {
+        max-width: 100%;
+    }
+    .tui-editor-contents span {
+        word-break: break-all;
+    }
+
+</style>
+<div class="@("tui-editor-contents mb-0 "+ClassName)" style="@Style">
+    @((MarkupString)Text)
+</div>
+
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public string Style { get; set; }
+    [Parameter]
+    public string ClassName { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        try
+        {
+            await JS.InvokeAsync<string>("highlightAllCode");
+        }
+        catch
+        {
+
+        }
+    }
+
+
+}

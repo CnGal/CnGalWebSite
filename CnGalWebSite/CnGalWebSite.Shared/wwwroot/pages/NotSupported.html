@@ -1,0 +1,137 @@
+﻿
+<!DOCTYPE html>
+<html lang="ch">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CnGal_中文GalGame资料站</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//app.cngal.org/_content/BootstrapBlazor/css/bootstrap.blazor.bundle.min.css">
+    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/cover-default.min.css">
+    <style>
+        .browser-link{
+            color: #d979a2;
+            transition: all .6s ease;
+        }
+        .browser-link:hover{
+            color: #C6447E;
+            cursor: pointer;
+        }
+        a {
+            color: #d979a2;
+            transition: all .6s ease;
+        }
+        a:hover {
+            color:  #C6447E;
+        }
+        a, a:hover, a:focus {
+            text-decoration: none;
+            outline: none;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="mt-4" style="display: flex; flex-direction: column; align-items: center;">
+        <div style="width: 100%; max-width: 700px;height:650px;">
+            <img src="//app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;margin-left: 15%;margin-right: 15%;">
+            <h4 class="text-center mt-4" style=" font-weight: 600;">貌似这个网站不支持你的浏览器哦</h4>
+            <p class="text-center mt-4">
+                你可以选择安装下方任一浏览器，或其他支持最新Web标准的浏览器，再重新进入
+                <a rel="进入CnGal资料站" href="https://www.cngal.org">www.cngal.org</a> 
+                <br/>如果使用的是QQ浏览器或360极速浏览器，请右击网页，选择极速模式，并重新打开标签页
+                <br/>有任何疑问可以加群 <a rel="点击链接加入群聊【CnGal-NewType反馈群】" href="https://jq.qq.com/?_wv=1027&k=oNCWoamp"  target="_blank" class="word-warp-break">761794704</a> 进行反馈
+                <br/>感谢你访问 CnGal资料站
+            </p>
+        </div>
+        <div class="mt-4 w-100">
+            <div class="row w-100" style="justify-content: space-between;">
+                <a class="col-12 col-md-6 col-lg-3 col-xl-2 mb-4 browser-link" style="display: flex; flex-direction: column;align-items: center;" rel="Google Chrome" href="https://www.google.cn/chrome/">
+                    <i class="fa fa-chrome fa-5x"></i>
+                    <p class="m-0 mt-2">Google Chrome</p>
+                </a>
+                <a class="col-12 col-md-6 col-lg-3 col-xl-2  mb-4 browser-link" style="display: flex; flex-direction: column;align-items: center;" rel="Mozilla Firefox" href="https://www.mozilla.org/zh-CN/firefox/">
+                    <i class="fa fa-firefox fa-5x"></i>
+                    <p class="m-0 mt-2">Mozilla Firefox</p>
+                </a>
+
+                <a class="col-12  col-md-6 col-lg-3 col-xl-2  mb-4 browser-link" style="display: flex; flex-direction: column;align-items: center;" rel="Safari" href="https://www.apple.com/safari/">
+                    <i class="fa fa-safari fa-5x"></i>
+                    <p class="m-0 mt-2">Safari</p>
+                </a>
+                <a class="col-12 col-md-6 col-lg-3 col-xl-2  mb-4  browser-link" style="display: flex; flex-direction: column;align-items: center;"  rel="Opera" href="https://www.opera.com/">
+                    <i class="fa fa-opera fa-5x"></i>
+                    <p class="m-0 mt-2">Opera</p>
+                </a>
+                <a class="col-12 col-md-6 col-lg-3 col-xl-2  mb-4 browser-link " style="display: flex; flex-direction: column;align-items: center;" rel="Microsoft Edge" href="https://www.microsoft.com/zh-cn/edge">
+                    <i class="fa fa-edge fa-5x"></i>
+                    <p class="m-0 mt-2">Microsoft Edge</p>
+                </a>
+            </div>
+        </div>
+    </div>
+     <script>
+        function browserVersion() {
+            var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+            var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1; //判断是否IE<11浏览器
+            var isIE11 = userAgent.indexOf('Trident') > -1 && userAgent.indexOf("rv:11.0") > -1;
+            var isEdge = userAgent.indexOf("Edge") > -1 && !isIE; //Edge浏览器
+            var isFirefox = userAgent.indexOf("Firefox") > -1; //Firefox浏览器
+            var isOpera = userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1; //Opera浏览器
+            var isChrome = userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Edge") == -1 && userAgent.indexOf("OPR") == -1; //Chrome浏览器
+            var isSafari = userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") == -1 && userAgent.indexOf("Edge") == -1 && userAgent.indexOf("OPR") == -1; //Safari浏览器
+            if (isIE) {
+                return 1;
+            } else if (isIE11) {
+                return 1;
+            } else if (isEdge) {
+                if (userAgent.split('Edge/')[1].split('.')[0] < 16) {
+                    return 1;
+                }
+                else {
+                    return 0;
+                }
+            } else if (isFirefox) {
+                if (userAgent.split('Firefox/')[1].split('.')[0] < 53) {
+                    return 1;
+                }
+                else {
+                    return 0;
+                }
+            } else if (isOpera) {
+                if (userAgent.split('OPR/')[1].split('.')[0] < 44) {
+                    return 1;
+                }
+                else {
+                    return 0;
+                }
+            } else if (isChrome) {
+                if (userAgent.split('Chrome/')[1].split('.')[0] < 56) {
+                    return 1;
+                }
+                else {
+                    return 0;
+                }
+            } else if (isSafari) {
+                if (userAgent.split('Safari/')[1].split('.')[0] < 11) {
+                    return 1;
+                }
+                else {
+                    return 0;
+                }
+            } else {
+                return -1;//不是ie浏览器
+            }
+        }
+
+        browserVersion();
+
+        if (browserVersion() != 1) {
+            window.location.href = "/";
+        }
+    </script>
+    <script src="//app.cngal.org/_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js"></script>
+</body>
+</html>

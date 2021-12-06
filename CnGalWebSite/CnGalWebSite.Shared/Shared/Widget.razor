@@ -1,0 +1,21 @@
+﻿<DropdownWidget class="px-3">
+    <DropdownWidgetItem Icon="fa fa-envelope-o">
+        <BodyTemplate>
+            @for (var index = 0; index < 4; index++)
+            {
+            <a class="dropdown-item d-flex align-items-center" href="#" @onclick:preventDefault>
+                <div style="width: 40px; height: 40px;">
+                    <Avatar Url="_content/BootstrapBlazorApp2.Shared/images/argo-c.png" IsCircle="true" Size="Size.Small" />
+                </div>
+                <div class="ms-2">
+                    <div class="d-flex position-relative">
+                        <h4>Argo Zhang</h4>
+                        <small><i class="fa fa-clock-o"></i> @(4 + index) mins</small>
+                    </div>
+                    <div class="text-truncate">Why not buy a new awesome theme?</div>
+                </div>
+            </a>
+            }
+        </BodyTemplate>
+    </DropdownWidgetItem>
+</DropdownWidget>

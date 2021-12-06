@@ -1,0 +1,13 @@
+﻿<div class="row m-0">
+    @foreach (var infor in Model)
+    {
+        <div class="@(" p-0 pe-1 "+(infor.Value.Length>10?"col-12":"col-6"))">
+            <BasicInforPair Model="infor"/>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<BasicInforPairModel> Model { get; set; }
+}

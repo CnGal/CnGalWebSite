@@ -1,0 +1,310 @@
+﻿@inject HttpClient Http
+@inject ToastService ToastService
+@implements IAsyncDisposable
+
+@if (IsRole)
+{
+    @if (IsSmallScreen)
+    {
+        <div class=" rounded shadow  bg-opacity rounded ps-3 pe-3 pt-3 pb-3 mb-2 mt-4" style="display: flex; flex-direction: row; justify-content: space-between;">
+            <h2 class="fw-bold font-color h4" style="margin-bottom:auto;margin-top:auto;"><i class="@TitleIcon"></i>&nbsp;&nbsp;@Title</h2>
+            <Button @onclick="GetNewRandomList" class="btn-sm" Color="Color.Dark" IsOutline="true" Size="Size.Small" Icon="fa fa-refresh" style="float: right"  IsAsync="true">
+                &nbsp;换一组
+            </Button>
+        </div>
+
+        <div class="row">
+            @for (int i = 0; i < Model.Count && i < ItemNum * 2; i++)
+            {
+                long temp = Model[i].Id;
+                string tempName = Model[i].DisPlayName;
+                <div class="col-6 col-md-3 mb-2 mt-2">
+                    <div class="rounded shadow bg-opacity rounded pb-1 h-100">
+                        <HomeCardViewTip Icon="fa fa-codepen" Id="temp" Image="@Model[i].Image" ReadCount="Model[i].ReadCount" CommentCount="Model[i].CommentCount" IsSmallScreen="true"
+                                         Name="@Model[i].DisPlayName" Url="@("/"+Type+"/index/" + temp)" IsRole="IsRole"></HomeCardViewTip>
+                    </div>
+                </div>
+            }
+        </div>
+
+    }
+    else
+    {
+        <div class=" rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mt-4">
+            <Button @onclick="GetNewRandomList" class="btn-sm" Color="Color.Dark" IsOutline="true" Size="Size.Small" Icon="fa fa-refresh" style="float: right"  IsAsync="true">
+                &nbsp;换一组
+            </Button>
+            <h2 class="fw-bold mb-4 font-color h4"><i class="@TitleIcon"></i>&nbsp;&nbsp;@Title</h2>
+            @if (IsNormalScreen)
+            {
+                <div class="row">
+                    @for (int i = 0; i < Model.Count && i < 8; i++)
+                    {
+                        long temp = Model[i].Id;
+                        string tempName = Model[i].DisPlayName;
+                        <div class="col-6 col-md-3 col-lg-2 mb-2">
+                            <HomeCardViewTip Icon="fa fa-codepen" Id="temp" Image="@Model[i].Image" ReadCount="Model[i].ReadCount" CommentCount="Model[i].CommentCount"
+                                             Name="@Model[i].DisPlayName" Url="@("/"+Type+"/index/" + temp)" IsRole="IsRole"></HomeCardViewTip>
+                        </div>
+                    }
+                </div>
+            }
+            else if (IsLargeScreen)
+            {
+                <div class="row">
+                    @for (int i = 0; i < Model.Count && i < 12; i++)
+                    {
+                        long temp = Model[i].Id;
+                        string tempName = Model[i].DisPlayName;
+                        <div class="col-12 col-md-6 col-lg-2 mb-2">
+                            <HomeCardViewTip Icon="fa fa-codepen" Id="temp" Image="@Model[i].Image" ReadCount="Model[i].ReadCount" CommentCount="Model[i].CommentCount"
+                                             Name="@Model[i].DisPlayName" Url="@("/"+Type+"/index/" + temp)" IsRole="IsRole"></HomeCardViewTip>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    @for (int i = 0; i < Model.Count && i < 24; i++)
+                    {
+                        long temp = Model[i].Id;
+                        string tempName = Model[i].DisPlayName;
+                        <div class="col-12 col-md-6 col-lg-1 mb-2">
+                            <HomeCardViewTip Icon="fa fa-codepen" Id="temp" Image="@Model[i].Image" ReadCount="Model[i].ReadCount" CommentCount="Model[i].CommentCount"
+                                             Name="@Model[i].DisPlayName" Url="@("/"+Type+"/index/" + temp)" IsRole="IsRole"></HomeCardViewTip>
+                        </div>
+                    }
+                </div>
+            }
+
+        </div>
+    }
+
+
+}
+else
+{
+    @if (IsSmallScreen)
+    {
+        <div class=" rounded shadow  bg-opacity rounded ps-3 pe-3 pt-3 pb-3 mb-2 mt-4" style="display: flex; flex-direction: row; justify-content: space-between;">
+            <h2 class="fw-bold font-color" style="margin-bottom:auto;margin-top:auto; h4"><i class="@TitleIcon"></i>&nbsp;&nbsp;@Title</h2>
+            <Button @onclick="GetNewRandomList" class="btn-sm" Color="Color.Dark" IsOutline="true" Size="Size.Small" Icon="fa fa-refresh" style="float: right"  IsAsync="true">
+                &nbsp;换一组
+            </Button>
+        </div>
+
+        <div class="row">
+            @for (int i = 0; i < Model.Count && i < ItemNum * 2; i++)
+            {
+                long temp = Model[i].Id;
+                string tempName = Model[i].DisPlayName;
+                <div class="col-6 col-md-3 mb-2 mt-2">
+                    <div class="rounded shadow bg-opacity rounded pb-1 h-100">
+                        <HomeCardViewTip Icon="fa fa-codepen" Id="temp" Image="@Model[i].Image" ReadCount="Model[i].ReadCount" CommentCount="Model[i].CommentCount" IsSmallScreen="true"
+                                         Name="@Model[i].DisPlayName" Url="@("/"+Type+"/index/" + temp)"  IsRole="IsRole"></HomeCardViewTip>
+                    </div>
+                </div>
+            }
+        </div>
+
+    }
+    else
+    {
+        <div class=" rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mt-4">
+            <Button @onclick="GetNewRandomList" class="btn-sm" Color="Color.Dark" IsOutline="true" Size="Size.Small" Icon="fa fa-refresh" style="float: right"  IsAsync="true">
+                &nbsp;换一组
+            </Button>
+            <h2 class="fw-bold mb-4 font-color h4"><i class="@TitleIcon"></i>&nbsp;&nbsp;@Title</h2>
+            @if (IsNormalScreen)
+            {
+                <div class="row">
+                    @for (int i = 0; i < Model.Count && i < ItemNum * 2; i++)
+                    {
+                        long temp = Model[i].Id;
+                        string tempName = Model[i].DisPlayName;
+                        <div class="col-6 col-md-3 mb-2">
+                            <HomeCardViewTip Icon="fa fa-codepen" Id="temp" Image="@Model[i].Image" ReadCount="Model[i].ReadCount" CommentCount="Model[i].CommentCount"
+                                             Name="@Model[i].DisPlayName" Url="@("/"+Type+"/index/" + temp)"  IsRole="IsRole"></HomeCardViewTip>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    @for (int i = 0; i < Model.Count && i < 12; i++)
+                    {
+                        long temp = Model[i].Id;
+                        string tempName = Model[i].DisPlayName;
+                        <div class="col-12 col-md-6 col-lg-2 mb-2">
+                            <HomeCardViewTip Icon="fa fa-codepen" Id="temp" Image="@Model[i].Image" ReadCount="Model[i].ReadCount" CommentCount="Model[i].CommentCount"
+                                             Name="@Model[i].DisPlayName" Url="@("/"+Type+"/index/" + temp)" IsRole="IsRole"></HomeCardViewTip>
+                        </div>
+                    }
+                </div>
+            }
+
+        </div>
+    }
+
+
+}
+
+@code {
+    int ItemNum = 4;
+
+    public List<EntryHomeAloneViewModel> Model { get; set; } = new List<EntryHomeAloneViewModel>();
+    [Parameter]
+    public string Url { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string TitleIcon { get; set; }
+    [Parameter]
+    public string UrlName { get; set; }
+    [Parameter]
+    public string APIUrl { get; set; }
+    [Parameter]
+    public bool IsRole { get; set; }
+
+    [Parameter]
+    public string UrlIcon { get; set; }
+    [Parameter]
+    public string Type { get; set; } = "entries";
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+
+    #region 获取屏幕大小
+
+    /// <summary>
+    /// 获得/设置 IJSRuntime 实例
+    /// </summary>
+    [Inject]
+    [System.Diagnostics.CodeAnalysis.NotNull]
+    public IJSRuntime JSRuntime { get; set; }
+
+
+
+    public bool IsSmallScreen { get; set; }
+    public bool IsNormalScreen { get; set; }
+    public bool IsLargeScreen { get; set; }
+    public bool IsXLargeScreen { get; set; }
+
+
+    private JSInterop<EntryRandomListCardTip> Interop { get; set; }
+    /// <summary>
+    /// OnAfterRenderAsync 方法
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            Interop = new JSInterop<EntryRandomListCardTip>(JSRuntime);
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
+        }
+    }
+
+    /// <summary>
+    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
+    /// </summary>
+    /// <returns></returns>
+    [JSInvokable]
+    public void SetCollapsed(int width)
+    {
+        if (IsRole)
+        {
+            if (IsSmallScreen != (width < 768))
+            {
+                IsSmallScreen = width < 768;
+
+                StateHasChanged();
+            }
+            if (IsNormalScreen != (width >= 768 && width < 1000))
+            {
+                IsNormalScreen = width >= 768 && width < 1000;
+
+                StateHasChanged();
+            }
+            if (IsLargeScreen != (width >= 1000 && width < 1600))
+            {
+                IsLargeScreen = width >= 1000 && width < 1600;
+
+                StateHasChanged();
+            }
+            if (IsXLargeScreen != (width >= 1600))
+            {
+                IsXLargeScreen = width >= 1600;
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            if (IsSmallScreen != (width < 768))
+            {
+                IsSmallScreen = width < 768;
+
+                StateHasChanged();
+            }
+            if (IsNormalScreen != (width >= 768 && width < 1517))
+            {
+                IsNormalScreen = width >= 768 && width < 1517;
+
+                StateHasChanged();
+            }
+            if (IsLargeScreen != (width >= 1517))
+            {
+                IsLargeScreen = width >= 1517;
+                StateHasChanged();
+            }
+        }
+
+    }
+    #endregion
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            //获取主页信息
+            Model = await Http.GetFromJsonAsync<List<EntryHomeAloneViewModel>>(ToolHelper.WebApiPath + APIUrl);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取随机词条文章列表失败");
+        }
+    }
+
+
+    public async Task GetNewRandomList()
+    {
+        await OnInitializedAsync();
+    }
+
+
+    #region 释放实例
+    private async ValueTask DisposeAsyncCore()
+    {
+        if (Interop != null)
+        {
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
+            Interop.Dispose();
+            Interop = null;
+        }
+    }
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore();
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+
+}

@@ -1,0 +1,12 @@
+﻿@page "/home/about"
+
+
+@inject IDataCacheService _dataCacheService
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Home.About></CnGalWebSite.Shared.Pages.Apps.Home.About>
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Home.About></CnGalWebSite.Shared.Pages.Webs.Home.About>
+}

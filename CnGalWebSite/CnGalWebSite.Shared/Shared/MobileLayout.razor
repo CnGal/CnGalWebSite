@@ -1,0 +1,116 @@
+﻿@inherits LayoutComponentBase
+@implements IDisposable
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IDataCacheService _dataCacheService
+@inject IJSRuntime JS
+@inject IDataCacheService _dataCacheService
+
+
+<StyleTip ColorString="@_dataCacheService.ThemeSetting.Theme" IsDark="_dataCacheService.ThemeSetting.IsDark" IsOnMouse="false" IsOnBgImage="_dataCacheService.ThemeSetting.IsOnBgImage"></StyleTip>
+<ImagesLargeViewTip></ImagesLargeViewTip>
+@if (_dataCacheService.ThemeSetting.IsDark == false)
+{
+    <style>
+        .bg-opacity {
+            background-color: transparent;
+        }
+    </style>
+}
+
+<div class="" style="@(_dataCacheService.ThemeSetting.IsDark?"":"display: flex; min-height: calc(100vh); background-color: rgba(255,255,255,.7);")">
+    <CascadingValue Value="this" IsFixed="true">
+        @Body
+    </CascadingValue>
+</div>
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    System.Threading.Timer mytimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        //清楚登入令牌
+        _dataCacheService.LoginKey = "";
+        _dataCacheService.IsOnThirdPartyLogin = true;
+        _dataCacheService.ThirdPartyLoginTempModel = null;
+
+        //启动定时器
+        mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 60 * 10);
+        //刷新用户状态
+        //await RefreshUserInfor();
+    }
+
+    public async void Send(object o)
+    {
+        try
+        {
+            var authState = await authenticationStateTask;
+            var user = authState.User;
+            if (user.Identity.IsAuthenticated)
+            {
+                await InvokeAsync(() => Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/MakeUserOnline"));
+            }
+        }
+        catch
+        {
+
+        }
+    }
+
+
+
+    /*  public async Task RefreshUserInfor()
+      {
+          var user = await authenticationStateTask;
+          if (user.User.Identity.IsAuthenticated == false)
+          {
+              return _dataCacheService.UserInfor = new UserInforViewModel { Ranks = new List<RankViewModel>() };
+          }
+
+          try
+          {
+              string userId = "";
+              foreach (var item in user.User.Claims)
+              {
+                  if (item.Type == "userid")
+                  {
+                      userId = item.Value;
+                  }
+              }
+
+              if (string.IsNullOrWhiteSpace(userId))
+              {
+                  return _dataCacheService.UserInfor = new UserInforViewModel { Ranks = new List<RankViewModel>() };
+              }
+              var model = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + userId);
+
+              StateHasChanged();
+              return _dataCacheService.UserInfor = model;
+          }
+          catch
+          {
+              await ToastService.Error("获取用户信息失败", "未知错误，请在确保网络正常后联系开发人员");
+              return _dataCacheService.UserInfor = new UserInforViewModel { Ranks = new List<RankViewModel>() };
+          }
+      }*/
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+        if (mytimer != null)
+        {
+            mytimer.Dispose();
+            mytimer = null;
+        }
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+
+}

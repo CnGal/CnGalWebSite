@@ -1,0 +1,24 @@
+﻿
+<style>
+    .layout-widget-button {
+        margin-right: 0px;
+        height: 50px;
+        border: 0px;
+        color: white;
+        background: transparent;
+    }
+        .layout-widget-button::after {
+            display:none;
+        }
+</style>
+<div>
+    <button class="layout-drawer dropdown-toggle layout-widget-button" style="margin-right: 0px; height: 50px; padding-top: 12px;" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false"  aria-label="添加">
+        <i class="fa fa-plus"></i>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><TabLink Text="创建词条" Url="/entries/establishentry" Icon="fa fa-pencil-square" class="dropdown-item">创建词条</TabLink></li>
+        <li><TabLink Text="创建周边" Url="/peripheries/createperiphery" Icon="fa fa-pencil-square" class="dropdown-item">创建周边</TabLink></li>
+        <li><TabLink Text="创建标签" Url="/tags/createtag" Icon="fa fa-pencil-square" class="dropdown-item">创建标签</TabLink></li>
+        <li><TabLink Text="发表文章" Url="/articles/createarticle" Icon="fa fa-pencil-square" class="dropdown-item">发布文章</TabLink></li>
+    </ul>
+</div>

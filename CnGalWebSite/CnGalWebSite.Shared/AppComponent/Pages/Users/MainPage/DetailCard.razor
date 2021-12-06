@@ -1,0 +1,97 @@
+﻿<div>
+    <div class="mt-1">
+        @if (Informations.Count != 0)
+        {
+            <div class="mb-3  pt-2">
+                <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="基本信息" UrlName="编辑" Url="@(Model.IsCurrentUser?("/space/editdata/"+Model.Id):"")" />
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.ListBasicInforPair Model="@Informations" />
+                </div>
+                <hr class="mt-3" />
+            </div>
+        }
+        @if (string.IsNullOrWhiteSpace(Model.MainPageContext) == false)
+        {
+            <div class="mb-3  pt-2">
+                <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="介绍" UrlName="编辑" Url="@(Model.IsCurrentUser?("/space/editmainpage/"+Model.Id):"")" />
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Texts.MarkdownView Text="@Model.MainPageContext" />
+                </div>
+            </div>
+
+        }
+
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public PersonalSpaceViewModel Model { get; set; }
+
+    public List<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel> Informations { get; set; } = new List<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "UID",
+            Value = Model.Id
+        });
+        Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "生日",
+            Value = Model.Birthday?.ToString("M") ?? "未知"
+        });
+        Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "用户认证",
+            Value = Model.Role == "Admin"? "管理员" : "普通用户"
+        });
+        Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "等级",
+            Value = "Lv " + Model.Level
+        });
+        Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "积分",
+            Value = Model.Integral.ToString()
+        });
+        Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "贡献值",
+            Value = Model.ContributionValue.ToString()
+        });
+        Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "编辑词条",
+            Value = Model.EditEntryNum.ToString()
+        });
+        Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "发表文章",
+            Value = Model.CreateArticleNum.ToString()
+        });
+        Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "在线时间",
+            Value = Model.OnlineTime.ToString("0.0")+"小时"
+        });
+        Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "注册时间",
+            Value = Model.RegisteTime.ToString("yyyy/MM/dd HH:mm")
+        });
+        Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "最后访问",
+            Value = Model.LastOnlineTime.ToString("yyyy/MM/dd HH:mm")
+        });
+        Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "上次编辑时间",
+            Value = Model.LastEditTime?.ToString("yyyy/MM/dd HH:mm") ?? "无"
+        });
+    }
+}

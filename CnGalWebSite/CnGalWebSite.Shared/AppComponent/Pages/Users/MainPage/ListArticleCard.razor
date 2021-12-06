@@ -1,0 +1,32 @@
+﻿<div class="pt-2">
+    <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="文章" />
+
+    <div class="mt-3">
+        @foreach (var item in Items)
+        {
+            <div class="mb-3">
+                <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ArticleCrad Model="item" />
+            </div>
+        }
+    </div>
+  
+</div>
+
+@code {
+    public List<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ArticleCardModel> Items { get; set; } = new List<Entries.Normal.Relevances.ArticleCardModel>();
+    [Parameter]
+    public List<ArticleInforTipViewModel> Model { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        foreach(var item in Model)
+        {
+            Items.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ArticleCardModel
+            {
+                ArticleId = item.Id,
+                Description = item.BriefIntroduction,
+                Image = item.MainImage,
+                Title = item.DisplayName
+            });
+        }
+    }
+}

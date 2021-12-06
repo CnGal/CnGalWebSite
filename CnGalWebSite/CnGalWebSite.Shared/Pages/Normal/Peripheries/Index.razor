@@ -1,0 +1,20 @@
+﻿@page "/peripheries/index/{Id}/{DefaultIndex}"
+@page "/peripheries/index/{Id}"
+
+@inject IDataCacheService _dataCacheService
+
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Peripheries.Index Id="@Id" DefaultIndex="@DefaultIndex" />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Peripheries.Index Id="@Id" />
+}
+@code{
+    [Parameter]
+    public string Id { get; set; }
+    [Parameter]
+    public string DefaultIndex { get; set; }
+}

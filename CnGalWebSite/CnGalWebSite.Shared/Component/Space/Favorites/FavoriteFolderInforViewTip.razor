@@ -1,0 +1,43 @@
+﻿<div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 pb-3 mb-3" @onclick="OnClick">
+        <div class="row">
+            <div class="col-12 col-xl-4 pt-3">
+                <img class="img-fluid" src="@Model.MainImage">
+            </div>
+            <div class="col-12 col-xl-8 pt-3">
+                <div style=" height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        @if (Model.IsDefault)
+                        {
+                            <div class="article-home-tag me-2">默认</div>
+                        }
+                        <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                        <div class="article-home-text mt-1 mb-1">
+                            @Model.BriefIntroduction
+                        </div>
+                    </div>
+                  
+                    <p class="m-0" style="color: gray">
+                        <i class="fa fa-calendar fa-fw"></i>
+                        <span class="article-home-infor-text">@Model.CreateTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+
+                        <i class="fa fa-star fa-fw"></i>
+                        <span  class="article-home-infor-text">@(Model.Count)个收藏&nbsp;&nbsp;&nbsp;</span>
+                    </p>
+                </div>
+               
+            </div>
+        </div>
+</div>
+
+@code {
+    [Parameter]
+    public FavoriteFolderAloneModel Model { get; set; }
+    [Parameter]
+    public EventCallback<FavoriteFolderAloneModel> OnClickLayout { get; set; }
+
+    public async Task OnClick()
+    {
+        await OnClickLayout.InvokeAsync(Model);
+    }
+
+}

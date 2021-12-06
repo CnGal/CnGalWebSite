@@ -1,0 +1,184 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+
+<TitleTip Title="@Modifier"></TitleTip>
+
+
+<div class="container" style="padding-right: 0; padding-left: 0">
+    <div class="row article-layout-center">
+        <div class="col-12">
+            <AlertTip Type="AlertTip.AlertTipType.PubulishEntry"></AlertTip>
+        </div>
+        <div class="col-12 col-md-12 col-lg-3 mb-4">
+            <div class=" rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3">
+
+                <h4 class="fw-bold mb-3">词条</h4>
+                <h5>
+                    <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("游戏"))">游戏</button>
+                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(()=>OnCondited("角色"))">角色</button>
+                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(()=>OnCondited("制作组"))">制作组</button>
+                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(()=>OnCondited("STAFF"))">STAFF</button>
+                </h5>
+                <hr />
+                <h4 class="fw-bold mt-4 mb-3">排序</h4>
+                <h5>
+                    <button type="button" class="badge-btn btn  btn-success" @onclick="@(()=>OnSorting("最后编辑时间"))">最后编辑时间</button>
+                    <button type="button" class="badge-btn btn  btn-success" @onclick="@(()=>OnSorting("创建时间"))">创建时间</button>
+                    <button type="button" class="badge-btn btn  btn-success" @onclick="@(()=>OnSorting("发行时间"))">发行时间</button>
+                    <button type="button" class="badge-btn btn  btn-success" @onclick="@(()=>OnSorting("名称"))">名称</button>
+                    <button type="button" class="badge-btn btn  btn-success" @onclick="@(()=>OnSorting("热度"))">热度</button>
+                </h5>
+                <hr />
+                <BootstrapBlazor.Components.Search Items="Items" IsLikeMatch="true" PlaceHolder="可以搜索哦~" OnSearch="@OnSearch"></BootstrapBlazor.Components.Search>
+            </div>
+        </div>
+        <div class="col-12  col-md-12 col-lg-9 mb-4">
+            <EntryHomeListView Input="Input" @ref="HomeListView"></EntryHomeListView>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    public PagedSortedAndFilterInput Input { get; set; } = new PagedSortedAndFilterInput { Sorting = "LastEditTime desc" };
+
+    [NotNull]
+    private EntryHomeListView? HomeListView { get; set; }
+    private IEnumerable<string> Items { get; set; } = new string[1] { "" };
+    private string modifier = "";
+    [Parameter]
+    public string Modifier
+    {
+        get
+        {
+            return modifier;
+        }
+
+        set
+        {
+            modifier = value;
+            OnCondited(modifier);
+        }
+    }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Items = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList");
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+        }
+    }
+
+    private async Task OnCondited(string name)
+    {
+        Input.ScreeningConditions = name;
+
+        if (HomeListView != null)
+        {
+            HomeListView.Input.ScreeningConditions = name;
+
+            await HomeListView.virtualize.RefreshDataAsync();
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnSorting(string name)
+    {
+        switch (name)
+        {
+            case "创建时间":
+                if (HomeListView.Input.Sorting == "Id desc")
+                {
+                    HomeListView.Input.Sorting = "Id";
+                }
+                else
+                {
+                    HomeListView.Input.Sorting = "Id desc";
+                }
+
+                break;
+            case "发行时间":
+                if (HomeListView.Input.Sorting == "PubulishTime desc")
+                {
+                    HomeListView.Input.Sorting = "PubulishTime";
+                }
+                else
+                {
+                    HomeListView.Input.Sorting = "PubulishTime desc";
+                }
+
+                break;
+            case "名称":
+                if (HomeListView.Input.Sorting == "Name desc")
+                {
+                    HomeListView.Input.Sorting = "Name";
+                }
+                else
+                {
+                    HomeListView.Input.Sorting = "Name desc";
+                }
+
+                break;
+            case "最后编辑时间":
+                if (HomeListView.Input.Sorting == "LastEditTime desc")
+                {
+                    HomeListView.Input.Sorting = "LastEditTime";
+                }
+                else
+                {
+                    HomeListView.Input.Sorting = "LastEditTime desc";
+                }
+                break;
+            case "热度":
+                if (HomeListView.Input.Sorting == "ReaderCount desc")
+                {
+                    HomeListView.Input.Sorting = "ReaderCount";
+                }
+                else
+                {
+                    HomeListView.Input.Sorting = "ReaderCount desc";
+                }
+                break;
+        }
+        await HomeListView.virtualize.RefreshDataAsync();
+    }
+    public async void OnClickUrl(NavigateModel model)
+    {
+        try
+        {
+            NavigationManager.NavigateTo(Provider,model.Url, model.Title, model.Icon);
+        }
+        catch
+        {
+            await ToastService.Error("导航失败", "请尝试刷新页面");
+        }
+    }
+
+    private async Task OnSearch(string text)
+    {
+        try
+        {
+            NavigationManager.NavigateTo(Provider,"/home/search/词条/Id desc/" + text, "搜索", "fa fa-search");
+        }
+        catch
+        {
+            await ToastService.Error("导航失败", "请重试");
+        }
+    }
+}
+

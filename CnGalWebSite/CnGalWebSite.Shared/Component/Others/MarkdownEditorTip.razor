@@ -1,0 +1,107 @@
+﻿@inject IJSRuntime JS
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+<div>
+    @if (ToolHelper.IsSSR)
+    {
+        <AlertTip Type="AlertTip.AlertTipType.MarkdownTip"></AlertTip>
+
+    }
+    <ImagesUploadViewTip images="images" OnUploadedImage="OnUploadImage"></ImagesUploadViewTip>
+    <div class="alert alert-success  rounded shadow  rounded mb-4" role="alert" style="margin:0px">
+        不了解Markdown？可以在这<a href="http://www.markdown.cn/" target="_blank" class="alert-link">查看语法说明</a>
+        遇到格式错乱？可以尝试<a @onclick="OnClickTextOnly"
+                      class="alert-link">切换编辑器</a>
+    </div>
+    @if (isTextOnly)
+    {
+        <EditorMdViewTip Context="@Context" @ref="markdownEditorTip"></EditorMdViewTip>
+    }
+    else
+    {
+        <Markdown Height="800" MinHeight="300" Placeholder="这是 Markdown" PreviewStyle="PreviewStyle.Tab" InitialEditType="InitialEditType.Wysiwyg" @bind-Value="@Context" Language="zh-CN"></Markdown>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Context { get;  set; }
+    [NotNull]
+    private EditorMdViewTip? markdownEditorTip;
+    public async Task< string> GetContext()
+    {
+        if (isTextOnly)
+        {
+            Context =await markdownEditorTip.GetContext();
+        }
+        return Context;
+    }
+
+    public List<ImagesUploadAloneModel> images = new List<ImagesUploadAloneModel>();
+
+    bool isTextOnly = false;
+    bool isLoaded = false;
+
+
+
+    protected override Task OnInitializedAsync()
+    {
+        //获取主页中原有的图片
+        if (string.IsNullOrWhiteSpace(Context) == false)
+        {
+            var temp = ToolHelper.GetImageLinks(Context);
+
+            images.Clear();
+            foreach (var item in temp)
+            {
+                images.Add(new ImagesUploadAloneModel
+                {
+                    ImagePath = item,
+                    Image = item
+                });
+            }
+            StateHasChanged();
+        }
+
+
+        return Task.CompletedTask;
+    }
+
+
+    public async Task NavigateToWASM()
+    {
+        await JS.InvokeAsync<string>("openNewPage", "http://app.cngal.org/");
+    }
+
+    public async Task OnClickTextOnly()
+    {
+        if(isTextOnly)
+        {
+            Context =await markdownEditorTip.GetContext();
+        }
+        isTextOnly = !isTextOnly;
+        StateHasChanged();
+    }
+
+    public async Task OnUploadImage(string url)
+    {
+        if (isTextOnly)
+        {
+            Context = await markdownEditorTip.GetContext();
+        }
+        //更新字符串
+        string temp = ("\n![image](" + url + ")\n");
+        Context += temp;
+        if (isTextOnly)
+        {
+            await markdownEditorTip.AddContext(temp);
+        }
+        StateHasChanged();
+    }
+}

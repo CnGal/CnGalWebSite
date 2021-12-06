@@ -1,0 +1,140 @@
+﻿@inject IJSRuntime JS
+
+@if (Messages.TotalCount == 0)
+{
+    <CnGalWebSite.Shared.Component.Errors.NotFoundTip IsNeedLayput="true"></CnGalWebSite.Shared.Component.Errors.NotFoundTip>
+}
+else
+{
+    @foreach (var item in Messages.Data)
+    {
+        if (isFirstReadMessageAppear == false)
+        {
+            if (isFirstMessage == true)
+            {
+                isFirstMessage = false;
+                if (item.IsReaded)
+                {
+                    isFirstReadMessageAppear = true;
+                    <AllMessageReaded OnRefreshMessage="OnRefresh"></AllMessageReaded>
+                }
+                else
+                {
+
+                    <FirstUnReadMessageTip></FirstUnReadMessageTip>
+                }
+            }
+            else
+            {
+                if (item.IsReaded)
+                {
+                    isFirstReadMessageAppear = true;
+                    <AllMessageReaded OnRefreshMessage="OnRefresh"></AllMessageReaded>
+                }
+            }
+        }
+
+        if (item.Type == MessageType.ExaminePassed)
+        {
+            <ExaminedMessageTip Model="item" OnClickUrl="OnClickUrl"></ExaminedMessageTip>
+        }
+        else if (item.Type == MessageType.ExamineUnPassed)
+        {
+            <ExaminedMessageTip Model="item" OnClickUrl="OnClickUrl"></ExaminedMessageTip>
+        }
+        else if (item.Type == MessageType.ArticleReply || item.Type == MessageType.CommentReply || item.Type == MessageType.SpaceReply)
+        {
+            <CommentRpelyMessageTip CommentId="string.IsNullOrWhiteSpace(item.AdditionalInfor)?0:long.Parse(item.AdditionalInfor)" Model="item"></CommentRpelyMessageTip>
+
+        }
+    }
+    <PageDtoTip CurrentPage="Messages.CurrentPage" ShowBtnCount="1" TotalPages="Messages.TotalPages" IsSmallScreen="IsSmallScreen" OnPageChanged="OnPageChange"></PageDtoTip>
+}
+
+
+
+@code {
+    [Parameter]
+    public PagedResultDto<CnGalWebSite.DataModel.Model.Message> Messages { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnPageChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnRefreshMessage { get; set; }
+
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+
+
+    [Parameter]
+    /// <summary>
+    /// 是否小屏幕
+    /// </summary>
+    public bool IsSmallScreen { get; set; }
+
+    public bool isFirstReadMessageAppear { get; set; } = false;
+
+    public bool isFirstMessage { get; set; } = true;
+
+    public async void OnRefresh()
+    {
+        isFirstReadMessageAppear = false;
+        isFirstMessage = true;
+        await OnRefreshMessage.InvokeAsync();
+    }
+
+    public async void OnPageChange(int index)
+    {
+        if (index == 1)
+        {
+            isFirstReadMessageAppear = false;
+            isFirstMessage = true;
+        }
+        await OnPageChanged.InvokeAsync(index);
+    }
+
+    private bool shouldRender;
+    private long LastMessageId = 0;
+
+    protected override void OnParametersSet()
+    {
+        if (Messages.TotalCount > 0)
+        {
+            if (LastMessageId == Messages.Data[0].Id)
+            {
+                shouldRender = false;
+            }
+            else
+            {
+                shouldRender = true;
+                LastMessageId = Messages.Data[0].Id;
+            }
+        }
+        else
+        {
+            if (LastMessageId != 0)
+            {
+                shouldRender = true;
+                LastMessageId = 0;
+            }
+            else
+            {
+                shouldRender = false;
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        try
+        {
+            await JS.InvokeAsync<string>("highlightAllCode");
+        }
+        catch
+        {
+
+        }
+    }
+}

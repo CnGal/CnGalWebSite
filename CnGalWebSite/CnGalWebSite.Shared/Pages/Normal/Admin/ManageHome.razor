@@ -1,0 +1,167 @@
+﻿@page "/admin/managehome"
+@attribute [Authorize(Roles = "Admin")]
+
+@inject HttpClient Http
+@inject IRoleService _roleService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+
+<TitleTip></TitleTip>
+
+<div class="">
+    <div class="" style="padding-right: 0;padding-left: 0;">
+        <div class="  rounded shadow  bg-opacity p-3 mb-3">
+            <h3 class="fw-bold text-center">杂项板块</h3>
+            <p class="text-center" style="color: gray;margin-top:20px">
+                <i class="fa fa-image fa-fw "></i>
+                <span class="article-infor-text">@(Model.Carousels.Count + "个轮播图")</span>&nbsp;&nbsp;&nbsp;
+
+                <i class="fa fa-link fa-fw "></i>
+                <span class="article-infor-text">@(Model.Links.Count + "个友情链接")</span>
+
+            </p>
+        </div>
+        <div class="  rounded shadow  bg-opacity">
+            <Tab>
+                <TabItem Text="轮播图" Icon="fa fa-cubes">
+                    <div>
+                        <Button IsOutline="true" Icon="fa fa-pencil" class="ms-1 mb-2" style="width: 100px" Text="编辑"  @onclick="@(() => ToUrl("admin/EditCarousels"))"></Button>
+                        <div class="row">
+                            @foreach (var item in Model.Carousels)
+                            {
+                                <div class=" col-12 col-md-6 col-lg-6 mt-2 mb-2">
+                                    <div class="card h-100 " style="background-color:transparent">
+                                        <img src="@item.Image" class="card-img" alt="...">
+                                        <div class="card-body">
+                                            <a class="card-text" href="@item.Link" target="_blank">
+                                                @item.Link
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>}
+
+                        </div>
+                    </div>
+                </TabItem>
+                <TabItem Text="友情链接" Icon="fa fa-link">
+                    <div>
+                        <Button IsOutline="true" Icon="fa fa-pencil" class="ms-1 mb-2" style="width: 100px" Text="编辑" @onclick="@(() => ToUrl("admin/EditFriendLinks"))"></Button>
+
+                        <div class="row">
+                            @foreach (var item in Model.Links)
+                            {
+                                <div class=" col-12 col-md-6 col-lg-6 mt-2 mb-2">
+                                    <div class="card h-100" style="background-color:transparent">
+                                        <img src="@item.Image" class="card-img" alt="...">
+                                        <div class="card-body">
+                                            <h5 class="card-title fw-bold">@item.Name</h5>
+                                            <a class="card-text" href="@item.Link" target="_blank">
+                                                @item.Link
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>}
+
+                        </div>
+                    </div>
+                </TabItem>
+                <TabItem Text="错误记录" Icon="fa fa-gavel">
+                  <ErrorCountChartListView></ErrorCountChartListView>
+                </TabItem>
+                <TabItem Text="默认图片" Icon="fa fa-image">
+                    <div>
+                        <div class="row">
+
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-2 mb-4">
+                                <div class="card h-100" style="background-color:transparent">
+                                    <img src="@Model.AppImage" class="card-img-top" alt="..." />
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">默认词条主图</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-2 mb-4">
+                                <div class="card h-100" style="background-color:transparent">
+                                    <img src="@Model.CertificateImage" class="card-img-top" alt="..." />
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">默认文章主图</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-2 mb-4">
+                                <div class="card h-100" style="background-color:transparent">
+                                    <img src="@Model.UserImage" class="card-img-top" alt="..." />
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">默认头像</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-2 mb-4">
+                                <div class="card h-100" style="background-color:transparent">
+                                    <img src="@Model.UserBackgroundImage" class="card-img-top" alt="..." />
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">默认用户背景图</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-2 mb-4">
+                                <div class="card h-100" style="background-color:transparent">
+                                    <img src="@Model.BackgroundImage" class="card-img-top" alt="..." />
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold">默认网站背景图</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </TabItem>
+            </Tab>
+
+
+        </div>
+    </div>
+</div>
+
+@code {
+    public int currentPage { get; set; } = 1;
+    public string SearchString { get; set; } = "";
+    bool isReady = false;
+    bool isFirst = false;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    public ManageHomeViewModel Model { get; set; } = new ManageHomeViewModel
+    {
+        Carousels = new List<CnGalWebSite.DataModel.Model.Carousel>(),
+        Links = new List<FriendLink>()
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<ManageHomeViewModel>(ToolHelper.WebApiPath + "api/admin/managehome");
+
+            isFirst = true;
+            isReady = true;
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取主页信息");
+        }
+
+    }
+
+
+    private void ToUrl(string url)
+    {
+        NavigationManager.NavigateTo(url);
+    }
+
+}

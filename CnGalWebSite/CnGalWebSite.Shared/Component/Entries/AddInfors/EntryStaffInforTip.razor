@@ -1,0 +1,72 @@
+﻿@if (EntryView.Staffs != null && EntryView.Staffs.Count != 0)
+{
+    <div class="  rounded shadow  ps-4 pe-4 pt-3 pb-3 mb-3 bg-opacity rounded">
+        <div class="row">
+            @if (IsSmallScreen == false)
+            {
+                <h2 class="fw-bold col-12 bg-color-1 h4">
+                    STAFF
+                </h2>
+
+            }
+            @{ int rx = 1;}
+            @foreach (var item in EntryView.Staffs)
+            {
+                bool isUsed = true;
+
+
+
+                @if (string.IsNullOrWhiteSpace(item.Modifier) == false)
+                {
+                    rx++;
+                    if (rx > 11)
+                    {
+                        rx = 1;
+                    }
+                    isUsed = true;
+                    <h5 class="fw-bold col-12 mt-2 @("bg-color-"+rx.ToString()) ">
+                        @item.Modifier
+                    </h5>
+                }
+
+                @foreach (var infor in item.StaffList)
+                {
+                    if (isUsed == false)
+                    {
+                        rx++;
+                        if (rx > 11)
+                        {
+                            rx = 1;
+                        }
+                    }
+                    else
+                    {
+                        isUsed = false;
+                    }
+                    <div class="h4 col-12 col-sm-6 @(IsLargeScreen?" col-xl-12":"")">
+                        <span class="badge  fw-bold  bg-title  @("bg-title-color-"+rx.ToString())  me-2">
+                            @infor.Modifier
+                        </span>
+                        @foreach (var temp in infor.Names)
+                        {
+                            <TabLink Text="@temp.RealName" Url="@("/entries/index/" +ToolHelper.Base64EncodeName(temp.RealName))" Icon="fa fa-pencil-square"
+                                     class="@("btn mb-2 me-2  bg-context-"+rx.ToString())" style="transition: all .6s ease; margin-top: 5px;">@temp.DisplayName</TabLink>
+                                }
+                    </div>
+                }
+            }
+
+        </div>
+
+    </div>
+}
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel EntryView { get; set; }
+    [Parameter]
+    public bool IsLargeScreen { get; set; }
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
+
+}

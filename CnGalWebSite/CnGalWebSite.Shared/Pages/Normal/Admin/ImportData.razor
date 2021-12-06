@@ -1,0 +1,60 @@
+﻿@page "/admin/importdata"
+@attribute [Authorize(Roles = "Admin")]
+
+@inject HttpClient Http
+@inject IRoleService _roleService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+<TitleTip></TitleTip>
+
+
+<div class="">
+    <div class="row">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 pb-3">
+            <ImportTip>
+            </ImportTip>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 pb-3">
+            <ImportEntries Title="导入词条"
+                           BriefIntroduction="上传特定格式的Json文件，将会在本地解析完成后调用API批量导入，数据格式参考API文档">
+            </ImportEntries>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 pb-3">
+            <ImportArticles Title="导入文章"
+                            BriefIntroduction="导入数据中应包含发表文章的用户Id，如为转载文章请包含原文信息">
+            </ImportArticles>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 pb-3">
+            <ImportHistoryUsers Title="导入历史用户"
+                                BriefIntroduction="导入数据中应包含密码，使用UserName作为唯一标识，第一次登入后将会迁移用户密码，并删除历史用户记录">
+            </ImportHistoryUsers>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 pb-3">
+            <ImportCarousels Title="导入轮播图"
+                             BriefIntroduction="建议在管理主页布局页面修改轮播图">
+            </ImportCarousels>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 pb-3">
+            <ImportArticleAuthor Title="导入文章作者"
+                                 BriefIntroduction="将会修改CreateUser字段为对应用户，请确保用户存在">
+            </ImportArticleAuthor>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 pb-3">
+            <ImportUserRank Title="导入用户头衔"
+                            BriefIntroduction="在导入前请确保头衔存在">
+            </ImportUserRank>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 pb-3">
+            <ImportPeripheries Title="导入周边"
+                            BriefIntroduction="在导入前请确保周边至少关联一个词条">
+            </ImportPeripheries>
+        </div>
+
+    </div>
+</div>
+
+@code {
+
+}

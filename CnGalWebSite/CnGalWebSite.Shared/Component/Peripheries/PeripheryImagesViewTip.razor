@@ -1,0 +1,43 @@
+﻿<div class="shadow rounded  bg-opacity ps-3 pe-3">
+    <div style="display: block;">
+        <h2 class="fw-bold pt-3 m-0 font-color h4"><i class="fa fa-image"></i>&nbsp;&nbsp;相册</h2>
+    </div>
+    <div class="pt-3 pb-1">
+        @if (IsEdit == true)
+        {
+            @switch (EditState)
+            {
+                case EditState.locked:
+                    <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                    break;
+                case EditState.Normal:
+                    <AlertTip Title="编辑相册" Type="@(Model.Count==0?AlertTip.AlertTipType.Blank: AlertTip.AlertTipType.Editable)" Url="@("/peripheries/EditImages/" + Id)"></AlertTip>
+                    break;
+            }
+        }
+        @if (EditState == EditState.Preview)
+        {
+            <AlertTip Title="编辑相册" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditImages/" + Id)" ExamineType="Operation.EditPeripheryImages" OnClickRevoke="OnClickRevoke"></AlertTip>
+        }
+    </div>
+    <EntryImageListViewTip Model="Model" />
+
+</div>
+
+
+@code {
+    [Parameter]
+    public List<PicturesViewModel> Model { get; set; }
+    [Parameter]
+    public bool IsEdit { get; set; }
+    [Parameter]
+    public EditState EditState { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+
+    [Parameter]
+    public EventCallback<Operation> OnClickRevoke { get; set; }
+
+
+
+}

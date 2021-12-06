@@ -1,0 +1,123 @@
+﻿@page "/admin/editcarousels"
+@attribute [Authorize(Roles = "Admin")]
+
+@inject HttpClient Http
+@inject IRoleService _roleService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+
+<TitleTip></TitleTip>
+
+
+<div class="">
+    <div class="" style="padding-right: 0; padding-left: 0">
+        <div class=" rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+            <h3 class="text-truncate mb-4 fw-bold">
+                编辑轮播图
+            </h3>
+            <hr />
+            @if (isReady == false)
+            {
+
+                <div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                </div>
+            }
+            else
+            {
+                   <EditCarouselsListViewTip Images="Model.Carousels"></EditCarouselsListViewTip>
+
+                    <hr class="mt-4" />
+
+                    <div class="form-group row mt-4">
+                        <div class="col-sm-10">
+                            <Button style="width: 100px" @onclick="@(()=> OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
+                        </div>
+                    </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@code {
+    public int currentPage { get; set; } = 1;
+    public string SearchString { get; set; } = "";
+    bool isReady = false;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    public EditCarouselsViewModel Model { get; set; } = new EditCarouselsViewModel
+    {
+        Carousels = new List<CarouselModel>()
+    };
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<EditCarouselsViewModel>(ToolHelper.WebApiPath + "api/admin/editcarousels");
+
+            StateHasChanged();
+            isReady = true;
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取轮播图信息失败");
+        }
+
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            //检查
+            for (int i = 0; i < Model.Carousels.Count; i++)
+            {
+                if (string.IsNullOrWhiteSpace(Model.Carousels[i].ImagePath))
+                {
+                    await ToastService.Error("编辑轮播图失败", "请输入图片链接");
+                    return;
+                }
+
+            }
+            var result = await Http.PostAsJsonAsync<EditCarouselsViewModel>(ToolHelper.WebApiPath + "api/admin/editcarousels", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("编辑轮播图失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("编辑轮播图成功", "编辑轮播图成功");
+                NavigationManager.NavigateTo(Provider,"/admin/managehome","管理主页布局", "fa fa-keyboard-o");
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "编辑轮播图失败");
+        }
+    }
+}
+

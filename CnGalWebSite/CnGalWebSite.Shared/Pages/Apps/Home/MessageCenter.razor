@@ -1,0 +1,72 @@
+﻿@page "/home/messagecenter"
+
+@attribute [Authorize]
+
+
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService ToastService
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+@inject IJSRuntime JS
+@inject DialogService DialogService
+@inject IDataCacheService _dataCacheService
+
+
+<TitleTip Title="消息中心"></TitleTip>
+
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="消息中心" />
+
+@if (isReady)
+{
+    <div style=" margin-top: 45px; width: 100%;" >
+        <div class="p-3">
+            <CnGalWebSite.Shared.AppComponent.Pages.Home.MessageCenters.ListMessageCard />
+
+        </div>
+    </div>
+}
+else
+{
+    <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+}
+
+
+@code {
+
+    bool isReady = false;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    public Dictionary<Operation, EditState> EditStates { get; set; } = new Dictionary<Operation, EditState>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OnReadedAllMessage();
+        isReady = true;
+
+        StateHasChanged();
+    }
+    public async Task OnReadedAllMessage()
+    {
+        try
+        {
+            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/ReadedAllMessages/");
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("使消息已读失败", obj.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "设置消息已读失败");
+        }
+    }
+
+}

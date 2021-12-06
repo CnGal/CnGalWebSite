@@ -1,0 +1,73 @@
+﻿<TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.Id)" Text="@Model.Name" class="a-font-color h-100">
+
+    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 h-100">
+        @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
+        {
+            <div class="row mb-2">
+                <div class="col-12  pt-3">
+                    <img class="img-fluid" src="@Model.MainImage">
+                </div>
+                <div class="col-12 pt-3">
+                    <header>
+                        <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
+                        <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                    </header>
+                    <div class="article-home-text">
+                        @Model.BriefIntroduction
+                    </div>
+                </div>
+            </div>
+            <div class="pb-3" style="color: gray;">
+                <i class="fa fa-calendar fa-fw"></i>
+                <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+
+                <i class="fa fa-commenting-o fa-fw"></i>
+                <span class="article-home-infor-text">@(Model.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
+
+                <i class="fa fa-eye fa-fw"></i>
+                <span class="article-home-infor-text">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
+            </div>
+        }
+        else
+        {
+            <div class="h-100" style=" display: flex; flex-direction: column; justify-content: center; ">
+                <div class="row mb-2">
+                    <div class="pt-3" style="width: 50%; margin-right: auto; margin-left: auto;">
+                        <img class="img-fluid" src="@Model.MainImage" style=" border-radius: 50%;">
+                    </div>
+                    <div class="col-12 pt-3">
+                        <header style=" display: flex; justify-content: center;">
+                            <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
+                            <h5 class="fw-bold" style=" margin-bottom: 0px; margin-left: 5px; margin-top: 1px;">@Model.DisplayName</h5>
+                        </header>
+                        <div class="article-home-text text-center">
+                            @Model.BriefIntroduction
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center pb-3" style="color: gray;">
+                    <i class="fa fa-calendar fa-fw"></i>
+                    <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+
+                    <i class="fa fa-commenting-o fa-fw"></i>
+                    <span class="article-home-infor-text">@(Model.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
+
+                    <i class="fa fa-eye fa-fw"></i>
+                    <span class="article-home-infor-text">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
+                </div>
+
+            </div>
+        }
+
+    </div>
+</TabLink>
+
+
+
+@code {
+    [Parameter]
+    public EntryInforTipViewModel Model { get; set; }
+    [Parameter]
+    public bool IsNormalScreen { get; set; }
+
+}

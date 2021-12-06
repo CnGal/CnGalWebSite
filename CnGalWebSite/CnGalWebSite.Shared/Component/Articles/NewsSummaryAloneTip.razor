@@ -1,0 +1,34 @@
+﻿<TabLink Icon="fa fa-newspaper-o" Url="@(string.IsNullOrWhiteSpace(Model.Link)?("/articles/index/" + Model.Id):Model.Link)"  target="_blank" Text="@Model.Name" class="a-font-color">
+    <div class=" bg-opacity aticle-home-layout ps-2 pe-2">
+        <div class="row pb-2">
+            <div class="col-12 col-xl-4 pt-3">
+                <img class="img-fluid" src="@Model.MainImage">
+            </div>
+            <div class="col-12 col-xl-8 pt-3" style=" display: flex;  flex-direction: column;justify-content: space-between;">
+                <div class="article-home-text">
+                    @Model.BriefIntroduction
+                </div>
+                <p class="m-0" style="color: gray;">
+                    <i class="fa fa-calendar fa-fw"></i>
+                    <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+
+                    <i class="fa fa-commenting-o fa-fw"></i>
+                    <span class="article-home-infor-text">@(Model.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
+
+                    <i class="fa fa-eye fa-fw d-none d-sm-inline"></i>
+                    <span class="article-home-infor-text d-none d-sm-inline">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
+
+                    <i class="fa fa-thumbs-o-up fa-fw d-none d-sm-inline"></i>
+                    <span class="article-home-infor-text d-none d-sm-inline">@(Model.ThumbsUpCount)人点赞&nbsp;&nbsp;&nbsp;</span>
+                </p>
+            </div>
+        </div>
+
+    </div>
+</TabLink>
+
+
+@code {
+    [Parameter]
+    public ArticleInforTipViewModel Model { get; set; }
+}

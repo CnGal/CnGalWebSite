@@ -1,0 +1,158 @@
+﻿@page "/entries/edit/home/{Id}"
+@page "/entries/edit/home/{Id}/{DefaultIndex}"
+@attribute [Authorize]
+
+
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService ToastService
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+@inject IJSRuntime JS
+@inject DialogService DialogService
+
+
+<TitleTip Title="编辑词条"></TitleTip>
+
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="编辑词条" />
+<link rel="stylesheet" href="https://static.cngal.top/_content/BootstrapBlazor.Markdown/css/bootstrap.blazor.markdown.min.css" media="none" onload="this.media='all'" />
+
+@if (isReady)
+{
+    <div style=" margin-top: 45px; width: 100%;">
+
+        <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.HeadCard Model="Model.PerfectionInfor" />
+        <div style="display: flex; flex-direction: row; align-items: center;" class="ms-3 me-3 pt-2 mb-2">
+            <CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine Model="TabItems" />
+        </div>
+
+        <div class="ms-3 me-3">
+            <div class="mt-3 mb-3" style="padding-right: 0;padding-left: 0;">
+                <div class="tab-content" id="@("pills" + randomIndex + "-tabContent")">
+                    <div class="@("tab-pane fade" + (defaultIndex == 0 ? " show active " : "") )" id="@("pills" + randomIndex + "-0")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-0-tab")">
+                        <div>
+                            <CnGalWebSite.Shared.AppComponent.Normal.Edits.ListEditButtonLine Model="EditStates" Examines="Model.Examines" />
+                        </div>
+                    </div>
+                    <div class="@("tab-pane fade" + (defaultIndex == 1 ? " show active " : "") )" id="@("pills" + randomIndex + "-1")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-1-tab")">
+                        <div class="p-2">
+                            <CnGalWebSite.Shared.AppComponent.Normal.Edits.ListEditRecord Model="Model.Examines" />
+                        </div>
+                    </div>
+                    <div class="@("tab-pane fade" + (defaultIndex == 2 ? " show active " : "") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
+                        <div>
+                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.ListPerfectionCheck Model="Model.PerfectionChecks" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+}
+
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private int defaultIndex { get; set; } = 0;
+    [Parameter]
+    public string DefaultIndex
+    {
+        get
+        {
+            return defaultIndex.ToString();
+        }
+        set
+        {
+            try
+            {
+                defaultIndex = int.Parse(value);
+            }
+            catch
+            {
+                defaultIndex = 0;
+            }
+        }
+
+    }
+    public int TabIndexNum = 0;
+    public int randomIndex = new Random().Next();
+    bool isReady = false;
+    private CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel TabItems = new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel { Items = new List<CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel>() };
+
+    public EditEntryInforBindModel Model = new EditEntryInforBindModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    public Dictionary<Operation, EditState> EditStates { get; set; } = new Dictionary<Operation, EditState>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<EditEntryInforBindModel>(ToolHelper.WebApiPath + "api/entries/GetEntryEditInforBindModel/" + Id);
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取词条编辑信息失败");
+            isReady = false;
+            return;
+        }
+        //初始化编辑按钮列表
+        EditStates.Add(Operation.EstablishMain, Model.State.MainState);
+        EditStates.Add(Operation.EstablishAddInfor, Model.State.InforState);
+        EditStates.Add(Operation.EstablishMainPage, Model.State.MainPageState);
+        EditStates.Add(Operation.EstablishImages, Model.State.ImagesState);
+        EditStates.Add(Operation.EstablishRelevances, Model.State.RelevancesState);
+        EditStates.Add(Operation.EstablishTags, Model.State.TagState);
+        //初始化Tab
+        int count = 3;
+        TabItems.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = defaultIndex,
+            Index = 0,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnTabClick(a)),
+            RandomIndex = randomIndex,
+            Text = "编辑",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Pivot,
+            ClassNames = $"col-{12 / count} p-0"
+        });
+        TabItems.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = defaultIndex,
+            Index = 1,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnTabClick(a)),
+            RandomIndex = randomIndex,
+            Text = "历史",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Pivot,
+            ClassNames = $"col-{12 / count} p-0"
+        });
+        TabItems.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = defaultIndex,
+            Index = 2,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnTabClick(a)),
+            RandomIndex = randomIndex,
+            Text = "明细",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Pivot,
+            ClassNames = $"col-{12 / count} p-0"
+        });
+
+
+        isReady = true;
+        StateHasChanged();
+    }
+    public Task OnTabClick(int index)
+    {
+
+        TabIndexNum = index;
+        return Task.CompletedTask;
+    }
+}

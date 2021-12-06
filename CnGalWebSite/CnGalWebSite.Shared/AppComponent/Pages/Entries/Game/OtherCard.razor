@@ -1,0 +1,145 @@
+﻿<div>
+    <div class="mt-1">
+        @if (News.Count != 0)
+        {
+            <div class="mb-3 pt-2">
+                <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="最新动态" Url="@(Model.NewsOfEntry.Count>5? "entries/news/"+Model.Id:"")"/>
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ListNewsCard Model="News" />
+                </div>
+                <hr class="mt-3" />
+            </div>
+        }
+        @if (Games.Count != 0)
+        {
+            <div class="mb-3 pt-2">
+                <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="相关游戏" />
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ListGameCard Model="Games" />
+                </div>
+                <hr class="mt-3" />
+            </div>
+        }
+        @if (Groups.Count != 0)
+        {
+            <div class="mb-3 pt-2">
+                <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="相关制作组" />
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ListGroupCard Model="Groups" />
+                </div>
+                <hr class="mt-3" />
+            </div>
+        }
+        @if (Articles.Count != 0)
+        {
+            <div class="mb-3 pt-2">
+                <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="相关文章" />
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ListArticleCard Model="Articles" />
+                </div>
+                <hr class="mt-3" />
+            </div>
+        }
+        @if (Others.Count != 0)
+        {
+            <div class="mb-3 pt-2">
+                <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="外部链接" Subtitle="以下链接与本站没有任何从属关系" />
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ListOtherLinkCard Model="Others" />
+                </div>
+                <hr class="mt-3" />
+            </div>
+        }
+
+
+        @if (Model.Pictures.Count != 0 && TabIndex == 3)
+        {
+            <div class="mb-3 pt-2">
+                <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="相册" />
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Images.ListImagesView Model="Model.Pictures" />
+                </div>
+                <hr class="mt-3" />
+            </div>
+
+        }
+        <div class="mb-3 pt-2">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="词条完善度" />
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Perfections.PerfectionCard EntryId="Model.Id" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public int TabIndex { get; set; }
+    public List<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.GameCardModel> Games = new List<Normal.Relevances.GameCardModel>();
+    public List<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.GroupCardModel> Groups = new List<Normal.Relevances.GroupCardModel>();
+    public List<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.OtherLinkCardModel> Others = new List<Normal.Relevances.OtherLinkCardModel>();
+    public List<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ArticleCardModel> Articles = new List<Normal.Relevances.ArticleCardModel>();
+    public List<CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCardModel> News = new List<CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCardModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        foreach (var item in Model.EntryRelevances.Where(s => s.Type == EntryType.Game))
+        {
+            Games.Add(new Normal.Relevances.GameCardModel
+            {
+                Title = item.Name,
+                Description = item.BriefIntroduction,
+                Image = item.MainImage,
+                EntryId=item.Id
+            });
+        }
+        foreach (var item in Model.EntryRelevances.Where(s => s.Type == EntryType.ProductionGroup))
+        {
+            Groups.Add(new Normal.Relevances.GroupCardModel
+            {
+                Title = item.Name,
+                Description = item.BriefIntroduction,
+                Image = item.MainImage,
+                EntryId = item.Id
+            });
+        }
+        foreach (var item in Model.OtherRelevances)
+        {
+            Others.Add(new Normal.Relevances.OtherLinkCardModel
+            {
+                Title = item.DisplayName,
+                Description = item.DisplayValue,
+                Image = item.Image,
+                Url = item.Link
+            });
+        }
+        foreach (var item in Model.ArticleRelevances)
+        {
+            Articles.Add(new Normal.Relevances.ArticleCardModel
+            {
+                Title = item.Name,
+                Description = item.BriefIntroduction,
+                Image = item.MainImage,
+                ArticleId = item.Id
+            });
+        }
+        foreach (var item in Model.NewsOfEntry.Take(5))
+        {
+            News.Add(new CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCardModel
+            {
+                Image=item.Image,
+                GroupId=item.GroupId,
+                Text=item.Title,
+                Time=item.HappenedTime,
+                Title=item.GroupName,
+                Type=item.NewsType,
+                Url=item.Link,
+                IsNeedLayout=false
+            });
+        }
+    }
+
+}

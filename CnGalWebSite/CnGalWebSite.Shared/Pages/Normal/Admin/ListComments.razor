@@ -1,0 +1,414 @@
+﻿@page "/admin/listcomments"
+@attribute [Authorize(Roles = "Admin")]
+@inject IAuthService AuthService
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+
+<TitleTip></TitleTip>
+
+
+<div class="">
+    <div class="" style="padding-right: 0;padding-left: 0;">
+        <div class="  rounded shadow  bg-opacity p-3">
+            <h3 class="fw-bold text-center">评论版块</h3>
+            <p class="text-center" style="color: gray;margin-top:20px">
+                <i class="fa fa-codepen fa-fw "></i>
+                <span class="article-infor-text">@(InforModel.EntryComments + "条对词条评论")</span>&nbsp;&nbsp;&nbsp;
+
+                <i class="fa fa-newspaper-o fa-fw "></i>
+                <span class="article-infor-text">@(InforModel.ArticleComments + "条对文章评论")</span>
+                @if (IsSmallScreen)
+                {
+                    <br />
+                }
+                else
+                {
+                    <span>&nbsp; &nbsp; &nbsp;</span>
+                }
+                <i class="fa fa-users fa-fw "></i>
+                <span class="article-infor-text">@(InforModel.SpaceComments + "条对用户留言")</span>&nbsp;&nbsp;&nbsp;
+
+                <i class="fa fa-star fa-fw "></i>
+                <span class="article-infor-text">@("总计"+InforModel.ParentComments + "条顶层评论")</span>
+                @if (IsSmallScreen)
+                {
+                    <br />
+                }
+                else
+                {
+                    <span>&nbsp; &nbsp; &nbsp;</span>
+                }
+
+                <i class="fa fa-comments fa-fw "></i>
+                <span class="article-infor-text">@(InforModel.ChildComments + "条评论回复")</span>&nbsp;&nbsp;&nbsp;
+
+                <i class="fa fa-unlink fa-fw "></i>
+                <span class="article-infor-text">@(InforModel.Hiddens + "个隐藏评论")</span>
+                @if (IsSmallScreen)
+                {
+                    <br />
+                }
+                else
+                {
+                    <span>&nbsp; &nbsp; &nbsp;</span>
+                }
+                <i class="fa fa-chrome fa-fw "></i>
+                <span class="article-infor-text">@("总计"+InforModel.All + "条评论")</span>
+
+            </p>
+        </div>
+
+        <div class="mt-3" style="padding-right: 0;padding-left: 0;">
+            <div class=" rounded shadow -lg p-4 bg-opacity">
+                <Table TItem="ListCommentAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
+                       ShowExtendButtons="true" ExtendButtonColumnWidth="200" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+                       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+                    <TableToolbarTemplate>
+                        <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Success" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Primary" Icon="fa fa-arrow-up" Text="增权重" OnClickCallback="OnPriorityUpClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Success" Icon="fa fa-arrow-down" Text="降权重" OnClickCallback="OnPriorityDownClick" IsAsync="true" />
+
+                        <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Danger" Icon="fa fa-close" Text="删除" OnClickCallback="OnDeleteClick" IsAsync="true" />
+
+                    </TableToolbarTemplate>
+                    <TableColumns>
+                        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
+                        <TableColumn @bind-Field="@context.Type" Searchable="true" Sortable="true" Width="100" />
+                        <TableColumn @bind-Field="@context.CommentTime" Sortable="true" Width="200" />
+                        <TableColumn @bind-Field="@context.Text" Searchable="true" AllowTextWrap="true" Width="400" />
+
+                        <TableColumn @bind-Field="@context.ApplicationUserId" Searchable="true" Sortable="true" Width="300" />
+                        <TableColumn @bind-Field="@context.ParentCodeNavigationId" Searchable="true" Sortable="true" Width="110" />
+
+                        <TableColumn @bind-Field="@context.EntryId" Searchable="true" Sortable="true" Width="110" />
+                        <TableColumn @bind-Field="@context.ArticleId" Sortable="true" Width="130" AllowTextWrap="true" />
+                        <TableColumn @bind-Field="@context.UserSpaceCommentManagerId" Sortable="true" Width="160" />
+                        <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+                    </TableColumns>
+                    <RowButtonTemplate>
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickCallback="@(() => LookComment( context.ArticleId,context.EntryId,context.UserSpaceCommentManagerId,context?.Type??CommentType.None))" />
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-comments-o" Text="切换显示" IsAsync="true" OnClickCallback="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, !context.IsHidden, true))" />
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClickCallback="@(() => OnRowEditPriorityClick(new long[] { context.Id }, 1 , true))" />
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClickCallback="@(() => OnRowEditPriorityClick(new long[] { context.Id }, - 1 , true))" />
+
+                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-close" Text="删除" IsAsync="true" OnClickCallback="@(() =>  OnRowDeleteClick(new long[] { context.Id } ,true))" />
+                    </RowButtonTemplate>
+                </Table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+@code {
+    [NotNull]
+    private Table<ListCommentAloneModel>? TableRows { get; set; }
+    private List<ListCommentAloneModel> SelectedRows { get; set; } = new();
+
+    public ListCommentsInforViewModel InforModel { get; set; } = new ListCommentsInforViewModel();
+    public ListCommentsViewModel ListModel { get; set; } = new ListCommentsViewModel { Comments = new List<ListCommentAloneModel>() };
+
+    private ListCommentAloneModel searchModel { get; set; } = new ListCommentAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    #region 获取屏幕大小
+
+    /// <summary>
+    /// 获得/设置 IJSRuntime 实例
+    /// </summary>
+    [Inject]
+    [System.Diagnostics.CodeAnalysis.NotNull]
+    public IJSRuntime? JSRuntime { get; set; }
+
+
+
+    public bool IsSmallScreen { get; set; }
+    public bool IsNormalScreen { get; set; }
+    public bool IsLargeScreen { get; set; }
+
+
+    private JSInterop<ListComments>? Interop { get; set; }
+    /// <summary>
+    /// OnAfterRenderAsync 方法
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            Interop = new JSInterop<ListComments>(JSRuntime);
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
+        }
+
+    }
+
+    /// <summary>
+    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
+    /// </summary>
+    /// <returns></returns>
+    [JSInvokable]
+    public void SetCollapsed(int width)
+    {
+        if (IsSmallScreen != (width < 768))
+        {
+            IsSmallScreen = width < 768;
+
+            StateHasChanged();
+        }
+        if (IsNormalScreen != (width >= 768 && width < 2000))
+        {
+            IsNormalScreen = width >= 768 && width < 2000;
+
+            StateHasChanged();
+        }
+        if (IsLargeScreen != (width >= 2000))
+        {
+            IsLargeScreen = width >= 2000;
+
+            StateHasChanged();
+        }
+    }
+    #endregion
+
+
+    protected override async Task OnInitializedAsync()
+    {
+#if DEBUG
+        //Thread.Sleep(10000);
+#endif
+        try
+        {
+            InforModel = await Http.GetFromJsonAsync<ListCommentsInforViewModel>(ToolHelper.WebApiPath + "api/admin/listcomments");
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取评论数据");
+        }
+
+    }
+
+    private async Task<QueryData<ListCommentAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<CommentsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetCommentList", new CommentsPagesInfor { SearchModel = searchModel, Options = options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListCommentAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取评论列表");
+            return new QueryData<ListCommentAloneModel>();
+        }
+    }
+
+    private Task LookComment(long? articleId, int? entryId, long? spaceId, CommentType type)
+    {
+        switch (type)
+        {
+            case CommentType.CommentArticle:
+                NavigationManager.NavigateTo(Provider,"/articles/index/" + articleId, "查看评论", "fa fa-comments-o");
+                break;
+            case CommentType.CommentEntries:
+                NavigationManager.NavigateTo(Provider,"/entries/index/" + entryId, "查看评论", "fa fa-comments-o");
+                break;
+        }
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="item"></param>
+    private async Task OnRowEditIsHiddenClick(long[] ids, bool isHidden, bool showMessage)
+    {
+        string tempString = isHidden == true ? "隐藏" : "显示";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<HiddenCommentModel>(ToolHelper.WebApiPath + "api/comments/HiddenComment", new HiddenCommentModel { Ids = ids, IsHidden = isHidden });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "评论失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "评论成功", tempString + "评论成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "评论失败");
+        }
+    }
+
+    private async Task OnHiddenClick(IEnumerable<ListCommentAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改评论显示状态", "请选中评论");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), true, false);
+
+        await ToastService.Success("隐藏评论成功", "隐藏评论成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnUnHiddenClick(IEnumerable<ListCommentAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改评论显示状态", "请选中评论");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), false, false);
+
+        await ToastService.Success("显示评论成功", "显示评论成功");
+        await TableRows.QueryAsync();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="item"></param>
+    private async Task OnRowDeleteClick(long[] ids, bool showMessage)
+    {
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<DeleteCommentModel>(ToolHelper.WebApiPath + "api/comments/DeleteComment", new DeleteCommentModel { Ids = ids });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("删除评论失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success("删除评论成功", "删除评论成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "删除评论失败");
+        }
+    }
+
+    private async Task OnDeleteClick(IEnumerable<ListCommentAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有删除评论", "请选中评论");
+            return;
+        }
+
+        await OnRowDeleteClick(items.Select(s => s.Id).ToArray(), false);
+
+        await ToastService.Success("删除评论成功", "删除评论成功");
+        await TableRows.QueryAsync();
+    }
+
+    private async Task OnRowEditPriorityClick(long[] ids, int plusPriority, bool showMessage)
+    {
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditCommentPriorityViewModel>(ToolHelper.WebApiPath + "api/comments/EditCommentPriority", new EditCommentPriorityViewModel { Ids = ids, PlusPriority = plusPriority });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("修改评论权重失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success("修改评论权重成功", "修改评论权重成功");
+                    await TableRows.QueryAsync();
+                }
+
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "修改评论权重失败");
+        }
+
+    }
+
+
+    private async Task OnPriorityUpClick(IEnumerable<ListCommentAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改评论权重", "请选中评论");
+            return;
+        }
+
+        await OnRowEditPriorityClick(items.Select(s => s.Id).ToArray(), 1, false);
+        await ToastService.Success("修改评论权重成功", "修改评论权重成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnPriorityDownClick(IEnumerable<ListCommentAloneModel> items)
+    {
+
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改评论权重", "请选中评论");
+            return;
+        }
+
+        await OnRowEditPriorityClick(items.Select(s => s.Id).ToArray(), -1, false);
+
+        await ToastService.Success("修改评论权重成功", "修改评论权重成功");
+        await TableRows.QueryAsync();
+    }
+
+    #region 释放实例
+    private async ValueTask DisposeAsyncCore()
+    {
+        if (Interop != null)
+        {
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
+            Interop.Dispose();
+            Interop = null;
+        }
+    }
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore();
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

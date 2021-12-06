@@ -1,0 +1,150 @@
+﻿<div>
+    <div class="mt-1">
+        @if (Informations.Count != 0)
+        {
+            <div class="mb-3  pt-2">
+                <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="基本信息" />
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.ListBasicInforPair Model="@Informations" />
+                </div>
+                <hr class="mt-3" />
+            </div>
+        }
+        @if (Model.PeripheryOverviewModels.Count != 0)
+        {
+            <div class="mb-3  pt-2">
+                <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="相关周边" />
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Peripheries.Cards.ListPeripheryOverviewCard Model="@Model.PeripheryOverviewModels" @ref="listPeripheryOverviewCard"/>
+                </div>
+            </div>
+        }
+      
+
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PeripheryViewModel Model { get; set; }
+
+    public CnGalWebSite.Shared.AppComponent.Pages.Peripheries.Cards.ListPeripheryOverviewCard listPeripheryOverviewCard;
+
+    public List<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel> Informations { get; set; } = new List<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Informations.Add(new AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "类型",
+            Value = Model.Type.GetDisplayName(),
+            MultipleLines = true
+        });
+        if (string.IsNullOrWhiteSpace(Model.Author) == false)
+        {
+            Informations.Add(new AppComponent.Pages.Entries.Normal.BasicInforPairModel
+            {
+                Name = "作者",
+                Value = Model.Author,
+                MultipleLines = true
+            });
+        }
+        if (string.IsNullOrWhiteSpace(Model.Material) == false)
+        {
+            Informations.Add(new AppComponent.Pages.Entries.Normal.BasicInforPairModel
+            {
+                Name = "材质",
+                Value = Model.Material,
+                MultipleLines = true
+            });
+        }
+        if (string.IsNullOrWhiteSpace(Model.Size) == false)
+        {
+            Informations.Add(new AppComponent.Pages.Entries.Normal.BasicInforPairModel
+            {
+                Name = "尺寸",
+                Value = Model.Size,
+                MultipleLines = true
+            });
+        }
+
+
+
+        if (string.IsNullOrWhiteSpace(Model.Brand) == false)
+        {
+            Informations.Add(new AppComponent.Pages.Entries.Normal.BasicInforPairModel
+            {
+                Name = "品牌",
+                Value = Model.Brand,
+                MultipleLines = true
+            });
+        }
+        if (string.IsNullOrWhiteSpace(Model.IndividualParts) == false)
+        {
+            Informations.Add(new AppComponent.Pages.Entries.Normal.BasicInforPairModel
+            {
+                Name = "单独部件数量",
+                Value = Model.IndividualParts,
+                MultipleLines = true
+            });
+        }
+        if (string.IsNullOrWhiteSpace(Model.Price) == false)
+        {
+            Informations.Add(new AppComponent.Pages.Entries.Normal.BasicInforPairModel
+            {
+                Name = "价格",
+                Value = Model.Price,
+                MultipleLines = true
+            });
+        }
+        if (string.IsNullOrWhiteSpace(Model.SaleLink) == false)
+        {
+            Informations.Add(new AppComponent.Pages.Entries.Normal.BasicInforPairModel
+            {
+                Name = "贩售链接",
+                Value = Model.SaleLink,
+                MultipleLines = false,
+                IsLink=true,
+                IsOutLink=true
+            });
+        }
+
+        Informations.Add(new AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "是否再版",
+            Value = Model.IsReprint ? "是" : "否",
+            MultipleLines = true
+        });
+
+        Informations.Add(new AppComponent.Pages.Entries.Normal.BasicInforPairModel
+        {
+            Name = "是否为可用物品",
+            Value = Model.IsAvailableItem ? "是" : "否",
+            MultipleLines = true
+        });
+        if(Model.Type==PeripheryType.SetorAlbumEtc)
+        {
+            if(Model.PageCount!=0)
+            {
+                Informations.Add(new AppComponent.Pages.Entries.Normal.BasicInforPairModel
+                {
+                    Name = "页数",
+                    Value = Model.PageCount.ToString(),
+                    MultipleLines = true
+                });
+            }
+        }
+        if (Model.Type == PeripheryType.Ost)
+        {
+            if (Model.SongCount != 0)
+            {
+                Informations.Add(new AppComponent.Pages.Entries.Normal.BasicInforPairModel
+                {
+                    Name = "歌曲数",
+                    Value = Model.SongCount.ToString(),
+                    MultipleLines = true
+                });
+            }
+        }
+    }
+}

@@ -1,0 +1,8 @@
+﻿<div class="alert alert-success  rounded shadow " role="alert">
+    这些消息你都读过啦~可以<a class="alert-link" @onclick="OnRefreshMessage">刷新</a>哦~
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnRefreshMessage { get; set; }
+}

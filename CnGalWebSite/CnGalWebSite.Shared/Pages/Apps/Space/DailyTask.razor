@@ -1,0 +1,135 @@
+﻿@page "/space/dailytask"
+
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService ToastService
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+@inject IJSRuntime JS
+@inject DialogService DialogService
+@inject IDataCacheService _dataCatcheService
+
+@if (string.IsNullOrWhiteSpace(_dataCatcheService.UserInfor.UserName) == false)
+{
+    <TitleTip Title="@(_dataCatcheService.UserInfor.UserName + " - CnGal 中文galgame资料站")" Description="@_dataCatcheService.UserInfor.PersonalSignature" Image="@_dataCatcheService.UserInfor.PhotoPath"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+}
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="每日任务" IsShadow="true" />
+@if (isReady)
+{
+    <div style=" margin-top: 60px; width: 100%;margin-bottom:65px;">
+        <div class="row ms-2 me-2">
+            @foreach (var item in Model)
+            {
+                <div class="col-6 mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Users.DailyTasks.TaskCard Model="item" />
+
+                </div>
+            }
+        </div>
+
+    </div>
+}
+else
+{
+    <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+}
+
+@code {
+
+    public List<CnGalWebSite.Shared.AppComponent.Pages.Users.DailyTasks.TaskCardModel> Model = new List<AppComponent.Pages.Users.DailyTasks.TaskCardModel>();
+
+    bool isReady = false;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取词条信息
+            var model = await Http.GetFromJsonAsync<DailyTaskModel>(ToolHelper.WebApiPath + "api/space/GetUserDailyTask/" + _dataCatcheService.UserInfor.Id);
+
+            Model.Add(new AppComponent.Pages.Users.DailyTasks.TaskCardModel
+            {
+                Icon = "fa-calendar-check-o",
+                IsCompleted = model.IsSignIn,
+                Text = "+5积分",
+                Title = "签到",
+                ButtonColor = model.IsSignIn ? Color.Success : Color.Primary,
+                IconColor = model.IsSignIn ? "text-success" : "text-primary",
+                ButtonText = model.IsSignIn ? "已达成" : "签到",
+                OnCompleting = EventCallback.Factory.Create(this, async () => await CompletingTask(1)),
+            });
+            Model.Add(new AppComponent.Pages.Users.DailyTasks.TaskCardModel
+            {
+                Icon = "fa-codepen",
+                IsCompleted = model.IsEdit,
+                Text = "+50积分",
+                Title = "编辑一个词条",
+                ButtonColor = model.IsEdit ? Color.Success : Color.Primary,
+                IconColor = model.IsEdit ? "text-success" : "text-primary",
+                ButtonText = model.IsEdit ? "已达成" : "未达成",
+                OnCompleting = EventCallback.Factory.Create(this, async () => await CompletingTask(2)),
+
+            });
+            Model.Add(new AppComponent.Pages.Users.DailyTasks.TaskCardModel
+            {
+                Icon = "fa-comments-o",
+                IsCompleted = model.IsComment,
+                Text = "+5积分",
+                Title = "发表一个评论",
+                ButtonColor = model.IsComment ? Color.Success : Color.Primary,
+                IconColor = model.IsComment ? "text-success" : "text-primary",
+                ButtonText = model.IsComment ? "已达成" : "未达成",
+                OnCompleting = EventCallback.Factory.Create(this, async () => await CompletingTask(3)),
+
+
+            });
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取用户每日任务失败");
+            isReady = false;
+            StateHasChanged();
+        }
+
+
+    }
+
+    public async Task CompletingTask(int index)
+    {
+        if (index == 1)
+        {
+            await SignIn();
+            isReady = false;
+            Model.Clear();
+            StateHasChanged();
+            await OnInitializedAsync();
+        }
+    }
+    private async Task SignIn()
+    {
+        try
+        {
+            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/signIn");
+            if (result.Successful == true)
+            {
+                StateHasChanged();
+                await ToastService.Success("签到成功", "已获得5积分");
+            }
+        }
+        catch(Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "签到失败");
+        }
+    }
+}

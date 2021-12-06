@@ -1,0 +1,32 @@
+﻿<TabLink Icon="fa fa-codepen" Url="@Model.Link" Text="@Model.Name" class="a-font-color">
+    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 h-100">
+        <div class="row mb-2">
+            <div class="col-xl-12 col-xxl-4 pt-3">
+                <img class="img-fluid" src="@Model.Image">
+            </div>
+            <div class="col-xl-12 col-xxl-8 pt-3">
+                <header>
+                    <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                </header>
+                <div class="mt-2 article-home-text">
+                    @Model.BriefIntroduction
+                </div>
+                <div class="h4 mt-2" style="margin-bottom:0.1rem">
+                    @foreach (var temp in Model.Positions)
+                    {
+                                <button class="btn mb-2 me-2  @ColorString" style="transition: all .6s ease; margin-top: 5px;">@temp</button>
+                   }
+                </div>
+            </div>
+        </div>
+    </div>
+</TabLink>
+
+
+    @code {
+        [Parameter]
+        public StaffGameModel Model { get; set; }
+        [Parameter]
+        public string ColorString { get; set; }
+      
+    }

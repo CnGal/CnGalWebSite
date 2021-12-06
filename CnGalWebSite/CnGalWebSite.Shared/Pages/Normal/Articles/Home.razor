@@ -1,0 +1,23 @@
+﻿@page "/articles/home"
+@page "/articles"
+
+
+
+@inject IDataCacheService _dataCacheService
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Articles.Home ScreeningConditions="@ScreeningConditions" Sorting="@Sorting" />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Articles.Home ScreeningConditions="@ScreeningConditions" Sorting="@Sorting"/>
+}
+@code{
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string ScreeningConditions { get; set; } 
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string Sorting { get; set; }
+}

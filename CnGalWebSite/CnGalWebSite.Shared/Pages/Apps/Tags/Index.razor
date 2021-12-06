@@ -1,0 +1,200 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject IDataCacheService _dataCatcheService
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+}
+
+<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.HeadBar Title="@Model.Name" OnEdit="@(() => NavigationManager.NavigateTo("/tags/edit/home/" + Model.Id))" CanEdit="true" ClassName="" />
+
+<div style="margin-top: 45px; width: 100%;margin-bottom:65px; ">
+    @if (isReady == false)
+    {
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+
+    }
+    else
+    {
+        @if (isNotFound)
+        {
+            <CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard EntryName="@Id" Type="未找到标签" />
+        }
+        else
+        {
+            <div>
+                <CnGalWebSite.Shared.AppComponent.Pages.Tags.HeadCard Model="Model" />
+                <div>
+                    <CnGalWebSite.Shared.AppComponent.Pages.Tags.PivotLine IsShowChildTags="@(Model.ChildrenTags.Count!=0)" IsShowChildEntries="@(Model.ChildrenEntries.Count!=0)" @ref="pivotLine"
+                                                                              IsShowDetail="@(Model.Name!="游戏"&&Model.Name!="角色"&&Model.Name!="STAFF"&&Model.Name!="制作组")"
+                                                                                     OnTabClick="OnTabClick" DefaultIndex="defaultIndex" RandomIndex="randomIndex" />
+                    <div class="ms-3 me-3">
+                        <div class="mt-3 mb-3" style="padding-right: 0;padding-left: 0;">
+                            <div class="tab-content" id="@("pills" + randomIndex + "-tabContent")">
+                                <div class="@("tab-pane fade" + (defaultIndex == 0 ? " show active " : "") )" id="@("pills" + randomIndex + "-0")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-0-tab")">
+                                    @if (Model.Name != "游戏" && Model.Name != "角色" && Model.Name != "STAFF" && Model.Name != "制作组")
+                                    {
+                                        <CnGalWebSite.Shared.AppComponent.Pages.Tags.DetailCard Model="@Model" />
+                                    }
+                                </div>
+                                <div class="@("tab-pane fade" + (defaultIndex == 1 ? " show active " : "") )" id="@("pills" + randomIndex + "-1")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-1-tab")">
+                                    <div class="mt-2">
+                                        <CnGalWebSite.Shared.AppComponent.Pages.Tags.ChildTagCard Model="Model" />
+                                    </div>
+                                </div>
+                                <div class="@("tab-pane fade" + (defaultIndex == 2 ? " show active " : "") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
+                                    <div class="mt-2">
+                                        <CnGalWebSite.Shared.AppComponent.Pages.Tags.ChildEntryCard Model="Model"  />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+
+    }
+</div>
+@code {
+    private string id = "";
+    [Parameter]
+    public string Id
+    {
+        get
+        {
+            return id;
+        }
+        set
+        {
+            id = value;
+            isReady = false;
+            if (isFirstLoad == false)
+            {
+                OnReLoad();
+            }
+        }
+    }
+
+    private int defaultIndex { get; set; } = 0;
+    [Parameter]
+    public string DefaultIndex
+    {
+        get
+        {
+            return defaultIndex.ToString();
+        }
+        set
+        {
+            try
+            {
+                defaultIndex = int.Parse(value);
+            }
+            catch
+            {
+                defaultIndex = 0;
+            }
+        }
+    }
+
+    bool isReady = false;
+    bool isNotFound = false;
+    bool isFirstLoad = true;
+    public bool IsAdmin { get; set; }
+
+    public TagIndexViewModel Model { get; set; } = new TagIndexViewModel();
+    string LastLookName = "";
+
+    public int TabIndexNum = 0;
+    public int randomIndex = new Random().Next();
+    CnGalWebSite.Shared.AppComponent.Pages.Tags.PivotLine pivotLine;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    public Task OnTabClick(int index)
+    {
+
+        TabIndexNum = index;
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+
+            isFirstLoad = false;
+        }
+
+    }
+
+    async Task OnReLoad()
+    {
+        await OnInitializedAsync();
+        await OnAfterRenderAsync_();
+    }
+
+    async Task OnAfterRenderAsync_()
+    {
+
+        //记录数据
+        if (Model.Name != LastLookName && string.IsNullOrWhiteSpace(Model.Name))
+        {
+            LastLookName = Model.Name;
+            try
+            {
+                await JS.InvokeAsync<string>("trackEvent", "标签", "浏览", Model.Name, "1", "look");
+            }
+            catch (Exception exc)
+            {
+
+            }
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var user = await authenticationStateTask;
+            IsAdmin = user.User.IsInRole("Admin");
+
+            isReady = false;
+            isNotFound = false;
+            StateHasChanged();
+
+            //获取标签信息
+            Model = await _dataCatcheService.TagIndexPageCatche.GetCatche(Id);
+            await Task.Delay(1);
+            //判断如果名称为空则返回主页
+            if (string.IsNullOrWhiteSpace(Model.Name))
+            {
+                NavigationManager.NavigateTo("/home");
+            }
+
+            //修改默认Tab
+            if(defaultIndex==0 &&(Model.Name == "游戏" || Model.Name == "角色" || Model.Name == "STAFF" || Model.Name == "制作组"))
+            {
+                defaultIndex = 1;
+                TabIndexNum = 1;
+            }
+
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            isNotFound = true;
+            isReady = true;
+            StateHasChanged();
+        }
+    }
+
+
+}

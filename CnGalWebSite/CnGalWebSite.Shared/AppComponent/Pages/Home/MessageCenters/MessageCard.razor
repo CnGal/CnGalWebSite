@@ -1,0 +1,26 @@
+﻿
+<a class="mb-3 a-font-color bg-opacity" href="@Model.Link">
+    <div class="new-row-warp no-margin">
+        <div>
+            <img class=" shadow -sm" src="@Model.Image"
+                 style="height: 40px;width: 40px;border-radius: 50%;" />
+        </div>
+        <div class="comment-tx-div">
+            <div class="new-row-warp no-margin">
+                <div class="comment-username me-2">@Model.Title</div>
+                <div class="comment-tag">@Model.Rank</div>
+            </div>
+            <div class="comment-time">@Model.PostTime.ToString("yyy-MM-dd H:mm")</div>
+        </div>
+        <div class="mt-2 col-12 no-padding">
+            <div class="tui-editor-contents">
+                @((MarkupString)Model.Text)
+            </div>
+        </div>
+    </div>
+</a>
+
+@code {
+    [Parameter]
+    public CnGalWebSite.DataModel.Model.Message Model { get; set; }
+}

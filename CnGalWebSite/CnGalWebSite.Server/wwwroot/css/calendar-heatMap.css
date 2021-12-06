@@ -1,0 +1,42 @@
+﻿.ContributionCalendar-day {
+    margin: 0.15rem;
+    height: 0.7rem;
+    width: 0.7rem;
+    border-radius: 2px;
+}
+
+.ContributionCalendar-color-x {
+    background-color: transparent
+}
+
+.ContributionCalendar-color-0 {
+    background-color: #ECEDEF
+}
+
+.ContributionCalendar-color-1 {
+    background-color: #C7E293
+}
+
+.ContributionCalendar-color-2 {
+    background-color: #75CC6B
+}
+
+.ContributionCalendar-color-3 {
+    background-color: #209A3B
+}
+
+.ContributionCalendar-color-4 {
+    background-color: #1F5B21
+}
+
+.ContributionCalendar-font {
+    font-size: 12px;
+    align-content: center;
+    margin-bottom: 0.1rem;
+    color: #666666;
+}
+
+.ContributionCalendar-tip-font {
+    font-size: 11px;
+    color: #666666;
+}
