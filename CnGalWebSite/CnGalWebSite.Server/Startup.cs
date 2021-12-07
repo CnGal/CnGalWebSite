@@ -31,7 +31,11 @@ namespace CnGalWebSite.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
-            services.AddServerSideBlazor();
+            services.AddServerSideBlazor()
+                .AddHubOptions(options =>
+                {
+                    options.MaximumReceiveMessageSize = int.MaxValue;
+                });
 
             services.AddBootstrapBlazor();
 
@@ -78,8 +82,6 @@ namespace CnGalWebSite.Server
             }
             //app.UseHttpsRedirection();
             //app.UseRequestLocalization(app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>().Value);
-
-            app.ApplicationServices.RegisterProvider();
 
             app.UseStaticFiles();
 
