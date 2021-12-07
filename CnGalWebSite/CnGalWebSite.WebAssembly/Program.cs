@@ -59,7 +59,6 @@ namespace CnGalWebSite.WebAssembly
 
             var host = builder.Build();
 
-
             await host.RunAsync();
         }
     }
