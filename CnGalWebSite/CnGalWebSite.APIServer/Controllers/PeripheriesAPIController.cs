@@ -720,7 +720,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
             }
             //判断是否为锁定状态
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryMain)))
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id == model.Id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryMain)))
             {
                 return new Result { Error = "当前周边该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }
@@ -854,7 +854,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
             }
             //判断是否为锁定状态
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryImages)))
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id == model.Id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryImages)))
             {
                 return new Result { Error = "当前周边该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }
@@ -1050,7 +1050,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
             }
             //判断是否为锁定状态
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryRelatedEntries)))
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id == model.Id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryRelatedEntries)))
             {
                 return new Result { Error = "当前周边该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }
@@ -1204,7 +1204,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
             }
             //判断是否为锁定状态
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryRelatedPeripheries)))
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id == model.Id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryRelatedPeripheries)))
             {
                 return new Result { Error = "当前周边该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }

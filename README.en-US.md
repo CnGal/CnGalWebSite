@@ -12,17 +12,16 @@
     愿每一个CnGal创作者的作品都能不被忘记
 </p>
 <span id="nav-1"></span>
-<p align="center">
-  <a href="https://github.com/CnGal/CnGalWebSite/LICENSE">
-    <img alt="GitHub" src="https://img.shields.io/github/license/misitebao/standard-repository?style=flat-square"/>
-  </a>
-  <a href="https://github.com/misitebao/standard-repository">
-    <img alt="GitHub" src="https://cdn.jsdelivr.net/gh/misitebao/standard-repository@main/assets/badge_flat-square.svg"/>
-  </a>
-  <a href="https://github.com/CnGal/CnGalWebSite">
-    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/CnGal/CnGalWebSite?style=flat-square"/>
-  </a>
-</p>
+<div align="center">
+ 
+ [![LICENSE](https://img.shields.io/github/license/CnGal/CnGalWebSite)](https://github.com/CnGal/CnGalWebSite/LICENSE)
+[![standard-repository](https://cdn.jsdelivr.net/gh/misitebao/standard-repository@main/assets/badge_flat.svg)](https://github.com/misitebao/standard-repository)
+[![stars](https://img.shields.io/github/stars/CnGal/CnGalWebSite)](https://github.com/CnGal/CnGalWebSite)
+[![爱发电](https://afdian.moeci.com/3/badge.svg)](https://afdian.net/@cngal)
+
+</div>
+
+
 
 ## Internationalization
 
@@ -322,7 +321,7 @@ CnGal资料站：https://www.cngal.org/
 
 ## Special Thanks
 
-感谢不愿透露姓名的热心人士提供的词库
+感谢不愿透露姓名的热心人士提供词库
 
 感谢半年以来参与资料站补全计划，一同编辑资料表和提供参考资料的小伙伴们：
 

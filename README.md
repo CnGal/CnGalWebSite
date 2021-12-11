@@ -12,17 +12,16 @@
     愿每一个CnGal创作者的作品都能不被忘记
 </p>
 <span id="nav-1"></span>
-<p align="center">
-  <a href="https://github.com/CnGal/CnGalWebSite/LICENSE">
-    <img alt="GitHub" src="https://img.shields.io/github/license/misitebao/standard-repository?style=flat-square"/>
-  </a>
-  <a href="https://github.com/misitebao/standard-repository">
-    <img alt="GitHub" src="https://cdn.jsdelivr.net/gh/misitebao/standard-repository@main/assets/badge_flat-square.svg"/>
-  </a>
-  <a href="https://github.com/CnGal/CnGalWebSite">
-    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/CnGal/CnGalWebSite?style=flat-square"/>
-  </a>
-</p>
+<div align="center">
+ 
+ [![LICENSE](https://img.shields.io/github/license/CnGal/CnGalWebSite)](https://github.com/CnGal/CnGalWebSite/LICENSE)
+[![standard-repository](https://cdn.jsdelivr.net/gh/misitebao/standard-repository@main/assets/badge_flat.svg)](https://github.com/misitebao/standard-repository)
+[![stars](https://img.shields.io/github/stars/CnGal/CnGalWebSite)](https://github.com/CnGal/CnGalWebSite)
+[![爱发电](https://afdian.moeci.com/3/badge.svg)](https://afdian.net/@cngal)
+
+</div>
+
+
 
 ## 国际化
 
@@ -228,7 +227,7 @@ SDK：.Net 6.0
 <span id="nav-9"></span>
 
 ## 贡献者
-感谢所有参与 CnGal资料站 开发的贡献者。[贡献者列表](https://github.com/LittleFish-233/standard-repository/graphs/contributors)
+感谢所有参与 CnGal资料站 开发的贡献者。[贡献者列表](https://github.com/CnGal/CnGalWebSite/graphs/contributors)
 
 <!-- 这里填写项目贡献者列表，通常是列表，当然也可以用图片代替。 -->
 
@@ -322,7 +321,7 @@ CnGal资料站：https://www.cngal.org/
 
 ## 特别感谢
 
-感谢不愿透露姓名的热心人士提供的词库
+感谢不愿透露姓名的热心人士提供词库
 
 感谢半年以来参与资料站补全计划，一同编辑资料表和提供参考资料的小伙伴们：
 
