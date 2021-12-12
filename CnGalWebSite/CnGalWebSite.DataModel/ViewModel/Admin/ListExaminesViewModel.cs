@@ -38,6 +38,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         public string Comments { get; set; }
         [Display(Name = "申请审核用户Id")]
         public string ApplicationUserId { get; set; }
+        [Display(Name = "申请审核的用户")]
+        public string UserName { get; set; }
         [Display(Name = "处理此审核的管理员")]
         public string PassedAdminName { get; set; }
         [Display(Name = "关联词条Id")]

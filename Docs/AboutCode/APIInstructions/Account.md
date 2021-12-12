@@ -87,13 +87,13 @@
 
 请求头里加入Authorization，并加上Bearer标注
 
-```
+````js
 fetch('api/user/1', {
   headers: {
     'Authorization': 'Bearer ' + token
   }
 })
-```
+````
 ## 发送验证码
 1. 进行人机验证
 2. 确定发送类型：电子邮件、手机短信

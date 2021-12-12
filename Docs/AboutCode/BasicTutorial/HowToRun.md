@@ -32,7 +32,6 @@
 {
   "ConnectionStrings": {
     //数据库连接字符串
-    //"CnaglDBConnection": ""
     "CnaglDBConnection": ""
   },
   //发送验证邮件的电子邮箱

@@ -196,7 +196,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         public Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(QueryPageOptions options, ListExamineAloneModel searchModel)
         {
-            IEnumerable<Examine> items = _examineRepository.GetAll().AsNoTracking();
+            IEnumerable<Examine> items = _examineRepository.GetAll().Include(s=>s.ApplicationUser).AsNoTracking();
             // 处理高级搜索
             if (!string.IsNullOrWhiteSpace(searchModel.EntryId?.ToString()))
             {
@@ -282,6 +282,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     ApplyTime = item.ApplyTime,
                     Comments = item.Comments,
                     ApplicationUserId = item.ApplicationUserId,
+                    UserName=item.ApplicationUser.UserName,
                     EntryId = item.EntryId,
                     TagId = item.TagId,
                     CommentId = item.CommentId,

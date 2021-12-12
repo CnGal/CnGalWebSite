@@ -1,6 +1,6 @@
 <div align="center">
   <!-- 在此处设置您的项目图标 -->
-  <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" height="70"/>
+  <img src="Docs/Images/logo.png" height="70"/>
 
 # CnGal资料站
 
