@@ -291,7 +291,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 foreach (var item in peripheries)
                 {
-                    model.Peripheries.Add(_appHelper.GetPheripheryInforTipViewModel(item));
+                    model.Peripheries.Add(_appHelper.GetPeripheryInforTipViewModel(item));
                 }
 
                 //获取用户收集的周边

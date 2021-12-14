@@ -13,6 +13,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CnGalWebSite.APIServer.Application.ElasticSearches;
 
 namespace CnGalWebSite.APIServer.Application.TimedTasks
 {
@@ -23,17 +24,19 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         private readonly ITableService _tableService;
         private readonly IBackUpArchiveService _backUpArchiveService;
         private readonly IPerfectionService _perfectionService;
+        private readonly IElasticsearchService _elasticsearchService;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<TimedTask>, string, SortOrder, IEnumerable<TimedTask>>> SortLambdaCacheApplicationUser = new();
 
         public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, ISteamInforService steamInforService, IBackUpArchiveService backUpArchiveService, ITableService tableService,
-            IPerfectionService perfectionService)
+            IPerfectionService perfectionService, IElasticsearchService elasticsearchService)
         {
             _timedTaskRepository = timedTaskRepository;
             _steamInforService = steamInforService;
             _backUpArchiveService = backUpArchiveService;
             _tableService = tableService;
             _perfectionService = perfectionService;
+            _elasticsearchService = elasticsearchService;
         }
 
         public Task<QueryData<ListTimedTaskAloneModel>> GetPaginatedResult(QueryPageOptions options, ListTimedTaskAloneModel searchModel)
@@ -185,6 +188,9 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         break;
                     case TimedTaskType.UpdatePerfection:
                         await _perfectionService.UpdateAllEntryPerfectionsAsync();
+                        break;
+                    case TimedTaskType.UpdateDataToElasticsearch:
+                        await _elasticsearchService.UpdateDataToElasticsearch(item.LastExecutedTime??DateTime.MinValue);
                         break;
                 }
                 //记录执行时间

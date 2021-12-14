@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CnGalWebSite.APIServer.Application.ElasticSearches;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -71,14 +72,17 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IFavoriteFolderService _favoriteFolderService;
         private readonly IRankService _rankService;
         private readonly IPeripheryService _peripheryService;
+        private readonly IElasticsearchBaseService<Entry> _entryElasticsearchBaseService;
+        private readonly IElasticsearchBaseService<Article> _articleElasticsearchBaseService;
+        private readonly IElasticsearchService _elasticsearchService;
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
         IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService,
-        IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository,
-        IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService,
-        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService,
-            IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository,
+        IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IElasticsearchService elasticsearchService,
+        IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IElasticsearchBaseService<Article> articleElasticsearchBaseService,
+        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IElasticsearchBaseService<Entry> entryElasticsearchBaseService,
+        IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService)
         {
@@ -116,6 +120,9 @@ namespace CnGalWebSite.APIServer.Controllers
             _rankService = rankService;
             _peripheryRepository = peripheryRepository;
             _peripheryService = peripheryService;
+            _entryElasticsearchBaseService = entryElasticsearchBaseService;
+            _articleElasticsearchBaseService = articleElasticsearchBaseService;
+            _elasticsearchService = elasticsearchService;
         }
 
         /// <summary>
@@ -1441,8 +1448,24 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<Result>> TempFunction()
         {
-            await _examineService.MigrationEditEntryTagsExamineRecord();
-            return new Result { Successful = true };
+            try
+            {
+                var tags = await _tagRepository.GetAllListAsync();
+                foreach (var tag in tags)
+                {
+                    if ((DateTime.Now.ToCstTime() - tag.LastEditTime).TotalDays > 365)
+                    {
+                        tag.LastEditTime = DateTime.Now.ToCstTime().AddDays(-70);
+                        await _tagRepository.UpdateAsync(tag);
+                    }
+                }
+                return new Result { Successful = true };
+            }
+            catch (Exception ex)
+            {
+                return new Result { Successful = false, Error = ex.Message };
+            }
+
         }
 
 

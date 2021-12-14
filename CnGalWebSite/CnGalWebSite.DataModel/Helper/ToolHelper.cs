@@ -21,9 +21,9 @@ namespace CnGalWebSite.DataModel.Helper
         //https://v3.cngal.org/
 
 
-        //public const string WebApiPath = "http://localhost:45160/";
+        public const string WebApiPath = "http://localhost:45160/";
         //public const string WebApiPath = "http://172.17.0.1:2001/";
-        public const string WebApiPath = "https://www.cngal.org/";
+        //public const string WebApiPath = "https://www.cngal.org/";
 
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";
 
@@ -418,6 +418,19 @@ namespace CnGalWebSite.DataModel.Helper
             }
 
             return PositionGeneralType.Other;
+        }
+
+        public static T ToEnumValue<T>(this string text) where T : Enum
+        {
+            foreach (var item in Enum.GetValues(typeof(T)))
+            {
+                var temp = (T)item;
+                if (text == temp.GetDisplayName())
+                {
+                    return temp;
+                }
+            }
+            return default;
         }
 
         /// <summary>

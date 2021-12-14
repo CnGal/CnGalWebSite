@@ -59,6 +59,8 @@ namespace CnGalWebSite.DataModel.Model
         UpdatePerfectionOverview,
         [Display(Name = "更新词条完善度")]
         UpdatePerfection,
+        [Display(Name = "更新Elasticsearch数据缓存")]
+        UpdateDataToElasticsearch
 
     }
     public enum TimedTaskExecuteType

@@ -19,5 +19,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
         public ArticleInforTipViewModel article { get; set; }
 
         public UserInforTipViewModel user { get; set; }
+
+        public TagInforTipViewModel tag { get; set; }
+
+        public PeripheryInforTipViewModel periphery { get; set; }
     }
 }

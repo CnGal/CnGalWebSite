@@ -27,14 +27,23 @@
                         <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("攻略"))">攻略</button>
                         <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("动态"))">动态</button>
                         <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("评测"))">评测</button>
-                        <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("周边"))">周边</button>
+                        <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("文章周边"))">周边</button>
                         <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("公告"))">公告</button>
                         <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("杂谈"))">杂谈</button>
                     </h5>
                     <hr />
+                    <h4 class="fw-bold mt-4 mb-3">周边</h4>
+                    <h5>
+                        <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("设定集或画册等"))">设定集或画册等</button>
+                        <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("原声集"))">原声集</button>
+                        <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("套装"))">套装</button>
+                        <button type="button" class="badge-btn btn btn-primary" @onclick="@(()=>OnCondited("其他"))">其他</button>
+                    </h5>
+                    <hr />
                     <h4 class="fw-bold mt-4 mb-3">排序</h4>
                     <h5>
-                        <button type="button" class="badge-btn btn btn-info" @onclick="@(()=>Sorting(Model.pagedResultDto.Sorting=="Name desc"?"Name": "Name desc"))">名称</button>
+                        <button type="button" class="badge-btn btn btn-info" @onclick="@(()=>Sorting(Model.pagedResultDto.Sorting=="Default"?"Default": "Default desc"))">默认</button>
+
                         <button type="button" class="badge-btn btn btn-info" @onclick="@(()=>Sorting(Model.pagedResultDto.Sorting=="ReaderCount desc"?"ReaderCount": "ReaderCount desc"))">热度</button>
                         <button type="button" class="badge-btn btn btn-info" @onclick="@(()=>Sorting(Model.pagedResultDto.Sorting=="LastEditTime desc"?"LastEditTime": "LastEditTime desc"))">最后编辑</button>
 
@@ -60,6 +69,13 @@
                         <li class="nav-item">
                             <a class="nav-link link-primary" @onclick="@(()=>OnCondited("文章"))">文章</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link link-primary" @onclick="@(()=>OnCondited("周边"))">周边</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link link-primary" @onclick="@(()=>OnCondited("标签"))">标签</a>
+                        </li>
+
                         <li class="form-inline ms-3">
                             <BootstrapBlazor.Components.Search Items="Items" IsLikeMatch="true" PlaceHolder="可以搜索哦~" @bind-Value="FilterText" OnSearch="@OnSearch"></BootstrapBlazor.Components.Search>
                         </li>
@@ -98,6 +114,14 @@
                         else if (Model.pagedResultDto.Data[i].article != null)
                         {
                             <ArticleInforViewTip Model="Model.pagedResultDto.Data[i].article"></ArticleInforViewTip>
+                        }
+                        else if (Model.pagedResultDto.Data[i].periphery != null)
+                        {
+                            <PeripheryInforViewTip Model="Model.pagedResultDto.Data[i].periphery"></PeripheryInforViewTip>
+                        }
+                        else if (Model.pagedResultDto.Data[i].tag != null)
+                        {
+                            <TagInforViewTip Model="Model.pagedResultDto.Data[i].tag"></TagInforViewTip>
                         }
                         else if (Model.pagedResultDto.Data[i].user != null)
                         {
@@ -159,7 +183,7 @@
 
     public SearchViewModel Model { get; set; } = new SearchViewModel
     {
-        pagedResultDto = new PagedResultDto<SearchAloneModel> { Data = new List<SearchAloneModel>(), CurrentPage = 1, TotalCount = 0, ScreeningConditions = "全部", Sorting = "Id desc" }
+        pagedResultDto = new PagedResultDto<SearchAloneModel> { Data = new List<SearchAloneModel>(), CurrentPage = 1, TotalCount = 0, ScreeningConditions = "全部", Sorting = "Default" }
     };
 
     private IEnumerable<int> PageItems => new int[] { 4, 8, 16, 30 };
@@ -200,7 +224,7 @@
         {
             Model.pagedResultDto.CurrentPage = pageIndex;
             Model.pagedResultDto.MaxResultCount = pageItems;
-            var result = await Http.PostAsJsonAsync<GetSearchInput>(ToolHelper.WebApiPath + "api/home/search", new GetSearchInput { CurrentPage = pageIndex, MaxResultCount = pageItems, Sorting = Model.pagedResultDto.Sorting ?? "Id desc", FilterText = Model.pagedResultDto.FilterText, ScreeningConditions = Model.pagedResultDto.ScreeningConditions });
+            var result = await Http.PostAsJsonAsync<GetSearchInput>(ToolHelper.WebApiPath + "api/home/search", new GetSearchInput { CurrentPage = pageIndex, MaxResultCount = pageItems, Sorting = Model.pagedResultDto.Sorting ?? "Default", FilterText = Model.pagedResultDto.FilterText, ScreeningConditions = Model.pagedResultDto.ScreeningConditions });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Model = JsonSerializer.Deserialize<SearchViewModel>(jsonContent, ToolHelper.options);
             if (Model.pagedResultDto.Data == null)
@@ -226,7 +250,7 @@
         {
             Model.pagedResultDto.CurrentPage = 1;
             Model.pagedResultDto.MaxResultCount = pageItems;
-            var result = await Http.PostAsJsonAsync<GetSearchInput>(ToolHelper.WebApiPath + "api/home/search", new GetSearchInput { CurrentPage = 1, MaxResultCount = pageItems, Sorting = Model.pagedResultDto.Sorting ?? "Id desc", FilterText = Model.pagedResultDto.FilterText, ScreeningConditions = Model.pagedResultDto.ScreeningConditions });
+            var result = await Http.PostAsJsonAsync<GetSearchInput>(ToolHelper.WebApiPath + "api/home/search", new GetSearchInput { CurrentPage = 1, MaxResultCount = pageItems, Sorting = Model.pagedResultDto.Sorting ?? "Default", FilterText = Model.pagedResultDto.FilterText, ScreeningConditions = Model.pagedResultDto.ScreeningConditions });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Model = JsonSerializer.Deserialize<SearchViewModel>(jsonContent, ToolHelper.options);
             if (Model.pagedResultDto.Data == null)
@@ -269,7 +293,7 @@
         {
             Model.pagedResultDto.FilterText = text;
             Model.pagedResultDto.CurrentPage = 1;
-            var result = await Http.PostAsJsonAsync<GetSearchInput>(ToolHelper.WebApiPath + "api/home/search", new GetSearchInput { CurrentPage = Model.pagedResultDto.CurrentPage, MaxResultCount = Model.pagedResultDto.MaxResultCount, Sorting = Model.pagedResultDto.Sorting ?? "Id desc", FilterText = Model.pagedResultDto.FilterText, ScreeningConditions = Model.pagedResultDto.ScreeningConditions });
+            var result = await Http.PostAsJsonAsync<GetSearchInput>(ToolHelper.WebApiPath + "api/home/search", new GetSearchInput { CurrentPage = Model.pagedResultDto.CurrentPage, MaxResultCount = Model.pagedResultDto.MaxResultCount, Sorting = Model.pagedResultDto.Sorting ?? "Default", FilterText = Model.pagedResultDto.FilterText, ScreeningConditions = Model.pagedResultDto.ScreeningConditions });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Model = JsonSerializer.Deserialize<SearchViewModel>(jsonContent, ToolHelper.options);
             if (Model.pagedResultDto.Data == null)
@@ -290,7 +314,7 @@
         {
             Model.pagedResultDto.ScreeningConditions = str;
             Model.pagedResultDto.CurrentPage = 1;
-            var result = await Http.PostAsJsonAsync<GetSearchInput>(ToolHelper.WebApiPath + "api/home/search", new GetSearchInput { CurrentPage = Model.pagedResultDto.CurrentPage, MaxResultCount = Model.pagedResultDto.MaxResultCount, Sorting = Model.pagedResultDto.Sorting ?? "Id desc", FilterText = Model.pagedResultDto.FilterText, ScreeningConditions = Model.pagedResultDto.ScreeningConditions });
+            var result = await Http.PostAsJsonAsync<GetSearchInput>(ToolHelper.WebApiPath + "api/home/search", new GetSearchInput { CurrentPage = Model.pagedResultDto.CurrentPage, MaxResultCount = Model.pagedResultDto.MaxResultCount, Sorting = Model.pagedResultDto.Sorting ?? "Default", FilterText = Model.pagedResultDto.FilterText, ScreeningConditions = Model.pagedResultDto.ScreeningConditions });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Model = JsonSerializer.Deserialize<SearchViewModel>(jsonContent, ToolHelper.options);
             if (Model.pagedResultDto.Data == null)

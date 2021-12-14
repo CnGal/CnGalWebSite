@@ -17,7 +17,7 @@
 
 
 @code {
-    public PagedSortedAndFilterInput Input { get; set; } = new PagedSortedAndFilterInput { Sorting = "LastEditTime desc" };
+    public PagedSortedAndFilterInput Input { get; set; } = new PagedSortedAndFilterInput { Sorting = "Default" };
 
     [Parameter]
     public string Sorting { get; set; }
@@ -34,7 +34,7 @@
     {
         if (string.IsNullOrWhiteSpace(Sorting))
         {
-            Sorting = "Id desc";
+            Sorting = "Default";
         }
         if (string.IsNullOrWhiteSpace(ScreeningConditions))
         {
@@ -56,6 +56,12 @@
                 break;
             case 2:
                 listSearchResult.ScreeningConditions = "文章";
+                break;
+            case 3:
+                listSearchResult.ScreeningConditions = "周边";
+                break;
+            case 4:
+                listSearchResult.ScreeningConditions = "标签";
                 break;
         }
         await listSearchResult.RefreshDataAsync();

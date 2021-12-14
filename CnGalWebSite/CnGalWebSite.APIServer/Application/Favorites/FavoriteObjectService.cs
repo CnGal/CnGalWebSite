@@ -147,7 +147,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
                 {
                     dtos.Add(new FavoriteObjectAloneViewModel
                     {
-                        periphery = _appHelper.GetPheripheryInforTipViewModel(item.Periphery)
+                        periphery = _appHelper.GetPeripheryInforTipViewModel(item.Periphery)
                     });
                 }
 

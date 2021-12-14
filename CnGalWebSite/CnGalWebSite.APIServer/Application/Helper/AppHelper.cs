@@ -1419,7 +1419,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             };
         }
 
-        public PeripheryInforTipViewModel GetPheripheryInforTipViewModel(Periphery periphery)
+        public PeripheryInforTipViewModel GetPeripheryInforTipViewModel(Periphery periphery)
         {
             //预处理图片
             periphery.MainPicture = GetImagePath(periphery.MainPicture, "app.png");

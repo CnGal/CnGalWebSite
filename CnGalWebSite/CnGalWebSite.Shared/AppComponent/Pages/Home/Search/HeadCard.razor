@@ -80,6 +80,14 @@
             {
                 DefaultIndex = 2;
             }
+            else if (ScreeningConditions.Contains("周边"))
+            {
+                DefaultIndex = 3;
+            }
+            else if (ScreeningConditions.Contains("标签"))
+            {
+                DefaultIndex = 4;
+            }
 
         }
         Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
@@ -101,13 +109,34 @@
             Text = "词条",
             Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
             ClassNames = $"col-auto pe-2 p-0"
-        }); Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        });
+        Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
         {
             DefaultIndex = DefaultIndex,
             Index = 2,
             OnTabClick = OnTabClick,
             RandomIndex = RandomIndex,
             Text = "文章",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+        Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = DefaultIndex,
+            Index = 3,
+            OnTabClick = OnTabClick,
+            RandomIndex = RandomIndex,
+            Text = "周边",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+        Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = DefaultIndex,
+            Index = 4,
+            OnTabClick = OnTabClick,
+            RandomIndex = RandomIndex,
+            Text = "标签",
             Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
             ClassNames = $"col-auto pe-2 p-0"
         });

@@ -12,7 +12,7 @@
         /// </summary>
         public int TotalPages => (int)Math.Ceiling(decimal.Divide(TotalCount, MaxResultCount));
 
-        public List<TEntity> Data { get; set; }
+        public List<TEntity> Data { get; set; }=new List<TEntity>();
 
         /// <summary>
         /// 是否显示上一页

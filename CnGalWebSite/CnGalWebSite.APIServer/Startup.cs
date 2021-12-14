@@ -26,6 +26,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using CnGalWebSite.APIServer.Application.ElasticSearches;
 
 namespace CnGalWebSite.APIServer
 {
@@ -60,6 +61,9 @@ namespace CnGalWebSite.APIServer
             services.AddScoped<IAppHelper, AppHelper>();
             //添加HTTP请求
             services.AddHttpClient();
+            //添加ElasticSearch服务
+            services.AddScoped<IElasticsearchProvider, ElasticsearchProvider>();
+            services.AddScoped(typeof(IElasticsearchBaseService<>), typeof(ElasticsearchBaseService<>));
             //依赖注入仓储
             services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
             //自动注入服务到依赖注入容器

@@ -247,7 +247,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// </summary>
         /// <param name="periphery">周边</param>
         /// <returns></returns>
-        PeripheryInforTipViewModel GetPheripheryInforTipViewModel(Periphery periphery);
+        PeripheryInforTipViewModel GetPeripheryInforTipViewModel(Periphery periphery);
         /// <summary>
         /// 将json字符串格式化
         /// </summary>

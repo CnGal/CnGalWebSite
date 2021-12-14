@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <UserSecretsId>fba4415c-d0bd-477e-a0fd-cece935a25b1</UserSecretsId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
@@ -42,6 +41,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.0" />
+    <PackageReference Include="NEST" Version="7.16.0" />
     <PackageReference Include="NetCore.AutoRegisterDi" Version="2.1.0" />
     <PackageReference Include="NETCore.MailKit" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using CnGalWebSite.APIServer.Application.ElasticSearches;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -26,13 +27,15 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ISearchService _searchService;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IHomeService _homeService;
+        private readonly IElasticsearchService _elasticsearchService;
 
-        public HomeAPIController(ISearchService searchService, 
+        public HomeAPIController(ISearchService searchService, IElasticsearchService elasticsearchService,
         IRepository<Entry, int> entryRepository,IHomeService homeService)
         {
             _searchService = searchService;
             _entryRepository = entryRepository;
             _homeService = homeService;
+            _elasticsearchService = elasticsearchService;
         }
         /// <summary>
         /// 获取即将发售游戏
@@ -155,7 +158,9 @@ namespace CnGalWebSite.APIServer.Controllers
             try
             {
                 var model = new SearchViewModel();
-                var dtos = await _searchService.GetPaginatedResult(input);
+                var dtos = input.StartIndex == -1 ?
+                    await _elasticsearchService.QueryAsync(input.CurrentPage, input.MaxResultCount,input.FilterText, input.ScreeningConditions,input.Sorting, QueryType.Page) :
+                    await _elasticsearchService.QueryAsync(input.StartIndex, input.MaxResultCount,input.FilterText, input.ScreeningConditions,input.Sorting, QueryType.Index);
                 dtos.Data = dtos.Data.ToList();
 
                 model.pagedResultDto = dtos;
