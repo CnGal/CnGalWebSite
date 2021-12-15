@@ -24,88 +24,97 @@
         background-color: rgba(255,255,255,.8);
     }
 </style>
-<div class="rounded  rounded shadow  bg-opacity  p-3">
-    <div class="modal-body">
-        <div class="swal2-header">
-            <div class="swal2-icon swal2-info"></div>
-            <h2 class="swal2-title">你已进入APP模式</h2>
-        </div>
-        <div class="swal2-content d-flex text-center">
+<!-- <div class="p-3">
+    <div>
+
+        <h1 class="h4 text-center">你已进入APP模式</h1>
+
+        <div class="text-center">
             APP模式将会带来更加稳定的编辑体验，你可以将 app.cngal.org 加入收藏夹，便于再次进入~
         </div>
-        <div class="swal2-actions">
-            <Button Icon="fa fa-check" Text="我知道了" @onclick="OnClickLeft"></Button>
-            <Button Icon="fa fa-star" Text="添加收藏夹" @onclick="OnClickRight" Color="Color.Success" class="ms-2"></Button>
+        <div class="mt-3 text-center">
+            <Button Icon="fa fa-star" Text="添加收藏夹" @onclick="OnClickRight" Color="Color.Dark" IsOutline="true" class="ms-2"></Button>
+            <Button Icon="fa fa-check" Text="我知道了" @onclick="OnClickLeft" Color="Color.Dark"></Button>
         </div>
     </div>
 </div>
+-->
+<div class="p-3 text-center">
+    <h1 class="h4 ">正在载入APP模式</h1>
+
+    <div>
+        正在下载相关资源，APP模式将会带来更加稳定的编辑体验，还请耐心等待哦
+    </div>
+    <div style="font-size:30px;" class="mt-3">
+        <i class="fa fa-spinner fa-spin"></i>
+    </div>
+</div>
+
+    @code {
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string ReturnUrl { get; set; }
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string Code { get; set; }
 
 
-@code {
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public string ReturnUrl { get; set; }
-
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public string Code { get; set; }
-
-
-    public string Url { get; set; }
-    [Inject]
-    [NotNull]
-    private DialogService? DialogService { get; set; }
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
-    protected override async Task OnInitializedAsync()
-    {
-        //上传
-        try
+        public string Url { get; set; }
+        [Inject]
+        [NotNull]
+        private DialogService? DialogService { get; set; }
+        [CascadingParameter]
+        public ErrorHandler ErrorHandler { get; set; }
+        protected override async Task OnInitializedAsync()
         {
-            var result = await Http.PostAsJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = Code });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            LoginResult obj = JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
-            //判断结果
-            if (obj.Code == LoginResultCode.OK)
+            //上传
+            try
             {
-                if (await AuthService.Login(obj.Token) == false)
+                var result = await Http.PostAsJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = Code });
+                string jsonContent = result.Content.ReadAsStringAsync().Result;
+                LoginResult obj = JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
+                //判断结果
+                if (obj.Code == LoginResultCode.OK)
                 {
-                    ErrorHandler.ProcessError(new Exception(), "获取令牌成功，但是尝试登入失败");
-                }
-                else
-                {
+                    if (await AuthService.Login(obj.Token) == false)
+                    {
+                        ErrorHandler.ProcessError(new Exception(), "获取令牌成功，但是尝试登入失败");
+                    }
+                    else
+                    {
 
+                    }
                 }
             }
-        }
-        catch (Exception exc)
-        {
+            catch (Exception exc)
+            {
 
+            }
         }
+
+        private Task OnClickLeft()
+        {
+            //处理回调
+            if (string.IsNullOrWhiteSpace(ReturnUrl) == false)
+            {
+                ReturnUrl = ToolHelper.Base64EncodeUrl(ToolHelper.Base64DecodeUrl(ReturnUrl).Replace("www.cngal.org", "app.cngal.org"));
+            }
+            //Url = "/account/login/" + ReturnUrl;
+            NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ToolHelper.Base64DecodeUrl(ReturnUrl));
+            return Task.CompletedTask;
+        }
+        private async Task OnClickRight()
+        {
+            try
+            {
+                await JS.InvokeAsync<string>("addfavorite");
+
+            }
+            catch
+            {
+
+            }
+        }
+
     }
-
-    private Task OnClickLeft()
-    {
-        //处理回调
-        if (string.IsNullOrWhiteSpace(ReturnUrl) == false)
-        {
-            ReturnUrl = ToolHelper.Base64EncodeUrl(ToolHelper.Base64DecodeUrl(ReturnUrl).Replace("www.cngal.org", "app.cngal.org"));
-        }
-        //Url = "/account/login/" + ReturnUrl;
-        NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ToolHelper.Base64DecodeUrl(ReturnUrl));
-        return Task.CompletedTask;
-    }
-    private async Task OnClickRight()
-    {
-        try
-        {
-            await JS.InvokeAsync<string>("addfavorite");
-
-        }
-        catch
-        {
-
-        }
-    }
-
-}

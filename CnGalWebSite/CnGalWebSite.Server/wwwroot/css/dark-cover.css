@@ -666,3 +666,9 @@ input.form-control{
 .bg-main {
     background-color: var(--active-color);
 }
+.nav-link{
+    color:white;
+}
+.nav-link:hover{
+    color:gray;
+}

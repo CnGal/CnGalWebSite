@@ -12,7 +12,7 @@
 @inject IServiceProvider Provider
 
 
-<TitleTip></TitleTip>
+<TitleTip Title="修改绑定邮箱"></TitleTip>
 <CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
 
 @if (isReady == false)
@@ -22,8 +22,9 @@
 else
 {
     if (state == "输入新邮箱")
-    {<div class="rounded   rounded shadow  bg-opacity  p-3">
-            <h2 class="mb-4 text-center">请输入新邮箱</h2>
+    {
+        <div class="p-3">
+            <h1 class="h4 mb-4 text-center">请输入新邮箱</h1>
             <div  class="form-group  mb-0">
 
                 <div class="row">
@@ -31,7 +32,7 @@ else
                         <BootstrapInput @bind-Value="ModelBefore.NewEmail" type="email" ShowLabel="true"/>
                     </div>
                     <div class="form-group col-12">
-                        <Button Color="Color.Primary" IsAsync="true" style="width:100%" OnClick="ConfirmEmailBefore">确定</Button>
+                        <Button Color="Color.Dark" IsAsync="true" style="width:100%" OnClick="ConfirmEmailBefore">确定</Button>
                     </div>
 
                 </div>
@@ -40,8 +41,8 @@ else
     }
     else if (state == "验证新邮箱")
     {
-        <div class="rounded   rounded shadow  bg-opacity  p-3">
-            <h2 class="mb-4 text-center">验证电子邮箱</h2>
+        <div class="p-3">
+            <h1 class="h4 mb-4 text-center">验证电子邮箱</h1>
             <h5 class="mb-4">我们已经向<strong>@(ModelBefore.NewEmail)</strong>发送了一封验证邮件，请在下方填写其中的验证码。如果没有在收件箱找到邮件，请检查垃圾箱。</h5>
             <div   class="form-group mt-4  mb-0">
 
@@ -57,7 +58,7 @@ else
                         <PostVerificationCodeTip Email="@ModelBefore.NewEmail"></PostVerificationCodeTip>
                     </div>
                     <div class="form-group col-12">
-                        <Button Color="Color.Primary"  IsAsync="true" style="width:100%" OnClick="ConfirmEmailAfter">验证</Button>
+                        <Button Color="Color.Dark"  IsAsync="true" style="width:100%" OnClick="ConfirmEmailAfter">验证</Button>
                     </div>
 
                 </div>

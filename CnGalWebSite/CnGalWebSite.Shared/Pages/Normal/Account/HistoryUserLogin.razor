@@ -10,15 +10,15 @@
 @inject IDataCacheService _dataCacheService
 
 
-<TitleTip></TitleTip>
+<TitleTip Title="历史用户登入"></TitleTip>
 <CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
 
 
-<div class="rounded   rounded shadow  bg-opacity  p-3">
+<div class="p-3">
 
     @if (IsConfirmed == false)
     {
-        <h3 class="mb-3 text-center">验证身份</h3>
+        <h1 class="h4 mb-3 text-center">验证身份</h1>
         <p class="mb-4">十分抱歉呐，网站翻新后我们需要重新验证你的身份哦，不过没关系，我们已经向你的邮箱发送了一封验证邮件，请在下方填写其中的验证码。如果没有在收件箱找到邮件，还请检查一下垃圾箱</p>
         <div  class="form-group col-12 mt-4  mb-0">
 
@@ -30,7 +30,7 @@
                     <PostVerificationCodeTip UserName="@_dataCacheService.UserName" IsFrist="false"></PostVerificationCodeTip>
                 </div>
                 <div class="form-group col-12">
-                    <Button Color="Color.Primary" IsAsync="true" style="width:100%" OnClick="ConfirmNumToken">验证</Button>
+                    <Button Color="Color.Dark" IsAsync="true" style="width:100%" OnClick="ConfirmNumToken">验证</Button>
                 </div>
 
             </div>
@@ -38,7 +38,7 @@
     }
     else
     {
-        <h3 class="mb-3 text-center">设置密码</h3>
+        <h1 class="h4 mb-3 text-center">设置密码</h1>
         <p class="mb-4">身份验证通过了，恭喜恭喜，为了确保阁下的安全，还请重新设置密码</p>
         <div  class="form-group col-12  mb-0">
 
@@ -50,7 +50,7 @@
                     <BootstrapInput @bind-Value="Model.ConfirmPassword" type="password" ShowLabel="true"/>
                 </div>
                 <div class="form-group col-12">
-                    <Button Color="Color.Primary"  IsAsync="true" style="width:100%" OnClick="ConfirmPassword">确定</Button>
+                    <Button Color="Color.Dark"  IsAsync="true" style="width:100%" OnClick="ConfirmPassword">确定</Button>
                 </div>
 
             </div>

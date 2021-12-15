@@ -10,13 +10,13 @@
 @inject IDataCacheService _dataCacheService
 
 
-<TitleTip></TitleTip>
+<TitleTip Title="注册"></TitleTip>
 <CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
 
 
 
-<div class="rounded  rounded shadow  bg-opacity  p-3">
-    <h2 class="mb-4 text-center">注册新用户</h2>
+<div class="p-3">
+    <h1 class="h4 mb-4 text-center">注册新用户</h1>
     <div  class="form-group col-12 mt-4  mb-0">
 
         <div class="row">
@@ -33,13 +33,13 @@
                 <BootstrapInput @bind-Value="Model.ConfirmPassword" type="password" ShowLabel="true"/>
             </div>
             <div class="form-group col-12">
-                <a href="/articles/index/225" class="link-primary">CnGal资料站隐私协议</a>
+                <a href="/articles/index/225">CnGal资料站隐私协议</a>
             </div>
             <div class="form-group col-6">
-                <Button Color="Color.Primary"  IsOutline="true" style="width:100%" @onclick="@(()=>OnLogin())">登录</Button>
+                <Button Color="Color.Dark"  IsOutline="true" style="width:100%" @onclick="@(()=>OnLogin())">登录</Button>
             </div>
             <div class="form-group col-6">
-                <Button Color="Color.Primary"  IsAsync="true" style="width:100%" OnClick="HandleRegistration">注册</Button>
+                <Button Color="Color.Dark"  IsAsync="true" style="width:100%" OnClick="HandleRegistration">注册</Button>
             </div>
         </div>
     </div>
