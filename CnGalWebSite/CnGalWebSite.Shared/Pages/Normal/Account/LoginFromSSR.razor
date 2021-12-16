@@ -24,7 +24,7 @@
         background-color: rgba(255,255,255,.8);
     }
 </style>
-<!-- <div class="p-3">
+<div class="p-3">
     <div>
 
         <h1 class="h4 text-center">你已进入APP模式</h1>
@@ -33,88 +33,78 @@
             APP模式将会带来更加稳定的编辑体验，你可以将 app.cngal.org 加入收藏夹，便于再次进入~
         </div>
         <div class="mt-3 text-center">
-            <Button Icon="fa fa-star" Text="添加收藏夹" @onclick="OnClickRight" Color="Color.Dark" IsOutline="true" class="ms-2"></Button>
-            <Button Icon="fa fa-check" Text="我知道了" @onclick="OnClickLeft" Color="Color.Dark"></Button>
+            <Button Icon="fa fa-star" Text="添加收藏夹" @onclick="OnClickRight" Color="Color.Dark" IsOutline="true" class="ms-2" Size="Size.Small"></Button>
+            <Button Icon="fa fa-check" Text="我知道了" @onclick="OnClickLeft" Color="Color.Dark"  Size="Size.Small" class="ms-3"></Button>
         </div>
     </div>
 </div>
--->
-<div class="p-3 text-center">
-    <h1 class="h4 ">正在载入APP模式</h1>
-
-    <div>
-        正在下载相关资源，APP模式将会带来更加稳定的编辑体验，还请耐心等待哦
-    </div>
-    <div style="font-size:30px;" class="mt-3">
-        <i class="fa fa-spinner fa-spin"></i>
-    </div>
-</div>
-
-    @code {
-        [Parameter]
-        [SupplyParameterFromQuery]
-        public string ReturnUrl { get; set; }
-
-        [Parameter]
-        [SupplyParameterFromQuery]
-        public string Code { get; set; }
 
 
-        public string Url { get; set; }
-        [Inject]
-        [NotNull]
-        private DialogService? DialogService { get; set; }
-        [CascadingParameter]
-        public ErrorHandler ErrorHandler { get; set; }
-        protected override async Task OnInitializedAsync()
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string ReturnUrl { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Code { get; set; }
+
+
+    public string Url { get; set; }
+    [Inject]
+    [NotNull]
+    private DialogService? DialogService { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        //上传
+        try
         {
-            //上传
-            try
+            var result = await Http.PostAsJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = Code });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            LoginResult obj = JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Code == LoginResultCode.OK)
             {
-                var result = await Http.PostAsJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = Code });
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                LoginResult obj = JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
-                //判断结果
-                if (obj.Code == LoginResultCode.OK)
+                if (await AuthService.Login(obj.Token) == false)
                 {
-                    if (await AuthService.Login(obj.Token) == false)
-                    {
-                        ErrorHandler.ProcessError(new Exception(), "获取令牌成功，但是尝试登入失败");
-                    }
-                    else
-                    {
+                    ErrorHandler.ProcessError(new Exception(), "获取令牌成功，但是尝试登入失败");
+                }
+                else
+                {
 
-                    }
                 }
             }
-            catch (Exception exc)
-            {
-
-            }
         }
-
-        private Task OnClickLeft()
+        catch (Exception exc)
         {
-            //处理回调
-            if (string.IsNullOrWhiteSpace(ReturnUrl) == false)
-            {
-                ReturnUrl = ToolHelper.Base64EncodeUrl(ToolHelper.Base64DecodeUrl(ReturnUrl).Replace("www.cngal.org", "app.cngal.org"));
-            }
-            //Url = "/account/login/" + ReturnUrl;
-            NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ToolHelper.Base64DecodeUrl(ReturnUrl));
-            return Task.CompletedTask;
+
         }
-        private async Task OnClickRight()
-        {
-            try
-            {
-                await JS.InvokeAsync<string>("addfavorite");
-
-            }
-            catch
-            {
-
-            }
-        }
-
     }
+
+    private Task OnClickLeft()
+    {
+        //处理回调
+        if (string.IsNullOrWhiteSpace(ReturnUrl) == false)
+        {
+            ReturnUrl = ToolHelper.Base64EncodeUrl(ToolHelper.Base64DecodeUrl(ReturnUrl).Replace("www.cngal.org", "app.cngal.org"));
+        }
+        //Url = "/account/login/" + ReturnUrl;
+        NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ToolHelper.Base64DecodeUrl(ReturnUrl));
+        return Task.CompletedTask;
+    }
+    private async Task OnClickRight()
+    {
+        try
+        {
+            await JS.InvokeAsync<string>("addfavorite");
+
+        }
+        catch
+        {
+
+        }
+    }
+
+}
