@@ -109,9 +109,9 @@ else
                                     @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false)
                                     {
 
-                                        <div class="alert alert-primary  rounded shadow  rounded" role="alert">
-                                            作者： <strong> @Model.OriginalAuthor</strong> &nbsp; 原文发表在<a href="@Model.OriginalLink" class="alert-link" style="word-wrap: break-word;word-break:break-all;" target="_blank">@Model.OriginalLink</a>
-                                        </div>
+                                <div class="alert alert-primary  rounded shadow  rounded" role="alert">
+                                    作者： <strong> @Model.OriginalAuthor</strong> &nbsp; 原文发表在： <a href="@Model.OriginalLink" class="alert-link" style="word-wrap: break-word;word-break:break-all;" target="_blank">@Model.OriginalLink</a>
+                                </div>
                                     }
 
                                     if (Model.MainPageState == EditState.Preview || Model.MainState == EditState.Preview || Model.RelevancesState == EditState.Preview)

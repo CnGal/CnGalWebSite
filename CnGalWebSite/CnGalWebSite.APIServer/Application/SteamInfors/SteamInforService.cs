@@ -32,7 +32,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
         public async Task UpdateAllGameSteamInfor()
         {
-            var steams = await _steamInforRepository.GetAll().Select(s => s.SteamId).ToListAsync();
+            var steams = await _steamInforRepository.GetAll().AsNoTracking().OrderByDescending(s=>s.PriceNow).ThenByDescending(s=>s.EntryId).Select(s => s.SteamId).ToListAsync();
 
             foreach (var item in steams)
             {

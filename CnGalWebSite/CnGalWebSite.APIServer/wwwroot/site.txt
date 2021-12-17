@@ -122,9 +122,6 @@ https://www.cngal.org/entries/index/121
 https://www.cngal.org/entries/index/122
 https://www.cngal.org/entries/index/123
 https://www.cngal.org/entries/index/124
-https://www.cngal.org/entries/index/125
-https://www.cngal.org/entries/index/126
-https://www.cngal.org/entries/index/127
 https://www.cngal.org/entries/index/128
 https://www.cngal.org/entries/index/129
 https://www.cngal.org/entries/index/130
@@ -3033,7 +3030,6 @@ https://www.cngal.org/entries/index/3038
 https://www.cngal.org/entries/index/3039
 https://www.cngal.org/entries/index/3040
 https://www.cngal.org/entries/index/3041
-https://www.cngal.org/entries/index/3042
 https://www.cngal.org/entries/index/3043
 https://www.cngal.org/entries/index/3044
 https://www.cngal.org/entries/index/3045
@@ -3287,6 +3283,17 @@ https://www.cngal.org/entries/index/3299
 https://www.cngal.org/entries/index/3300
 https://www.cngal.org/entries/index/3301
 https://www.cngal.org/entries/index/3302
+https://www.cngal.org/entries/index/3303
+https://www.cngal.org/entries/index/3304
+https://www.cngal.org/entries/index/3305
+https://www.cngal.org/entries/index/3306
+https://www.cngal.org/entries/index/3307
+https://www.cngal.org/entries/index/3308
+https://www.cngal.org/entries/index/3309
+https://www.cngal.org/entries/index/3310
+https://www.cngal.org/entries/index/3311
+https://www.cngal.org/entries/index/3312
+https://www.cngal.org/entries/index/3313
 https://www.cngal.org/articles/index/151
 https://www.cngal.org/articles/index/149
 https://www.cngal.org/articles/index/28
@@ -3420,6 +3427,8 @@ https://www.cngal.org/articles/index/24
 https://www.cngal.org/articles/index/25
 https://www.cngal.org/articles/index/26
 https://www.cngal.org/articles/index/27
+https://www.cngal.org/articles/index/257
+https://www.cngal.org/articles/index/256
 https://www.cngal.org/articles/index/225
 https://www.cngal.org/articles/index/23
 https://www.cngal.org/articles/index/79
