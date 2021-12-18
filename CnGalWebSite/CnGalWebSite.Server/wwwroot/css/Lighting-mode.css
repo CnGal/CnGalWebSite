@@ -1,5 +1,5 @@
 ﻿ .steam-infor-price {
-    width: 50px;
+    width: 60px;
     border-radius: 4px;
     text-align-last: center;
     border: 1px solid  var(--main-color);
@@ -14,7 +14,7 @@
 }
 
 .steam-infor-cut {
-    width: 50px;
+    width: 60px;
     border-radius: 4px;
     background-color:   var(--main-color);
     text-align-last: center;

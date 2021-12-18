@@ -47,6 +47,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var steamInfor = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
             if (steamInfor != null && steamInfor.PriceNow != -1)
             {
+               
                 return steamInfor;
             }
             steamInfor = await _steamInforService.UpdateSteamInfor(steamId, entryId);

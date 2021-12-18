@@ -23,10 +23,10 @@
                         <div class="me-1">
                             &nbsp;&nbsp;&nbsp;&nbsp;当前
                         </div>
-                        <div class="steam-infor-price me-1">@SteamInfor.PriceNowString</div>
-                        <div class="steam-infor-cut me-1">@(SteamInfor.PriceNow==0?"FREE":( SteamInfor.CutNow==0?"SALE": "-"+SteamInfor.CutNow+"%"))</div>
+                        <div class="steam-infor-price me-1 text-center">@SteamInfor.PriceNowString</div>
+                        <div class="steam-infor-cut me-1 text-center">@(SteamInfor.PriceNow==0?"FREE":( SteamInfor.CutNow==0?"SALE": "-"+SteamInfor.CutNow+"%"))</div>
                     </div>
-                    @if (SteamInfor.PriceLowest != 0)
+                    @if (SteamInfor.CutLowest > 0)
                     {
                         <div class="">
                             <div class="d-flex steam-infor-row">
@@ -62,7 +62,7 @@
                             &nbsp;&nbsp;&nbsp;&nbsp;当前
                         </div>
                         <div class="steam-infor-price me-1 text-center">¥ 0</div>
-                        <div class="steam-infor-cut me-1 text-center">未发售</div>
+                        <div class="steam-infor-cut me-1 text-center">@(SteamInfor.PriceNow==-1? "未发售" : "已下架")</div>
                     </div>
                     @if (!IsHiddenLink)
                     {
@@ -94,7 +94,7 @@
                                 <div class="steam-infor-cut me-1 text-center">@(SteamInfor.PriceNow==0?"FREE":( SteamInfor.CutNow==0?"SALE": "-"+SteamInfor.CutNow+"%"))</div>
                             </div>
                         </div>
-                        @if (SteamInfor.PriceLowest != 0)
+                        @if (SteamInfor.CutLowest > 0)
                         {
                             <div class="mt-2">
                                 <div class="d-flex steam-infor-row">
@@ -114,7 +114,7 @@
                         <a class="text-center steam-font-color" target="_blank" href="@("https://store.steampowered.com/app/" + SteamId)">@("https://store.steampowered.com/app/" + SteamId)</a>
                     </div>
                 }
-                }
+            }
             else
             {
                 <div class="row m-0 p-0 steam-infor-layout">
@@ -131,7 +131,7 @@
                                     &nbsp;&nbsp;&nbsp;&nbsp;当前
                                 </div>
                                 <div class="steam-infor-price me-1 text-center">¥ 0</div>
-                                <div class="steam-infor-cut me-1 text-center">未发售</div>
+                                <div class="steam-infor-cut me-1 text-center">@(SteamInfor.PriceNow==-1? "未发售" : "已下架")</div>
                             </div>
                         </div>
                     </div>

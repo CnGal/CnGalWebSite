@@ -5,7 +5,7 @@
 
 <BootstrapBlazorRoot>
     <ErrorHandler @ref="errorHandler" >
-        <ErrorLogger  ShowToast="false"  >
+        <ErrorLogger  ShowToast="false"  OnErrorHandleAsync="OnErrorHandleAsync">
             @if (_dataCacheService.IsApp == false)
             {
                 <CascadingAuthenticationState>
@@ -62,9 +62,17 @@
 
 @code{
     ErrorHandler errorHandler;
-    public void OnErrorHandleAsync(ILogger logger, Exception ex)
+    public Task OnErrorHandleAsync(ILogger logger, Exception ex)
     {
-        errorHandler.ProcessError(ex, "发生未经捕获的异常", "代码里有Bug");
+        if(ex is OutOfMemoryException)
+        {
+            throw ex;
+        }
+        else
+        {
+            errorHandler.ProcessError(ex, "发生未经捕获的异常", "代码里有Bug");
+            return Task.CompletedTask;
+        }
     }
 
 }

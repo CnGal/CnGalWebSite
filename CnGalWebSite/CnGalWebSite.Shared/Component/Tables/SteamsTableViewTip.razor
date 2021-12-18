@@ -25,12 +25,12 @@ else
             <TableColumn @bind-Field="@context.EntryId" Filterable="true" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="100" AllowTextWrap="true" Fixed="true" />
             <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
             <TableColumn @bind-Field="@context.SteamId" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.OriginalPrice" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.PriceNow" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.CutNow" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.PriceLowest" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="170" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.LowestTime" Filterable="true" Sortable="true" FormatString="yyyy-MM-dd" Width="170" AllowTextWrap="true" />
+            <TableColumn @bind-Field="@context.OriginalPrice" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true"  Formatter="PriceFormatter" />
+            <TableColumn @bind-Field="@context.PriceNow" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true"  Formatter="PriceFormatter"/>
+            <TableColumn @bind-Field="@context.CutNow" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true"  Formatter="CutFormatter"/>
+            <TableColumn @bind-Field="@context.PriceLowest" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true"  Formatter="PriceLowestFormatter"/>
+            <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="170" AllowTextWrap="true"   Formatter="CutLowestFormatter"/>
+            <TableColumn @bind-Field="@context.LowestTime" Filterable="true" Sortable="true"  Width="170" AllowTextWrap="true"  Formatter="LowestTimeFormatter"/>
         </TableColumns>
         <RowButtonTemplate>
             <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickCallback="@(() =>OnLook(context.SteamId))" />
@@ -84,6 +84,79 @@ else
             ErrorHandler.ProcessError(ex, "无法获取游戏价格信息汇总表格");
         }
     }
+
+    public async Task< string> PriceFormatter(object price)
+    {
+        string res= ((double)(int)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)price).Value/100).ToString("0.00");
+        if(res=="-0.01")
+        {
+            res = "未发售";
+        }
+        else if(res == "-0.02")
+        {
+            res = "已下架";
+        }
+        return res;
+    }
+
+    public async Task<string> PriceLowestFormatter(object price)
+    {
+        string res = ((double)(int)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)price).Value / 100).ToString("0.00");
+        if (res == "-0.01")
+        {
+            res = "未记录";
+        }
+        else if (res == "-0.02")
+        {
+            res = "已下架";
+        }
+
+        return res;
+    }
+
+    public async Task<string> CutLowestFormatter(object cut)
+    {
+        string res = ((int)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)cut).Value).ToString();
+        if (res == "-1")
+        {
+            res = "未记录";
+        }
+        else if (res == "-2")
+        {
+            res = "已下架";
+        }
+
+        return res;
+    }
+
+    public async Task<string> CutFormatter(object cut)
+    {
+        string res = ((int)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)cut).Value).ToString();
+        if (res == "-1")
+        {
+            res = "未发售";
+        }
+        else if (res == "-2")
+        {
+            res = "已下架";
+        }
+
+        return res;
+    }
+
+    public async Task<string> LowestTimeFormatter(object cut)
+    {
+        DateTime res = (DateTime)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)cut).Value;
+        if (res==DateTime.MinValue||res.Year==1970)
+        {
+            return  "未记录";
+        }
+        else
+        {
+            return res.ToString("yyyy-MM-dd");
+        }
+    }
+
     private Task<QueryData<SteamInforTableModel>> OnQuerySteamAsync(QueryPageOptions options)
     {
         IEnumerable<SteamInforTableModel> items = ModelSteam.SteamInfors;
