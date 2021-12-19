@@ -680,7 +680,7 @@ namespace CnGalWebSite.APIServer.Application.Users
                 .ToListAsync();
 
             model.EditCount = examines.Count;
-            model.LastEditTime = examines.Max(s => s.ApplyTime);
+            model.LastEditTime = examines.Count == 0 ? null : examines.Max(s => s.ApplyTime);
 
             //计算成功率和失败率和待审核率
             model.PassedExamineCount = examines.Count(s => s.IsPassed == true);
