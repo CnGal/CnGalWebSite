@@ -30,6 +30,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CnGalWebSite.APIServer.Application.ElasticSearches;
+using CnGalWebSite.APIServer.Application.News;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -75,6 +76,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IElasticsearchBaseService<Entry> _entryElasticsearchBaseService;
         private readonly IElasticsearchBaseService<Article> _articleElasticsearchBaseService;
         private readonly IElasticsearchService _elasticsearchService;
+        private readonly INewsService _newsService;
+        private readonly IRepository<GameNews, long> _gameNewsRepository;
+        private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
+
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
@@ -82,9 +87,10 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IElasticsearchService elasticsearchService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IElasticsearchBaseService<Article> articleElasticsearchBaseService,
         UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IElasticsearchBaseService<Entry> entryElasticsearchBaseService,
-        IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository,
+        IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
-        IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService)
+        IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
+        IRepository<WeeklyNews, long> weeklyNewsRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -123,6 +129,9 @@ namespace CnGalWebSite.APIServer.Controllers
             _entryElasticsearchBaseService = entryElasticsearchBaseService;
             _articleElasticsearchBaseService = articleElasticsearchBaseService;
             _elasticsearchService = elasticsearchService;
+            _newsService = newsService;
+            _gameNewsRepository = gameNewsRepository;
+            _weeklyNewsRepository = weeklyNewsRepository;
         }
 
         /// <summary>
@@ -509,6 +518,37 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPeripheryAloneModel>>> GetPeripheryListAsync(PeripheriesPagesInfor input)
         {
             var dtos = await _peripheryService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<ListGameNewsInforViewModel>> ListGameNewsAsync()
+        {
+            var model = new ListGameNewsInforViewModel
+            {
+                All = await _gameNewsRepository.LongCountAsync() + await _weeklyNewsRepository.LongCountAsync(),
+                GameNews = await _gameNewsRepository.LongCountAsync(),
+                PublishedNews = await _gameNewsRepository.LongCountAsync(s => s.State == GameNewsState.Publish),
+                DeletedNews = await _gameNewsRepository.LongCountAsync(s => s.State == GameNewsState.Ignore),
+                WeelyNews = await _weeklyNewsRepository.LongCountAsync()
+            };
+
+            return model;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListGameNewAloneModel>>> GetGameNewListAsync(GameNewsPagesInfor input)
+        {
+            var dtos = await _newsService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListWeeklyNewAloneModel>>> GetWeeklyNewListAsync(WeeklyNewsPagesInfor input)
+        {
+            var dtos = await _newsService.GetPaginatedResult(input.Options, input.SearchModel);
 
             return dtos;
         }
@@ -1450,14 +1490,14 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var tags = await _tagRepository.GetAllListAsync();
-                foreach (var tag in tags)
+                await _weeklyNewsRepository.DeleteAsync(s => true);
+                var news = await _gameNewsRepository.GetAll().Include(s=>s.RSS).ToListAsync();
+                foreach (var item in news)
                 {
-                    if ((DateTime.Now.ToCstTime() - tag.LastEditTime).TotalDays > 365)
-                    {
-                        tag.LastEditTime = DateTime.Now.ToCstTime().AddDays(-70);
-                        await _tagRepository.UpdateAsync(tag);
-                    }
+                    item.Title = "已删除";
+                    item.PublishTime = DateTime.MinValue;
+                    item.RSS.PublishTime = DateTime.MinValue;
+                    await _gameNewsRepository.UpdateAsync(item);
                 }
                 return new Result { Successful = true };
             }

@@ -1,0 +1,93 @@
+﻿@inject IAuthService AuthService
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<TitleTip></TitleTip>
+
+<div class="">
+        <Table TItem="ListWeeklyNewAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
+               ShowExtendButtons="true" ExtendButtonColumnWidth="120" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+               ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+            <TableToolbarTemplate>
+
+            </TableToolbarTemplate>
+            <TableColumns>
+                <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
+                <TableColumn @bind-Field="@context.State" Searchable="true" AllowTextWrap="true" Width="120" />
+                <TableColumn @bind-Field="@context.Title" Searchable="true" AllowTextWrap="true" Width="200" />
+                <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" AllowTextWrap="true" Width="200" />
+
+                <TableColumn @bind-Field="@context.CreateTime" Sortable="true" AllowTextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
+                <TableColumn @bind-Field="@context.PublishTime" Sortable="true" AllowTextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
+            </TableColumns>
+            <RowButtonTemplate>
+                <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickCallback="@(() => EditArticle(context.Id))" />
+                @if (context.ArticleId != 0)
+                {
+                    <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickCallback="@(() => EditWeeklyNews(context.ArticleId ))" />
+
+                }
+            </RowButtonTemplate>
+        </Table>
+</div>
+@code {
+    [NotNull]
+    private Table<ListWeeklyNewAloneModel>? TableRows { get; set; }
+    private List<ListWeeklyNewAloneModel> SelectedRows { get; set; } = new();
+
+    public ListWeeklyNewsViewModel ListModel { get; set; } = new ListWeeklyNewsViewModel { WeeklyNews = new List<ListWeeklyNewAloneModel>() };
+
+    private ListWeeklyNewAloneModel SearchModelUser { get; set; } = new ListWeeklyNewAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取周报数据");
+        }
+
+    }
+
+    private async Task<QueryData<ListWeeklyNewAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<WeeklyNewsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetWeeklyNewList", new WeeklyNewsPagesInfor { SearchModel = SearchModelUser, Options = options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListWeeklyNewAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取周报列表");
+            return new QueryData<ListWeeklyNewAloneModel>();
+        }
+    }
+
+    private Task EditArticle(long id)
+    {
+        NavigationManager.NavigateTo(Provider, "/articles/editarticle/" + id, "编辑文章", "fa fa-pencil");
+        return Task.CompletedTask;
+    }
+
+    private async Task EditWeeklyNews(long id)
+    {
+
+
+    }
+
+}

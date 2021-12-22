@@ -40,25 +40,25 @@ namespace CnGalWebSite.DataModel.Model
         public string PassedAdminName { get; set; }
 
         public string ApplicationUserId { get; set; }
-        public ApplicationUser? ApplicationUser { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
 
         public int? EntryId { get; set; }
-        public Entry? Entry { get; set; }
+        public Entry Entry { get; set; }
 
         public int? TagId { get; set; }
-        public Tag? Tag { get; set; }
+        public Tag Tag { get; set; }
 
         public long? ArticleId { get; set; }
-        public Article? Article { get; set; }
+        public Article Article { get; set; }
 
         public long? CommentId { get; set; }
-        public Comment? Comment { get; set; }
+        public Comment Comment { get; set; }
 
         public int? DisambigId { get; set; }
-        public Disambig? Disambig { get; set; }
+        public Disambig Disambig { get; set; }
 
         public long? PeripheryId { get; set; }
-        public Periphery? Periphery { get; set; }
+        public Periphery Periphery { get; set; }
         /// <summary>
         /// 前置审核Id
         /// </summary>

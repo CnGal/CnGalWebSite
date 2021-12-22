@@ -58,6 +58,9 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<PeripheryRelevanceUser> PeripheryRelevanceUsers { get; set; }
         public DbSet<PeripheryRelevanceEntry> PeripheryRelevanceEntries { get; set; }
         public DbSet<PeripheryRelation> PeripheryRelations { get; set; }
+        public DbSet<GameNews> GameNewses { get; set; }
+        public DbSet<WeeklyNews> WeeklyNewses { get; set; }
+        public DbSet<WeiboUserInfor> WeiboUserInfors { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

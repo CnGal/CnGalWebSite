@@ -54,7 +54,8 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         public async Task<SteamInfor> UpdateSteamInfor(int steamId, int entryId)
         {
             //获取信息
-            var client = _clientFactory.CreateClient();
+            using var client = _clientFactory.CreateClient();
+
             var jsonContent = await client.GetStringAsync("https://api.isthereanydeal.com/v01/game/overview/?key=" + _configuration["IsthereanydealAPIToken"] + "&region=cn&country=CN&shop=steam&ids=app%2F" + steamId + "&allowed=steam");
             var thirdResult = JObject.Parse(jsonContent);
             var steamNowJson = new SteamNowJson
@@ -248,7 +249,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             //获取信息
             try
             {
-                var client = _clientFactory.CreateClient();
+                using var client = _clientFactory.CreateClient();
                 var jsonContent = await client.GetStringAsync("http://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + user.SteamId);
                 var obj = JObject.Parse(jsonContent);
                 var steamGames = obj["response"].ToObject<UserSteamResponseJson>();
