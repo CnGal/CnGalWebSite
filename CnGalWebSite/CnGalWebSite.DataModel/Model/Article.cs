@@ -122,12 +122,12 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 相关性列表
         /// </summary>
-        public ICollection<ArticleRelevance>? Relevances { get; set; }
+        public ICollection<ArticleRelevance> Relevances { get; set; }=new List<ArticleRelevance>();
 
         /// <summary>
         /// 审核记录 也是编辑记录
         /// </summary>
-        public ICollection<Examine>? Examines { get; set; }
+        public ICollection<Examine> Examines { get; set; }
     }
     public enum ArticleType
     {

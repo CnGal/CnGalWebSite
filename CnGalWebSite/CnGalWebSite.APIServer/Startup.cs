@@ -27,6 +27,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using CnGalWebSite.APIServer.Application.ElasticSearches;
+using CnGalWebSite.APIServer.Application.News;
 
 namespace CnGalWebSite.APIServer
 {
@@ -59,6 +60,7 @@ namespace CnGalWebSite.APIServer
             services.AddControllersWithViews(a => a.EnableEndpointRouting = false);
             //依赖注入辅助类
             services.AddScoped<IAppHelper, AppHelper>();
+            services.AddScoped<IRSSHelper, RSSHelper>();
             //添加HTTP请求
             services.AddHttpClient();
             //添加ElasticSearch服务

@@ -21,9 +21,9 @@ namespace CnGalWebSite.DataModel.Helper
         //https://v3.cngal.org/
 
 
-        //public const string WebApiPath = "http://localhost:45160/";
+        public const string WebApiPath = "http://localhost:45160/";
         //public const string WebApiPath = "http://172.17.0.1:2001/";
-        public const string WebApiPath = "https://www.cngal.org/";
+        //public const string WebApiPath = "https://www.cngal.org/";
 
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";
 
@@ -730,6 +730,21 @@ namespace CnGalWebSite.DataModel.Helper
 
             return -1;
         }
+
+        /// <summary>
+        /// 是否在同一个星期
+        /// </summary>
+        /// <param name="day1"></param>
+        /// <param name="day2"></param>
+        /// <returns></returns>
+        public static bool IsInSameWeek(this DateTime day1, DateTime day2)
+        {
+            DateTime temp1 = day1.AddDays(-(int)day1.DayOfWeek).Date;
+            DateTime temp2 = day2.AddDays(-(int)day2.DayOfWeek).Date;
+
+            return temp1 == temp2;
+        }
+
     }
 
 

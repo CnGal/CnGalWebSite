@@ -1,0 +1,162 @@
+﻿@inject IAuthService AuthService
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<TitleTip></TitleTip>
+
+<div>
+        <Table TItem="ListGameNewAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
+               ShowExtendButtons="true" ExtendButtonColumnWidth="120" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+               ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+            <TableToolbarTemplate>
+                <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Success" Icon="fa fa-map-signs" Text="关注" OnClickCallback="OnUnIgnoredClick" IsAsync="true" />
+                <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnIgnoredClick" IsAsync="true" />
+
+            </TableToolbarTemplate>
+            <TableColumns>
+                <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="50" />
+                <TableColumn @bind-Field="@context.State" Searchable="true" AllowTextWrap="true" Width="50" />
+                <TableColumn @bind-Field="@context.Author" Searchable="true" AllowTextWrap="true" Sortable="true" Width="120" />
+                <TableColumn @bind-Field="@context.Title" Searchable="true" AllowTextWrap="true" Width="200" />
+                <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" AllowTextWrap="true" Width="200" />
+
+                <TableColumn @bind-Field="@context.PublishTime" Sortable="true" AllowTextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
+            </TableColumns>
+            <RowButtonTemplate>
+                <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickCallback="@(() => EditArticle(context.Id))" />
+                @if (context.ArticleId != 0)
+                {
+                    <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickCallback="@(() => EditGameNews(context.ArticleId ))" />
+
+                }
+                @if (context.State == GameNewsState.Ignore)
+                {
+                    <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="关注" IsAsync="true" OnClickCallback="@(() => OnRowEditIsIgnoredClick(new long[] { context.Id }, false, true))" />
+                }
+                else
+                {
+                    <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickCallback="@(() => OnRowEditIsIgnoredClick(new long[] { context.Id }, true, true))" />
+                }
+            </RowButtonTemplate>
+        </Table>
+</div>
+@code {
+    [NotNull]
+    private Table<ListGameNewAloneModel>? TableRows { get; set; }
+    private List<ListGameNewAloneModel> SelectedRows { get; set; } = new();
+
+    public ListGameNewsViewModel ListModel { get; set; } = new ListGameNewsViewModel { GameNews = new List<ListGameNewAloneModel>() };
+
+    private ListGameNewAloneModel SearchModelUser { get; set; } = new ListGameNewAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取动态数据");
+        }
+
+    }
+
+    private async Task<QueryData<ListGameNewAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<GameNewsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetGameNewList", new GameNewsPagesInfor { SearchModel = SearchModelUser, Options = options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListGameNewAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取动态列表");
+            return new QueryData<ListGameNewAloneModel>();
+        }
+    }
+
+    private Task EditArticle(long id)
+    {
+        NavigationManager.NavigateTo(Provider, "/articles/editarticle/" + id, "编辑文章", "fa fa-pencil");
+        return Task.CompletedTask;
+    }
+
+    private async Task EditGameNews(long id)
+    {
+
+
+    }
+
+    private async Task OnRowEditIsIgnoredClick(long[] ids, bool isIgnore, bool showMessage)
+    {
+        string tempString = isIgnore == true ? "隐藏动态" : "关注动态";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<IgnoreGameNewsModel>(ToolHelper.WebApiPath + "api/news/IgnoreGameNews", new IgnoreGameNewsModel { Ids = ids, IsIgnore = isIgnore });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "成功", tempString + "成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "失败");
+        }
+    }
+
+    private async Task OnIgnoredClick(IEnumerable<ListGameNewAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改动态状态", "请选中动态");
+            return;
+        }
+
+        await OnRowEditIsIgnoredClick(items.Select(s => s.Id).ToArray(), true, false);
+
+        await ToastService.Success("忽略成功", "忽略成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnUnIgnoredClick(IEnumerable<ListGameNewAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改动态状态", "请选中动态");
+            return;
+        }
+
+        await OnRowEditIsIgnoredClick(items.Select(s => s.Id).ToArray(), false, false);
+
+        await ToastService.Success("关注成功", "关注成功");
+        await TableRows.QueryAsync();
+    }
+
+
+}

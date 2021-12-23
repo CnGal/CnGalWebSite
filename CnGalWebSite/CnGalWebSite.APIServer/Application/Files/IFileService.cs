@@ -12,5 +12,7 @@ namespace CnGalWebSite.APIServer.Application.Files
 
         Task<QueryData<ListFileAloneModel>> GetPaginatedResult(QueryPageOptions options, ListFileAloneModel searchModel);
 
+        Task<string> SaveImageAsync(string url, string userId, double x = 0, double y = 0);
+
     }
 }

@@ -46,11 +46,12 @@
     <PackageReference Include="NETCore.MailKit" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.0" />
+    <PackageReference Include="ReverseMarkdown" Version="3.20.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.2" />
-    <PackageReference Include="TencentCloudSDK" Version="3.0.429" />
-    <PackageReference Include="Zack.EFCore.Batch.MySQL.Pomelo_NET6" Version="6.0.6" />
+    <PackageReference Include="TencentCloudSDK" Version="3.0.431" />
+    <PackageReference Include="Zack.EFCore.Batch.MySQL.Pomelo_NET6" Version="6.0.8" />
   </ItemGroup>
 
   <ItemGroup>
