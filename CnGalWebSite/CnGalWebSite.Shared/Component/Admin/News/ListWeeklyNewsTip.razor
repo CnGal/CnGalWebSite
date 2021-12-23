@@ -4,30 +4,30 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
-
+@inject DialogService DialogService
 <TitleTip></TitleTip>
 
 <div class="">
         <Table TItem="ListWeeklyNewAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
-               ShowExtendButtons="true" ExtendButtonColumnWidth="120" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+               ShowExtendButtons="true" ExtendButtonColumnWidth="130" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
                ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
             <TableToolbarTemplate>
 
             </TableToolbarTemplate>
             <TableColumns>
                 <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-                <TableColumn @bind-Field="@context.State" Searchable="true" AllowTextWrap="true" Width="120" />
-                <TableColumn @bind-Field="@context.Title" Searchable="true" AllowTextWrap="true" Width="200" />
+                <TableColumn @bind-Field="@context.State" Sortable="true" Searchable="true"  DefaultSort="true" DefaultSortOrder="SortOrder.Asc" AllowTextWrap="true" Width="50" />
+                <TableColumn @bind-Field="@context.Title" Searchable="true" AllowTextWrap="true" Width="220" />
                 <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" AllowTextWrap="true" Width="200" />
 
                 <TableColumn @bind-Field="@context.CreateTime" Sortable="true" AllowTextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
                 <TableColumn @bind-Field="@context.PublishTime" Sortable="true" AllowTextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
             </TableColumns>
             <RowButtonTemplate>
-                <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickCallback="@(() => EditArticle(context.Id))" />
+                <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickCallback="@(() => EditWeeklyNews(context.Id))" />
                 @if (context.ArticleId != 0)
                 {
-                    <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickCallback="@(() => EditWeeklyNews(context.ArticleId ))" />
+                    <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickCallback="@(() => EditArticle(context.ArticleId ))" />
 
                 }
             </RowButtonTemplate>
@@ -86,7 +86,19 @@
 
     private async Task EditWeeklyNews(long id)
     {
-
+        var option = new DialogOption()
+        {
+            Title = "编辑动态",
+            IsScrolling = true,
+            Size = Size.Large,
+            ShowCloseButton = false
+        };
+        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EditWeeklyNewsTip>(new Dictionary<string, object>
+        {
+            [nameof(EditWeeklyNewsTip.Id)] = id,
+            [nameof(EditWeeklyNewsTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => { await option.Dialog.Close(); await TableRows.QueryAsync(); }),
+        }).Render();
+        await DialogService.Show(option);
 
     }
 

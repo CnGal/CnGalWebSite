@@ -1467,12 +1467,28 @@ namespace CnGalWebSite.APIServer.Controllers
             var model = new List<NewsSummaryAloneViewModel>();
             foreach (var item in articles)
             {
+                var articleInfor = _appHelper.GetArticleInforTipViewModel(item);
+                articleInfor.LastEditTime = item.PubishTime;
+
                 var temp = new NewsSummaryAloneViewModel
                 {
-                    Articles = new List<ArticleInforTipViewModel> { _appHelper.GetArticleInforTipViewModel(item) }
+                    Articles = new List<ArticleInforTipViewModel> { articleInfor }
                 };
 
                 var infor = item.Relevances.FirstOrDefault(s => s.Modifier == "制作组");
+                if (infor == null)
+                {
+                    infor = item.Relevances.FirstOrDefault(s => s.Modifier == "STAFF");
+                    if (infor == null)
+                    {
+                        infor = item.Relevances.FirstOrDefault(s => s.Modifier == "游戏");
+                        if (infor == null)
+                        {
+                            infor = item.Relevances.FirstOrDefault(s => s.Modifier == "角色");
+                        }
+                    }
+                }
+
                 if (infor != null)
                 {
                     var group = await _entryRepository.FirstOrDefaultAsync(s => s.Name == infor.DisplayName);

@@ -3,32 +3,25 @@
 
 
 <div style="display:flex;">
-    <div  style="display: flex;align-items: center;">
-        <img class="shadow -sm" src="@Image" style="height: 50;width: 50px;border-radius: 50%;" />
+    <div  style="display: flex;align-items: center;" @onclick="@(() =>OnClickUser.InvokeAsync(Model))">
+        <img class="shadow -sm" src="@Model.Image" style="height: 50px;width: 50px;border-radius: 50%;" />
     </div>
-    <div  class="comment-tx-div" style=" flex: 1 1 auto; width: 0;">
+    <div  class="comment-tx-div" style=" flex: 1 1 auto; width: 0;" @onclick="@(()=>OnClickNews.InvokeAsync(Model))">
         <div  class="new-row-warp no-margin">
-            <div class="comment-tag me-2 bg-main" >@Type</div>
-            <div class="comment-username a-font-color me-2">@Title</div>
-            <div class="comment-username" style="color:gray">@Time.ToTimeFromNowString()</div>
+            <div class="comment-tag me-2 bg-main" >@Model.Type</div>
+            <div class="comment-username a-font-color me-2">@Model.Title</div>
+            <div class="comment-username" style="color:gray">@Model.Time.ToTimeFromNowString()</div>
         </div>
-        <div class="comment-time text-truncate" style="width: 100%;">@Text</div>
+        <div class="comment-time text-truncate" style="width: 100%;">@Model.Text</div>
     </div>
 </div>
 
 
 @code {
     [Parameter]
-    public string Image { get; set; }
+    public HomeNewsAloneViewModel Model { get; set; }
     [Parameter]
-    public string Title { get; set; }
+    public EventCallback<HomeNewsAloneViewModel> OnClickUser { get; set; }
     [Parameter]
-    public int GroupId { get; set; }
-
-    [Parameter]
-    public string Type { get; set; }
-    [Parameter]
-    public string Text { get; set; }
-    [Parameter]
-    public DateTime Time { get; set; }
+    public EventCallback<HomeNewsAloneViewModel> OnClickNews { get; set; }
 }

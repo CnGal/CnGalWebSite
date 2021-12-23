@@ -51,7 +51,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.2" />
     <PackageReference Include="TencentCloudSDK" Version="3.0.431" />
-    <PackageReference Include="Zack.EFCore.Batch.MySQL.Pomelo_NET6" Version="6.0.8" />
+    <PackageReference Include="Zack.EFCore.Batch.MySQL.Pomelo_NET6" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>

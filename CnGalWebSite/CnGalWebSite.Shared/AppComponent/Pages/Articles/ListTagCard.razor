@@ -1,13 +1,17 @@
-﻿<div class="mt-4 mb-4">
-    <i class="fa fa-tags fa-fw article-tag-text-color-large"></i>
-    @foreach (var item in Relevances)
-    {
-        @foreach (var temp in item.Informations)
+﻿@if (Relevances.Count > 0)
+{
+    <div class="mt-4 mb-4">
+        <i class="fa fa-tags fa-fw article-tag-text-color-large"></i>
+        @foreach (var item in Relevances)
         {
-            <a class="article-tag  article-tag-color-large" href="@temp.Link">@temp.DisplayName</a>
+            @foreach (var temp in item.Informations)
+            {
+                <a class="article-tag  article-tag-color-large" href="@temp.Link">@temp.DisplayName</a>
+            }
         }
-    }
-</div>
+    </div>
+
+}
 
 @code {
     [Parameter]

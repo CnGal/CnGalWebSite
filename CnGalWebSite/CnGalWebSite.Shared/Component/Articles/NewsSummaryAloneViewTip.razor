@@ -11,7 +11,7 @@
 
 
 
-                    <CollapseItem Text="@item.DisplayName" IsCollapsed="true">
+                    <CollapseItem Text="@(item.DisplayName+" - "+item.LastEditTime.ToTimeFromNowString())" IsCollapsed="true">
                         <NewsSummaryAloneTip Model="item"/>
                     </CollapseItem>
 

@@ -84,7 +84,7 @@ namespace CnGalWebSite.APIServer.Application.News
         {
             var model = new WeiboUserInfor
             {
-                Id = id
+                WeiboId = id
             };
 
             using var client = _clientFactory.CreateClient();
@@ -97,7 +97,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
             var item = (XmlElement)doc.SelectSingleNode("rss").SelectSingleNode("channel").SelectSingleNode("title");
 
-           model.WeiboName = item.InnerText;
+            model.WeiboName = item.InnerText.Replace("的微博", "");
 
             //获取头像
             item = (XmlElement)doc.SelectSingleNode("rss").SelectSingleNode("channel").SelectSingleNode("image").SelectSingleNode("url");

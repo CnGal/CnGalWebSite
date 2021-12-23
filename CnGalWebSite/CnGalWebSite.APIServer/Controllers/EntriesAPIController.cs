@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TencentCloud.Ame.V20190916.Models;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -812,12 +813,24 @@ namespace CnGalWebSite.APIServer.Controllers
                                     {
                                         Title = temp.DisplayName ?? temp.Name,
                                         BriefIntroduction = temp.BriefIntroduction,
-                                        Link = "/articles/index/" + temp.Id,
+                                        Link =temp.OriginalLink ?? ("/articles/index/" + temp.Id),
                                         HappenedTime = temp.RealNewsTime ?? temp.CreateTime,
                                         NewsType = temp.NewsType ?? "动态",
                                     };
 
                                     var infor1 = temp.Relevances.FirstOrDefault(s => s.Modifier == "制作组");
+                                    if (infor == null)
+{
+                                        infor1 = temp.Relevances.FirstOrDefault(s => s.Modifier == "STAFF");
+                                        if (infor == null)
+{
+                                            infor1 = temp.Relevances.FirstOrDefault(s => s.Modifier == "游戏");
+                                            if (infor == null)
+                                            {
+                                                infor1 = temp.Relevances.FirstOrDefault(s => s.Modifier == "角色");
+                                            }
+                                        }
+                                    }
                                     if (infor1 != null)
                                     {
                                         var group = await _entryRepository.FirstOrDefaultAsync(s => s.Name == infor1.DisplayName);

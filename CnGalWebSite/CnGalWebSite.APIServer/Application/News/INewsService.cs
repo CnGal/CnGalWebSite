@@ -17,11 +17,15 @@ namespace CnGalWebSite.APIServer.Application.News
 
         Task PublishWeeklyNews(WeeklyNews weeklyNews);
 
-        WeeklyNews ResetWeeklyNews(WeeklyNews weeklyNews);
+        Task<WeeklyNews> ResetWeeklyNews(WeeklyNews weeklyNews);
 
         Task AddWeiboUserInfor(string entryName, long weiboId);
 
         string GenerateRealWeeklyNewsMainPage(WeeklyNews weeklyNews);
+
+        Task<Article> GameNewsToArticle(GameNews gameNews);
+
+        Task<Article> WeeklyNewsToArticle(WeeklyNews weeklyNews);
 
         Task<QueryData<ListGameNewAloneModel>> GetPaginatedResult(QueryPageOptions options, ListGameNewAloneModel searchModel);
 

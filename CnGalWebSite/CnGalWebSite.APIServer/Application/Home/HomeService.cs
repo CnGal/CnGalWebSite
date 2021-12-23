@@ -235,6 +235,20 @@ namespace CnGalWebSite.APIServer.Application.Home
                     };
 
                     var infor = item.Relevances.FirstOrDefault(s => s.Modifier == "制作组");
+                    if(infor == null)
+                    {
+                        infor = item.Relevances.FirstOrDefault(s => s.Modifier == "STAFF");
+                        if (infor == null)
+                        {
+                            infor = item.Relevances.FirstOrDefault(s => s.Modifier == "游戏");
+                            if (infor == null)
+                            {
+                                infor = item.Relevances.FirstOrDefault(s => s.Modifier == "角色");
+                            }
+                        }
+                    }
+
+
                     if (infor != null)
                     {
                         var group = await _entryRepository.FirstOrDefaultAsync(s => s.Name == infor.DisplayName);
@@ -242,20 +256,27 @@ namespace CnGalWebSite.APIServer.Application.Home
                         {
                             temp.Image = string.IsNullOrWhiteSpace(group.Thumbnail) ? _appHelper.GetImagePath(item.CreateUser.PhotoPath, "user.png") : _appHelper.GetImagePath(group.Thumbnail, "user.png");
                             temp.Title = group.DisplayName ?? group.Name;
+                            temp.GroupId = group.Id;
                         }
                         else
                         {
                             temp.Image = _appHelper.GetImagePath(item.CreateUser.PhotoPath, "user.png");
                             temp.Title = item.CreateUser.UserName;
+                            temp.UserId = item.CreateUser.Id;
                         }
                     }
                     else
                     {
                         temp.Image = _appHelper.GetImagePath(item.CreateUser.PhotoPath, "user.png");
                         temp.Title = item.CreateUser.UserName;
+                        temp.UserId = item.CreateUser.Id;
                     }
 
                     temp.Link = item.OriginalLink;
+                    if(temp.Title=="搬运姬"&&string.IsNullOrWhiteSpace(item.OriginalAuthor)==false)
+                    {
+                        temp.Title = item.OriginalAuthor;
+                    }
 
                     model.Add(temp);
                 }

@@ -10,33 +10,29 @@ namespace CnGalWebSite.DataModel.ViewModel.News
 {
     public class EditWeeklyNewsModel
     {
+        [Display(Name = "Id")]
         public long Id { get; set; }
-
+        [Display(Name = "标题")]
         public string Title { get; set; }
-        /// <summary>
-        /// 主图
-        /// </summary>
+        [Display(Name = "主图")]
         public string MainPicture { get; set; }
-        /// <summary>
-        /// 简介
-        /// </summary>
+        [Display(Name = "简介")]
         public string BriefIntroduction { get; set; }
-        /// <summary>
-        /// 主页
-        /// </summary>
+        [Display(Name = "主页")]
         [StringLength(10000000)]
         public string MainPage { get; set; }
-        /// <summary>
-        /// 类型
-        /// </summary>
+        [Display(Name = "类型")]
         public ArticleType Type { get; set; }
 
         public List<WeeklyNewsRelatedNewsEditModel> News { get; set; }=new List<WeeklyNewsRelatedNewsEditModel> { };
-
+        [Display(Name = "发布时间")]
         public DateTime PublishTime { get; set; }
+        [Display(Name = "创建时间")]
         public DateTime CreateTime { get; set; }
-
+        [Display(Name = "状态")]
         public GameNewsState State { get; set; }
+
+        public long? ArticleId { get; set; }
     }
 
     public class WeeklyNewsRelatedNewsEditModel

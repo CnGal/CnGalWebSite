@@ -1,0 +1,298 @@
+﻿@inject ToastService ToastService
+@inject DialogService DialogService
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IServiceProvider Provider
+
+<style>
+    .modal-footer {
+        display: none;
+    }
+
+    .modal-title {
+        font-weight: bolder;
+    }
+    .checkbox-list .checkbox-item {
+        width: 100%;
+    }
+    .form-check {
+        width: 100%;
+        display: flex;
+    }
+    .checkbox-list .checkbox-item .form-check-label {
+        max-width: 10004px;
+    }
+    .form-check .form-check-input[type=checkbox] {
+        min-width: 17px;
+    }
+</style>
+
+<div>
+    <Scroll Height="600px">
+        <div>
+            @if (isReady)
+            {
+                <div>
+                    <div class="mb-4">
+                        <h5 class="text-truncate fw-bold">正文</h5>
+
+                        <div class="row">
+                            <div class="col-12 col-sm-6">
+                                <ImageCropperButton @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <div class="row">
+
+                                <div class="form-group col-12">
+                                    <BootstrapInput @bind-Value="Model.Title" ShowLabel="true" />
+                                </div>
+                                <div class="form-group col-12">
+                                    <Textarea @bind-Value="Model.BriefIntroduction" rows="2" ShowLabel="true" />
+                                </div>
+                                <div class="form-group col-12">
+                                    <Textarea @bind-Value="Model.MainPage" rows="5" ShowLabel="true" />
+                                </div>
+
+                            </div>
+                        </div>
+                        <hr />
+                        <h5 class="text-truncate fw-bold">基本信息</h5>
+                        <div class="form-group mt-4">
+                            <div class="row">
+                                <div class="form-group col-12  col-sm-6">
+                                    <Select @bind-Value="Model.Type" ShowLabel="true"></Select>
+                                </div>
+
+                            </div>
+                        </div>
+                        <hr />
+                        <h5 class="text-truncate fw-bold">包含的动态</h5>
+                        <CheckboxList @bind-Value="@GameNewsValue" ShowBorder="true" Items="@GameNewsItems" IsVertical="true" >
+                        </CheckboxList>
+                        <hr />
+                        <Button Color="Color.Danger" Icon="fa fa-refresh" @onclick="OnReset" IsAsync="true" Text="重置"></Button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <h3 class="mb-3 text-center">正在加载</h3>
+                    <div class="d-flex" style="justify-content: center;">
+                        <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
+                    </div>
+                </div>
+
+            }
+
+        </div>
+
+    </Scroll>
+
+    <div class="mt-3" style="display: flex; justify-content: space-between;">
+        @if (Model.State == GameNewsState.Edit)
+        {
+            <Button Color="Color.Success" Icon="fa fa-file-text-o" @onclick="OnPreview" IsAsync="true" Text="预览"></Button>
+        }
+        else if (Model.State == GameNewsState.Publish && Model.ArticleId != null)
+        {
+            <Button Color="Color.Success" Icon="fa fa-file-text-o" @onclick="OnLook" IsAsync="true" Text="查看"></Button>
+
+        }
+
+        <div style="display:flex;">
+            @if (Model.State == GameNewsState.Edit)
+            {
+                <Button Color="Color.Info" IsOutline="true" Icon="fa fa-paper-plane-o" class="me-1" @onclick="@OnPublish" IsAsync="true" Text="发布"></Button>
+            }
+            <Button Color="Color.Primary" Icon="fa fa-save" class="me-1" @onclick="@OnSave" IsAsync="true" Text="保存"></Button>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnClickClose { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public EditWeeklyNewsModel Model { get; set; } = new EditWeeklyNewsModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private IEnumerable<long> Value1 { get; set; }
+    bool isReady = false;
+
+    List<SelectedItem> GameNewsItems { get; set; } = new List<SelectedItem>();
+    private List<string> GameNewsValue { get; set; } = new List<string>();
+
+    private IEnumerable<string> Items { get; set; } = new string[1] { "" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<EditWeeklyNewsModel>(ToolHelper.WebApiPath + "api/news/EditWeeklyNews/" + Id);
+
+            //设置包含的动态
+
+            foreach (var item in Model.News)
+            {
+                GameNewsItems.Add(new SelectedItem
+                {
+                    Text = item.NewsTitle.ToString(),
+                    Value = item.NewsTitle.ToString(),
+                    Active = item.IsSelected
+                });
+                if (item.IsSelected == true)
+                {
+                    GameNewsValue.Add(item.NewsTitle.ToString());
+                }
+            }
+
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑周报信息失败");
+        }
+    }
+
+    public async Task OnSave()
+    {
+        //上传
+        try
+        {
+            //处理数据
+            if (Model.News.Any(s=>s.IsSelected)==false)
+            {
+                await ToastService.Error("保存周报数据失败", "至少选中一个动态");
+            }
+            foreach(var item in Model.News)
+            {
+                if(GameNewsValue.Any(s=>s==item.NewsTitle))
+                {
+                    item.IsSelected = true;
+                }
+                else
+                {
+                    item.IsSelected = false;
+                }
+            }
+
+
+            var result = await Http.PostAsJsonAsync<EditWeeklyNewsModel>(ToolHelper.WebApiPath + "api/news/EditWeeklyNews", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("保存周报数据失败", obj.Error);
+            }
+            else
+            {
+                isReady = false;
+                StateHasChanged();
+                Model = await Http.GetFromJsonAsync<EditWeeklyNewsModel>(ToolHelper.WebApiPath + "api/news/EditWeeklyNews/" + Id);
+                isReady = true;
+                await ToastService.Success("保存周报数据成功", "保存周报数据成功");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "保存周报数据失败");
+        }
+    }
+
+
+    public async Task OnPublish()
+    {
+        //先保存
+        await OnSave();
+        try
+        {
+            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/PublishWeelyNews/" + Id);
+            if (result.Successful)
+            {
+                await ToastService.Success("发布周报成功", "发布周报成功");
+                await OnClickClose.InvokeAsync();
+            }
+            else
+            {
+                await ToastService.Error("发布周报失败", result.Error);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "发布周报失败");
+        }
+
+    }
+
+
+    public async Task OnPreview()
+    {
+
+        try
+        {
+            ArticleViewModel model = await Http.GetFromJsonAsync<ArticleViewModel>(ToolHelper.WebApiPath + "api/news/GetWeelyNewsPreview/" + Id);
+
+            var option = new DialogOption()
+            {
+                Title = "预览周报",
+                Size = Size.Medium,
+                ShowCloseButton = false
+            };
+            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<PreviewArticleTip>(new Dictionary<string, object>
+            {
+                [nameof(PreviewArticleTip.Model)] = model
+            }).Render();
+            await DialogService.Show(option);
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑周报信息失败");
+        }
+
+    }
+
+    private async Task OnLook()
+    {
+        await OnClickClose.InvokeAsync();
+        NavigationManager.NavigateTo(Provider, "/articles/index/" + Model.ArticleId, Model.Title, "fa fa-newspaper-o");
+
+    }
+    public async Task OnReset()
+    {
+        try
+        {
+            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/ResetWeelyNews/" + Id);
+            if (result.Successful)
+            {
+                await ToastService.Success("重置周报成功", "重置周报成功");
+                isReady = false;
+                StateHasChanged();
+                Model = await Http.GetFromJsonAsync<EditWeeklyNewsModel>(ToolHelper.WebApiPath + "api/news/EditWeeklyNews/" + Id);
+                isReady = true;
+            }
+            else
+            {
+                await ToastService.Error("重置周报失败", result.Error);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "重置周报失败");
+        }
+
+    }
+
+}

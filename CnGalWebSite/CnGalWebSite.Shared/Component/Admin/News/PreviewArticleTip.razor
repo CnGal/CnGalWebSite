@@ -1,0 +1,55 @@
+﻿@inject ToastService ToastService
+
+@inject HttpClient Http
+<style>
+    .modal-footer {
+        display: none;
+    }
+
+    .modal-title {
+        font-weight: bolder;
+    }
+</style>
+
+<div>
+    <Scroll Height="700px">
+        <div>
+            <img src="@Model.MainPicture" alt="@Model.Name" style="width:100%" />
+            <div style="display:flex;" class="mt-3 mb-3">
+                <dic style="display: flex;align-items: center;">
+                    <img class="shadow-sm" src="@Model.BackgroundPicture" style="height: 50px;width: 50px;border-radius: 50%;" />
+                </dic>
+                <div class="ms-2" style="display: flex; flex-direction: column; justify-content: space-between; font-size: initial;">
+                        <div >@Model.CreateUserName</div>
+                    <div style="color:gray;">@Model.PubishTime?.ToTimeFromNowString()</div>
+                </div>
+            </div>
+            <CnGalWebSite.Shared.AppComponent.Normal.Texts.MarkdownView Text="@Model.MainPage" />
+            <CnGalWebSite.Shared.AppComponent.Pages.Articles.ListTagCard Relevances="Model.Relevances" />
+        </div>
+
+    </Scroll>
+</div>
+
+@code {
+ 
+    [Parameter]
+    public ArticleViewModel Model { get; set; }
+ 
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+          
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取预览文章信息失败");
+        }
+    }
+}

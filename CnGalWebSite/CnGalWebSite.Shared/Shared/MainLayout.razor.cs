@@ -268,7 +268,7 @@ namespace CnGalWebSite.Shared.Shared
                               new MenuItem() { Text = "备份", Icon = "fa fa-fw fa-cloud-upload", Url = "/admin/listbackuparchives" },
                               new MenuItem() { Text = "批量导入", Icon = "fa fa-fw fa-upload", Url = "/admin/importdata" },
                               new MenuItem() { Text = "定时任务", Icon = "fa fa-fw fa-tasks", Url = "/admin/listtimedtasks" },
-                              new MenuItem() { Text = "管理动态", Icon = "fa fa-fw fa-newspaper-o", Url = "/admin/listnews" },
+                              new MenuItem() { Text = "动态采集", Icon = "fa fa-fw fa-newspaper-o", Url = "/admin/listnews" },
                               new MenuItem() { Text = "管理评论", Icon = "fa fa-fw fa-comments-o", Url = "/admin/listcomments" },
                               new MenuItem() { Text = "管理消息", Icon = "fa fa-fw fa-envelope-o", Url = "/admin/listmessages" },
                               new MenuItem() { Text = "管理用户", Icon = "fa fa-fw  fa-user-circle", Url = "/admin/ListUsers" },
@@ -292,19 +292,24 @@ namespace CnGalWebSite.Shared.Shared
 
         public async void Send(object o)
         {
-            try
+            await InvokeAsync(async () =>
             {
-                var authState = await authenticationStateTask;
-                var user = authState.User;
-                if (user.Identity.IsAuthenticated)
+                try
                 {
-                    await InvokeAsync(() => Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/MakeUserOnline"));
+                    var authState = await authenticationStateTask;
+                    var user = authState.User;
+                    if (user.Identity.IsAuthenticated)
+                    {
+                        await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/MakeUserOnline");
+                    }
                 }
-            }
-            catch
-            {
 
-            }
+                catch
+                {
+
+                }
+            });
+
         }
 
         public void OnSearch()

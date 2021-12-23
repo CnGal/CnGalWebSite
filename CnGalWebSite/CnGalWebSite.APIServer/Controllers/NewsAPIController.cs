@@ -33,6 +33,12 @@ using CnGalWebSite.APIServer.Application.ElasticSearches;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.DataModel.ViewModel.News;
 using Elasticsearch.Net;
+using CnGalWebSite.DataModel.ViewModel.Articles;
+using Markdig;
+using CnGalWebSite.DataModel.ViewModel.Home;
+using TencentCloud.Ame.V20190916.Models;
+using Nest;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -93,7 +99,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
-           IRepository<WeeklyNews, long> weeklyNewsRepository )
+           IRepository<WeeklyNews, long> weeklyNewsRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -148,10 +154,10 @@ namespace CnGalWebSite.APIServer.Controllers
 
             }
 
-            var news = await _gameNewsRepository.GetAll().Include(s=>s.Article).Where(s => model.Ids.Contains(s.Id)).ToListAsync();
-            foreach(var item in news)
+            var news = await _gameNewsRepository.GetAll().Include(s => s.Article).Where(s => model.Ids.Contains(s.Id)).ToListAsync();
+            foreach (var item in news)
             {
-                if(item.Article!=null)
+                if (item.Article != null)
                 {
                     item.State = GameNewsState.Publish;
                 }
@@ -170,7 +176,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var gameNews = await _gameNewsRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id == id);
 
-            if(gameNews == null)
+            if (gameNews == null)
             {
                 return NotFound("未找到该动态");
             }
@@ -180,7 +186,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
             EditGameNewsModel model = new EditGameNewsModel
             {
-                Entries = gameNews.Entries.Select(s=>s.EntryName).ToList(),
                 AuthorEntryName = author?.Entry?.Name ?? "",
                 Author = gameNews.Author,
                 State = gameNews.State,
@@ -193,8 +198,17 @@ namespace CnGalWebSite.APIServer.Controllers
                 PublishTime = gameNews.PublishTime,
                 Title = gameNews.Title,
                 Type = gameNews.Type,
-                WeiboId = author?.WeiboId ?? 0
+                WeiboId = (author == null || author?.WeiboId == 0) ? "" : author.WeiboId.ToString(),
+                ArticleId= gameNews.ArticleId,
             };
+
+            foreach (var item in gameNews.Entries)
+            {
+                model.Entries.Add(new DataModel.ViewModel.RelevancesModel
+                {
+                    DisplayName = item.EntryName
+                });
+            }
 
             return model;
         }
@@ -203,9 +217,9 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<Result>> EditGameNewsAsync(EditGameNewsModel model)
         {
 
-            if(string.IsNullOrWhiteSpace(model.Author)||string.IsNullOrWhiteSpace(model.Title))
+            if (string.IsNullOrWhiteSpace(model.Author) || string.IsNullOrWhiteSpace(model.Title))
             {
-                return new Result { Successful = false ,Error= "作者名称或标题不能为空" };
+                return new Result { Successful = false, Error = "作者名称或标题不能为空" };
             }
 
             var gameNews = await _gameNewsRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id == model.Id);
@@ -220,9 +234,17 @@ namespace CnGalWebSite.APIServer.Controllers
             var author = await _weiboUserInforRepository.GetAll().AsNoTracking().Include(s => s.Entry).FirstOrDefaultAsync(s => s.WeiboName == gameNews.Author);
 
             //查看是否修正了作者信息
-            if (author == null && string.IsNullOrWhiteSpace(model.AuthorEntryName)==false && model.WeiboId != 0)
+            if (author == null && string.IsNullOrWhiteSpace(model.AuthorEntryName) == false && string.IsNullOrWhiteSpace(model.WeiboId)==false)
             {
-                await _newsService.AddWeiboUserInfor(model.AuthorEntryName, model.WeiboId);
+                try
+                {
+                    await _newsService.AddWeiboUserInfor(model.AuthorEntryName, long.Parse(model.WeiboId));
+
+                }
+                catch
+                {
+                    return new Result { Successful = false, Error = "尝试获取作者信息失败" };
+                }
             }
 
             //更新数据
@@ -237,28 +259,30 @@ namespace CnGalWebSite.APIServer.Controllers
             gameNews.Type = model.Type;
 
             gameNews.Entries.Clear();
-            foreach(var item in model.Entries)
+            foreach (var item in model.Entries.Where(s=>string.IsNullOrWhiteSpace(s.DisplayName)==false))
             {
                 gameNews.Entries.Add(new GameNewsRelatedEntry
                 {
-                    EntryName = item
+                    EntryName = item.DisplayName
                 });
             }
 
             //简单的将名称之类的信息同步到对应文章
-            if (gameNews.State==GameNewsState.Publish)
+            if (gameNews.State == GameNewsState.Publish)
             {
                 var article = await _articleRepository.FirstOrDefaultAsync(s => s.Id == gameNews.ArticleId);
 
                 article.OriginalAuthor = model.Author;
-                article.OriginalLink=model.Link;
+                article.OriginalLink = model.Link;
                 article.DisplayName = model.Title;
                 article.BriefIntroduction = model.BriefIntroduction;
                 article.MainPage = model.MainPage;
-                article.MainPicture=model.MainPicture;
+                article.MainPicture = model.MainPicture;
 
                 await _articleRepository.UpdateAsync(article);
             }
+
+            await _gameNewsRepository.UpdateAsync(gameNews);
 
             return new Result { Successful = true };
         }
@@ -278,12 +302,104 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ArticleViewModel>> GetGameNewsPreviewAsync(long id)
+        {
+            var gameNews = await _gameNewsRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id == id);
+            if (gameNews == null)
+            {
+                return NotFound("未找到该动态");
+            }
+            //生成文章
+            Article article = null;
+            try
+            {
+                article = await _newsService.GameNewsToArticle(gameNews);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            article.CreateUser = await _userManager.FindByIdAsync(article.CreateUserId);
 
+            //正常流程初始化
+            var model = new ArticleViewModel
+            {
+                Id = article.Id,
+                Name = article.DisplayName ?? article.Name,
+                Type = article.Type,
+                MainPage = article.MainPage,
+                PubishTime = article.RealNewsTime ?? article.PubishTime,
+                OriginalLink = article.OriginalLink,
+                OriginalAuthor = article.OriginalAuthor,
+                BriefIntroduction = article.BriefIntroduction,
+            };
+            //初始化图片
+            model.MainPicture = _appHelper.GetImagePath(article.MainPicture, "app.png");
+
+            //初始化主页Html代码
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
+            model.MainPage = Markdown.ToHtml(model.MainPage ?? "", pipeline);
+
+            //走动态的作者初始化流程
+            var temp = new HomeNewsAloneViewModel
+            {
+                ArticleId = article.Id,
+                Text = article.DisplayName ?? article.Name,
+                Time = article.RealNewsTime ?? article.PubishTime,
+                Type = article.NewsType ?? "动态",
+            };
+
+            var infor = article.Relevances.FirstOrDefault(s => s.Modifier == "制作组");
+            if (infor == null)
+            {
+                infor = article.Relevances.FirstOrDefault(s => s.Modifier == "STAFF");
+                if (infor == null)
+                {
+                    infor = article.Relevances.FirstOrDefault(s => s.Modifier == "游戏");
+                    if (infor == null)
+                    {
+                        infor = article.Relevances.FirstOrDefault(s => s.Modifier == "角色");
+                    }
+                }
+            }
+
+
+            if (infor != null)
+            {
+                var group = await _entryRepository.FirstOrDefaultAsync(s => s.Name == infor.DisplayName);
+                if (group != null)
+                {
+                    temp.Image = string.IsNullOrWhiteSpace(group.Thumbnail) ? _appHelper.GetImagePath(article.CreateUser.PhotoPath, "user.png") : _appHelper.GetImagePath(group.Thumbnail, "user.png");
+                    temp.Title = group.DisplayName ?? group.Name;
+                }
+                else
+                {
+                    temp.Image = _appHelper.GetImagePath(article.CreateUser.PhotoPath, "user.png");
+                    temp.Title = article.CreateUser.UserName;
+                }
+            }
+            else
+            {
+                temp.Image = _appHelper.GetImagePath(article.CreateUser.PhotoPath, "user.png");
+                temp.Title = article.CreateUser.UserName;
+            }
+
+            temp.Link = article.OriginalLink;
+            if (temp.Title == "搬运姬" && string.IsNullOrWhiteSpace(article.OriginalAuthor) == false)
+            {
+                temp.Title = article.OriginalAuthor;
+            }
+            model.CreateUserName = temp.Title;
+            model.BackgroundPicture = temp.Image;
+
+            return model;
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EditWeeklyNewsModel>> EditWeeklyNewsAsync(long id)
         {
-            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s=>s.News).FirstOrDefaultAsync(s => s.Id == id);
+            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s => s.News).FirstOrDefaultAsync(s => s.Id == id);
 
             if (weeklyNews == null)
             {
@@ -301,6 +417,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 Title = weeklyNews.Title,
                 Type = weeklyNews.Type,
                 CreateTime = weeklyNews.CreateTime,
+                ArticleId=weeklyNews.ArticleId,
             };
 
             //选中的动态
@@ -309,7 +426,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var news = await _gameNewsRepository.GetAll().Where(s => dateTime.AddDays(-14) < s.PublishTime).ToListAsync();
             news = news.Where(s => s.PublishTime.IsInSameWeek(dateTime)).ToList();
 
-           foreach(var item in news)
+            foreach (var item in news)
             {
                 model.News.Add(new WeeklyNewsRelatedNewsEditModel
                 {
@@ -363,11 +480,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 article.DisplayName = model.Title;
                 article.BriefIntroduction = model.BriefIntroduction;
-                article.MainPage = model.MainPage;
+                article.MainPage = _newsService.GenerateRealWeeklyNewsMainPage(weeklyNews);
                 article.MainPicture = model.MainPicture;
 
                 await _articleRepository.UpdateAsync(article);
             }
+
+            await _weeklyNewsRepository.UpdateAsync(weeklyNews);
 
             return new Result { Successful = true };
         }
@@ -376,7 +495,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Result>> PublishWeelyNewsAsync(long id)
         {
-            var weeklyNews = await _weeklyNewsRepository.GetAll().FirstOrDefaultAsync(s => s.Id == id);
+            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s=>s.News).FirstOrDefaultAsync(s => s.Id == id);
 
             if (weeklyNews == null)
             {
@@ -392,14 +511,14 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Result>> ResetWeelyNewsAsync(long id)
         {
-            var weeklyNews = await _weeklyNewsRepository.GetAll().FirstOrDefaultAsync(s => s.Id == id);
+            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s=>s.News).FirstOrDefaultAsync(s => s.Id == id);
 
             if (weeklyNews == null)
             {
                 return new Result { Successful = false, Error = "未找到该周报" };
             }
 
-            _newsService.ResetWeeklyNews(weeklyNews);
+           await _newsService.ResetWeeklyNews(weeklyNews);
 
             await _weeklyNewsRepository.UpdateAsync(weeklyNews);
 
@@ -407,23 +526,53 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<WeelyNewsPreviewModel>> GetWeelyNewsPreviewAsync(long id)
+        public async Task<ActionResult<ArticleViewModel>> GetWeelyNewsPreviewAsync(long id)
         {
-            var weeklyNews = await _weeklyNewsRepository.GetAll().FirstOrDefaultAsync(s => s.Id == id);
+            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s=>s.News).FirstOrDefaultAsync(s => s.Id == id);
 
             if (weeklyNews == null)
             {
-                return NotFound();
+                return NotFound("未找到该周报");
             }
 
-            var model = new WeelyNewsPreviewModel
+            //生成文章
+            Article article = null;
+            try
             {
-                Id = weeklyNews.Id,
-                MainPage = _newsService.GenerateRealWeeklyNewsMainPage(weeklyNews),
-                Title = weeklyNews.Title,
+                article = await _newsService.WeeklyNewsToArticle(weeklyNews);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            article.CreateUser = await _userManager.FindByIdAsync(article.CreateUserId);
+
+            //正常流程初始化
+            var model = new ArticleViewModel
+            {
+                Id = article.Id,
+                Name = article.DisplayName ?? article.Name,
+                Type = article.Type,
+                MainPage = article.MainPage,
+                PubishTime = article.CreateTime,
+                OriginalLink = article.OriginalLink,
+                OriginalAuthor = article.OriginalAuthor,
+                BriefIntroduction = article.BriefIntroduction,
+                CreateUserName = article.CreateUser.UserName,
+                BackgroundPicture = _appHelper.GetImagePath(article.CreateUser.PhotoPath, "user.png")
             };
+            //初始化图片
+            model.MainPicture = _appHelper.GetImagePath(article.MainPicture, "app.png");
+
+            //初始化主页Html代码
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
+            model.MainPage = Markdown.ToHtml(model.MainPage ?? "", pipeline);
+
+            
+       
 
             return model;
+
         }
     }
 }

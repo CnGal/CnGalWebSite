@@ -18,8 +18,8 @@
 
         @foreach(var item in Items.Take(ItemNum))
         {
-            <div class="@(IsNormalScreen?" mb-3 col-6":"mb-3 col-12")" @onclick="@(()=>OnClickNews(item))" style="cursor:pointer;">
-                <HomeNewsAloneTip Title="@item.Title" Time="@item.Time" Text="@item.Text" GroupId="@item.GroupId" Image="@item.Image" Type="@item.Type"></HomeNewsAloneTip>
+            <div class="@(IsNormalScreen?" mb-3 col-6":"mb-3 col-12")" style="cursor:pointer;">
+                <HomeNewsAloneTip Model="item" OnClickNews="OnClickNews" OnClickUser="OnClickUser"></HomeNewsAloneTip>
             </div>
         }
     </div>
@@ -160,8 +160,22 @@
         }
         else
         {
-            NavigationManager.NavigateTo(Provider, link, model.Title, "fa fa-newspaper-o");
+            NavigationManager.NavigateTo(Provider, link, model.Text, "fa fa-newspaper-o");
         }
+    }
+
+    public async Task OnClickUser(HomeNewsAloneViewModel model)
+    {
+
+        if (model.GroupId == -1)
+        {
+            NavigationManager.NavigateTo(Provider, "/space/index/" + model.UserId, model.Title, "fa fa-star-o");
+        }
+        else
+        {
+            NavigationManager.NavigateTo(Provider, "/entries/index/" + model.GroupId + "/10", model.Title, "fa fa-codepen");
+        }
+
     }
 
     #region 释放实例
