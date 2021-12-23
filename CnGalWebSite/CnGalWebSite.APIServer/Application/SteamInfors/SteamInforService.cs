@@ -133,7 +133,8 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             {
                 steam = new SteamInfor
                 {
-                    EntryId = entryId
+                    EntryId = entryId,
+                    SteamId = steamId,
                 };
             }
 

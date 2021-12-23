@@ -60,6 +60,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
         private readonly IRepository<Rank, long> _rankRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
+        private readonly IRepository<SteamInfor, long> _steamInforRepository;
         private readonly IUserService _userService;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
@@ -82,7 +83,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IElasticsearchService elasticsearchService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IElasticsearchBaseService<Article> articleElasticsearchBaseService,
         UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IElasticsearchBaseService<Entry> entryElasticsearchBaseService,
-        IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository,
+        IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, IRepository<SteamInfor, long> steamInforRepository,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService)
         {
@@ -123,6 +124,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _entryElasticsearchBaseService = entryElasticsearchBaseService;
             _articleElasticsearchBaseService = articleElasticsearchBaseService;
             _elasticsearchService = elasticsearchService;
+            _steamInforRepository = steamInforRepository;
         }
 
         /// <summary>
@@ -1450,15 +1452,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var tags = await _tagRepository.GetAllListAsync();
-                foreach (var tag in tags)
-                {
-                    if ((DateTime.Now.ToCstTime() - tag.LastEditTime).TotalDays > 365)
-                    {
-                        tag.LastEditTime = DateTime.Now.ToCstTime().AddDays(-70);
-                        await _tagRepository.UpdateAsync(tag);
-                    }
-                }
+                await _steamInforRepository.DeleteAsync(s => s.SteamId == -1);
                 return new Result { Successful = true };
             }
             catch (Exception ex)
