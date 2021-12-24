@@ -1491,7 +1491,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _weeklyNewsRepository.DeleteAsync(s => true);
+               string temp= await _fileService.SaveImageAsync("https://wx1.sinaimg.cn/mw2000/0085plZ0gy1gxoqwt0tnaj31hh0r8dnh.jpg", "", 460, 215);
+                /*await _weeklyNewsRepository.DeleteAsync(s => true);
                 var news = await _gameNewsRepository.GetAll().Include(s=>s.RSS).ToListAsync();
                 foreach (var item in news)
                 {
@@ -1499,7 +1500,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     item.PublishTime = DateTime.MinValue;
                     item.RSS.PublishTime = DateTime.MinValue;
                     await _gameNewsRepository.UpdateAsync(item);
-                }
+                }*/
                 return new Result { Successful = true };
             }
             catch (Exception ex)

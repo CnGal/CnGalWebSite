@@ -1,0 +1,105 @@
+﻿@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+
+<div class="shadow-sm apps-headbar-layout" style=" position: fixed; top: 0;width:100%;z-index:10000;">
+    <div style="display: flex; height: 45px; flex-direction: row; align-items: center;" class="ms-2 me-2">
+        <div style=" display: flex; flex-direction: column; justify-content: center;" class="me-2" @onclick="OnClickBack">
+            <i class="fa fa-chevron-left fa-fw " style=" font-size: 17px;"></i>
+        </div>
+        <div style=" width: 100%; font-size: 16px; text-align: center; margin-right: 30px; " class="text-truncate">
+            @Title
+        </div>
+        <div style=" display: flex; flex-direction: column; justify-content: center;" class="me-2" @onclick="@(()=>NavigationManager.NavigateTo("/home/search"))">
+            <i class="fa fa-search fa-fw " style=" font-size: 17px;"></i>
+        </div>
+    </div>
+    <div style="display: flex; flex-direction: row; align-items: center;" class="ms-3 me-3 pt-1 mb-2">
+        <CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine Model="Model" Styles="display: flex;flex-direction: row; overflow-x: auto;flex-wrap: nowrap;width: fit-content;"></CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Sorting { get; set; }
+
+    public async void OnClickBack()
+    {
+        await JS.InvokeAsync<string>("goback");
+    }
+
+    [Parameter]
+    public EventCallback<int> OnTabClick { get; set; }
+
+    public int DefaultIndex { get; set; }
+    public int RandomIndex { get; set; }
+    private CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel Model = new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel { Items = new List<CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel>() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Sorting) == false)
+        {
+            if (Sorting.Contains("全部"))
+            {
+                DefaultIndex = 0;
+            }
+            else if (Sorting.Contains("本年"))
+            {
+                DefaultIndex = 1;
+            }
+
+            else if (Sorting.Contains("本月"))
+            {
+                DefaultIndex = 2;
+            }
+            else if (Sorting.Contains("本周"))
+            {
+                DefaultIndex = 3;
+            }
+        }
+        Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = DefaultIndex,
+            Index = 0,
+            OnTabClick = OnTabClick,
+            RandomIndex = RandomIndex,
+            Text = "全部",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+        Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = DefaultIndex,
+            Index = 1,
+            OnTabClick = OnTabClick,
+            RandomIndex = RandomIndex,
+            Text = "本年",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+        Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = DefaultIndex,
+            Index = 2,
+            OnTabClick = OnTabClick,
+            RandomIndex = RandomIndex,
+            Text = "本月",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+        Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = DefaultIndex,
+            Index = 2,
+            OnTabClick = OnTabClick,
+            RandomIndex = RandomIndex,
+            Text = "本周",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+
+    }
+
+}

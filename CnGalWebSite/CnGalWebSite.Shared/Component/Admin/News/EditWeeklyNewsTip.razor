@@ -136,10 +136,13 @@
     {
         try
         {
+            isReady = false;
+            StateHasChanged();
             Model = await Http.GetFromJsonAsync<EditWeeklyNewsModel>(ToolHelper.WebApiPath + "api/news/EditWeeklyNews/" + Id);
 
             //设置包含的动态
-
+            GameNewsValue.Clear();
+            GameNewsItems.Clear();
             foreach (var item in Model.News)
             {
                 GameNewsItems.Add(new SelectedItem
@@ -276,11 +279,9 @@
             var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/ResetWeelyNews/" + Id);
             if (result.Successful)
             {
+                await OnInitializedAsync();
                 await ToastService.Success("重置周报成功", "重置周报成功");
-                isReady = false;
-                StateHasChanged();
-                Model = await Http.GetFromJsonAsync<EditWeeklyNewsModel>(ToolHelper.WebApiPath + "api/news/EditWeeklyNews/" + Id);
-                isReady = true;
+
             }
             else
             {

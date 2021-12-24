@@ -12,8 +12,8 @@ namespace CnGalWebSite.DataModel.Helper
 {
     public static class ToolHelper
     {
-        //http://localhost:45160/
-        //http://localhost:44360/
+        //http://localhost:45160/";
+        //public const string WebApiPath = "http://172.19.160.1:45160/";
         //http://localhost:51313/
         //http://101.34.84.38:2001/
         //121.43.54.210
@@ -21,9 +21,9 @@ namespace CnGalWebSite.DataModel.Helper
         //https://v3.cngal.org/
 
 
-        public const string WebApiPath = "http://localhost:45160/";
+        //public const string WebApiPath = "http://localhost:45160/";
         //public const string WebApiPath = "http://172.17.0.1:2001/";
-        //public const string WebApiPath = "https://www.cngal.org/";
+        public const string WebApiPath = "https://www.cngal.org/";
 
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";
 

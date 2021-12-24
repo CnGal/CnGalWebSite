@@ -138,6 +138,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             {
 
                 //更新执行状态
+                _timedTaskRepository.Clear();
                 item = await _timedTaskRepository.FirstOrDefaultAsync(s => s.Id == item.Id);
                 if (item != null)
                 {
@@ -203,6 +204,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         break;
                 }
                 //记录执行时间
+                _timedTaskRepository.Clear();
                 item = await _timedTaskRepository.FirstOrDefaultAsync(s => s.Id == item.Id);
                 if (item != null)
                 {
@@ -214,6 +216,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             }
             catch
             {
+                _timedTaskRepository.Clear();
                 item = await _timedTaskRepository.FirstOrDefaultAsync(s => s.Id == item.Id);
                 if (item != null)
                 {

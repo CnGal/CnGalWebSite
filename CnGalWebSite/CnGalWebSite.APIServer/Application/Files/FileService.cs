@@ -15,8 +15,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Net.Http;
-using Nest;
 using SortOrder = BootstrapBlazor.Components.SortOrder;
+using System.Net.Http.Json;
+using System.Text.Json;
+using CnGalWebSite.DataModel.Helper;
+using Microsoft.Extensions.Configuration;
+using CnGalWebSite.DataModel.Model;
 
 namespace CnGalWebSite.APIServer.Application.Files
 {
@@ -26,16 +30,18 @@ namespace CnGalWebSite.APIServer.Application.Files
         private readonly IAppHelper _appHelper;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IRepository<FileManager, int> _fileManagerRepository;
+        private readonly IConfiguration _configuration;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<UserFile>, string, SortOrder, IEnumerable<UserFile>>> SortLambdaCache = new();
 
 
-        public FileService(IAppHelper appHelper, IRepository<UserFile, int> userFileRepository, IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository)
+        public FileService(IAppHelper appHelper, IRepository<UserFile, int> userFileRepository, IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository, IConfiguration configuration)
         {
             _userFileRepository = userFileRepository;
             _appHelper = appHelper;
             _clientFactory = clientFactory;
             _fileManagerRepository = fileManagerRepository;
+            _configuration = configuration;
         }
 
         public async Task<PagedResultDto<ImageInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input)
@@ -165,17 +171,34 @@ namespace CnGalWebSite.APIServer.Application.Files
 
         public async Task<string> SaveImageAsync(string url, string userId, double x = 0, double y = 0)
         {
-            using var client = _clientFactory.CreateClient();
+            try
+            {
+                using var client = _clientFactory.CreateClient();
+                client.Timeout = TimeSpan.FromSeconds(30);
 
-            var Bytes = await client.GetByteArrayAsync(url);
+                var result = await client.PostAsJsonAsync<TransferDepositFileModel>(_configuration["TransferDepositFileAPI"] + "api/files/TransferDepositFile", new TransferDepositFileModel
+                {
+                    Url = url,
+                    X = x,
+                    Y = y
+                });
+                string jsonContent = result.Content.ReadAsStringAsync().Result;
+                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
 
-
-            using Stream stream = new MemoryStream(Bytes);
-            IFormFile fromFile = new FormFile(stream, 0, stream.Length, "测试.png", "测试.png");
-
-            var fileManager = await _fileManagerRepository.GetAll().Include(s => s.UserFiles).Include(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.ApplicationUserId == userId);
-
-            return await _appHelper.UploadImageNewAsync(fileManager, fromFile, x, y);
+                if (obj.Successful)
+                {
+                    return obj.Error.Replace("http://local.host/","https://pic.cngal.top/");
+                }
+                else
+                {
+                    return url;
+                }
+            }
+            catch(Exception ex)
+            {
+                return url;
+            }
+         
         }
     }
 }

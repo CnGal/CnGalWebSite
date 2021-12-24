@@ -467,7 +467,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
             //走批量导入的流程
             var admin = await _userManager.FindByIdAsync(article.CreateUserId);
-            await _examineService.AddBatchArticleExaminesAsync(article, admin, "自动生成动态");
+            await _examineService.AddBatchArticleExaminesAsync(article, admin, "自动生成周报");
 
             //查找文章
             var articleId = await _articleRepository.GetAll().Where(s => s.Name == article.Name).Select(s => s.Id).FirstOrDefaultAsync();
@@ -535,7 +535,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
             //获取在这个星期的所有动态
             DateTime dateTime = DateTime.Now.ToCstTime();
-            var news = await _gameNewsRepository.GetAll().Where(s => dateTime.AddDays(-14) < s.PublishTime).ToListAsync();
+            var news = await _gameNewsRepository.GetAll().Where(s => dateTime.AddDays(-14) < s.PublishTime && s.State != GameNewsState.Ignore).ToListAsync();
             news = news.Where(s => s.PublishTime.IsInSameWeek(dateTime)).ToList();
             weeklyNews.News.AddRange(news);
 
@@ -558,7 +558,14 @@ namespace CnGalWebSite.APIServer.Application.News
             //添加主图
             if (string.IsNullOrWhiteSpace(entry.MainPicture))
             {
-                entry.MainPicture = user.Image;
+                if (entry.Type == EntryType.Staff || entry.Type == EntryType.Role)
+                {
+                    entry.MainPicture = user.Image;
+                }
+                else
+                {
+                    entry.MainPicture = await _fileService.SaveImageAsync(user.Image, _configuration["NewsAdminId"], 460, 215);
+                }
 
             }
             if (string.IsNullOrWhiteSpace(entry.Thumbnail))
@@ -583,7 +590,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public  string GenerateWeeklyNewsTitle(WeeklyNews weeklyNews)
         {
-            return "CnGal周报（" + weeklyNews.CreateTime.AddDays(-(int)weeklyNews.CreateTime.DayOfWeek).ToString("yyyy.M.d") + " - " + weeklyNews.CreateTime.AddDays(7 - (int)weeklyNews.CreateTime.DayOfWeek).ToString("yyyy.M.d") + "）";
+            return "CnGal周报（" + weeklyNews.CreateTime.AddDays(-(int)weeklyNews.CreateTime.DayOfWeek+1).ToString("yyyy.M.d") + " - " + weeklyNews.CreateTime.AddDays(7 - (int)weeklyNews.CreateTime.DayOfWeek).ToString("yyyy.M.d") + "）";
         }
 
         public string GenerateWeeklyNewsBriefIntroduction(WeeklyNews weeklyNews)
@@ -591,7 +598,7 @@ namespace CnGalWebSite.APIServer.Application.News
             string model = "";
             foreach(var item in weeklyNews.News)
             {
-                model += "★ " + item.Author + " - " + item.Title;
+                model += "★ " + item.Author + " - " + item.Title+" ";
             }
             model = _appHelper.GetStringAbbreviation(model, 50);
             return model;

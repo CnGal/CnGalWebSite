@@ -1,0 +1,119 @@
+﻿
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+<TitleTip Title="动态汇总"></TitleTip>
+
+<CnGalWebSite.Shared.AppComponent.Pages.Articles.News.HeadCard Title="动态汇总" OnTabClick="@OnCondited"  Sorting="@TimeString" />
+
+<div style="margin-top: 90px; width: 100%; ">
+    @if (isReady)
+    {
+    <div class="ms-3 me-3">
+        @foreach (var item in Model)
+        {
+            <CnGalWebSite.Shared.AppComponent.Pages.Articles.News.GroupCard Model="item" />
+        }
+
+    </div>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+    }
+</div>
+@code {
+
+    [Parameter]
+    public string TimeString { get; set; } = "全部";
+
+    bool isReady = false;
+
+    private IEnumerable<string> ArticleItems { get; set; } = new string[1] { "" };
+
+    public List<NewsSummaryAloneViewModel> Model = new List<NewsSummaryAloneViewModel>();
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取所有文章
+            ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
+
+            await OnCondited(TimeString switch
+            {
+                "全部" => 0,
+                "本年" => 1,
+                "本月" => 2,
+                "本周" => 3,
+                _ => 0
+            });
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有文章名称列表失败");
+        }
+    }
+
+    private async Task OnCondited(int index)
+    {
+
+        TimeString = index switch
+        {
+            0 => "全部",
+            1 => "本年",
+            2 => "本月",
+            3 => "本周",
+            _ => "全部"
+        };
+
+        isReady = false;
+        StateHasChanged();
+        try
+        {
+            if (string.IsNullOrWhiteSpace(TimeString))
+            {
+                TimeString = "全部";
+            }
+            Model = await Http.GetFromJsonAsync<List<NewsSummaryAloneViewModel>>(ToolHelper.WebApiPath + "api/articles/GetNewSummary/" + TimeString);
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取动态分类汇总列表失败");
+        }
+    }
+
+    public async void OnClickUrl(NavigateModel model)
+    {
+        try
+        {
+            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
+        }
+        catch
+        {
+            await ToastService.Error("导航失败", "请尝试刷新页面");
+        }
+    }
+
+    private async Task OnSearch(string text)
+    {
+        try
+        {
+            NavigationManager.NavigateTo(Provider, "/home/search/文章/Id desc/" + text, "搜索", "fa fa-search");
+        }
+        catch
+        {
+            await ToastService.Error("导航失败", "请重试");
+        }
+    }
+}
+
