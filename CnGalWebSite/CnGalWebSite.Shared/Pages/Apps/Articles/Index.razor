@@ -176,7 +176,7 @@ else
         try
         {
             var user = await authenticationStateTask;
-            CanEdit = user.User.IsInRole("Admin");
+            CanEdit = user.User.IsInRole("Editor");
             if (user.User.Identity.Name == Model.LastEditUserName || user.User.Identity.Name == Model.CreateUserName)
             {
                 CanEdit = true;

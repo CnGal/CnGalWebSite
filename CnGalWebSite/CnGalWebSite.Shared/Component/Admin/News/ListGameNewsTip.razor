@@ -12,8 +12,10 @@
                ShowExtendButtons="true" ExtendButtonColumnWidth="170" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
                ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
             <TableToolbarTemplate>
-                <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Success" Icon="fa fa-map-signs" Text="关注" OnClickCallback="OnUnIgnoredClick" IsAsync="true" />
-                <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnIgnoredClick" IsAsync="true" />
+                <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Success" Icon="fa fa-plus" Text="添加自定义动态" OnClickCallback="AddCustomNews" IsAsync="true" />
+                <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Primary" Icon="fa fa-plus" Text="添加微博动态" OnClickCallback="AddWeiboNews" IsAsync="true" />
+                <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Info" Icon="fa fa-map-signs" Text="关注" OnClickCallback="OnUnIgnoredClick" IsAsync="true" />
+                <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnIgnoredClick" IsAsync="true" />
 
             </TableToolbarTemplate>
             <TableColumns>
@@ -77,7 +79,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<GameNewsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetGameNewList", new GameNewsPagesInfor { SearchModel = SearchModelUser, Options = options });
+            var result = await Http.PostAsJsonAsync<GameNewsPagesInfor>(ToolHelper.WebApiPath + "api/news/GetGameNewList", new GameNewsPagesInfor { SearchModel = SearchModelUser, Options = options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListGameNewAloneModel>>(jsonContent, ToolHelper.options);
         }
@@ -111,7 +113,38 @@
         }).Render();
         await DialogService.Show(option);
     }
+    private async Task AddWeiboNews(IEnumerable<ListGameNewAloneModel> items)
+    {
 
+        var option = new DialogOption()
+        {
+            Title = "添加微博动态",
+            IsScrolling = true,
+            Size = Size.Large,
+            ShowCloseButton = false
+        };
+        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<AddWeiboNewsTip>(new Dictionary<string, object>
+        {
+            [nameof(AddWeiboNewsTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => { await option.Dialog.Close(); await TableRows.QueryAsync(); }),
+        }).Render();
+        await DialogService.Show(option);
+    }
+    private async Task AddCustomNews(IEnumerable<ListGameNewAloneModel> items)
+    {
+
+        var option = new DialogOption()
+        {
+            Title = "添加自定义动态",
+            IsScrolling = true,
+            Size = Size.Large,
+            ShowCloseButton = false
+        };
+        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<AddCustomNewsTip>(new Dictionary<string, object>
+        {
+            [nameof(AddCustomNewsTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => { await option.Dialog.Close(); await TableRows.QueryAsync(); }),
+        }).Render();
+        await DialogService.Show(option);
+    }
     private async Task OnRowEditIsIgnoredClick(long[] ids, bool isIgnore, bool showMessage)
     {
         string tempString = isIgnore == true ? "隐藏动态" : "关注动态";

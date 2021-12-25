@@ -1,5 +1,5 @@
 ﻿@page "/admin/listnews"
-@attribute [Authorize(Roles = "Admin")]
+@attribute [Authorize(Roles = "Editor")]
 @inject IAuthService AuthService
 @inject HttpClient Http
 @inject ToastService? ToastService
@@ -133,7 +133,7 @@
     {
         try
         {
-            InforModel = await Http.GetFromJsonAsync<ListGameNewsInforViewModel>(ToolHelper.WebApiPath + "api/admin/listgamenews");
+            InforModel = await Http.GetFromJsonAsync<ListGameNewsInforViewModel>(ToolHelper.WebApiPath + "api/news/listgamenews");
         }
         catch (Exception ex)
         {

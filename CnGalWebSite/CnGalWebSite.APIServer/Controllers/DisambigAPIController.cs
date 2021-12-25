@@ -235,7 +235,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 disambig = await _disambigRepository.InsertAsync(disambig);
                 //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                 {
                     await _examineService.ExamineEditDisambigMainAsync(disambig, disambigMain);
                     await _examineService.UniversalCreateDisambigExaminedAsync(disambig, user, true, resulte, Operation.DisambigMain, model.Note);
@@ -287,7 +287,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                     disambig = await _disambigRepository.GetAll().Include(s => s.Entries).Include(s => s.Articles).FirstOrDefaultAsync(s => s.Id == disambig.Id);
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEditDisambigRelevancesAsync(disambig, disambigRelevances);
                         await _examineService.UniversalCreateDisambigExaminedAsync(disambig, user, true, resulte, Operation.DisambigRelevances, model.Note);
@@ -429,7 +429,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         resulte = text.ToString();
                     }
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEditDisambigMainAsync(disambig, disambigMain);
                         await _examineService.UniversalEditDisambigExaminedAsync(disambig, user, true, resulte, Operation.DisambigMain, model.Note);
@@ -580,7 +580,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         resulte = text.ToString();
                     }
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEditDisambigRelevancesAsync(disambig, disambigRelevances);
                         await _examineService.UniversalEditDisambigExaminedAsync(disambig, user, true, resulte, Operation.DisambigRelevances, model.Note);

@@ -147,13 +147,13 @@
             {
                 GameNewsItems.Add(new SelectedItem
                 {
-                    Text = item.NewsTitle.ToString(),
-                    Value = item.NewsTitle.ToString(),
+                    Text = GetNewsTitle(item),
+                    Value = GetNewsTitle(item),
                     Active = item.IsSelected
-                });
+                }) ;
                 if (item.IsSelected == true)
                 {
-                    GameNewsValue.Add(item.NewsTitle.ToString());
+                    GameNewsValue.Add(GetNewsTitle(item));
                 }
             }
 
@@ -164,6 +164,11 @@
         {
             ErrorHandler.ProcessError(ex, "获取编辑周报信息失败");
         }
+    }
+
+    public string GetNewsTitle(WeeklyNewsRelatedNewsEditModel model)
+    {
+        return $"{model.NewsId}. {model.NewsTitle}";
     }
 
     public async Task OnSave()
@@ -178,7 +183,7 @@
             }
             foreach(var item in Model.News)
             {
-                if(GameNewsValue.Any(s=>s==item.NewsTitle))
+                if(GameNewsValue.Any(s=>s== GetNewsTitle(item)))
                 {
                     item.IsSelected = true;
                 }

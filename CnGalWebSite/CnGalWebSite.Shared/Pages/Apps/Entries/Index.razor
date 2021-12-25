@@ -180,7 +180,7 @@ else
         try
         {
             var user = await authenticationStateTask;
-            IsAdmin = user.User.IsInRole("Admin");
+            IsAdmin = user.User.IsInRole("Editor");
 
             isReady = false;
             isNotFound = true;

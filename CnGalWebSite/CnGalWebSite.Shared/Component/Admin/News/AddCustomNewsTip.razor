@@ -8,17 +8,12 @@
     .modal-footer {
         display: none;
     }
-
-    .modal-title {
-        font-weight: bolder;
-    }
 </style>
 
 <div>
     <Scroll Height="600px">
         <div>
-            @if (isReady)
-            {
+
                 <div>
                     <div class="mb-4">
                         <h5 class="text-truncate fw-bold">正文</h5>
@@ -83,40 +78,17 @@
 
                     </div>
                 </div>
-            }
-            else
-            {
-                <div>
-                    <h3 class="mb-3 text-center">正在加载</h3>
-                    <div class="d-flex" style="justify-content: center;">
-                        <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
-                    </div>
-                </div>
-
-            }
+           
 
         </div>
 
     </Scroll>
 
     <div class="mt-3" style="display: flex; justify-content: space-between;">
-        @if (Model.State == GameNewsState.Edit)
-        {
-            <Button Color="Color.Success" Icon="fa fa-file-text-o" @onclick="OnPreview" IsAsync="true" Text="预览"></Button>
-        }
-        else if (Model.State == GameNewsState.Publish&&Model.ArticleId!=null)
-        {
-            <Button Color="Color.Success" Icon="fa fa-file-text-o" @onclick="OnLook" IsAsync="true" Text="查看"></Button>
+        <Button Color="Color.Danger" Icon="fa fa-close" class="me-1" @onclick="@OnClickClose" IsAsync="true" Text="取消"></Button>
 
-        }
 
-        <div style="display:flex;">
-            @if (Model.State == GameNewsState.Edit)
-            {
-                <Button Color="Color.Info" IsOutline="true" Icon="fa fa-paper-plane-o" class="me-1" @onclick="@OnPublish" IsAsync="true" Text="发布"></Button>
-            }
-            <Button Color="Color.Primary" Icon="fa fa-save" class="me-1" @onclick="@OnSave" IsAsync="true" Text="保存"></Button>
-        </div>
+        <Button Color="Color.Success" Icon="fa fa-save" class="me-1" @onclick="@OnSave" IsAsync="true" Text="保存"></Button>
     </div>
 
 </div>
@@ -124,9 +96,8 @@
 @code {
     [Parameter]
     public EventCallback OnClickClose { get; set; }
-    [Parameter]
-    public long Id { get; set; }
-    [Parameter]
+
+
     public EditGameNewsModel Model { get; set; } = new EditGameNewsModel();
 
     [CascadingParameter]
@@ -141,15 +112,16 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditGameNewsModel>(ToolHelper.WebApiPath + "api/news/EditGameNews/" + Id);
             Items = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList");
+            Model.Type = ArticleType.News;
+            Model.PublishTime = DateTime.Now.ToCstTime();
 
             isReady = true;
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取编辑动态信息失败");
+            ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
         }
     }
 
@@ -160,97 +132,31 @@
         {
             //处理数据
             long temp = 0;
-            if (string.IsNullOrWhiteSpace(Model.WeiboId) == false && long.TryParse(Model.WeiboId, out temp) == false)
+            if (string.IsNullOrWhiteSpace(Model.Author)|| string.IsNullOrWhiteSpace(Model.Title)||string.IsNullOrWhiteSpace(Model.BriefIntroduction) || string.IsNullOrWhiteSpace(Model.MainPage) || string.IsNullOrWhiteSpace(Model.Link))
             {
-                await ToastService.Error("保存动态数据失败", "微博Id无效");
+                await ToastService.Error("添加自定义动态失败", "作者，标题，简介，主页，原文链接都必须填写");
             }
 
 
-            var result = await Http.PostAsJsonAsync<EditGameNewsModel>(ToolHelper.WebApiPath + "api/news/EditGameNews", Model);
+            var result = await Http.PostAsJsonAsync<EditGameNewsModel>(ToolHelper.WebApiPath + "api/news/AddCustomNews", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("保存动态数据失败", obj.Error);
+                await ToastService.Error("添加自定义动态失败", obj.Error);
             }
             else
             {
-                isReady = false;
-                StateHasChanged();
-                Model = await Http.GetFromJsonAsync<EditGameNewsModel>(ToolHelper.WebApiPath + "api/news/EditGameNews/" + Id);
-                isReady = true;
-                await ToastService.Success("保存动态数据成功", "保存动态数据成功");
+
+                await ToastService.Success("添加自定义动态成功", "添加自定义动态成功");
+                await OnClickClose.InvokeAsync();
             }
         }
         catch (Exception ex)
         {
-            await ToastService.Error("保存动态数据失败", "保存动态数据失败");
+            await ToastService.Error("添加自定义动态失败", "添加自定义动态失败");
             //ErrorHandler.ProcessError(ex, "保存动态数据失败");
         }
     }
-
-
-    public async Task OnPublish()
-    {
-        //先保存
-        await OnSave();
-        try
-        {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/PublishGameNews/" + Id);
-            if (result.Successful)
-            {
-                await ToastService.Success("发布动态成功", "发布动态成功");
-                await OnClickClose.InvokeAsync();
-            }
-            else
-            {
-                await ToastService.Error("发布动态失败", result.Error);
-            }
-
-        }
-        catch (Exception ex)
-        {
-            await ToastService.Error("发布动态失败", "发布动态失败");
-            //ErrorHandler.ProcessError(ex, "发布动态失败");
-        }
-
-    }
-
-
-    public async Task OnPreview()
-    {
-
-        try
-        {
-            ArticleViewModel model = await Http.GetFromJsonAsync<ArticleViewModel>(ToolHelper.WebApiPath + "api/news/GetGameNewsPreview/" + Id);
-
-            var option = new DialogOption()
-            {
-                Title = "预览动态",
-                Size = Size.Medium,
-                ShowCloseButton = false
-            };
-            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<PreviewArticleTip>(new Dictionary<string, object>
-            {
-                [nameof(PreviewArticleTip.Model)] = model
-            }).Render();
-            await DialogService.Show(option);
-
-        }
-        catch (Exception ex)
-        {
-            await ToastService.Error("获取编辑动态信息失败", "获取编辑动态信息失败");
-            //ErrorHandler.ProcessError(ex, "获取编辑动态信息失败");
-        }
-
-    }
-
-    private async Task OnLook()
-    {
-        await OnClickClose.InvokeAsync();
-        NavigationManager.NavigateTo(Provider, "/articles/index/" + Model.ArticleId, Model.Title, "fa fa-newspaper-o");
-
-    }
-
 }

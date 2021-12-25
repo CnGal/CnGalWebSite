@@ -135,7 +135,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 //判断当前是否隐藏
                 if (periphery.IsHidden == true)
                 {
-                    if (user == null || await _userManager.IsInRoleAsync(user, "Admin") != true)
+                    if (user == null || await _userManager.IsInRoleAsync(user, "Editor") != true)
                     {
                         return NotFound();
                     }
@@ -502,7 +502,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 periphery = await _peripheryRepository.InsertAsync(periphery);
                 //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                 {
                     await _examineService.ExamineEditPeripheryMainAsync(periphery, peripheryMain);
                     await _examineService.UniversalCreatePeripheryExaminedAsync(periphery, user, true, resulte, Operation.EditPeripheryMain, model.Note);
@@ -553,7 +553,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
 
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEditPeripheryImagesAsync(periphery, peripheryImages);
                         await _examineService.UniversalEditPeripheryExaminedAsync(periphery, user, true, resulte, Operation.EditPeripheryImages, model.Note);
@@ -594,7 +594,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         resulte = text.ToString();
                     }
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEditPeripheryRelatedEntriesAsync(periphery, examinedModel);
                         await _examineService.UniversalEditPeripheryExaminedAsync(periphery, user, true, resulte, Operation.EditPeripheryRelatedEntries, model.Note);
@@ -632,7 +632,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         resulte = text.ToString();
                     }
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEditPeripheryRelatedPeripheriesAsync(periphery, peripheryRelatedPeripheries);
                         await _examineService.UniversalEditPeripheryExaminedAsync(periphery, user, true, resulte, Operation.EditPeripheryRelatedPeripheries, model.Note);
@@ -779,7 +779,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     resulte = text.ToString();
                 }
                 //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                 {
                     await _examineService.ExamineEditPeripheryMainAsync(periphery, peripheryMain);
                     await _examineService.UniversalEditPeripheryExaminedAsync(periphery, user, true, resulte, Operation.EditPeripheryMain, model.Note);
@@ -941,7 +941,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 resulte = text.ToString();
             }
             //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
                 await _examineService.ExamineEditPeripheryImagesAsync(periphery, peripheryImages);
                 await _examineService.UniversalEditPeripheryExaminedAsync(periphery, user, true, resulte, Operation.EditPeripheryImages, model.Note);
@@ -1134,7 +1134,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 resulte = text.ToString();
             }
             //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
                 await _examineService.ExamineEditPeripheryRelatedEntriesAsync(periphery, examinedModel);
                 await _examineService.UniversalEditPeripheryExaminedAsync(periphery, user, true, resulte, Operation.EditPeripheryRelatedEntries, model.Note);
@@ -1284,7 +1284,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 resulte = text.ToString();
             }
             //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
                 await _examineService.ExamineEditPeripheryRelatedPeripheriesAsync(periphery, examinedModel);
                 await _examineService.UniversalEditPeripheryExaminedAsync(periphery, user, true, resulte, Operation.EditPeripheryRelatedPeripheries, model.Note);

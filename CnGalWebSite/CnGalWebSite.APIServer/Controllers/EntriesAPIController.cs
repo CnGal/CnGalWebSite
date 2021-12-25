@@ -1133,7 +1133,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     resulte = text.ToString();
                 }
                 //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                 {
                     await _examineService.ExamineEstablishMainAsync(entry, entryMain);
                     await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishMain, model.Note);
@@ -1983,7 +1983,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 resulte = text.ToString();
             }
             //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
                 await _examineService.ExamineEstablishAddInforAsync(entry, entryAddInfor);
                 await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishAddInfor, model.Note);
@@ -2141,7 +2141,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 resulte = text.ToString();
             }
             //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
                 await _examineService.ExamineEstablishImagesAsync(entry, entryImages);
                 await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishImages, model.Note);
@@ -2647,7 +2647,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 resulte = text.ToString();
             }
             //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
                 await _examineService.ExamineEstablishRelevancesAsync(entry, examinedModel);
                 await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishRelevances, model.Note);
@@ -2727,7 +2727,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.Context = "";
             }
             //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
                 await _examineService.ExamineEstablishMainPageAsync(entry, model.Context);
                 await _examineService.UniversalEditExaminedAsync(entry, user, true, model.Context, Operation.EstablishMainPage, model.Note);
@@ -2817,7 +2817,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 entry.Pictures = new List<EntryPicture>();
 
                 //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                 {
                     await _examineService.ExamineEstablishMainAsync(entry, entryMain);
                     await _examineService.UniversalEstablishExaminedAsync(entry, user, true, resulte, Operation.EstablishMain, model.Note);
@@ -2972,7 +2972,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         resulte = text.ToString();
                     }
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEstablishAddInforAsync(entry, entryAddInfor);
                         await _examineService.UniversalEstablishExaminedAsync(entry, user, true, resulte, Operation.EstablishAddInfor, model.Note);
@@ -3025,7 +3025,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
 
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEstablishImagesAsync(entry, entryImages);
                         await _examineService.UniversalEstablishExaminedAsync(entry, user, true, resulte, Operation.EstablishImages, model.Note);
@@ -3176,7 +3176,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         resulte = text.ToString();
                     }
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEstablishRelevancesAsync(entry, entryRelevancesModel);
                         await _examineService.UniversalEstablishExaminedAsync(entry, user, true, resulte, Operation.EstablishRelevances, model.Note);
@@ -3194,7 +3194,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 if (string.IsNullOrWhiteSpace(model.Context) == false)
                 {
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEstablishMainPageAsync(entry, model.Context);
                         await _examineService.UniversalEstablishExaminedAsync(entry, user, true, model.Context, Operation.EstablishMainPage, model.Note);
@@ -3234,7 +3234,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         resulte = text.ToString();
                     }
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEstablishTagsAsync(entry, examinedModel);
                         await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishTags, model.Note);
@@ -3406,7 +3406,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 resulte = text.ToString();
             }
             //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
                 await _examineService.ExamineEstablishTagsAsync(entry, examinedModel);
                 await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishTags, model.Note);

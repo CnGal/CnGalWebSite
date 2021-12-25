@@ -27,6 +27,8 @@ namespace CnGalWebSite.APIServer.Application.News
 
         Task<Article> WeeklyNewsToArticle(WeeklyNews weeklyNews);
 
+        Task AddGameMewsFromWeibo(long id, string keyword);
+
         Task<QueryData<ListGameNewAloneModel>> GetPaginatedResult(QueryPageOptions options, ListGameNewAloneModel searchModel);
 
         Task<QueryData<ListWeeklyNewAloneModel>> GetPaginatedResult(QueryPageOptions options, ListWeeklyNewAloneModel searchModel);

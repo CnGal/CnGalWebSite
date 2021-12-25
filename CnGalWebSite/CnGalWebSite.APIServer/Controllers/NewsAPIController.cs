@@ -42,7 +42,7 @@ using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Editor")]
     [ApiController]
     [Route("api/news/[action]")]
     public class NewsAPIController : ControllerBase
@@ -283,6 +283,67 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             await _gameNewsRepository.UpdateAsync(gameNews);
+
+            return new Result { Successful = true };
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Result>> AddCustomNewsAsync(EditGameNewsModel model)
+        {
+
+            if (string.IsNullOrWhiteSpace(model.Author) || string.IsNullOrWhiteSpace(model.Title))
+            {
+                return new Result { Successful = false, Error = "作者名称或标题不能为空" };
+            }
+
+            var gameNews = new GameNews();
+            gameNews.Author = model.Author;
+            gameNews.BriefIntroduction = model.BriefIntroduction;
+            gameNews.Link = model.Link;
+            gameNews.MainPage = model.MainPage;
+            gameNews.MainPicture = model.MainPicture;
+            gameNews.NewsType = model.NewsType;
+            gameNews.PublishTime = model.PublishTime;
+            gameNews.Title = model.Title;
+            gameNews.Type = model.Type;
+
+            gameNews.RSS = new OriginalRSS
+            {
+                Author = model.Author,
+                Description = model.MainPage,
+                Link = model.Link,
+                PublishTime = model.PublishTime,
+                Title = model.Title,
+                Type = OriginalRSSType.Custom
+            };
+
+            gameNews.Entries.Clear();
+            foreach (var item in model.Entries.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false))
+            {
+                gameNews.Entries.Add(new GameNewsRelatedEntry
+                {
+                    EntryName = item.DisplayName
+                });
+            }
+
+            //查找作者关联词条
+            var author = await _weiboUserInforRepository.GetAll().AsNoTracking().Include(s => s.Entry).FirstOrDefaultAsync(s => s.WeiboName == gameNews.Author);
+
+            //查看是否修正了作者信息
+            if (author == null && string.IsNullOrWhiteSpace(model.AuthorEntryName) == false && string.IsNullOrWhiteSpace(model.WeiboId) == false)
+            {
+                try
+                {
+                    await _newsService.AddWeiboUserInfor(model.AuthorEntryName, long.Parse(model.WeiboId));
+
+                }
+                catch
+                {
+                    return new Result { Successful = false, Error = "尝试获取作者信息失败" };
+                }
+            }
+        
+            await _gameNewsRepository.InsertAsync(gameNews);
 
             return new Result { Successful = true };
         }
@@ -573,6 +634,69 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
 
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<ListGameNewsInforViewModel>> ListGameNewsAsync()
+        {
+            var model = new ListGameNewsInforViewModel
+            {
+                All = await _gameNewsRepository.LongCountAsync() + await _weeklyNewsRepository.LongCountAsync(),
+                GameNews = await _gameNewsRepository.LongCountAsync(),
+                PublishedNews = await _gameNewsRepository.LongCountAsync(s => s.State == GameNewsState.Publish),
+                DeletedNews = await _gameNewsRepository.LongCountAsync(s => s.State == GameNewsState.Ignore),
+                WeelyNews = await _weeklyNewsRepository.LongCountAsync()
+            };
+
+            return model;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListGameNewAloneModel>>> GetGameNewListAsync(GameNewsPagesInfor input)
+        {
+            var dtos = await _newsService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListWeeklyNewAloneModel>>> GetWeeklyNewListAsync(WeeklyNewsPagesInfor input)
+        {
+            var dtos = await _newsService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Result>> AddWeiboNewsAsync(AddWeiboNewsModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Link))
+            {
+                return new Result { Successful = false, Error = "链接不能为空" };
+            }
+            //尝试拆分
+            var text = model.Link.Split('/');
+            if (text.Length < 2)
+            {
+                return new Result { Successful = false, Error = "链接无效" };
+            }
+            long id = 0;
+            if (long.TryParse(text[3], out id) == false)
+            {
+                return new Result { Successful = false, Error = "链接无效，无法识别Id" };
+            }
+            var keyword = text[4];
+            try
+            {
+                await _newsService.AddGameMewsFromWeibo(id, keyword);
+
+            }
+            catch (Exception ex)
+            {
+                return new Result { Successful = false, Error = ex.Message };
+            }
+
+            return new Result { Successful = true };
         }
     }
 }

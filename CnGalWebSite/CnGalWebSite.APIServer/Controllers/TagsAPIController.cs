@@ -152,7 +152,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 tag = await _tagRepository.InsertAsync(tag);
                 //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                 {
                     await _examineService.ExamineEditTagMainAsync(tag, tagMain);
                     await _examineService.UniversalCreateTagExaminedAsync(tag, user, true, resulte, Operation.EditTagMain, model.Note);
@@ -192,7 +192,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         resulte = text.ToString();
                     }
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEditTagChildTagsAsync(tag, examinedModel);
                         await _examineService.UniversalCreateTagExaminedAsync(tag, user, true, resulte, Operation.EditTagChildTags, model.Note);
@@ -232,7 +232,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         resulte = text.ToString();
                     }
                     //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEditTagChildEntriesAsync(tag, tagChildEntries);
                         await _examineService.UniversalCreateTagExaminedAsync(tag, user, true, resulte, Operation.EditTagChildEntries, model.Note);
@@ -599,7 +599,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     resulte = text.ToString();
                 }
                 //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                 {
                     await _examineService.ExamineEditTagMainAsync(tag, tagMain);
                     await _examineService.UniversalEditTagExaminedAsync(tag, user, true, resulte, Operation.EditTagMain, model.Note);
@@ -749,7 +749,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 resulte = text.ToString();
             }
             //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
                 await _examineService.ExamineEditTagChildTagsAsync(tag, examinedModel);
                 await _examineService.UniversalEditTagExaminedAsync(tag, user, true, resulte, Operation.EditTagChildTags, model.Note);
@@ -897,7 +897,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 resulte = text.ToString();
             }
             //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
                 await _examineService.ExamineEditTagChildEntriesAsync(tag, examinedModel);
                 await _examineService.UniversalEditTagExaminedAsync(tag, user, true, resulte, Operation.EditTagChildEntries, model.Note);

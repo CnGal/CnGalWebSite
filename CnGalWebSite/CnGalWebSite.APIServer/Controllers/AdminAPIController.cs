@@ -190,7 +190,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 MBgImageName = _appHelper.GetImagePath(user.MBgImage, "app.png"),
                 SBgImageName = _appHelper.GetImagePath(user.SBgImage, "app.png"),
                 PhotoName = _appHelper.GetImagePath(user.PhotoPath, "user.png"),
-                BackgroundName = _appHelper.GetImagePath(user.BackgroundImage, "user.png"),
+                BackgroundName = _appHelper.GetImagePath(user.BackgroundImage, "userbackground.jpg"),
                 CanComment = user.CanComment ?? true,
                 Roles = new List<UserRolesModel>(),
                 Birthday = user.Birthday,
@@ -523,36 +523,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<ListGameNewsInforViewModel>> ListGameNewsAsync()
-        {
-            var model = new ListGameNewsInforViewModel
-            {
-                All = await _gameNewsRepository.LongCountAsync() + await _weeklyNewsRepository.LongCountAsync(),
-                GameNews = await _gameNewsRepository.LongCountAsync(),
-                PublishedNews = await _gameNewsRepository.LongCountAsync(s => s.State == GameNewsState.Publish),
-                DeletedNews = await _gameNewsRepository.LongCountAsync(s => s.State == GameNewsState.Ignore),
-                WeelyNews = await _weeklyNewsRepository.LongCountAsync()
-            };
-
-            return model;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListGameNewAloneModel>>> GetGameNewListAsync(GameNewsPagesInfor input)
-        {
-            var dtos = await _newsService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListWeeklyNewAloneModel>>> GetWeeklyNewListAsync(WeeklyNewsPagesInfor input)
-        {
-            var dtos = await _newsService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
+       
 
         /// <summary>
         /// 获取编辑记录详细信息视图
@@ -1491,9 +1462,9 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-               string temp= await _fileService.SaveImageAsync("https://wx1.sinaimg.cn/mw2000/0085plZ0gy1gxoqwt0tnaj31hh0r8dnh.jpg", "", 460, 215);
-                /*await _weeklyNewsRepository.DeleteAsync(s => true);
-                var news = await _gameNewsRepository.GetAll().Include(s=>s.RSS).ToListAsync();
+                string temp= await _fileService.SaveImageAsync("https://wx1.sinaimg.cn/mw2000/0085plZ0gy1gxoqwt0tnaj31hh0r8dnh.jpg", "", 460, 215);
+                //await _weeklyNewsRepository.DeleteAsync(s => true);
+                /*var news = await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.State == GameNewsState.Ignore).ToListAsync();
                 foreach (var item in news)
                 {
                     item.Title = "已删除";

@@ -48,6 +48,12 @@ namespace CnGalWebSite.DrawingBed.Controllers
                 string tempFilePath;
 
                 uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "temp", "images");
+
+                //清空文件夹
+                DeleteFiles(uploadsFolder);
+                DeleteFiles(Path.Combine(_webHostEnvironment.WebRootPath, "temp", "imageprogress"));
+
+
                 var temp = image.FileName.Split('.');
                 var Suffix = "";
                 if (temp.Length == 1)
@@ -106,6 +112,12 @@ namespace CnGalWebSite.DrawingBed.Controllers
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("> "+DateTime.Now.ToString("G"));
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                Console.ForegroundColor = ConsoleColor.White;
                 return new Result { Successful = false, Error = ex.Message };
             }
         }
@@ -136,7 +148,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         }
         private static string GetFileBase64(string path)
         {
-            var fsForRead = new FileStream(path, FileMode.Open);
+            using var fsForRead = new FileStream(path, FileMode.Open);
             string base64Str;
             try
             {
@@ -221,6 +233,47 @@ namespace CnGalWebSite.DrawingBed.Controllers
                 image.Save(newPath);
 
             };
+        }
+        private static bool DeleteFiles(string path)
+        {
+            if (Directory.Exists(path) == false)
+            {
+                Console.WriteLine("Path is not Existed!");
+                return false;
+            }
+            DirectoryInfo dir = new DirectoryInfo(path);
+            FileInfo[] files = dir.GetFiles();
+            try
+            {
+                foreach (var item in files)
+                {
+                    System.IO.File.Delete(item.FullName);
+                }
+                if (dir.GetDirectories().Length != 0)
+                {
+                    foreach (var item in dir.GetDirectories())
+                    {
+                        if (!item.ToString().Contains("$") && (!item.ToString().Contains("Boot")))
+                        {
+                            // Console.WriteLine(item);
+
+                            DeleteFiles(dir.ToString() + "\\" + item.ToString());
+                        }
+                    }
+                }
+                
+
+                return true;
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Delete Failed!");
+                return false;
+
+            }
+
+
+
         }
     }
 }

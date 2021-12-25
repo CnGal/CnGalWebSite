@@ -117,6 +117,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
             const string ROLE_ID = ADMIN_ID;
             const string USER_ROLE_ID = "a18be9c0-aa65-4af8-bd17-00bd9344e576";
             const string SUPER_ADMIN_ROLE_ID = "a18be9c0-aa65-4af8-bd17-00bd9344e577";
+            const string EDITOR_ROLE_ID = "a18be9c0-aa65-4af8-bd17-00bd9344e578";
 
 
             //创建种子角色
@@ -127,6 +128,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
                 NormalizedName = "Admin"
             }, new IdentityRole { Name = "User", NormalizedName = "USER", Id = USER_ROLE_ID }
             , new IdentityRole { Name = "SuperAdmin", NormalizedName = "SUPERADMIN", Id = SUPER_ADMIN_ROLE_ID }
+            , new IdentityRole { Name = "Editor", NormalizedName = "EDITOR", Id = EDITOR_ROLE_ID }
             );
 
             //创建超级管理员
@@ -163,7 +165,13 @@ namespace CnGalWebSite.APIServer.Infrastructure
                 {
                     RoleId = SUPER_ADMIN_ROLE_ID,
                     UserId = ADMIN_ID
+                }, new IdentityUserRole<string>
+                {
+                    RoleId = EDITOR_ROLE_ID,
+                    UserId = ADMIN_ID
                 }
+
+
             );
 
             //添加四个顶级标签

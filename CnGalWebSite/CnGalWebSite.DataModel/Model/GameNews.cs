@@ -40,6 +40,8 @@ namespace CnGalWebSite.DataModel.Model
 
         public GameNewsState State { get; set; }
 
+        public bool IsOriginal { get; set; }
+
         public OriginalRSS RSS { get; set; }
 
         public long? ArticleId { get; set; }
@@ -80,13 +82,17 @@ namespace CnGalWebSite.DataModel.Model
 
         public string Link { get; set; }
 
+        public string Author { get; set; }
+
         public OriginalRSSType Type { get; set; }
     }
 
     public enum OriginalRSSType
     {
         [Display(Name ="微博")]
-        Weibo
+        Weibo,
+        [Display(Name = "自定义")]
+        Custom,
     }
 
     public class WeeklyNews

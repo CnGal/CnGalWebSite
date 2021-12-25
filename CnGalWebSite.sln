@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.DataModel", "C
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{8C05FF93-54B4-4128-8E03-BAC78CDA6CAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.DrawingBed", "CnGalWebSite\CnGalWebSite.DrawingBed\CnGalWebSite.DrawingBed.csproj", "{F1CB2ACF-FE68-4052-B2E6-5F1FA5F10DFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.DrawingBed", "CnGalWebSite\CnGalWebSite.DrawingBed\CnGalWebSite.DrawingBed.csproj", "{F1CB2ACF-FE68-4052-B2E6-5F1FA5F10DFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

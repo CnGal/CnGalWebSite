@@ -3,6 +3,7 @@ using System;
 using CnGalWebSite.APIServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CnGalWebSite.APIServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211225063136_AddEditor_1")]
+    partial class AddEditor_1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,7 +153,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "2f960a14-bed8-48af-bdd1-9525e1594f47",
+                            ConcurrencyStamp = "1a465a37-b6e4-4adc-aa7c-079756c8797c",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
@@ -169,7 +171,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             PasswordHash = "AQAAAAEAACcQAAAAEDecloBliZOnB0dNPQmr8qhoodaLmPdrKN10/bvLDrHaAJSxqWOnrEsvBhl5kzrZmQ==",
                             PersonalSignature = "这个人太懒了，什么也没写额(～￣▽￣)～",
                             PhoneNumberConfirmed = false,
-                            RegistTime = new DateTime(2021, 12, 25, 16, 55, 21, 170, DateTimeKind.Unspecified).AddTicks(7036),
+                            RegistTime = new DateTime(2021, 12, 25, 14, 31, 35, 863, DateTimeKind.Unspecified).AddTicks(9784),
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
@@ -1023,9 +1025,6 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
-
-                    b.Property<string>("Author")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
@@ -2154,28 +2153,28 @@ namespace CnGalWebSite.APIServer.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            ConcurrencyStamp = "a63a30c8-dd01-4c3e-a4b3-0775d031056a",
+                            ConcurrencyStamp = "bbec3028-6af8-4d1a-9205-9a874d0a9d03",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e576",
-                            ConcurrencyStamp = "2d31910e-4572-4e69-b23c-260e10d87b8e",
+                            ConcurrencyStamp = "4c7c83d3-e9e5-46e7-8255-78aa212ddf2a",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e577",
-                            ConcurrencyStamp = "e00b1d5c-ff23-4c9a-b5f8-a0f2f81eda36",
+                            ConcurrencyStamp = "407040fd-aa32-41ab-aea5-ae5557f5ea4b",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e578",
-                            ConcurrencyStamp = "c8010ff9-cad5-449e-8a50-08bddd8401b6",
+                            ConcurrencyStamp = "c3d754a0-af73-4239-a496-922566747d27",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         });

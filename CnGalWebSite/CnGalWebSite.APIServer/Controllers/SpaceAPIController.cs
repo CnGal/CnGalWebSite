@@ -427,7 +427,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
             }
             //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
                 await _examineService.ExamineEditUserMainPageAsync(user, model.MainPage);
                 await _examineService.UniversalEditUserExaminedAsync(user, true, model.MainPage, Operation.UserMainPage, "");
@@ -525,7 +525,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     resulte = text.ToString();
                 }
                 //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                 {
                     await _examineService.ExamineEditUserMainAsync(user, userMain);
                     await _examineService.UniversalEditUserExaminedAsync(user, true, resulte, Operation.EditUserMain, "");

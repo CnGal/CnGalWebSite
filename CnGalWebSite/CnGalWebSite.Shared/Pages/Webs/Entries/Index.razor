@@ -1091,7 +1091,7 @@ else
 
             var userState = await authenticationStateTask;
             var user = userState.User;
-            if (user.IsInRole("Admin"))
+            if (user.IsInRole("Editor"))
             {
                 IsAdmin = true;
                 CanDeleted = true;

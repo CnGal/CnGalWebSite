@@ -227,7 +227,7 @@ namespace CnGalWebSite.APIServer.Application.News
             //查找最新的RSS源的时间
 
             var time = await _gameNewsRepository.GetAll().AnyAsync() ?
-                await _gameNewsRepository.GetAll().Include(s => s.RSS).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
+                await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s=>s.RSS.Type==OriginalRSSType.Weibo).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
             var weiboes = await _rssHelper.GetOriginalWeibo(long.Parse(_configuration["RSSWeiboUserId"]),time);
 
             if(weiboes.Count == 0)
@@ -277,6 +277,39 @@ namespace CnGalWebSite.APIServer.Application.News
 
             await _weeklyNewsRepository.UpdateAsync(weekly);
             
+        }
+
+        public async Task AddGameMewsFromWeibo(long id,string keyword)
+        {
+          
+
+            var item = await _rssHelper.GetOriginalWeibo(id, keyword);
+            var temp = await ProcessingOriginalRSS(item);
+
+            temp = await _gameNewsRepository.InsertAsync(temp);
+
+            //获取周报
+            var weekly = await _weeklyNewsRepository.GetAll().Include(s => s.News).OrderByDescending(s => s.CreateTime).FirstOrDefaultAsync();
+            if (weekly == null || weekly.CreateTime.IsInSameWeek(DateTime.Now.ToCstTime()) == false)
+            {
+                weekly = await GenerateNewestWeeklyNews();
+            }
+            //判断是否需要立即发表
+            if (temp.State == GameNewsState.Publish)
+            {
+                try
+                {
+                    await PublishNews(temp);
+
+                    weekly.News.Add(temp);
+                }
+                catch
+                {
+                    temp.State = GameNewsState.Edit;
+                    await _gameNewsRepository.UpdateAsync(temp);
+                }
+
+            }
         }
 
         public async Task UpdateWeiboUserInforCache()
@@ -666,20 +699,41 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public async Task< GameNews> ProcessingMicroblog(OriginalRSS originalRSS,List<string> entries,List<WeiboUserInfor> users)
         {
-            var authorString = GetMicroblogAuthor(originalRSS.Title);
+            var authorString = GetMicroblogAuthor(originalRSS.Description);
             GameNews model = new GameNews
             {
                 Type = ArticleType.News,
                 RSS = originalRSS,
                 Title = GetMicroblogTitle(originalRSS.Title,originalRSS.Description, authorString, 15),
                 BriefIntroduction = GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 50),
-                Author = GetMicroblogAuthor(originalRSS.Description),
+                Author = authorString ,
                 MainPage = GetMicroblogMainPage(originalRSS.Description, authorString),
                 Link=originalRSS.Link,
                 MainPicture=await GetMicroblogMainImage(originalRSS.Description),
                 PublishTime=originalRSS.PublishTime,
                 State=GameNewsState.Edit
             };
+            //修正作者
+            if(string.IsNullOrWhiteSpace(model.Author))
+            {
+                model.Author = originalRSS.Author;
+            }
+            //获取原文时间
+            if (model.Title.Length > 5)
+            {
+                var originalInfor = await _rssHelper.CorrectOriginalWeiboInfor(model.Title[0..5], GetMicroblogOriginalId(originalRSS.Description));
+                if(originalInfor==null)
+                {
+                    model.IsOriginal = false;
+                }
+                else
+                {
+                    model.IsOriginal = true;
+                    model.Link= originalInfor.Link;
+                    model.PublishTime= originalInfor.PublishTime;
+                }
+
+            }
 
             //查找关联词条
             var relatedEntries =new List<string>();
@@ -711,7 +765,7 @@ namespace CnGalWebSite.APIServer.Application.News
             }
 
             //如果找到了关联词条 也找到了 作者 而且有主图 那么直接发布
-            if (isAuthor && model.Entries.Count > 1 && string.IsNullOrWhiteSpace(model.MainPicture) == false)
+            if (isAuthor && model.Entries.Count > 1 && string.IsNullOrWhiteSpace(model.MainPicture) == false&&model.IsOriginal)
             {
                 model.State = GameNewsState.Publish;
             }
@@ -721,11 +775,15 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public List<string> ScreenRelatedEntry(List<string> entries)
         {
+            //清除重复
+            ToolHelper.Purge(ref entries);
+
             List<string> result = new List<string>();
             List<string> keyword = new List<string>
             {
                 "Unity",
-                "Steam"
+                "Steam",
+                "平安夜"
             };
             foreach (var entry in entries)
             {
@@ -782,7 +840,6 @@ namespace CnGalWebSite.APIServer.Application.News
             return _appHelper.GetStringAbbreviation(title, maxLength);
         }
 
-
         public string GetMicroblogAuthor(string description)
         {
             var temp = description.Split("- 转发");
@@ -793,11 +850,30 @@ namespace CnGalWebSite.APIServer.Application.News
             return ToolHelper.MidStrEx(description, "@", "</a>");
         }
 
-  /*      public string GetMicroblogBriefIntroduction(string description)
+        public long GetMicroblogOriginalId(string description)
         {
-            var str=StripHTML(description);
-            return _appHelper.GetStringAbbreviation(GetMicroblogTitle(str), 50);
-        }*/
+            var temp = ToolHelper.MidStrEx(description, "- 转发 <a href=\"https://weibo.com/", "\" target=\"_blank\">@");
+            if (string.IsNullOrWhiteSpace(temp))
+            {
+                return 0;
+            }
+
+            long id = 0;
+            if(long.TryParse(temp,out id ))
+            {
+                return id;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        /*      public string GetMicroblogBriefIntroduction(string description)
+              {
+                  var str=StripHTML(description);
+                  return _appHelper.GetStringAbbreviation(GetMicroblogTitle(str), 50);
+              }*/
 
         public string GetMicroblogMainPage(string description,string author)
         {

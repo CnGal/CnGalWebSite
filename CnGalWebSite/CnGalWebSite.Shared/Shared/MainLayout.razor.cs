@@ -285,6 +285,22 @@ namespace CnGalWebSite.Shared.Shared
                 });
 
             }
+            else if(user.IsInRole("Editor"))
+            {
+                menus.Insert(0,
+                new MenuItem()
+                {
+                    IsCollapsed = false,
+                    Text = "编辑者后台",
+                    Icon = "fa fa-fw fa-mortar-board",
+                    Url = "/null",
+                    Items = new List<MenuItem>{
+                                new MenuItem() { Text = "动态采集", Icon = "fa fa-fw fa-newspaper-o", Url = "/admin/listnews" }
+                    }
+                });
+            }
+
+
             return menus;
         }
 

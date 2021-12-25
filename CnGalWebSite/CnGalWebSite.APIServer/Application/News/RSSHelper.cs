@@ -56,6 +56,9 @@ namespace CnGalWebSite.APIServer.Application.News
                 var title = (XmlElement)item.SelectSingleNode("title");
                 weibo.Title = title.InnerText;
 
+                var author = (XmlElement)item.SelectSingleNode("author");
+                weibo.Author = author.InnerText;
+
                 var description = (XmlElement)item.SelectSingleNode("description");
                 weibo.Description = description.InnerText;
                 var link = (XmlElement)item.SelectSingleNode("link");
@@ -106,6 +109,8 @@ namespace CnGalWebSite.APIServer.Application.News
             return model;
         }
 
+
+
         /// <summary>
         /// GMT时间转成本地时间
         /// </summary>
@@ -129,7 +134,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 if (pattern != "")
                 {
                     dt = DateTime.ParseExact(gmt, pattern, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AdjustToUniversal);
-                    dt = dt.ToLocalTime();
+                    dt = dt.AddHours(8);
                 }
                 else
                 {
@@ -138,8 +143,109 @@ namespace CnGalWebSite.APIServer.Application.News
             }
             catch
             {
+
             }
             return dt;
+        }
+
+        public async Task<OriginalRSS> CorrectOriginalWeiboInfor(string Text, long id)
+        {
+            try
+            {
+                OriginalRSS model = new OriginalRSS();
+                using var client = _clientFactory.CreateClient();
+
+                //获取最新微博数据
+                var xmlStr = await client.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
+                //反序列化数据
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(xmlStr);
+
+                var items = doc.SelectSingleNode("rss").SelectSingleNode("channel").SelectNodes("item");
+                foreach (XmlNode item in items)
+                {
+                    var weibo = new OriginalRSS
+                    {
+                        Type = OriginalRSSType.Weibo
+                    };
+
+                    var pubDate = (XmlElement)item.SelectSingleNode("pubDate");
+                    weibo.PublishTime = GMT2Local(pubDate.InnerText);
+
+                    var author = (XmlElement)item.SelectSingleNode("author");
+                    weibo.Author = author.InnerText;
+
+                    var title = (XmlElement)item.SelectSingleNode("title");
+                    weibo.Title = title.InnerText;
+
+                    var description = (XmlElement)item.SelectSingleNode("description");
+                    weibo.Description = description.InnerText;
+                    var link = (XmlElement)item.SelectSingleNode("link");
+                    weibo.Link = link.InnerText;
+
+                    if (weibo.Title.Contains(Text))
+                    {
+                        return weibo;
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
+
+
+            return null;
+        }
+
+        public async Task<OriginalRSS> GetOriginalWeibo( long id,string keyWord)
+        {
+            OriginalRSS model = new OriginalRSS();
+            using var client = _clientFactory.CreateClient();
+
+            //获取最新微博数据
+            var xmlStr = await client.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
+            //反序列化数据
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(xmlStr);
+
+            var items = doc.SelectSingleNode("rss").SelectSingleNode("channel").SelectNodes("item");
+            foreach (XmlNode item in items)
+            {
+                var weibo = new OriginalRSS
+                {
+                    Type = OriginalRSSType.Weibo
+                };
+
+                var pubDate = (XmlElement)item.SelectSingleNode("pubDate");
+                weibo.PublishTime = GMT2Local(pubDate.InnerText);
+
+                var title = (XmlElement)item.SelectSingleNode("title");
+                weibo.Title = title.InnerText;
+
+                var author = (XmlElement)item.SelectSingleNode("author");
+                weibo.Author = author.InnerText;
+
+                var description = (XmlElement)item.SelectSingleNode("description");
+                weibo.Description = description.InnerText;
+                var link = (XmlElement)item.SelectSingleNode("link");
+                weibo.Link = link.InnerText;
+
+                if (weibo.Link.Contains(keyWord))
+                {
+                    var images = ToolHelper.GetImageLinks(weibo.Description);
+                    foreach (var temp in images)
+                    {
+                        var infor = await _fileService.SaveImageAsync(temp, _configuration["NewsAdminId"]);
+
+                        //替换图片
+                        weibo.Description = weibo.Description.Replace(temp, infor);
+                    }
+                    return weibo;
+                }
+            }
+
+            return null;
         }
     }
 }

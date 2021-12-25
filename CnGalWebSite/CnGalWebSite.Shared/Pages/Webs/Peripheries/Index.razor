@@ -332,7 +332,7 @@ else
 
             if (user.User.Identity.IsAuthenticated)
             {
-                IsAdmin = user.User.IsInRole("Admin");
+                IsAdmin = user.User.IsInRole("Editor");
                 //判断文章是否被收藏
                 await GetUserIsFavorited();
             }
