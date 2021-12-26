@@ -3,7 +3,7 @@
 @inject ILocalStorageService _localStorage
 @using Microsoft.Extensions.Logging
 
-<BootstrapBlazorRoot>
+<BootstrapBlazorRoot >
     <ErrorHandler @ref="errorHandler" >
         <ErrorLogger  ShowToast="false"  OnErrorHandleAsync="OnErrorHandleAsync">
             @if (_dataCacheService.IsApp == false)

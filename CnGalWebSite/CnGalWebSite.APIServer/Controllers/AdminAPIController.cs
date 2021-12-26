@@ -31,6 +31,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CnGalWebSite.APIServer.Application.ElasticSearches;
 using CnGalWebSite.APIServer.Application.News;
+using TencentCloud.Ame.V20190916.Models;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -187,10 +188,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 Integral = user.Integral,
                 ContributionValue = user.ContributionValue,
                 Claims = userClaims.Select(c => c.Value).ToList(),
-                MBgImageName = _appHelper.GetImagePath(user.MBgImage, "app.png"),
-                SBgImageName = _appHelper.GetImagePath(user.SBgImage, "app.png"),
-                PhotoName = _appHelper.GetImagePath(user.PhotoPath, "user.png"),
-                BackgroundName = _appHelper.GetImagePath(user.BackgroundImage, "userbackground.jpg"),
+                MBgImageName = _appHelper.GetImagePath(user.MBgImage, ""),
+                SBgImageName = _appHelper.GetImagePath(user.SBgImage, ""),
+                PhotoName = _appHelper.GetImagePath(user.PhotoPath, ""),
+                BackgroundName = _appHelper.GetImagePath(user.BackgroundImage, ""),
                 CanComment = user.CanComment ?? true,
                 Roles = new List<UserRolesModel>(),
                 Birthday = user.Birthday,
@@ -1462,7 +1463,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                string temp= await _fileService.SaveImageAsync("https://wx1.sinaimg.cn/mw2000/0085plZ0gy1gxoqwt0tnaj31hh0r8dnh.jpg", "", 460, 215);
+                //string temp= await _fileService.SaveImageAsync("https://wx1.sinaimg.cn/mw2000/0085plZ0gy1gxoqwt0tnaj31hh0r8dnh.jpg", "", 460, 215);
+                await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
                 //await _weeklyNewsRepository.DeleteAsync(s => true);
                 /*var news = await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.State == GameNewsState.Ignore).ToListAsync();
                 foreach (var item in news)
@@ -1476,7 +1478,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             catch (Exception ex)
             {
-                return new Result { Successful = false, Error = ex.Message };
+                return new Result { Successful = false, Error = ex.Message+"\n"+ex.StackTrace+"\n"+ex.Source };
             }
 
         }

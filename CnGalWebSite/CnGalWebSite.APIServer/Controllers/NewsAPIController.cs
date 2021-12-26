@@ -717,7 +717,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var keyword = text[4];
 
             //查找是否已经录入
-            if(await _gameNewsRepository.GetAll().Include(s=>s.RSS).AnyAsync(s=>s.RSS.Link==model.Link&&s.Title!="已删除"))
+            if(await _gameNewsRepository.GetAll().Include(s=>s.RSS).AnyAsync(s=>(s.RSS.Link==model.Link||s.Link==model.Link)&&s.Title!="已删除"))
             {
                 return new Result { Successful = false, Error = "该微博动态已存在" };
             }

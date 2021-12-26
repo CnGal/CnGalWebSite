@@ -731,6 +731,12 @@ namespace CnGalWebSite.APIServer.Application.News
                 }
                 else
                 {
+                    //检查是否重复
+                    if(await _gameNewsRepository.GetAll().Include(s => s.RSS).AnyAsync(s => (s.RSS.Link == model.Link || s.Link == model.Link) && s.Title != "已删除"))
+                    {
+                        throw new Exception("该微博动态已存在");
+                    }
+
                     model.IsOriginal = true;
                     model.Link= originalInfor.Link;
                     model.PublishTime= originalInfor.PublishTime;

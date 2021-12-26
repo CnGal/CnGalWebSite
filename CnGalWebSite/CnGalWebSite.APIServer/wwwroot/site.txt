@@ -3249,6 +3249,7 @@ https://www.cngal.org/articles/index/235
 https://www.cngal.org/articles/index/128
 https://www.cngal.org/articles/index/32
 https://www.cngal.org/articles/index/34
+https://www.cngal.org/articles/index/243
 https://www.cngal.org/articles/index/157
 https://www.cngal.org/articles/index/164
 https://www.cngal.org/articles/index/53
@@ -3260,6 +3261,8 @@ https://www.cngal.org/articles/index/36
 https://www.cngal.org/articles/index/52
 https://www.cngal.org/articles/index/240
 https://www.cngal.org/articles/index/239
+https://www.cngal.org/articles/index/245
+https://www.cngal.org/articles/index/246
 https://www.cngal.org/articles/index/67
 https://www.cngal.org/articles/index/167
 https://www.cngal.org/articles/index/180
@@ -3331,6 +3334,7 @@ https://www.cngal.org/articles/index/137
 https://www.cngal.org/articles/index/138
 https://www.cngal.org/articles/index/136
 https://www.cngal.org/articles/index/59
+https://www.cngal.org/articles/index/244
 https://www.cngal.org/articles/index/123
 https://www.cngal.org/articles/index/5
 https://www.cngal.org/articles/index/81
@@ -3370,6 +3374,7 @@ https://www.cngal.org/articles/index/61
 https://www.cngal.org/articles/index/18
 https://www.cngal.org/articles/index/144
 https://www.cngal.org/articles/index/146
+https://www.cngal.org/articles/index/242
 https://www.cngal.org/articles/index/206
 https://www.cngal.org/articles/index/4
 https://www.cngal.org/articles/index/64
