@@ -351,16 +351,24 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Result>> PublishGameNewsAsync(long id)
         {
-            var gameNews = await _gameNewsRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id == id);
-
-            if (gameNews == null)
+            try
             {
-                return new Result { Successful = false, Error = "未找到该动态" };
+                var gameNews = await _gameNewsRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id == id);
+
+                if (gameNews == null)
+                {
+                    return new Result { Successful = false, Error = "未找到该动态" };
+                }
+
+                await _newsService.PublishNews(gameNews);
+
+                return new Result { Successful = true };
+            }
+            catch (Exception ex)
+            {
+                return new Result { Successful = false, Error = ex.Message };
             }
 
-            await _newsService.PublishNews(gameNews);
-
-            return new Result { Successful = true };
         }
 
         [HttpGet("{id}")]
@@ -483,9 +491,9 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //选中的动态
             //获取在这个星期的所有动态
-            DateTime dateTime = DateTime.Now.ToCstTime();
-            var news = await _gameNewsRepository.GetAll().Where(s => dateTime.AddDays(-14) < s.PublishTime).ToListAsync();
-            news = news.Where(s => s.PublishTime.IsInSameWeek(dateTime)).ToList();
+
+            var news = await _gameNewsRepository.GetAll().Where(s => model.CreateTime.AddDays(7) > s.PublishTime&& model.CreateTime.AddDays(-7) < s.PublishTime).ToListAsync();
+            news = news.Where(s => s.PublishTime.IsInSameWeek(model.CreateTime)).ToList();
 
             foreach (var item in news)
             {
@@ -556,34 +564,50 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Result>> PublishWeelyNewsAsync(long id)
         {
-            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s=>s.News).FirstOrDefaultAsync(s => s.Id == id);
-
-            if (weeklyNews == null)
+            try
             {
-                return new Result { Successful = false, Error = "未找到该周报" };
+                var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s => s.News).FirstOrDefaultAsync(s => s.Id == id);
+
+                if (weeklyNews == null)
+                {
+                    return new Result { Successful = false, Error = "未找到该周报" };
+                }
+
+                await _newsService.PublishWeeklyNews(weeklyNews);
+
+                return new Result { Successful = true };
+            }
+            catch (Exception ex)
+            {
+                return new Result { Successful = false, Error = ex.Message };
             }
 
-            await _newsService.PublishWeeklyNews(weeklyNews);
-
-            return new Result { Successful = true };
         }
 
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Result>> ResetWeelyNewsAsync(long id)
         {
-            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s=>s.News).FirstOrDefaultAsync(s => s.Id == id);
-
-            if (weeklyNews == null)
+            try
             {
-                return new Result { Successful = false, Error = "未找到该周报" };
+                var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s => s.News).FirstOrDefaultAsync(s => s.Id == id);
+
+                if (weeklyNews == null)
+                {
+                    return new Result { Successful = false, Error = "未找到该周报" };
+                }
+
+                await _newsService.ResetWeeklyNews(weeklyNews);
+
+                await _weeklyNewsRepository.UpdateAsync(weeklyNews);
+
+                return new Result { Successful = true };
+            }
+            catch (Exception ex)
+            {
+                return new Result { Successful = false, Error = ex.Message };
             }
 
-           await _newsService.ResetWeeklyNews(weeklyNews);
-
-            await _weeklyNewsRepository.UpdateAsync(weeklyNews);
-
-            return new Result { Successful = true };
         }
 
         [HttpGet("{id}")]
@@ -685,7 +709,19 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Successful = false, Error = "链接无效，无法识别Id" };
             }
+            if(id<=0)
+            {
+                return new Result { Successful = false, Error = "链接无效，识别到的Id不符合条件" };
+            }
+
             var keyword = text[4];
+
+            //查找是否已经录入
+            if(await _gameNewsRepository.GetAll().Include(s=>s.RSS).AnyAsync(s=>s.RSS.Link==model.Link&&s.Title!="已删除"))
+            {
+                return new Result { Successful = false, Error = "该微博动态已存在" };
+            }
+
             try
             {
                 await _newsService.AddGameMewsFromWeibo(id, keyword);

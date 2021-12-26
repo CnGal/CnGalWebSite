@@ -230,10 +230,6 @@ namespace CnGalWebSite.APIServer.Application.News
                 await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s=>s.RSS.Type==OriginalRSSType.Weibo).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
             var weiboes = await _rssHelper.GetOriginalWeibo(long.Parse(_configuration["RSSWeiboUserId"]),time);
 
-            if(weiboes.Count == 0)
-            {
-                return;
-            }
             //获取周报
             var weekly=await _weeklyNewsRepository.GetAll().Include(s=>s.News).OrderByDescending(s => s.CreateTime).FirstOrDefaultAsync();
             if (weekly == null || weekly.CreateTime.IsInSameWeek( DateTime.Now.ToCstTime()) == false)
@@ -241,6 +237,10 @@ namespace CnGalWebSite.APIServer.Application.News
                 weekly = await GenerateNewestWeeklyNews();
             }
 
+            if(weiboes.Count == 0)
+            {
+                return;
+            }
             //处理原始数据
             foreach (var item in weiboes)
             {
@@ -281,9 +281,11 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public async Task AddGameMewsFromWeibo(long id,string keyword)
         {
-          
-
             var item = await _rssHelper.GetOriginalWeibo(id, keyword);
+            if(item == null)
+            {
+                throw new Exception("无法获取该微博，请尝试添加自定义动态");
+            }
             var temp = await ProcessingOriginalRSS(item);
 
             temp = await _gameNewsRepository.InsertAsync(temp);
@@ -383,7 +385,7 @@ namespace CnGalWebSite.APIServer.Application.News
             else
             {
 
-                isNeedCreate = DateTime.Now.ToCstTime().IsInSameWeek(last.CreateTime);
+                isNeedCreate = !DateTime.Now.ToCstTime().IsInSameWeek(last.CreateTime);
             }
 
             if (isNeedCreate)
@@ -560,17 +562,18 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public async Task<WeeklyNews> ResetWeeklyNews(WeeklyNews weeklyNews)
         {
+            weeklyNews.News.Clear();
+
+            //获取在这个星期的所有动态
+            var news = await _gameNewsRepository.GetAll().Where(s => s.State==GameNewsState.Publish&&weeklyNews.CreateTime.AddDays(7) > s.PublishTime && weeklyNews.CreateTime.AddDays(-7) < s.PublishTime).ToListAsync();
+            news = news.Where(s => s.PublishTime.IsInSameWeek(weeklyNews.CreateTime)).ToList();
+            weeklyNews.News.AddRange(news);
+
             weeklyNews.Title = GenerateWeeklyNewsTitle(weeklyNews);
             weeklyNews.BriefIntroduction = GenerateWeeklyNewsBriefIntroduction(weeklyNews);
             weeklyNews.MainPage = "";
             weeklyNews.MainPicture = GenerateWeeklyNewsMainImage(weeklyNews);
-            weeklyNews.News.Clear();
-
-            //获取在这个星期的所有动态
-            DateTime dateTime = DateTime.Now.ToCstTime();
-            var news = await _gameNewsRepository.GetAll().Where(s => dateTime.AddDays(-14) < s.PublishTime && s.State != GameNewsState.Ignore).ToListAsync();
-            news = news.Where(s => s.PublishTime.IsInSameWeek(dateTime)).ToList();
-            weeklyNews.News.AddRange(news);
+           
 
             return weeklyNews;
         }
@@ -623,7 +626,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public  string GenerateWeeklyNewsTitle(WeeklyNews weeklyNews)
         {
-            return "CnGal周报（" + weeklyNews.CreateTime.AddDays(-(int)weeklyNews.CreateTime.DayOfWeek+1).ToString("yyyy.M.d") + " - " + weeklyNews.CreateTime.AddDays(7 - (int)weeklyNews.CreateTime.DayOfWeek).ToString("yyyy.M.d") + "）";
+            return "CnGal周报（" + weeklyNews.CreateTime.AddDays(-(int)weeklyNews.CreateTime.DayOfWeek).ToString("yyyy.M.d") + " - " + weeklyNews.CreateTime.AddDays(7 - (int)weeklyNews.CreateTime.DayOfWeek-1).ToString("yyyy.M.d") + "）";
         }
 
         public string GenerateWeeklyNewsBriefIntroduction(WeeklyNews weeklyNews)

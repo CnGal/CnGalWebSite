@@ -1458,7 +1458,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var nowTime = DateTime.Now.ToCstTime();
 
             var articles = await _articleRepository.GetAll().Include(s => s.Relevances).Include(s => s.CreateUser)
-                .Where(s => s.Type == ArticleType.News && string.IsNullOrWhiteSpace(s.Name) == false && (s.RealNewsTime != null ? (s.RealNewsTime.Value.Date.AddDays(days) > nowTime.Date) : (s.PubishTime.Date.AddDays(days) > nowTime.Date)))
+                .Where(s => s.Type == ArticleType.News && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false && (s.RealNewsTime != null ? (s.RealNewsTime.Value.Date.AddDays(days) > nowTime.Date) : (s.PubishTime.Date.AddDays(days) > nowTime.Date)))
                 .OrderByDescending(s => s.RealNewsTime)
                 .ThenByDescending(s => s.PubishTime)
                 .ToListAsync();

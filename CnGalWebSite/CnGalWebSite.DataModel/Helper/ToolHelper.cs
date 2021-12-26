@@ -749,6 +749,7 @@ namespace CnGalWebSite.DataModel.Helper
             return temp1 == temp2;
         }
 
+       
     }
 
 
