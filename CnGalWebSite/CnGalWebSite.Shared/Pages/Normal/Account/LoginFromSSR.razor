@@ -88,7 +88,7 @@
         //处理回调
         if (string.IsNullOrWhiteSpace(ReturnUrl) == false)
         {
-            ReturnUrl = ToolHelper.Base64EncodeUrl(ToolHelper.Base64DecodeUrl(ReturnUrl).Replace("www.cngal.org", "app.cngal.org"));
+            ReturnUrl = ToolHelper.Base64EncodeUrl(ToolHelper.Base64DecodeUrl(ReturnUrl).Replace("www.cngal.org", "app.cngal.org").Replace("m.cngal.org", "app.cngal.org"));
         }
         //Url = "/account/login/" + ReturnUrl;
         NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ToolHelper.Base64DecodeUrl(ReturnUrl));

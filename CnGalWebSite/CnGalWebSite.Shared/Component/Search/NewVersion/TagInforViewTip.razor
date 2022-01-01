@@ -1,0 +1,40 @@
+﻿<TabLink Icon="fa fa-tag" Url="@("/tags/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
+    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 mb-3">
+        <div class="mb-2"  style="display:flex;">
+            <div class="pt-3">
+                <img style=" width: 250px; "  src="@Model.MainImage">
+            </div>
+            <div class="pt-3">
+                <header>
+                    <div class="article-home-tag">标签</div>
+                    <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                </header>
+                <div style="@($" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; ")">
+                    @Model.BriefIntroduction
+                </div>
+              
+            </div>
+        </div>
+
+        <p class="" style="color: gray;">
+            <i class="fa fa-calendar fa-fw"></i>
+            <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+
+            <i class="fa fa-eye fa-fw"></i>
+            <span class="article-home-infor-text">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
+        </p>
+        <div style="height: 1px;"></div>
+
+    </div>
+
+</TabLink>
+
+
+
+@code {
+    [Parameter]
+    public TagInforTipViewModel Model { get; set; }
+    [Parameter]
+    public string ColorNum { get; set; }
+
+}

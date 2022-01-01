@@ -204,6 +204,12 @@ function InitMouse() {
 
 function openNewPage(url) {
     window.open(url, "_blank");
+    /*var windowReference = window.open();
+    $.ajax({
+        url: "url", success: function (result) {
+            windowReference.location = url;
+        }
+    });*/
 }
 function setInnerHTML(id, html) {
     var box = document.getElementById(id)

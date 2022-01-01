@@ -50,6 +50,7 @@
 
         try
         {
+            _dataCacheService.RefreshSearchCatche();
 
             Carousels = await Http.GetFromJsonAsync<List<DataModel.Model.Carousel>>(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView");
 

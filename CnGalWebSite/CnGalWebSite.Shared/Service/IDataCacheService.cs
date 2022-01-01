@@ -54,7 +54,11 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<List<DataModel.Model.Carousel>> HomePageCarouselsCatche { get; set; }
 
+        SearchViewModel SearchViewModel { get; set; }
+
         Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>> GetHomePageListCardMode(string apiUrl, string type, int maxCount, bool isRefresh);
+
+        void RefreshSearchCatche();
 
     }
 }

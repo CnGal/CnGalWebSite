@@ -1195,7 +1195,7 @@ else
     {
         int next = 0;
         AlternateTimelineItems.Clear();
-        foreach (var item in EntryView.NewsOfEntry)
+        foreach (var item in EntryView.NewsOfEntry.OrderByDescending(s=>s.HappenedTime))
         {
             AlternateTimelineItems.Add(new TimelineItem
             {

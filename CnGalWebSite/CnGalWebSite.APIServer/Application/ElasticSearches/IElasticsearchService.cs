@@ -9,6 +9,8 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
     {
         Task UpdateDataToElasticsearch(DateTime LastUpdateTime);
 
+        Task DeleteDataOfElasticsearch();
+
         Task<PagedResultDto<SearchAloneModel>> QueryAsync(int page, int limit, string text, string screeningConditions, string sort, QueryType type);
     }
 }

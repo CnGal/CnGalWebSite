@@ -9,17 +9,17 @@
 
 @if (IsFrist)
 {
-    <Button Color="Color.Primary" IsOutline="false" IsDisabled="true" Icon="fa fa-spin fa-spinner" Text="获取验证码"></Button>
+    <Button Color="Color.Dark" IsOutline="false" IsDisabled="true" Icon="fa fa-spin fa-spinner" Text="获取验证码"></Button>
 }
 else
 {
     @if (isPost)
     {
-        <Button Color="Color.Primary" IsOutline="false" IsDisabled="true" Text="@("重新发送（"+seconds.ToString()+"秒）")"></Button>
+        <Button Color="Color.Dark" IsOutline="false" IsDisabled="true" Text="@("重新发送（"+seconds.ToString()+"秒）")"></Button>
     }
     else
     {
-        <Button Color="Color.Primary" IsOutline="true" Text="获取验证码" @onclick="OnVerification" IsAsync="true" @ref="button1"></Button>
+        <Button Color="Color.Dark" IsOutline="true" Text="获取验证码" @onclick="OnVerification" IsAsync="true" @ref="button1"></Button>
     }
 }
 
@@ -181,6 +181,7 @@ else
         IsFrist = false;
         isPost = false;
         IsSuccess = false;
+        StateHasChanged();
         return Task.CompletedTask;
     }
 }

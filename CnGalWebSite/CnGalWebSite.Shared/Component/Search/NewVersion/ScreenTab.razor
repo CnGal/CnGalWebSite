@@ -1,0 +1,112 @@
+﻿<div>
+    <CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine Model="Model" Styles=""></CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine>
+
+</div>
+
+@code {
+    [Parameter]
+    public SearchScreenType Type { get; set; }
+    [Parameter]
+    public string ScreenString { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnTabClick { get; set; }
+    public int DefaultIndex { get; set; }
+    public int RandomIndex { get; set; } = new Random().Next();
+
+    private CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel Model = new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel { Items = new List<CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel>() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshTab(Type);
+    }
+
+    public Task RefreshTab(SearchScreenType type)
+    {
+        Model.Items.Clear();
+
+        List<string> sortStrings = new List<string> {
+            "游戏",
+            "角色",
+            "STAFF",
+            "制作组",
+            "感想",
+            "访谈",
+            "攻略",
+            "动态",
+            "评测",
+            "周边",
+            "公告",
+            "杂谈",
+            "设定集或画集等",
+            "原声集",
+            "套装",
+            "其他周边",
+        };
+
+        if(ScreenString=="其他")
+        {
+            ScreenString = "其他周边";
+        }
+        if (ScreenString=="全部"|| ScreenString == "文章"|| ScreenString == "词条"|| ScreenString == "周边")
+        {
+            DefaultIndex = 666;
+        }
+        else
+        {
+            DefaultIndex = sortStrings.IndexOf(ScreenString);
+        }
+
+
+
+        int count = 0;
+        if (type==SearchScreenType.All)
+        {
+
+        }
+        else if(type==SearchScreenType.Entry)
+        {
+            count = 0;
+            sortStrings = sortStrings.GetRange(0, 4);
+        }
+        else if(type==SearchScreenType.Article)
+        {
+            count = 4;
+            sortStrings = sortStrings.GetRange(4, 8);
+        }
+        else if (type == SearchScreenType.Periphery)
+        {
+            count = 12;
+            sortStrings = sortStrings.GetRange(12, 4);
+        }
+
+        foreach (var item in sortStrings)
+        {
+            Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+            {
+                DefaultIndex = DefaultIndex,
+                Index = count,
+                OnTabClick = OnTabClick,
+                RandomIndex = RandomIndex,
+                Text = item,
+                Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+                ClassNames = $"col-auto pe-2 p-0"
+            });
+
+            count++;
+        }
+        Model.Items.Insert(0,new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = DefaultIndex,
+            Index = 666,
+            OnTabClick = OnTabClick,
+            RandomIndex = RandomIndex,
+            Text = "全部分类",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

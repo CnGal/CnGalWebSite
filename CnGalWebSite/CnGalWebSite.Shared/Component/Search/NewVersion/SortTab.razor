@@ -1,0 +1,99 @@
+﻿<div>
+    <CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine Model="Model" Styles=""></CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine>
+
+</div>
+
+@code {
+    [Parameter]
+    public string Sorting { get; set; }
+    [Parameter]
+    public SearchScreenType Type { get; set; }
+    [Parameter]
+    public string ScreenString { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnTabClick { get; set; }
+    public int DefaultIndex { get; set; }
+    public int RandomIndex { get; set; } = new Random().Next();
+
+    private CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel Model = new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel { Items = new List<CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel>() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshTab(Type, ScreenString);
+    }
+
+    public Task RefreshTab(SearchScreenType type, string screenString,string sort="")
+    {
+        Model.Items.Clear();
+        if(string.IsNullOrWhiteSpace(sort)==false)
+        {
+            Sorting = sort;
+        }
+
+        List<string> sortStrings = new List<string> {
+                "默认排序",
+                "最后编辑时间",
+                "创建时间",
+                "热度",
+                "发行时间",
+            };
+
+        if (string.IsNullOrWhiteSpace(Sorting) == false)
+        {
+            if (Sorting.Contains("Default"))
+            {
+                DefaultIndex = 0;
+            }
+            else
+           if (Sorting.Contains("LastEditTime"))
+            {
+                DefaultIndex = 1;
+            }
+            else if (Sorting.Contains("Id"))
+            {
+                DefaultIndex = 2;
+            }
+
+            else if (Sorting.Contains("ReaderCount"))
+            {
+                DefaultIndex = 3;
+            }
+            else if (Sorting.Contains("PubulishTime"))
+            {
+                DefaultIndex = 4;
+            }
+        }
+
+        int count = 0;
+
+
+
+        if (type == SearchScreenType.Entry && screenString == "游戏")
+        {
+
+        }
+        else
+        {
+            count = 0;
+            sortStrings = sortStrings.GetRange(0, 4);
+        }
+        foreach (var item in sortStrings)
+        {
+            Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+            {
+                DefaultIndex = DefaultIndex,
+                Index = count,
+                OnTabClick = OnTabClick,
+                RandomIndex = RandomIndex,
+                Text = item,
+                Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+                ClassNames = $"col-auto pe-2 p-0"
+            });
+
+            count++;
+        }
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

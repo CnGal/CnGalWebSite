@@ -1463,8 +1463,10 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                //string temp= await _fileService.SaveImageAsync("https://wx1.sinaimg.cn/mw2000/0085plZ0gy1gxoqwt0tnaj31hh0r8dnh.jpg", "", 460, 215);
+                //string temp= await _fileService.SaveImageAsync("https://wx1.sinaimg.cn/mw2000/0085plZ0gy1gxoqwt0tnaj31hh0r8dnh.jpg", "", 0, 0);
+                await _elasticsearchService.DeleteDataOfElasticsearch();
                 await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
+                
                 //await _weeklyNewsRepository.DeleteAsync(s => true);
                 /*var news = await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.State == GameNewsState.Ignore).ToListAsync();
                 foreach (var item in news)

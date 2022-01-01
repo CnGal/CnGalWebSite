@@ -16,6 +16,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using CnGalWebSite.DataModel.Application.Dtos;
 
 namespace CnGalWebSite.Shared.Service
 {
@@ -104,6 +105,13 @@ namespace CnGalWebSite.Shared.Service
         /// 主页缓存
         /// </summary>
         public List<KeyValuePair<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>, string>> HomeListCards { get; set; } = new List<KeyValuePair<List<AppComponent.Normal.Cards.MainImageCardModel>, string>>();
+        /// <summary>
+        /// 搜索页面缓存
+        /// </summary>
+        public SearchViewModel SearchViewModel { get; set; } = new SearchViewModel
+        {
+            pagedResultDto = new PagedResultDto<SearchAloneModel> { Data = new List<SearchAloneModel>(), CurrentPage = 1, TotalCount = 0, MaxResultCount = 8, ScreeningConditions = "全部", Sorting = "Default" }
+        };
 
         private readonly HttpClient _httpClient;
 
@@ -162,6 +170,12 @@ namespace CnGalWebSite.Shared.Service
             }
         }
 
-
+        public void RefreshSearchCatche()
+        {
+            SearchViewModel = new SearchViewModel
+            {
+                pagedResultDto = new PagedResultDto<SearchAloneModel> { Data = new List<SearchAloneModel>(), CurrentPage = 1, TotalCount = 0, MaxResultCount = 8, ScreeningConditions = "全部", Sorting = "Default" }
+            };
+        }
     }
 }

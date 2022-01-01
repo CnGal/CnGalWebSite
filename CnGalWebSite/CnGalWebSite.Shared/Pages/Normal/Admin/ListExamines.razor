@@ -97,7 +97,7 @@
            new SelectedItem{ Value = "true", Text ="已通过" },
           new SelectedItem{ Value = "false", Text ="未通过"}
     };
-    private bool IsAutoRefresh { get; set; } = true;
+    private bool IsAutoRefresh { get; set; } = false;
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 

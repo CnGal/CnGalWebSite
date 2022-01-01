@@ -119,6 +119,15 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
             }
         }
 
+        public async Task DeleteDataOfElasticsearch()
+        {
+            await _peripheryElasticsearchBaseService.RemoveIndex();
+            await _articleElasticsearchBaseService.RemoveIndex();
+            await _entryElasticsearchBaseService.RemoveIndex();
+            await _tagElasticsearchBaseService.RemoveIndex();
+        }
+
+
         public async Task<PagedResultDto<SearchAloneModel>> QueryAsync(int page, int limit, string text, string screeningConditions, string sort, QueryType type)
         {
             string sortString = "id";
@@ -141,7 +150,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
                     string[] temp = sort.Split(' ');
                     string f = temp[0][0].ToString();
                     sortString = f.ToLower() + temp[0][1..^0];
-                    if (temp.Length > 1)
+                    if (temp.Length == 1)
                     {
                         order = SortOrder.Ascending;
                     }

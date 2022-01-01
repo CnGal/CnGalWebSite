@@ -626,7 +626,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public  string GenerateWeeklyNewsTitle(WeeklyNews weeklyNews)
         {
-            return "CnGal周报（" + weeklyNews.CreateTime.AddDays(-(int)weeklyNews.CreateTime.DayOfWeek).ToString("yyyy.M.d") + " - " + weeklyNews.CreateTime.AddDays(7 - (int)weeklyNews.CreateTime.DayOfWeek-1).ToString("yyyy.M.d") + "）";
+            return $"CnGal每周速报（{weeklyNews.CreateTime.Year}年第{WeekOfYear(weeklyNews.CreateTime)}周）";
         }
 
         public string GenerateWeeklyNewsBriefIntroduction(WeeklyNews weeklyNews)
@@ -969,6 +969,36 @@ namespace CnGalWebSite.APIServer.Application.News
 
 
             return strOutput;
+        }
+
+        private int WeekOfYear(DateTime curDay)
+        {
+
+            int firstdayofweek = Convert.ToInt32(Convert.ToDateTime(curDay.Year.ToString() + "- " + "1-1 ").DayOfWeek);
+
+            int days = curDay.DayOfYear;
+
+            int daysOutOneWeek = days - (7 - firstdayofweek);
+
+            if (daysOutOneWeek <= 0)
+
+            {
+
+                return 1;
+
+            }
+            else
+            {
+
+                int weeks = daysOutOneWeek / 7;
+
+                if (daysOutOneWeek % 7 != 0)
+
+                    weeks++;
+
+                return weeks + 1;
+
+            }
         }
     }
 }

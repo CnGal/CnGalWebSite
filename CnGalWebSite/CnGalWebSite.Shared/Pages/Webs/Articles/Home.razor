@@ -5,6 +5,7 @@
 @inject IAppHelper _appHelper
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 <TitleTip Title="@ScreeningConditions"></TitleTip>
 
@@ -70,7 +71,7 @@
             //获取所有文章
             ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取所有文章名称列表失败");
         }
@@ -132,7 +133,7 @@
     {
         try
         {
-            NavigationManager.NavigateTo(Provider,model.Url, model.Title, model.Icon);
+            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
         }
         catch
         {
@@ -144,7 +145,7 @@
     {
         try
         {
-            NavigationManager.NavigateTo(Provider,"/home/search/文章/Id desc/" + text, "搜索", "fa fa-search");
+            NavigationManager.NavigateTo(Provider, "/home/search/文章/Id desc/" + text, "搜索", "fa fa-search");
         }
         catch
         {
