@@ -625,8 +625,8 @@ namespace CnGalWebSite.APIServer.Application.News
         }
 
         public  string GenerateWeeklyNewsTitle(WeeklyNews weeklyNews)
-        {
-            return $"CnGal每周速报（{weeklyNews.CreateTime.Year}年第{WeekOfYear(weeklyNews.CreateTime)}周）";
+{
+            return $"CnGal每周速报（{weeklyNews.CreateTime.Year}年第{WeekOfYear(weeklyNews.CreateTime.AddDays(6-(int)weeklyNews.CreateTime.DayOfWeek))}周）";
         }
 
         public string GenerateWeeklyNewsBriefIntroduction(WeeklyNews weeklyNews)
