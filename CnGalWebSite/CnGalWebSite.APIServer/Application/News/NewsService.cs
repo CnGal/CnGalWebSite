@@ -538,7 +538,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 MainPicture = weeklyNews.MainPicture,
                 Type = ArticleType.News,
                 PubishTime=DateTime.Now.ToCstTime(),
-                CreateTime=weeklyNews.CreateTime,
+                CreateTime= DateTime.Now.ToCstTime(),
                 NewsType = "周报",
                 CreateUserId = _configuration["NewsAdminId"]
             };
@@ -626,7 +626,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public  string GenerateWeeklyNewsTitle(WeeklyNews weeklyNews)
 {
-            return $"CnGal每周速报（{weeklyNews.CreateTime.Year}年第{WeekOfYear(weeklyNews.CreateTime.AddDays(6-(int)weeklyNews.CreateTime.DayOfWeek))}周）";
+            return $"CnGal每周速报（{weeklyNews.CreateTime.AddDays(6 - (int)weeklyNews.CreateTime.DayOfWeek).Year}年第{WeekOfYear(weeklyNews.CreateTime.AddDays(6-(int)weeklyNews.CreateTime.DayOfWeek))}周）";
         }
 
         public string GenerateWeeklyNewsBriefIntroduction(WeeklyNews weeklyNews)
@@ -672,7 +672,7 @@ namespace CnGalWebSite.APIServer.Application.News
             model += "## 正文\n";
             foreach (var item in weeklyNews.News)
             {
-                model += "**" + item.Author + " - " + item.Title + "** \n\n" + item.BriefIntroduction + "\n\n" + "[原文链接](" + item.Link + ")\n\n";
+                model += "**" + item.Author + " - " + item.Title + "** \n\n" + item.BriefIntroduction + "\n\n" + "[原文链接 - " + item.PublishTime.ToString("yyyy/M/d HH:mm") + "](" + item.Link + ")\n\n";
                 if(string.IsNullOrWhiteSpace(item.MainPicture)==false)
                 {
                     model += "![image](" + item.MainPicture + ")\n\n";

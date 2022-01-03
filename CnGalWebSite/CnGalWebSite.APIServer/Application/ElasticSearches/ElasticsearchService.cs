@@ -165,7 +165,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
                 model= await QueryEntryAsync(page, limit, text, screeningConditions, sortString, order, type);
             }
             else if (screeningConditions == "文章" || screeningConditions == "感想" || screeningConditions == "访谈" || screeningConditions == "攻略" || screeningConditions == "动态" || screeningConditions == "评测" ||
-                screeningConditions == "文章周边" || screeningConditions == "公告" || screeningConditions == "杂谈")
+                screeningConditions == "文章周边" || screeningConditions == "公告" || screeningConditions == "杂谈" || screeningConditions == "二创")
             {
                 model = await QueryArticleAsync(page, limit, text, screeningConditions, sortString, order, type);
             }
@@ -337,9 +337,10 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
                 "攻略" => new ArticleType[] { ArticleType.Strategy },
                 "动态" => new ArticleType[] { ArticleType.News },
                 "评测" =>  new ArticleType[] {ArticleType.Evaluation },
-                "周边" => new ArticleType[] { ArticleType.Peripheral },
+                "文章周边" => new ArticleType[] { ArticleType.Peripheral },
                 "公告" =>  new ArticleType[] {ArticleType.Notice },
                 "杂谈" => new ArticleType[] { ArticleType.None },
+                "二创" => new ArticleType[] { ArticleType.Fan },
                 _ => new ArticleType[] { ArticleType.Notice, ArticleType.Peripheral, ArticleType.Evaluation, ArticleType.News, ArticleType.Interview, ArticleType.Tought, ArticleType.None },
             };
 

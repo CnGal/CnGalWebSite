@@ -31,7 +31,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CnGalWebSite.APIServer.Application.ElasticSearches;
 using CnGalWebSite.APIServer.Application.News;
-using TencentCloud.Ame.V20190916.Models;
+using CnGalWebSite.APIServer.Application.HistoryData;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -81,11 +81,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly INewsService _newsService;
         private readonly IRepository<GameNews, long> _gameNewsRepository;
         private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
+        private readonly IHistoryDataService _historyDataService;
 
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
-        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService,
+        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, IHistoryDataService historyDataService,
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IElasticsearchService elasticsearchService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IElasticsearchBaseService<Article> articleElasticsearchBaseService,
         UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IElasticsearchBaseService<Entry> entryElasticsearchBaseService,
@@ -134,6 +135,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _newsService = newsService;
             _gameNewsRepository = gameNewsRepository;
             _weeklyNewsRepository = weeklyNewsRepository;
+            _historyDataService = historyDataService;
         }
 
         /// <summary>
@@ -1466,7 +1468,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 //string temp= await _fileService.SaveImageAsync("https://wx1.sinaimg.cn/mw2000/0085plZ0gy1gxoqwt0tnaj31hh0r8dnh.jpg", "", 0, 0);
                 await _elasticsearchService.DeleteDataOfElasticsearch();
                 await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
-                
+
                 //await _weeklyNewsRepository.DeleteAsync(s => true);
                 /*var news = await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.State == GameNewsState.Ignore).ToListAsync();
                 foreach (var item in news)
@@ -1476,6 +1478,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     item.RSS.PublishTime = DateTime.MinValue;
                     await _gameNewsRepository.UpdateAsync(item);
                 }*/
+
+               //await _historyDataService.GenerateZhiHuArticleImportJson();
                 return new Result { Successful = true };
             }
             catch (Exception ex)

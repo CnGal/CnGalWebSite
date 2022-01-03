@@ -221,12 +221,14 @@
         {
             await sortTab.RefreshTab(SearchScreenType.All, _dataCacheService.SearchViewModel.pagedResultDto.ScreeningConditions);
             await screenTab.RefreshTab(SearchScreenType.All);
+            searchScreenType = SearchScreenType.All;
             _dataCacheService.SearchViewModel.pagedResultDto.ScreeningConditions = "全部";
         }
         else if (index == 1)
         {
             await sortTab.RefreshTab(SearchScreenType.Entry, _dataCacheService.SearchViewModel.pagedResultDto.ScreeningConditions);
             await screenTab.RefreshTab(SearchScreenType.Entry);
+            searchScreenType = SearchScreenType.Entry;
             _dataCacheService.SearchViewModel.pagedResultDto.ScreeningConditions = "词条";
 
         }
@@ -234,6 +236,7 @@
         {
             await sortTab.RefreshTab(SearchScreenType.Article, _dataCacheService.SearchViewModel.pagedResultDto.ScreeningConditions);
             await screenTab.RefreshTab(SearchScreenType.Article);
+            searchScreenType = SearchScreenType.Article;
             _dataCacheService.SearchViewModel.pagedResultDto.ScreeningConditions = "文章";
 
         }
@@ -241,6 +244,7 @@
         {
             await sortTab.RefreshTab(SearchScreenType.Periphery, _dataCacheService.SearchViewModel.pagedResultDto.ScreeningConditions);
             await screenTab.RefreshTab(SearchScreenType.Periphery);
+            searchScreenType = SearchScreenType.Periphery;
             _dataCacheService.SearchViewModel.pagedResultDto.ScreeningConditions = "周边";
         }
 
@@ -321,13 +325,14 @@
             6 => "攻略",
             7 => "动态",
             8 => "评测",
-            9 => "周边",
+            9 => "文章周边",
             10 => "公告",
             11 => "杂谈",
-            12 => "设定集或画册等",
-            13 => "原声集",
-            14 => "套装",
-            15 => "其他",
+            12 => "二创",
+            13=> "设定集或画册等",
+            14 => "原声集",
+            15 => "套装",
+            16 => "其他",
             666 => searchScreenType switch
             {
                 SearchScreenType.All => "全部",

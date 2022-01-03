@@ -63,6 +63,9 @@ namespace CnGalWebSite.APIServer.Application.Articles
                     case "杂谈":
                         query = query.Where(s => s.Type == ArticleType.None);
                         break;
+                    case "二创":
+                        query = query.Where(s => s.Type == ArticleType.Fan);
+                        break;
                     case "公告":
                         query = query.Where(s => s.Type == ArticleType.Notice);
                         break;
@@ -234,6 +237,9 @@ namespace CnGalWebSite.APIServer.Application.Articles
                         break;
                     case "杂谈":
                         query = query.Where(s => s.Type == ArticleType.None);
+                        break;
+                    case "二创":
+                        query = query.Where(s => s.Type == ArticleType.Fan);
                         break;
                     case "公告":
                         query = query.Where(s => s.Type == ArticleType.Notice);

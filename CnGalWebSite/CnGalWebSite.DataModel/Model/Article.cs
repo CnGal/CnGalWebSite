@@ -146,7 +146,9 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "公告")]
         Notice,
         [Display(Name = "杂谈")]
-        None
+        None,
+        [Display(Name = "二创")]
+        Fan,
     }
 
     public class ArticleRelevance
