@@ -1,6 +1,8 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Admin
 {
     public class ListDisambigsInforViewModel
@@ -28,7 +30,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
     public class DisambigsPagesInfor
     {
-        public QueryPageOptions Options { get; set; }
+        public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
         public ListDisambigAloneModel SearchModel { get; set; }
 
         public string ObjectId { get; set; }

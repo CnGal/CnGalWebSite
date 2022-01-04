@@ -66,7 +66,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<FavoriteFoldersPagesInfor>(ToolHelper.WebApiPath + "api/favorites/GetFavoriteFolderList", new FavoriteFoldersPagesInfor { Options=options,SearchModel = searchModel, UserId = Id });
+            var result = await Http.PostAsJsonAsync<FavoriteFoldersPagesInfor>(ToolHelper.WebApiPath + "api/favorites/GetFavoriteFolderList", new FavoriteFoldersPagesInfor { Options=(QueryPageOptionsHelper)options,SearchModel = searchModel, UserId = Id });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListFavoriteFolderAloneModel>>(jsonContent, ToolHelper.options);
         }

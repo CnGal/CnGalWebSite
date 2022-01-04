@@ -1,7 +1,9 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.DataModel.Model;
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.TimedTasks
 {
     public class ListTimedTasksInforViewModel
@@ -45,7 +47,7 @@ namespace CnGalWebSite.DataModel.ViewModel.TimedTasks
 
     public class TimedTasksPagesInfor
     {
-        public QueryPageOptions Options { get; set; }
+        public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
         public ListTimedTaskAloneModel SearchModel { get; set; }
 
         public string Text { get; set; }

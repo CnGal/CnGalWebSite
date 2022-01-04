@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.ImportModel
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.ImportModel
 {
     public class ImportUserModel
     {

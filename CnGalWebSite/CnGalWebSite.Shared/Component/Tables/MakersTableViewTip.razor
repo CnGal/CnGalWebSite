@@ -49,7 +49,7 @@ else
     {
         MakerInfors = new List<MakerInforTableModel>()
     };
-    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<MakerInforTableModel>, string, SortOrder, IEnumerable<MakerInforTableModel>>> SortLambdaCacheMaker = new();
+    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<MakerInforTableModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<MakerInforTableModel>>> SortLambdaCacheMaker = new();
     private MakerInforTableModel SearchModelMaker { get; set; } = new MakerInforTableModel();
 
     [Parameter]
@@ -130,7 +130,7 @@ else
         {
             // 外部未进行排序，内部自动进行排序处理
             var invoker = SortLambdaCacheMaker.GetOrAdd(typeof(MakerInforTableModel), key => LambdaExtensions.GetSortLambda<MakerInforTableModel>().Compile());
-            items = invoker(items, options.SortName, options.SortOrder);
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
             isSorted = true;
         }
 

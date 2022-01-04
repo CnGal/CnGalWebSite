@@ -158,7 +158,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
 
         }
 
-        public async Task<QueryData<ListCommentAloneModel>> GetPaginatedResult(QueryPageOptions options, ListCommentAloneModel searchModel, CommentType type = CommentType.None, string objectId = "")
+        public async Task<QueryData<ListCommentAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListCommentAloneModel searchModel, CommentType type = CommentType.None, string objectId = "")
         {
             IEnumerable<Comment> items = _commentRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Text) == false).AsNoTracking().Include(s => s.ParentCodeNavigation);
             //判断评论列表类型
@@ -213,13 +213,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
                }*/
 
             // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
-
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
-            {
+          
                 // 处理 SearchText 模糊搜索
                 if (!string.IsNullOrWhiteSpace(options.SearchText))
                 {
@@ -229,22 +223,14 @@ namespace CnGalWebSite.APIServer.Application.Comments
                                  || (item.ArticleId.ToString()?.Contains(options.SearchText) ?? false)
                                 /* || (item.ParentCodeNavigationId.ToString()?.Contains(options.SearchText) ?? false)*/);
                 }
-            }
-            // 过滤
-            /* var isFiltered = false;
-             if (options.Filters.Any())
-             {
-                 items = items.Where(options.Filters.GetFilterFunc<Entry>());
-                 isFiltered = true;
-             }*/
-
+         
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCache.GetOrAdd(typeof(Comment), key => LambdaExtensions.GetSortLambda<Comment>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
                 isSorted = true;
             }
 

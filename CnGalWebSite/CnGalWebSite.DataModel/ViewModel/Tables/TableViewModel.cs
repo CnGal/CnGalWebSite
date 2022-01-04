@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.ViewModel.Tables
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.ViewModel.Tables
 {
     public class TableViewModel
     {

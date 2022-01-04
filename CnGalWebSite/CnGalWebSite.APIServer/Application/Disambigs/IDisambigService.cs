@@ -8,7 +8,7 @@ namespace CnGalWebSite.APIServer.Application.Disambigs
 {
     public interface IDisambigService
     {
-        Task<QueryData<ListDisambigAloneModel>> GetPaginatedResult(QueryPageOptions options, ListDisambigAloneModel searchModel);
+        Task<QueryData<ListDisambigAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListDisambigAloneModel searchModel);
 
         void UpdateDisambigDataMain(Disambig disambig, DisambigMain examine);
 

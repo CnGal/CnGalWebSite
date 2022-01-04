@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.ViewModel.Ranks
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.ViewModel.Ranks
 {
     public class EditRankPriorityViewModel
     {

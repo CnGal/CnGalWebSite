@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.Model
 {
     public class Entry
@@ -81,23 +83,23 @@ namespace CnGalWebSite.DataModel.Model
         /// 消歧义页
         /// </summary>
         public int? DisambigId { get; set; }
-        public Disambig? Disambig { get; set; }
+        public Disambig Disambig { get; set; }
         /// <summary>
         /// 备份管理
         /// </summary>
         public long? BackUpArchiveId { get; set; }
-        public BackUpArchive? BackUpArchive { get; set; }
+        public BackUpArchive BackUpArchive { get; set; }
         /// <summary>
         /// 完善度检查
         /// </summary>
         public int? PerfectionId { get; set; }
-        public Perfection? Perfection { get; set; }
+        public Perfection Perfection { get; set; }
 
 
         /// <summary>
         /// 附加信息列表
         /// </summary>
-        public ICollection<BasicEntryInformation>? Information { get; set; }
+        public ICollection<BasicEntryInformation> Information { get; set; }
 
         /// <summary>
         /// 主页
@@ -108,28 +110,28 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 相关性列表
         /// </summary>
-        public ICollection<EntryRelevance>? Relevances { get; set; }
+        public ICollection<EntryRelevance> Relevances { get; set; }
         /// <summary>
         /// 周边列表
         /// </summary>
-        public ICollection<PeripheryRelevanceEntry>? Peripheries { get; set; }
+        public ICollection<PeripheryRelevanceEntry> Peripheries { get; set; }
 
         /// <summary>
         /// 图片列表
         /// </summary>
-        public ICollection<EntryPicture>? Pictures { get; set; }
+        public ICollection<EntryPicture> Pictures { get; set; }
         /// <summary>
         /// 审核记录 也是编辑记录
         /// </summary>
-        public ICollection<Examine>? Examines { get; set; }
+        public ICollection<Examine> Examines { get; set; }
         /// <summary>
         /// 标签
         /// </summary>
-        public ICollection<Tag>? Tags { get; set; }
+        public ICollection<Tag> Tags { get; set; }
         /// <summary>
         /// 评分列表 也是已玩用户列表
         /// </summary>
-        public ICollection<PlayedGame>? PlayedGames { get; set; }
+        public ICollection<PlayedGame> PlayedGames { get; set; }
 
     }
 
@@ -189,7 +191,7 @@ namespace CnGalWebSite.DataModel.Model
 
         public string DisplayValue { get; set; }
 
-        public ICollection<BasicEntryInformationAdditional>? Additional { get; set; }
+        public ICollection<BasicEntryInformationAdditional> Additional { get; set; }
     }
 
     public class BasicEntryInformationAdditional

@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.Model
 {
     public class Message
@@ -28,7 +30,7 @@ namespace CnGalWebSite.DataModel.Model
 
         public string ApplicationUserId { get; set; }
 
-        public ApplicationUser? ApplicationUser { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
     }
 
     public enum MessageType

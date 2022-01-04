@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.Model
 {
     public class PlayedGame
@@ -27,7 +29,7 @@ namespace CnGalWebSite.DataModel.Model
         public Entry Entry { get; set; }
         public int? EntryId { get; set; }
 
-        public ApplicationUser? ApplicationUser { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
         public string ApplicationUserId { get; set; }
 
     }

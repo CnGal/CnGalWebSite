@@ -41,7 +41,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public Task<QueryData<ListBackUpArchiveAloneModel>> GetPaginatedResult(QueryPageOptions options, ListBackUpArchiveAloneModel searchModel)
+        public Task<QueryData<ListBackUpArchiveAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListBackUpArchiveAloneModel searchModel)
         {
             var tempDateTimeNow = DateTime.Now.ToCstTime();
 
@@ -58,27 +58,12 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
 
 
 
-            // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
 
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    // items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false));
-                }
+                // items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false));
             }
-            // 过滤
-            /* var isFiltered = false;
-             if (options.Filters.Any())
-             {
-                 items = items.Where(options.Filters.GetFilterFunc<Entry>());
-                 isFiltered = true;
-             }*/
 
             // 排序
             var isSorted = false;
@@ -86,7 +71,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCacheApplicationUser.GetOrAdd(typeof(BackUpArchive), key => LambdaExtensions.GetSortLambda<BackUpArchive>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 

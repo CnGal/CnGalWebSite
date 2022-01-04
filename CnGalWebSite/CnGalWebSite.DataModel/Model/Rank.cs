@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.Model
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.Model
 {
     public class Rank
     {
@@ -16,7 +18,7 @@
 
         public int Priority { get; set; } = 0;
 
-        public ICollection<RankUser>? RankUsers { get; set; }
+        public ICollection<RankUser> RankUsers { get; set; }
 
 
         public DateTime CreateTime { get; set; }
@@ -28,7 +30,7 @@
         public long Id { get; set; }
 
         public string ApplicationUserId { get; set; }
-        public ApplicationUser? ApplicationUser { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
 
         public long RankId { get; set; }
         public Rank Rank { get; set; }

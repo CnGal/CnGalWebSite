@@ -75,7 +75,7 @@
             options.Searchs = new List<IFilterAction>();
             SearchModelUser.ApplicationUserId = Id;
 
-            var result = await Http.PostAsJsonAsync<MessagesPagesInfor>(ToolHelper.WebApiPath + "api/space/GetMessagesListNormal", new MessagesPagesInfor { SearchModel = SearchModelUser, Options = options });
+            var result = await Http.PostAsJsonAsync<MessagesPagesInfor>(ToolHelper.WebApiPath + "api/space/GetMessagesListNormal", new MessagesPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListMessageAloneModel>>(jsonContent, ToolHelper.options);
         }

@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.DataModel.Model;
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Admin
 {
     public class ListWeeklyNewsInforViewModel
@@ -45,7 +47,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
     public class WeeklyNewsPagesInfor
     {
-        public QueryPageOptions Options { get; set; }
+        public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
         public ListWeeklyNewAloneModel SearchModel { get; set; }
     }
 }

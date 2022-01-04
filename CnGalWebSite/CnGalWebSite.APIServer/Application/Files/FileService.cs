@@ -94,7 +94,7 @@ namespace CnGalWebSite.APIServer.Application.Files
             return dtos_;
         }
 
-        public Task<QueryData<ListFileAloneModel>> GetPaginatedResult(QueryPageOptions options, ListFileAloneModel searchModel)
+        public Task<QueryData<ListFileAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListFileAloneModel searchModel)
         {
             IEnumerable<UserFile> items = _userFileRepository.GetAll();
             // 处理高级搜索
@@ -107,36 +107,21 @@ namespace CnGalWebSite.APIServer.Application.Files
                 items = items.Where(item => item.UserId?.Contains(searchModel.UserId, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
-            // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
-
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
-            {
+          
                 // 处理 SearchText 模糊搜索
                 if (!string.IsNullOrWhiteSpace(options.SearchText))
                 {
                     items = items.Where(item => (item.FileName?.Contains(options.SearchText) ?? false)
                                  || (item.UserId?.Contains(options.SearchText) ?? false));
                 }
-            }
-            // 过滤
-            /* var isFiltered = false;
-             if (options.Filters.Any())
-             {
-                 items = items.Where(options.Filters.GetFilterFunc<Entry>());
-                 isFiltered = true;
-             }*/
-
+         
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCache.GetOrAdd(typeof(UserFile), key => LambdaExtensions.GetSortLambda<UserFile>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
                 isSorted = true;
             }
 

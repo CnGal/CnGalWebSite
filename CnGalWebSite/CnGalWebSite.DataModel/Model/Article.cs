@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.Model
 {
     public class Article
@@ -63,7 +65,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 创建文章的用户
         /// </summary>
-        public ApplicationUser? CreateUser { get; set; }
+        public ApplicationUser CreateUser { get; set; }
         public string CreateUserId { get; set; }
 
         /// <summary>
@@ -81,7 +83,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 点赞列表
         /// </summary>
-        public List<ThumbsUp>? ThumbsUps { get; set; }
+        public List<ThumbsUp> ThumbsUps { get; set; }
 
         /// <summary>
         /// 是否隐藏
@@ -111,13 +113,13 @@ namespace CnGalWebSite.DataModel.Model
         /// 消歧义页
         /// </summary>
         public int? DisambigId { get; set; }
-        public Disambig? Disambig { get; set; }
+        public Disambig Disambig { get; set; }
 
         /// <summary>
         /// 备份管理
         /// </summary>
         public long? BackUpArchiveId { get; set; }
-        public BackUpArchive? BackUpArchive { get; set; }
+        public BackUpArchive BackUpArchive { get; set; }
 
         /// <summary>
         /// 相关性列表

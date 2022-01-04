@@ -1,5 +1,7 @@
 ﻿using CnGalWebSite.DataModel.Model;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Favorites
 {
     public class MoveFavoriteObjectsModel

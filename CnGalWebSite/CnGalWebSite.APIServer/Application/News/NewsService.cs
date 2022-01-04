@@ -58,7 +58,7 @@ namespace CnGalWebSite.APIServer.Application.News
         }
 
 
-        public Task<QueryData<ListGameNewAloneModel>> GetPaginatedResult(QueryPageOptions options, ListGameNewAloneModel searchModel)
+        public Task<QueryData<ListGameNewAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListGameNewAloneModel searchModel)
         {
             IEnumerable<GameNews> items = _gameNewsRepository.GetAll().AsNoTracking().Where(s => s.Title != "已删除");
             // 处理高级搜索
@@ -77,14 +77,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 items = items.Where(item => item.BriefIntroduction?.Contains(searchModel.BriefIntroduction, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
-            // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
-
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
-            {
+           
                 // 处理 SearchText 模糊搜索
                 if (!string.IsNullOrWhiteSpace(options.SearchText))
                 {
@@ -92,22 +85,14 @@ namespace CnGalWebSite.APIServer.Application.News
                     || (item.Title?.Contains(options.SearchText) ?? false)
                     || (item.BriefIntroduction?.Contains(options.SearchText) ?? false));
                 }
-            }
-            // 过滤
-            /* var isFiltered = false;
-             if (options.Filters.Any())
-             {
-                 items = items.Where(options.Filters.GetFilterFunc<Entry>());
-                 isFiltered = true;
-             }*/
-
+        
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCacheGameNews.GetOrAdd(typeof(GameNews), key => LambdaExtensions.GetSortLambda<GameNews>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
                 isSorted = true;
             }
 
@@ -142,7 +127,7 @@ namespace CnGalWebSite.APIServer.Application.News
             });
         }
 
-        public Task<QueryData<ListWeeklyNewAloneModel>> GetPaginatedResult(QueryPageOptions options, ListWeeklyNewAloneModel searchModel)
+        public Task<QueryData<ListWeeklyNewAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListWeeklyNewAloneModel searchModel)
         {
             IEnumerable<WeeklyNews> items = _weeklyNewsRepository.GetAll().AsNoTracking();
             // 处理高级搜索
@@ -157,28 +142,14 @@ namespace CnGalWebSite.APIServer.Application.News
                 items = items.Where(item => item.BriefIntroduction?.Contains(searchModel.BriefIntroduction, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
-            // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
-
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
-            {
+          
                 // 处理 SearchText 模糊搜索
                 if (!string.IsNullOrWhiteSpace(options.SearchText))
                 {
                     items = items.Where(item => (item.Title?.Contains(options.SearchText) ?? false)
                     || (item.BriefIntroduction?.Contains(options.SearchText) ?? false));
                 }
-            }
-            // 过滤
-            /* var isFiltered = false;
-             if (options.Filters.Any())
-             {
-                 items = items.Where(options.Filters.GetFilterFunc<Entry>());
-                 isFiltered = true;
-             }*/
+          
 
             // 排序
             var isSorted = false;
@@ -186,7 +157,7 @@ namespace CnGalWebSite.APIServer.Application.News
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCacheWeeklyNews.GetOrAdd(typeof(WeeklyNews), key => LambdaExtensions.GetSortLambda<WeeklyNews>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
                 isSorted = true;
             }
 

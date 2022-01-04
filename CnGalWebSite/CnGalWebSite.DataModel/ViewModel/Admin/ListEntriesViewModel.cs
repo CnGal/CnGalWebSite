@@ -1,7 +1,9 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.DataModel.Model;
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Admin
 {
     public class ListEntriesInforViewModel
@@ -45,7 +47,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
     public class EntriesPagesInfor
     {
-        public QueryPageOptions Options { get; set; }
+        public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
         public ListEntryAloneModel SearchModel { get; set; }
 
         public string Text { get; set; }

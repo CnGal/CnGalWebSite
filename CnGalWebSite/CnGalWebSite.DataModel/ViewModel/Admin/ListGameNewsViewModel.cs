@@ -1,4 +1,4 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using CnGalWebSite.DataModel.Model;
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
+using System;
+using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Admin
 {
     public class ListGameNewsInforViewModel
@@ -46,7 +48,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
     public class GameNewsPagesInfor
     {
-        public QueryPageOptions Options { get; set; }
+        public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
         public ListGameNewAloneModel SearchModel { get; set; }
     }
 }

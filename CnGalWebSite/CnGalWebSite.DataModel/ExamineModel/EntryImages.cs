@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.ExamineModel
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.ExamineModel
 {
     public class EntryImages
     {

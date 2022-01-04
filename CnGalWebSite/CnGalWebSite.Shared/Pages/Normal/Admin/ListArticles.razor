@@ -207,7 +207,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<ArticlesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetArticleList", new ArticlesPagesInfor { SearchModel = SearchModelArticle, Options = options });
+            var result = await Http.PostAsJsonAsync<ArticlesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetArticleList", new ArticlesPagesInfor { SearchModel = SearchModelArticle, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListArticleAloneModel>>(jsonContent, ToolHelper.options);
         }

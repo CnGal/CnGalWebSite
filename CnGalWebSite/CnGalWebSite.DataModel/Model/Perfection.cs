@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.Model
 {
     public class Perfection
@@ -13,7 +15,7 @@ namespace CnGalWebSite.DataModel.Model
         public int EntryId { get; set; }
         public Entry Entry { get; set; }
 
-        public ICollection<PerfectionCheck>? Checks { get; set; }
+        public ICollection<PerfectionCheck> Checks { get; set; }
     }
 
     public class PerfectionCheck
@@ -39,7 +41,7 @@ namespace CnGalWebSite.DataModel.Model
         public PerfectionDefectType DefectType { get; set; }
 
         public long? PerfectionId { get; set; }
-        public Perfection? Perfection { get; set; }
+        public Perfection Perfection { get; set; }
     }
 
     public enum PerfectionCheckLevel

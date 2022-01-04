@@ -1,6 +1,8 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Admin
 {
     public class ListErrorCountsInforViewModel
@@ -26,7 +28,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
     public class ErrorCountsPagesInfor
     {
-        public QueryPageOptions Options { get; set; }
+        public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
         public ListErrorCountAloneModel SearchModel { get; set; }
 
         public string Text { get; set; }

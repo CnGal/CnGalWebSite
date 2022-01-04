@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.Model
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.Model
 {
     public class SteamInfor
     {
@@ -21,7 +23,7 @@
         /// <summary>
         /// 关联的游戏
         /// </summary>
-        public Entry? Entry { get; set; }
+        public Entry Entry { get; set; }
         public int? EntryId { get; set; }
 
         public DateTime LowestTime { get; set; }
@@ -45,7 +47,7 @@
     public class UserSteamResponseJson
     {
         public int game_count { get; set; }
-        public List<UserSteamGameJson>? games { get; set; }
+        public List<UserSteamGameJson> games { get; set; }
     }
 
     public class UserSteamGameJson

@@ -21,8 +21,8 @@ namespace CnGalWebSite.DataModel.Helper
         //https://v3.cngal.org/
 
 
-        //public const string WebApiPath = "http://localhost:45160/";
-        public const string WebApiPath = "http://172.17.0.1:2001/";
+        public const string WebApiPath = "http://localhost:45160/";
+        //public const string WebApiPath = "http://172.17.0.1:2001/";
         //public const string WebApiPath = "https://www.cngal.org/";
 
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";
@@ -750,6 +750,28 @@ namespace CnGalWebSite.DataModel.Helper
         }
 
        
+    }
+
+    public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions
+    {
+        /// <summary>
+        /// 隐式转换
+        /// </summary>
+        /// <param name="cat"></param>
+        public static implicit  operator QueryPageOptionsHelper(BootstrapBlazor.Components.QueryPageOptions cat)
+        {
+            return new QueryPageOptionsHelper
+            {
+                SearchText = cat.SearchText,
+                SortName = cat.SortName,
+                SortOrder = (CnGalWebSite.DataModel.ViewModel.Search.SortOrder)cat.SortOrder,
+                SearchModel = cat.SearchModel,
+                PageIndex = cat.PageIndex,
+                StartIndex = cat.StartIndex,
+                PageItems = cat.PageItems,
+                IsPage = cat.IsPage,
+            };
+        }
     }
 
 

@@ -1,6 +1,8 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Admin
 {
     public class ListFilesInforViewModel
@@ -29,7 +31,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
     public class FilesPagesInfor
     {
-        public QueryPageOptions Options { get; set; }
+        public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
         public ListFileAloneModel SearchModel { get; set; }
 
         public string Text { get; set; }

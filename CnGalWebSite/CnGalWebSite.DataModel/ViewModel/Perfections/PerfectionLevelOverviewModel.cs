@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.ViewModel.Perfections
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.ViewModel.Perfections
 {
     public class PerfectionLevelOverviewModel
     {

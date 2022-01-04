@@ -1,5 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.Model
 {
     public class Comment
@@ -23,29 +27,29 @@ namespace CnGalWebSite.DataModel.Model
         /// 发表评论的用户
         /// </summary>
         public string ApplicationUserId { get; set; }
-        public ApplicationUser? ApplicationUser { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
 
         public int? EntryId { get; set; }
-        public Entry? Entry { get; set; }
+        public Entry Entry { get; set; }
 
         public long? ArticleId { get; set; }
-        public Article? Article { get; set; }
+        public Article Article { get; set; }
 
         public long? PeripheryId { get; set; }
-        public Periphery? Periphery { get; set; }
+        public Periphery Periphery { get; set; }
 
         public long? UserSpaceCommentManagerId { get; set; }
-        public UserSpaceCommentManager? UserSpaceCommentManager { get; set; }
+        public UserSpaceCommentManager UserSpaceCommentManager { get; set; }
 
         /// <summary>
         /// 父评论
         /// </summary>
-        public Comment? ParentCodeNavigation { get; set; }
+        public Comment ParentCodeNavigation { get; set; }
 
         /// <summary>
         /// 子评论
         /// </summary>
-        public ICollection<Comment>? InverseParentCodeNavigation { get; set; }
+        public ICollection<Comment> InverseParentCodeNavigation { get; set; }
     }
     public enum CommentType
     {

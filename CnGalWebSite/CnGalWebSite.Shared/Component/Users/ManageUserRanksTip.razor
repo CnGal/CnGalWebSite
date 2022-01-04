@@ -69,7 +69,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<UserRanksPagesInfor>(ToolHelper.WebApiPath + "api/ranks/GetUserRankList", new UserRanksPagesInfor { SearchModel = SearchModelUser, Options = options, UserId = Id });
+            var result = await Http.PostAsJsonAsync<UserRanksPagesInfor>(ToolHelper.WebApiPath + "api/ranks/GetUserRankList", new UserRanksPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options, UserId = Id });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListUserRankAloneModel>>(jsonContent, ToolHelper.options);
         }

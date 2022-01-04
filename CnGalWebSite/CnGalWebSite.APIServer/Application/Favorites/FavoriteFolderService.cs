@@ -23,7 +23,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
             _favoriteFolderRepository = favoriteFolderRepository;
         }
 
-        public async Task<QueryData<ListFavoriteFolderAloneModel>> GetPaginatedResult(QueryPageOptions options, ListFavoriteFolderAloneModel searchModel, string userId = "")
+        public async Task<QueryData<ListFavoriteFolderAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListFavoriteFolderAloneModel searchModel, string userId = "")
         {
             IEnumerable<FavoriteFolder> items;
 
@@ -48,14 +48,6 @@ namespace CnGalWebSite.APIServer.Application.Favorites
                 items = items.Where(item => item.BriefIntroduction?.Contains(searchModel.BriefIntroduction, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
-            // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
-
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
-            {
                 // 处理 SearchText 模糊搜索
                 if (!string.IsNullOrWhiteSpace(options.SearchText))
                 {
@@ -63,15 +55,14 @@ namespace CnGalWebSite.APIServer.Application.Favorites
                                  || (item.BriefIntroduction?.Contains(options.SearchText) ?? false)
                                  || (item.ApplicationUserId.ToString()?.Contains(options.SearchText) ?? false));
                 }
-            }
-
+         
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCache.GetOrAdd(typeof(FavoriteFolder), key => LambdaExtensions.GetSortLambda<FavoriteFolder>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
                 isSorted = true;
             }
 

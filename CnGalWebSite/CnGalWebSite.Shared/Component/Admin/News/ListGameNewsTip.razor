@@ -79,7 +79,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<GameNewsPagesInfor>(ToolHelper.WebApiPath + "api/news/GetGameNewList", new GameNewsPagesInfor { SearchModel = SearchModelUser, Options = options });
+            var result = await Http.PostAsJsonAsync<GameNewsPagesInfor>(ToolHelper.WebApiPath + "api/news/GetGameNewList", new GameNewsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListGameNewAloneModel>>(jsonContent, ToolHelper.options);
         }

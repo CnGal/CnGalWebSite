@@ -46,7 +46,7 @@ else
     {
         GroupInfors = new List<GroupInforTableModel>()
     };
-    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<GroupInforTableModel>, string, SortOrder, IEnumerable<GroupInforTableModel>>> SortLambdaCacheGroup = new();
+    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<GroupInforTableModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<GroupInforTableModel>>> SortLambdaCacheGroup = new();
     private GroupInforTableModel SearchModelGroup { get; set; } = new GroupInforTableModel();
 
     [Parameter]
@@ -125,7 +125,7 @@ else
         {
             // 外部未进行排序，内部自动进行排序处理
             var invoker = SortLambdaCacheGroup.GetOrAdd(typeof(GroupInforTableModel), key => LambdaExtensions.GetSortLambda<GroupInforTableModel>().Compile());
-            items = invoker(items, options.SortName, options.SortOrder);
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
             isSorted = true;
         }
 

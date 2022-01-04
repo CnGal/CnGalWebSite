@@ -73,7 +73,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<CommentsPagesInfor>(ToolHelper.WebApiPath + "api/comments/GetCommentListNormal", new CommentsPagesInfor { SearchModel = searchModel, Options = options, Type = Type, ObjectId = Id });
+            var result = await Http.PostAsJsonAsync<CommentsPagesInfor>(ToolHelper.WebApiPath + "api/comments/GetCommentListNormal", new CommentsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options, Type = Type, ObjectId = Id });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListCommentAloneModel>>(jsonContent, ToolHelper.options);
         }

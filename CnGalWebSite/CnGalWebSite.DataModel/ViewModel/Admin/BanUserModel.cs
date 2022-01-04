@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.ViewModel.Admin
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.ViewModel.Admin
 {
     public class BanUserModel
     {

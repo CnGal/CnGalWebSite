@@ -185,7 +185,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<ExaminesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetExamineList", new ExaminesPagesInfor { SearchModel = SearchModelExamine, Options = options });
+            var result = await Http.PostAsJsonAsync<ExaminesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetExamineList", new ExaminesPagesInfor { SearchModel = SearchModelExamine, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListExamineAloneModel>>(jsonContent, ToolHelper.options);
         }

@@ -1,6 +1,8 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Admin
 {
     public class ListHistoryUsersInforViewModel
@@ -34,7 +36,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
     public class HistoryUsersPagesInfor
     {
-        public QueryPageOptions Options { get; set; }
+        public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
         public ListHistoryUserAloneModel SearchModel { get; set; }
 
         public string ObjectId { get; set; }

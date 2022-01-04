@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.ViewModel.Space
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.ViewModel.Space
 {
     public class PersonalSpaceViewModel
     {

@@ -33,7 +33,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<ErrorCountsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetErrorCountList", new ErrorCountsPagesInfor { SearchModel = searchModel, Options = options });
+            var result = await Http.PostAsJsonAsync<ErrorCountsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetErrorCountList", new ErrorCountsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListErrorCountAloneModel>>(jsonContent, ToolHelper.options);
         }

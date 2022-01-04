@@ -7,7 +7,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
 {
     public interface IBackUpArchiveService
     {
-        Task<QueryData<ListBackUpArchiveAloneModel>> GetPaginatedResult(QueryPageOptions options, ListBackUpArchiveAloneModel searchModel);
+        Task<QueryData<ListBackUpArchiveAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListBackUpArchiveAloneModel searchModel);
 
 
         /// <summary>

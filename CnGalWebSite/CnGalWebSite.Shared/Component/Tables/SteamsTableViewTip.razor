@@ -52,7 +52,7 @@ else
     {
         SteamInfors = new List<SteamInforTableModel>()
     };
-    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<SteamInforTableModel>, string, SortOrder, IEnumerable<SteamInforTableModel>>> SortLambdaCacheSteam = new();
+    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<SteamInforTableModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<SteamInforTableModel>>> SortLambdaCacheSteam = new();
     private SteamInforTableModel SearchModelSteam { get; set; } = new SteamInforTableModel();
 
     public async Task OnLook(int id)
@@ -193,7 +193,7 @@ else
         {
             // 外部未进行排序，内部自动进行排序处理
             var invoker = SortLambdaCacheSteam.GetOrAdd(typeof(SteamInforTableModel), key => LambdaExtensions.GetSortLambda<SteamInforTableModel>().Compile());
-            items = invoker(items, options.SortName, options.SortOrder);
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
             isSorted = true;
         }
 

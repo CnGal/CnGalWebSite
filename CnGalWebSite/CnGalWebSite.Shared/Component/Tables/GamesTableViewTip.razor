@@ -53,7 +53,7 @@ else
         BasicInfors = new List<BasicInforTableModel>()
     };
     private bool isReady = false;
-    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<BasicInforTableModel>, string, SortOrder, IEnumerable<BasicInforTableModel>>> SortLambdaCacheBasic = new();
+    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<BasicInforTableModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<BasicInforTableModel>>> SortLambdaCacheBasic = new();
     private BasicInforTableModel SearchModelBasic { get; set; } = new BasicInforTableModel();
     protected override async Task OnInitializedAsync()
     {
@@ -137,7 +137,7 @@ else
         {
             // 外部未进行排序，内部自动进行排序处理
             var invoker = SortLambdaCacheBasic.GetOrAdd(typeof(BasicInforTableModel), key => LambdaExtensions.GetSortLambda<BasicInforTableModel>().Compile());
-            items = invoker(items, options.SortName, options.SortOrder);
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
             isSorted = true;
         }
 

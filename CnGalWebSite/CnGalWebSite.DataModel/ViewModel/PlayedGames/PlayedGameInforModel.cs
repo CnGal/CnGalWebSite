@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
 {
     public class PlayedGameInforModel
     {

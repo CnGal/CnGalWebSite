@@ -111,7 +111,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<PeripheriesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetPeripheryList", new PeripheriesPagesInfor { SearchModel = SearchModelArticle, Options = options });
+            var result = await Http.PostAsJsonAsync<PeripheriesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetPeripheryList", new PeripheriesPagesInfor { SearchModel = SearchModelArticle, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListPeripheryAloneModel>>(jsonContent, ToolHelper.options);
         }

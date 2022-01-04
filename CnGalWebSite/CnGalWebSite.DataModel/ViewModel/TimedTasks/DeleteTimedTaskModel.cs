@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.ViewModel.TimedTasks
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.ViewModel.TimedTasks
 {
     public class DeleteTimedTaskModel
     {

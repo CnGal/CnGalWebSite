@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.ViewModel
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.ViewModel
 {
     public class EntryHomeViewModel
     {

@@ -1,6 +1,8 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel
 {
     public class EditAddInforViewModel
@@ -15,7 +17,7 @@ namespace CnGalWebSite.DataModel.ViewModel
 
         public string Name { get; set; }
         [Display(Name = "相关网站")]
-        public List<SocialPlatform>? SocialPlatforms { get; set; } = new List<SocialPlatform>() { };
+        public List<SocialPlatform> SocialPlatforms { get; set; } = new List<SocialPlatform>() { };
 
         #region 游戏
         [Display(Name = "发行时间")]
@@ -43,7 +45,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         [Display(Name = "QQ群")]
         public string QQgroupGame { get; set; }
         [Display(Name = "STAFF")]
-        public List<StaffModel>? Staffs { get; set; } = new List<StaffModel>();
+        public List<StaffModel> Staffs { get; set; } = new List<StaffModel>();
         #endregion
         #region 角色
 

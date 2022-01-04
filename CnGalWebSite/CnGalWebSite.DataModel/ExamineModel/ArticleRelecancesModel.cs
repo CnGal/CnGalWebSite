@@ -1,4 +1,10 @@
-﻿namespace CnGalWebSite.DataModel.ExamineModel
+﻿using System.Collections.Generic;
+
+using System;
+ using System.Collections.Generic;
+using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.ExamineModel
 {
     public class ArticleRelecancesModel
     {

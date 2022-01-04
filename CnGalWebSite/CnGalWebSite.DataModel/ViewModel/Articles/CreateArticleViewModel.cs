@@ -1,7 +1,8 @@
-﻿using CnGalWebSite.DataModel.Helper;
-using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.DataModel.Model;
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Articles
 {
     public class CreateArticleViewModel
@@ -46,9 +47,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         [Display(Name = "原文链接")]
         public string OriginalLink { get; set; }
         [Display(Name = "发布日期")]
-        public DateTime PubishTime { get; set; } = DateTime.Now.ToCstTime().Date;
+        public DateTime PubishTime { get; set; } = DateTime.Now.Date;
         [Display(Name = "动态发生时间")]
-        public DateTime? RealNewsTime { get; set; } = DateTime.Now.ToCstTime().Date;
+        public DateTime? RealNewsTime { get; set; } = DateTime.Now.Date;
 
 
         public List<RelevancesModel> Roles { get; set; }

@@ -205,7 +205,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<CommentsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetCommentList", new CommentsPagesInfor { SearchModel = searchModel, Options = options });
+            var result = await Http.PostAsJsonAsync<CommentsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetCommentList", new CommentsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListCommentAloneModel>>(jsonContent, ToolHelper.options);
         }

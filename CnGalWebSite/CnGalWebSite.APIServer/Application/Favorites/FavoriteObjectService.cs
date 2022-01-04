@@ -32,7 +32,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
             _entryRepository = entryRepository;
         }
 
-        public async Task<QueryData<ListFavoriteObjectAloneModel>> GetPaginatedResult(QueryPageOptions options, ListFavoriteObjectAloneModel searchModel, long favoriteFolderId = 0)
+        public async Task<QueryData<ListFavoriteObjectAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListFavoriteObjectAloneModel searchModel, long favoriteFolderId = 0)
         {
             IEnumerable<FavoriteObject> items;
 
@@ -54,7 +54,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCache.GetOrAdd(typeof(FavoriteObject), key => LambdaExtensions.GetSortLambda<FavoriteObject>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
                 isSorted = true;
             }
 

@@ -176,7 +176,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<TimedTasksPagesInfor>(ToolHelper.WebApiPath + "api/timedtasks/GetTimedTaskList", new TimedTasksPagesInfor { SearchModel = searchModel, Options = options });
+            var result = await Http.PostAsJsonAsync<TimedTasksPagesInfor>(ToolHelper.WebApiPath + "api/timedtasks/GetTimedTaskList", new TimedTasksPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListTimedTaskAloneModel>>(jsonContent, ToolHelper.options);
         }

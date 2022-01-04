@@ -2,6 +2,8 @@
 using CnGalWebSite.DataModel.Models;
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Accounts
 {
     public class PostVerificationCodeModel

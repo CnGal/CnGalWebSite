@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using CnGalWebSite.DataModel.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.Model
 {
     public class ApplicationUser : IdentityUser
@@ -80,30 +84,30 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 管理用户创建的文件
         /// </summary>
-        public FileManager? FileManager { get; set; }
+        public FileManager FileManager { get; set; }
 
         /// <summary>
         /// 管理用户空间的留言
         /// </summary>
-        public UserSpaceCommentManager? UserSpaceCommentManager { get; set; }
+        public UserSpaceCommentManager UserSpaceCommentManager { get; set; }
 
-        public ICollection<SignInDay>? SignInDays { get; set; }
+        public ICollection<SignInDay> SignInDays { get; set; }
 
-        public ICollection<Examine>? Examines { get; set; }
+        public ICollection<Examine> Examines { get; set; }
 
-        public ICollection<Message>? Messages { get; set; }
+        public ICollection<Message> Messages { get; set; }
 
-        public ICollection<PlayedGame>? PlayedGames { get; set; }
+        public ICollection<PlayedGame> PlayedGames { get; set; }
 
-        public ICollection<UserOnlineInfor>? UserOnlineInfors { get; set; }
+        public ICollection<UserOnlineInfor> UserOnlineInfors { get; set; }
 
-        public ICollection<FavoriteFolder>? FavoriteFolders { get; set; }
+        public ICollection<FavoriteFolder> FavoriteFolders { get; set; }
 
-        public ICollection<ThirdPartyLoginInfor>? ThirdPartyLoginInfors { get; set; }
+        public ICollection<ThirdPartyLoginInfor> ThirdPartyLoginInfors { get; set; }
 
-        public ICollection<RankUser>? UserRanks { get; set; }
+        public ICollection<RankUser> UserRanks { get; set; }
 
-        public ICollection<PeripheryRelevanceUser>? UserOwnedPeripheries { get; set; }
+        public ICollection<PeripheryRelevanceUser> UserOwnedPeripheries { get; set; }
 
 
     }
@@ -115,7 +119,7 @@ namespace CnGalWebSite.DataModel.Model
 
         public string ApplicationUserId { get; set; }
 
-        public ApplicationUser? ApplicationUser { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
 
     }
 }

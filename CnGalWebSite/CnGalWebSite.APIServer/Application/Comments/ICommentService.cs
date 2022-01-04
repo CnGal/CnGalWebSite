@@ -11,6 +11,6 @@ namespace CnGalWebSite.APIServer.Application.Comments
     public interface ICommentService
     {
         Task<PagedResultDto<CommentViewModel>> GetPaginatedResult(GetCommentInput input, CommentType type, string Id, string rankName, string ascriptionUserId);
-        Task<QueryData<ListCommentAloneModel>> GetPaginatedResult(QueryPageOptions options, ListCommentAloneModel searchModel, CommentType type = CommentType.None, string objectId = "");
+        Task<QueryData<ListCommentAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListCommentAloneModel searchModel, CommentType type = CommentType.None, string objectId = "");
     }
 }

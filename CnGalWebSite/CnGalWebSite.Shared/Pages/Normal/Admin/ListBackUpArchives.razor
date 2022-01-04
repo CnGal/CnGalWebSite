@@ -89,7 +89,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<BackUpArchivesPagesInfor>(ToolHelper.WebApiPath + "api/BackUpArchives/GetBackUpArchiveList", new BackUpArchivesPagesInfor { SearchModel = searchModel, Options = options });
+            var result = await Http.PostAsJsonAsync<BackUpArchivesPagesInfor>(ToolHelper.WebApiPath + "api/BackUpArchives/GetBackUpArchiveList", new BackUpArchivesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListBackUpArchiveAloneModel>>(jsonContent, ToolHelper.options);
         }

@@ -73,7 +73,7 @@ else
     private IEnumerable<int> PageItemsSource => new int[] { 10, 20, 40, 80, 200, 1000 };
 
     private bool isReady = false;
-    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<StaffModel>, string, SortOrder, IEnumerable<StaffModel>>> SortLambdaCacheBasic = new();
+    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<StaffModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<StaffModel>>> SortLambdaCacheBasic = new();
     private StaffModel SearchModelBasic { get; set; } = new StaffModel();
 
     Table<StaffModel> StaffsTable;
@@ -270,7 +270,7 @@ else
         {
             // 外部未进行排序，内部自动进行排序处理
             var invoker = SortLambdaCacheBasic.GetOrAdd(typeof(StaffModel), key => LambdaExtensions.GetSortLambda<StaffModel>().Compile());
-            items = invoker(items, options.SortName, options.SortOrder);
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
             isSorted = true;
         }
 

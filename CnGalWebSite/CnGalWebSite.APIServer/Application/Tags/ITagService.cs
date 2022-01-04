@@ -9,7 +9,7 @@ namespace CnGalWebSite.APIServer.Application.Tags
 {
     public interface ITagService
     {
-        Task<BootstrapBlazor.Components.QueryData<ListTagAloneModel>> GetPaginatedResult(BootstrapBlazor.Components.QueryPageOptions options, ListTagAloneModel searchModel);
+        Task<BootstrapBlazor.Components.QueryData<ListTagAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListTagAloneModel searchModel);
 
         Task UpdateTagDataAsync(Tag tag, Examine examine);
 

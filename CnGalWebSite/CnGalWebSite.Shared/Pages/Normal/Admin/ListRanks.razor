@@ -104,7 +104,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<RanksPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetRankList", new RanksPagesInfor { SearchModel = SearchModelUser, Options = options });
+            var result = await Http.PostAsJsonAsync<RanksPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetRankList", new RanksPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListRankAloneModel>>(jsonContent, ToolHelper.options);
         }

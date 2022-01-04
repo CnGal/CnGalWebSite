@@ -38,7 +38,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             _userRepository = userRepository;
         }
 
-        public Task<QueryData<ListRankAloneModel>> GetPaginatedResult(QueryPageOptions options, ListRankAloneModel searchModel)
+        public Task<QueryData<ListRankAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListRankAloneModel searchModel)
         {
             IEnumerable<Rank> items = _rankRepository.GetAll().Include(s => s.RankUsers).Where(s => string.IsNullOrWhiteSpace(s.Name) == false).AsNoTracking();
             // 处理高级搜索
@@ -57,29 +57,14 @@ namespace CnGalWebSite.APIServer.Application.Ranks
                 items = items.Where(item => item.Styles?.Contains(searchModel.Styles, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
-            // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
 
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
-                    || (item.CSS?.Contains(options.SearchText) ?? false)
-                    || (item.Styles?.Contains(options.SearchText) ?? false));
-                }
+                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
+                || (item.CSS?.Contains(options.SearchText) ?? false)
+                || (item.Styles?.Contains(options.SearchText) ?? false));
             }
-            // 过滤
-            /* var isFiltered = false;
-             if (options.Filters.Any())
-             {
-                 items = items.Where(options.Filters.GetFilterFunc<Entry>());
-                 isFiltered = true;
-             }*/
 
             // 排序
             var isSorted = false;
@@ -87,7 +72,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCacheRank.GetOrAdd(typeof(Rank), key => LambdaExtensions.GetSortLambda<Rank>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
                 isSorted = true;
             }
 
@@ -125,7 +110,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             });
         }
 
-        public Task<QueryData<ListRankUserAloneModel>> GetPaginatedResult(QueryPageOptions options, ListRankUserAloneModel searchModel, long rankId)
+        public Task<QueryData<ListRankUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListRankUserAloneModel searchModel, long rankId)
         {
             IEnumerable<RankUser> items = _rankUserRepository.GetAll().Include(s => s.ApplicationUser).Where(s => s.RankId == rankId).AsNoTracking();
             // 处理高级搜索
@@ -139,27 +124,13 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             }
 
 
-            // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
-
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
-            {
+         
                 // 处理 SearchText 模糊搜索
                 if (!string.IsNullOrWhiteSpace(options.SearchText))
                 {
                     items = items.Where(item => (item.ApplicationUserId?.Contains(options.SearchText) ?? false));
                 }
-            }
-            // 过滤
-            /* var isFiltered = false;
-             if (options.Filters.Any())
-             {
-                 items = items.Where(options.Filters.GetFilterFunc<Entry>());
-                 isFiltered = true;
-             }*/
+          
 
             // 排序
             var isSorted = false;
@@ -167,7 +138,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCacheRankUser.GetOrAdd(typeof(RankUser), key => LambdaExtensions.GetSortLambda<RankUser>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
                 isSorted = true;
             }
 
@@ -200,7 +171,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             });
         }
 
-        public Task<QueryData<ListUserRankAloneModel>> GetPaginatedResult(QueryPageOptions options, ListUserRankAloneModel searchModel, string userId)
+        public Task<QueryData<ListUserRankAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserRankAloneModel searchModel, string userId)
         {
             IEnumerable<RankUser> items = _rankUserRepository.GetAll().Include(s => s.Rank).Where(s => s.ApplicationUserId == userId).AsNoTracking();
             // 处理高级搜索
@@ -209,35 +180,20 @@ namespace CnGalWebSite.APIServer.Application.Ranks
                 items = items.Where(item => item.Rank.Name?.Contains(searchModel.Name, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
-            // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
-
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
-            {
+          
                 // 处理 SearchText 模糊搜索
                 if (!string.IsNullOrWhiteSpace(options.SearchText))
                 {
                     items = items.Where(item => (item.Rank.Name?.Contains(options.SearchText) ?? false));
                 }
-            }
-            // 过滤
-            /* var isFiltered = false;
-             if (options.Filters.Any())
-             {
-                 items = items.Where(options.Filters.GetFilterFunc<Entry>());
-                 isFiltered = true;
-             }*/
-
+          
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCacheRankUser.GetOrAdd(typeof(RankUser), key => LambdaExtensions.GetSortLambda<RankUser>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
                 isSorted = true;
             }
 

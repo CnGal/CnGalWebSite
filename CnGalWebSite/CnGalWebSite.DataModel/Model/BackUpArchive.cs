@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.Model
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.Model
 {
     public class BackUpArchive
     {
@@ -11,13 +13,13 @@
         public double LastTimeUsed { get; set; }
 
 
-        public List<BackUpArchiveDetail>? BackUpArchiveDetails { get; set; }
+        public List<BackUpArchiveDetail> BackUpArchiveDetails { get; set; }
 
         public int? EntryId { get; set; }
-        public Entry? Entry { get; set; }
+        public Entry Entry { get; set; }
 
         public long? ArticleId { get; set; }
-        public Article? Article { get; set; }
+        public Article Article { get; set; }
     }
 
     public class BackUpArchiveDetail
@@ -33,7 +35,7 @@
         public double TimeUsed { get; set; }
 
         public long? BackUpArchiveId { get; set; }
-        public BackUpArchive? BackUpArchive { get; set; }
+        public BackUpArchive BackUpArchive { get; set; }
 
 
     }

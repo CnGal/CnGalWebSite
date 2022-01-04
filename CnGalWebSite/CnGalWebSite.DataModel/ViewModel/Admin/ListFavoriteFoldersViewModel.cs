@@ -1,6 +1,8 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Admin
 {
     public class ListFavoriteFoldersInforViewModel
@@ -35,7 +37,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
     public class FavoriteFoldersPagesInfor
     {
-        public QueryPageOptions Options { get; set; }
+        public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
         public ListFavoriteFolderAloneModel SearchModel { get; set; }
 
         public string UserId { get; set; }

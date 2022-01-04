@@ -10,6 +10,6 @@ namespace CnGalWebSite.APIServer.Application.Messages
     {
         Task<PagedResultDto<DataModel.Model.Message>> GetPaginatedResult(GetMessageInput input, string userId);
 
-        Task<QueryData<ListMessageAloneModel>> GetPaginatedResult(QueryPageOptions options, ListMessageAloneModel searchModel);
+        Task<QueryData<ListMessageAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListMessageAloneModel searchModel);
     }
 }

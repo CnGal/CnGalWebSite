@@ -10,11 +10,11 @@ namespace CnGalWebSite.APIServer.Application.Ranks
 {
     public interface IRankService
     {
-        Task<QueryData<ListRankAloneModel>> GetPaginatedResult(QueryPageOptions options, ListRankAloneModel searchModel);
+        Task<QueryData<ListRankAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListRankAloneModel searchModel);
 
-        Task<QueryData<ListRankUserAloneModel>> GetPaginatedResult(QueryPageOptions options, ListRankUserAloneModel searchModel, long rankId);
+        Task<QueryData<ListRankUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListRankUserAloneModel searchModel, long rankId);
 
-        Task<QueryData<ListUserRankAloneModel>> GetPaginatedResult(QueryPageOptions options, ListUserRankAloneModel searchModel, string userId);
+        Task<QueryData<ListUserRankAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserRankAloneModel searchModel, string userId);
 
         Task UpdateUserRanks(ApplicationUser user);
 

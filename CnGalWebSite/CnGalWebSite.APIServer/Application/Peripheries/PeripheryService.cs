@@ -39,7 +39,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             _peripheryRelationRepository = peripheryRelationRepository;
         }
 
-        public Task<QueryData<ListPeripheryAloneModel>> GetPaginatedResult(QueryPageOptions options, ListPeripheryAloneModel searchModel)
+        public Task<QueryData<ListPeripheryAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPeripheryAloneModel searchModel)
         {
             IEnumerable<Periphery> items = _peripheryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).AsNoTracking();
             // 处理高级搜索
@@ -60,14 +60,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                 items = items.Where(item => item.Material?.Contains(searchModel.Material, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
-            // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
-
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
-            {
+        
                 // 处理 SearchText 模糊搜索
                 if (!string.IsNullOrWhiteSpace(options.SearchText))
                 {
@@ -76,14 +69,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                                  || (item.Author?.Contains(options.SearchText) ?? false)
                                  || (item.Material?.Contains(options.SearchText) ?? false));
                 }
-            }
-            // 过滤
-            /* var isFiltered = false;
-             if (options.Filters.Any())
-             {
-                 items = items.Where(options.Filters.GetFilterFunc<Entry>());
-                 isFiltered = true;
-             }*/
+       
 
             // 排序
             var isSorted = false;
@@ -91,7 +77,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCachePeriphery.GetOrAdd(typeof(Periphery), key => LambdaExtensions.GetSortLambda<Periphery>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
                 isSorted = true;
             }
 

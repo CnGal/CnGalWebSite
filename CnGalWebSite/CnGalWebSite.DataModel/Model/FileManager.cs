@@ -1,5 +1,7 @@
 ﻿using CnGalWebSite.DataModel.Model;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.Models
 {
     public class FileManager
@@ -9,11 +11,11 @@ namespace CnGalWebSite.DataModel.Models
 
         public long UsedSize { get; set; }
 
-        public ICollection<UserFile>? UserFiles { get; set; }
+        public ICollection<UserFile> UserFiles { get; set; }
 
         public string ApplicationUserId { get; set; }
 
-        public ApplicationUser? ApplicationUser { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
     }
 
     public class UserFile
@@ -28,7 +30,7 @@ namespace CnGalWebSite.DataModel.Models
 
         public DateTime UploadTime { get; set; }
 
-        public FileManager? FileManager { get; set; }
+        public FileManager FileManager { get; set; }
 
         public string UserId { get; set; }
     }

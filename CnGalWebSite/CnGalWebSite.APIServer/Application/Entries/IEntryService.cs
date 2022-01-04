@@ -14,7 +14,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
     {
         Task<PagedResultDto<Entry>> GetPaginatedResult(GetEntryInput input);
 
-        Task<QueryData<ListEntryAloneModel>> GetPaginatedResult(QueryPageOptions options, ListEntryAloneModel searchModel);
+        Task<QueryData<ListEntryAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListEntryAloneModel searchModel);
 
         Task<PagedResultDto<EntryInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input);
 

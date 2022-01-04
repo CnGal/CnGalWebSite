@@ -1,8 +1,8 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace CnGalWebSite.APIServer.Application.ErrorCounts
         {
             _errorCountRepository = errorCountRepository;
         }
-        public Task<QueryData<ListErrorCountAloneModel>> GetPaginatedResult(QueryPageOptions options, ListErrorCountAloneModel searchModel)
+        public Task<QueryData<ListErrorCountAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListErrorCountAloneModel searchModel)
         {
             IEnumerable<ErrorCount> items = _errorCountRepository.GetAll().AsNoTracking();
             // 处理高级搜索
@@ -32,27 +32,12 @@ namespace CnGalWebSite.APIServer.Application.ErrorCounts
             }
 
 
-            // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
 
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    items = items.Where(item => (item.Text?.Contains(options.SearchText) ?? false));
-                }
+                items = items.Where(item => (item.Text?.Contains(options.SearchText) ?? false));
             }
-            // 过滤
-            /* var isFiltered = false;
-             if (options.Filters.Any())
-             {
-                 items = items.Where(options.Filters.GetFilterFunc<Entry>());
-                 isFiltered = true;
-             }*/
 
             // 排序
             var isSorted = false;
@@ -60,7 +45,7 @@ namespace CnGalWebSite.APIServer.Application.ErrorCounts
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCache.GetOrAdd(typeof(ErrorCount), key => LambdaExtensions.GetSortLambda<ErrorCount>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 

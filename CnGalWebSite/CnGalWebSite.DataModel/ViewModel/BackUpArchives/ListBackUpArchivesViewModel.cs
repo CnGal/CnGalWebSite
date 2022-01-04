@@ -1,6 +1,8 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.BackUpArchives
 {
     public class ListBackUpArchivesInforViewModel
@@ -34,7 +36,7 @@ namespace CnGalWebSite.DataModel.ViewModel.BackUpArchives
 
     public class BackUpArchivesPagesInfor
     {
-        public QueryPageOptions Options { get; set; }
+        public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
         public ListBackUpArchiveAloneModel SearchModel { get; set; }
 
         public string Text { get; set; }

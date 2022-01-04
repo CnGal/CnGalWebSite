@@ -10,7 +10,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
 {
     public interface IPeripheryService
     {
-        Task<QueryData<ListPeripheryAloneModel>> GetPaginatedResult(QueryPageOptions options, ListPeripheryAloneModel searchModel);
+        Task<QueryData<ListPeripheryAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPeripheryAloneModel searchModel);
 
         void UpdatePeripheryDataMain(Periphery periphery, PeripheryMain examine);
 

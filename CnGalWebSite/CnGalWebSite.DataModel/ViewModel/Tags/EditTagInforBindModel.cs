@@ -1,5 +1,7 @@
 ﻿using CnGalWebSite.DataModel.ViewModel.Admin;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Tags
 {
     public class EditTagInforBindModel

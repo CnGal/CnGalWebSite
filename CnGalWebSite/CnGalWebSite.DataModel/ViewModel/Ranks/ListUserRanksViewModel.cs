@@ -1,6 +1,8 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Ranks
 {
     public class ListUserRanksInforViewModel
@@ -31,7 +33,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Ranks
 
     public class UserRanksPagesInfor
     {
-        public QueryPageOptions Options { get; set; }
+        public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
         public ListUserRankAloneModel SearchModel { get; set; }
 
         public string UserId { get; set; }

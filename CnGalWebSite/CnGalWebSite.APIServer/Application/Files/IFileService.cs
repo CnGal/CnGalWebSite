@@ -10,7 +10,7 @@ namespace CnGalWebSite.APIServer.Application.Files
     {
         Task<PagedResultDto<ImageInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input);
 
-        Task<QueryData<ListFileAloneModel>> GetPaginatedResult(QueryPageOptions options, ListFileAloneModel searchModel);
+        Task<QueryData<ListFileAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListFileAloneModel searchModel);
 
         Task<string> SaveImageAsync(string url, string userId, double x = 0, double y = 0);
 

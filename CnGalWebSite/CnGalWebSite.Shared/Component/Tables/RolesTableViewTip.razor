@@ -60,7 +60,7 @@ else
     {
         RoleInfors = new List<RoleInforTableModel>()
     };
-    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<RoleInforTableModel>, string, SortOrder, IEnumerable<RoleInforTableModel>>> SortLambdaCacheRole = new();
+    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<RoleInforTableModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<RoleInforTableModel>>> SortLambdaCacheRole = new();
     private RoleInforTableModel SearchModelRole { get; set; } = new RoleInforTableModel();
 
     [Parameter]
@@ -179,7 +179,7 @@ else
         {
             // 外部未进行排序，内部自动进行排序处理
             var invoker = SortLambdaCacheRole.GetOrAdd(typeof(RoleInforTableModel), key => LambdaExtensions.GetSortLambda<RoleInforTableModel>().Compile());
-            items = invoker(items, options.SortName, options.SortOrder);
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
             isSorted = true;
         }
 

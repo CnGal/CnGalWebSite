@@ -14,7 +14,7 @@ namespace CnGalWebSite.APIServer.Application.Users
     {
         Task<PagedResultDto<ApplicationUser>> GetPaginatedResult(GetUserInput input);
 
-        Task<QueryData<ListUserAloneModel>> GetPaginatedResult(QueryPageOptions options, ListUserAloneModel searchModel);
+        Task<QueryData<ListUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserAloneModel searchModel);
 
         Task<bool> AddUserThirdPartyLogin(string id_token, ApplicationUser user, ThirdPartyLoginType type);
 

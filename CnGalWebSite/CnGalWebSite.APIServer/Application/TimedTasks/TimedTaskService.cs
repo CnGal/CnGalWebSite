@@ -42,7 +42,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             _newsService = newsService;
         }
 
-        public Task<QueryData<ListTimedTaskAloneModel>> GetPaginatedResult(QueryPageOptions options, ListTimedTaskAloneModel searchModel)
+        public Task<QueryData<ListTimedTaskAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListTimedTaskAloneModel searchModel)
         {
             IEnumerable<TimedTask> items = _timedTaskRepository.GetAll().AsNoTracking();
             // 处理高级搜索
@@ -61,27 +61,13 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
 
 
 
-            // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
-
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
-            {
+          
                 // 处理 SearchText 模糊搜索
                 if (!string.IsNullOrWhiteSpace(options.SearchText))
                 {
                     items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false));
                 }
-            }
-            // 过滤
-            /* var isFiltered = false;
-             if (options.Filters.Any())
-             {
-                 items = items.Where(options.Filters.GetFilterFunc<Entry>());
-                 isFiltered = true;
-             }*/
+           
 
             // 排序
             var isSorted = false;
@@ -89,7 +75,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCacheApplicationUser.GetOrAdd(typeof(TimedTask), key => LambdaExtensions.GetSortLambda<TimedTask>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
                 isSorted = true;
             }
 

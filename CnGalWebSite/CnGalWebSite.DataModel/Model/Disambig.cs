@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.Model
+﻿using System;
+ using System.Collections.Generic;
+namespace CnGalWebSite.DataModel.Model
 {
     public class Disambig
     {
@@ -29,13 +31,13 @@
         /// </summary>
         public bool IsHidden { get; set; }
 
-        public ICollection<Article>? Articles { get; set; }
-        public ICollection<Entry>? Entries { get; set; }
+        public ICollection<Article> Articles { get; set; }
+        public ICollection<Entry> Entries { get; set; }
 
         /// <summary>
         /// 审核记录 也是编辑记录
         /// </summary>
-        public ICollection<Examine>? Examines { get; set; }
+        public ICollection<Examine> Examines { get; set; }
 
     }
 }

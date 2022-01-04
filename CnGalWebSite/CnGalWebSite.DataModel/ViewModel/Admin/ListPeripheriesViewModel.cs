@@ -1,6 +1,8 @@
-﻿using BootstrapBlazor.Components;
+﻿
 using System.ComponentModel.DataAnnotations;
 
+using System;
+ using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Admin
 {
     public class ListPeripheriesInforViewModel
@@ -48,7 +50,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
     public class PeripheriesPagesInfor
     {
-        public QueryPageOptions Options { get; set; }
+        public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
         public ListPeripheryAloneModel SearchModel { get; set; }
     }
 }

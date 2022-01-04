@@ -6,6 +6,6 @@ namespace CnGalWebSite.APIServer.Application.ErrorCounts
 {
     public interface IErrorCountService
     {
-        Task<QueryData<ListErrorCountAloneModel>> GetPaginatedResult(QueryPageOptions options, ListErrorCountAloneModel searchModel);
+        Task<QueryData<ListErrorCountAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListErrorCountAloneModel searchModel);
     }
 }

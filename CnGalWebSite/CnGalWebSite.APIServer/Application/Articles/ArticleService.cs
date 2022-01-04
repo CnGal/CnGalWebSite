@@ -25,7 +25,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IAppHelper _appHelper;
 
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Article>, string, SortOrder, IEnumerable<Article>>> SortLambdaCacheArticle = new();
+        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Article>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Article>>> SortLambdaCacheArticle = new();
 
 
         public ArticleService(IAppHelper appHelper, IRepository<Article, long> articleRepository)
@@ -110,7 +110,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             return dtos;
         }
 
-        public Task<QueryData<ListArticleAloneModel>> GetPaginatedResult(QueryPageOptions options, ListArticleAloneModel searchModel)
+        public Task<QueryData<ListArticleAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListArticleAloneModel searchModel)
         {
             IEnumerable<Article> items = _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).AsNoTracking();
             // 处理高级搜索
@@ -136,13 +136,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             }
 
             // 处理 Searchable=true 列与 SeachText 模糊搜索
-            if (options.Searchs.Any())
-            {
-
-                // items = items.Where(options.Searchs.GetFilterFunc<Entry>(FilterLogic.Or));
-            }
-            else
-            {
+          
                 // 处理 SearchText 模糊搜索
                 if (!string.IsNullOrWhiteSpace(options.SearchText))
                 {
@@ -151,14 +145,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                                  || (item.OriginalAuthor?.Contains(options.SearchText) ?? false)
                                  || (item.OriginalLink?.Contains(options.SearchText) ?? false));
                 }
-            }
-            // 过滤
-            /* var isFiltered = false;
-             if (options.Filters.Any())
-             {
-                 items = items.Where(options.Filters.GetFilterFunc<Entry>());
-                 isFiltered = true;
-             }*/
+          
 
             // 排序
             var isSorted = false;
@@ -166,7 +153,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCacheArticle.GetOrAdd(typeof(Article), key => LambdaExtensions.GetSortLambda<Article>().Compile());
-                items = invoker(items, options.SortName, options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
                 isSorted = true;
             }
 

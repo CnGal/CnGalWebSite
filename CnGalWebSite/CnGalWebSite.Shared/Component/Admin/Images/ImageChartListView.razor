@@ -39,7 +39,7 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<FilesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetFileList", new FilesPagesInfor { SearchModel = searchModel, Options = options });
+            var result = await Http.PostAsJsonAsync<FilesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetFileList", new FilesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListFileAloneModel>>(jsonContent, ToolHelper.options);
         }

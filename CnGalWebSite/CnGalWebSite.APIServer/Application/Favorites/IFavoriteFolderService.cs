@@ -6,6 +6,6 @@ namespace CnGalWebSite.APIServer.Application.Favorites
 {
     public interface IFavoriteFolderService
     {
-        Task<QueryData<ListFavoriteFolderAloneModel>> GetPaginatedResult(QueryPageOptions options, ListFavoriteFolderAloneModel searchModel, string userId = "");
+        Task<QueryData<ListFavoriteFolderAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListFavoriteFolderAloneModel searchModel, string userId = "");
     }
 }

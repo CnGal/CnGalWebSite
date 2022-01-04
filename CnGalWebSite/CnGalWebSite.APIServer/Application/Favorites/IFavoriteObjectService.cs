@@ -8,7 +8,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
 {
     public interface IFavoriteObjectService
     {
-        Task<QueryData<ListFavoriteObjectAloneModel>> GetPaginatedResult(QueryPageOptions options, ListFavoriteObjectAloneModel searchModel, long favoriteFolderId = 0);
+        Task<QueryData<ListFavoriteObjectAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListFavoriteObjectAloneModel searchModel, long favoriteFolderId = 0);
 
         Task<PagedResultDto<FavoriteObjectAloneViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input, long favoriteFolderId);
     }
