@@ -14,7 +14,7 @@
   <mp:PhoneIdentity PhoneProductId="d1d49837-4302-4c2a-9b86-7b2f55762b96" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>CnGalUWP</DisplayName>
+    <DisplayName>CnGal资料站</DisplayName>
     <PublisherDisplayName>Little Fish</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -32,7 +32,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="CnGalUWP.App">
       <uap:VisualElements
-        DisplayName="CnGalUWP"
+        DisplayName="CnGal资料站"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
         Description="CnGal资料站的官方UWP客户端。CnGal是一个非营利性的，立志于收集整理国内制作组创作的中文Galgame/AVG的介绍、攻略、评测、感想等内容的资料性质的网站。 此外，CnGal官方还会与圈内中文AVG制作组进行友好合作，如免费提供Banner广告位，网站服务器资源等。"

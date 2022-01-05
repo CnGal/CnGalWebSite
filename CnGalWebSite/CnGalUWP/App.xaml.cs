@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CnGalUWP.Services;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -25,6 +26,11 @@ namespace CnGalUWP
     /// </summary>
     sealed partial class App : Application
     {
+        /// <summary>
+        /// 全局静态帮助类 用于获取数据 缓存数据 同步状态
+        /// </summary>
+        public static AppHelper Helper { get; private set; }=new AppHelper();
+
         /// <summary>
         /// 初始化单一实例应用程序对象。这是执行的创作代码的第一行，
         /// 已执行，逻辑上等同于 main() 或 WinMain()。
