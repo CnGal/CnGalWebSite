@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using CnGalWebSite.DataModel.Application.Dtos;
+using CnGalWebSite.DataModel.ViewModel.Votes;
 
 namespace CnGalWebSite.Shared.Service
 {
@@ -81,6 +82,11 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public IPageModelCatche<PeripheryViewModel> PeripheryIndexPageCatche { get; set; }
         /// <summary>
+        /// 投票主页数据缓存
+        /// </summary>
+        public IPageModelCatche<VoteViewModel> VoteIndexPageCatche { get; set; }
+
+        /// <summary>
         /// 标签主页数据缓存
         /// </summary>
         public IPageModelCatche<TagIndexViewModel> TagIndexPageCatche { get; set; }
@@ -115,7 +121,7 @@ namespace CnGalWebSite.Shared.Service
 
         private readonly HttpClient _httpClient;
 
-        public DataCatcheService(HttpClient httpClient, IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche,
+        public DataCatcheService(HttpClient httpClient, IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche, IPageModelCatche<VoteViewModel> voteIndexPageCatche ,
         IPageModelCatche<PeripheryViewModel> peripheryIndexPageCatche, IPageModelCatche<TagIndexViewModel> tagIndexPageCatche, IPageModelCatche<List<HomeNewsAloneViewModel>> homePageNewsCatche,
         IPageModelCatche<List<DataModel.Model.Carousel>> homePageCarouselsCatche)
         {
@@ -123,6 +129,7 @@ namespace CnGalWebSite.Shared.Service
             (EntryIndexPageCatche = entryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/entries/GetEntryView/");
             (ArticleIndexPageCatche = articleIndexPageCatche).Init(ToolHelper.WebApiPath + "api/articles/GetArticleView/");
             (PeripheryIndexPageCatche = peripheryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/peripheries/GetPeripheryView/");
+            (VoteIndexPageCatche = voteIndexPageCatche).Init(ToolHelper.WebApiPath + "api/votes/GetVoteView/");
             (TagIndexPageCatche = tagIndexPageCatche).Init(ToolHelper.WebApiPath + "api/tags/gettag/");
             HomePageNewsCatche = homePageNewsCatche;
             HomePageCarouselsCatche = homePageCarouselsCatche;

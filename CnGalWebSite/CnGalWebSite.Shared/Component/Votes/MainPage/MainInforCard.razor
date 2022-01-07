@@ -1,0 +1,24 @@
+﻿<div class="">
+
+    @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
+    {
+        <img src="@Model.MainPicture" alt="@Model.Name" style="width:100%">
+    }
+    <div class="ms-3 me-3 pt-4">
+        <h1 class="fw-bold text-center h3">@Model.Name</h1>
+    </div>
+    <div class="ms-3 me-3 mt-4">
+        <div class="tui-editor-contents">
+            @((MarkupString)Model.MainPage)
+        </div>
+    </div>
+    <div class="ms-3 me-3  mt-4">
+        <BasicInforCard Model="Model" />
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public VoteViewModel Model { get; set; }
+}

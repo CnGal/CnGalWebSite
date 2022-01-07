@@ -61,6 +61,9 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<GameNews> GameNewses { get; set; }
         public DbSet<WeeklyNews> WeeklyNewses { get; set; }
         public DbSet<WeiboUserInfor> WeiboUserInfors { get; set; }
+        public DbSet<Vote> Votes { get; set; }
+        public DbSet<VoteOption> VoteOptions { get; set; }
+        public DbSet<VoteUser> VoteUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -38,6 +38,9 @@ namespace CnGalWebSite.DataModel.Model
         public long? PeripheryId { get; set; }
         public Periphery Periphery { get; set; }
 
+        public long? VoteId { get; set; }
+        public Vote Vote { get; set; }
+
         public long? UserSpaceCommentManagerId { get; set; }
         public UserSpaceCommentManager UserSpaceCommentManager { get; set; }
 
@@ -64,6 +67,8 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "用户留言")]
         CommentUser,
         [Display(Name = "评论周边")]
-        CommentPeriphery
+        CommentPeriphery,
+        [Display(Name = "评论投票")]
+        CommentVote,
     }
 }

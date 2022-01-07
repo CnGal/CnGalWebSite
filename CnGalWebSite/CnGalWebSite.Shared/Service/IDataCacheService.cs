@@ -10,6 +10,7 @@ using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Theme;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CnGalWebSite.DataModel.ViewModel.Votes;
 
 namespace CnGalWebSite.Shared.Service
 {
@@ -53,6 +54,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<List<HomeNewsAloneViewModel>> HomePageNewsCatche { get; set; }
 
         IPageModelCatche<List<DataModel.Model.Carousel>> HomePageCarouselsCatche { get; set; }
+
+        IPageModelCatche<VoteViewModel> VoteIndexPageCatche { get; set; }
 
         SearchViewModel SearchViewModel { get; set; }
 

@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
+using CnGalWebSite.DataModel.ViewModel.Votes;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -395,7 +396,52 @@ namespace CnGalWebSite.DataModel.Helper
 
             return result;
         }
+        public static List<EditVoteOptionModel> GetOptionsFromString(string text)
+        {
+            var result = new List<EditVoteOptionModel>();
 
+            text = text.Replace("，", ",").Replace("、", ",").Replace("：", ":").Replace("\r\n", "\n");
+            var Subcategory = "文本";
+            //按行分割
+            var lines = text.Split('\n');
+
+            foreach (var item in lines)
+            {
+                if (string.IsNullOrWhiteSpace(item))
+                {
+                    continue;
+                }
+                //按冒号分割
+                var pairs = item.Split(":");
+                if (pairs.Length == 0)
+                {
+                    continue;
+                }
+                else if ((pairs.Length == 1 || (pairs.Length == 2 && string.IsNullOrWhiteSpace(pairs[1]))) && item.Contains(":"))
+                {
+                    Subcategory = pairs[0];
+                    continue;
+                }
+
+
+                //分割名字
+                var name = pairs[0];
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    continue;
+                }
+                //创建
+                result.Add(new EditVoteOptionModel
+                {
+                    Text=name,
+                    Type=Subcategory.ToEnumValue<VoteOptionType>()
+                });
+
+
+            }
+
+            return result;
+        }
         public static PositionGeneralType GetGeneralType(string text)
         {
             foreach (var item in Enum.GetValues(typeof(PositionGeneralType)))

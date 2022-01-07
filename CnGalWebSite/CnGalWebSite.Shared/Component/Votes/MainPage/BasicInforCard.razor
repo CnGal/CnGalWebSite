@@ -1,0 +1,38 @@
+﻿<div class="row m-0" style="color:gray">
+    @if (DateTime.Now.ToCstTime() < Model.BeginTime)
+    {
+        <div class="col-6 p-0">
+            <i class="fa fa-clock-o fa-fw text-primaly"></i>
+            <span>未开始</span>
+        </div>
+    }
+    else if (DateTime.Now.ToCstTime() > Model.EndTime)
+    {
+        <div class="col-6 p-0">
+            <i class="fa fa-check-circle fa-fw text-success"></i>
+            <span>已结束</span>
+        </div>
+    }
+    else
+    {
+        <div class="col-6 p-0">
+            <i class="fa fa-check-circle-o fa-fw text-success"></i>
+            <span>正在进行</span>
+        </div>
+    }
+
+    <div class="col-6 p-0">
+        <i class="fa fa-users fa-fw"></i>
+        <span>@("参与人数："+Model.Count)</span>
+    </div>
+    <div class="col-12 p-0">
+        <i class="fa fa-calendar fa-fw "></i>
+        <span>@(Model.BeginTime.ToString("yyyy/MM/dd HH:mm")+" - "+ Model.EndTime.ToString("yyyy/MM/dd HH:mm"))</span>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public VoteViewModel Model { get; set; }
+}
+

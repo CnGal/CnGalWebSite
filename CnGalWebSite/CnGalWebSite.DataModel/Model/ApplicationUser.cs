@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using CnGalWebSite.DataModel.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using CnGalWebSite.DataModel.Models;
+using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
-using System;
-
-using System;
- using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.Model
 {
     public class ApplicationUser : IdentityUser

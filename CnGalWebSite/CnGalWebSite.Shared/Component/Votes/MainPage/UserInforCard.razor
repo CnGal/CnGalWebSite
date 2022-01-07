@@ -1,0 +1,22 @@
+﻿<a style="display:flex;" href="@("/space/index/"+Model.UserId)" >
+    <div style="display: flex;align-items: center;">
+        <img class="shadow-sm" src="@Model.Image" style="height: 50px;width: 50px;border-radius: 50%;" />
+    </div>
+    <div class="comment-tx-div">
+        <div  class="new-row-warp no-margin">
+            @foreach (var item in Model.Ranks)
+            {
+                <RankAloneViewTip Model="item"></RankAloneViewTip>
+            }
+            <div class="comment-username a-font-color me-2">@Model.UserName</div>
+
+                <div class="comment-username" style="color:gray;">@Model.VotedTime.ToTimeFromNowString()</div>
+        </div>
+        <div class="comment-time a-font-color">@Model.PersonalSignature</div>
+    </div>
+</a>
+
+@code {
+    [Parameter]
+    public VoteUserViewModel Model { get; set; }
+}

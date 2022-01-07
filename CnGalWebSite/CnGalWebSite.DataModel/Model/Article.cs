@@ -126,6 +126,8 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public ICollection<ArticleRelevance> Relevances { get; set; }=new List<ArticleRelevance>();
 
+        public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
+
         /// <summary>
         /// 审核记录 也是编辑记录
         /// </summary>

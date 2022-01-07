@@ -29,5 +29,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
         GameOverviewPeripheriesModel GetGameOverViewPeripheriesModel(ApplicationUser user, Periphery periphery, List<long> ownedPeripheries, bool showUserPhoto);
 
         Task<PeripheryEditState> GetPeripheryEditState(ApplicationUser user, long peripheryId);
+
+        Task<List<long>> GetPeripheryIdsFromNames(List<string> names);
     }
 }

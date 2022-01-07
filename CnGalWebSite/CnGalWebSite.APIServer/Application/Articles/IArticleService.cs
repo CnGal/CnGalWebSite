@@ -6,6 +6,7 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Articles
@@ -25,5 +26,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
         void UpdateArticleDataMainPage(Article article, string examine);
 
         void UpdateArticleData(Article article, Examine examine);
+
+        Task<List<long>> GetArticleIdsFromNames(List<string> names);
     }
 }

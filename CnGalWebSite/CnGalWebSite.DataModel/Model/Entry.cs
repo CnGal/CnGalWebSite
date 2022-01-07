@@ -133,6 +133,8 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public ICollection<PlayedGame> PlayedGames { get; set; }
 
+        public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
+
     }
 
     public class EditionModel

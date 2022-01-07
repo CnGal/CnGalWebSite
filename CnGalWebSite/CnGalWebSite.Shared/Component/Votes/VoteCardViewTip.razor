@@ -1,0 +1,41 @@
+﻿<a href="@("votes/index/"+Model.Id)">
+    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 h-100 a-font-color">
+        <div class="row mb-2">
+            <div class="col-12 pt-3">
+                <img class="img-fluid" src="@Model.MainPicture">
+            </div>
+            <div class="col-12 pt-3">
+                <header>
+                    <div class="article-home-tag">投票</div>
+                    <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                </header>
+                <div class="article-home-text">
+                    @Model.BriefIntroduction
+                </div>
+                <div class="mt-3">
+                    @foreach (var item in Model.Users)
+                    {
+                        <a href="@("/space/index/"+item.UserId)">
+                            <img src="@item.Image" alt="@item.UserName" class="me-3" style=" width: 40px; height: 40px; border-radius: 50%;" />
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+        <p class="" style="color: gray;">
+            <i class="fa fa-calendar fa-fw"></i>
+            <span class="article-home-infor-text">@(Model.BeginTime.ToString("yyyy/MM/dd")+" - "+ Model.EndTime.ToString("yyyy/MM/dd"))&nbsp;&nbsp;&nbsp;</span>
+
+            <i class="fa fa-user"></i>
+            <span class="article-home-infor-text">@(Model.Count)人参与&nbsp;&nbsp;&nbsp;</span>
+        </p>
+
+    </div>
+</a>
+
+
+@code {
+    [Parameter]
+    public VoteCardViewModel Model { get; set; }
+
+}

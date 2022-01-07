@@ -1,0 +1,70 @@
+﻿<div style="border: 1px solid var(--bs-secondary); border-radius: 5px;">
+    <div style="display:flex;">
+        @if (string.IsNullOrWhiteSpace(Model.Image) == false)
+        {
+            <a href="@Url">
+                <img src="@Model.Image" alt="@Model.Name" style="height:50px;" />
+            </a>
+        }
+
+        <div style="display: block; width: 100%;">
+            <div style="float:left">
+
+            </div>
+            <div style="display: flex; width: 100%; justify-content: space-between; height: 100%; align-content: center;" class="ps-3">
+                <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <div>@Model.Name</div>
+                    @if (IsShowResult)
+                    {
+                        <div>@(Model.Count+"票")</div>
+                    }
+                </div>
+                @if (IsShowResult)
+                {
+                    <div style=" display: flex; align-content: center; flex-direction: column; justify-content: center; ">
+                        <div class="pe-3">
+                            @Percent
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public VoteOptionViewModel Model { get; set; }
+    [Parameter]
+    public bool IsShowResult { get; set; }
+    [Parameter]
+    public bool IsSeleted { get; set; }
+
+    [Parameter]
+    public long TotalCount { get; set; }
+
+    public string Url { get; set; } = "";
+    public string Percent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Url = Model.Type switch
+        {
+            VoteOptionType.Text => "",
+            VoteOptionType.Entry => "entries/index/" + Model.ObjectId,
+            VoteOptionType.Article => "articles/index/" + Model.ObjectId,
+            VoteOptionType.Periphery => "peripheries/index/" + Model.ObjectId,
+            _ => "",
+        };
+        if (TotalCount != 0)
+        {
+            Percent = ((double)Model.Count / TotalCount).ToString("0.00") + "%";
+        }
+        else
+        {
+            Percent = "0%";
+        }
+        StateHasChanged();
+    }
+}

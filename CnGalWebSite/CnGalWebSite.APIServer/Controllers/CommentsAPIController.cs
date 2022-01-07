@@ -35,13 +35,14 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Comment, long> _commentRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
+        private readonly IRepository<Vote, long> _voteRepository;
         private readonly ICommentService _commentService;
         private readonly IAppHelper _appHelper;
 
         public CommentsAPIController(UserManager<ApplicationUser> userManager, IRepository<ApplicationUser, string> userRepository, ICommentService commentService,
             IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper,
-            IRepository<Entry, int> entryRepository)
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository,
+        IRepository<Entry, int> entryRepository)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
@@ -51,6 +52,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _userManager = userManager;
             _userRepository = userRepository;
             _peripheryRepository = peripheryRepository;
+            _voteRepository = voteRepository;
         }
 
         [AllowAnonymous]
@@ -116,6 +118,18 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                 }
             }
+            else if (commentType == CommentType.CommentVote)
+            {
+                var vote = await _voteRepository.FirstOrDefaultAsync(s => s.Id == int.Parse(id));
+                if (vote != null)
+                {
+                    //判断是否被关闭
+                    if (vote.CanComment == false)
+                    {
+                        return new PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>() };
+                    }
+                }
+            }
 
             var input = new GetCommentInput
             {
@@ -135,6 +149,7 @@ namespace CnGalWebSite.APIServer.Controllers
             Article article = null;
             Entry entry = null;
             Periphery periphery = null;
+            Vote vote = null;
             UserSpaceCommentManager userSpace = null;
             Comment replyComment = null;
             ApplicationUser userTemp = null;
@@ -177,6 +192,17 @@ namespace CnGalWebSite.APIServer.Controllers
                     if (periphery.CanComment == false)
                     {
                         return new Result { Successful = false, Error = "该周边不允许评论" };
+                    }
+                    break;
+                case CommentType.CommentVote:
+                    vote = await _voteRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
+                    if (vote == null)
+                    {
+                        return new Result { Successful = false, Error = "无法找到该投票，Id" + model.ObjectId };
+                    }
+                    if (vote.CanComment == false)
+                    {
+                        return new Result { Successful = false, Error = "该投票不允许评论" };
                     }
                     break;
                 case CommentType.CommentUser:

@@ -1,0 +1,70 @@
+﻿@page "/votes/home"
+
+@inject HttpClient Http
+@inject IRoleService _roleService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+
+<TitleTip Title="投票"></TitleTip>
+
+<div class="">
+    <div class="row">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 pb-3">
+            <CnGalWebSite.Shared.Component.Votes.HomeTitleCard Title="投票板块" OnToolClick="OnCreateVote" Icon="fa-dropbox"
+                                                               BriefIntroduction="这里是正在测试中的投票板块，如果有什么好的设计方案欢迎加群761794704反馈">
+            </CnGalWebSite.Shared.Component.Votes.HomeTitleCard>
+        </div>
+        @if (isReady)
+        {
+            @foreach (var item in Model)
+            {
+                <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4  pb-3">
+
+                    <CnGalWebSite.Shared.Component.Votes.VoteCardViewTip Model="item" />
+                </div>
+            }
+
+        }
+        else
+        {
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4  pb-3">
+                <CnGalWebSite.Shared.Component.Votes.HomeLoadingCard />
+            </div>
+        }
+
+
+    </div>
+
+</div>
+
+@code {
+
+
+    private List<VoteCardViewModel> Model = new List<VoteCardViewModel>();
+
+    bool isReady = false;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            Model = await Http.GetFromJsonAsync<List<VoteCardViewModel>>(ToolHelper.WebApiPath + "api/votes/GetVoteCards");
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取投票主页信息列表失败");
+        }
+    }
+
+    private Task OnCreateVote()
+    {
+        NavigationManager.NavigateTo(Provider, "/votes/createvote","创建投票");
+        return Task.CompletedTask;
+    }
+}

@@ -58,12 +58,13 @@ namespace CnGalWebSite.APIServer.Application.Helper
         private readonly IRepository<FavoriteFolder, long> _favoriteFolderRepository;
         private readonly IRepository<SendCount, long> _sendCountRepository;
         private readonly IRepository<Loginkey, long> _loginkeyRepository;
+        private readonly IRepository<Vote, long> _voteRepository;
         private readonly IEmailService _EmailService;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
 
         public AppHelper(IRepository<TimedTask, int> timedTaskRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<SignInDay, long> signInDayRepository, IRepository<Periphery, long> peripheryRepository,
-        IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository,
+        IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<Vote, long> voteRepository,
         IRepository<ErrorCount, long> errorCountRepository, IRepository<PlayedGame, long> playedGameRepository, IRepository<HistoryUser, int> historyUserRepository, IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository,
             IRepository<Comment, long> commentRepository, IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<SteamInfor, int> steamInforRepository, IRepository<Loginkey, long> loginkeyRepository,
         IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository, IEmailService EmailService, IRepository<TokenCustom, int> tokenCustomRepository,
@@ -96,6 +97,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             _sendCountRepository = sendCountRepository;
             _loginkeyRepository = loginkeyRepository;
             _peripheryRepository = peripheryRepository;
+            _voteRepository = voteRepository;
         }
 
         public async Task<bool> IsEntryLockedAsync(int entryId, string userId, Operation operation)
@@ -818,6 +820,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             Article article = null;
             Entry entry = null;
             Periphery periphery = null;
+            Vote vote = null;
             UserSpaceCommentManager userSpace = null;
             Comment replyComment = null;
             ApplicationUser userTemp = null;
@@ -846,6 +849,13 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 case CommentType.CommentPeriphery:
                     periphery = await _peripheryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
                     if (periphery == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentVote:
+                    vote = await _voteRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
+                    if (vote == null)
                     {
                         return;
                     }
@@ -894,6 +904,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
                     break;
                 case CommentType.CommentPeriphery:
                     comment.PeripheryId = tempId;
+                    break;
+                case CommentType.CommentVote:
+                    comment.VoteId = tempId;
                     break;
                 case CommentType.CommentUser:
                     comment.UserSpaceCommentManager = userSpace;
@@ -996,6 +1009,10 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 case CommentType.CommentPeriphery:
                     tempCount = await _commentRepository.CountAsync(s => s.PeripheryId == tempId);
                     await _peripheryRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    break;
+                case CommentType.CommentVote:
+                    tempCount = await _commentRepository.CountAsync(s => s.VoteId == tempId);
+                    await _voteRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
                     break;
             }
         }

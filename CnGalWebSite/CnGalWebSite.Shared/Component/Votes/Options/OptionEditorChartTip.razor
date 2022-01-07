@@ -1,0 +1,353 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+@if (IsSmallScreen == false)
+{
+    <style>
+        .table-wrapper {
+            min-height: 400px;
+        }
+    </style>
+    <Table TItem="EditVoteOptionModel" @ref="OptionsTable"
+           IsPagination="true" PageItemsSource="@PageItemsSource"
+           IsStriped="true" IsBordered="true" IsMultipleSelect="true" ShowSearch="true"
+           ShowToolbar="true" ShowExtendButtons="true" ShowSkeleton="true"
+           OnQueryAsync="@OnQueryAsync" EditMode="EditMode.InCell"
+           OnAddAsync="@OnAddAsync" OnSaveAsync="@OnSaveAsync" OnDeleteAsync="@OnDeleteAsync">
+        <TableToolbarTemplate>
+            <TableToolbarButton TItem="EditVoteOptionModel" Color="Color.Warning" Icon="fa fa-upload" Text="批量导入" OnClickCallback="OnImportClick" />
+        </TableToolbarTemplate>
+
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Text" Filterable="true" Sortable="true" Searchable="true" DefaultSort="true" />
+            <TableColumn @bind-Field="@context.Type" Filterable="true" Sortable="true" Searchable="true"/>
+        </TableColumns>
+    </Table>
+
+}
+else
+{
+    <div class="row">
+        @for (int i = 0; i < Options.Count; i++)
+        {
+            int temp = i;
+            <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3">
+                <div class="card p-3" style="background-color:transparent">
+                    <div class="row">
+                        <div class="col mt-2" style="padding-right:0px;">
+                            <p class="text-truncate text-center" style="font-size:.875rem">
+                                @Options[i].Type.GetDisplayName()：@Options[i].Text
+                            </p>
+                        </div>
+                        <div class="col-12 d-flex" style="justify-content: space-between;">
+                            <Button IsOutline="true" Size="Size.Small" Color="Color.Danger" Icon="fa fa-trash-o" @onclick="@(()=> DeleteOption(temp))" Text="删除"></Button>
+                            <Button IsOutline="true" Size="Size.Small" Color="Color.Success" Icon="fa fa-pencil" @onclick="@(()=> EditOption(temp))" Text="编辑" class="ms-1"></Button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="mt-2">
+            <Button Color="Color.Primary" IsOutline="true" style="width:100px" @onclick="@(() => AddOption())" Text="添加" Icon="fa fa-plus"></Button>
+            <Button Color="Color.Success" IsOutline="true" class="ms-2" style="width:100px" @onclick="@(() => OnImportClick(null))" Text="导入" Icon="fa fa-upload"></Button>
+
+        </div>
+    </div>
+}
+
+@code{
+    [Parameter]
+    public List<EditVoteOptionModel> Options { get; set; }
+
+    private IEnumerable<int> PageItemsSource => new int[] { 10, 20, 40, 80, 200, 1000 };
+
+    private bool isReady = false;
+    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<EditVoteOptionModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<EditVoteOptionModel>>> SortLambdaCacheBasic = new();
+    private EditVoteOptionModel SearchModelBasic { get; set; } = new EditVoteOptionModel();
+
+    Table<EditVoteOptionModel> OptionsTable;
+
+    #region 获取屏幕大小
+
+    /// <summary>
+    /// 获得/设置 IJSRuntime 实例
+    /// </summary>
+    [Inject]
+    [System.Diagnostics.CodeAnalysis.NotNull]
+    public IJSRuntime JSRuntime { get; set; }
+
+
+
+    public bool IsSmallScreen { get; set; } = true;
+    public bool IsNormalScreen { get; set; }
+    public bool IsLargeScreen { get; set; }
+
+
+    private JSInterop<OptionEditorChartTip> Interop { get; set; }
+    /// <summary>
+    /// OnAfterRenderAsync 方法
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            Interop = new JSInterop<OptionEditorChartTip>(JSRuntime);
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
+        }
+    }
+
+
+
+    /// <summary>
+    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
+    /// </summary>
+    /// <returns></returns>
+    [JSInvokable]
+    public void SetCollapsed(int width)
+    {
+        if (IsSmallScreen != (width < 1100))
+        {
+            IsSmallScreen = width < 1100;
+            StateHasChanged();
+        }
+        if (IsNormalScreen != (width >= 1100 && width < 768))
+        {
+            IsNormalScreen = width >= 1100 && width < 768;
+            StateHasChanged();
+        }
+        if (IsLargeScreen != (width >= 768))
+        {
+            IsLargeScreen = width >= 768;
+            StateHasChanged();
+        }
+    }
+    #endregion
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+    private static Task<EditVoteOptionModel> OnAddAsync() => Task.FromResult(new EditVoteOptionModel());
+
+    private async Task<bool> OnSaveAsync(EditVoteOptionModel item, ItemChangedType type)
+    {
+        //检查数据是否合格
+
+        if (item.TempId == 0)
+        {
+            if (Options.Count == 0)
+            {
+                item.TempId = 1;
+            }
+            else
+            {
+                item.TempId = Options.Max(i => i.TempId) + 1;
+            }
+            Options.Add(item);
+        }
+        else
+        {
+            var oldItem = Options.FirstOrDefault(i => i.TempId == item.TempId);
+            if (oldItem != null)
+            {
+                oldItem.TempId = item.TempId;
+                oldItem.RealId = item.RealId;
+                oldItem.Text = item.Text;
+                oldItem.Type = item.Type;
+            }
+        }
+        return true;
+    }
+
+    private Task<bool> OnDeleteAsync(IEnumerable<EditVoteOptionModel> items)
+    {
+        items.ToList().ForEach(i => Options.Remove(i));
+        return Task.FromResult(true);
+    }
+
+
+    private Task<QueryData<EditVoteOptionModel>> OnQueryAsync(QueryPageOptions options)
+    {
+        IEnumerable<EditVoteOptionModel> items = Options;
+        // 处理高级搜索
+        if (!string.IsNullOrWhiteSpace(SearchModelBasic.Text))
+        {
+            items = items.Where(item => item.Text?.Contains(SearchModelBasic.Text, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+
+        // 处理 Searchable=true 列与 SeachText 模糊搜索
+        if (options.Searchs.Any())
+        {
+            items = items.Where(options.Searchs.GetFilterFunc<EditVoteOptionModel>(FilterLogic.Or));
+        }
+        else
+        {
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Text?.Contains(options.SearchText) ?? false));
+            }
+        }
+        // 过滤
+        var isFiltered = false;
+        if (options.Filters.Any())
+        {
+            items = items.Where(options.Filters.GetFilterFunc<EditVoteOptionModel>());
+            isFiltered = true;
+        }
+
+        // 排序
+        var isSorted = false;
+        if (!string.IsNullOrWhiteSpace(options.SortName))
+        {
+            // 外部未进行排序，内部自动进行排序处理
+            var invoker = SortLambdaCacheBasic.GetOrAdd(typeof(EditVoteOptionModel), key => LambdaExtensions.GetSortLambda<EditVoteOptionModel>().Compile());
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+            isSorted = true;
+        }
+
+        // 设置记录总数
+        var total = items.Count();
+
+        // 内存分页
+        items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
+
+        return Task.FromResult(new QueryData<EditVoteOptionModel>()
+        {
+            Items = items,
+            TotalCount = total,
+            IsSorted = isSorted,
+            IsFiltered = isFiltered
+        });
+    }
+
+    [Inject]
+    [NotNull]
+    private DialogService? DialogService { get; set; }
+
+    public async Task DeleteOption(int i)
+    {
+        Options.RemoveAt(i);
+        StateHasChanged();
+        await ToastService.Success("删除成功", "成功删除选项");
+    }
+    public async Task EditOption(int i)
+    {
+        var items = Utility.GenerateEditorItems<EditVoteOptionModel>();
+        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
+        //item.Data = Foo.GenerateHobbys(Localizer);
+
+        var option = new EditDialogOption<EditVoteOptionModel>()
+        {
+            Title = "编辑选项",
+            Model = Options[i],
+            Items = items,
+            OnCloseAsync = () =>
+            {
+                //Trace.Log("关闭按钮被点击");
+                return Task.CompletedTask;
+            },
+            OnSaveAsync = async context =>
+            {
+                // Trace.Log("保存按钮被点击");
+                var item = (EditVoteOptionModel)context.Model;
+
+
+                Options[i] = item;
+                StateHasChanged();
+                await ToastService.Success("修改成功", "成功修改选项");
+                return true;
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
+    }
+
+    public async Task AddOption()
+    {
+        EditVoteOptionModel model = new EditVoteOptionModel();
+        var items = Utility.GenerateEditorItems<EditVoteOptionModel>();
+        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
+        //item.Data = Foo.GenerateHobbys(Localizer);
+
+        var option = new EditDialogOption<EditVoteOptionModel>()
+        {
+            Title = "添加选项",
+            Model = model,
+            Items = items,
+            OnCloseAsync = () =>
+            {
+                //Trace.Log("关闭按钮被点击");
+                return Task.CompletedTask;
+            },
+            OnSaveAsync = async context =>
+            {
+                // Trace.Log("保存按钮被点击");
+                var item = (EditVoteOptionModel)context.Model;
+              
+                Options.Add(item);
+                StateHasChanged();
+                await ToastService.Success("添加成功", "成功添加选项");
+                return true;
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
+    }
+
+    public async Task OnImportClick(IEnumerable<EditVoteOptionModel> items)
+    {
+        var option = new DialogOption()
+        {
+            Title = "批量导入选项",
+            ShowCloseButton = false
+        };
+        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<BatchImprotOptionTip>(new Dictionary<string, object>
+        {
+            [nameof(BatchImprotOptionTip.OnAddStaffs)] = EventCallback.Factory.Create<List<EditVoteOptionModel>>(this, async (model) => await OnImported(model)),
+            [nameof(BatchImprotOptionTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
+        }).Render();
+        await DialogService.Show(option);
+    }
+
+    public async Task OnImported(List<EditVoteOptionModel> model)
+    {
+        //检查是否符合要求
+        foreach (var item in model)
+        {
+            await OnSaveAsync(item, ItemChangedType.Add);
+        }
+        if (OptionsTable != null)
+        {
+            await OptionsTable.QueryAsync();
+        }
+        StateHasChanged();
+    }
+
+
+    #region 释放实例
+    private async ValueTask DisposeAsyncCore()
+    {
+        if (Interop != null)
+        {
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
+            Interop.Dispose();
+            Interop = null;
+        }
+    }
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore();
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

@@ -242,6 +242,7 @@ namespace CnGalWebSite.Shared.Shared
                     new MenuItem() { Text = "STAFF", Icon = "fa fa-fw fa-star", Url = "/tags/index/3"},
                     new MenuItem() { Text = "制作组", Icon = "fa fa-fw fa-object-group", Url = "/tags/index/4"}
                 } },
+                new MenuItem() { Text = "投票", Icon = "fa fa-fw fa-dropbox", Url = "/votes/home" },
                 new MenuItem() { Text = "数据汇总", Icon = "fa fa-fw fa-line-chart", Url = "/tables/index" },
                 new MenuItem() { Text = "编辑指引", Icon = "fa fa-fw fa-map-signs", Url = "/perfections/home" },
                 new MenuItem() { Text = "Steam鉴赏家", Icon = "fa fa-fw fa-steam", Url = "https://store.steampowered.com/curator/11627314/",Target="_blank" },

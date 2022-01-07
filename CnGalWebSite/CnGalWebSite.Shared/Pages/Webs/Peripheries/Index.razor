@@ -28,7 +28,7 @@
 @if (isNotFound == true)
 {
     int temp = 0;
-    <NotFoundArticle IsNeedLayput="true" ArticleName="@(int.TryParse(Id,out temp)?"":ToolHelper.Base64DecodeName(Id))"></NotFoundArticle>
+    <NotFoundPeriphery IsNeedLayput="true" ArticleName="@(int.TryParse(Id,out temp)?"":ToolHelper.Base64DecodeName(Id))"></NotFoundPeriphery>
 }
 else
 {
@@ -194,10 +194,7 @@ else
     bool isNotFound = false;
     bool isAsyncReady = false;
 
-    public PeripheryViewModel Model { get; set; } = new PeripheryViewModel
-    {
-        Name = "CnGal_中文GalGame资料站"
-    };
+    public PeripheryViewModel Model { get; set; } = new PeripheryViewModel();
 
     public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
 

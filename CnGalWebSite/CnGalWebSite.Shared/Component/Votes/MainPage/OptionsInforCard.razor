@@ -1,0 +1,91 @@
+﻿<div>
+    <div class="fw-bold mb-2" style="font-size:large">投票选项</div>
+    @if (Model.UserSelections.Any()==false)
+    {
+        @foreach (var item in Model.Options)
+        {
+<div class="mb-2">
+    <OptionAloneCard TotalCount="Model.Count" IsShowResult="IsShowResult" Model="item" IsSeleted="@(Model.UserSelections.Contains(item.OptionId))" />
+
+</div>
+        }
+    }
+    else
+    {
+        @if (Model.Type == VoteType.SingleChoice)
+        {
+            <div>
+                <div>
+                    <RadioList TValue="string" Items="@Items" IsVertical="true"></RadioList>
+
+
+                </div>
+                <div>
+                    @foreach (var item in Model.Options)
+                    {
+                    <div class="mb-2">
+                        <OptionAloneCard TotalCount="Model.Count" IsShowResult="IsShowResult" Model="item" IsSeleted="@(Model.UserSelections.Contains(item.OptionId))" />
+
+                    </div>
+                    }
+                </div>
+            </div>
+
+        }
+        else
+        {
+
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public VoteViewModel Model { get; set; }
+    [Parameter]
+    public bool IsShowResult { get; set; }
+
+    public List<SelectedItem> Items { get; set; } = new List<SelectedItem>();
+    public string SeletedItemSingle { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Model.UserSelections.Any() == false)
+        {
+            foreach(var item in Model.Options)
+            {
+                Items.Add(new SelectedItem
+                {
+                    Active = false,
+                    Text = item.Name,
+                    Value = item.Name
+                });
+            }
+        }
+    }
+
+    public List<long> GetSeletedItems()
+    {
+        if (Model.UserSelections.Any())
+        {
+            return null;
+        }
+        if (Model.Type == VoteType.SingleChoice)
+        {
+            var temp=  Model.Options.FirstOrDefault(s => s.Name == SeletedItemSingle)?.OptionId;
+            if(temp==null)
+            {
+                return null;
+            }
+            else
+            {
+                return new List<long> { temp.Value };
+            }
+        }
+        else
+        {
+            return null;
+        }
+    }
+}

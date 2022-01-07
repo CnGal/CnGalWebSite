@@ -1,43 +1,37 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Articles;
+﻿using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Comments;
+using CnGalWebSite.APIServer.Application.ElasticSearches;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.ErrorCounts;
 using CnGalWebSite.APIServer.Application.Favorites;
 using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Messages;
+using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
-using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
-using Newtonsoft.Json;
+using CnGalWebSite.DataModel.ViewModel.Articles;
+using CnGalWebSite.DataModel.ViewModel.Home;
+using CnGalWebSite.DataModel.ViewModel.News;
+using Markdig;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CnGalWebSite.APIServer.Application.ElasticSearches;
-using CnGalWebSite.APIServer.Application.News;
-using CnGalWebSite.DataModel.ViewModel.News;
-using Elasticsearch.Net;
-using CnGalWebSite.DataModel.ViewModel.Articles;
-using Markdig;
-using CnGalWebSite.DataModel.ViewModel.Home;
-using TencentCloud.Ame.V20190916.Models;
-using Nest;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -184,7 +178,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //查找作者关联词条
             var author = await _weiboUserInforRepository.GetAll().Include(s => s.Entry).FirstOrDefaultAsync(s => s.WeiboName == gameNews.Author);
 
-            EditGameNewsModel model = new EditGameNewsModel
+            var model = new EditGameNewsModel
             {
                 AuthorEntryName = author?.Entry?.Name ?? "",
                 Author = gameNews.Author,
@@ -199,7 +193,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 Title = gameNews.Title,
                 Type = gameNews.Type,
                 WeiboId = (author == null || author?.WeiboId == 0) ? "" : author.WeiboId.ToString(),
-                ArticleId= gameNews.ArticleId,
+                ArticleId = gameNews.ArticleId,
             };
 
             foreach (var item in gameNews.Entries)
@@ -234,7 +228,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var author = await _weiboUserInforRepository.GetAll().AsNoTracking().Include(s => s.Entry).FirstOrDefaultAsync(s => s.WeiboName == gameNews.Author);
 
             //查看是否修正了作者信息
-            if (author == null && string.IsNullOrWhiteSpace(model.AuthorEntryName) == false && string.IsNullOrWhiteSpace(model.WeiboId)==false)
+            if (author == null && string.IsNullOrWhiteSpace(model.AuthorEntryName) == false && string.IsNullOrWhiteSpace(model.WeiboId) == false)
             {
                 try
                 {
@@ -259,7 +253,7 @@ namespace CnGalWebSite.APIServer.Controllers
             gameNews.Type = model.Type;
 
             gameNews.Entries.Clear();
-            foreach (var item in model.Entries.Where(s=>string.IsNullOrWhiteSpace(s.DisplayName)==false))
+            foreach (var item in model.Entries.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false))
             {
                 gameNews.Entries.Add(new GameNewsRelatedEntry
                 {
@@ -278,6 +272,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 article.BriefIntroduction = model.BriefIntroduction;
                 article.MainPage = model.MainPage;
                 article.MainPicture = model.MainPicture;
+                article.NewsType = model.NewsType;
 
                 await _articleRepository.UpdateAsync(article);
             }
@@ -296,25 +291,27 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "作者名称或标题不能为空" };
             }
 
-            var gameNews = new GameNews();
-            gameNews.Author = model.Author;
-            gameNews.BriefIntroduction = model.BriefIntroduction;
-            gameNews.Link = model.Link;
-            gameNews.MainPage = model.MainPage;
-            gameNews.MainPicture = model.MainPicture;
-            gameNews.NewsType = model.NewsType;
-            gameNews.PublishTime = model.PublishTime;
-            gameNews.Title = model.Title;
-            gameNews.Type = model.Type;
-
-            gameNews.RSS = new OriginalRSS
+            var gameNews = new GameNews
             {
                 Author = model.Author,
-                Description = model.MainPage,
+                BriefIntroduction = model.BriefIntroduction,
                 Link = model.Link,
+                MainPage = model.MainPage,
+                MainPicture = model.MainPicture,
+                NewsType = model.NewsType,
                 PublishTime = model.PublishTime,
                 Title = model.Title,
-                Type = OriginalRSSType.Custom
+                Type = model.Type,
+
+                RSS = new OriginalRSS
+                {
+                    Author = model.Author,
+                    Description = model.MainPage,
+                    Link = model.Link,
+                    PublishTime = model.PublishTime,
+                    Title = model.Title,
+                    Type = OriginalRSSType.Custom
+                }
             };
 
             gameNews.Entries.Clear();
@@ -342,7 +339,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = "尝试获取作者信息失败" };
                 }
             }
-        
+
             await _gameNewsRepository.InsertAsync(gameNews);
 
             return new Result { Successful = true };
@@ -385,7 +382,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 article = await _newsService.GameNewsToArticle(gameNews);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -475,7 +472,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return NotFound("未找到该周报");
             }
 
-            EditWeeklyNewsModel model = new EditWeeklyNewsModel
+            var model = new EditWeeklyNewsModel
             {
                 State = weeklyNews.State,
                 BriefIntroduction = weeklyNews.BriefIntroduction,
@@ -486,13 +483,13 @@ namespace CnGalWebSite.APIServer.Controllers
                 Title = weeklyNews.Title,
                 Type = weeklyNews.Type,
                 CreateTime = weeklyNews.CreateTime,
-                ArticleId=weeklyNews.ArticleId,
+                ArticleId = weeklyNews.ArticleId,
             };
 
             //选中的动态
             //获取在这个星期的所有动态
 
-            var news = await _gameNewsRepository.GetAll().Where(s => model.CreateTime.AddDays(7) > s.PublishTime&& model.CreateTime.AddDays(-7) < s.PublishTime).ToListAsync();
+            var news = await _gameNewsRepository.GetAll().Where(s => model.CreateTime.AddDays(7) > s.PublishTime && model.CreateTime.AddDays(-7) < s.PublishTime).ToListAsync();
             news = news.Where(s => s.PublishTime.IsInSameWeek(model.CreateTime)).ToList();
 
             foreach (var item in news)
@@ -613,7 +610,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ArticleViewModel>> GetWeelyNewsPreviewAsync(long id)
         {
-            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s=>s.News).FirstOrDefaultAsync(s => s.Id == id);
+            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s => s.News).FirstOrDefaultAsync(s => s.Id == id);
 
             if (weeklyNews == null)
             {
@@ -653,8 +650,8 @@ namespace CnGalWebSite.APIServer.Controllers
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
             model.MainPage = Markdown.ToHtml(model.MainPage ?? "", pipeline);
 
-            
-       
+
+
 
             return model;
 
@@ -704,12 +701,11 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Successful = false, Error = "链接无效" };
             }
-            long id = 0;
-            if (long.TryParse(text[3], out id) == false)
+            if (long.TryParse(text[3], out var id) == false)
             {
                 return new Result { Successful = false, Error = "链接无效，无法识别Id" };
             }
-            if(id<=0)
+            if (id <= 0)
             {
                 return new Result { Successful = false, Error = "链接无效，识别到的Id不符合条件" };
             }
@@ -717,7 +713,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var keyword = text[4];
 
             //查找是否已经录入
-            if(await _gameNewsRepository.GetAll().Include(s=>s.RSS).AnyAsync(s=>(s.RSS.Link==model.Link||s.Link==model.Link)&&s.Title!="已删除"))
+            if (await _gameNewsRepository.GetAll().Include(s => s.RSS).AnyAsync(s => (s.RSS.Link == model.Link || s.Link == model.Link) && s.Title != "已删除"))
             {
                 return new Result { Successful = false, Error = "该微博动态已存在" };
             }

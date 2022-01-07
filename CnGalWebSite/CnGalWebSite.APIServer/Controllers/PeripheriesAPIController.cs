@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TencentCloud.Ame.V20190916.Models;
+using CnGalWebSite.APIServer.Application.Entries;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -36,8 +37,9 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
         private readonly IPeripheryService _peripheryService;
+        private readonly IEntryService _entryService;
 
-        public PeripheriesAPIController(IPeripheryService peripheryService,
+        public PeripheriesAPIController(IPeripheryService peripheryService, IEntryService entryService,
         UserManager<ApplicationUser> userManager, IRepository<PeripheryRelevanceUser, long> userOwnedPeripheryRepository,
          IExamineService examineService, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository)
         {
@@ -49,6 +51,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _peripheryRepository = peripheryRepository;
             _peripheryService = peripheryService;
             _userOwnedPeripheryRepository = userOwnedPeripheryRepository;
+            _entryService = entryService;
         }
 
 
@@ -410,6 +413,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     return new Result { Successful = false, Error = "该周边的名称与其他周边重复" };
                 }
+
                 //预处理 建立词条关联信息
                 //判断关联是否存在
                 var entryId = new List<int>();
@@ -419,49 +423,36 @@ namespace CnGalWebSite.APIServer.Controllers
                 entryNames.AddRange(model.Groups.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
                 entryNames.AddRange(model.Staffs.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
                 entryNames.AddRange(model.Roles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+
+                try
+                {
+                    entryId = await _entryService.GetEntryIdsFromNames(entryNames);
+                }
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
+                }
                 //确保至少有一个关联词条
-                if (entryNames.Any() == false)
+                if (entryId.Any() == false)
                 {
                     return new Result { Successful = false, Error = "至少需要关联一个词条" };
                 }
 
-                foreach (var item in entryNames)
-                {
-                    var infor = await _entryRepository.GetAll().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
-                    if (infor <= 0)
-                    {
-                        return new Result { Successful = false, Error = "词条 " + item + " 不存在" };
-                    }
-                    else
-                    {
-                        entryId.Add(infor);
-                    }
-                }
-                //删除重复数据
-                entryId = entryId.Distinct().ToList();
-
+            
                 //预处理 建立周边关联信息
                 //判断关联是否存在
                 var peripheryIds = new List<long>();
 
                 var peripheryNames = new List<string>();
                 peripheryNames.AddRange(model.Peripheries.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-
-
-                foreach (var item in peripheryNames)
+                try
                 {
-                    var infor = await _peripheryRepository.GetAll().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
-                    if (infor <= 0)
-                    {
-                        return new Result { Successful = false, Error = "周边 " + item + " 不存在" };
-                    }
-                    else
-                    {
-                        peripheryIds.Add(infor);
-                    }
+                    peripheryIds = await _peripheryService.GetPeripheryIdsFromNames(peripheryNames);
                 }
-                //删除重复数据
-                peripheryIds = peripheryIds.Distinct().ToList();
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
+                }
 
                 //第一步 处理主要信息
 

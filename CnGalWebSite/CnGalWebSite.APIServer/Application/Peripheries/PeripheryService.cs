@@ -117,6 +117,28 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             });
         }
 
+        public async Task<List<long>> GetPeripheryIdsFromNames(List<string> names)
+        {
+            //判断关联是否存在
+            var entryId = new List<long>();
+
+            foreach (var item in names)
+            {
+                var infor = await _peripheryRepository.GetAll().AsNoTracking().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
+                if (infor <= 0)
+                {
+                    throw new Exception("周边 " + item + " 不存在");
+                }
+                else
+                {
+                    entryId.Add(infor);
+                }
+            }
+            //删除重复数据
+            entryId = entryId.Distinct().ToList();
+
+            return entryId;
+        }
 
         public void UpdatePeripheryDataMain(Periphery periphery, PeripheryMain examine)
         {

@@ -6,6 +6,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Entries
@@ -31,6 +32,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
         void UpdateEntryDataMainPage(Entry entry, string examine);
 
         Task UpdateEntryDataAsync(Entry entry, Examine examine);
+
+        Task<List<int>> GetEntryIdsFromNames(List<string> names);
 
         Task<EntryEditState> GetEntryEditState(ApplicationUser user, int entryId);
     }

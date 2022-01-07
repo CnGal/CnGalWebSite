@@ -274,6 +274,29 @@ namespace CnGalWebSite.APIServer.Application.Articles
             return dtos_;
         }
 
+        public async Task<List<long>> GetArticleIdsFromNames(List<string> names)
+        {
+            //判断关联是否存在
+            var entryId = new List<long>();
+
+            foreach (var item in names)
+            {
+                var infor = await _articleRepository.GetAll().AsNoTracking().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
+                if (infor <= 0)
+                {
+                    throw new Exception("文章 " + item + " 不存在");
+                }
+                else
+                {
+                    entryId.Add(infor);
+                }
+            }
+            //删除重复数据
+            entryId = entryId.Distinct().ToList();
+
+            return entryId;
+        }
+
         public void UpdateArticleDataMain(Article article, ArticleMain examine)
         {
             article.Name = examine.Name;

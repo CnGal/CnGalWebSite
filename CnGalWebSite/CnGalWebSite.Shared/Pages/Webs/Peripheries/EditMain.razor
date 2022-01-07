@@ -188,7 +188,7 @@
         try
         {
             //处理数据
-            if (string.IsNullOrWhiteSpace(Model.Name))
+            if (string.IsNullOrWhiteSpace(Model.Name) || string.IsNullOrWhiteSpace(Model.DisplayName))
             {
                 await ToastService.Error("编辑周边失败", "请填写所有必填项目");
                 return;

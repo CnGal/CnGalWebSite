@@ -159,6 +159,8 @@ namespace CnGalWebSite.DataModel.Model
         /// To 指当前周边被关联的其他周边关联 呈现编辑视图时不使用
         /// </summary>
         public virtual ICollection<PeripheryRelation> PeripheryRelationToPeripheryNavigation { get; set; }=new List<PeripheryRelation>();
+
+        public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
     }
 
     public class PeripheryRelevanceUser
