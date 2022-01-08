@@ -11,7 +11,10 @@
 {
     <TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
 }
-
+else
+{
+    <TitleTip></TitleTip>
+}
 <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.HeadBar Title="@Model.Name" OnEdit="@(() => NavigationManager.NavigateTo("/peripheries/edit/home/" + Model.Id))" CanEdit="true" ClassName="" />
 
 <div style="margin-top: 45px; width: 100%;margin-bottom:65px; " @onclick="@(() => peripheryFooter.UnRelyComment())">
@@ -31,8 +34,8 @@
             <div>
                 <CnGalWebSite.Shared.AppComponent.Pages.Peripheries.HeadCard Model="Model" />
                 <div>
-                    <CnGalWebSite.Shared.AppComponent.Pages.Peripheries.PivotLine IsShowImages="@(Model.Pictures.Count!=0)" 
-                                                                                     OnTabClick="OnTabClick" DefaultIndex="defaultIndex" RandomIndex="randomIndex" />
+                    <CnGalWebSite.Shared.AppComponent.Pages.Peripheries.PivotLine IsShowImages="@(Model.Pictures.Count!=0)"
+                                                                                  OnTabClick="OnTabClick" DefaultIndex="defaultIndex" RandomIndex="randomIndex" />
                     <div class="ms-3 me-3">
                         <div class="mt-3 mb-3" style="padding-right: 0;padding-left: 0;">
                             <div class="tab-content" id="@("pills" + randomIndex + "-tabContent")">
@@ -57,10 +60,10 @@
 
     }
 </div>
-@if (isNotFound == false&&isReady==true)
+@if (isNotFound == false && isReady == true)
 {
     <CnGalWebSite.Shared.AppComponent.Pages.Peripheries.PeripheryFooter @ref="peripheryFooter" Image="@Model.MainPicture" RelyCallBack="RefreshComment" IsCollected="Model.IsCollected" CollectionChanged="OnCollectionChanged"
-                                                                           PeripheryId="@Model.Id" PeripheryName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
+                                                                        PeripheryId="@Model.Id" PeripheryName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
 }
 @code {
     private string id = "";
@@ -191,7 +194,7 @@
             isNotFound = false;
             StateHasChanged();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             isNotFound = true;
             isReady = true;
@@ -203,7 +206,7 @@
     {
 
         Model.IsCollected = isCollected;
-        if(isCollected)
+        if (isCollected)
         {
             await detailCard.listPeripheryOverviewCard.CollectionChanged(true, Model.Id);
             Model.CollectedCount++;

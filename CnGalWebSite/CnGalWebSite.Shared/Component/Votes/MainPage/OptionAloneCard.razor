@@ -1,22 +1,29 @@
-﻿<div style="border: 1px solid var(--bs-secondary); border-radius: 5px;">
+﻿<div style="width:100%">
     <div style="display:flex;">
-        @if (string.IsNullOrWhiteSpace(Model.Image) == false)
-        {
-            <a href="@Url">
+        <a href="@Url" class="@(IsShowResult?"":"ms-3")" style="@ImageMinWidth">
+            @if (string.IsNullOrWhiteSpace(Model.Image) == false)
+            {
                 <img src="@Model.Image" alt="@Model.Name" style="height:50px;" />
-            </a>
-        }
+            }
+        </a>
+   
 
-        <div style="display: block; width: 100%;">
-            <div style="float:left">
+        <div style="width: 100%; height: 50px; position: relative; display: flex; ">
+            <div class="option-background" style="@($"height: 100%;position: absolute;width:{(IsShowResult?((double)Model.Count*100 / TotalCount).ToString("0"):0)}%;")">
 
             </div>
-            <div style="display: flex; width: 100%; justify-content: space-between; height: 100%; align-content: center;" class="ps-3">
+            <div style=" display: flex; width: 100%; justify-content: space-between; height: 100%; align-content: center; z-index: 2;" class="ps-3">
                 <div style="display: flex; flex-direction: column; justify-content: center;">
-                    <div>@Model.Name</div>
+                    <div class="fw-bold" style="display: flex; align-items: center;">
+                        <div style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">@Model.Name</div>
+                        @if (IsSeleted&&IsShowResult)
+                        {
+                            <i class="fa fa-check-circle fa-fw font-color ms-1"></i>
+                        }
+                    </div>
                     @if (IsShowResult)
                     {
-                        <div>@(Model.Count+"票")</div>
+                        <div style="font-size:small;color:gray;">@(Model.Count+"票")</div>
                     }
                 </div>
                 @if (IsShowResult)
@@ -40,6 +47,8 @@
     public bool IsShowResult { get; set; }
     [Parameter]
     public bool IsSeleted { get; set; }
+    [Parameter]
+    public string ImageMinWidth { get; set; }
 
     [Parameter]
     public long TotalCount { get; set; }
@@ -51,15 +60,15 @@
     {
         Url = Model.Type switch
         {
-            VoteOptionType.Text => "",
+            VoteOptionType.Text => null,
             VoteOptionType.Entry => "entries/index/" + Model.ObjectId,
             VoteOptionType.Article => "articles/index/" + Model.ObjectId,
             VoteOptionType.Periphery => "peripheries/index/" + Model.ObjectId,
-            _ => "",
+            _ => null,
         };
         if (TotalCount != 0)
         {
-            Percent = ((double)Model.Count / TotalCount).ToString("0.00") + "%";
+            Percent = Math.Round(((double)Model.Count * 100 / TotalCount), 2, MidpointRounding.AwayFromZero).ToString() + "%";
         }
         else
         {

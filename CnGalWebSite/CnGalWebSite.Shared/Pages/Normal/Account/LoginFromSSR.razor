@@ -58,7 +58,6 @@
     public ErrorHandler ErrorHandler { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        //上传
         try
         {
             var result = await Http.PostAsJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = Code });

@@ -63,23 +63,27 @@
 
                 @for (int i = 0; i < _dataCacheService.SearchViewModel.pagedResultDto.Data.Count; i++)
                 {
-                    if (_dataCacheService.SearchViewModel.pagedResultDto.Data[i].entry != null)
-                    {
-                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="_dataCacheService.SearchViewModel.pagedResultDto.Data[i].entry" ColorNum="main"></CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip>
-                        tempNum++;
-                    }
-                    else if (_dataCacheService.SearchViewModel.pagedResultDto.Data[i].article != null)
-                    {
-                        <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="_dataCacheService.SearchViewModel.pagedResultDto.Data[i].article"></CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip>
-                    }
-                    else if (_dataCacheService.SearchViewModel.pagedResultDto.Data[i].periphery != null)
-                    {
-                        <CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip Model="_dataCacheService.SearchViewModel.pagedResultDto.Data[i].periphery"></CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip>
-                    }
-                    else if (_dataCacheService.SearchViewModel.pagedResultDto.Data[i].tag != null)
-                    {
-                        <CnGalWebSite.Shared.Component.Search.NewVersion.TagInforViewTip Model="_dataCacheService.SearchViewModel.pagedResultDto.Data[i].tag"></CnGalWebSite.Shared.Component.Search.NewVersion.TagInforViewTip>
-                    }
+                    <div class="mb-3">
+                        @if (_dataCacheService.SearchViewModel.pagedResultDto.Data[i].entry != null)
+                        {
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="_dataCacheService.SearchViewModel.pagedResultDto.Data[i].entry" ColorNum="main"></CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip>
+                            tempNum++;
+                        }
+                        else if (_dataCacheService.SearchViewModel.pagedResultDto.Data[i].article != null)
+                        {
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="_dataCacheService.SearchViewModel.pagedResultDto.Data[i].article"></CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip>
+                        }
+                        else if (_dataCacheService.SearchViewModel.pagedResultDto.Data[i].periphery != null)
+                        {
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip Model="_dataCacheService.SearchViewModel.pagedResultDto.Data[i].periphery"></CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip>
+                        }
+                        else if (_dataCacheService.SearchViewModel.pagedResultDto.Data[i].tag != null)
+                        {
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.TagInforViewTip Model="_dataCacheService.SearchViewModel.pagedResultDto.Data[i].tag"></CnGalWebSite.Shared.Component.Search.NewVersion.TagInforViewTip>
+                        }
+
+                    </div>
+
 
                 }
 

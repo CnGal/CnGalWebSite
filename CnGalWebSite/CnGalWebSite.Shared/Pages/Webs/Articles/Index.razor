@@ -13,7 +13,10 @@
 {
     <TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
 }
-
+else
+{
+    <TitleTip></TitleTip>
+}
 
 @if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
 {
@@ -109,16 +112,16 @@ else
                                     @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false)
                                     {
 
-                                <div class="alert alert-primary  rounded shadow  rounded" role="alert">
-                                    作者： <strong> @Model.OriginalAuthor</strong> &nbsp; 原文发表在： <a href="@Model.OriginalLink" class="alert-link" style="word-wrap: break-word;word-break:break-all;" target="_blank">@Model.OriginalLink</a>
-                                </div>
+                                        <div class="alert alert-primary  rounded shadow  rounded" role="alert">
+                                            作者： <strong> @Model.OriginalAuthor</strong> &nbsp; 原文发表在： <a href="@Model.OriginalLink" class="alert-link" style="word-wrap: break-word;word-break:break-all;" target="_blank">@Model.OriginalLink</a>
+                                        </div>
                                     }
 
                                     if (Model.MainPageState == EditState.Preview || Model.MainState == EditState.Preview || Model.RelevancesState == EditState.Preview)
                                     {
                                         <AlertTip Title="编辑文章" Type="AlertTip.AlertTipType.preview" Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></AlertTip>
                                     }
-                                    <div class="tui-editor-contents">
+                                    <div class="markdown-body">
                                         @((MarkupString)Model.MainPage)
                                     </div>
 

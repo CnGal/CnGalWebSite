@@ -22,6 +22,7 @@
             if (user.Identity.IsAuthenticated)
             {
                 await AuthService.Logout();
+                _dataCacheService.RefreshAllCatche();
 
                 NavigationManager.NavigateTo("/account/login");
             }

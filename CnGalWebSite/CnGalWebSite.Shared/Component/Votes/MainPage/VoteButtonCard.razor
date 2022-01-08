@@ -1,0 +1,80 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService? ToastService
+
+@if (DateTime.Now.ToCstTime() > Model.BeginTime && DateTime.Now.ToCstTime() < Model.EndTime)
+{
+    <div style="display: flex; flex-direction: column; align-content: center;">
+        @if (Model.ShowResult == false)
+        {
+            <Checkbox TValue="string" State="CheckboxState.UnChecked" DisplayText="匿名参与投票" ShowAfterLabel="true" class="ms-1 mb-2" OnStateChanged="OnSeletedItemChanged"></Checkbox>
+            <div style=" display: flex; justify-content: center; ">
+                <Button Icon="fa fa-check" Text="投票" Color="Color.Dark" IsAsync="true" OnClick="OnClickVoted" style=" width: 100px;" />
+            </div>
+        }
+        else
+        {
+            <div style=" display: flex; justify-content: center; ">
+                <Button Icon="fa fa-refresh" Text="重新投票" Color="Color.Dark" IsAsync="true" OnClick="OnClickReVoted" style=" width: 100px;" />
+            </div>
+        }
+    </div>
+
+}
+
+@code {
+    [Parameter]
+    public VoteViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnVoted { get; set; }
+    [Parameter]
+    public EventCallback OnReVoted { get; set; }
+
+    public CheckboxState IsAnonymous { get; set; }
+
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task OnClickReVoted()
+    {
+        await OnReVoted.InvokeAsync();
+    }
+
+    public async Task OnClickVoted()
+    {
+        try
+        {
+
+            var result = await Http.PostAsJsonAsync<UserVoteModel>(ToolHelper.WebApiPath + "api/votes/UserVote", new UserVoteModel
+            {
+                IsAnonymous = IsAnonymous == CheckboxState.Checked,
+                VoteId = Model.Id,
+                VoteOptionIds = Model.UserSelections
+            });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("投票失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("投票成功", "投票成功");
+                await OnVoted.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "投票失败");
+        }
+    }
+
+    public async Task OnSeletedItemChanged(CheckboxState state, string str)
+    {
+
+        IsAnonymous = state;
+    }
+}

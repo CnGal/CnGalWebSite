@@ -1,18 +1,21 @@
-﻿<a style="display:flex;" href="@("/space/index/"+Model.UserId)" >
-    <div style="display: flex;align-items: center;">
-        <img class="shadow-sm" src="@Model.Image" style="height: 50px;width: 50px;border-radius: 50%;" />
-    </div>
-    <div class="comment-tx-div">
-        <div  class="new-row-warp no-margin">
-            @foreach (var item in Model.Ranks)
-            {
-                <RankAloneViewTip Model="item"></RankAloneViewTip>
-            }
-            <div class="comment-username a-font-color me-2">@Model.UserName</div>
+﻿<a style="display:flex;" href="@("/space/index/"+Model.UserId)" class="h-100 ">
+    <div style="display:flex;" class="div-shadow rounded bg-opacity p-2 w-100">
+        <div style="display: flex;align-items: center;">
+            <img class="shadow-sm" src="@Model.Image" style="height: 45px;width: 45px;border-radius: 50%;" />
+        </div>
+        <div class="comment-tx-div">
+            <div class="new-row-warp no-margin">
+                @foreach (var item in Model.Ranks)
+                {
+                    <RankAloneViewTip Model="item"></RankAloneViewTip>
+                }
+                <div class="comment-username a-font-color me-2">@Model.UserName</div>
 
                 <div class="comment-username" style="color:gray;">@Model.VotedTime.ToTimeFromNowString()</div>
+            </div>
+            <div class="comment-time" style="color: gray; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">@Model.PersonalSignature</div>
         </div>
-        <div class="comment-time a-font-color">@Model.PersonalSignature</div>
+
     </div>
 </a>
 

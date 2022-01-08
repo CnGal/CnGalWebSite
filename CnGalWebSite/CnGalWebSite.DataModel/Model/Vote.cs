@@ -151,7 +151,7 @@ namespace CnGalWebSite.DataModel.Model
         public ApplicationUser ApplicationUser { get; set; }
         public string ApplicationUserId { get; set; }
 
-        public long VoteId { get; set; }
+        public long? VoteId { get; set; }
         public Vote Vote { get; set; }
 
         public DateTime VotedTime { get; set; }

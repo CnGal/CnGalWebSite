@@ -9,5 +9,7 @@ namespace CnGalWebSite.Shared.Service
         Task<TModel> GetCatche(string apiUrl, bool noRefresh = false);
 
         void Clean(string apiUrl);
+
+        void Clean();
     }
 }

@@ -49,8 +49,11 @@
                         <div class="form-group col-12">
                             <Textarea @bind-Value="Model.BriefIntroduction" rows="3" />
                         </div>
-                        <div class ="form-group col-12 col-sm-6">
-                            <DateTimeRange @bind-Value="@DateTimeRangeValue2" style="width:100%" DisplayText="起止时间" ShowLabel="true"/>
+                        <div class="form-group col-12 col-sm-6">
+                            <DateTimePicker @bind-Value="@Model.BeginTime" ViewModel="DatePickerViewModel.DateTime" />
+                        </div>
+                        <div class="form-group col-12 col-sm-6">
+                            <DateTimePicker @bind-Value="@Model.EndTime" ViewModel="DatePickerViewModel.DateTime" />
                         </div>
                         <div class="form-group col-12  col-sm-6">
                             <Select @bind-Value="Model.Type" />
@@ -58,10 +61,10 @@
                         @if (Model.Type == VoteType.MultipleChoice)
                         {
                             <div class="form-group col-12  col-sm-6">
-                                <BootstrapInputNumber ShowButton="true" Value="@Model.MinimumSelectionCount" Max="@Model.MaximumSelectionCount.ToString()" Min="2" />
+                                <BootstrapInputNumber ShowButton="true" @bind-Value="@Model.MinimumSelectionCount" Max="@Model.MaximumSelectionCount.ToString()" Min="1" />
                             </div>
                             <div class="form-group col-12  col-sm-6">
-                                <BootstrapInputNumber ShowButton="true" Value="@Model.MaximumSelectionCount" Max="99" Min="@Model.MinimumSelectionCount.ToString()" />
+                                <BootstrapInputNumber ShowButton="true" @bind-Value="@Model.MaximumSelectionCount" Max="99" Min="@Model.MinimumSelectionCount.ToString()" />
                             </div>
                         }
 
@@ -80,7 +83,7 @@
 
             @if (isReady == true)
             {
-                <MarkdownEditorTip @ref="markdownEditorTip"></MarkdownEditorTip>
+                <MarkdownEditorTip @ref="markdownEditorTip"  Context="@Model.MainPage"></MarkdownEditorTip>
             }
 
 
@@ -196,20 +199,25 @@
                 await ToastService.Error("创建投票失败", "请填写所有必填项目");
                 return;
             }
+
+            if (Model.BeginTime > Model.EndTime)
+            {
+                await ToastService.Error("编辑投票失败", "开始时间必须早于结束时间");
+                return;
+
+            }
             //复制选项
             if (optionEditor != null)
             {
                 Model.Options = optionEditor.Options;
             }
-            //复制时间
-            Model.BeginTime = DateTimeRangeValue2.Start;
-            Model.EndTime = DateTimeRangeValue2.End;
+    
 
             if (Model.Type==VoteType.MultipleChoice)
             {
-                if (Model.MinimumSelectionCount < 2)
+                if (Model.MinimumSelectionCount < 1)
                 {
-                    await ToastService.Error("创建投票失败", "只能最少同时选中项目数必须大于2");
+                    await ToastService.Error("创建投票失败", "只能最少同时选中项目数必须大于0");
                     return;
                 }
                 if (Model.MaximumSelectionCount > Model.Options.Count)

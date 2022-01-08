@@ -47,9 +47,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Votes
         [Display(Name = "允许用户重新投票")]
         public bool IsAllowModification { get; set; }
         [Display(Name = "同时选中项下限")]
-        public long MinimumSelectionCount { get; set; }
+        public long MinimumSelectionCount { get; set; } = 1;
         [Display(Name = "同时选中项上限")]
-        public long MaximumSelectionCount { get; set; }
+        public long MaximumSelectionCount { get; set; } = 2;
 
         [Display(Name = "备注")]
         public string Note { get; set; }

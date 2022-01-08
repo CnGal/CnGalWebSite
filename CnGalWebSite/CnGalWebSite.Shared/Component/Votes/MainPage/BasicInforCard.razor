@@ -2,7 +2,7 @@
     @if (DateTime.Now.ToCstTime() < Model.BeginTime)
     {
         <div class="col-6 p-0">
-            <i class="fa fa-clock-o fa-fw text-primaly"></i>
+            <i class="fa fa-clock-o fa-fw text-primary"></i>
             <span>未开始</span>
         </div>
     }
@@ -27,7 +27,7 @@
     </div>
     <div class="col-12 p-0">
         <i class="fa fa-calendar fa-fw "></i>
-        <span>@(Model.BeginTime.ToString("yyyy/MM/dd HH:mm")+" - "+ Model.EndTime.ToString("yyyy/MM/dd HH:mm"))</span>
+        <span>@(Model.BeginTime.ToString("yyyy.M.d HH:mm")+" - "+ Model.EndTime.ToString("yyyy.M.d HH:mm"))</span>
     </div>
 </div>
 

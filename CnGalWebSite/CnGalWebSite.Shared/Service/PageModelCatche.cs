@@ -66,5 +66,9 @@ namespace CnGalWebSite.Shared.Service
         {
             _catches.Remove(_baseUrl + apiUrl);
         }
+        public void Clean()
+        {
+            _catches.Clear();
+        }
     }
 }

@@ -185,7 +185,7 @@ namespace CnGalWebSite.APIServer.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     ApplicationUserId = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    VoteId = table.Column<long>(type: "bigint", nullable: false),
+                    VoteId = table.Column<long>(type: "bigint", nullable: true),
                     VotedTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsAnonymous = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
@@ -237,35 +237,35 @@ namespace CnGalWebSite.APIServer.Migrations
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                 column: "ConcurrencyStamp",
-                value: "c7b43029-07b2-4297-938e-56594856d290");
+                value: "411fb597-c5da-4051-9041-05b1507760bc");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e576",
                 column: "ConcurrencyStamp",
-                value: "ad7b9b6b-1b44-4a9b-89b4-08786da48907");
+                value: "1d3e3fa7-3ce0-46de-ac93-7474f277a75f");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e577",
                 column: "ConcurrencyStamp",
-                value: "073a6e45-2a0d-4035-a2eb-cf645713d0e3");
+                value: "192bf073-ed3f-4aff-a0d0-2a93b3cf584f");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e578",
                 column: "ConcurrencyStamp",
-                value: "8ebf273d-83f8-45fb-a1c3-e3564261e9b0");
+                value: "bc982083-fcce-4366-a9c6-5de8271460b1");
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                 columns: new[] { "ConcurrencyStamp", "RegistTime" },
-                values: new object[] { "41d7e16a-2a7e-4b47-9c65-2212981a8156", new DateTime(2022, 1, 7, 21, 6, 22, 177, DateTimeKind.Unspecified).AddTicks(2218) });
+                values: new object[] { "f9804148-ff46-4bff-88a4-5d454ce5e06e", new DateTime(2022, 1, 8, 17, 37, 21, 67, DateTimeKind.Unspecified).AddTicks(290) });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_VoteId",

@@ -279,6 +279,7 @@ namespace CnGalWebSite.Shared.Shared
                               new MenuItem() { Text = "管理标签", Icon = "fa fa-fw fa-tag", Url = "/admin/ListTags" },
                               new MenuItem() { Text = "管理收藏", Icon = "fa fa-fw fa-folder-open", Url = "/admin/ListFavoriteFolders" },
                               new MenuItem() { Text = "管理周边", Icon = "fa fa-fw fa-shopping-basket", Url = "/admin/ListPeripheries" },
+                              new MenuItem() { Text = "管理投票", Icon = "fa fa-fw fa-dropbox", Url = "/admin/ListVotes" },
                               new MenuItem() { Text = "管理头衔", Icon = "fa fa-fw fa-tree", Url = "/admin/ListRanks" },
                               new MenuItem() { Text = "管理图片", Icon = "fa fa-fw fa-image", Url = "/admin/ListImages" },
                               new MenuItem() { Text = "其他设置", Icon = "fa fa-fw fa-cog", Url = "/admin/ManageHome" }

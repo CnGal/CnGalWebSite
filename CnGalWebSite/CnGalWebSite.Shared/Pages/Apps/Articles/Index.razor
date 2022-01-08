@@ -159,7 +159,7 @@ else
             LastLookName = Model.Name;
             try
             {
-                await JS.InvokeAsync<string>("trackEvent", "词条", "浏览", Model.Name, "1", "look");
+                await JS.InvokeAsync<string>("trackEvent", "文章", "浏览", Model.Name, "1", "look");
             }
             catch (Exception exc)
             {

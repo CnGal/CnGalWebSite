@@ -19,38 +19,44 @@
     .layout.is-page.@colorString .layout-drawer:hover {
         background-color: var(--hover-color);
     }
+
 </style>
 
 @if (isDark)
 {
-        <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/vs2015.min.css"/>
-        <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/dark-cover.min.css" />
-        <style>
-            [data-bs-toggle="lgbSelect"] .form-select {
-                background-color: transparent;
-                color: white;
-            }
-        </style>
+    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/vs2015.min.css" media="none" onload="this.media='all'" />
+    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/dark-cover.min.css" />
+    <link href="https://cdn.bootcdn.net/ajax/libs/github-markdown-css/5.1.0/github-markdown-dark.min.css" rel="stylesheet" media="none" onload="this.media='all'">
+    <style>
+        [data-bs-toggle="lgbSelect"] .form-select {
+            background-color: transparent;
+            color: white;
+        }
+    </style>
 }
 else
 {
-        <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/vs.min.css"/>
-        <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/Lighting-mode.min.css"/>
+    <!-- <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/editor.md/css/editormd.min.css" media="none" onload="this.media='all'" />
+    -->
 
-        <style>
-            #__vconsole .vc-switch {
-                margin-right: 20px;
-                box-shadow: 0 0.5rem 1rem rgb(255, 255, 255, 15%) !important;
-            }
-        </style>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/github-markdown-css/5.1.0/github-markdown-light.min.css" media="none" onload="this.media='all'" />
+    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/vs.min.css" media="none" onload="this.media='all'" />
+    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/Lighting-mode.min.css" />
+
+    <style>
+        #__vconsole .vc-switch {
+            margin-right: 20px;
+            box-shadow: 0 0.5rem 1rem rgb(255, 255, 255, 15%) !important;
+        }
+    </style>
 
     if (IsOnBgImage)
     {
-            <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/show-background.min.css" />
+        <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/show-background.min.css" />
     }
     else
     {
-            <style>
+        <style>
                 .layout.is-page .layout-side {
                     background-color: @colorMain !important;
                 }
@@ -61,26 +67,26 @@ else
                 #web_bg {
                     display: none;
                 }
-            </style>
+        </style>
     }
 }
 @if (IsOnMouse)
 {
-        <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/mouse.min.css"/>
+    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/mouse.min.css" />
 
 
 }
 
 @if (IsOnBgImage && isDark == false)
 {
-        <style>
-            .layout.is-page .layout-footer {
-                background-color: transparent !important;
-                box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 50%) !important;
-            }
-        </style>
+    <style>
+        .layout.is-page .layout-footer {
+            background-color: transparent !important;
+            box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 50%) !important;
+        }
+    </style>
 
-       
+
     <AuthorizeView>
         <Authorized>
             @{
@@ -109,12 +115,21 @@ else
 }
 else
 {
-        <style>
-            .bgimage-ison {
-                display: none !important;
-            }
-        </style>
+    <style>
+        .bgimage-ison {
+            display: none !important;
+        }
+    </style>
 }
+<style>
+    .markdown-body img {
+        background-color: transparent;
+    }
+
+    .markdown-body {
+        background-color: transparent;
+    }
+</style>
 
 @code {
     public string colorMain = "#D979A2";

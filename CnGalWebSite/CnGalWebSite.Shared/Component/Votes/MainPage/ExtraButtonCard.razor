@@ -1,0 +1,61 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+
+<div style="display:flex;">
+    <Button Icon="fa fa-pencil" Text="编辑" Color="Color.Success" IsAsync="true" OnClick="OnEdit" Size="Size.ExtraSmall" style=" width: 80px;" class="me-3" />
+    @if (Model.IsHidden)
+    {
+        <Button Icon="fa fa-map-signs" Text="显示" Color="Color.Primary" IsAsync="true" OnClick="@(()=>OnClickVoted(false))" Size="Size.ExtraSmall" style=" width: 80px;" />
+
+    }
+    else
+    {
+        <Button Icon="fa fa-unlink" Text="隐藏" Color="Color.Danger" IsAsync="true" OnClick="@(()=>OnClickVoted(true))" Size="Size.ExtraSmall" style=" width: 80px;" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public VoteViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback StateChanged { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task OnClickVoted(bool isHidden)
+    {
+        string text = isHidden ? "隐藏" : "显示";
+
+        try
+        {
+            var result = await Http.PostAsJsonAsync<HiddenVoteModel>(ToolHelper.WebApiPath + "api/votes/HiddenVote", new HiddenVoteModel { Ids = new long[] { Model.Id }, IsHidden = true });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(text+"投票失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success(text + "投票成功", text + "投票成功");
+                await StateChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, text + "投票失败");
+        }
+    }
+
+    public Task OnEdit()
+    {
+        NavigationManager.NavigateTo(Provider,"/votes/editvote/" + Model.Id, "编辑投票");
+        return Task.CompletedTask;
+    }
+}

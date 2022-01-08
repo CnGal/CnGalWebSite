@@ -77,7 +77,7 @@
     private List<ListPeripheryAloneModel> SelectedRows { get; set; } = new();
 
 
-    public ListRanksInforViewModel InforModel { get; set; } = new ListRanksInforViewModel();
+    public ListPeripheriesInforViewModel InforModel { get; set; } = new ListPeripheriesInforViewModel();
     public ListPeripheriesViewModel ListModel { get; set; } = new ListPeripheriesViewModel { Peripheries = new List<ListPeripheryAloneModel>() };
 
     private ListPeripheryAloneModel SearchModelArticle { get; set; } = new ListPeripheryAloneModel();
@@ -94,7 +94,7 @@
 #endif
         try
         {
-            InforModel = await Http.GetFromJsonAsync<ListRanksInforViewModel>(ToolHelper.WebApiPath + "api/admin/listperipheries");
+            InforModel = await Http.GetFromJsonAsync<ListPeripheriesInforViewModel>(ToolHelper.WebApiPath + "api/admin/listperipheries");
 
         }
         catch(Exception ex)

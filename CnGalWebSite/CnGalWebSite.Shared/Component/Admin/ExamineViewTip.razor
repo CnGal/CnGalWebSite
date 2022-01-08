@@ -6,7 +6,7 @@
     <div class="row" style="padding-right: 0; padding-left: 0">
         <div class="col-12 col-md-12 col-lg-8 mb-4">
             <h5 class="fw-bold mb-4">@(Model.isExamined?"当前差异概览":"编辑概览")</h5>
-            <div class="tui-editor-contents" style=" white-space: break-spaces;">
+            <div class="markdown-body" style=" white-space: break-spaces;">
                 @((MarkupString)Model.editOverview)
             </div>
         </div>
@@ -87,7 +87,7 @@
                 }
                 @if (string.IsNullOrWhiteSpace(Model.beforeText) == false)
                 {
-                    <div class="tui-editor-contents">
+                    <div class="markdown-body">
                         @((MarkupString)Model.beforeText)
                     </div>
 
@@ -146,7 +146,7 @@
                 }
                 @if (string.IsNullOrWhiteSpace(Model.afterText) == false)
                 {
-                    <div class="tui-editor-contents">
+                    <div class="markdown-body">
                         @((MarkupString)Model.afterText)
                     </div>
                 }

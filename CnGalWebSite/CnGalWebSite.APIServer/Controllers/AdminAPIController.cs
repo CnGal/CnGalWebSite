@@ -32,6 +32,7 @@ using System.Threading.Tasks;
 using CnGalWebSite.APIServer.Application.ElasticSearches;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.HistoryData;
+using CnGalWebSite.APIServer.Application.Votes;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -62,6 +63,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
         private readonly IRepository<Rank, long> _rankRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
+        private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<SteamInfor, long> _steamInforRepository;
         private readonly IUserService _userService;
         private readonly IAppHelper _appHelper;
@@ -75,6 +77,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IFavoriteFolderService _favoriteFolderService;
         private readonly IRankService _rankService;
         private readonly IPeripheryService _peripheryService;
+        private readonly IVoteService _voteService;
         private readonly IElasticsearchBaseService<Entry> _entryElasticsearchBaseService;
         private readonly IElasticsearchBaseService<Article> _articleElasticsearchBaseService;
         private readonly IElasticsearchService _elasticsearchService;
@@ -93,6 +96,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
+        IVoteService voteService, IRepository<Vote, long> voteRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository)
         {
             _userManager = userManager;
@@ -136,6 +140,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _gameNewsRepository = gameNewsRepository;
             _weeklyNewsRepository = weeklyNewsRepository;
             _historyDataService = historyDataService;
+            _voteService = voteService;
+            _voteRepository = voteRepository;
         }
 
         /// <summary>
@@ -511,8 +517,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var model = new ListPeripheriesInforViewModel
             {
-                All = await _rankRepository.LongCountAsync(),
-                Hiddens = await _rankRepository.LongCountAsync(s => s.IsHidden == true)
+                All = await _peripheryRepository.LongCountAsync(),
+                Hiddens = await _peripheryRepository.LongCountAsync(s => s.IsHidden == true)
             };
 
             return model;
@@ -526,7 +532,26 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-       
+        [HttpGet]
+        public async Task<ActionResult<ListVotesInforViewModel>> ListVotesAsync()
+        {
+            var model = new ListVotesInforViewModel
+            {
+                All = await _rankRepository.LongCountAsync(),
+                Hiddens = await _rankRepository.LongCountAsync(s => s.IsHidden == true)
+            };
+
+            return model;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListVoteAloneModel>>> GetVoteListAsync(VotesPagesInfor input)
+        {
+            var dtos = await _voteService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
+        }
+
 
         /// <summary>
         /// 获取编辑记录详细信息视图

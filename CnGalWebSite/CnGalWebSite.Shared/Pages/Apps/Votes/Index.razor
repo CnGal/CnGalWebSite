@@ -1,0 +1,215 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService ToastService
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+@inject IJSRuntime JS
+@inject DialogService DialogService
+@inject IDataCacheService _dataCatcheService
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+}
+
+<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.DisplayName" IsShadow="true"/>
+<div style="margin-top: 45px; width: 100%;margin-bottom:65px; " @onclick="@(() => voteFooter.UnRelyComment())">
+    @if (isReady)
+    {
+        if (isNotFound)
+        {
+            <CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard EntryName="@Id" Type="未找到投票" />
+        }
+        else
+        {
+            <div class="">
+                <div>
+                    <CnGalWebSite.Shared.Component.Votes.MainPage.MainInforCard Model="Model" />
+
+                </div>
+
+                <div class="ms-3 me-3 mt-3">
+                    <CnGalWebSite.Shared.Component.Votes.MainPage.OptionsInforCard Model="Model" IsShowResult="Model.ShowResult" />
+                </div>
+                @if (Model.ShowResult == false || Model.IsAllowModification)
+                {
+                    <div class="ms-3 me-3 mt-3">
+                        <CnGalWebSite.Shared.Component.Votes.MainPage.VoteButtonCard Model="Model" OnVoted="OnVoted" OnReVoted="OnReVoted" />
+                    </div>
+                }
+                <div class="ms-3 me-3 mt-4">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Comments.ListComment ObjectId="@Model.Id" Type="CommentType.CommentVote" CanDeleted="CanEdit" OnRelying="@((a)=>voteFooter.RelyComment(a.UserName,a.CommentId))" @ref="comments" />
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+    }
+</div>
+@if (isNotFound == false && isReady == true)
+{
+    <CnGalWebSite.Shared.AppComponent.Pages.Votes.VoteFooter @ref="voteFooter" Image="@Model.MainPicture" RelyCallBack="RefreshComment"
+                                                                   VoteId="@Model.Id" ArticleName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
+}
+
+@code {
+    private string id = "";
+    [Parameter]
+    public string Id
+    {
+        get
+        {
+            return id;
+        }
+        set
+        {
+            id = value;
+            isReady = false;
+            if (isFirstLoad == false)
+            {
+                OnReLoad();
+            }
+        }
+    }
+
+    private int defaultIndex { get; set; } = 0;
+    [Parameter]
+    public string DefaultIndex
+    {
+        get
+        {
+            return defaultIndex.ToString();
+        }
+        set
+        {
+            try
+            {
+                defaultIndex = int.Parse(value);
+            }
+            catch
+            {
+                defaultIndex = 0;
+            }
+        }
+    }
+
+    bool isReady = false;
+    bool isNotFound = false;
+    bool isFirstLoad = true;
+    public CnGalWebSite.Shared.AppComponent.Pages.Votes.VoteFooter voteFooter;
+    public CnGalWebSite.Shared.AppComponent.Normal.Comments.ListComment comments;
+
+    public bool CanEdit { get; set; }
+    public VoteViewModel Model { get; set; } = new VoteViewModel();
+
+    public UserInforViewModel UserInfor { get; set; } = new UserInforViewModel { Ranks = new List<RankViewModel>() };
+    string LastLookName = "";
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+
+            isFirstLoad = false;
+        }
+
+    }
+
+    async Task OnReLoad()
+    {
+        await OnInitializedAsync();
+        await OnAfterRenderAsync_();
+    }
+
+    public async Task RefreshComment()
+    {
+        if (comments != null)
+        {
+            await comments.Refresh();
+
+        }
+    }
+
+    async Task OnAfterRenderAsync_()
+    {
+
+        //记录数据
+        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name))
+        {
+            LastLookName = Model.Name;
+            try
+            {
+                await JS.InvokeAsync<string>("trackEvent", "投票", "浏览", Model.Name, "1", "look");
+            }
+            catch (Exception exc)
+            {
+
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var user = await authenticationStateTask;
+            CanEdit = user.User.IsInRole("Editor");
+
+            isReady = false;
+            isNotFound = true;
+
+            Model = await _dataCatcheService.VoteIndexPageCatche.GetCatche(Id,true);
+
+            //判断如果名称为空则返回主页
+            if (string.IsNullOrWhiteSpace(Model.Name))
+            {
+                NavigationManager.NavigateTo("/home");
+            }
+
+            isReady = true;
+            isNotFound = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取投票失败");
+            isReady = true;
+            isNotFound = true;
+            StateHasChanged();
+        }
+
+    }
+
+    public async Task OnVoted()
+    {
+        Model = await _dataCatcheService.VoteIndexPageCatche.GetCatche(Id, false);
+        StateHasChanged();
+    }
+    public async Task OnReVoted()
+    {
+        Model.ShowResult = false;
+        StateHasChanged();
+    }
+
+    public Task HiddenStateChanged()
+    {
+        Model.IsHidden = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+   
+}

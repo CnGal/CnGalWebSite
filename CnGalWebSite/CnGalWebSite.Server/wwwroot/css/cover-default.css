@@ -17,15 +17,15 @@ html, body, button, .popover {
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
 }
 
+hr {
+    opacity: 0.1;
+}
+
 del {
     text-decoration: none;
     color: #b30000;
     text-decoration: line-through;
     background: #fadad7;
-}
-
-hr {
-    opacity: 0.1;
 }
 
 ins {
@@ -144,15 +144,10 @@ html {
     filter: gray;
 }*/
 
-.tui-editor-contents img {
-    background-color: transparent;
-}
 .btn-info.disabled, .btn-info:disabled {
     color: white;
 }
-.tui-editor-contents {
-    margin-bottom: 16px;
-}
+
 .layout-menu .scroll {
     overflow-x: hidden;
 }

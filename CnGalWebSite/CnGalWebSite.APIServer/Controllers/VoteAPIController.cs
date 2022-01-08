@@ -41,7 +41,7 @@ using Result = CnGalWebSite.DataModel.Model.Result;
 namespace CnGalWebSite.APIServer.Controllers
 {
 
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("api/votes/[action]")]
     public class VoteAPIController : ControllerBase
@@ -154,6 +154,10 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<VoteViewModel>> GetVoteViewAsync(long id)
         {
             var vote = await _voteRepository.GetAll().Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                .Include(s => s.Articles).ThenInclude(s=>s.CreateUser)
+                .Include(s => s.Entries).ThenInclude(s=>s.Relevances)
+                .Include(s => s.Entries).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
+                .Include(s => s.Peripheries)
                .Include(s => s.VoteUsers).ThenInclude(s => s.SeletedOptions)
                .Include(s => s.VoteOptions)
                .ThenInclude(s => s.VoteUsers).ThenInclude(s => s.SeletedOptions)
@@ -174,7 +178,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 BackgroundPicture = vote.BackgroundPicture,
                 BeginTime = vote.BeginTime,
                 BriefIntroduction = vote.BriefIntroduction,
-                CanComment = vote.CanComment??true,
+                CanComment = vote.CanComment ?? true,
                 CommentCount = vote.CommentCount,
                 Count = vote.VoteUsers.Count,
                 CreateTime = vote.CreateTime,
@@ -187,8 +191,19 @@ namespace CnGalWebSite.APIServer.Controllers
                 Id = vote.Id,
                 ReaderCount = vote.ReaderCount,
                 Thumbnail = vote.Thumbnail,
-                Type = vote.Type
+                Type = vote.Type,
+                MaximumSelectionCount = vote.MaximumSelectionCount,
+                MinimumSelectionCount = vote.MinimumSelectionCount,
             };
+            //核对选项数
+            if(model.Type==VoteType.SingleChoice)
+            {
+                model.MaximumSelectionCount = 1;
+                model.MinimumSelectionCount = 1;
+            }
+            //初始化主页Html代码
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
+            model.MainPage = Markdown.ToHtml(model.MainPage ?? "", pipeline);
 
             foreach (var item in vote.Entries)
             {
@@ -203,7 +218,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.Peripheries.Add(_appHelper.GetPeripheryInforTipViewModel(item));
             }
 
-            foreach(var item in vote.VoteOptions)
+            foreach (var item in vote.VoteOptions)
             {
                 var temp = new VoteOptionViewModel
                 {
@@ -211,7 +226,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     OptionId = item.Id
                 };
 
-                if(item.Article!=null)
+                if (item.Article != null)
                 {
                     temp.Image = item.Article.MainPicture;
                     temp.Name = item.Article.DisplayName;
@@ -220,7 +235,16 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 else if (item.Entry != null)
                 {
-                    temp.Image = item.Entry.MainPicture;
+                    if (item.Entry.Type == EntryType.Game || item.Entry.Type == EntryType.ProductionGroup)
+                    {
+                        temp.Image = item.Entry.MainPicture;
+                    }
+                    else
+                    {
+                        temp.Image = item.Entry.Thumbnail;
+
+                    }
+
                     temp.Name = item.Entry.DisplayName;
                     temp.ObjectId = item.Entry.Id;
                     temp.Type = VoteOptionType.Entry;
@@ -239,9 +263,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 model.Options.Add(temp);
             }
-            if (vote.VoteUsers.Count>0&& vote.VoteUsers.Where(s => s.IsAnonymous == false).Any() == false)
+            if (vote.VoteUsers.Count > 0 && vote.VoteUsers.Where(s => s.IsAnonymous == false).Any())
             {
-                var users = await _userRepository.GetAll().Where(s => vote.VoteUsers.Where(s => s.IsAnonymous == false).Select(s => s.ApplicationUserId).Contains(s.Id)).AsNoTracking().ToListAsync();
+                var userIds = vote.VoteUsers.Where(s => s.IsAnonymous == false).Select(s => s.ApplicationUserId);
+                var users = await _userRepository.GetAll().Where(s => userIds.Contains(s.Id)).AsNoTracking().ToListAsync();
                 foreach (var item in users)
                 {
                     model.Users.Add(new VoteUserViewModel
@@ -254,9 +279,9 @@ namespace CnGalWebSite.APIServer.Controllers
                         VotedTime = vote.VoteUsers.FirstOrDefault(s => s.ApplicationUserId == item.Id)?.VotedTime ?? DateTime.MinValue,
                     });
                 }
-
+                model.Users = model.Users.OrderByDescending(s => s.VotedTime).Take(20).ToList();
             }
-          
+
 
             //获取用户选择
             //获取当前用户ID
@@ -264,11 +289,20 @@ namespace CnGalWebSite.APIServer.Controllers
             if (user != null)
             {
                 model.UserSelections = vote.VoteUsers.FirstOrDefault(s => s.ApplicationUserId == user.Id)?.SeletedOptions.Select(s => s.Id).ToList();
-                if(model.UserSelections==null)
+                if (model.UserSelections == null)
                 {
                     model.UserSelections = new List<long>();
                 }
+               
             }
+            //计算是否展示结果
+            if(model.UserSelections.Count > 0||DateTime.Now.ToCstTime()>model.EndTime)
+            {
+                model.ShowResult = true;
+            }
+
+            //增加阅读人数
+            await _voteRepository.GetRangeUpdateTable().Where(s => s.Id == id).Set(s => s.ReaderCount, b => b.ReaderCount + 1).ExecuteAsync();
 
             return model;
         }
@@ -277,12 +311,12 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<VoteCardViewModel>>> GetVoteCardsAsync()
         {
-            var votes = await _voteRepository.GetAll().Include(s => s.VoteUsers).ThenInclude(s => s.ApplicationUser)
+            var votes = await _voteRepository.GetAll().Include(s => s.VoteUsers).ThenInclude(s => s.ApplicationUser).AsNoTracking()
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
 
-            var model=new List<VoteCardViewModel>();
+            var model = new List<VoteCardViewModel>();
 
-            foreach(var item in votes)
+            foreach (var item in votes)
             {
                 var temp = new VoteCardViewModel
                 {
@@ -294,39 +328,43 @@ namespace CnGalWebSite.APIServer.Controllers
                     Id = item.Id,
                     Name = item.Name,
                 };
-
-                foreach(var infor in item.VoteUsers)
+                if (item.VoteUsers.Count > 0 && item.VoteUsers.Any(s => s.IsAnonymous == false))
                 {
-                    temp.Users.Add(new VoteUserMinViewModel
+                    foreach (var infor in item.VoteUsers.Where(s => s.IsAnonymous == false).OrderByDescending(s => s.VotedTime).Take(6))
                     {
-                        Image = _appHelper.GetImagePath(infor.ApplicationUser.PhotoPath, "user.png"),
-                        UserId = infor.ApplicationUserId,
-                        UserName = infor.ApplicationUser.UserName
-                    });
+                        temp.Users.Add(new VoteUserMinViewModel
+                        {
+                            Image = _appHelper.GetImagePath(infor.ApplicationUser.PhotoPath, "user.png"),
+                            UserId = infor.ApplicationUserId,
+                            UserName = infor.ApplicationUser.UserName
+                        });
+                    }
                 }
+             
                 model.Add(temp);
             }
 
             return model;
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> CreateVoteAsync(CreateVoteModel model)
         {
-            if(await _voteRepository.GetAll().AnyAsync(s=>s.Name==model.Name))
+            if (await _voteRepository.GetAll().AnyAsync(s => s.Name == model.Name))
             {
                 return new Result { Successful = false, Error = "已存在该名称的投票" };
             }
             //检查选项数是否合法
-            if(model.Options.Count<2)
+            if (model.Options.Count < 2)
             {
                 return new Result { Successful = false, Error = "至少需要两个选项" };
             }
             if (model.Type == VoteType.MultipleChoice)
             {
-                if (model.MinimumSelectionCount < 2)
+                if (model.MinimumSelectionCount < 1)
                 {
-                    return new Result { Successful = false, Error = "只能最少同时选中项目数必须大于2" };
+                    return new Result { Successful = false, Error = "只能最少同时选中项目数必须大于0" };
                 }
                 if (model.MaximumSelectionCount > model.Options.Count)
                 {
@@ -337,7 +375,17 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = "只能最少同时选中项目数必须小于等于最多同时选中项目数" };
                 }
             }
-
+            //检查时间
+            if(model.BeginTime>model.EndTime)
+            {
+                return new Result { Successful = false, Error = "开始时间必须早于结束时间" };
+            }
+            //核对选项数
+            if (model.Type == VoteType.SingleChoice)
+            {
+                model.MaximumSelectionCount = 1;
+                model.MinimumSelectionCount = 1;
+            }
             Vote vote = new Vote
             {
                 Name = model.Name,
@@ -381,7 +429,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //建立文章关联信息
 
-            articleNames.AddRange(model.Peripheries.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+            articleNames.AddRange(model.Articles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
             articleNames.AddRange(model.Options.Where(s => s.Type == VoteOptionType.Article && string.IsNullOrWhiteSpace(s.Text) == false).Select(s => s.Text));
 
             try
@@ -397,8 +445,8 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //添加关联项目
             vote.Articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
-            vote.Entries = await _entryRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
-            vote.Peripheries = await _peripheryRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
+            vote.Entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
+            vote.Peripheries = await _peripheryRepository.GetAll().Where(s => peripheryIds.Contains(s.Id)).ToListAsync();
 
             //解析选项
             //重新获取Id
@@ -425,42 +473,50 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 vote.VoteOptions.Add(new VoteOption
                 {
-                    EntryId = item
+                    EntryId = item,
+                    Type=VoteOptionType.Entry
                 });
             }
             foreach (var item in articleIds)
             {
                 vote.VoteOptions.Add(new VoteOption
                 {
-                    ArticleId = item
+                    ArticleId = item,
+                    Type = VoteOptionType.Article
                 });
             }
             foreach (var item in peripheryIds)
             {
                 vote.VoteOptions.Add(new VoteOption
                 {
-                    PeripheryId = item
+                    PeripheryId = item,
+                    Type = VoteOptionType.Periphery
                 });
             }
             foreach (var item in model.Options.Where(s => s.Type == VoteOptionType.Text))
             {
                 vote.VoteOptions.Add(new VoteOption
                 {
-                    Text = item.Text
+                    Text = item.Text,
+                    Type = VoteOptionType.Text
                 });
             }
 
 
-            vote=await _voteRepository.InsertAsync(vote);
+            vote = await _voteRepository.InsertAsync(vote);
 
             return new Result { Successful = true, Error = vote.Id.ToString() };
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<EditVoteModel>> EditVoteAsync(long id)
         {
             var vote = await _voteRepository.GetAll().AsNoTracking()
-               .Include(s => s.Entries).Include(s => s.Articles).Include(s => s.Peripheries).Include(s => s.VoteOptions)
+               .Include(s => s.Entries).Include(s => s.Articles).Include(s => s.Peripheries)
+               .Include(s => s.VoteOptions).ThenInclude(s => s.Entry)
+               .Include(s => s.VoteOptions).ThenInclude(s => s.Article)
+               .Include(s => s.VoteOptions).ThenInclude(s => s.Periphery)
                .FirstOrDefaultAsync(s => s.Id == id);
             if (vote == null)
             {
@@ -521,7 +577,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
             }
 
-            foreach(var item in vote.Articles)
+            foreach (var item in vote.Articles)
             {
                 model.Articles.Add(new RelevancesModel
                 {
@@ -567,6 +623,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> EditVoteAsync(EditVoteModel model)
         {
@@ -579,7 +636,37 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Successful = false, Error = "未找到目标投票" };
             }
-
+            //检查选项数是否合法
+            if (model.Options.Count < 2)
+            {
+                return new Result { Successful = false, Error = "至少需要两个选项" };
+            }
+            if (model.Type == VoteType.MultipleChoice)
+            {
+                if (model.MinimumSelectionCount < 1)
+                {
+                    return new Result { Successful = false, Error = "只能最少同时选中项目数必须大于0" };
+                }
+                if (model.MaximumSelectionCount > model.Options.Count)
+                {
+                    return new Result { Successful = false, Error = "只能最多同时选中项目数必须小于等于选项数" };
+                }
+                if (model.MinimumSelectionCount > model.MaximumSelectionCount)
+                {
+                    return new Result { Successful = false, Error = "只能最少同时选中项目数必须小于等于最多同时选中项目数" };
+                }
+            }
+            //核对选项数
+            if (model.Type == VoteType.SingleChoice)
+            {
+                model.MaximumSelectionCount = 1;
+                model.MinimumSelectionCount = 1;
+            }
+            //检查时间
+            if (model.BeginTime > model.EndTime)
+            {
+                return new Result { Successful = false, Error = "开始时间必须早于结束时间" };
+            }
 
             vote.Name = model.Name;
             vote.DisplayName = model.DisplayName;
@@ -622,7 +709,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //建立文章关联信息
 
-            articleNames.AddRange(model.Peripheries.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+            articleNames.AddRange(model.Articles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
             articleNames.AddRange(model.Options.Where(s => s.Type == VoteOptionType.Article && string.IsNullOrWhiteSpace(s.Text) == false).Select(s => s.Text));
 
             try
@@ -638,8 +725,8 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //添加关联项目
             vote.Articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
-            vote.Entries = await _entryRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
-            vote.Peripheries = await _peripheryRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
+            vote.Entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
+            vote.Peripheries = await _peripheryRepository.GetAll().Where(s => peripheryIds.Contains(s.Id)).ToListAsync();
 
             //解析选项
             //重新获取Id
@@ -722,24 +809,39 @@ namespace CnGalWebSite.APIServer.Controllers
             //添加新选项
             foreach (var item in entryIds)
             {
-                vote.VoteOptions.Add(new VoteOption
+                if (vote.VoteOptions.Where(s=>s.EntryId!=null).Any(s => entryIds.Contains(s.EntryId.Value)) == false)
                 {
-                    EntryId = item
-                });
+                    vote.VoteOptions.Add(new VoteOption
+                    {
+                        EntryId = item,
+                        Type = VoteOptionType.Entry,
+                    });
+
+                }
             }
             foreach (var item in articleIds)
             {
-                vote.VoteOptions.Add(new VoteOption
+                if (vote.VoteOptions.Where(s => s.ArticleId != null).Any(s => articleIds.Contains(s.ArticleId.Value)) == false)
                 {
-                    ArticleId = item
-                });
+                    vote.VoteOptions.Add(new VoteOption
+                    {
+                        ArticleId = item,
+                        Type = VoteOptionType.Article,
+                    });
+                }
+
             }
             foreach (var item in peripheryIds)
             {
-                vote.VoteOptions.Add(new VoteOption
+                if (vote.VoteOptions.Where(s => s.PeripheryId != null).Any(s => peripheryIds.Contains(s.PeripheryId.Value)) == false)
                 {
-                    PeripheryId = item
-                });
+                    vote.VoteOptions.Add(new VoteOption
+                    {
+                        PeripheryId = item,
+                        Type = VoteOptionType.Periphery,
+                    });
+                }
+
             }
             foreach (var item in model.Options.Where(s => s.Type == VoteOptionType.Text))
             {
@@ -747,7 +849,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     vote.VoteOptions.Add(new VoteOption
                     {
-                        Text = item.Text
+                        Text = item.Text,
+                        Type = VoteOptionType.Text,
                     });
                 }
                 else
@@ -783,10 +886,12 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Successful = false, Error = "未找到目标投票" };
             }
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            if(vote.IsAllowModification==false)
+            if (vote.IsAllowModification == false)
             {
-                if(vote.VoteUsers.Any(s=>s.ApplicationUserId==model.UserId))
+                if (vote.VoteUsers.Any(s => s.ApplicationUserId == user.Id))
                 {
                     return new Result { Successful = false, Error = "当前投票不允许修改" };
                 }
@@ -794,12 +899,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //判断选项是否在当前投票中
             var options = vote.VoteOptions.Where(s => model.VoteOptionIds.Contains(s.Id));
-            if(options.Any()==false)
+            if (options.Any() == false)
             {
                 return new Result { Successful = false, Error = "没有选中项目或选中项与投票不匹配" };
             }
             //判断选择是否符合规则
-            if(vote.Type==VoteType.SingleChoice&&options.Count()>1)
+            if (vote.Type == VoteType.SingleChoice && options.Count() > 1)
             {
                 return new Result { Successful = false, Error = "单选投票只能选择一个" };
             }
@@ -809,13 +914,13 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "请选中 " + str + " 个项目" };
             }
 
-            var voteUser=vote.VoteUsers.FirstOrDefault(s=>s.ApplicationUserId==model.UserId);
+            var voteUser = vote.VoteUsers.FirstOrDefault(s => s.ApplicationUserId == user.Id);
             if (voteUser == null)
             {
                 voteUser = new VoteUser
                 {
                     SeletedOptions = options.ToList(),
-                    ApplicationUserId = model.UserId,
+                    ApplicationUserId = user.Id,
                     IsAnonymous = model.IsAnonymous,
                     VotedTime = DateTime.Now.ToCstTime(),
                     VoteId = vote.Id
@@ -834,6 +939,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenVoteAsync(HiddenVoteModel model)
         {
@@ -841,6 +947,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> EditVotePriorityAsync(EditVotePriorityViewModel model)
         {

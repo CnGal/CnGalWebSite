@@ -115,7 +115,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Votes
         /// </summary>
         public List<VoteUserViewModel> Users { get; set; } = new List<VoteUserViewModel>();
 
+        public bool ShowResult { get; set; } = false;
         public List<long> UserSelections { get; set; } = new List<long>();
+        public long MinimumSelectionCount { get; set; }
+
+        public long MaximumSelectionCount { get; set; }
 
     }
 

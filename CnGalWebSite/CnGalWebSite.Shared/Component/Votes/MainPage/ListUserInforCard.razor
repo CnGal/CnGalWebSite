@@ -1,13 +1,16 @@
 ﻿<div>
-    <div class="shadow rounded  bg-opacity ps-3 pe-3 mb-3">
+    <div class="shadow-sm rounded  bg-opacity ps-3 pe-3 mb-2">
         <div style="display: block;">
-            <h2 class="fw-bold pt-3 pb-3 m-0 font-color h4"><i class="fa fa-codepen"></i>&nbsp;&nbsp;参与投票的用户</h2>
+            <h2 class="fw-bold pt-2 pb-2 m-0 font-color h5"><i class="fa fa-codepen"></i>&nbsp;&nbsp;参与投票的用户</h2>
         </div>
     </div>
-    <div>
+    <div class="row m-0">
         @foreach (var item in Model.Users)
         {
+        <div class="@("col-12 col-md-6 p-0 pb-2 "+(temp?"ps-1":"pe-1"))">
             <UserInforCard Model="item" />
+        </div>
+        temp=!temp;
         }
     </div>
 </div>
@@ -15,4 +18,5 @@
 @code {
     [Parameter]
     public VoteViewModel Model { get; set; }
+    bool temp = false;
 }

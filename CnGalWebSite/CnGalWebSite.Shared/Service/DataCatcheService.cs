@@ -176,7 +176,19 @@ namespace CnGalWebSite.Shared.Service
                 return null;
             }
         }
+        public void RefreshAllCatche()
+        {
+            RefreshSearchCatche();
+            EntryIndexPageCatche.Clean();
+            ArticleIndexPageCatche.Clean();
+            PeripheryIndexPageCatche.Clean();
+            VoteIndexPageCatche.Clean();
+            TagIndexPageCatche.Clean();
 
+            LoginKey = null;
+            ThirdPartyLoginTempModel = null;
+            UserInfor= new UserInforViewModel { Ranks = new List<RankViewModel>() };
+        }
         public void RefreshSearchCatche()
         {
             SearchViewModel = new SearchViewModel

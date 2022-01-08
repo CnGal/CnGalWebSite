@@ -1,46 +1,50 @@
 ﻿@inject IJSRuntime JS
 
-<style>
-    .tui-editor-contents img {
-        background-color: transparent; 
-    }
-</style>
-<div class="tui-editor-contents" id="@("markdown-" + Id)">
 
-</div>
 
-@code {
-    public string MarkdownText { get; set; }
-    public int Id = new Random().Next();
+    <style>
+        .markdown-body img {
+            background-color: transparent;
+        }
+    </style>
 
-    [Parameter]
-    public string Text { get; set; }
 
-    #region 渲染MarkDown
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        try
+    <div class="markdown-body" id="@("markdown-" + Id)">
+
+    </div>
+
+    @code {
+        public string MarkdownText { get; set; }
+        public int Id = new Random().Next();
+
+        [Parameter]
+        public string Text { get; set; }
+
+        #region 渲染MarkDown
+        /// <summary>
+        /// OnAfterRenderAsync 方法
+        /// </summary>
+        /// <param name="firstRender"></param>
+        /// <returns></returns>
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!string.IsNullOrWhiteSpace(Text))
+            await base.OnAfterRenderAsync(firstRender);
+            try
             {
-                MarkdownText = await JS.InvokeAsync<string>("marked", Text);
-                await JS.InvokeAsync<string>("cleanInnerHTML", "markdown-" + Id);
-                await JS.InvokeAsync<string>("setInnerHTML", "markdown-" + Id, MarkdownText);
+                if (!string.IsNullOrWhiteSpace(Text))
+                {
+                    MarkdownText = await JS.InvokeAsync<string>("marked", Text);
+                    await JS.InvokeAsync<string>("cleanInnerHTML", "markdown-" + Id);
+                    await JS.InvokeAsync<string>("setInnerHTML", "markdown-" + Id, MarkdownText);
+                }
             }
-        }
-        catch
-        {
+            catch
+            {
+
+            }
+
+
 
         }
-
-
-
+        #endregion
     }
-    #endregion
-}

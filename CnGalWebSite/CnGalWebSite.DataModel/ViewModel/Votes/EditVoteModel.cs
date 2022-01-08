@@ -47,7 +47,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Votes
         [Display(Name = "截止时间")]
         public DateTime EndTime { get; set; }
 
-        [Display(Name = "是否允许修改")]
+        [Display(Name = "允许用户重新投票")]
         public bool IsAllowModification { get; set; }
         [Display(Name = "同时选中项下限")]
         public long MinimumSelectionCount { get; set; }

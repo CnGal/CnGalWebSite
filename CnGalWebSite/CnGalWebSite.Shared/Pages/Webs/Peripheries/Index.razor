@@ -14,7 +14,10 @@
 {
     <TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
 }
-
+else
+{
+    <TitleTip></TitleTip>
+}
 
 @if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
 {
@@ -28,7 +31,7 @@
 @if (isNotFound == true)
 {
     int temp = 0;
-    <NotFoundPeriphery IsNeedLayput="true" ArticleName="@(int.TryParse(Id,out temp)?"":ToolHelper.Base64DecodeName(Id))"></NotFoundPeriphery>
+    <NotFoundPeriphery IsNeedLayput="true"></NotFoundPeriphery>
 }
 else
 {
@@ -155,7 +158,7 @@ else
             <div class="col-xl-3">
                 <div class="">
                     <PeripheryListRelevancesViewTip Entries="Model.Entries" Peripheries="Model.Peripheries" IsNormalScreen="IsNormalScreen" RelatedEntriesState="Model.RelatedEntriesState" RelatedPeripheriesState="Model.RelatedPeripheriesState"
-                                                    IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id"  Type="Model.Type"/>
+                                                    IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" Type="Model.Type" />
                 </div>
                 @if (IsLargeScreen)
                 {
@@ -333,7 +336,7 @@ else
                 //判断文章是否被收藏
                 await GetUserIsFavorited();
             }
-           
+
             try
             {
                 await OnCommentPageClick(1);

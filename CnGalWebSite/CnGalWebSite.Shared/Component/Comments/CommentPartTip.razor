@@ -7,11 +7,11 @@
 
 <style>
     /*评论Markdown样式*/
-    .comment-text-markdown .tui-editor-contents {
+    .comment-text-markdown .markdown-body {
         font-weight: 300;
     }
 
-        .comment-text-markdown .tui-editor-contents p {
+        .comment-text-markdown .markdown-body p {
             font-size: 19px;
         }
 </style>
@@ -19,7 +19,7 @@
     <div class="new-row-warp no-margin">
         <UserRankTextViewTip UserId="@Model.ApplicationUserId" UserName="@Model.UserName" Image="@Model.UserImage" Ranks="@Model.Ranks" Text="@Model.CommentTime.ToString("yyyy年M月d日 H:mm")"></UserRankTextViewTip>
         <div class="mt-2 col-12 no-padding comment-text-markdown">
-            <div class="tui-editor-contents">
+            <div class="markdown-body">
                 @((MarkupString)(ReplyTip+Model.Text))
             </div>
         </div>

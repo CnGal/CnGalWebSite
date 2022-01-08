@@ -63,5 +63,7 @@ namespace CnGalWebSite.Shared.Service
 
         void RefreshSearchCatche();
 
+        void RefreshAllCatche();
+
     }
 }

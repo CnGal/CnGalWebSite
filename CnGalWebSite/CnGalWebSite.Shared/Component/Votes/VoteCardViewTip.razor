@@ -1,30 +1,51 @@
 ﻿<a href="@("votes/index/"+Model.Id)">
-    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 h-100 a-font-color">
-        <div class="row mb-2">
-            <div class="col-12 pt-3">
+    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 h-100 a-font-color" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="">
+            <div class=" pt-3">
                 <img class="img-fluid" src="@Model.MainPicture">
             </div>
-            <div class="col-12 pt-3">
+            <div class=" pt-3">
                 <header>
                     <div class="article-home-tag">投票</div>
                     <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
                 </header>
-                <div class="article-home-text">
+                <div style=" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; ">
                     @Model.BriefIntroduction
                 </div>
-                <div class="mt-3">
-                    @foreach (var item in Model.Users)
+                <div class="mt-2" style="color:gray;">
+                    @if (DateTime.Now.ToCstTime() < Model.BeginTime)
                     {
-                        <a href="@("/space/index/"+item.UserId)">
-                            <img src="@item.Image" alt="@item.UserName" class="me-3" style=" width: 40px; height: 40px; border-radius: 50%;" />
-                        </a>
+                        <i class="fa fa-clock-o fa-fw text-primary"></i>
+                        <span>未开始</span>
+                    }
+                    else if (DateTime.Now.ToCstTime() > Model.EndTime)
+                    {
+                        <i class="fa fa-check-circle fa-fw text-success"></i>
+                        <span>已结束</span>
+                    }
+                    else
+                    {
+                        <i class="fa fa-check-circle-o fa-fw text-success"></i>
+                        <span>正在进行</span>
                     }
                 </div>
+                @if (Model.Users.Count>0)
+                {
+                    <div class="mt-2" style="display:flex;">
+                        @foreach (var item in Model.Users.Take(4))
+                        {
+                            <a href="@("/space/index/"+item.UserId)">
+                                <img src="@item.Image" alt="@item.UserName" class="me-3" style=" width: 40px; height: 40px; border-radius: 50%;" />
+                            </a>
+                        }
+                    </div>
+                }
+
             </div>
         </div>
-        <p class="" style="color: gray;">
+        <p class="mt-2" style="color: gray;">
             <i class="fa fa-calendar fa-fw"></i>
-            <span class="article-home-infor-text">@(Model.BeginTime.ToString("yyyy/MM/dd")+" - "+ Model.EndTime.ToString("yyyy/MM/dd"))&nbsp;&nbsp;&nbsp;</span>
+            <span class="article-home-infor-text">@(Model.BeginTime.ToString("yyyy.M.d HH:mm")+" - "+ Model.EndTime.ToString("yyyy.M.d  HH:mm"))&nbsp;&nbsp;&nbsp;</span>
 
             <i class="fa fa-user"></i>
             <span class="article-home-infor-text">@(Model.Count)人参与&nbsp;&nbsp;&nbsp;</span>

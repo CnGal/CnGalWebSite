@@ -9,7 +9,7 @@
         </p>
 
     </div>
-    <AuthorizeView>
+    <AuthorizeView Roles="Admin">
         <Authorized>
             <div class="card-footer" style="background-color: transparent; border: 0px; padding: 0px">
                 <Button style="width: 100px" @onclick="OnToolClick" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-plus" Text="创建"></Button>

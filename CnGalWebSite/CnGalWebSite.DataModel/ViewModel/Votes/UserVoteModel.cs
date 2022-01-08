@@ -8,8 +8,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Votes
     {
         public long VoteId { get; set; }
 
-        public string UserId { get; set; }
-
         public List<long> VoteOptionIds { get; set; } = new List<long>();
 
         public bool IsAnonymous { get; set; }

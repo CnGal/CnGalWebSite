@@ -289,6 +289,14 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        public async Task<ActionResult<Result>> EditVoteCanCommentAsync(EditVoteCanCommentModel model)
+        {
+            await _voteRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.CanComment, b => model.CanComment).ExecuteAsync();
+            return new Result { Successful = true };
+        }
+
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> EditEntryCanCommentAsync(EditEntryCanCommentModel model)
         {
             await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.CanComment, b => model.CanComment).ExecuteAsync();

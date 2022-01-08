@@ -3315,7 +3315,8 @@ namespace CnGalWebSite.APIServer.ExamineX
                 OriginalLink = model.OriginalLink,
                 PubishTime = model.PubishTime,
                 RealNewsTime = model.RealNewsTime,
-                DisplayName = model.DisplayName
+                DisplayName = model.DisplayName,
+                NewsType = model.NewsType,
             };
             //序列化
             var resulte = "";

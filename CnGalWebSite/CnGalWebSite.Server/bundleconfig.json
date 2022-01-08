@@ -3,7 +3,6 @@
     "outputFileName": "wwwroot/styles/bundle-css.css",
     "inputFiles": [
       "wwwroot/css/app.css",
-      //"wwwroot/css/github-markdown.css",
       "wwwroot/css/calendar-heatMap.css",
       "wwwroot/css/site.css"
     ]
@@ -29,7 +28,6 @@
   {
     "outputFileName": "wwwroot/styles/pc.min.css",
     "inputFiles": [
-      "wwwroot/css/github-markdown.css",
       "wwwroot/css/pc.css"
     ]
   },
