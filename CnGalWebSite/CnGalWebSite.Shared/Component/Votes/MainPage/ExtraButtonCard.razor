@@ -9,12 +9,12 @@
     <Button Icon="fa fa-pencil" Text="编辑" Color="Color.Success" IsAsync="true" OnClick="OnEdit" Size="Size.ExtraSmall" style=" width: 80px;" class="me-3" />
     @if (Model.IsHidden)
     {
-        <Button Icon="fa fa-map-signs" Text="显示" Color="Color.Primary" IsAsync="true" OnClick="@(()=>OnClickVoted(false))" Size="Size.ExtraSmall" style=" width: 80px;" />
+        <Button Icon="fa fa-map-signs" Text="显示" Color="Color.Primary" IsAsync="true" OnClickWithoutRender="@(()=>OnClickVoted(false))" Size="Size.ExtraSmall" style=" width: 80px;" />
 
     }
     else
     {
-        <Button Icon="fa fa-unlink" Text="隐藏" Color="Color.Danger" IsAsync="true" OnClick="@(()=>OnClickVoted(true))" Size="Size.ExtraSmall" style=" width: 80px;" />
+        <Button Icon="fa fa-unlink" Text="隐藏" Color="Color.Danger" IsAsync="true" OnClickWithoutRender="@(()=>OnClickVoted(true))" Size="Size.ExtraSmall" style=" width: 80px;" />
     }
 </div>
 

@@ -26,13 +26,13 @@
                     <RowButtonTemplate>
                         @if(context.IsHidden)
                         {
-                              <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickCallback="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" />
+                              <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" />
                         }
                         else
                         {
-                              <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickCallback="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" />
+                              <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" />
                         }
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-trash" Text="删除" IsAsync="true" OnClickCallback="@(() =>  OnRowDeleteClick(new long[] { context.RankId },true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-trash" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new long[] { context.RankId },true))" />
                     </RowButtonTemplate>
                 </Table>
             </div>

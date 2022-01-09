@@ -3,26 +3,18 @@
         <EntryTabAloneTip Icon="fa-home" Index="0" OnTabClick="OnClick" Text="介绍" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
         <EntryTabAloneTip Icon="fa-picture-o" Index="1" OnTabClick="OnClick" Text="图片" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
 
-        @if (Type == EntryType.Game)
-        {
-            <EntryTabAloneTip Icon="fa-child" Index="2" OnTabClick="OnClick" Text="角色" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
-        }
         @if (IsSmallScreen && Type == EntryType.Game)
         {
             <EntryTabAloneTip Icon="fa-users" Index="17" OnTabClick="OnClick" Text="STAFF" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
         }
         <EntryTabAloneTip Icon="fa-newspaper-o" Index="10" OnTabClick="OnClick" Text="动态" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
 
-        @if (Type == EntryType.Staff)
-        {
-            <EntryTabAloneTip Icon="fa-gamepad" Index="14" OnTabClick="OnClick" Text="游戏" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
-        }
         <EntryTabAloneTip Icon="fa-link" Index="3" OnTabClick="OnClick" Text="相关" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
         <EntryTabAloneTip Icon="fa-comments-o" Index="12" OnTabClick="OnClick" Text="讨论" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
 
 
         <EntryTabAloneTip Icon="fa-shopping-basket" Index="20" OnTabClick="OnClick" Text="周边" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
-        <EntryTabAloneTip Icon="fa-paper-plane-o" Index="16" OnTabClick="OnClick" Text="外部链接" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
+
         <EntryTabAloneTip Icon="fa-history" Index="4" OnTabClick="OnClick" Text="历史" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
 
         <AuthorizeView>

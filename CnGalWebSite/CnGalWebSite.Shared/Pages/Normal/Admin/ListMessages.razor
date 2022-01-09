@@ -62,9 +62,9 @@
                         <TableColumn @bind-Field="@context.IsReaded" Sortable="true" Searchable="true" ComponentType="@typeof(Switch)" Width="110" />
                     </TableColumns>
                     <RowButtonTemplate>
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickCallback="@(() => LookLink( context.Link , context.LinkTitle))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-comments-o" Text="切换状态" IsAsync="true" OnClickCallback="@(() => OnRowEditIsReadedClick(new long[] { context.Id }, !context.IsReaded, true))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-close" Text="删除" IsAsync="true" OnClickCallback="@(() =>  OnRowDeleteClick(new long[] { context.Id },true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookLink( context.Link , context.LinkTitle))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-comments-o" Text="切换状态" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsReadedClick(new long[] { context.Id }, !context.IsReaded, true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-close" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new long[] { context.Id },true))" />
                     </RowButtonTemplate>
                 </Table>
             </div>

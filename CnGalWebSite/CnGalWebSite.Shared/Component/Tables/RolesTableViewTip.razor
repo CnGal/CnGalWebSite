@@ -40,7 +40,7 @@ else
             <TableColumn @bind-Field="@context.RoleTaste" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickCallback="@(() =>OnLook(context.RealId,context.Name))" />
+            <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.RealId,context.Name))" />
         </RowButtonTemplate>
 
     </Table>

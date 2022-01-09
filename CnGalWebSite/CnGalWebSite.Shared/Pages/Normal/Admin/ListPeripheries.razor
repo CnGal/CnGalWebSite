@@ -56,11 +56,11 @@
 
                     </TableColumns>
                     <RowButtonTemplate>
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickCallback="@(() => OnRowLookClick( context.Id , context.Name))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClickCallback="@(() => OnRowEditPriorityClick(new long[] { context.Id }, 1 , true))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClickCallback="@(() => OnRowEditPriorityClick(new long[] { context.Id }, - 1 , true))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-unlink" Text="切换显示" IsAsync="true" OnClickCallback="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, !context.IsHidden, true))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-comments-o" Text="开关评论" IsAsync="true" OnClickCallback="@(() => OnRowEditCanCommentClick(new long[] { context.Id }, !context.CanComment, true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.Id , context.Name))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new long[] { context.Id }, 1 , true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new long[] { context.Id }, - 1 , true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-unlink" Text="切换显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, !context.IsHidden, true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-comments-o" Text="开关评论" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditCanCommentClick(new long[] { context.Id }, !context.CanComment, true))" />
                     </RowButtonTemplate>
                 </Table>
             </div>

@@ -66,9 +66,9 @@
                         <TableColumn @bind-Field="@context.Comments" Sortable="true" AllowTextWrap="true" Searchable="true" Width="350" />
                     </TableColumns>
                     <RowButtonTemplate>
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickCallback="@(() => OnRowLookClick( context.Id))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-paper-plane-o" Text="通过" IsAsync="true" OnClickCallback="@(() => OnExamine( context.Id,true,true))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-unlink" Text="驳回" IsAsync="true" OnClickCallback="@(() => OnExamine( context.Id,false,true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.Id))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-paper-plane-o" Text="通过" IsAsync="true" OnClickWithoutRender="@(() => OnExamine( context.Id,true,true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-unlink" Text="驳回" IsAsync="true" OnClickWithoutRender="@(() => OnExamine( context.Id,false,true))" />
                     </RowButtonTemplate>
                 </Table>
             </div>

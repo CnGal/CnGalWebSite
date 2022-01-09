@@ -275,8 +275,10 @@ else
         {
             isReady = false;
             isNotFound = false;
+
+
             //获取周边信息
-            Model = await _dataCatcheService.VoteIndexPageCatche.GetCatche(Id, true);
+            Model = await _dataCatcheService.VoteIndexPageCatche.GetCatche(Id);
             //判断投票名称是否为空 为空则跳转到主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {
@@ -285,12 +287,16 @@ else
 
             isReady = true;
             StateHasChanged();
-
             var user = await authenticationStateTask;
             if (user.User.Identity.IsAuthenticated)
             {
                 IsAdmin = user.User.IsInRole("Editor");
             }
+            else
+            {
+                _dataCatcheService.VoteIndexPageCatche.Clean(Id);
+            }
+
             try
             {
                 await OnCommentPageClick(1);

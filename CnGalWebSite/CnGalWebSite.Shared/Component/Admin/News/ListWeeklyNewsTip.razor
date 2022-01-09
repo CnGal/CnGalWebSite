@@ -24,12 +24,9 @@
                 <TableColumn @bind-Field="@context.PublishTime" Sortable="true" AllowTextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
             </TableColumns>
             <RowButtonTemplate>
-                <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickCallback="@(() => EditWeeklyNews(context.Id))" />
-                @if (context.ArticleId != 0)
-                {
-                    <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickCallback="@(() => EditArticle(context.ArticleId ))" />
+                <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditWeeklyNews(context.Id))" />
 
-                }
+                    <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickWithoutRender="@(() => EditArticle(context.ArticleId ))" IsShow="context.ArticleId != 0"/>
             </RowButtonTemplate>
         </Table>
 </div>

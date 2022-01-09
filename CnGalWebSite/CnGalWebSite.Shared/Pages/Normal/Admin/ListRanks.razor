@@ -50,17 +50,14 @@
                         <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                     </TableColumns>
                     <RowButtonTemplate>
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickCallback="@(() => LookLink(context.Id))" />
-                        @if(context.IsHidden)
-                        {
-                              <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickCallback="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" />
-                        }
-                        else
-                        {
-                              <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickCallback="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" />
-                        }
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClickCallback="@(() => OnRowEditPriorityClick(new long[] { context.Id }, 1 , true))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClickCallback="@(() => OnRowEditPriorityClick(new long[] { context.Id }, - 1 , true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => LookLink(context.Id))" />
+
+                              <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" IsShow="context.IsHidden"/>
+
+                              <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" IsShow="!context.IsHidden"/>
+                        
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new long[] { context.Id }, 1 , true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new long[] { context.Id }, - 1 , true))" />
                     </RowButtonTemplate>
                 </Table>
             </div>
@@ -273,7 +270,7 @@
                 //Trace.Log("关闭按钮被点击");
                 return Task.CompletedTask;
             },
-            OnSaveAsync = async context =>
+            OnEditAsync = async context =>
             {
                 return await CreateRank((CreateRankModel)context.Model);
             }

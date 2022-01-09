@@ -263,6 +263,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 model.Options.Add(temp);
             }
+            //对选项进行排序
+            model.Options = model.Options.OrderBy(s => s.Name).ToList();
+
             if (vote.VoteUsers.Count > 0 && vote.VoteUsers.Where(s => s.IsAnonymous == false).Any())
             {
                 var userIds = vote.VoteUsers.Where(s => s.IsAnonymous == false).Select(s => s.ApplicationUserId);

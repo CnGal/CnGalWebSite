@@ -1,0 +1,40 @@
+﻿<div class=" rounded shadow  bg-opacity rounded ps-3 pe-3 pt-3 pb-3" style="display: flex; flex-direction: row; justify-content: space-between;">
+    <h2 class="fw-bold font-color h4" style="margin-bottom:auto;margin-top:auto;"><i class="@("fa  fa-fw "+Icon)"></i>&nbsp;&nbsp;@Title</h2>
+    @if (isCollapsed)
+    {
+        <Button style=" width: 75px;" Color="Color.Dark" IsOutline="true" Icon="fa fa-chevron-right" Text="折叠" OnClick="@(()=>OnCollapseChanged(false))" />
+
+    }
+    else
+    {
+        <Button style=" width: 75px;" Color="Color.Dark" IsOutline="true" Icon="fa fa-chevron-down" Text="展开" OnClick="@(()=>OnCollapseChanged(true))" />
+
+    }
+
+
+</div>
+
+<CascadingValue Value=this>
+    <div style="@(isCollapsed?"display:none;":"display:block;")">
+        @ChildContent
+    </div>
+</CascadingValue>
+
+@code {
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    bool isCollapsed { get; set; }
+
+    private Task OnCollapseChanged(bool state)
+    {
+        isCollapsed = state;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

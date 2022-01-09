@@ -33,7 +33,7 @@ else
             <TableColumn @bind-Field="@context.LowestTime" Filterable="true" Sortable="true"  Width="170" AllowTextWrap="true"  Formatter="LowestTimeFormatter"/>
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickCallback="@(() =>OnLook(context.SteamId))" />
+            <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.SteamId))" />
         </RowButtonTemplate>
 
     </Table>

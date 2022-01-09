@@ -69,10 +69,10 @@
                         <TableColumn @bind-Field="@context.LastExecutedTime" Searchable="true" Sortable="true" Width="170" />
                     </TableColumns>
                     <RowButtonTemplate>
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-pencil" Text="编辑" IsAsync="true" OnClickCallback="@(() =>  OnEditModel( context))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" IsAsync="true" OnClickCallback="@(() => OnRowRunClick( new int[] { context.Id } ,true))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-comments-o" Text="切换运行状态" IsAsync="true" OnClickCallback="@(() => OnRowEditIsPauseClick(new int[] { context.Id }, !context.IsPause, true))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-close" Text="删除" IsAsync="true" OnClickCallback="@(() =>  OnRowDeleteClick(new int[] { context.Id } ,true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-pencil" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() =>  OnEditModel( context))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" IsAsync="true" OnClickWithoutRender="@(() => OnRowRunClick( new int[] { context.Id } ,true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-comments-o" Text="切换运行状态" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsPauseClick(new int[] { context.Id }, !context.IsPause, true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-close" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new int[] { context.Id } ,true))" />
                     </RowButtonTemplate>
                 </Table>
             </div>
@@ -350,7 +350,7 @@
                 //Trace.Log("关闭按钮被点击");
                 return Task.CompletedTask;
             },
-            OnSaveAsync = async context =>
+            OnEditAsync = async context =>
             {
                 // Trace.Log("保存按钮被点击");
                 var editModel = (ListTimedTaskAloneModel)context.Model;

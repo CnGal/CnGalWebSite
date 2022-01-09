@@ -11,7 +11,7 @@
 @code {
     public List<RoleCardModel> Items { get; set; } = new List<RoleCardModel>();
     [Parameter]
-    public List<RoleInforModel> Model { get; set; } = new List<RoleInforModel>();
+    public List<EntryInforTipViewModel> Model { get; set; } = new List<EntryInforTipViewModel>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -19,9 +19,9 @@
         {
             Items.Add(new RoleCardModel
             {
-                CV = item.CV,
-                Image = item.ImagePath,
-                Name = item.Name,
+                CVs = item.AddInfors.FirstOrDefault()?.Contents??new List<string>(),
+                Image = item.MainImage,
+                Name = item.DisplayName,
                 EntryId=item.Id,
             });
         }

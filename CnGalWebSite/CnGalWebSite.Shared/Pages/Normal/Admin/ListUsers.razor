@@ -54,11 +54,11 @@
                         <TableColumn @bind-Field="@context.IsPassedVerification" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                     </TableColumns>
                     <RowButtonTemplate>
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickCallback="@(() => LookUser( context.Id , context.UserName))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-pencil-square-o" Text="编辑" IsAsync="true" OnClickCallback="@(() => EditUser(context.Id ))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-database" Text="解封" IsAsync="true" OnClickCallback="@(() => OnRowBanUsersClick(new string[] { context.Id },false ,true))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-pencil-square-o" Text="封禁" IsAsync="true" OnClickCallback="@(() =>  OnRowBanUsersClick(new string[] { context.Id },true ,true))" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-comments-o" Text="开关留言" IsAsync="true" OnClickCallback="@(() => OnRowEditCanCommentClick(new string[] { context.Id }, !context.CanComment, true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookUser( context.Id , context.UserName))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-pencil-square-o" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditUser(context.Id ))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-database" Text="解封" IsAsync="true" OnClickWithoutRender="@(() => OnRowBanUsersClick(new string[] { context.Id },false ,true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-pencil-square-o" Text="封禁" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowBanUsersClick(new string[] { context.Id },true ,true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-comments-o" Text="开关留言" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditCanCommentClick(new string[] { context.Id }, !context.CanComment, true))" />
                     </RowButtonTemplate>
                 </Table>
             </div>
@@ -143,7 +143,7 @@
                 //Trace.Log("关闭按钮被点击");
                 return Task.CompletedTask;
             },
-            OnSaveAsync = async context =>
+            OnEditAsync = async context =>
             {
                 var result = await AuthService.Register((RegisterModel)context.Model);
 

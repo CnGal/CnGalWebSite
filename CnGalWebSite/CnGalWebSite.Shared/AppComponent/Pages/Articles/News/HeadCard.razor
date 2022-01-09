@@ -59,6 +59,10 @@
                 DefaultIndex = 3;
             }
         }
+        else
+        {
+            DefaultIndex = 2;
+        }
         Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
         {
             DefaultIndex = DefaultIndex,
@@ -92,7 +96,7 @@
         Model.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
         {
             DefaultIndex = DefaultIndex,
-            Index = 2,
+            Index = 3,
             OnTabClick = OnTabClick,
             RandomIndex = RandomIndex,
             Text = "本周",

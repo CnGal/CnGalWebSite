@@ -82,31 +82,26 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// <summary>
         /// 附加信息列表
         /// </summary>
-        public List<InformationsModel> Information { get; set; }
+        public List<InformationsModel> Information { get; set; } = new List<InformationsModel>();
         /// <summary>
-        /// staff信息 
+        /// Staff信息 
         /// </summary>
-        public List<StaffInforModel> Staffs { get; set; }
+        public List<StaffInforModel> Staffs { get; set; }=new List<StaffInforModel> { };
 
         /// <summary>
         /// 动态动态
         /// </summary>
-        public List<NewsModel> NewsOfEntry { get; set; }
+        public List<NewsModel> NewsOfEntry { get; set; }=new List<NewsModel> { };
 
         /// <summary>
         /// 角色信息 
         /// </summary>
-        public List<RoleInforModel> Roles { get; set; }
+        public List<EntryInforTipViewModel> Roles { get; set; }=new List<EntryInforTipViewModel> {};
 
         /// <summary>
         /// STAFF的关联游戏列表
         /// </summary>
-        public List<StaffGameModel> StaffGames { get; set; }
-
-        /// <summary>
-        /// 制作组的关联游戏列表
-        /// </summary>
-        public List<EntryInforTipViewModel> GroupGames { get; set; }
+        public List<EntryInforTipViewModel> StaffGames { get; set; }=new List<EntryInforTipViewModel> {};
 
         /// <summary>
         /// 主页
@@ -116,35 +111,36 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// <summary>
         /// 相关词条
         /// </summary>
-        public List<EntryInforTipViewModel> EntryRelevances { get; set; }
+        public List<EntryInforTipViewModel> EntryRelevances { get; set; }=new List<EntryInforTipViewModel>();
 
         /// <summary>
         /// 相关文章
         /// </summary>
-        public List<ArticleInforTipViewModel> ArticleRelevances { get; set; }
+        public List<ArticleInforTipViewModel> ArticleRelevances { get; set; } = new List<ArticleInforTipViewModel> { };
 
         /// <summary>
         /// 外部链接
         /// </summary>
-        public List<RelevancesKeyValueModel> OtherRelevances { get; set; }
+        public List<RelevancesKeyValueModel> OtherRelevances { get; set; }=new List<RelevancesKeyValueModel> { };
 
 
         /// <summary>
         /// 图片列表
         /// </summary>
-        public List<PicturesViewModel> Pictures { get; set; }
+        public List<PicturesViewModel> Pictures { get; set; } = new List<PicturesViewModel>();
         /// <summary>
         /// 审核记录 也是编辑记录
         /// </summary>
-        public List<ExaminedNormalListModel> Examines { get; set; }
+        public List<ExaminedNormalListModel> Examines { get; set; }=new List<ExaminedNormalListModel> { };
 
         /// <summary>
         /// 标签列表
         /// </summary>
-        public List<TagsViewModel> Tags { get; set; }
+        public List<TagsViewModel> Tags { get; set; }=new List<TagsViewModel> { };
     }
     public class TagsViewModel
     {
+        public int Id { get; set; }
         public string Name { get; set; }
     }
 
@@ -189,17 +185,6 @@ namespace CnGalWebSite.DataModel.ViewModel
         public DateTime HappenedTime { get; set; }
     }
 
-    public class StaffGameModel
-    {
-        public string Name { get; set; }
-        public string BriefIntroduction { get; set; }
-        public string Link { get; set; }
-
-        public List<string> Positions { get; set; }
-
-        public string Image { get; set; }
-    }
-
     public class StaffInforModel
     {
         public string Modifier { get; set; }
@@ -217,19 +202,6 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string DisplayName { get; set; }
 
         public string RealName { get; set; }
-    }
-
-    public class RoleInforModel
-    {
-        public string Name { get; set; }
-
-        public int Id { get; set; }
-
-        public string CV { get; set; }
-
-        public string ImagePath { get; set; }
-
-        public string BriefIntroduction { get; set; }
     }
 
 

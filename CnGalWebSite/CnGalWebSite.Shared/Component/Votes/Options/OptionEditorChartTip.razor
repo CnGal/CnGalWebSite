@@ -256,7 +256,7 @@ else
                 //Trace.Log("关闭按钮被点击");
                 return Task.CompletedTask;
             },
-            OnSaveAsync = async context =>
+            OnEditAsync = async context =>
             {
                 // Trace.Log("保存按钮被点击");
                 var item = (EditVoteOptionModel)context.Model;
@@ -289,7 +289,7 @@ else
                 //Trace.Log("关闭按钮被点击");
                 return Task.CompletedTask;
             },
-            OnSaveAsync = async context =>
+            OnEditAsync = async context =>
             {
                 // Trace.Log("保存按钮被点击");
                 var item = (EditVoteOptionModel)context.Model;

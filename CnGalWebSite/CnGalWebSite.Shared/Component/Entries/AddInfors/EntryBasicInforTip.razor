@@ -76,10 +76,9 @@
             @{ bool isFirstBadge = true;}
             @foreach (var item in EntryView.Tags)
             {
-                <button type="button" class="badge-btn btn btn-primary m-1  @(isFirstBadge ? "ms-0" : "")"
-                        @onclick="@(() =>  OnNavigateTo("/tags/index/"+ToolHelper.Base64EncodeName(item.Name), item.Name, "fa fa-tag"))">
+                <TabLink type="button" class="@("badge-btn btn btn-primary m-1 "+(isFirstBadge ? "ms-0" : ""))" Url="@("/tags/index/"+item.Id)">
                     @item.Name
-                </button>
+                </TabLink>
                 isFirstBadge = false;
             }
             @if (EntryView.IsEdit == true)
@@ -87,30 +86,27 @@
                 @switch (EntryView.TagState)
                 {
                     case EditState.locked:
-                        <button type="button" class="badge-btn btn btn-secondary m-1 @(isFirstBadge ? "ms-0" : "")">
+                        <button type="button" class="@("badge-btn btn btn-secondary m-1 "+(isFirstBadge ? "ms-0" : ""))" >
                             锁定
                         </button>
                         break;
                     case EditState.Preview:
-                        <button type="button" class="badge-btn btn btn-warning m-1 @(isFirstBadge ? "ms-0" : "")"
-                                @onclick="@(() =>OnNavigateTo("/entries/EditTags/" + EntryView.Id, "编辑标签", "fa fa-edit"))">
+                        <TabLink type="button" class="@("badge-btn btn btn-warning m-1 "+(isFirstBadge ? "ms-0" : ""))"  Url="@("/entries/EditTags/" + EntryView.Id)">
                             预览
-                        </button>
+                        </TabLink>
                         break;
                     case EditState.Normal:
                         @if (EntryView.Tags.Count == 0)
                         {
-                            <button type="button" class="badge-btn btn btn-success m-1 @(isFirstBadge ? "ms-0" : "")"
-                                    @onclick="@(() =>OnNavigateTo("/entries/EditTags/" + EntryView.Id, "编辑标签", "fa fa-edit"))">
+                            <TabLink type="button" class="@("badge-btn btn btn-success m-1 "+(isFirstBadge ? "ms-0" : ""))"  Url="@("/entries/EditTags/" + EntryView.Id)">
                                 添加
-                            </button>
+                            </TabLink>
                         }
                         else
                         {
-                            <button type="button" class="badge-btn btn btn-primary m-1  @(isFirstBadge ? "ms-0" : "")"
-                                    @onclick="@(() =>OnNavigateTo("/entries/EditTags/" + EntryView.Id, "编辑标签", "fa fa-edit"))">
+                            <TabLink type="button" class="@("badge-btn btn btn-primary m-1 "+(isFirstBadge ? "ms-0" : ""))"   Url="@("/entries/EditTags/" + EntryView.Id)">
                                 编辑
-                            </button>
+                            </TabLink>
                         }
 
                         break;
@@ -120,10 +116,9 @@
             {
                 @if (EntryView.Tags.Count == 0)
                 {
-                    <button type="button" class="badge-btn btn btn-success m-1 @(isFirstBadge ? "ms-0" : "")"
-                            @onclick="@(() => OnNavigateTo("/entries/EditTags/" + EntryView.Id, "编辑标签", "fa fa-edit"))">
+                    <TabLink class="@("badge-btn btn btn-success m-1 "+(isFirstBadge ? "ms-0" : ""))"  Url="@("/entries/EditTags/" + EntryView.Id)">
                         添加
-                    </button>
+                    </TabLink>
                 }
             }
 
@@ -139,30 +134,10 @@
 @code {
     [Parameter]
     public EntryIndexViewModel EntryView { get; set; }
-    [Parameter]
-    public EventCallback<NavigateModel> OnClickUrl { get; set; }
 
     [Parameter]
     public bool IsLargeScreen { get; set; }
     [Parameter]
     public EventCallback<Operation> OnClickRevoke { get; set; }
-    public async Task OnNavigateTo(string url,string title,string icon)
-    {
-        await OnClickUrl.InvokeAsync(new NavigateModel
-        {
-            Url =url,
-            Title = title,
-            Icon =icon
-        });
-    }
-    public async Task OnClick(string name)
-    {
-        await  OnClickUrl.InvokeAsync(new NavigateModel
-        {
-            Url = "/entries/index/A" + ToolHelper.Base64EncodeName(name),
-            Title = name,
-            Icon = "fa fa-codepen"
-        });
-    }
-
+  
 }

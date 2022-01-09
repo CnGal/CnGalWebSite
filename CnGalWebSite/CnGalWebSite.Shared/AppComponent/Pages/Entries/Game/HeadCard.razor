@@ -5,7 +5,7 @@
             <div style=" font-size: larger; ">@Model.Name</div>
             <div style=" font-size: smaller;color:gray; " class="mt-1 mb-2">@Model.BriefIntroduction</div>
             <div class="">
-                <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.ListTagButton Names="Model.Tags.Select(s=>s.Name).ToList()" />
+                <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.ListTagButton Model="Model.Tags" />
             </div>
         </div>
     </div>

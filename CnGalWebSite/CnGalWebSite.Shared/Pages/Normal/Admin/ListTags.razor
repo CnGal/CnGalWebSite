@@ -43,9 +43,9 @@
                         <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                     </TableColumns>
                     <RowButtonTemplate>
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-pencil" Text="编辑" IsAsync="true" OnClickCallback="@(()=> { NavigationManager.NavigateTo(Provider,"/tags/edittag/" + ToolHelper.Base64EncodeName(context.Name), context.Name, "fa fa-tag");return Task.CompletedTask; })" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickCallback="@(()=> { NavigationManager.NavigateTo(Provider,"/tags/index/" + ToolHelper.Base64EncodeName(context.Name), context.Name, "fa fa-tag");return Task.CompletedTask; })" />
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-comments-o" Text="切换显示" IsAsync="true" OnClickCallback="@(() => OnRowEditIsHiddenClick(new int[] { context.Id }, !context.IsHidden, true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-pencil" Text="编辑" IsAsync="true" OnClickWithoutRender="@(()=> { NavigationManager.NavigateTo(Provider,"/tags/edittag/" + ToolHelper.Base64EncodeName(context.Name), context.Name, "fa fa-tag");return Task.CompletedTask; })" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(()=> { NavigationManager.NavigateTo(Provider,"/tags/index/" + ToolHelper.Base64EncodeName(context.Name), context.Name, "fa fa-tag");return Task.CompletedTask; })" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-comments-o" Text="切换显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new int[] { context.Id }, !context.IsHidden, true))" />
                     </RowButtonTemplate>
                 </Table>
             </div>

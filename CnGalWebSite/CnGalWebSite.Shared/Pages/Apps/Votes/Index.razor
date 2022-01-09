@@ -179,7 +179,10 @@ else
             {
                 NavigationManager.NavigateTo("/home");
             }
-
+            if(user.User.Identity.IsAuthenticated==false)
+            {
+                 _dataCatcheService.VoteIndexPageCatche.Clean(Id);
+            }
             isReady = true;
             isNotFound = false;
             StateHasChanged();
@@ -211,5 +214,5 @@ else
         StateHasChanged();
         return Task.CompletedTask;
     }
-   
+
 }

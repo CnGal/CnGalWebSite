@@ -59,6 +59,9 @@ namespace CnGalWebSite.APIServer.Application.Comments
                 case CommentType.CommentPeriphery:
                     query = query.Where(s => s.Type == type && s.PeripheryId == tempId);
                     break;
+                case CommentType.CommentVote:
+                    query = query.Where(s => s.Type == type && s.VoteId == tempId);
+                    break;
                 case CommentType.CommentUser:
                     //
                     var userSpace = await _userSpaceCommentManagerRepository.FirstOrDefaultAsync(s => s.ApplicationUserId == Id);
@@ -71,6 +74,8 @@ namespace CnGalWebSite.APIServer.Application.Comments
                         return new PagedResultDto<CommentViewModel>() { Data = new List<CommentViewModel>(), TotalCount = 0 };
                     }
                     break;
+                default:
+                    throw new ArgumentException("未知评论类型");
             }
 
 
@@ -175,6 +180,12 @@ namespace CnGalWebSite.APIServer.Application.Comments
                 case CommentType.CommentEntries:
                     items = items.Where(s => s.EntryId == tempId);
                     break;
+                case CommentType.CommentPeriphery:
+                    items = items.Where(s => s.PeripheryId == tempId);
+                    break;
+                case CommentType.CommentVote:
+                    items = items.Where(s => s.VoteId == tempId);
+                    break;
                 case CommentType.CommentUser:
                     var space = await _userSpaceCommentManagerRepository.FirstOrDefaultAsync(s => s.ApplicationUserId == objectId);
                     if (space == null)
@@ -183,6 +194,8 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     }
                     items = items.Where(s => s.UserSpaceCommentManagerId == space.Id);
                     break;
+                default:
+                    throw new ArgumentException("未知评论类型");
             }
             // 处理高级搜索
             if (!string.IsNullOrWhiteSpace(searchModel.Text))

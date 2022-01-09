@@ -45,7 +45,7 @@
                         <TableColumn @bind-Field="@context.ArticleId" Searchable="true" Sortable="true" Width="150" />
                     </TableColumns>
                     <RowButtonTemplate>
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" IsAsync="true" OnClickCallback="@(() => OnRowRunClick( new long[] { context.Id } ,true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" IsAsync="true" OnClickWithoutRender="@(() => OnRowRunClick( new long[] { context.Id } ,true))" />
                     </RowButtonTemplate>
                 </Table>
             </div>

@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.Shared.AppComponent.Pages.Entries.Game.Roles
+﻿using System.Collections.Generic;
+
+namespace CnGalWebSite.Shared.AppComponent.Pages.Entries.Game.Roles
 {
     public class RoleCardModel
     {
@@ -6,7 +8,7 @@
 
         public string Name { get; set; }
 
-        public string CV { get; set; }
+        public List<string> CVs { get; set; }
 
         public int EntryId { get; set; }
     }

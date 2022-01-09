@@ -1,7 +1,7 @@
 ﻿
 <TabLink target="_blank" Url="@Model.Link" class="a-font-color">
     <div class="div-shadow rounded  bg-opacity aticle-home-layout p-3 h-100" >
-        <div class="row mb-2" style="height: 100%; align-content: center;">
+        <div class="" style="height: 100%; align-content: center;display:flex;">
             @{
                 string imageStr = Model.Image;
                 if (string.IsNullOrWhiteSpace(imageStr))
@@ -55,25 +55,25 @@
 
                 if (string.IsNullOrWhiteSpace(imageStr))
                 {
-                    <div class="col-12" style="display: flex; flex-direction: column; justify-content: center;">
-                        <header>
-                            <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
-                        </header>
-                        <div class="article-home-text">
-                            @Model.DisplayValue
+                        <div style="display: flex; flex-direction: column; justify-content: center;">
+                            <header style=" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                                <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                            </header>
+                            <div style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
+                                @Model.DisplayValue
+                            </div>
                         </div>
-                    </div>
                 }
                 else
                 {
-                    <div class="col-3" style="display: flex; flex-direction: column; justify-content: center;">
-                        <img class="img-fluid" src="@imageStr">
+                    <div class="" style=" display: flex; flex-direction: column; justify-content: center;">
+                        <img src="@imageStr" style="width: 116px;" />
                     </div>
-                    <div class="col-9" style="display: flex; flex-direction: column; justify-content: center;">
-                        <header>
+                    <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
+                        <header style=" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
                             <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
                         </header>
-                        <div class="article-home-text">
+                        <div style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
                             @Model.DisplayValue
                         </div>
                     </div>

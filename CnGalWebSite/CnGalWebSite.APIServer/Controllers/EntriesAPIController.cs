@@ -602,14 +602,13 @@ namespace CnGalWebSite.APIServer.Controllers
             var tags = new List<TagsViewModel>();
             foreach (var item in entry.Tags)
             {
-                tags.Add(new TagsViewModel { Name = item.Name });
+                tags.Add(new TagsViewModel { Name = item.Name,Id=item.Id });
             }
 
             //加载附加信息 关联词条获取
-            var roleInforModel = new List<RoleInforModel>();
+            var roleInforModel = new List<EntryInforTipViewModel>();
             var newsModel = new List<NewsModel>();
-            var staffGames = new List<StaffGameModel>();
-            var groupGames = new List<EntryInforTipViewModel>();
+            var staffGames = new List<EntryInforTipViewModel>();
             var relevancesEntry = new List<EntryInforTipViewModel>();
             var relevanceArticle = new List<ArticleInforTipViewModel>();
             var relevanceOther = new List<RelevancesKeyValueModel>();
@@ -625,7 +624,7 @@ namespace CnGalWebSite.APIServer.Controllers
                             {
                                 //一次性查找数据
                                 var tempStrings = relevances[i].Informations.Select(s => s.DisplayName).ToArray();
-                                var tempDatas = await _entryRepository.GetAll().Where(s => tempStrings.Any(n => n == s.Name)).ToListAsync();
+                                var tempDatas = await _entryRepository.GetAll().Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Relevances).Where(s => tempStrings.Any(n => n == s.Name)).AsNoTracking().ToListAsync();
 
                                 foreach (var infor in tempDatas)
                                 {
@@ -636,38 +635,25 @@ namespace CnGalWebSite.APIServer.Controllers
                             {
                                 //一次性查找数据
                                 var tempStrings = relevances[i].Informations.Select(s => s.DisplayName).ToArray();
-                                var tempDatas = await _entryRepository.GetAll().Include(s => s.Information).Where(s => tempStrings.Any(n => n == s.Name)).Select(s => new
-                                {
-                                    s.Name,
-                                    s.DisplayName,
-                                    s.Thumbnail,
-                                    s.Id,
-                                    s.BriefIntroduction,
-                                    s.Information
-                                }).ToListAsync();
+                                var tempDatas = await _entryRepository.GetAll().Include(s => s.Information).Where(s => tempStrings.Any(n => n == s.Name)).AsNoTracking().ToListAsync();
 
                                 foreach (var infor in tempDatas)
                                 {
                                     //获取角色词条
-                                    var role = new RoleInforModel
-                                    {
-                                        Name = infor.Name
-                                    };
-
-                                    role.Name = infor.DisplayName ?? infor.Name;
-                                    role.ImagePath = _appHelper.GetImagePath(infor.Thumbnail, "user.png");
-                                    role.Id = infor.Id;
-                                    role.BriefIntroduction = infor.BriefIntroduction;
+                                    var role = _appHelper.GetEntryInforTipViewModel(infor);
+                                    role.AddInfors.Clear();
                                     //查找配音
-                                    foreach (var roleInfor in infor.Information)
+                                    var roleCV = infor.Information.FirstOrDefault(s => s.DisplayName == "声优")?.DisplayValue;
+                                    if(string.IsNullOrWhiteSpace( roleCV )==false)
                                     {
-                                        if (roleInfor.DisplayName == "声优")
+                                        var temp = roleCV.Replace("，", ",").Replace("、", ",").Split(',');
+                                        role.AddInfors.Add(new EntryInforTipAddInforModel
                                         {
-                                            role.CV = roleInfor.DisplayValue;
-                                            break;
-                                        }
+                                            Modifier = "配音",
+                                            Contents = temp.ToList()
+                                        });
                                     }
-
+                                 
                                     roleInforModel.Add(role);
                                 }
                             }
@@ -686,7 +672,7 @@ namespace CnGalWebSite.APIServer.Controllers
                             {
                                 //一次性查找数据
                                 var tempStrings = relevances[i].Informations.Select(s => s.DisplayName).ToArray();
-                                var tempDatas = await _entryRepository.GetAll().Where(s => tempStrings.Any(n => n == s.Name)).ToListAsync();
+                                var tempDatas = await _entryRepository.GetAll().Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Relevances).Where(s => tempStrings.Any(n => n == s.Name)).AsNoTracking().ToListAsync();
 
                                 foreach (var infor in tempDatas)
                                 {
@@ -705,7 +691,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         {
                             //一次性查找数据
                             var tempStrings2 = relevances[i].Informations.Select(s => s.DisplayName).ToArray();
-                            var tempDatas2 = await _entryRepository.GetAll().Where(s => tempStrings2.Any(n => n == s.Name)).ToListAsync();
+                            var tempDatas2 = await _entryRepository.GetAll().Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Relevances).Where(s => tempStrings2.Any(n => n == s.Name)).AsNoTracking().ToListAsync();
 
                             foreach (var infor_ in tempDatas2)
                             {
@@ -725,41 +711,31 @@ namespace CnGalWebSite.APIServer.Controllers
                             {
                                 //一次性查找数据
                                 var tempStrings = relevances[i].Informations.Select(s => s.DisplayName).ToArray();
-                                var tempDatas = await _entryRepository.GetAll().Include(s => s.Information).Where(s => tempStrings.Any(n => n == s.Name)).Select(s => new
-                                {
-                                    s.Name,
-                                    s.DisplayName,
-                                    s.MainPicture,
-                                    s.Id,
-                                    s.BriefIntroduction,
-                                    s.Information
-                                }).ToListAsync();
+                                var tempDatas = await _entryRepository.GetAll().Include(s => s.Information).Where(s => tempStrings.Any(n => n == s.Name)).AsNoTracking().ToListAsync();
 
 
                                 foreach (var infor in tempDatas)
                                 {
                                     //获取角色词条
-                                    var staffGame = new StaffGameModel
-                                    {
-                                        Name = infor.Name,
-                                        Positions = new List<string>()
-                                    };
-                                    staffGame.Name = infor.DisplayName ?? infor.Name;
-                                    staffGame.Image = _appHelper.GetImagePath(infor.MainPicture, "app.png");
-                                    staffGame.Link = "/entries/index/" + infor.Id;
-                                    staffGame.BriefIntroduction = _appHelper.GetStringAbbreviation(infor.BriefIntroduction, 20);
+                                    var staffGame = _appHelper.GetEntryInforTipViewModel(infor);
+                                    staffGame.AddInfors.Clear();
                                     //查找担任过的职位
-                                    foreach (var roleInfor in infor.Information.Where(s => s.Modifier == "STAFF"))
+                                    var tempStaffs = infor.Information.Where(s => s.Modifier == "STAFF" && s.DisplayValue == entry.Name);
+                                    if(tempStaffs.Any())
                                     {
-                                        if (roleInfor.DisplayValue == entry.Name)
+                                        var inforPositions = new List<string>();
+                                        foreach (var roleInfor in tempStaffs)
                                         {
-                                            staffGame.Positions.Add(roleInfor.DisplayName);
-                                            if (staffGame.Positions.Count >= 3)
-                                            {
-                                                break;
-                                            }
+                                            inforPositions.Add(roleInfor.DisplayName);
                                         }
+
+                                        staffGame.AddInfors.Add(new EntryInforTipAddInforModel
+                                        {
+                                            Modifier = "职位",
+                                            Contents = inforPositions
+                                        });
                                     }
+                                   
                                     staffGames.Add(staffGame);
                                 }
                             }
@@ -767,7 +743,7 @@ namespace CnGalWebSite.APIServer.Controllers
                             {
                                 //一次性查找数据
                                 var tempStrings = relevances[i].Informations.Select(s => s.DisplayName).ToArray();
-                                var tempDatas = await _entryRepository.GetAll().Where(s => tempStrings.Any(n => n == s.Name)).ToListAsync();
+                                var tempDatas = await _entryRepository.GetAll().Include(s=>s.Information).ThenInclude(s=>s.Additional).Include(s=>s.Relevances).Where(s => tempStrings.Any(n => n == s.Name)).AsNoTracking().ToListAsync();
 
                                 foreach (var infor in tempDatas)
                                 {
@@ -787,7 +763,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         {
                             //一次性查找数据
                             var tempStrings1 = relevances[i].Informations.Select(s => s.DisplayName).ToArray();
-                            var tempDatas1 = await _articleRepository.GetAll().Include(s => s.CreateUser).Where(s => tempStrings1.Any(n => n == s.Name)).ToListAsync();
+                            var tempDatas1 = await _articleRepository.GetAll().Include(s => s.CreateUser).Where(s => tempStrings1.Any(n => n == s.Name)).AsNoTracking().ToListAsync();
 
                             foreach (var infor1 in tempDatas1)
                             {
@@ -974,7 +950,6 @@ namespace CnGalWebSite.APIServer.Controllers
             model.Tags = tags;
             model.Roles = roleInforModel;
             model.StaffGames = staffGames;
-            model.GroupGames = groupGames;
             newsModel.Sort((NewsModel a, NewsModel b) => { return a.HappenedTime > b.HappenedTime ? 1 : (a.HappenedTime < b.HappenedTime ? -1 : 0); });
             model.NewsOfEntry = newsModel;
 

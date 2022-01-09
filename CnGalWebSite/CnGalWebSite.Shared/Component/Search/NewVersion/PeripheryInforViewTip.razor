@@ -1,15 +1,15 @@
 ﻿<TabLink Icon="fa fa-codepen" Url="@("/peripheries/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
-    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3">
+    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 h-100">
             <div class=" mb-2"  style="display:flex;">
                 <div class="pt-3">
                     <img style=" width: 250px; " src="@Model.MainImage">
                 </div>
                 <div class="ps-3 pt-3">
-                    <header>
+                    <header style=" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
                         <div class="article-home-tag">周边</div>
                         <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
                     </header>
-                    <div style="@($" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; ")">
+                    <div style="@($" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; ")">
                         @Model.BriefIntroduction
                     </div>
                     @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)

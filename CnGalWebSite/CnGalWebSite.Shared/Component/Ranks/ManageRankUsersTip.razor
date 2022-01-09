@@ -24,16 +24,16 @@
                         <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                     </TableColumns>
                     <RowButtonTemplate>
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickCallback="@(() => LookLink( context.UserId , context.UserName))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookLink( context.UserId , context.UserName))" />
                         @if(context.IsHidden)
                         {
-                              <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickCallback="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" />
+                              <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" />
                         }
                         else
                         {
-                              <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickCallback="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" />
+                              <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" />
                         }
-                        <TableCellButton Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-trash" Text="删除" IsAsync="true" OnClickCallback="@(() =>  OnRowDeleteClick(new string[] { context.UserId },true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-trash" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new string[] { context.UserId },true))" />
                     </RowButtonTemplate>
                 </Table>
             </div>

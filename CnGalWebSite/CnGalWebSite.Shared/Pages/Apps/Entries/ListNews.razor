@@ -54,20 +54,8 @@ else
     bool isReady = false;
     bool isNotFound = false;
 
-    public EntryIndexViewModel Model { get; set; } = new EntryIndexViewModel
-    {
-        ArticleRelevances = new List<ArticleInforTipViewModel>(),
-        EntryRelevances = new List<EntryInforTipViewModel>(),
-        OtherRelevances = new List<RelevancesKeyValueModel>(),
-        Information = new List<InformationsModel>(),
-        Pictures = new List<PicturesViewModel>(),
-        Tags = new List<TagsViewModel>(),
-        MainPage = "# 123",
-        Type = EntryType.Staff,
-        StaffGames = new List<StaffGameModel>(),
-        GroupGames = new List<EntryInforTipViewModel>()
+    public EntryIndexViewModel Model { get; set; } = new EntryIndexViewModel();
 
-    };
     public List<CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCardModel> News = new List<CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCardModel>();
 
     [CascadingParameter]
@@ -86,20 +74,7 @@ else
         var model = await _dataCatcheService.EntryIndexPageCatche.GetCatche(Id);
         if (model == null)
         {
-            Model = new EntryIndexViewModel
-            {
-                ArticleRelevances = new List<ArticleInforTipViewModel>(),
-                EntryRelevances = new List<EntryInforTipViewModel>(),
-                OtherRelevances = new List<RelevancesKeyValueModel>(),
-                Information = new List<InformationsModel>(),
-                Pictures = new List<PicturesViewModel>(),
-                Tags = new List<TagsViewModel>(),
-                MainPage = "# 123",
-                Type = EntryType.Staff,
-                StaffGames = new List<StaffGameModel>(),
-                GroupGames = new List<EntryInforTipViewModel>()
-
-            };
+            Model = new EntryIndexViewModel();
             isNotFound = true;
             isReady = true;
             StateHasChanged();

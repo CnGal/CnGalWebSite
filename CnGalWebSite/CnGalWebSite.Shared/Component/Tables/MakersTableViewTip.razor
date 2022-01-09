@@ -31,7 +31,7 @@ else
             <TableColumn @bind-Field="@context.Other" Filterable="true" Sortable="true" Width="200" AllowTextWrap="true" />
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickCallback="@(() =>OnLook(context.RealId,context.Name))" />
+            <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.RealId,context.Name))" />
         </RowButtonTemplate>
 
     </Table>

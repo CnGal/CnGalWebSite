@@ -19,7 +19,7 @@
                     <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                 </TableColumns>
                 <RowButtonTemplate>
-                    <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickCallback="@(() => { NavigationManager.NavigateTo(Provider,"/disambigs/index/" + context.Id, context.Name, "fa fa-key");return Task.CompletedTask; })" />
+                    <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => { NavigationManager.NavigateTo(Provider,"/disambigs/index/" + context.Id, context.Name, "fa fa-key");return Task.CompletedTask; })" />
                 </RowButtonTemplate>
             </Table>
         </div>

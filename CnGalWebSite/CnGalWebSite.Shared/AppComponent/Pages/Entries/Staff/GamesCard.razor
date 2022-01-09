@@ -18,14 +18,14 @@
         {
             Games.Add(new Game.GameCardModel
             {
-                BriefIntroduction=item.BriefIntroduction,
-                Image=item.Image,
-                Link=item.Link,
-                Name=item.Name,
-                Positions=item.Positions
+                BriefIntroduction = item.BriefIntroduction,
+                Image = item.MainImage,
+                Link ="entries/index/"+ item.Id,
+                Name = item.Name,
+                Positions = item.AddInfors.FirstOrDefault()?.Contents ?? new List<string>()
             });
         }
-       
+
     }
 
 }

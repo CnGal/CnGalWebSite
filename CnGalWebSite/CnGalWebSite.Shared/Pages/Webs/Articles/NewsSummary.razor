@@ -98,7 +98,7 @@
         {
             if (string.IsNullOrWhiteSpace(TimeString))
             {
-                TimeString = "全部";
+                TimeString = "本月";
             }
             Model = await Http.GetFromJsonAsync<List<NewsSummaryAloneViewModel>>(ToolHelper.WebApiPath + "api/articles/GetNewSummary/" + TimeString);
             isReady = true;

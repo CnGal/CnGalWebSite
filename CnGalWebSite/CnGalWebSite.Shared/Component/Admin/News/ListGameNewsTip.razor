@@ -28,20 +28,15 @@
                 <TableColumn @bind-Field="@context.PublishTime" Sortable="true" AllowTextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
             </TableColumns>
             <RowButtonTemplate>
-                <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickCallback="@(() => EditGameNews(context.Id))" />
-                @if (context.ArticleId != 0)
-                {
-                    <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickCallback="@(() => EditArticle(context.ArticleId ))" />
+                <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditGameNews(context.Id))" />
 
-                }
-                @if (context.State == GameNewsState.Ignore)
-                {
-                    <TableCellButton Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="关注" IsAsync="true" OnClickCallback="@(() => OnRowEditIsIgnoredClick(new long[] { context.Id }, false, true))" />
-                }
-                else
-                {
-                    <TableCellButton Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickCallback="@(() => OnRowEditIsIgnoredClick(new long[] { context.Id }, true, true))" />
-                }
+                    <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickWithoutRender="@(() => EditArticle(context.ArticleId ))" IsShow="context.ArticleId != 0"/>
+
+
+                    <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="关注" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsIgnoredClick(new long[] { context.Id }, false, true))" IsShow="context.State == GameNewsState.Ignore"/>
+
+                    <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsIgnoredClick(new long[] { context.Id }, true, true))" IsShow="context.State != GameNewsState.Ignore"/>
+                
             </RowButtonTemplate>
         </Table>
 </div>
