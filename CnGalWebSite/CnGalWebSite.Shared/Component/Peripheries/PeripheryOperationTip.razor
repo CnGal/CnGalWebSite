@@ -1,306 +1,60 @@
 ﻿@inject ToastService? ToastService
 
-@if (IsSmallSreeen)
-{
-    <div style="width: 100%;" class="mt-4">
-        <p class="text-center">
-            <AuthorizeView>
-                <Authorized>
-                    @if (IsCollected)
-                    {
-                    <i class="fa fa-check fa-fw article-operation-color-small-1" @onclick="@(() => OnClick(5))"></i>
-                    <span class="article-operation-color-small-1" @onclick="@(() => OnClick(5))">我已拥有&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; </span>
-                    }
-                    else
-                    {
-                    <i class="fa fa-shopping-basket fa-fw article-operation-color-small-1" @onclick="@(() => OnClick(6))"></i>
-                    <span class="article-operation-color-small-1" @onclick="@(() => OnClick(6))">拥有&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; </span>
-                    }
-                    @if (IsFavorited)
-                    {
-                    <i class="fa fa-star fa-fw article-operation-color-small-1" @onclick="@(() => OnClick(7))"></i>
-                    <span class="article-operation-color-small-1" @onclick="@(() => OnClick(7))">取消收藏&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; </span>
-                    }
-                    else
-                    {
-                    <i class="fa fa-star-o fa-fw article-operation-color-small-1" @onclick="@(() => OnClick(8))"></i>
-                    <span class="article-operation-color-small-1" @onclick="@(() => OnClick(8))">收藏&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; </span>
-                    }
-                    @if (IsEdit)
-                    {
-                    <i class="fa fa-sign-out fa-fw article-operation-color-small-3" @onclick="@(() => OnClick(9))"></i>
-                    <span class="article-operation-color-small-3" @onclick="@(() => OnClick(9))">退出编辑&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; </span>
+<div style=" display: flex; justify-content: center;">
+    <AuthorizeView>
+        <Authorized>
+            @if (IsCollected)
+            {
+                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  Icon="fa fa-check" Text="我已拥有" OnClick="@(() => OnClick(5))" />
+
+            }
+            else
+            {
+                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  IsOutline="true" Icon="fa fa-shopping-basket" Text="拥有" OnClick="@(() => OnClick(6))" />
+
+            }
+            @if (IsFavorited)
+            {
+                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  IsOutline="true"  Icon="fa fa-star" Text="取消收藏" OnClick="@(() => OnClick(7))" />
+
+            }
+            else
+            {
+                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"   IsOutline="true" Icon="fa fa-star-o" Text="收藏" OnClick="@(() => OnClick(8))" />
+
+            }
+            @if (IsEdit)
+            {
+                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  IsOutline="true"  Icon="fa fa-sign-out" Text="退出编辑" OnClick="@(() => OnClick(9))" />
+
+            }
+            else
+            {
+                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  IsOutline="true"  Icon="fa  fa-pencil" Text="编辑" OnClick="@(() => OnClick(2))" />
+
+            }
 
 
-                    }
-                    else
-                    {
-                    <i class="fa fa-pencil fa-fw article-operation-color-small-3" @onclick="@(() => OnClick(2))"></i>
-                    <span class="article-operation-color-small-3" @onclick="@(() => OnClick(2))">编辑&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; </span>
+        </Authorized>
+        <NotAuthorized>
+            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  IsOutline="true"  Icon="fa fa-sign-in " Text="登入后记录收集进度" OnClick="@(() => OnClick(10))" />
 
+        </NotAuthorized>
+    </AuthorizeView>
+    <AuthorizeView Roles="Admin">
+        @if (IsHidden)
+        {
+            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  IsOutline="true" Icon="fa fa-map-signs" Text="取消隐藏" OnClick="@(() => OnClick(3))" />
 
-                    }
-                </Authorized>
-                <NotAuthorized>
-                    <i class="fa fa-sign-in fa-fw article-operation-color-small-3" @onclick="@(() => OnClick(10))"></i>
-                    <span class="article-operation-color-small-3" @onclick="@(() => OnClick(10))">登入后记录收集进度&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; </span>
-                </NotAuthorized>
-            </AuthorizeView>
-          
-            <AuthorizeView Roles="Admin">
-                @if (IsHidden)
-                {
-                <br />
-                <i class="fa fa-map-signs fa-fw article-operation-color-small-4" @onclick="@(() => OnClick(3))"></i>
-                <span class="article-operation-color-small-4" @onclick="@(() => OnClick(3))">取消隐藏&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; </span>
-                }
-                else
-                {
-                <br />
-                <i class="fa fa-unlink fa-fw article-operation-color-small-4" @onclick="@(() => OnClick(4))"></i>
-                <span class="article-operation-color-small-4" @onclick="@(() => OnClick(4))">隐藏&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; </span>
-                }
-            </AuthorizeView>
-        </p>
+        }
+        else
+        {
+            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true"  Icon="fa fa-unlink fa-check" Text="隐藏" OnClick="@(() => OnClick(4))" />
 
-    </div>
-}
-else
-{
-    if (IsNormalSreeen)
-    {
-        <div style="width: 100%;" class="mt-4">
-            <div class="new-row-warp">
-                <div style="margin-left: auto;margin-right: auto;">
-                    <AuthorizeView>
-                        <Authorized>
-                            @if (IsCollected)
-                            {
-                            <button class="article-operation article-operation-color-1" style="width:130px" @onclick="@(() => OnClick(5))">
-                                <i class="fa fa-check fa-fw"></i>&nbsp;我已拥有
-                            </button>
-                            }
-                            else
-                            {
-                            <button class="article-operation article-operation-color-1" @onclick="@(() => OnClick(6))">
-                                <i class="fa fa-shopping-basket fa-fw"></i>&nbsp;拥有
-                            </button>
-                            }
-                            @if (IsFavorited)
-                            {
-                            <button class="article-operation article-operation-color-1" style="width:130px" @onclick="@(() => OnClick(7))">
-                                <i class="fa fa-star fa-fw"></i>&nbsp;取消收藏
-                            </button>
-                            }
-                            else
-                            {
-                            <button class="article-operation article-operation-color-1" @onclick="@(() => OnClick(8))">
-                                <i class="fa fa-star-o fa-fw"></i>&nbsp;收藏
-                            </button>
-                            }
-                            @if (IsEdit)
-                            {
-                            <button class="article-operation article-operation-color-3" @onclick="@(() => OnClick(9))">
-                                <i class="fa fa-sign-out  fa-fw"></i>&nbsp;退出编辑
-                            </button>
+        }
 
-
-                            }
-                            else
-                            {
-                            <button class="article-operation article-operation-color-3" @onclick="@(() => OnClick(2))">
-                                <i class="fa fa-pencil fa-fw"></i>&nbsp;编辑
-                            </button>
-
-
-                            }
-                        </Authorized>
-                        <NotAuthorized>
-                            <button class="article-operation article-operation-color-1" @onclick="@(() => OnClick(10))">
-                                <i class="fa fa-sign-in  fa-fw"></i>&nbsp;登入后记录收集进度
-                            </button>
-
-                        </NotAuthorized>
-                    </AuthorizeView>
-                   
-
-                    <AuthorizeView Roles="Admin">
-                        @if (IsHidden)
-                        {
-                        <button class="article-operation article-operation-color-4" style="width:130px" @onclick="@(() => OnClick(3))">
-                            <i class="fa fa-map-signs fa-fw"></i>&nbsp;取消隐藏
-                        </button>
-                        }
-                        else
-                        {
-                        <button class="article-operation article-operation-color-4" @onclick="@(() => OnClick(4))">
-                            <i class="fa fa-unlink fa-fw"></i>&nbsp;隐藏
-                        </button>
-                        }
-                    </AuthorizeView>
-
-                </div>
-
-            </div>
-        </div>
-    }
-    else if (IsLargeSreeen)
-    {
-        <div class=" rounded shadow -lg bg-opacity font-color">
-            <ul class="list-group list-group-flush">
-                <AuthorizeView>
-                    <Authorized>
-                        @if (IsCollected)
-                        {
-                        <li class="list-group li-user-space" @onclick="@(() => OnClick(5))">
-                            <div class="li-user-space-left-div">
-                                <i class="fa fa-angle-double-right fa-fw fa-lg"></i>
-                            </div>
-                            <div class="li-user-space-right-div">
-                                <div class="li-user-space-text">&nbsp;&nbsp;&nbsp;我已拥有</div>
-                                <i class="fa fa-check fa-fw fa-lg li-user-space-icon"></i>
-
-                            </div>
-                        </li>
-                        <div><hr style="margin: 0px;" /></div>
-                        }
-                        else
-                        {
-                        <li class="list-group li-user-space" @onclick="@(() => OnClick(6))">
-                            <div class="li-user-space-left-div">
-                                <i class="fa fa-angle-double-right fa-fw fa-lg"></i>
-                            </div>
-                            <div class="li-user-space-right-div">
-                                <div class="li-user-space-text">&nbsp;&nbsp;&nbsp;拥有</div>
-                                <i class="fa fa-shopping-basket fa-fw fa-lg li-user-space-icon"></i>
-
-                            </div>
-                        </li>
-                        <div><hr style="margin: 0px;" /></div>
-                        }
-                        @if (IsFavorited)
-                        {
-                        <li class="list-group li-user-space" @onclick="@(() => OnClick(7))">
-                            <div class="li-user-space-left-div">
-                                <i class="fa fa-angle-double-right fa-fw fa-lg"></i>
-                            </div>
-                            <div class="li-user-space-right-div">
-                                <div class="li-user-space-text">&nbsp;&nbsp;&nbsp;取消收藏</div>
-                                <i class="fa fa-star fa-fw fa-lg li-user-space-icon"></i>
-
-                            </div>
-                        </li>
-                        <div><hr style="margin: 0px;" /></div>
-                        }
-                        else
-                        {
-                        <li class="list-group li-user-space" @onclick="@(() => OnClick(8))">
-                            <div class="li-user-space-left-div">
-                                <i class="fa fa-angle-double-right fa-fw fa-lg"></i>
-                            </div>
-                            <div class="li-user-space-right-div">
-                                <div class="li-user-space-text">&nbsp;&nbsp;&nbsp;收藏</div>
-                                <i class="fa fa-star-o fa-fw fa-lg li-user-space-icon"></i>
-
-                            </div>
-                        </li>
-                        <div><hr style="margin: 0px;" /></div>
-                        }
-                        @if (IsEdit)
-                {
-                        <li class="list-group li-user-space" @onclick="@(() => OnClick(9))">
-                            <div class="li-user-space-left-div">
-                                <i class="fa fa-angle-double-right fa-fw fa-lg"></i>
-                            </div>
-                            <div class="li-user-space-right-div">
-                                <div class="li-user-space-text">&nbsp;&nbsp;&nbsp;退出编辑</div>
-                                <i class="fa fa-sign-out fa-fw fa-lg li-user-space-icon"></i>
-
-                            </div>
-                        </li>
-                        <div><hr style="margin: 0px;" /></div>
-
-                }
-                else
-                {
-                        <li class="list-group li-user-space" @onclick="@(() => OnClick(2))">
-                            <div class="li-user-space-left-div">
-                                <i class="fa fa-angle-double-right fa-fw fa-lg"></i>
-                            </div>
-                            <div class="li-user-space-right-div">
-                                <div class="li-user-space-text">&nbsp;&nbsp;&nbsp;编辑</div>
-                                <i class="fa fa-pencil fa-fw fa-lg li-user-space-icon"></i>
-
-                            </div>
-                        </li>
-                        <div><hr style="margin: 0px;" /></div>
-
-                }
-                    </Authorized>
-                    <NotAuthorized>
-                        <li class="list-group li-user-space" @onclick="@(() => OnClick(10))">
-                            <div class="li-user-space-left-div">
-                                <i class="fa fa-angle-double-right fa-fw fa-lg"></i>
-                            </div>
-                            <div class="li-user-space-right-div">
-                                <div class="li-user-space-text">&nbsp;&nbsp;&nbsp;登入后记录收集进度</div>
-                                <i class="fa fa-sign-in fa-fw fa-lg li-user-space-icon"></i>
-
-                            </div>
-                        </li>
-                        <div><hr style="margin: 0px;" /></div>
-
-                    </NotAuthorized>
-                </AuthorizeView>
-              
-
-
-                <AuthorizeView Roles="Admin">
-                    @if (IsHidden)
-                    {
-                    <li class="list-group li-user-space" @onclick="@(() => OnClick(3))">
-                        <div class="li-user-space-left-div">
-                            <i class="fa fa-angle-double-right fa-fw fa-lg"></i>
-                        </div>
-                        <div class="li-user-space-right-div">
-                            <div class="li-user-space-text">&nbsp;&nbsp;&nbsp;取消隐藏</div>
-                            <i class="fa fa-map-signs fa-fw fa-lg li-user-space-icon"></i>
-
-                        </div>
-                    </li>
-                    <div><hr style="margin: 0px;" /></div>
-                    }
-                    else
-                    {
-                    <li class="list-group li-user-space" @onclick="@(() => OnClick(4))">
-                        <div class="li-user-space-left-div">
-                            <i class="fa fa-angle-double-right fa-fw fa-lg"></i>
-                        </div>
-                        <div class="li-user-space-right-div">
-                            <div class="li-user-space-text">&nbsp;&nbsp;&nbsp;隐藏</div>
-                            <i class="fa fa-unlink fa-fw fa-lg li-user-space-icon"></i>
-
-                        </div>
-                    </li>
-                    <div><hr style="margin: 0px;" /></div>
-                    }
-                </AuthorizeView>
-                <li class="list-group li-user-space">
-                    <div class="li-user-space-left-div">
-                        <i class="fa fa-angle-double-right fa-fw fa-lg"></i>
-                    </div>
-                    <div class="li-user-space-right-div">
-                        <div class="li-user-space-text" style="cursor: default">&nbsp;&nbsp;&nbsp;已有 @CollectedCount 人拥有</div>
-                        <i class="fa fa-cubes fa-fw fa-lg li-user-space-icon" style="cursor: default"></i>
-
-                    </div>
-                </li>
-            </ul>
-        </div>
-
-    }
-}
-
+    </AuthorizeView>
+</div>
 
 
 @code {

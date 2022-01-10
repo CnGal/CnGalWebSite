@@ -49,7 +49,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Peripheries
         public string Price { get; set; }
         [Display(Name = "是否为再版")]
         public bool IsReprint { get; set; }
-        [Display(Name = "是否为可用物品")]
+        [Display(Name = "是否为装饰品")]
         public bool IsAvailableItem { get; set; }
         #endregion
         #region 设定集

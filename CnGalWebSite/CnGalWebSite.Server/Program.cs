@@ -14,14 +14,18 @@ namespace CnGalWebSite.Server
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-.ConfigureAppConfiguration(builder =>
-{
-    builder.AddCommandLine(args);//设置添加命令行
-})
-.ConfigureWebHostDefaults(webBuilder =>
-{
-    webBuilder.UseStartup<Startup>();
-});
+                        .ConfigureAppConfiguration(builder =>
+                        {
+                            builder.AddCommandLine(args);//设置添加命令行
+                        })
+                        .ConfigureWebHostDefaults(webBuilder =>
+                        {
+                            webBuilder.UseStartup<Startup>();
+                            webBuilder.UseDefaultServiceProvider(s =>
+                            {
+                                s.ValidateScopes = true;
+                            });
+                        });
         }
     }
 }

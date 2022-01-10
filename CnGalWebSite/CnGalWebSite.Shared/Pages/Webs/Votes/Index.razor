@@ -131,16 +131,17 @@ else
             </div>
             @if (IsLargeScreen)
             {
-                <div class="col-xl-6">
-                    @if (Model.Entries.Count != 0 || Model.Artciles.Count != 0 || Model.Peripheries.Count != 0)
-                    {
-                        <CnGalWebSite.Shared.Component.Votes.MainPage.RelevanceInforCard Model="Model" />
-                    }
-                    @if (Model.Users.Count != 0)
-                    {
-                        <CnGalWebSite.Shared.Component.Votes.MainPage.ListUserInforCard Model="Model" />
-                    }
-                </div>
+    <div class="col-xl-6">
+        @if (Model.Users.Count != 0)
+        {
+            <CnGalWebSite.Shared.Component.Votes.MainPage.ListUserInforCard Model="Model" />
+        }
+        @if (Model.Entries.Count != 0 || Model.Artciles.Count != 0 || Model.Peripheries.Count != 0)
+        {
+            <CnGalWebSite.Shared.Component.Votes.MainPage.RelevanceInforCard Model="Model" />
+        }
+
+    </div>
             }
         }
 

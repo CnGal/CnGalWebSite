@@ -64,8 +64,8 @@ namespace CnGalWebSite.APIServer
             //添加HTTP请求
             services.AddHttpClient();
             //添加ElasticSearch服务
-            services.AddScoped<IElasticsearchProvider, ElasticsearchProvider>();
-            services.AddScoped(typeof(IElasticsearchBaseService<>), typeof(ElasticsearchBaseService<>));
+            services.AddTransient<IElasticsearchProvider, ElasticsearchProvider>();
+            services.AddTransient(typeof(IElasticsearchBaseService<>), typeof(ElasticsearchBaseService<>));
             //依赖注入仓储
             services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
             //自动注入服务到依赖注入容器

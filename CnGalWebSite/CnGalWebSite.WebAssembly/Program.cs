@@ -53,7 +53,7 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.AddScoped<IAppHelper, AppHelper>();
             builder.Services.AddScoped(x => new ExamineService());
             builder.Services.AddScoped(x => new ImagesLargeViewService());
-
+            builder.Services.BuildServiceProvider(validateScopes: false);
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 

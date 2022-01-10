@@ -1,86 +1,117 @@
-﻿<div style="font-size: initial;" class="row">
-
-    <div class="col-12 col-md-6">
-        类型：@Model.Type.GetDisplayName()
+﻿<div class=" ps-3 pe-3 pb-2 pt-2">
+    <div class="">
+        <h2 class="fw-bold pb-3 m-0 font-color h5"><i class="fa fa-info-circle"></i>&nbsp;&nbsp;基础信息</h2>
     </div>
-    @if (string.IsNullOrWhiteSpace(Model.Size) == false)
-    {
-        <div class="col-12 col-md-6">
-            尺寸：@Model.Size
-        </div>
-    }
-    @if (string.IsNullOrWhiteSpace(Model.Brand) == false)
-    {
-        <div class="col-12 col-md-6">
-            品牌：@Model.Brand
-        </div>
-    }
-    @if (string.IsNullOrWhiteSpace(Model.Author) == false)
-    {
-        <div class="col-12 col-md-6">
-            作者：@Model.Author
-        </div>
-    }
-    @if (string.IsNullOrWhiteSpace(Model.Material) == false)
-    {
-        <div class="col-12 col-md-6">
-            材质：@Model.Material
-        </div>
-    }
-    @if (string.IsNullOrWhiteSpace(Model.IndividualParts) == false)
-    {
-        <div class="col-12 col-md-6">
-            单独部件数量：@Model.IndividualParts
-        </div>
-    }
-    @if (string.IsNullOrWhiteSpace(Model.Price) == false)
-    {
-        <div class="col-12 col-md-6">
-            价格：@Model.Price
-        </div>
-    }
+    <div>
+        @if (IsEdit == true)
+        {
 
-    <div class="col-12 col-md-6">
-        是否再版：@(Model.IsReprint?"是":"否")
+            @switch (State)
+            {
+                case EditState.locked:
+                    <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                    break;
+                case EditState.Normal:
+                    <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.Editable" Url="@("/peripheries/EditMain/" + Id)"></AlertTip>
+                    break;
+            }
+        }
+        @if (State == EditState.Preview)
+        {
+            <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditMain/" + Id)" ExamineType="Operation.EditPeripheryMain" OnClickRevoke="OnRevoke"></AlertTip>
+        }
+
+
     </div>
+    <div class="row">
 
-    <div class="col-12 col-md-6">
-        是否为可用物品：@(Model.IsAvailableItem ? "是":"否")
-    </div>
-
-    @if (Model.Type == PeripheryType.SetorAlbumEtc)
-    {
-        @if (Model.PageCount != 0)
+        <div class="col-12 col-md-6">
+            <i class="fa fa-fw  fa-tag font-color "></i>&nbsp;&nbsp;@Model.Type.GetDisplayName()
+        </div>
+        @if (string.IsNullOrWhiteSpace(Model.Size) == false)
         {
             <div class="col-12 col-md-6">
-                页数：@Model.PageCount
+                <i class="fa  fa-fw font-color fa-cube"></i>&nbsp;&nbsp;尺寸：@Model.Size
             </div>
         }
-    }
-    @if (Model.Type == PeripheryType.Ost)
-    {
-        @if (Model.SongCount != 0)
+        @if (string.IsNullOrWhiteSpace(Model.Brand) == false)
         {
             <div class="col-12 col-md-6">
-                歌曲数：@Model.SongCount
+                <i class="fa fa-fw font-color fa-trademark"></i>&nbsp;&nbsp;品牌：@Model.Brand
             </div>
         }
-    }
-    @if (string.IsNullOrWhiteSpace(Model.SaleLink) == false)
-    {
-        <div class="col-12">
-            贩售链接：<a href="@Model.SaleLink" style="word-break: break-all;">@Model.SaleLink</a>
+        @if (string.IsNullOrWhiteSpace(Model.Author) == false)
+        {
+            <div class="col-12 col-md-6">
+                <i class="fa  fa-fw font-color fa-trademark"></i>&nbsp;&nbsp;作者：@Model.Author
+            </div>
+        }
+        @if (string.IsNullOrWhiteSpace(Model.Material) == false)
+        {
+            <div class="col-12 col-md-6">
+                <i class="fa fa-fw font-color fa-puzzle-piece"></i>&nbsp;&nbsp;材质：@Model.Material
+            </div>
+        }
+        @if (string.IsNullOrWhiteSpace(Model.IndividualParts) == false)
+        {
+            <div class="col-12 col-md-6">
+                <i class="fa fa-fw font-color fa-signal"></i>&nbsp;&nbsp;单独部件数量：@Model.IndividualParts
+            </div>
+        }
+        @if (string.IsNullOrWhiteSpace(Model.Price) == false)
+        {
+            <div class="col-12 col-md-6">
+                <i class="fa font-color fa-fw fa-money"></i>&nbsp;&nbsp;价格：@Model.Price
+            </div>
+        }
+
+        <div class="col-12 col-md-6">
+            <i class="fa font-color fa-fw fa-minus-square-o"></i>&nbsp;&nbsp;@(Model.IsReprint?"已再版":"未再版")
         </div>
-    }
-    @if (string.IsNullOrWhiteSpace(Model.SaleLink) == false)
-    {
-        <div class="col-12">
-            简介：@Model.BriefIntroduction
-        </div>
-    }
+        @if (Model.IsAvailableItem)
+        {
+            <div class="col-12 col-md-6">
+                <i class="fa font-color fa-fw  fa-tag"></i>&nbsp;&nbsp;@(Model.IsAvailableItem ? "装饰品":"")
+            </div>
+
+        }
+
+        @if (Model.Type == PeripheryType.SetorAlbumEtc)
+        {
+            @if (Model.PageCount != 0)
+            {
+                <div class="col-12 col-md-6">
+                    <i class="fa fa-fw font-color fa-file-text-o"></i>&nbsp;&nbsp;页数：@Model.PageCount
+                </div>
+            }
+        }
+        @if (Model.Type == PeripheryType.Ost)
+        {
+            @if (Model.SongCount != 0)
+            {
+                <div class="col-12 col-md-6">
+                    <i class="fa fa-fw font-color fa-file-text-o"></i>&nbsp;&nbsp;歌曲数：@Model.SongCount
+                </div>
+            }
+        }
+        @if (string.IsNullOrWhiteSpace(Model.SaleLink) == false)
+        {
+            <div class="col-12 text-truncate">
+                <i class="fa fa-fw font-color fa-link"></i>&nbsp;&nbsp;贩售链接：<a href="@Model.SaleLink" style="word-break: break-all;">@Model.SaleLink</a>
+            </div>
+        }
+    </div>
 
 </div>
 @code {
+    [Parameter]
+    public EditState State { get; set; }
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public bool  IsEdit { get; set; }
     [Parameter]
     public PeripheryViewModel Model { get; set; }
 

@@ -1,0 +1,44 @@
+﻿@inject HttpClient Http
+
+
+<div>
+    @if (Model.Count > 0)
+    {
+        <div>
+            <h2 class="fw-bold pt-3 pb-3 m-0 font-color h5"><i class="fa fa-dropbox"></i>&nbsp;&nbsp;相关投票</h2>
+            @foreach (var item in Model)
+            {
+                <div>
+                    <VoteInforMinCard Model="item" />
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+
+@code {
+    [Parameter]
+    public VoteOptionType Type { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+
+
+    public List<VoteCardViewModel> Model { get; set; } = new List<VoteCardViewModel>();
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<List<VoteCardViewModel>>(ToolHelper.WebApiPath + "api/votes/GetRelatedVotes/" + (int)Type + "/" + Id);
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取关联投票数据失败");
+        }
+    }
+}

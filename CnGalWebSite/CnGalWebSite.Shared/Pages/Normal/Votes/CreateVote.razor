@@ -213,7 +213,7 @@
             {
                 Model.Options = optionEditor.Options;
             }
-    
+
 
             if (Model.Type==VoteType.MultipleChoice)
             {
@@ -247,7 +247,7 @@
             else
             {
                 await ToastService.Success("创建投票成功", "创建投票成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/votes/index/" + obj.Error, Model.Name);
+                NavigationManager.NavigateTo(Provider, "/votes/index/" + obj.Error, Model.Name, "fa fa-dropbox");
             }
         }
         catch (Exception ex)

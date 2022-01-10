@@ -1,11 +1,10 @@
 ﻿
 <div class="mb-1">
-    <div class="shadow rounded  bg-opacity ps-3 pe-3 mb-3">
-        <div style="display: block;">
-            <h2 class="fw-bold pt-3 pb-3 m-0 font-color h4"><i class="fa fa-codepen"></i>&nbsp;&nbsp;关联词条</h2>
+    <div class="shadow rounded  bg-opacity ps-3 pe-3 mb-2">
+        <div>
+            <h2 class="fw-bold pt-2 pb-2 m-0 font-color h5"><i class="fa fa-codepen"></i>&nbsp;&nbsp;关联词条</h2>
         </div>
     </div>
-
     @if (IsEdit == true)
     {
         <div class="pb-1">
@@ -27,11 +26,11 @@
         </div>
     }
 
-    <div class="row">
+    <div>
         @foreach (var item in Entries)
         {
-            <div class="@((IsNormalScreen?"col-12 col-md-6 col-lg-4":"col-12")+" mb-3")">
-                <PeripheryRelevanceEntryInforTip Model="item" />
+            <div class="mt-2">
+                <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" />
             </div>
         }
 
@@ -39,9 +38,9 @@
 
     @if (IsEdit == true ||( Peripheries.Count > 0&& Type != PeripheryType.Set))
     {
-        <div class="shadow rounded  bg-opacity ps-3 pe-3 mb-3">
-            <div style="display: block;">
-                <h2 class="fw-bold pt-3 pb-3 m-0 font-color h4"><i class="fa fa-shopping-basket"></i>&nbsp;&nbsp;关联周边</h2>
+        <div class="shadow rounded bg-opacity ps-3 pe-3 mb-2 mt-2">
+            <div>
+                <h2 class="fw-bold pt-2 pb-2 m-0 font-color h5"><i class="fa fa-shopping-basket"></i>&nbsp;&nbsp;关联周边</h2>
             </div>
         </div>
 
@@ -69,11 +68,11 @@
     }
     @if (Type != PeripheryType.Set)
     {
-        <div class="row">
+        <div>
             @foreach (var item in Peripheries)
             {
-                <div class="@((IsNormalScreen?"col-12 col-md-6 col-lg-4":"col-12")+" mb-3")">
-                    <PeripheryRelatedPeripheryInforTip Model="item" />
+                <div class="mt-2">
+                    <CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip Model="item" />
                 </div>
             }
 
@@ -86,8 +85,7 @@
     public List<EntryInforTipViewModel> Entries { get; set; } = new List<EntryInforTipViewModel>();
     [Parameter]
     public List<PeripheryInforTipViewModel> Peripheries { get; set; } = new List<PeripheryInforTipViewModel>();
-    [Parameter]
-    public bool IsNormalScreen { get; set; }
+
     [Parameter]
     public bool IsEdit { get; set; }
     [Parameter]

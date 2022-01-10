@@ -28,6 +28,10 @@ namespace CnGalWebSite.APIServer
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseDefaultServiceProvider(s =>
+                    {
+                        s.ValidateScopes = true;
+                    });
                 })
                 .ConfigureLogging(logging =>
                 {

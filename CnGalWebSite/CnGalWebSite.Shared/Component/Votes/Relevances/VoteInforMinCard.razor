@@ -1,0 +1,41 @@
+﻿<a style="width: 100%;" href="@("votes/index/"+Model.Id)" class="a-font-color">
+    <div style="display: flex; border: 1px solid var(--bs-secondary);border-radius:5px;">
+        <img src="@Model.MainPicture" alt="@Model.Name" style="height:50px;" />
+        <div style="width: 100%; height: 50px; position: relative; display: flex; ">
+            <div style=" display: flex; width: 100%;" class="ps-3">
+                <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <div class="fw-bold" style="display: flex; align-items: center;">
+                        <div style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">@Model.Name</div>
+                    </div>
+
+                    <div style="font-size: small; color: gray; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">
+                        @if (DateTime.Now.ToCstTime() < Model.BeginTime)
+                        {
+                            <i class="fa fa-clock-o fa-fw text-primary"></i>
+                            <span>未开始&nbsp;&nbsp;&nbsp;</span>
+                        }
+                        else if (DateTime.Now.ToCstTime() > Model.EndTime)
+                        {
+                            <i class="fa fa-check-circle fa-fw text-success"></i>
+                            <span>已结束&nbsp;&nbsp;&nbsp;</span>
+                        }
+                        else
+                        {
+                            <i class="fa fa-check-circle-o fa-fw text-success"></i>
+                            <span>正在进行&nbsp;&nbsp;&nbsp;</span>
+                        }
+                        <i class="fa fa-user"></i>
+                        <span class="article-home-infor-text">@(Model.Count)人参与&nbsp;&nbsp;&nbsp;</span>
+                        <i class="fa fa-calendar fa-fw"></i>
+                        <span class="article-home-infor-text">@(Model.BeginTime.ToString("yyyy.M.d HH:mm")+" - "+ Model.EndTime.ToString("yyyy.M.d  HH:mm"))&nbsp;&nbsp;&nbsp;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</a>
+@code {
+    [Parameter]
+    public VoteCardViewModel Model { get; set; }
+
+}

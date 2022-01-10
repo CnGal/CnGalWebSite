@@ -27,7 +27,30 @@ else
 {
     <div id="web_bg" style="background-image: url(@Model.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
 }
+<style>
+    .search-view .tab-Badge-color .line {
+        background: transparent;
+        transition: none;
+    }
 
+    .search-view .auto-complete {
+        width: 100%;
+    }
+
+    .search-view .div-shadow {
+        transition: all .6s ease;
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+        cursor: pointer;
+    }
+
+        .search-view .div-shadow:hover {
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
+        }
+
+    .search-view .shadow {
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+    }
+</style>
 @if (isNotFound == true)
 {
     int temp = 0;
@@ -35,8 +58,8 @@ else
 }
 else
 {
-    <div class="row">
-        <div class="col-12 @(IsLargeScreen?" col-xl-9":"")">
+    <div class="row search-view">
+        <div class="col-12 @(IsLargeScreen?" col-xl-6":"")">
             @if (isReady == false)
             {
                 <div style="padding-right: 0;padding-left: 0;">
@@ -66,15 +89,15 @@ else
 
                 }
 
-                <div class="  rounded shadow  bg-opacity pt-3 mb-4">
-                    <div class="row mt-2 ms-2 me-2" style="padding-right: 0;padding-left: 0;">
+                <div class="  rounded shadow  bg-opacity mb-2">
+                    <div>
 
                         @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
                         {
-                            <img class="col-12 col-md-12 col-lg-12 mt-1 mb-4" src="@Model.MainPicture" alt="@Model.Name">
+                            <img class="w-100" src="@Model.MainPicture" alt="@Model.Name">
                         }
-                        <div class="col-12 col-md-12 col-lg-12 mt-1 mb-2">
-                            <h1 class="fw-bold text-center mt-4 h3">@Model.Name</h1>
+                        <div class="mt-4 ms-3 me-3">
+                            <h1 class="fw-bold text-center h3">@Model.Name</h1>
 
                             <p class="text-center" style="color: gray;margin-top:20px">
                                 <i class="fa fa-eye fa-fw "></i>
@@ -93,45 +116,36 @@ else
                                 <span class="article-infor-text">@(Model.CollectedCount + "人拥有")&nbsp; &nbsp; &nbsp;</span>
 
                             </p>
-                        </div>
-                        <div class="col-12 col-md-12 col-lg-12">
                             <hr />
-                            <div class="mb-4 mt-4">
-                                @if (Model.IsEdit == true)
-                                {
+                            <div class="markdown-body">
+                                @((MarkupString)Model.BriefIntroduction)
+                            </div>
+                            <div class="pb-4">
+                                <div>
+                                    <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Periphery" Id="Model.Id" />
+                                </div>
 
-                                    @switch (Model.MainState)
-                                    {
-                                        case EditState.locked:
-                                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                                            break;
-                                        case EditState.Normal:
-                                            <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.Editable" Url="@("/peripheries/EditMain/" + Model.Id)"></AlertTip>
-                                            break;
-                                    }
-                                }
-                                @if (Model.MainState == EditState.Preview)
-                                {
-                                    <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditMain/" + Model.Id)" ExamineType="Operation.EditPeripheryMain" OnClickRevoke="OnRevoke"></AlertTip>
-                                }
-
-                                <PeripheryBasicInforTip Model="Model" />
-
-
-                                @if (IsLargeScreen == false)
-                                {
+                                <div class="mt-4">
                                     <PeripheryOperationTip IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" OnArticleClick="OnArticleClick" CollectedCount="Model.CollectedCount" IsCollected="Model.IsCollected"
-                                                           IsLargeSreeen="IsLargeScreen" IsNormalSreeen="IsNormalScreen" IsSmallSreeen="IsSmallScreen" IsFavorited="IsUserFavorited"></PeripheryOperationTip>
-                                }
+                                                           IsFavorited="IsUserFavorited"></PeripheryOperationTip>
+
+                                </div>
                             </div>
 
                         </div>
                     </div>
 
+
                 </div>
+                @if (IsLargeScreen == false)
+                {
+                    <div class="rounded shadow bg-opacity mb-2">
+                        <PeripheryBasicInforTip Model="Model" IsEdit="Model.IsEdit" State="Model.MainState" OnRevoke="OnRevoke" Id="Model.Id" />
+                    </div>
+                }
                 @if (Model.Pictures.Count != 0 || Model.IsEdit)
                 {
-                    <div class="mb-4">
+                    <div class="mb-2">
                         <PeripheryImagesViewTip Model="Model.Pictures" EditState="Model.ImagesState" IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" />
                     </div>
                 }
@@ -155,16 +169,15 @@ else
 
         @if (IsLargeScreen)
         {
-            <div class="col-xl-3">
+            <div class="col-xl-6">
+                <div class="rounded shadow bg-opacity mb-2">
+                    <PeripheryBasicInforTip Model="Model" IsEdit="Model.IsEdit" State="Model.MainState" OnRevoke="OnRevoke" Id="Model.Id" />
+                </div>
                 <div class="">
-                    <PeripheryListRelevancesViewTip Entries="Model.Entries" Peripheries="Model.Peripheries" IsNormalScreen="IsNormalScreen" RelatedEntriesState="Model.RelatedEntriesState" RelatedPeripheriesState="Model.RelatedPeripheriesState"
+                    <PeripheryListRelevancesViewTip Entries="Model.Entries" Peripheries="Model.Peripheries" RelatedEntriesState="Model.RelatedEntriesState" RelatedPeripheriesState="Model.RelatedPeripheriesState"
                                                     IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" Type="Model.Type" />
                 </div>
-                @if (IsLargeScreen)
-                {
-                    <PeripheryOperationTip IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" OnArticleClick="OnArticleClick" CollectedCount="Model.CollectedCount" IsCollected="Model.IsCollected"
-                                           IsLargeSreeen="IsLargeScreen" IsNormalSreeen="IsNormalScreen" IsSmallSreeen="IsSmallScreen" IsFavorited="IsUserFavorited"></PeripheryOperationTip>
-                }
+               
             </div>
         }
     </div>

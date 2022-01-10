@@ -4,10 +4,10 @@
             <h2 class="fw-bold pt-2 pb-2 m-0 font-color h5"><i class="fa fa-codepen"></i>&nbsp;&nbsp;参与投票的用户</h2>
         </div>
     </div>
-    <div class="row m-0">
+    <div class="row">
         @foreach (var item in Model.Users)
         {
-        <div class="@("col-12 col-md-6 p-0 pb-2 "+(temp?"ps-1":"pe-1"))">
+        <div class="@("col-12 pb-2")">
             <UserInforCard Model="item" />
         </div>
         temp=!temp;

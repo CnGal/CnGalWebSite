@@ -70,7 +70,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Peripheries
         /// </summary>
         public bool IsReprint { get; set; } = true;
         /// <summary>
-        /// 是否为可用物品
+        /// 是否为装饰品
         /// </summary>
         public bool IsAvailableItem { get; set; }
         #endregion

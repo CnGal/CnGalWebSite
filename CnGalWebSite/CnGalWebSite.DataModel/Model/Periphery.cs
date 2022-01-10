@@ -198,7 +198,7 @@ namespace CnGalWebSite.DataModel.Model
     }
     public enum PeripheryType
     {
-        [Display(Name = "其他")]
+        [Display(Name = "其他周边类型")]
         None,
         [Display(Name = "设定集或画册等")]
         SetorAlbumEtc,

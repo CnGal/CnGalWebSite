@@ -1,6 +1,7 @@
 ﻿@inject HttpClient Http
 @inject ExamineService _examineService
 @inject ToastService? ToastService
+@inject NavigationManager NavigationManager
 
 @if (DateTime.Now.ToCstTime() > Model.BeginTime && DateTime.Now.ToCstTime() < Model.EndTime)
 {
@@ -31,6 +32,8 @@
     public EventCallback OnReVoted { get; set; }
 
     public CheckboxState IsAnonymous { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
 
 
@@ -44,6 +47,13 @@
 
     public async Task OnClickVoted()
     {
+        //判断用户是否登录
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated == false)
+        {
+            NavigationManager.NavigateTo("account/apps/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+            return;
+        }
         try
         {
 

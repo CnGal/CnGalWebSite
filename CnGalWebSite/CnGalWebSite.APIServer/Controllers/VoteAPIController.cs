@@ -958,5 +958,62 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+
+        [AllowAnonymous]
+        [HttpGet("{type}/{id}")]
+        public async Task<ActionResult<List<VoteCardViewModel>>> GetRelatedVotesAsync(VoteOptionType type,long id)
+        {
+            var votes = new List<Vote>();
+            switch (type)
+            {
+                case VoteOptionType.Entry:
+                    var entry = await _entryRepository.GetAll().Include(s => s.Votes).ThenInclude(s=>s.VoteUsers).AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+                    if(entry == null)
+                    {
+                        return NotFound();
+                    }
+                    votes = entry.Votes.ToList();
+                    break;
+                case VoteOptionType.Article:
+                    var article = await _articleRepository.GetAll().Include(s => s.Votes).ThenInclude(s => s.VoteUsers).AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+                    if (article == null)
+                    {
+                        return NotFound();
+                    }
+                    votes = article.Votes.ToList();
+                    break;
+
+                case VoteOptionType.Periphery:
+                    var periphery = await _peripheryRepository.GetAll().Include(s => s.Votes).ThenInclude(s => s.VoteUsers).AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+                    if (periphery == null)
+                    {
+                        return NotFound();
+                    }
+                    votes = periphery.Votes.ToList();
+                    break;
+                default:
+                    return NotFound("无效的投票类型");
+            }
+
+
+            var model = new List<VoteCardViewModel>();
+
+            foreach (var item in votes)
+            {
+                var temp = new VoteCardViewModel
+                {
+                    BeginTime = item.BeginTime,
+                    EndTime = item.EndTime,
+                    BriefIntroduction = item.BriefIntroduction,
+                    Count = item.VoteUsers.Count,
+                    MainPicture = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                    Id = item.Id,
+                    Name = item.Name,
+                };
+                model.Add(temp);
+            }
+
+            return model;
+        }
     }
 }
