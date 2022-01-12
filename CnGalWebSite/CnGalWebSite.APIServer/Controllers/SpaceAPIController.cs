@@ -488,7 +488,14 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-
+            //检查重名
+            if(user.UserName!=model.UserName)
+            {
+                if(await _userRepository.GetAll().AnyAsync(s=>s.UserName == model.UserName))
+                {
+                    return new Result { Successful = false,Error="该用户名已被使用" };
+                }
+            }
 
 
             user.Birthday = model.Birthday;

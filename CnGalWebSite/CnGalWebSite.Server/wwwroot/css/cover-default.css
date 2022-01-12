@@ -28,6 +28,7 @@ del {
     background: #fadad7;
 }
 
+
 ins {
     background: #eaf2c2;
     color: #406619;
@@ -46,7 +47,9 @@ ins {
     width: 32px;
     height: 32px;
 }
-
+.layout.is-page .layout-right, .layout.is-page .layout-main {
+    background-color: #F5F6F7;
+}
 /*展示颜色样式*/
 .color1, .layout.is-page.color1 .layout-header {
     background-color: #5E9CFB;
