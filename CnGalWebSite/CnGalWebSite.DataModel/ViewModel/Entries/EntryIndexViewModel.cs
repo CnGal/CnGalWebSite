@@ -61,9 +61,9 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string DisambigName { get; set; }
 
         [Display(Name = "制作组")]
-        public string ProductionGroup { get; set; }
+        public List<StaffNameModel> ProductionGroups { get; set; } = new List<StaffNameModel>();
         [Display(Name = "发行商")]
-        public string Publisher { get; set; }
+        public List<StaffNameModel> Publishers { get; set; } = new List<StaffNameModel>();
 
         public EditState MainState { get; set; }
         public EditState MainPageState { get; set; }
@@ -199,11 +199,13 @@ namespace CnGalWebSite.DataModel.ViewModel
 
     public class StaffNameModel
     {
+        /// <summary>
+        /// 显示名称
+        /// </summary>
         public string DisplayName { get; set; }
 
-        public string RealName { get; set; }
+        public long Id { get; set; }
     }
-
 
     public class InformationsModel
     {

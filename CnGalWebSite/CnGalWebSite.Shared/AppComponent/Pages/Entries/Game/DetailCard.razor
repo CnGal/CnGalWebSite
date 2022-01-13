@@ -102,23 +102,33 @@
             }
 
         }
-        if (string.IsNullOrWhiteSpace(Model.Publisher) == false)
+        if (Model.Publishers.Count>0)
         {
+            var temp = "";
+            foreach(var item in Model.Publishers)
+            {
+                temp += (item.DisplayName + ",");
+            }
             Informations.Add(new Normal.BasicInforPairModel
             {
                 Name = "发行商",
-                Value = Model.Publisher,
+                Value = temp,
                 IsLink = true,
                 IsOutLink = false,
                 MultipleLines = true
             });
         }
-        if (string.IsNullOrWhiteSpace(Model.ProductionGroup) == false)
+        if (Model.ProductionGroups.Count > 0)
         {
+            var temp = "";
+            foreach (var item in Model.ProductionGroups)
+            {
+                temp += (item.DisplayName + ",");
+            }
             Informations.Add(new Normal.BasicInforPairModel
             {
                 Name = "制作组",
-                Value = Model.ProductionGroup,
+                Value = temp,
                 IsLink = true,
                 IsOutLink = false,
                 MultipleLines = true

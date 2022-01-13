@@ -89,7 +89,7 @@ else
 
                 }
 
-                <div class="  rounded shadow  bg-opacity mb-2">
+                <div class="  rounded shadow  bg-opacity mb-3">
                     <div>
 
                         @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
@@ -139,13 +139,13 @@ else
                 </div>
                 @if (IsLargeScreen == false)
                 {
-                    <div class="rounded shadow bg-opacity mb-2">
-                        <PeripheryBasicInforTip Model="Model" IsEdit="Model.IsEdit" State="Model.MainState" OnRevoke="OnRevoke" Id="Model.Id" />
+                    <div class="rounded shadow bg-opacity mb-3">
+                        <PeripheryBasicInforTip Model="Model" OnRevoke="OnRevoke" />
                     </div>
                 }
                 @if (Model.Pictures.Count != 0 || Model.IsEdit)
                 {
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <PeripheryImagesViewTip Model="Model.Pictures" EditState="Model.ImagesState" IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" />
                     </div>
                 }
@@ -170,8 +170,8 @@ else
         @if (IsLargeScreen)
         {
             <div class="col-xl-6">
-                <div class="rounded shadow bg-opacity mb-2">
-                    <PeripheryBasicInforTip Model="Model" IsEdit="Model.IsEdit" State="Model.MainState" OnRevoke="OnRevoke" Id="Model.Id" />
+                <div class="rounded shadow bg-opacity mb-3">
+                    <PeripheryBasicInforTip Model="Model"  OnRevoke="OnRevoke" />
                 </div>
                 <div class="">
                     <PeripheryListRelevancesViewTip Entries="Model.Entries" Peripheries="Model.Peripheries" RelatedEntriesState="Model.RelatedEntriesState" RelatedPeripheriesState="Model.RelatedPeripheriesState"

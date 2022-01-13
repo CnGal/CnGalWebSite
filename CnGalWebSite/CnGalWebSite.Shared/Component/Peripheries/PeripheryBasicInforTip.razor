@@ -1,24 +1,24 @@
 ﻿<div class=" ps-3 pe-3 pb-2 pt-2">
     <div class="">
-        <h2 class="fw-bold pb-3 m-0 font-color h5"><i class="fa fa-info-circle"></i>&nbsp;&nbsp;基础信息</h2>
+        <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-info-circle"></i>&nbsp;&nbsp;基础信息</h2>
     </div>
     <div>
-        @if (IsEdit == true)
+        @if (Model.IsEdit == true)
         {
 
-            @switch (State)
+            @switch (Model.MainState)
             {
                 case EditState.locked:
                     <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
                     break;
                 case EditState.Normal:
-                    <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.Editable" Url="@("/peripheries/EditMain/" + Id)"></AlertTip>
+                    <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.Editable" Url="@("/peripheries/EditMain/" + Model.Id)"></AlertTip>
                     break;
             }
         }
-        @if (State == EditState.Preview)
+        @if (Model.MainState == EditState.Preview)
         {
-            <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditMain/" + Id)" ExamineType="Operation.EditPeripheryMain" OnClickRevoke="OnRevoke"></AlertTip>
+            <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditMain/" + Model.Id)" ExamineType="Operation.EditPeripheryMain" OnClickRevoke="OnRevoke"></AlertTip>
         }
 
 
@@ -104,14 +104,9 @@
 
 </div>
 @code {
-    [Parameter]
-    public EditState State { get; set; }
+
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
-    [Parameter]
-    public long Id { get; set; }
-    [Parameter]
-    public bool  IsEdit { get; set; }
     [Parameter]
     public PeripheryViewModel Model { get; set; }
 

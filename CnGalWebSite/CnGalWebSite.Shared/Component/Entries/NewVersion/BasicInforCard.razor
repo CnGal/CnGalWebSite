@@ -1,0 +1,265 @@
+﻿@if (Model.IsEdit == true)
+{
+
+    @switch (Model.InforState)
+    {
+        case EditState.locked:
+            <div class="mb-3">
+
+                <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+            </div>
+            break;
+        case EditState.Normal:
+            @if (Model.Information.Count == 0)
+            {
+                <div class="rounded shadow bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
+                    <div class="">
+                        <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-info-circle"></i>&nbsp;&nbsp;基础信息</h2>
+                    </div>
+
+                    <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditAddInfor/"+Model.Id)"></AlertTip>
+                </div>
+            }
+            else
+            {
+                <div class="mb-3">
+
+                    <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditAddInfor/"+Model.Id)"></AlertTip>
+                </div>
+
+            }
+
+            break;
+    }
+
+}
+@if (Model.Information.Count == 0 && Model.InforState != EditState.Preview && Model.IsEdit == false)
+{
+    <div class="rounded shadow bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
+        <div class="">
+            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-info-circle"></i>&nbsp;&nbsp;基础信息</h2>
+        </div>
+
+
+        <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditAddInfor/"+Model.Id)"></AlertTip>
+    </div>
+}
+@if (Model.InforState == EditState.Preview)
+{
+    <div class="mb-3">
+
+        <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditAddInfor/" + Model.Id)" ExamineType="Operation.EstablishAddInfor" OnClickRevoke="OnRevoke"></AlertTip>
+    </div>
+}
+
+
+@if (Model.Information.Any(s => s.Modifier == "基本信息" && s.Informations.Any(s => s.DisplayName != "官网")))
+{
+    <div class="rounded shadow bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
+
+        <div class="">
+            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-info-circle"></i>&nbsp;&nbsp;基础信息</h2>
+        </div>
+        <div class="row">
+            @foreach (var item in Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations)
+            {
+                @if (item.DisplayName == "发行时间")
+                {
+                    @if (item.DisplayValue.Contains("预计"))
+                    {
+                        <BasicInforAloneTip Icon="fa-calendar-plus-o" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+
+                    }
+                    else
+                    {
+                        <BasicInforAloneTip Icon="fa-calendar-check-o" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+
+                    }
+                }
+                else if (item.DisplayName == "原作")
+                {
+                    <BasicInforAloneTip Icon=" fa-files-o" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+                else if (item.DisplayName == "官网" || item.DisplayName == "类型")
+                {
+
+                }
+                else if (item.DisplayName == "游戏平台")
+                {
+                    <BasicInforAloneTip Icon="fa-gamepad" Text="@item.DisplayValue" IsNormalScreen="IsNormalScreen" />
+                }
+
+                else if (item.DisplayName == "引擎")
+                {
+                    <BasicInforAloneTip Icon="fa-anchor" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+
+                }
+
+                else if (item.DisplayName == "发行方式")
+                {
+                    <BasicInforAloneTip Icon="fa-bullhorn" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+
+                else if (item.DisplayName == "QQ群")
+                {
+                    <BasicInforAloneTip Icon="fa-qq" Text="@item.DisplayValue" IsNormalScreen="IsNormalScreen" />
+                }
+
+                else if (item.DisplayName == "声优")
+                {
+                    <BasicInforAloneTip Icon="fa-microphone" Text="@("配音："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+
+                else if (item.DisplayName == "性别")
+                {
+                    @if (item.DisplayValue == "女")
+                    {
+                        <BasicInforAloneTip Icon="fa-venus" Text="@item.DisplayValue" IsNormalScreen="IsNormalScreen" />
+
+                    }
+                    else if (item.DisplayValue == "男")
+                    {
+                        <BasicInforAloneTip Icon="fa-mars" Text="@item.DisplayValue" IsNormalScreen="IsNormalScreen" />
+
+
+                    }
+                    else
+                    {
+                        <BasicInforAloneTip Icon="fa-genderless" Text="@item.DisplayValue" IsNormalScreen="IsNormalScreen" />
+                    }
+                }
+
+                else if (item.DisplayName == "身材数据")
+                {
+                    <BasicInforAloneTip Icon="fa-child" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+
+                else if (item.DisplayName == "身材(主观)")
+                {
+                    <BasicInforAloneTip Icon="fa-child" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+
+                }
+
+                else if (item.DisplayName == "生日")
+                {
+                    <BasicInforAloneTip Icon="fa-birthday-cake" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+
+                else if (item.DisplayName == "发色")
+                {
+                    <BasicInforAloneTip Icon="fa-circle" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+                else if (item.DisplayName == "瞳色")
+                {
+                    <BasicInforAloneTip Icon="fa-eye" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+
+                }
+                else if (item.DisplayName == "服饰")
+                {
+                    <BasicInforAloneTip Icon="fa-circle" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+                else if (item.DisplayName == "性格")
+                {
+                    <BasicInforAloneTip Icon="fa-circle" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+                else if (item.DisplayName == "角色身份")
+                {
+                    <BasicInforAloneTip Icon="fa-circle" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+                else if (item.DisplayName == "血型")
+                {
+                    <BasicInforAloneTip Icon="fa-circle" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+                else if (item.DisplayName == "身高")
+                {
+                    <BasicInforAloneTip Icon="fa-circle" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+                else if (item.DisplayName == "兴趣")
+                {
+                    <BasicInforAloneTip Icon="fa-circle" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+                else if (item.DisplayName == "年龄")
+                {
+                    <BasicInforAloneTip Icon="fa-fire" Text="@(item.DisplayName+"："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+                else if (item.DisplayName == "昵称（官方称呼）")
+                {
+                    <BasicInforAloneTip Icon="fa-vcard-o" Text="@("昵称："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+                else if (item.DisplayName == "别称")
+                {
+                    <BasicInforAloneTip Icon="fa-id-card" Text="@("别称："+item.DisplayValue)" IsNormalScreen="IsNormalScreen" />
+                }
+                else
+                {
+                    <BasicInforAloneTip Icon="fa-circle" Text="@(item.DisplayName+"：")" IsNormalScreen="IsNormalScreen" />
+                }
+            }
+        </div>
+    </div>
+}
+
+
+
+@if (Model.Information.Any(s => s.Modifier == "相关网站")
+|| (Model.Information.Any(s => s.Modifier == "基本信息") && Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网")))
+{
+    <div class="rounded shadow bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
+        <div class="">
+            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-link"></i>&nbsp;&nbsp;相关网站</h2>
+        </div>
+        <div class="row">
+            @if (Model.Information.Any(s => s.Modifier == "相关网站"))
+            {
+                @foreach (var item in Model.Information.FirstOrDefault(s => s.Modifier == "相关网站").Informations)
+                {
+                    @if (item.DisplayValue.Contains("bilibili.com"))
+                    {
+                        <BasicInforAloneTip Icon="fa-external-link-square" Text="B站：" Url="@item.DisplayValue" />
+                    }
+                    else if (item.DisplayValue.Contains("weibo.com"))
+                    {
+                        <BasicInforAloneTip Icon=" fa-weibo" Text="微博：" Url="@item.DisplayValue" />
+                    }
+                    else if (item.DisplayValue.Contains("youtube.com"))
+                    {
+                        <BasicInforAloneTip Icon="fa-youtube" Text="YouTube：" Url="@item.DisplayValue" />
+                    }
+                    else if (item.DisplayValue.Contains("twitter.com"))
+                    {
+                        <BasicInforAloneTip Icon="fa-twitter" Text="Twitter：" Url="@item.DisplayValue" />
+                    }
+                    else if (item.DisplayValue.Contains("facebook.com"))
+                    {
+                        <BasicInforAloneTip Icon="fa-facebook" Text="Facebook：" Url="@item.DisplayValue" />
+                    }
+                    else
+                    {
+                        <BasicInforAloneTip Icon=" fa-external-link-square" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" />
+                    }
+                }
+            }
+
+            @if (Model.Information.Any(s => s.Modifier == "基本信息"))
+            {
+                @if (Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))
+                {
+                    var item = Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.FirstOrDefault(s => s.DisplayName == "官网");
+                    <BasicInforAloneTip Icon="fa-coffee" Text="官网：" Url="@item.DisplayValue" />
+                }
+            }
+        </div>
+    </div>
+
+}
+@code {
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public bool IsNormalScreen { get; set; }
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+}

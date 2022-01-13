@@ -2,6 +2,7 @@
 @inject ExamineService _examineService
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 @if (DateTime.Now.ToCstTime() > Model.BeginTime && DateTime.Now.ToCstTime() < Model.EndTime)
 {
@@ -51,7 +52,16 @@
         var user = await authenticationStateTask;
         if (user.User.Identity.IsAuthenticated == false)
         {
-            NavigationManager.NavigateTo("account/apps/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+            if(_dataCacheService.IsApp==true)
+            {
+                NavigationManager.NavigateTo("account/apps/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+
+            }
+            else
+            {
+                NavigationManager.NavigateTo("account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+
+            }
             return;
         }
         try

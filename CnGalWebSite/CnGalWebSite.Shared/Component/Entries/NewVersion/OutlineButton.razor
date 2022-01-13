@@ -1,0 +1,68 @@
+﻿@inject ToastService ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+@if (IsTitile)
+{
+    <div class="@("badge me-2 bg-title bg-title-color-"+ColorNum)"
+         style="margin-top: 0px; margin-bottom: 5px; height: 25px; font-size: small; padding-top: 6px; font-weight: normal; ">
+        @Text
+    </div>
+}
+else
+{
+    @if (string.IsNullOrWhiteSpace(Url))
+    {
+        <div @onclick="OnClickNull"
+             class="@("btn me-2 bg-context-"+ColorNum)"
+             style="transition: all .6s ease; word-break: keep-all; margin-top: 0px; height: 25px; margin-bottom: 5px; font-size: small; padding-top: 2px; font-weight: normal; ">
+            @Text
+        </div>
+
+    }
+    else
+    {
+        <TabLink Text="@Text" Url="@Url" Icon="@Icon"
+                 class="@("btn me-2 bg-context-"+ColorNum)"
+                 style="transition: all .6s ease; word-break: keep-all; margin-top: 0px; height: 25px; margin-bottom: 5px; font-size: small; padding-top: 2px; font-weight: normal; ">
+            <span>@Text</span>
+            @if (IsShowExistTag)
+            {
+                <i class="fa fa-check-circle fa-fw"></i>
+            }
+        </TabLink>
+    }
+}
+
+
+@code {
+    [Parameter]
+    public bool IsTitile { get; set; }
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public string Url { get; set; }
+    [Parameter]
+    public string Icon { get; set; }
+    [Parameter]
+    public bool IsExist { get; set; }
+    [Parameter]
+    public bool IsShowExistTag { get; set; }
+
+    [Parameter]
+    public string ColorNum { get; set; }
+
+    public async Task OnClickNull()
+    {
+        if (IsShowExistTag)
+        {
+            NavigationManager.NavigateTo(Provider, "/entries/establishentry?Name=" + Text, "创建词条", "fa-pencil");
+        }
+        else
+        {
+            await ToastService.Error("该词条不存在", "你可以亲自创建“" + Text + "”哦~");
+
+        }
+
+    }
+}

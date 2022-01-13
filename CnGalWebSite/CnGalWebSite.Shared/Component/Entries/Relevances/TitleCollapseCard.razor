@@ -1,13 +1,13 @@
-﻿<div class=" rounded shadow  bg-opacity rounded ps-3 pe-3 pt-3 pb-3" style="display: flex; flex-direction: row; justify-content: space-between;">
-    <h2 class="fw-bold font-color h4" style="margin-bottom:auto;margin-top:auto;"><i class="@("fa  fa-fw "+Icon)"></i>&nbsp;&nbsp;@Title</h2>
+﻿<div class=" rounded shadow  bg-opacity rounded ps-3 pe-3 pt-2 pb-2" style="display: flex; flex-direction: row; justify-content: space-between;">
+    <h2 class="fw-bold font-color h5" style="margin-bottom:auto;margin-top:auto;"><i class="@("fa  fa-fw "+Icon)"></i>&nbsp;&nbsp;@Title</h2>
     @if (isCollapsed)
     {
-        <Button style=" width: 75px;" Color="Color.Dark" IsOutline="true" Icon="fa fa-chevron-right" Text="折叠" OnClick="@(()=>OnCollapseChanged(false))" />
+        <Button style=" width: 75px;" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-chevron-right" Text="折叠" OnClick="@(()=>OnCollapseChanged(false))" />
 
     }
     else
     {
-        <Button style=" width: 75px;" Color="Color.Dark" IsOutline="true" Icon="fa fa-chevron-down" Text="展开" OnClick="@(()=>OnCollapseChanged(true))" />
+        <Button style=" width: 75px;" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-chevron-down" Text="展开" OnClick="@(()=>OnCollapseChanged(true))" />
 
     }
 

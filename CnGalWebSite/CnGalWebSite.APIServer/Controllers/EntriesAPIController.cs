@@ -23,6 +23,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TencentCloud.Ame.V20190916.Models;
+using Nest;
+using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -246,22 +248,42 @@ namespace CnGalWebSite.APIServer.Controllers
             var information = new List<InformationsModel>();
             var issuleTime = "";
             var issuleTimeString = "";
+            if (tempInformation.Count > 0)
+            {
+                var Publisher = tempInformation.FirstOrDefault(s => s.DisplayName == "发行商")?.DisplayValue;
+                if (string.IsNullOrWhiteSpace(Publisher) == false)
+                {
+                    var temp = Publisher.Replace("，", ",").Replace("、", ",").Split(',');
+
+                    foreach (var item in temp)
+                    {
+                        model.Publishers.Add(new StaffNameModel
+                        {
+                            DisplayName = item,
+                        });
+                    }
+                }
+                var GroupVaule = tempInformation.FirstOrDefault(s => s.DisplayName == "制作组")?.DisplayValue;
+                if (string.IsNullOrWhiteSpace(GroupVaule) == false)
+                {
+                    var temp = GroupVaule.Replace("，", ",").Replace("、", ",").Split(',');
+
+                    foreach (var item in temp)
+                    {
+                        model.ProductionGroups.Add(new StaffNameModel
+                        {
+                            DisplayName = item,
+                        });
+                    }
+                }
+              
+            }
             foreach (var item in tempInformation)
             {
                 //判断
                 if (item.DisplayName == "性别")
                 {
                     item.DisplayValue = ((GenderType)Enum.Parse(typeof(GenderType), item.DisplayValue)).GetDisplayName();
-                }
-                else if (item.DisplayName == "制作组")
-                {
-                    model.ProductionGroup = item.DisplayValue;
-                    continue;
-                }
-                else if (item.DisplayName == "发行商")
-                {
-                    model.Publisher = item.DisplayValue;
-                    continue;
                 }
                 else if (item.DisplayName == "Steam平台Id")
                 {
@@ -283,6 +305,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 else if (item.DisplayName == "发行时间备注")
                 {
                     issuleTimeString = item.DisplayValue;
+                }
+                else if(item.DisplayName=="制作组"|| item.DisplayName == "发行商")
+                {
+                    continue;
                 }
 
                 var isAdd = false;
@@ -378,8 +404,6 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 //尝试获取staff的显示名称
                 var displayName = item.Additional.FirstOrDefault(s => s.DisplayName == "昵称（官方称呼）")?.DisplayValue;//(await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayValue && s.Type == EntryType.Staff))?.DisplayName ?? item.DisplayValue;
-                //读取需要的信息
-                var realName = item.Additional.FirstOrDefault(s => s.DisplayName == "昵称（官方称呼）")?.DisplayValue;
                 var mainModifier = "";
                 var secordModifier = item.Additional.FirstOrDefault(s => s.DisplayName == "职位（官方称呼）")?.DisplayValue;
                 foreach (var infor in item.Additional)
@@ -404,7 +428,6 @@ namespace CnGalWebSite.APIServer.Controllers
                                 temp.Names.Add(new StaffNameModel
                                 {
                                     DisplayName = displayName,
-                                    RealName = realName
                                 });
                                 isAdd = true;
                                 break;
@@ -422,7 +445,6 @@ namespace CnGalWebSite.APIServer.Controllers
                             temp.Names.Add(new StaffNameModel
                             {
                                 DisplayName = displayName,
-                                RealName = realName
                             });
                             infor.StaffList.Add(temp);
                             isAdd = true;
@@ -446,7 +468,6 @@ namespace CnGalWebSite.APIServer.Controllers
                     temp.StaffList[0].Names.Add(new StaffNameModel
                     {
                         DisplayName = displayName,
-                        RealName = realName
                     });
                     staffInforModel.Add(temp);
                 }
@@ -456,6 +477,36 @@ namespace CnGalWebSite.APIServer.Controllers
             if (staffInforModel[0].StaffList.Count == 0)
             {
                 staffInforModel.RemoveAt(0);
+            }
+
+
+            //为Staff匹配Id
+            List<StaffNameModel> staffRealNames = new List<StaffNameModel>();
+            staffRealNames.AddRange(model.Publishers);
+            staffRealNames.AddRange(model.ProductionGroups);
+            foreach (var item in staffInforModel)
+            {
+                foreach (var temp in item.StaffList)
+                {
+                    staffRealNames.AddRange(temp.Names);
+                }
+            }
+            
+            var staffRealIds = await _entryRepository.GetAll().AsNoTracking().Where(s => staffRealNames.Select(s=>s.DisplayName).Contains(s.Name)).Select(s => new
+            {
+                s.DisplayName,
+                s.Name,
+                s.Id
+            }).ToListAsync();
+
+            foreach(var item in staffRealIds)
+            {
+                var temp= staffRealNames.Where(s => s.DisplayName == item.Name).ToList();
+                foreach(var infor in temp)
+                {
+                    infor.DisplayName = item.DisplayName;
+                    infor.Id=item.Id;
+                }
             }
 
             //序列化图片列表
@@ -628,7 +679,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
                                 foreach (var infor in tempDatas)
                                 {
-                                    relevancesEntry.Add(_appHelper.GetEntryInforTipViewModel(infor));
+                                    var role = _appHelper.GetEntryInforTipViewModel(infor);
+                                    if(entry.Type==EntryType.Staff)
+                                    {
+                                        role.AddInfors.RemoveAll(s => s.Modifier == "配音");
+                                    }
+                                    relevancesEntry.Add(role);
                                 }
                             }
                             else

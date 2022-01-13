@@ -21,6 +21,30 @@ else
 {
     <TitleTip></TitleTip>
 }
+<style>
+    .search-view .tab-Badge-color .line {
+        background: transparent;
+        transition: none;
+    }
+
+    .search-view .auto-complete {
+        width: 100%;
+    }
+
+    .search-view .div-shadow {
+        transition: all .6s ease;
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+        cursor: pointer;
+    }
+
+        .search-view .div-shadow:hover {
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
+        }
+
+    .search-view .shadow {
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+    }
+</style>
 
 @{bool isFirst = true;}
 @if (string.IsNullOrWhiteSpace(EntryView.SmallBackgroundPicture) == false)
@@ -38,8 +62,8 @@ else
 }
 else
 {
-    <div class="row">
-        <div class=" @(IsLargeScreen && (EntryView.Type == EntryType.Game || EntryView.Type == EntryType.ProductionGroup) ? "col-xl-12 col-xxl-9" : "col-lg-12")">
+    <div class="row search-view">
+        <div class=" @(IsLargeScreen ? "col-xl-12 col-xxl-8" : "col-lg-12")">
             @if (isReady == false)
             {
                 <div class="  rounded shadow  bg-opacity pt-3">
@@ -98,292 +122,35 @@ else
                         这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
                     </div>
                 }
-                @if (EntryView.Type == EntryType.Game || EntryView.Type == EntryType.ProductionGroup)
+
+                <div class=" mb-3 ">
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" />
+                </div>
+                @if (IsLargeScreen == false)
                 {
-                    <div class="  rounded shadow  bg-opacity rounded  ps-4 pe-4 pt-3  mb-3">
-
-                        @if (EntryView.IsEdit == true)
-                        {
-
-                            @switch (EntryView.MainState)
-                            {
-                                case EditState.locked:
-                                    <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                                    break;
-                                case EditState.Normal:
-                                    <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditMain/" + @EntryView.Id)"></AlertTip>
-                                    break;
-                            }
-                        }
-                        @if (EntryView.MainState == EditState.Preview)
-                        {
-                            <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditMain/" + @EntryView.Id)" ExamineType="Operation.EstablishMain" OnClickRevoke="OnRevoke"></AlertTip>
-                        }
-
-                        <div class="row" style="padding-right: 0;padding-left: 0;">
-                            <div class="col-12 col-md-12 col-lg-5 pt-1 pb-4">
-                                <img style="width:100%;height:auto;" src="@EntryView.MainPicture" alt="@EntryView.Name">
-
-                            </div>
-                            <div class="col-12 col-md-12 col-lg-7 pt-1 pb-2">
-                                <h1 class="fw-bold h3">@EntryView.Name</h1>
-                                <div class="h4">
-
-                                    @if (string.IsNullOrWhiteSpace(EntryView.ProductionGroup) == false)
-                                    {
-                                        string[] productions = EntryView.ProductionGroup.Replace(",", "、").Replace("，", "、").Split('、');
-                                        <span class="badge  bg-title-pr  bg-title-color-pr  me-2">
-                                            制作组
-                                        </span>
-                                        @foreach (var temp in productions)
-                                        {
-                                            <TabLink Text="@temp" Url="@("/entries/index/" + ToolHelper.Base64EncodeName(temp))" Icon="fa fa-pencil-square"
-                                                     class="btn me-2 bg-title-pb bg-context-pr">@temp</TabLink>
-                                                }
-                                    }
-                                </div>
-                                <div class="h4" style="margin-top:-5px;margin-bottom:15px">
-                                    @if (string.IsNullOrWhiteSpace(EntryView.Publisher) == false)
-                                    {
-                                        string[] publishers = EntryView.Publisher.Replace(",", "、").Replace("，", "、").Split('、');
-                                        <span class="badge bg-title-pr bg-title-color-pb  me-2">
-                                            发行商
-                                        </span>
-                                        @foreach (var temp in publishers)
-                                        {
-                                            <TabLink Text="@temp" Url="@("/entries/index/" + ToolHelper.Base64EncodeName(temp))" Icon="fa fa-pencil-square"
-                                                     class="btn me-2 bg-title-pb bg-context-pb">@temp</TabLink>
-                                                }
-                                    }
-
-                                </div>
-                                <h6 style="font-size:15px;">@EntryView.BriefIntroduction</h6>
-                            </div>
+                    @if (EntryView.IsEdit == true && EntryView.Type == EntryType.Game)
+                    {
+                        <div class="col-12  mb-3">
+                            <EntryPerfectionInforTipView EntryId="@EntryView.Id" IsNormalScreen="true"></EntryPerfectionInforTipView>
                         </div>
-                    </div>
-
-                    if (IsLargeScreen == false)
-                    {
-                        @if (IsSmallScreen)
-                        {
-                            <div class="row">
-                                <div class="col-12 ">
-                                    <EntrySteamInforTip EntryId="@EntryView.Id" SteamId="EntryView.SteamId" OnOpenNewPage="OpenNewPage" EntryName="@EntryView.Name"
-                                                        IsNormalScreen="false" IsOutSide="true" IsHiddenLink="@EntryView.IsEdit"></EntrySteamInforTip>
-                                </div>
-
-                                @if (EntryView.IsEdit == true && EntryView.Type == EntryType.Game)
-                                {
-                                    <div class="col-12  mb-3">
-                                        <EntryPerfectionInforTipView EntryId="@EntryView.Id" IsNormalScreen="true"></EntryPerfectionInforTipView>
-                                    </div>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            @if (EntryView.IsEdit == true && EntryView.Type == EntryType.Game)
-                            {
-                                @if (EntryView.SteamId > 0)
-                                {
-                                    <div class="row">
-                                        <div class="col-12 col-lg-6">
-                                            <EntrySteamInforTip EntryId="@EntryView.Id" SteamId="EntryView.SteamId" OnOpenNewPage="OpenNewPage" EntryName="@EntryView.Name"
-                                                                IsNormalScreen="false" IsOutSide="true" IsHiddenLink="@EntryView.IsEdit"></EntrySteamInforTip>
-                                        </div>
-
-                                        <div class="col-12 col-lg-6 mb-3">
-                                            <EntryPerfectionInforTipView EntryId="@EntryView.Id" IsNormalScreen="true"></EntryPerfectionInforTipView>
-                                        </div>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="row">
-
-                                        <div class="col-12 mb-3">
-                                            <EntryPerfectionInforTipView EntryId="@EntryView.Id" IsNormalScreen="true"></EntryPerfectionInforTipView>
-                                        </div>
-                                    </div>
-                                }
-
-
-                            }
-                            else
-                            {
-                                <EntrySteamInforTip EntryId="@EntryView.Id" SteamId="EntryView.SteamId" OnOpenNewPage="OpenNewPage" EntryName="@EntryView.Name"
-                                                    IsNormalScreen="@IsNormalScreen" IsOutSide="true" IsHiddenLink="@EntryView.IsEdit"></EntrySteamInforTip>
-                            }
-
-                        }
-                        <EntryBasicInforTip EntryView="EntryView" IsLargeScreen="false" OnClickRevoke="OnRevoke"></EntryBasicInforTip>
                     }
-                    if (IsNormalScreen == true)
-                    {
-                        <EntryStaffInforTip EntryView="EntryView" IsLargeScreen="false"></EntryStaffInforTip>
-                    }
-                }
-                else
+                @if (EntryView.SteamId > 0)
                 {
-                    <div class="  rounded shadow  bg-opacity ps-4 pe-4 pt-3 mb-3">
-                        @if (EntryView.IsEdit == true)
-                        {
-
-                            @switch (EntryView.MainState)
-                            {
-                                case EditState.locked:
-                                    <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                                    break;
-                                case EditState.Normal:
-                                    <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditMain/" + @EntryView.Id)"></AlertTip>
-                                    break;
-
-                            }
-                        }
-                        @if (EntryView.MainState == EditState.Preview)
-                        {
-                            <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditMain/" + @EntryView.Id)" ExamineType="Operation.EstablishMain" OnClickRevoke="OnRevoke"></AlertTip>
-                        }
-
-
-
-                        <div class="row" style="padding-right: 0;padding-left: 0;">
-                            <div class="col-12 col-md-4 col-lg-3 mt-1 mb-4">
-                                <img style="width:100%;height:auto;" src="@EntryView.MainPicture">
-                            </div>
-                            <div class="col-12 col-md-8 col-lg-9 mt-1 mb-4">
-                                <h3 class="fw-bold">@EntryView.Name</h3>
-                                <h6>@EntryView.BriefIntroduction</h6>
-                                <hr />
-                                @if (EntryView.IsEdit == true)
-                                {
-                                    @switch (EntryView.InforState)
-                                    {
-                                        case EditState.locked:
-                                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                                            break;
-                                        case EditState.Normal:
-                                            @if (EntryView.Information.Count == 0)
-                                            {
-                                                <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
-                                            }
-                                            else
-                                            {
-                                                <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
-                                            }
-
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    @if (EntryView.Information.Count == 0)
-                                    {
-                                        <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
-                                    }
-                                }
-                                @if (EntryView.InforState == EditState.Preview)
-                                {
-                                    <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditAddInfor/" + @EntryView.Id)" ExamineType="Operation.EstablishAddInfor" OnClickRevoke="OnRevoke"></AlertTip>
-                                }
-
-
-                                @{ isFirst = true;}
-                                @foreach (var item in EntryView.Information)
-                                {
-                                    if (isFirst == true)
-                                    {
-                                        isFirst = false;
-                                    }
-                                    else
-                                    {
-                                        <hr />
-                                    }
-                                    <h5 class="fw-bold mb-2">@item.Modifier</h5>
-                                    <div class="row mt-2" style="padding-right: 0; padding-left: 0">
-                                        @foreach (var infor in item.Informations)
-                                        {
-                                            if (item.Modifier == "相关网站")
-                                            {
-                                                <div class="col-12 col-md-12 col-lg-12">
-                                                    <h6 style="word-wrap:break-word;word-break:break-all;">@(infor.DisplayName + "：")<a href="@infor.DisplayValue" target="_blank">@infor.DisplayValue</a></h6>
-                                                </div>
-                                            }
-                                            else if (item.Modifier == "STAFF")
-                                            {
-
-                                            }
-                                            else
-                                            {
-                                                string temp = infor.DisplayName + "：" + infor.DisplayValue;
-                                                <div class="col-12 col-md-12 col-lg-12">
-                                                    <h6 style="word-wrap:break-word;word-break:break-all;">@temp</h6>
-                                                </div>
-                                            }
-                                        }
-                                    </div>
-                                }
-                                <div>
-                                    @{ bool isFirstBadge = true;}
-                                    @foreach (var item in EntryView.Tags)
-                                    {
-                                        <button type="button" class="badge-btn btn btn-primary m-1  @(isFirstBadge ? "ms-0" : "")"
-                                                @onclick="@(() => { NavigationManager.NavigateTo("/tags/index/" + ToolHelper.Base64EncodeName(item.Name)); })">
-                                            @item.Name
-                                        </button>
-                                        isFirstBadge = false;
-                                    }
-                                    @if (EntryView.IsEdit == true)
-                                    {
-                                        @switch (EntryView.TagState)
-                                        {
-                                            case EditState.locked:
-                                                <button type="button" class="badge-btn btn btn-secondary m-1 @(isFirstBadge ? "ms-0" : "")">
-                                                    锁定
-                                                </button>
-                                                break;
-                                            case EditState.Preview:
-                                                <button type="button" class="badge-btn btn btn-warning m-1 @(isFirstBadge ? "ms-0" : "")"
-                                                        @onclick="@(() => { NavigationManager.NavigateTo("/entries/EditTags/" + EntryView.Id); })">
-                                                    预览
-                                                </button>
-                                                break;
-                                            case EditState.Normal:
-                                                @if (EntryView.Tags.Count == 0)
-                                                {
-                                                    <button type="button" class="badge-btn btn btn-success m-1 @(isFirstBadge ? "ms-0" : "")"
-                                                            @onclick="@(() => { NavigationManager.NavigateTo("/entries/EditTags/" + EntryView.Id);})">
-                                                        添加
-                                                    </button>
-                                                }
-                                                else
-                                                {
-                                                    <button type="button" class="badge-btn btn btn-primary m-1  @(isFirstBadge ? "ms-0" : "")"
-                                                            @onclick="@(() => { NavigationManager.NavigateTo("/entries/EditTags/" + EntryView.Id);})">
-                                                        编辑
-                                                    </button>
-                                                }
-
-                                                break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        @if (EntryView.Tags.Count == 0)
-                                        {
-                                            <button type="button" class="badge-btn btn btn-success m-1 @(isFirstBadge ? "ms-0" : "")"
-                                                    @onclick="@(() => { NavigationManager.NavigateTo("/entries/EditTags/" + EntryView.Id); })">
-                                                添加
-                                            </button>
-                                        }
-                                    }
-
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard IsNormalScreen="true" Model="EntryView" />
                 }
+
+
+                <div>
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
+                </div>
+            }
+
+
+                if (IsNormalScreen == true)
+                {
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" IsLargeScreen="false" />
+                }
+
 
                 <EntryTabViewTip Type="EntryView.Type" IsEdit="EntryView.IsEdit" RandomIndex="randomIndex" IsHidden="EntryView.IsHidden"
                                  OnTabClick="OnTabClick" IsSmallScreen="IsSmallScreen" IsFavorited="IsUserFavorited" DefaultIndex="defaultIndex"></EntryTabViewTip>
@@ -429,12 +196,7 @@ else
                                     }
 
 
-                                    <div class="markdown-body" style="margin-bottom:0px">
-                                        @((MarkupString)EntryView.MainPage)
-                                    </div>
-                                    <div>
-                                       <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Entry" Id="EntryView.Id"/>
-                                    </div>
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" IsLargeScreen="IsLargeScreen"/>
 
                                 </div>
                             </div>
@@ -495,7 +257,7 @@ else
                                             <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
                                             break;
                                         case EditState.Normal:
-                                            @if (EntryView.ArticleRelevances.Count == 0 && EntryView.EntryRelevances.Count == 0 && EntryView.OtherRelevances.Count == 0 && EntryView.StaffGames.Count == 0)
+                                            @if (EntryView.ArticleRelevances.Count == 0 && EntryView.EntryRelevances.Count == 0 && EntryView.OtherRelevances.Count == 0 && EntryView.StaffGames.Count == 0 && EntryView.Roles.Count == 0)
                                             {
                                                 <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
                                             }
@@ -509,7 +271,7 @@ else
                                 }
                                 else
                                 {
-                                    @if (EntryView.ArticleRelevances.Count == 0 && EntryView.EntryRelevances.Count == 0 && EntryView.OtherRelevances.Count == 0 && EntryView.StaffGames.Count == 0 && EntryView.RelevancesState != EditState.locked)
+                                    @if (EntryView.ArticleRelevances.Count == 0 && EntryView.EntryRelevances.Count == 0 && EntryView.OtherRelevances.Count == 0 && EntryView.StaffGames.Count == 0 && EntryView.Roles.Count == 0 && EntryView.RelevancesState != EditState.locked)
                                     {
                                         <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
                                     }
@@ -650,37 +412,45 @@ else
             }
         </div>
 
-        @if (IsLargeScreen && (EntryView.Type == EntryType.Game || EntryView.Type == EntryType.ProductionGroup))
+        @if (IsLargeScreen)
         {
-            <div class="col-xl-12 col-xxl-3">
-                @if (isReady)
-                {
-                    @if (EntryView.IsEdit == true && EntryView.Type == EntryType.Game)
-                    {
-                        <EntryPerfectionInforTipView EntryId="@EntryView.Id"></EntryPerfectionInforTipView>
-                    }
-                    @if (EntryView.SteamId != 0)
-                    {
-
-                        <EntrySteamInforTip EntryId="@EntryView.Id" SteamId="EntryView.SteamId" OnOpenNewPage="OpenNewPage" EntryName="@EntryView.Name" IsOutSide="true" IsHiddenLink="@EntryView.IsEdit"></EntrySteamInforTip>
-                    }
-                    <EntryBasicInforTip EntryView="EntryView" IsLargeScreen="true" OnClickRevoke="OnRevoke"></EntryBasicInforTip>
-                    <EntryStaffInforTip EntryView="EntryView" IsLargeScreen="true"></EntryStaffInforTip>
-                }
-                else
-                {
-                    <div class="  rounded shadow  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
-                        <SkeletonParagraph />
-                        <div class="mt-2">
-                        </div>
-                        <SkeletonParagraph />
-                        <div class="mt-2">
-                        </div>
-                        <SkeletonParagraph />
-                    </div>
-                }
-
+    <div class="col-xl-12 col-xxl-4">
+        @if (isReady)
+        {
+            @if (EntryView.IsEdit == true && EntryView.Type == EntryType.Game)
+            {
+                <EntryPerfectionInforTipView EntryId="@EntryView.Id"></EntryPerfectionInforTipView>
+            }
+            @if (EntryView.SteamId != 0)
+            {
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard IsNormalScreen="false" Model="EntryView" />
+            }
+            <div>
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
             </div>
+            @if (EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff)
+            {
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="EntryView" />
+            }
+            @if (EntryView.Type == EntryType.Game)
+            {
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" IsLargeScreen="true" />
+            }
+        }
+        else
+        {
+            <div class="  rounded shadow  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+            </div>
+        }
+
+    </div>
         }
     </div>
 }

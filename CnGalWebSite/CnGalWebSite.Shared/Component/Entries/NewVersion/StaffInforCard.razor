@@ -1,16 +1,15 @@
-﻿@if (EntryView.Staffs != null && EntryView.Staffs.Count != 0)
+﻿@if (Model.Staffs != null && Model.Staffs.Count != 0)
 {
-    <div class="  rounded shadow  ps-4 pe-4 pt-3 pb-3 mb-3 bg-opacity rounded">
+    <div class="  rounded shadow  ps-3 pe-3 pt-2 pb-2 mb-3 bg-opacity rounded">
         <div class="row">
             @if (IsSmallScreen == false)
             {
-                <h2 class="fw-bold col-12 bg-color-1 h4">
-                    STAFF
-                </h2>
-
+                <div class="">
+                    <h2 class="fw-bold pb-2 m-0 bg-color-1 h5"><i class="fa fa-sitemap"></i>&nbsp;&nbsp;STAFF</h2>
+                </div>
             }
             @{ int rx = 1;}
-            @foreach (var item in EntryView.Staffs)
+            @foreach (var item in Model.Staffs)
             {
                 bool isUsed = true;
 
@@ -24,9 +23,9 @@
                         rx = 1;
                     }
                     isUsed = true;
-                    <h5 class="fw-bold col-12 mt-2 @("bg-color-"+rx.ToString()) ">
+                    <h3 class="col-12 mt-2 h6 @("bg-color-"+rx.ToString()) ">
                         @item.Modifier
-                    </h5>
+                    </h3>
                 }
 
                 @foreach (var infor in item.StaffList)
@@ -43,15 +42,15 @@
                     {
                         isUsed = false;
                     }
-                    <div class="h4 col-12 col-sm-6 @(IsLargeScreen?" col-xl-12":"")">
-                        <span class="badge  fw-bold  bg-title  @("bg-title-color-"+rx.ToString())  me-2">
-                            @infor.Modifier
-                        </span>
+                    <div class="h4 col-12 col-sm-6 @(IsLargeScreen?" col-xl-12":"")" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
+
+                        <OutlineButton IsTitile="true" Text="@infor.Modifier" ColorNum="@rx.ToString()" />
+
                         @foreach (var temp in infor.Names)
                         {
-                            <TabLink Text="@temp.DisplayName" Url="@("/entries/index/" +temp.Id)" Icon="fa fa-pencil-square"
-                                     class="@("btn mb-2 me-2  bg-context-"+rx.ToString())" style="transition: all .6s ease; margin-top: 5px;">@temp.DisplayName</TabLink>
-                                }
+                            <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="@rx.ToString()" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
+                                           Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
+                        }
                     </div>
                 }
             }
@@ -63,7 +62,7 @@
 
 @code {
     [Parameter]
-    public EntryIndexViewModel EntryView { get; set; }
+    public EntryIndexViewModel Model { get; set; }
     [Parameter]
     public bool IsLargeScreen { get; set; }
     [Parameter]

@@ -1,0 +1,23 @@
+﻿@if (string.IsNullOrWhiteSpace(Url))
+{
+    <span class="@(IsNormalScreen?"col-12 col-md-6":(Text.Length>20?"col-12":"col-6" ) )">
+        <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text
+    </span>
+}
+else
+{
+<span class="col-12" style=" word-break: break-all;">
+    <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text<a href="@Url" target="_blank">@Url</a>
+</span>
+}
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public string Url { get; set; }
+    [Parameter]
+    public string Icon { get; set; }
+    [Parameter]
+    public bool IsNormalScreen { get; set; }
+}

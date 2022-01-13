@@ -1,0 +1,13 @@
+﻿<div class="rounded shadow bg-opacity rounded ps-3 pe-3 pb-3 pt-2 mb-3">
+    <div class="">
+        <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-paint-brush"></i>&nbsp;&nbsp;@(Model.Type==EntryType.Role? "立绘" : "主图")</h2>
+    </div>
+    <div>
+       <img src="@Model.MainPicture" alt="@Model.Name" style="width:100%"/>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+}

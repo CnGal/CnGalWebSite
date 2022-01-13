@@ -1,0 +1,74 @@
+﻿@inject HttpClient Http
+
+
+@if (IsReady)
+{
+    <div class="rounded shadow bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
+        <div class="">
+            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-steam"></i>&nbsp;&nbsp;Steam信息</h2>
+        </div>
+        <div class="row">
+            @if (SteamInfor.PriceNow > 0)
+            {
+                <div class="@(IsNormalScreen?"col-12 col-md-6":"col-12")">
+                    <BasicInforAloneTip Icon="fa-money" Text="@("当前价格："+SteamInfor.PriceNowString+( SteamInfor.CutNow==0?"": " - 折扣 "+SteamInfor.CutNow+"%"))" />
+                </div>
+                @if (SteamInfor.CutLowest > 0)
+                {
+                    <div class="@(IsNormalScreen?"col-12 col-md-6":"col-12")">
+                        <BasicInforAloneTip Icon="fa-area-chart" Text="@("历史最低："+SteamInfor.PriceLowestString+( SteamInfor.CutLowest==0?"": " - 折扣 "+SteamInfor.CutLowest+"%"))" />
+                    </div>
+                }
+            }
+            else if (SteamInfor.PriceNow == -1)
+            {
+                <div class="@(IsNormalScreen?"col-12 col-md-6":"col-12")">
+                    <BasicInforAloneTip Icon="fa-calendar-plus-o" Text="未发售" />
+                </div>
+
+            }
+            else if (SteamInfor.PriceNow == -2)
+            {
+                <div class="@(IsNormalScreen?"col-12 col-md-6":"col-12")">
+                    <BasicInforAloneTip Icon="fa-calendar-times-o" Text="已下架" />
+                </div>
+            }
+
+            <div class="col-12">
+                <BasicInforAloneTip Icon="fa-home" Text="商店页面：" Url="@("https://store.steampowered.com/app/" + Model.SteamId)" />
+            </div>
+        </div>
+    </div>
+}
+@code {
+    public SteamInfor SteamInfor { get; set; } = new SteamInfor();
+
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+
+    [Parameter]
+    public bool IsNormalScreen { get; set; } = false;
+
+    public bool IsReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (Model.SteamId == 0 || Model.Id == 0)
+            {
+                return;
+            }
+            SteamInfor = await Http.GetFromJsonAsync<SteamInfor>(ToolHelper.WebApiPath + "api/steam/Getsteaminfor/" + Model.SteamId + "/" + Model.Id);
+            IsReady = true;
+            StateHasChanged();
+        }
+        catch (Exception exc)
+        {
+            IsReady = true;
+            StateHasChanged();
+        }
+
+    }
+
+}
