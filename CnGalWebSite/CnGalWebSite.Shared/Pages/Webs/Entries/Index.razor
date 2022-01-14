@@ -524,6 +524,8 @@ else
 
     public bool IsUserFavorited { get; set; }
     public FavoriteFoldersViewModel UserFavoriteInfor { get; set; }
+
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
@@ -697,6 +699,7 @@ else
             if (user.Identity.IsAuthenticated)
             {
                 await GetUserIsFavorited();
+                await GetPlayedGameInfor();
             }
             //初始化动态时间线
             InitNewsTimeLine();
@@ -742,24 +745,6 @@ else
         {
             ErrorHandler.ProcessError(ex, "获取用户收藏夹失败");
         }
-    }
-
-    public async Task GetSteamInfor()
-    {
-        //继续尝试获取steam信息
-        if (EntryView.SteamId != 0)
-        {
-            try
-            {
-                steamInfor = await Http.GetFromJsonAsync<SteamInfor>(ToolHelper.WebApiPath + "api/steam/Getsteaminfor/" + EntryView.SteamId + "/" + EntryView.Id);
-            }
-            catch
-            {
-                steamInfor = null;
-            }
-
-        }
-
     }
 
     public Color GetColor(int index)
@@ -896,11 +881,30 @@ else
         {
             await OnUnFavoriteClick();
         }
+        else if(index==21)
+        {
+
+        }
         else
         {
             TabIndexNum = index;
         }
     }
+
+    public async Task GetPlayedGameInfor()
+    {
+        
+        try
+        {
+            GameInforModel = await Http.GetFromJsonAsync<PagedResultDto<PlayedGameInforModel>>(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameInfor/" + EntryView.Id);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取用户对该游戏记录信息失败");
+        }
+    }
+
 
     private async Task OnCommentPageClick(int pageIndex)
     {
@@ -921,19 +925,6 @@ else
     private async Task OnDeleted()
     {
         await OnCommentPageClick(ListComments.CurrentPage);
-    }
-    public async Task GetPlayedGameInforAsync()
-    {
-        try
-        {
-            //获取词条信息
-            GameInforModel = await Http.GetFromJsonAsync<PlayedGameInforModel>(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameInfor/" + EntryView.Id);
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取评分信息失败");
-        }
-
     }
 
 

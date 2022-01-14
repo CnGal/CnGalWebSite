@@ -262,22 +262,34 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
                 //查找
                 var steams = await _steamInforRepository.GetAll().Where(s => appids.Contains(s.SteamId)).ToListAsync();
-                var userGames = await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).Select(s => s.EntryId).ToListAsync();
-                //遍历列表并导入到已玩游戏
-                foreach (var item in steams)
+                var userGames = await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).ToListAsync();
+
+                //遍历列表更新已玩游戏信息
+                foreach (var item in userGames)
                 {
-                    if (item.EntryId != 0)
+                    var steamTemp= steams.FirstOrDefault(s=>s.EntryId==item.EntryId);
+                    if (steamTemp!=null)
                     {
-                        //查找用户是否拥有游戏
-                        if (userGames.Any(s => s == item.EntryId) == false)
-                        {
-                            await _playedGameRepository.InsertAsync(new PlayedGame
-                            {
-                                EntryId = item.EntryId,
-                                ApplicationUserId = user.Id
-                            });
-                        }
+                        item.IsInSteam = true;
+                        item.PlayDuration = steamGames.games.FirstOrDefault(s => s.appid == steamTemp.SteamId)?.playtime_forever ?? 0;
                     }
+                    else
+                    {
+                        item.IsInSteam = false;
+                    }
+                }
+
+                //添加新游戏
+                foreach(var item in steams.Where(s=>userGames.Select(s=>s.EntryId).Contains(s.EntryId) ==false))
+                {
+                    await _playedGameRepository.InsertAsync(new PlayedGame
+                    {
+                        IsInSteam = true,
+                        PlayDuration = steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0,
+                        EntryId = item.EntryId,
+                        Type = ((steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0)>0)?PlayedGameType.Played:PlayedGameType.WantToPlay,
+                        ApplicationUserId = user.Id,
+                    });
                 }
 
                 return true;

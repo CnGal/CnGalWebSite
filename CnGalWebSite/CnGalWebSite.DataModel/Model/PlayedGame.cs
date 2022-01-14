@@ -25,6 +25,18 @@ namespace CnGalWebSite.DataModel.Model
         /// 评分时间
         /// </summary>
         public DateTime ScoreTime { get; set; }
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public PlayedGameType Type { get; set; }
+        /// <summary>
+        /// 游玩时长 分钟
+        /// </summary>
+        public long PlayDuration { get; set; }
+        /// <summary>
+        /// 是否在Steam库中
+        /// </summary>
+        public bool IsInSteam { get; set; }
 
         public Entry Entry { get; set; }
         public int? EntryId { get; set; }
@@ -32,5 +44,17 @@ namespace CnGalWebSite.DataModel.Model
         public ApplicationUser ApplicationUser { get; set; }
         public string ApplicationUserId { get; set; }
 
+    }
+
+    public enum PlayedGameType
+    {
+        [Display(Name = "想玩")]
+        WantToPlay,
+        [Display(Name = "正在玩")]
+        Playing,
+        [Display(Name = "已玩")]
+        Played,
+        [Display(Name = "不感兴趣")]
+        Uninterested
     }
 }

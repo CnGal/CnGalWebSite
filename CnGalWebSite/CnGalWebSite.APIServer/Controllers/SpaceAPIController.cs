@@ -24,6 +24,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using CnGalWebSite.APIServer.Application.SteamInfors;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -43,6 +44,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IMessageService _messageService;
         private readonly IUserService _userService;
         private readonly IRankService _rankService;
+        private readonly ISteamInforService _steamInforService;
         private readonly IAppHelper _appHelper;
 
         public SpaceAPIController(IRepository<Message, int> messageRepository, IMessageService messageService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository,
@@ -500,6 +502,19 @@ namespace CnGalWebSite.APIServer.Controllers
 
             user.Birthday = model.Birthday;
             user.CanComment = model.CanComment;
+
+            //判断SteamId是否改变
+            if(model.SteamId!=user.SteamId)
+            {
+                user.SteamId = model.SteamId;
+                user= await _userRepository.UpdateAsync(user);
+                if(string.IsNullOrWhiteSpace( model.SteamId)==false)
+                {
+                    //更新游戏信息
+                    await _steamInforService.UpdateUserSteam(user);
+                }
+            }
+
             //user.IsShowFavotites = model.IsShowFavorites;
             //更新头衔是否显示
             await _rankService.UpdateUserRanksIsHidden(user, model.Ranks);
