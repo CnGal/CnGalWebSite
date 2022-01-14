@@ -896,7 +896,7 @@ else
         
         try
         {
-            GameInforModel = await Http.GetFromJsonAsync<PagedResultDto<PlayedGameInforModel>>(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameInfor/" + EntryView.Id);
+            GameInforModel = await Http.GetFromJsonAsync<PlayedGameInforModel>(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameInfor/" + EntryView.Id);
             StateHasChanged();
         }
         catch (Exception ex)

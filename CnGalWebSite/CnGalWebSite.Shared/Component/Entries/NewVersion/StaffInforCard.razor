@@ -5,7 +5,7 @@
             @if (IsSmallScreen == false)
             {
                 <div class="">
-                    <h2 class="fw-bold pb-2 m-0 bg-color-1 h5"><i class="fa fa-sitemap"></i>&nbsp;&nbsp;STAFF</h2>
+                    <h2 class="fw-bold pb-3 m-0 bg-color-1 h5"><i class="fa fa-sitemap"></i>&nbsp;&nbsp;STAFF</h2>
                 </div>
             }
             @{ int rx = 1;}
@@ -23,7 +23,7 @@
                         rx = 1;
                     }
                     isUsed = true;
-                    <h3 class="col-12 mt-2 h6 @("bg-color-"+rx.ToString()) ">
+                    <h3 class="col-12 h6 @("bg-color-"+rx.ToString()) ">
                         @item.Modifier
                     </h3>
                 }
@@ -42,7 +42,7 @@
                     {
                         isUsed = false;
                     }
-                    <div class="h4 col-12 col-sm-6 @(IsLargeScreen?" col-xl-12":"")" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
+                    <div class="h4 col-12 col-sm-6 mb-2 @(IsLargeScreen?" col-xl-12":"")" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
 
                         <OutlineButton IsTitile="true" Text="@infor.Modifier" ColorNum="@rx.ToString()" />
 
