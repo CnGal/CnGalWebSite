@@ -14,12 +14,12 @@
 
 <div class="">
     <div class="" style="padding-right: 0;padding-left: 0;">
-        <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+        <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
             不建议直接修改用户数据，请尝试和用户沟通后修改
         </div>
         @if (isReady == false)
         {
-            <div class="  rounded shadow  bg-opacity  ps-4 pe-4 pt-4 pb-4 mb-4">
+            <div class="  rounded shadow-sm  bg-opacity  ps-4 pe-4 pt-4 pb-4 mb-4">
                 <h3 class="text-truncate mb-4 fw-bold">编辑基本信息</h3>
                 <h5 class="text-truncate mb-4 fw-bold">当前用户：（Id:）</h5>
                 <hr>
@@ -39,7 +39,7 @@
                     <SkeletonParagraph />
                 </div>
             </div>
-            <div class="  rounded shadow  bg-opacity  ps-4 pe-4 pt-4 pb-4">
+            <div class="  rounded shadow-sm  bg-opacity  ps-4 pe-4 pt-4 pb-4">
                 <h3 class="text-truncate mb-4 fw-bold">编辑用户主页</h3>
                 <hr>
 
@@ -63,7 +63,7 @@
         else
         {
             <ValidateForm Model="@Model" ValidateAllProperties="true" @ref="ComplexForm">
-                <div class="  rounded shadow  bg-opacity  ps-4 pe-4 pt-4 pb-4 mb-4">
+                <div class="  rounded shadow-sm  bg-opacity  ps-4 pe-4 pt-4 pb-4 mb-4">
                     <h3 class="text-truncate mb-4 fw-bold">编辑基本信息</h3>
                     <h5 class="mb-4 fw-bold">当前用户 @Model.UserName：（Id：@Model.Id）</h5>
                     <hr />
@@ -125,7 +125,7 @@
                     </div>
                 </div>
             </ValidateForm>
-            <div class="  rounded shadow  bg-opacity  ps-4 pe-4 pt-4 pb-4 mb-4">
+            <div class="  rounded shadow-sm  bg-opacity  ps-4 pe-4 pt-4 pb-4 mb-4">
                 <h3 class="text-truncate mb-4 fw-bold">编辑用户主页</h3>
                 <hr class="mb-4" />
 
@@ -136,7 +136,7 @@
 
 
             </div>
-                <div class="  rounded shadow  bg-opacity  ps-4 pe-4 pt-4 pb-4 mb-4">
+                <div class="  rounded shadow-sm  bg-opacity  ps-4 pe-4 pt-4 pb-4 mb-4">
                     <div>
                         <h3 class="text-truncate mb-4 fw-bold">保存以上用户数据</h3>
                         <hr class="mb-4" />

@@ -72,7 +72,7 @@
 	padding: 0.5em 1em 0.5em 1em;
 	background-color: #2B81AF;
 	color: #FFF;
-	text-shadow: rgba(0, 0, 0, 0.5) 2px 2px 1px;
+	text-shadow-sm: rgba(0, 0, 0, 0.5) 2px 2px 1px;
 }
 
 #qunit-modulefilter-container {

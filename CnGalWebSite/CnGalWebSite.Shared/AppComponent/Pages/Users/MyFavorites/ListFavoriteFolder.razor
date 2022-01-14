@@ -12,7 +12,7 @@
     }
     else
     {
-        <HeadBar Title="收藏夹" IsShadow="true" OnClickGoBack="OnClickBack" OnClickEdit="OnManage" />
+        <HeadBar Title="收藏夹" Isshadow-sm="true" OnClickGoBack="OnClickBack" OnClickEdit="OnManage" />
         <div style=" margin-top: 60px; width: 100%;margin-bottom:65px;">
             <div class="ms-3 me-3">
                 @if (Model != null && Model.Favorites != null)
@@ -30,7 +30,7 @@
 }
 else
 {
-    <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="收藏夹" IsShadow="true" />
+    <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="收藏夹" Isshadow-sm="true" />
     <div>
         <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
     </div>

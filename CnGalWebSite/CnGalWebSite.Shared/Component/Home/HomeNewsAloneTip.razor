@@ -4,7 +4,7 @@
 
 <div style="display:flex;">
     <div  style="display: flex;align-items: center;" @onclick="@(() =>OnClickUser.InvokeAsync(Model))">
-        <img class="shadow -sm" src="@Model.Image" style="height: 50px;width: 50px;border-radius: 50%;" />
+        <img class="shadow-sm -sm" src="@Model.Image" style="height: 50px;width: 50px;border-radius: 50%;" />
     </div>
     <div  class="comment-tx-div" style=" flex: 1 1 auto; width: 0;" @onclick="@(()=>OnClickNews.InvokeAsync(Model))">
         <div  class="new-row-warp no-margin">

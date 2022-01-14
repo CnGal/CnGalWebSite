@@ -8,7 +8,7 @@
     {
         @if (Model.Peripheries.Count == 0)
         {
-            <div class="alert alert-success  rounded shadow  rounded" role="alert">
+            <div class="alert alert-success  rounded shadow-sm  rounded" role="alert">
                 此部分还没有任何内容，你可以尝试<TabLink Text="创建周边" Url="/peripheries/createperiphery" Icon="fa fa-edit" class="alert-link">添加</TabLink>
             </div>
         }
@@ -16,7 +16,7 @@
         {
             if (IsEdit)
             {
-                <div class="alert alert-primary  rounded shadow  rounded" role="alert">
+                <div class="alert alert-primary  rounded shadow-sm  rounded" role="alert">
                     编辑词周边需要到对应周边页面进行编辑哦
                 </div>
             }

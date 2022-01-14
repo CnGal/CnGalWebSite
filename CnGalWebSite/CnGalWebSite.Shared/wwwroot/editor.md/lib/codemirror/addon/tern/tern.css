@@ -63,9 +63,9 @@
   max-width: 40em;
   position: absolute;
   z-index: 10;
-  -webkit-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-  -moz-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-  box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+  -webkit-box-shadow-sm: 2px 3px 5px rgba(0,0,0,.2);
+  -moz-box-shadow-sm: 2px 3px 5px rgba(0,0,0,.2);
+  box-shadow-sm: 2px 3px 5px rgba(0,0,0,.2);
 
   transition: opacity 1s;
   -moz-transition: opacity 1s;

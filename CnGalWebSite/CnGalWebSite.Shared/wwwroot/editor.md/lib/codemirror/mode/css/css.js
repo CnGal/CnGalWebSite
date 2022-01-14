@@ -421,7 +421,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
     "border-spacing", "border-style", "border-top", "border-top-color",
     "border-top-left-radius", "border-top-right-radius", "border-top-style",
     "border-top-width", "border-width", "bottom", "box-decoration-break",
-    "box-shadow", "box-sizing", "break-after", "break-before", "break-inside",
+    "box-shadow-sm", "box-sizing", "break-after", "break-before", "break-inside",
     "caption-side", "clear", "clip", "color", "color-profile", "column-count",
     "column-fill", "column-gap", "column-rule", "column-rule-color",
     "column-rule-style", "column-rule-width", "column-span", "column-width",
@@ -471,7 +471,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
     "text-decoration-color", "text-decoration-line", "text-decoration-skip",
     "text-decoration-style", "text-emphasis", "text-emphasis-color",
     "text-emphasis-position", "text-emphasis-style", "text-height",
-    "text-indent", "text-justify", "text-outline", "text-overflow", "text-shadow",
+    "text-indent", "text-justify", "text-outline", "text-overflow", "text-shadow-sm",
     "text-size-adjust", "text-space-collapse", "text-transform", "text-underline-position",
     "text-wrap", "top", "transform", "transform-origin", "transform-style",
     "transition", "transition-delay", "transition-duration",
@@ -493,8 +493,8 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
   ], propertyKeywords = keySet(propertyKeywords_);
 
   var nonStandardPropertyKeywords_ = [
-    "scrollbar-arrow-color", "scrollbar-base-color", "scrollbar-dark-shadow-color",
-    "scrollbar-face-color", "scrollbar-highlight-color", "scrollbar-shadow-color",
+    "scrollbar-arrow-color", "scrollbar-base-color", "scrollbar-dark-shadow-sm-color",
+    "scrollbar-face-color", "scrollbar-highlight-color", "scrollbar-shadow-sm-color",
     "scrollbar-3d-light-color", "scrollbar-track-color", "shape-inside",
     "searchfield-cancel-button", "searchfield-decoration", "searchfield-results-button",
     "searchfield-results-decoration", "zoom"
@@ -547,7 +547,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
     "avoid-region", "background", "backwards", "baseline", "below", "bidi-override", "binary",
     "bengali", "blink", "block", "block-axis", "bold", "bolder", "border", "border-box",
     "both", "bottom", "break", "break-all", "break-word", "bullets", "button", "button-bevel",
-    "buttonface", "buttonhighlight", "buttonshadow", "buttontext", "calc", "cambodian",
+    "buttonface", "buttonhighlight", "buttonshadow-sm", "buttontext", "calc", "cambodian",
     "capitalize", "caps-lock-indicator", "caption", "captiontext", "caret",
     "cell", "center", "checkbox", "circle", "cjk-decimal", "cjk-earthly-branch",
     "cjk-heavenly-stem", "cjk-ideographic", "clear", "clip", "close-quote",
@@ -621,8 +621,8 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
     "table-footer-group", "table-header-group", "table-row", "table-row-group",
     "tamil",
     "telugu", "text", "text-bottom", "text-top", "textarea", "textfield", "thai",
-    "thick", "thin", "threeddarkshadow", "threedface", "threedhighlight",
-    "threedlightshadow", "threedshadow", "tibetan", "tigre", "tigrinya-er",
+    "thick", "thin", "threeddarkshadow-sm", "threedface", "threedhighlight",
+    "threedlightshadow-sm", "threedshadow-sm", "tibetan", "tigre", "tigrinya-er",
     "tigrinya-er-abegede", "tigrinya-et", "tigrinya-et-abegede", "to", "top",
     "trad-chinese-formal", "trad-chinese-informal",
     "translate", "translate3d", "translateX", "translateY", "translateZ",

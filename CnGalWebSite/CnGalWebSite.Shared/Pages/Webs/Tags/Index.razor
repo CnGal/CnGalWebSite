@@ -17,14 +17,14 @@
 
 <div class="">
     <div class="" style="padding-right: 0; padding-left: 0">
-        <div class="alert alert-success  rounded shadow  rounded" role="alert">
+        <div class="alert alert-success  rounded shadow-sm  rounded" role="alert">
             没有找到想要的标签？ 你可以在这<a class="alert-link" @onclick="OnCreate">创建</a>任何符合规范的标签
         </div>
 
-        <div class=" rounded shadow  bg-opacity rounded pt-3 ps-3 pe-3 mb-3" style=" padding-bottom: 1px; font-size: larger;">
+        <div class=" rounded shadow-sm  bg-opacity rounded pt-3 ps-3 pe-3 mb-3" style=" padding-bottom: 1px; font-size: larger;">
             <TagHeadNavTip TagList="Model.Taglevels" />
         </div>
-        <div class=" rounded shadow  bg-opacity rounded p-4 pb-0 mb-4">
+        <div class=" rounded shadow-sm  bg-opacity rounded p-4 pb-0 mb-4">
             @if (Model.IsEdit == true)
             {
 

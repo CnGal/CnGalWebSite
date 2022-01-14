@@ -49,7 +49,7 @@
 
                     @if (isReady == false)
                     {
-                        <div class="rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+                        <div class="rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
                             <div>
                                 <SkeletonParagraph />
                                 <div class="mt-2">
@@ -71,7 +71,7 @@
                     {
                 <div class="tab-content" id="@("pills"+randomIndex+"-tabContent")">
                     <div class="@("tab-pane fade"+(defaultIndex==1?"show active":"") )" id="@("pills"+randomIndex+"-1")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-1-tab")">
-                        <div class="rounded  rounded shadow  p-4 bg-opacity">
+                        <div class="rounded  rounded shadow-sm  p-4 bg-opacity">
                             <div>
                                 @if (Model.IsCurrentUser == true)
                                 {
@@ -89,7 +89,7 @@
                         </div>
                     </div>
                     <div class="@("tab-pane fade"+(defaultIndex==0?" show active ":"") )" id="@("pills"+randomIndex+"-0")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-0-tab")">
-                        <div class="rounded  rounded shadow  p-4 bg-opacity">
+                        <div class="rounded  rounded shadow-sm  p-4 bg-opacity">
                             <CalendarHeatmapTip BeforeTreatmentDate="Model.SignInDaysList" ShowTip="false"></CalendarHeatmapTip>
                             <div class="mt-4 mb-1" style="display: flex; justify-content: center;">
                                 @if (Model.IsCurrentUser == true)
@@ -115,7 +115,7 @@
                         </div>
                     </div>
                     <div class="@("tab-pane fade"+(defaultIndex==2?" show active ":"") )" id="@("pills"+randomIndex+"-2")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-2-tab")">
-                        <div class="rounded  rounded shadow  p-4 bg-opacity">
+                        <div class="rounded  rounded shadow-sm  p-4 bg-opacity">
                             <div>
                                 <p class="text-center" style="font-size: large; font-weight: bold;">编辑概览</p>
                                 <CalendarHeatmapTip BeforeTreatmentDate="Model.EditCountList"></CalendarHeatmapTip>
@@ -132,7 +132,7 @@
                         </div>
                     </div>
                     <div class="@("tab-pane fade"+(defaultIndex==3?" show active ":"") )" id="@("pills"+randomIndex+"-3")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-3-tab")">
-                        <div class="rounded  rounded shadow  p-4 bg-opacity">
+                        <div class="rounded  rounded shadow-sm  p-4 bg-opacity">
                             <div>
 
                                 <h5 class="fw-bold mb-3">基本信息</h5>
@@ -202,7 +202,7 @@
                         </div>
                     </div>
                     <div class="@("tab-pane fade"+(defaultIndex==4?" show active ":"") )" id="@("pills"+randomIndex+"-4")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-4-tab")">
-                        <div class="rounded  rounded shadow  p-4 bg-opacity">
+                        <div class="rounded  rounded shadow-sm  p-4 bg-opacity">
                             <div style="overflow-x: auto; overflow-y: auto;">
                                 <table class="table">
                                     <thead>

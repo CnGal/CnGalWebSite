@@ -12,7 +12,7 @@
         case EditState.Normal:
             @if (Model.Information.Count == 0)
             {
-                <div class="rounded shadow bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
+                <div class="rounded shadow-sm bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
                     <div class="">
                         <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-info-circle"></i>&nbsp;&nbsp;基础信息</h2>
                     </div>
@@ -35,7 +35,7 @@
 }
 @if (Model.Information.Count == 0 && Model.InforState != EditState.Preview && Model.IsEdit == false)
 {
-    <div class="rounded shadow bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
+    <div class="rounded shadow-sm bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
         <div class="">
             <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-info-circle"></i>&nbsp;&nbsp;基础信息</h2>
         </div>
@@ -55,7 +55,7 @@
 
 @if (Model.Information.Any(s => s.Modifier == "基本信息" && s.Informations.Any(s => s.DisplayName != "官网")))
 {
-    <div class="rounded shadow bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
+    <div class="rounded shadow-sm bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
 
         <div class="">
             <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-info-circle"></i>&nbsp;&nbsp;基础信息</h2>
@@ -204,7 +204,7 @@
 @if (Model.Information.Any(s => s.Modifier == "相关网站")
 || (Model.Information.Any(s => s.Modifier == "基本信息") && Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网")))
 {
-    <div class="rounded shadow bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
+    <div class="rounded shadow-sm bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
         <div class="">
             <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-link"></i>&nbsp;&nbsp;相关网站</h2>
         </div>

@@ -21,12 +21,12 @@ else
 <div class="">
     <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
     <AlertTip Type="AlertTip.AlertTipType.EntryStandard"></AlertTip>
-    <div class="alert alert-success  rounded shadow  rounded" role="alert">
+    <div class="alert alert-success  rounded shadow-sm  rounded" role="alert">
         可以在这里填写遗漏的信息、游戏的剧情、人物的性格......这个页面将会成为词条主页中最大版面的部分
     </div>
     @if (isReady == false)
     {
-        <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
             <h3 class="text-truncate mb-4 fw-bold">编辑主页</h3>
             <h5 class=" mb-4 fw-bold">当前词条：（Id:）</h5>
             <hr>
@@ -52,7 +52,7 @@ else
     {
         @if (Model.Type == EntryType.Staff)
         {
-            <div class="alert alert-danger  rounded shadow  rounded" role="alert">
+            <div class="alert alert-danger  rounded shadow-sm  rounded" role="alert">
                 这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
             </div>
         }
@@ -60,7 +60,7 @@ else
         {
 
         }
-        <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-3">
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-3">
             <h3 class="text-truncate mb-4 fw-bold">编辑主页</h3>
             <h5 class="text-truncate mb-4 fw-bold">当前词条：@Model.Name（Id:@Model.Id）</h5>
             <hr class="mb-4" />
@@ -71,7 +71,7 @@ else
 
             }
         </div>
-        <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
             <div>
                 <ValidateForm Model="@Model">
                     <BootstrapBlazor.Components.Textarea @bind-Value="Model.Note" DisplayText="备注" />

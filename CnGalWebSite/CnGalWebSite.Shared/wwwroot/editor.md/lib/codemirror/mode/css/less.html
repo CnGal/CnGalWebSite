@@ -90,8 +90,8 @@ fieldset span button, fieldset span input[type="file"] {
   height: 42px;
   border-top: 2px solid lighten(@alpha-blue, 20%);
   border-bottom: 2px solid darken(@alpha-blue, 25%);
-  .box-shadow(0, 1px, 8px, 0.6);
-  -moz-box-shadow: 0 0 0 #000; // Because firefox sucks.
+  .box-shadow-sm(0, 1px, 8px, 0.6);
+  -moz-box-shadow-sm: 0 0 0 #000; // Because firefox sucks.
 
   &.docked {
     background-color: hsla(210, 60%, 40%, 0.4);
@@ -134,7 +134,7 @@ fieldset span button, fieldset span input[type="file"] {
       }
     }
     .border-radius(5px, bottom);
-    .box-shadow(0, 6px, 8px, 0.5);
+    .box-shadow-sm(0, 6px, 8px, 0.5);
   }
 }
 </textarea></form>

@@ -16,7 +16,7 @@
         <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
         <AlertTip Type="AlertTip.AlertTipType.ArticleStandard"></AlertTip>
         <ValidateForm Model="@Model" ValidateAllProperties="true" @ref="ComplexForm">
-            <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
                 <h3 class="text-truncate mb-4 fw-bold">填写主要信息</h3>
                 <hr />
 
@@ -69,7 +69,7 @@
                                 <hr />
                             </div>
                             <div class="col-12">
-                                <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+                                <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
                                     请选择该动态发生时的真实时间，我们会据此生成时间轴
                                 </div>
                             </div>
@@ -99,7 +99,7 @@
 
             </div>
         </ValidateForm>
-        <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
             <h3 class="text-truncate mb-4 fw-bold">编辑正文</h3>
             <hr class="mb-4" />
 
@@ -110,10 +110,10 @@
 
 
         </div>
-        <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+        <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
             我们会根据名称自动关联词条。未填写的词条将会自动忽略，不需要手动删除
         </div>
-        <div class=" rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+        <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
             <h3 class="text-truncate mb-4 fw-bold">
                 添加关联词条
             </h3>
@@ -131,15 +131,15 @@
             <InputOtherLinkListTip Model="Model.others" Title="自定义链接"></InputOtherLinkListTip>
         </div>
 
-        <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+        <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
             当你点击“完成”按钮时，将会立即发起审核请求，请在点击前确保内容正确无误
         </div>
-        <div class="alert alert-success  rounded shadow  rounded" role="alert">
+        <div class="alert alert-success  rounded shadow-sm  rounded" role="alert">
             你不需要一次性把文章写完，可以在醒目位置备注“延迟审核”，在提交后慢慢修改
         </div>
         <ValidateForm Model="@Model" ValidateAllProperties="true">
 
-            <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
+            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
                 <div>
                     <BootstrapBlazor.Components.Textarea @bind-Value="Model.Note" DisplayText="备注" />
                     <Button class="mt-3" style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>

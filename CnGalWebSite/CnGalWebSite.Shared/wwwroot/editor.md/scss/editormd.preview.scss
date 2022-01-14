@@ -161,7 +161,7 @@
                 background: #fff;
                 border: 1px solid #ddd;
                 @include border-radius(4px);
-                @include box-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+                @include box-shadow-sm(0 3px 5px rgba(0, 0, 0, 0.2));
 
                 > li ul {
                     width: 100%;
@@ -192,7 +192,7 @@
                     top: 32px;
                     left: 10%;
                     display: none;
-                    @include box-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+                    @include box-shadow-sm(0 3px 5px rgba(0, 0, 0, 0.2));
 
                     &:before, &:after {
                         pointer-events: pointer-events;

@@ -27,30 +27,7 @@ else
 {
     <div id="web_bg" style="background-image: url(@Model.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
 }
-<style>
-    .search-view .tab-Badge-color .line {
-        background: transparent;
-        transition: none;
-    }
 
-    .search-view .auto-complete {
-        width: 100%;
-    }
-
-    .search-view .div-shadow {
-        transition: all .6s ease;
-        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
-        cursor: pointer;
-    }
-
-        .search-view .div-shadow:hover {
-            box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
-        }
-
-    .search-view .shadow {
-        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
-    }
-</style>
 @if (isNotFound == true)
 {
     int temp = 0;
@@ -58,12 +35,12 @@ else
 }
 else
 {
-    <div class="row search-view">
+    <div class="row">
         <div class="col-12 @(IsLargeScreen?" col-xl-6":"")">
             @if (isReady == false)
             {
                 <div style="padding-right: 0;padding-left: 0;">
-                    <div class="  rounded shadow  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                    <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
                         <SkeletonParagraph />
                         <hr class="m-2" />
                         <SkeletonParagraph />
@@ -83,13 +60,13 @@ else
             {
                 @if (Model.IsHidden == true)
                 {
-                    <div class="alert alert-info  rounded shadow  rounded" role="alert">
+                    <div class="alert alert-info  rounded shadow-sm  rounded" role="alert">
                         当前周边处于隐藏状态，如果你看到了这个提示，请立即联系管理员
                     </div>
 
                 }
 
-                <div class="  rounded shadow  bg-opacity mb-3">
+                <div class="  rounded shadow-sm  bg-opacity mb-3">
                     <div>
 
                         @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
@@ -139,7 +116,7 @@ else
                 </div>
                 @if (IsLargeScreen == false)
                 {
-                    <div class="rounded shadow bg-opacity mb-3">
+                    <div class="rounded shadow-sm bg-opacity mb-3">
                         <PeripheryBasicInforTip Model="Model" OnRevoke="OnRevoke" />
                     </div>
                 }
@@ -170,7 +147,7 @@ else
         @if (IsLargeScreen)
         {
             <div class="col-xl-6">
-                <div class="rounded shadow bg-opacity mb-3">
+                <div class="rounded shadow-sm bg-opacity mb-3">
                     <PeripheryBasicInforTip Model="Model"  OnRevoke="OnRevoke" />
                 </div>
                 <div class="">

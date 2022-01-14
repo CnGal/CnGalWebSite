@@ -13,7 +13,7 @@
 
 <div class="">
     <div class="" style="padding-right: 0;padding-left: 0;">
-        <div class="  rounded shadow  bg-opacity p-3">
+        <div class="  rounded shadow-sm  bg-opacity p-3">
             <h3 class="fw-bold text-center">互联网档案馆备份版块</h3>
             <p class="text-center" style="color: gray;margin-top:20px">
                 <i class="fa fa-close fa-fw "></i>
@@ -27,7 +27,7 @@
         </div>
 
         <div class="mt-3" style="padding-right: 0;padding-left: 0;">
-            <div class=" rounded shadow -lg p-4 bg-opacity">
+            <div class=" rounded shadow-sm -lg p-4 bg-opacity">
                 <Table TItem="ListBackUpArchiveAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
                        ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true IsAutoRefresh="@IsAutoRefresh"
                        ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">

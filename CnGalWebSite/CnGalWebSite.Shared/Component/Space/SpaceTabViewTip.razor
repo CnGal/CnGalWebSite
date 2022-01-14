@@ -1,5 +1,5 @@
 ﻿@if (IsSmallSreeen)
-{<div class=" rounded shadow  bg-opacity">
+{<div class=" rounded shadow-sm  bg-opacity">
      <ul class="row nav" style="margin:0px" id="pills-tab" role="tablist">
          <EntryTabAloneTip Icon="fa-home" Index="1" OnTabClick="OnClick" Text="介绍" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
          @if (IsCurrentUser)
@@ -29,7 +29,7 @@
 }
 else
 {
-    <div class=" rounded shadow  bg-opacity">
+    <div class=" rounded shadow-sm  bg-opacity">
         <ul class="list-group list-group-flush nav" id="pills-tab" role="tablist">
             <SpaceTabAloneTip Icon="fa-home" Index="1" OnTabClick="OnClick" Text="介绍" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
             @if (IsCurrentUser)

@@ -158,7 +158,7 @@ html {
     display: none;
 }
 .layout.is-page .layout-side {
-    box-shadow: 0 14px 28px rgba(255,255,255,.25), 0 10px 10px rgba(255,255,255,.22);
+    box-shadow: none;
 }
 .layout.is-page .layout-user-state {
     background-color: white;

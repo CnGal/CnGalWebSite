@@ -22,16 +22,16 @@ else
 
         <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
         <AlertTip Type="AlertTip.AlertTipType.EntryStandard"></AlertTip>
-        <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+        <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
             请尽量填写此部分，我们会根据名称动态关联词条，即使词条此时并不存在也可以填写，只要你确保会在未来创建
         </div>
 
-        <div class="alert alert-warning  rounded shadow  rounded" role="alert">
+        <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
             未填写的词条将会自动忽略，不需要手动删除
         </div>
         @if (Model.Type == EntryType.Staff)
         {
-            <div class="alert alert-danger  rounded shadow  rounded" role="alert">
+            <div class="alert alert-danger  rounded shadow-sm  rounded" role="alert">
                 这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
             </div>
         }
@@ -41,7 +41,7 @@ else
         }
         @if (isReady == false)
         {
-            <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
                 <h3 class="text-truncate mb-4 fw-bold">编辑关联词条</h3>
                 <h5 class="mb-4 fw-bold">当前词条：（Id:）</h5>
                 <hr>
@@ -63,7 +63,7 @@ else
         else
         {
 
-            <div class=" rounded shadow  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-3">
+            <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-3">
                 <h3 class="text-truncate mb-4 fw-bold">
                     编辑关联词条
                 </h3>
@@ -90,7 +90,7 @@ else
                 <InputOtherLinkListTip Model="Model.others" Title="自定义链接"></InputOtherLinkListTip>
             </div>
 
-            <div class="  rounded shadow  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
+            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
                 <div>
                     <ValidateForm Model="@Model">
                         <BootstrapBlazor.Components.Textarea @bind-Value="Model.Note" DisplayText="备注" />

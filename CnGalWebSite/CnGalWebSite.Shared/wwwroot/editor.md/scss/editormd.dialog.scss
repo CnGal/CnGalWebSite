@@ -6,7 +6,7 @@
     z-index: 99999;
     display: none;
     @include border-radius(3px);
-    @include box-shadow(0 0 10px rgba(0, 0, 0, 0.3));
+    @include box-shadow-sm(0 0 10px rgba(0, 0, 0, 0.3));
     //@include user-select(none); 
     background: #fff;
     font-size: 14px;

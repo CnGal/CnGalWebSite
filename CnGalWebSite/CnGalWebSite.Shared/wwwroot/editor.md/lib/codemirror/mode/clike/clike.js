@@ -412,7 +412,7 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
                     "vec2 vec3 vec4 ivec2 ivec3 ivec4 bvec2 bvec3 bvec4 " +
                     "mat2 mat3 mat4 " +
                     "sampler1D sampler2D sampler3D samplerCube " +
-                    "sampler1DShadow sampler2DShadow " +
+                    "sampler1Dshadow-sm sampler2Dshadow-sm " +
                     "const attribute uniform varying " +
                     "break continue discard return " +
                     "for while do if else struct " +
@@ -429,8 +429,8 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
                     "texture2D texture2DProj texture2DLod texture2DProjLod " +
                     "texture3D texture3DProj texture3DLod texture3DProjLod " +
                     "textureCube textureCubeLod " +
-                    "shadow1D shadow2D shadow1DProj shadow2DProj " +
-                    "shadow1DLod shadow2DLod shadow1DProjLod shadow2DProjLod " +
+                    "shadow-sm1D shadow-sm2D shadow-sm1DProj shadow-sm2DProj " +
+                    "shadow-sm1DLod shadow-sm2DLod shadow-sm1DProjLod shadow-sm2DProjLod " +
                     "dFdx dFdy fwidth " +
                     "noise1 noise2 noise3 noise4"),
     atoms: words("true false " +

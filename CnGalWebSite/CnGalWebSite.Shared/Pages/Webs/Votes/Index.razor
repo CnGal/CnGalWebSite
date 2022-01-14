@@ -29,30 +29,6 @@ else
 }
 
 
-<style>
-    .search-view .tab-Badge-color .line {
-        background: transparent;
-        transition: none;
-    }
-
-    .search-view .auto-complete {
-        width: 100%;
-    }
-
-    .search-view .div-shadow {
-        transition: all .6s ease;
-        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
-        cursor: pointer;
-    }
-
-        .search-view .div-shadow:hover {
-            box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
-        }
-
-    .search-view .shadow {
-        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
-    }
-</style>
 
 @if (isNotFound == true)
 {
@@ -61,7 +37,7 @@ else
 }
 else
 {
-    <div class="row search-view">
+    <div class="row">
         @if (isReady == false)
         {
             <div class="col-12">
@@ -87,13 +63,13 @@ else
 
                 @if (Model.IsHidden == true)
                 {
-                    <div class="alert alert-info  rounded shadow  rounded" role="alert">
+                    <div class="alert alert-info  rounded shadow-sm  rounded" role="alert">
                         当前投票处于隐藏状态，如果你看到了这个提示，请立即联系管理员
                     </div>
 
                 }
 
-                <div class="rounded shadow  bg-opacity mb-4 pb-3">
+                <div class="rounded shadow-sm  bg-opacity mb-4 pb-3">
                     <div>
                         <CnGalWebSite.Shared.Component.Votes.MainPage.MainInforCard Model="Model" />
 
