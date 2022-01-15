@@ -20,6 +20,12 @@
                     </div>
                 }
             }
+            else if (SteamInfor.PriceNow == 0)
+            {
+                <div class="@(IsNormalScreen?"col-12 col-md-6":"col-12")">
+                    <BasicInforAloneTip Icon="fa-check-circle-o" Text="当前价格：¥ 0.00 - Free" />
+                </div>
+            }
             else if (SteamInfor.PriceNow == -1)
             {
                 <div class="@(IsNormalScreen?"col-12 col-md-6":"col-12")">

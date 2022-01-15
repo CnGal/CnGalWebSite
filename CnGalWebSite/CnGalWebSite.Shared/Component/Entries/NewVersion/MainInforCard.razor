@@ -1,4 +1,4 @@
-﻿<div class="rounded shadow-sm bg-opacity rounded p-3">
+﻿<div class="rounded shadow-sm bg-opacity rounded pb-3">
 
     @if (Model.IsEdit == true)
     {
@@ -17,58 +17,116 @@
     {
         <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditMain/" + Model.Id)" ExamineType="Operation.EstablishMain" OnClickRevoke="OnRevoke"></AlertTip>
     }
-
-    <div style="display:flex;">
-        <div>
-            @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
-            {
-                <img style="height:200px;" src="@Model.MainPicture" alt="@Model.Name">
-
-            }
-            else
-            {
-                <img style="height:200px;border-radius:50%;" src="@Model.Thumbnail" alt="@Model.Name" >
-
-            }
-        </div>
-        <div class="ps-3">
-            <h1 class="fw-bold h3">@Model.Name</h1>
-            <div class="h4" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
-
-                @if (Model.ProductionGroups.Count > 0)
+    @if (IsSmallScreen)
+    {
+        <div style="display: flex; flex-direction: column;">
+            <div style="width: 100%; display: flex; justify-content: center;">
+                @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
                 {
-                    <OutlineButton IsTitile="true" Text="制作组" ColorNum="pr" />
-
-                    @foreach (var temp in Model.ProductionGroups)
-                    {
-                        <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
-                                       Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
-                    }
+                    <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name">
+                }
+                else
+                {
+                    <img style="height:200px;border-radius:50%;" src="@Model.Thumbnail" alt="@Model.Name">
                 }
             </div>
-            <div class="h4" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
-                @if (Model.Publishers.Count > 0)
-                {
-                    <OutlineButton IsTitile="true" Text="发行商" ColorNum="pr" />
+            <div class="pt-2 ps-3 pe-3">
+                <h1 class="fw-bold h3" style="@((Model.Type==EntryType.Staff||Model.Type==EntryType.Role)?"text-align: center;":"")">@Model.Name</h1>
+                <div class="h4" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
 
-                    @foreach (var temp in Model.Publishers)
+                    @if (Model.ProductionGroups.Count > 0)
                     {
-                        <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
-                                       Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
-                    }
-                }
+                        <OutlineButton IsTitile="true" Text="制作组" ColorNum="pr" />
 
+                        @foreach (var temp in Model.ProductionGroups)
+                        {
+                            <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
+                                           Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
+                        }
+                    }
+                </div>
+                <div class="h4" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
+                    @if (Model.Publishers.Count > 0)
+                    {
+                        <OutlineButton IsTitile="true" Text="发行商" ColorNum="pr" />
+
+                        @foreach (var temp in Model.Publishers)
+                        {
+                            <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
+                                           Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
+                        }
+                    }
+
+                </div>
+                <span style="@("overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; "+((Model.Type==EntryType.Staff||Model.Type==EntryType.Role)?"text-align: center;":""))">
+                    @Model.BriefIntroduction
+                </span>
             </div>
-            <span style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;">
-                @Model.BriefIntroduction
-            </span>
         </div>
-    </div>
+
+    }
+    else
+    {
+        <div style="display:flex;" class="ps-3 pt-3 pe-3">
+            <div>
+                @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
+                {
+
+
+
+                    <img style="height:200px;" src="@Model.MainPicture" alt="@Model.Name">
+
+
+
+                }
+                else
+                {
+                    <img style="height:200px;border-radius:50%;" src="@Model.Thumbnail" alt="@Model.Name">
+
+                }
+            </div>
+            <div class="ps-3">
+                <h1 class="fw-bold h3">@Model.Name</h1>
+                <div class="h4" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
+
+                    @if (Model.ProductionGroups.Count > 0)
+                    {
+                        <OutlineButton IsTitile="true" Text="制作组" ColorNum="pr" />
+
+                        @foreach (var temp in Model.ProductionGroups)
+                        {
+                            <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
+                                           Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
+                        }
+                    }
+                </div>
+                <div class="h4" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
+                    @if (Model.Publishers.Count > 0)
+                    {
+                        <OutlineButton IsTitile="true" Text="发行商" ColorNum="pr" />
+
+                        @foreach (var temp in Model.Publishers)
+                        {
+                            <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
+                                           Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
+                        }
+                    }
+
+                </div>
+                <span style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;">
+                    @Model.BriefIntroduction
+                </span>
+            </div>
+        </div>
+
+    }
 </div>
 
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
 }

@@ -1,5 +1,6 @@
 ﻿
-@if ((Model.Type == EntryType.Role || Model.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(Model.MainPage)&& IsLargeScreen==false)
+@if ((Model.Type == EntryType.Role || Model.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(Model.MainPage)
+    && string.IsNullOrWhiteSpace(Model.MainPicture)==false&& IsLargeScreen==false)
 {
     <div class="row">
         <div class="col-12">

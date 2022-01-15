@@ -45,15 +45,14 @@ namespace CnGalWebSite.APIServer.Controllers
             //没有找到 则尝试更新数据
             //无法更新则返回错误
             var steamInfor = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
-            if (steamInfor != null /*&& steamInfor.PriceNow != -1*/)
+            if (steamInfor != null && steamInfor.PriceNow != -1 && steamInfor.PriceNow != -2)
             {
-               
                 return steamInfor;
             }
             steamInfor = await _steamInforService.UpdateSteamInfor(steamId, entryId);
             if (steamInfor == null)
             {
-                return NotFound();
+                return NotFound("无法获取Steam信息");
             }
 
             return steamInfor;

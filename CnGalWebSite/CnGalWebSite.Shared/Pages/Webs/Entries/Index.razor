@@ -100,7 +100,7 @@ else
                 }
 
                 <div class=" mb-3 ">
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" />
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" IsSmallScreen="IsSmallScreen"/>
                 </div>
                 @if (IsLargeScreen == false)
                 {
@@ -374,7 +374,7 @@ else
 
                                 @if (EntryView.Staffs.Count > 0)
                                 {
-                                    <EntryStaffInforTip IsSmallScreen="IsSmallScreen" EntryView="EntryView" IsLargeScreen="false"></EntryStaffInforTip>
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" IsLargeScreen="false" />
                                 }
                             </div>
                         </div>
