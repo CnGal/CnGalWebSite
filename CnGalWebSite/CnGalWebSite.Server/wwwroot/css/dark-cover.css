@@ -513,14 +513,14 @@ body {
     display: none;
 }
 .div-shadow {
-    box-shadow: 0 0.5rem 1rem rgba(255, 255,255, 0.15) !important;
+    box-shadow: 0 0.5rem 1rem rgba(255, 255,255, 0.08) !important;
     transition: all .6s ease;
-    background-color: #303030;
+    background-color: #242424;
     cursor: pointer;
 }
 
     .div-shadow:hover {
-        box-shadow: 0 1rem 3rem rgba(255, 255, 255, 0.18) !important;
+        box-shadow: 0 1rem 3rem rgba(255, 255, 255, 0.15) !important;
     }
 .menu .nav .dropdown-menu .nav-link:not(.disabled):hover, .menu .nav .dropdown-menu .nav-link.active, .menu .submenu .nav-link.active, .menu .submenu .nav-link:not(.disabled):hover, .cascade .dropdown-item:not(.disabled):hover, .cascade .dropdown-item.active, .cascade .nav .nav-link:not(.disabled):hover, .cascade .nav .nav-link.active {
     background-color: gray;
@@ -645,30 +645,45 @@ input.form-control{
     color:white;
 }
 
-.bg-title-color-main {
-    color: white;
-    background-color: var(--main-color);
-}
 
 .bg-context-main:hover {
     color: white;
-    background-color: var(--main-color);
+    background-color: gray;
 }
 
 .bg-context-main {
     color:white  !important;
-    border-color: var(--main-color);
+    border-color: gray;
 }
 
 .bg-color-main {
     color: var(--main-color);
 }
 .bg-main {
-    background-color: var(--active-color);
+    background-color:gray;
 }
 .nav-link{
     color:white;
 }
 .nav-link:hover{
     color:gray;
+}
+
+.bg-title-color-pr {
+    color: white;
+    background-color: gray;
+}
+
+.bg-context-pr:hover {
+    color: white;
+    background-color: gray;
+}
+
+.bg-context-pr {
+    color: white;
+    border-color: gray;
+}
+
+.bg-color-pr {
+    color: white;
 }

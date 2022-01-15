@@ -539,6 +539,7 @@ namespace CnGalWebSite.APIServer.Application.News
             var news = await _gameNewsRepository.GetAll().Where(s => s.State==GameNewsState.Publish&&weeklyNews.CreateTime.AddDays(7) > s.PublishTime && weeklyNews.CreateTime.AddDays(-7) < s.PublishTime).ToListAsync();
             news = news.Where(s => s.PublishTime.IsInSameWeek(weeklyNews.CreateTime)).ToList();
             weeklyNews.News.AddRange(news);
+            weeklyNews.News = weeklyNews.News.OrderBy(s => s.PublishTime).ToList();
 
             weeklyNews.Title = GenerateWeeklyNewsTitle(weeklyNews);
             weeklyNews.BriefIntroduction = GenerateWeeklyNewsBriefIntroduction(weeklyNews);
