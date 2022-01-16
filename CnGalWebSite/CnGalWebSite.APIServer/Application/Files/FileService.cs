@@ -66,7 +66,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                 models = await query.AsNoTracking().Include(s => s.FileManager).ThenInclude(s => s.ApplicationUser)
                     .Select(s => new ImageInforTipViewModel
                     {
-                        FileName = _appHelper.GetImagePath(s.FileName, ""),
+                        FileName = s.FileName,
                         Id = s.Id,
                         FileSize = s.FileSize,
                         UploadTime = s.UploadTime,
@@ -159,9 +159,9 @@ namespace CnGalWebSite.APIServer.Application.Files
             try
             {
                 using var client = _clientFactory.CreateClient();
-                client.Timeout = TimeSpan.FromSeconds(30);
+                //client.Timeout = TimeSpan.FromSeconds(30);
 
-                var result = await client.PostAsJsonAsync<TransferDepositFileModel>(_configuration["TransferDepositFileAPI"] + "api/files/TransferDepositFile", new TransferDepositFileModel
+                var result = await client.PostAsJsonAsync(_configuration["TransferDepositFileAPI"] + "api/files/TransferDepositFile", new TransferDepositFileModel
                 {
                     Url = url,
                     X = x,

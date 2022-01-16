@@ -82,8 +82,25 @@ namespace CnGalWebSite.DataModel.ViewModel
 
         #endregion
         #region Staff
-        [Display(Name = "昵称（官方称呼）")]
-        public string Nickname { get; set; }
+        [Display(Name = "微博平台Id")]
+        public string WeiboId { get; set; }
+        [Display(Name = "Bilibili平台Id")]
+        public string BilibiliId { get; set; }
+        [Display(Name = "AcFun平台Id")]
+        public string AcFunId { get; set; }
+        [Display(Name = "知乎平台Id")]
+        public string ZhihuId { get; set; }
+        [Display(Name = "爱发电平台Id（不包括@）")]
+        public string AfdianId { get; set; }
+        [Display(Name = "Pixiv平台Id")]
+        public string PixivId { get; set; }
+        [Display(Name = "Twitter平台Id")]
+        public string TwitterId { get; set; }
+        [Display(Name = "YouTube平台Id")]
+        public string YouTubeId { get; set; }
+        [Display(Name = "Facebook平台Id")]
+        public string FacebookId { get; set; }
+
         #endregion
 
         #region 制作组

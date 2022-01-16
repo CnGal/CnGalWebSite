@@ -119,6 +119,9 @@ else
                 <div>
                     <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
                 </div>
+                <div>
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView"/>
+                </div>
             }
 
 
@@ -403,6 +406,9 @@ else
             }
             <div>
                 <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
+            </div>
+            <div>
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" />
             </div>
             @if (EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff)
             {

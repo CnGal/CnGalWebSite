@@ -48,7 +48,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                     model.Add(new EntryHomeAloneViewModel
                     {
                         Id = item.Id,
-                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png",true),
                         DisPlayName = item.DisplayName ?? item.Name,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
@@ -74,7 +74,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                     model.Add(new EntryHomeAloneViewModel
                     {
                         Id = item.Id,
-                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png", true),
                         DisPlayName = item.DisplayName ?? item.Name,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
@@ -100,7 +100,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                     model.Add(new EntryHomeAloneViewModel
                     {
                         Id = item.Id,
-                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png", true),
                         DisPlayName = item.DisplayName ?? item.Name,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
@@ -126,7 +126,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                     model.Add(new EntryHomeAloneViewModel
                     {
                         Id = item.Id,
-                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png", true),
                         DisPlayName = item.DisplayName ?? item.Name,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
@@ -153,7 +153,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                     model.Add(new EntryHomeAloneViewModel
                     {
                         Id = item.Id,
-                        Image = _appHelper.GetImagePath(item.Image, "app.png"),
+                        Image = _appHelper.GetImagePath(item.Image, "app.png", true),
                         DisPlayValue = item.Link,
                         DisPlayName = item.Name,
                         CommentCount=-1,
@@ -178,7 +178,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                 model.Add(new EntryHomeAloneViewModel
                 {
                     Id = item.Id,
-                    Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png"),
+                    Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png", true),
                     DisPlayName = item.DisplayName ?? item.Name,
                     CommentCount = item.CommentCount,
                     ReadCount = item.ReaderCount,
@@ -203,7 +203,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                     model.Add(new EntryHomeAloneViewModel
                     {
                         Id = item.Id,
-                        Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png"),
+                        Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png", true),
                         DisPlayName = item.DisplayName ?? item.Name,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,

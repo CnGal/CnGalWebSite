@@ -59,7 +59,8 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
         public async Task UpdateEntryDataToElasticsearch(DateTime LastUpdateTime)
         {
-            var entries = await _entryRepository.GetAll().AsNoTracking().Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
+            var entries = await _entryRepository.GetAll().AsNoTracking()
+                .Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
             if (entries.Count != 0)
             {
                 await _entryElasticsearchBaseService.InsertRangeAsync(entries);

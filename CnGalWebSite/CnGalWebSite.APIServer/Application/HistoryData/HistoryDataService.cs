@@ -18,6 +18,12 @@ using System.Linq;
 using CnGalWebSite.DataModel.Model;
 using Markdig;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.APIServer.ExamineX;
+using System.Linq.Dynamic.Core;
+using Microsoft.EntityFrameworkCore;
+using CnGalWebSite.DataModel.ExamineModel;
+using Microsoft.AspNetCore.Identity;
 
 namespace CnGalWebSite.APIServer.Application.HistoryData
 {
@@ -26,17 +32,24 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
         private readonly IFileService _fileService;
+        private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private List<OriginalImageToDrawingBedUrl> _images;
+        private readonly IRepository<Entry, int> _entryRepository;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
 
-        public HistoryDataService(IHttpClientFactory clientFactory, IConfiguration configuration, IFileService fileService, IWebHostEnvironment webHostEnvironment, IAppHelper appHelper)
+        public HistoryDataService(IHttpClientFactory clientFactory, IConfiguration configuration, IFileService fileService, IWebHostEnvironment webHostEnvironment, IAppHelper appHelper,
+            IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<ApplicationUser, string> userRepository)
         {
             _clientFactory = clientFactory;
             _configuration = configuration;
             _fileService = fileService;
             _webHostEnvironment = webHostEnvironment;
             _appHelper = appHelper;
+            _entryRepository = entryRepository;
+            _examineService = examineService;
+            _userRepository = userRepository;
             InitImages();
         }
 
@@ -86,7 +99,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
             catch
             {
                 SaveZhiHuArticles(new List<ZhiHuArticleModel>());
-                return new List<ZhiHuArticleModel>(); 
+                return new List<ZhiHuArticleModel>();
             }
 
         }
@@ -145,13 +158,13 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
                 var currentEntries = LoadCurrentDatabaseEntryData();
 
                 //对比之前的文章 排除相同项目
-                var deleteArticles =new List<string>();
+                var deleteArticles = new List<string>();
                 int count = 0;
-                foreach(var article in articles)
+                foreach (var article in articles)
                 {
-                    foreach(var item in currentArticles)
+                    foreach (var item in currentArticles)
                     {
-                        if(GetStringSimilarity(item.Name,article.Key)>0.9)
+                        if (GetStringSimilarity(item.Name, article.Key) > 0.9)
                         {
                             deleteArticles.Add(article.Key);
                         }
@@ -160,15 +173,15 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
                     Console.WriteLine($"【1】已比较完成第 {count} 篇文章");
                 }
 
-                articles.RemoveAll(s=>deleteArticles.Contains(s.Key));
+                articles.RemoveAll(s => deleteArticles.Contains(s.Key));
                 //获取各个文章并替换图片等内容
                 List<ZhiHuArticleModel> zhiHuArticles = InitZhiHuArticles();
                 count = 0;
-                foreach(var item in articles)
+                foreach (var item in articles)
                 {
                     if (zhiHuArticles.Any(s => s.Title == item.Key))
                     {
-                        
+
                     }
                     else
                     {
@@ -176,7 +189,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
                         SaveImages();
                         SaveZhiHuArticles(zhiHuArticles);
                     }
-                 
+
                     count++;
                     Console.WriteLine($"【2】已获取完成第 {count} 篇文章");
                 }
@@ -241,7 +254,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
             {
                 article.Type = ArticleType.Interview;
             }
-            else if (model.Title.Contains("评测") || model.Title.Contains("测评")||model.Title.Contains("浅评"))
+            else if (model.Title.Contains("评测") || model.Title.Contains("测评") || model.Title.Contains("浅评"))
             {
                 article.Type = ArticleType.Evaluation;
             }
@@ -251,7 +264,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
             }
 
             //查找关联词条
-            foreach (var item in entries.Where(s => s != "幻觉"&&s!="画师"))
+            foreach (var item in entries.Where(s => s != "幻觉" && s != "画师"))
             {
                 if (model.MainPage.Contains(item))
                 {
@@ -276,7 +289,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
                 }
             }
 
-            if(model.Title.Contains("风之起兮")|| model.Title.Contains("钟奇物语：不存在的浅色回忆"))
+            if (model.Title.Contains("风之起兮") || model.Title.Contains("钟奇物语：不存在的浅色回忆"))
             {
                 article.MainPicture = "https://pic.cngal.top/images/2022/01/03/ad270b158661.jpg";
                 article.Relevances.Add(new ArticleRelevance
@@ -315,7 +328,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
                     Modifier = "游戏"
                 });
             }
-            if (model.Title.Contains("暖寒")||model.Title.Contains("雪霁")||model.Title.Contains("《千面》同人文"))
+            if (model.Title.Contains("暖寒") || model.Title.Contains("雪霁") || model.Title.Contains("《千面》同人文"))
             {
                 article.MainPicture = "https://media.st.dl.pinyuncloud.com/steam/apps/1168470/header.jpg";
                 article.Relevances.Add(new ArticleRelevance
@@ -334,7 +347,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
                 });
             }
 
-            if (model.Title.Contains("《他人世界末》沧海月明")||model.Title.Contains("《他人世界末》木竹樱—心中"))
+            if (model.Title.Contains("《他人世界末》沧海月明") || model.Title.Contains("《他人世界末》木竹樱—心中"))
             {
                 article.MainPicture = "https://pic.cngal.top/images/2022/01/03/e3694dd5b7dd.png";
                 article.Relevances.Add(new ArticleRelevance
@@ -397,11 +410,11 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
 
             } while (string.IsNullOrWhiteSpace(ToolHelper.MidStrEx(title, "#", "#")) == false);
 
-            return _appHelper.GetStringAbbreviation(title, maxLength).Replace("\n","").Replace("\r", "").Replace("image", "");
+            return _appHelper.GetStringAbbreviation(title, maxLength).Replace("\n", "").Replace("\r", "").Replace("image", "");
         }
         public async Task CutImage(ZhiHuArticleModel model)
         {
-            if(string.IsNullOrWhiteSpace(model.Image)==false&&model.IsCutImage==false)
+            if (string.IsNullOrWhiteSpace(model.Image) == false && model.IsCutImage == false)
             {
                 model.Image = await _fileService.SaveImageAsync(model.Image, _configuration["NewsAdminId"], 460, 215);
                 model.IsCutImage = true;
@@ -436,7 +449,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
 
                 try
                 {
-                    var time = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes[2].ChildNodes[2].InnerText.Replace("发布于 ","").Replace("编辑于 ", "");
+                    var time = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes[2].ChildNodes[2].InnerText.Replace("发布于 ", "").Replace("编辑于 ", "");
                     article.PublishTime = DateTime.ParseExact(time, "yyyy-MM-dd HH:mm", null);
                 }
                 catch
@@ -448,10 +461,10 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
 
                 var converter = new ReverseMarkdown.Converter();
 
-               
-               
+
+
                 article.MainPage = converter.Convert(htmlStr);
-                article.MainPage =await ProgressImage(article.MainPage);
+                article.MainPage = await ProgressImage(article.MainPage);
                 article.Title = name;
                 article.Url = url;
                 article.Image = ToolHelper.GetImageLinks(article.MainPage).FirstOrDefault();
@@ -475,7 +488,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
                     var image = ToolHelper.MidStrEx(textTemp[1], "data-original=\"", "\">");
                     var newImage = await UploadImage(image);
 
-                    text = text.Replace("<figure"+ToolHelper.MidStrEx(text, "<figure", "</figure>") + "</figure>", "\n![image](" + newImage + ")\n");
+                    text = text.Replace("<figure" + ToolHelper.MidStrEx(text, "<figure", "</figure>") + "</figure>", "\n![image](" + newImage + ")\n");
                 }
             }
 
@@ -513,7 +526,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
 
                 DirectoryInfo directoryInfo = new DirectoryInfo(path);
 
-                var files= directoryInfo.GetFiles();
+                var files = directoryInfo.GetFiles();
 
                 foreach (var file in files)
                 {
@@ -536,14 +549,14 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
         }
 
 
-        public  List<NameIdPairModel>  LoadCurrentDatabaseArticleData()
+        public List<NameIdPairModel> LoadCurrentDatabaseArticleData()
         {
             var path = Path.Combine(_webHostEnvironment.WebRootPath, "BackUp", "当前数据", "CurrentArticles.json");
 
-            using (StreamReader file = File.OpenText(path ))
+            using (StreamReader file = File.OpenText(path))
             {
                 JsonSerializer serializer = new JsonSerializer();
-               return  (List<NameIdPairModel>)serializer.Deserialize(file, typeof(List<NameIdPairModel>));
+                return (List<NameIdPairModel>)serializer.Deserialize(file, typeof(List<NameIdPairModel>));
             }
         }
 
@@ -575,6 +588,71 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
             LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
             return (double)levenshteinDistance.LevenshteinDistancePercent(str1, str2);
         }
+
+        public async Task ImportBgmLink()
+        {
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "temp", "items-cngal-bgm.json");
+            List<Icemic_Data> datas;
+            using (StreamReader file = File.OpenText(path))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                datas=(List<Icemic_Data>)serializer.Deserialize(file, typeof(List<Icemic_Data>));
+            }
+            if(datas==null)
+            {
+                return;
+            }
+
+            var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+
+            foreach (var item in datas.Where(s => s.Metadata.cngalId != 0 && s.Metadata.bgmId != 0))
+            {
+                var entry = await _entryRepository.GetAll().Include(s => s.Relevances).FirstOrDefaultAsync(s => s.Id == item.Metadata.cngalId);
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                if (entry.Relevances.Any(s =>string.IsNullOrWhiteSpace(s.Link)==false&&( s.Link.Contains("bangumi")|| s.Link.Contains("bgm.tv"))) == false)
+                {
+                    //创建审核数据模型
+                    var examinedModel = new EntryRelevancesModel
+                    {
+                        Relevances = new List<EntryRelevancesExaminedModel>()
+                    };
+
+                    examinedModel.Relevances.Add(new EntryRelevancesExaminedModel
+                    {
+                        DisplayName = "Bangumi",
+                        DisplayValue = "《" + entry.DisplayName + "》作品条目",
+                        IsDelete = false,
+                        Modifier= "其他",
+                        Link = "https://bangumi.tv/subject/" + item.Metadata.bgmId
+                    });
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, examinedModel);
+                        resulte = text.ToString();
+                    }
+
+                    await _examineService.ExamineEstablishRelevancesAsync(entry, examinedModel);
+                    await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishRelevances, "批量导入Bangumi链接");
+
+                }
+            }
+        }
+    }
+    public class Icemic_Data
+    {
+        public Metadata Metadata { get; set; }
+
+    }
+    public class Metadata
+    {
+        public int cngalId { get; set; }
+        public int bgmId { get; set; }
     }
 
     public class LevenshteinDistance

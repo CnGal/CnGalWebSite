@@ -627,7 +627,9 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public string GenerateRealWeeklyNewsMainPage(WeeklyNews weeklyNews)
         {
-            if(string.IsNullOrWhiteSpace(weeklyNews.MainPage))
+            weeklyNews.News = weeklyNews.News.OrderBy(s => s.PublishTime).ToList();
+
+            if (string.IsNullOrWhiteSpace(weeklyNews.MainPage))
             {
                 weeklyNews.MainPage = "";
             }

@@ -33,6 +33,7 @@ using CnGalWebSite.APIServer.Application.ElasticSearches;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.HistoryData;
 using CnGalWebSite.APIServer.Application.Votes;
+using Microsoft.Extensions.Configuration;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -85,6 +86,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<GameNews, long> _gameNewsRepository;
         private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
         private readonly IHistoryDataService _historyDataService;
+        private readonly IConfiguration _configuration;
 
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
@@ -96,8 +98,8 @@ namespace CnGalWebSite.APIServer.Controllers
         IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
-        IVoteService voteService, IRepository<Vote, long> voteRepository,
-        IRepository<WeeklyNews, long> weeklyNewsRepository)
+        IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository,
+        IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -142,6 +144,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _historyDataService = historyDataService;
             _voteService = voteService;
             _voteRepository = voteRepository;
+            _configuration = configuration;
+            _steamInforRepository = steamInforRepository;
         }
 
         /// <summary>
@@ -1490,9 +1494,10 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                //string temp= await _fileService.SaveImageAsync("https://wx1.sinaimg.cn/mw2000/0085plZ0gy1gxoqwt0tnaj31hh0r8dnh.jpg", "", 0, 0);
-                await _elasticsearchService.DeleteDataOfElasticsearch();
-                await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
+                await _historyDataService.ImportBgmLink();
+                //string temp= await _fileService.SaveImageAsync("https://wx4.sinaimg.cn/mw2000/008qAv3ngy1gyem1zkfwqj31cr0s9hbg.jpg", _configuration["NewsAdminId"]);
+                //await _elasticsearchService.DeleteDataOfElasticsearch();
+                //await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
 
                 //await _weeklyNewsRepository.DeleteAsync(s => true);
                 /*var news = await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.State == GameNewsState.Ignore).ToListAsync();

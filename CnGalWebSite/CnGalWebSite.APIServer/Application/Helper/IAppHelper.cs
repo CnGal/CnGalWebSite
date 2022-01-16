@@ -30,7 +30,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <param name="image">图片名称</param>
         /// <param name="defaultStr">默认名称</param>
         /// <returns>图片路径</returns>
-        string GetImagePath(string image, string defaultStr);
+        string GetImagePath(string image, string defaultStr, bool mediumImage = false);
 
         /// <summary>
         /// 上传图片 并保存到数据库记录中 并按比例裁剪

@@ -1453,13 +1453,61 @@ namespace CnGalWebSite.APIServer.Controllers
                         }
                         else if (item.Modifier == "相关网站")
                         {
-                            var socialPlatform = new SocialPlatform
+                            if (item.DisplayValue.Contains("weibo.com"))
                             {
-                                Name = item.DisplayName,
-                                Link = item.DisplayValue
-                            };
+                                model.WeiboId = item.DisplayValue.Replace("https://weibo.com/u/", "").Split('/').FirstOrDefault();
 
-                            model.SocialPlatforms.Add(socialPlatform);
+                            }
+                            else if (item.DisplayValue.Contains("bilibili.com"))
+                            {
+                                model.BilibiliId = item.DisplayValue.Replace("https://space.bilibili.com/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("acfun.cn"))
+                            {
+                                model.AcFunId = item.DisplayValue.Replace("https://www.acfun.cn/u/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("zhihu.com"))
+                            {
+                                model.ZhihuId = item.DisplayValue.Replace("https://www.zhihu.com/people/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("afdian.net"))
+                            {
+                                model.AfdianId = item.DisplayValue.Replace("https://afdian.net/@", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("pixiv.net"))
+                            {
+                                model.PixivId = item.DisplayValue.Replace("https://www.pixiv.net/users/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("twitter.com"))
+                            {
+                                model.TwitterId = item.DisplayValue.Replace("https://twitter.com/", "").Replace("https://www.twitter.com/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("youtube.com"))
+                            {
+                                model.YouTubeId = item.DisplayValue.Replace("https://www.youtube.com/channel/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("facebook.com"))
+                            {
+                                model.FacebookId = item.DisplayValue.Replace("https://www.facebook.com/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else
+                            {
+                                var socialPlatform = new SocialPlatform
+                                {
+                                    Name = item.DisplayName,
+                                    Link = item.DisplayValue
+                                };
+
+                                model.SocialPlatforms.Add(socialPlatform);
+                            }
 
                         }
 
@@ -1546,26 +1594,70 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         if (item.Modifier == "基本信息")
                         {
-                            switch (item.DisplayName)
-                            {
-                                case "昵称（官方称呼）":
-                                    model.Nickname = item.DisplayValue;
-                                    break;
-                            }
+
                         }
                         else if (item.Modifier == "相关网站")
                         {
-                            var socialPlatform = new SocialPlatform
+                            if (item.DisplayValue.Contains("weibo.com"))
                             {
-                                Name = item.DisplayName,
-                                Link = item.DisplayValue
-                            };
+                                model.WeiboId = item.DisplayValue.Replace("https://weibo.com/u/", "").Split('/').FirstOrDefault();
 
-                            model.SocialPlatforms.Add(socialPlatform);
+                            }
+                            else if (item.DisplayValue.Contains("bilibili.com"))
+                            {
+                                model.BilibiliId = item.DisplayValue.Replace("https://space.bilibili.com/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else  if (item.DisplayValue.Contains("acfun.cn"))
+                            {
+                                model.AcFunId = item.DisplayValue.Replace("https://www.acfun.cn/u/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else  if (item.DisplayValue.Contains("zhihu.com"))
+                            {
+                                model.ZhihuId = item.DisplayValue.Replace("https://www.zhihu.com/people/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("afdian.net"))
+                            {
+                                model.AfdianId = item.DisplayValue.Replace("https://afdian.net/@", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("pixiv.net"))
+                            {
+                                model.PixivId = item.DisplayValue.Replace("https://www.pixiv.net/users/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("twitter.com"))
+                            {
+                                model.TwitterId = item.DisplayValue.Replace("https://twitter.com/", "").Replace("https://www.twitter.com/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("youtube.com"))
+                            {
+                                model.YouTubeId = item.DisplayValue.Replace("https://www.youtube.com/channel/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("facebook.com"))
+                            {
+                                model.FacebookId = item.DisplayValue.Replace("https://www.facebook.com/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else
+                            {
+                                var socialPlatform = new SocialPlatform
+                                {
+                                    Name = item.DisplayName,
+                                    Link = item.DisplayValue
+                                };
+
+                                model.SocialPlatforms.Add(socialPlatform);
+                            }
 
                         }
-
                     }
+
+
                     break;
             }
 
@@ -1909,7 +2001,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                     break;
                 case EntryType.Staff:
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "昵称（官方称呼）", DisplayValue = model.Nickname });
+
                     //循环添加 删除标签 到原有信息列表的每一各项目中
                     foreach (var item in entry.Information)
                     {
@@ -1957,6 +2049,81 @@ namespace CnGalWebSite.APIServer.Controllers
                         basics.Add(new BasicEntryInformation_ { Modifier = "相关网站", DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = true });
                     }
                 }
+                //加载在基本信息中的网站
+                if(string.IsNullOrWhiteSpace(model.WeiboId)==false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "微博",
+                        Link = "https://weibo.com/u/" + model.WeiboId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.BilibiliId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "Bilibili",
+                        Link = "https://space.bilibili.com/" + model.BilibiliId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.AcFunId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "AcFun",
+                        Link = "https://www.acfun.cn/u/" + model.AcFunId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.ZhihuId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "知乎",
+                        Link = "https://www.zhihu.com/people/" + model.ZhihuId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.AfdianId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "爱发电",
+                        Link = "https://afdian.net/@" + model.AfdianId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.PixivId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "Pixiv",
+                        Link = "https://www.pixiv.net/users/" + model.PixivId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.TwitterId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "Twitter",
+                        Link = "https://twitter.com/" + model.TwitterId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.YouTubeId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "YouTube",
+                        Link = "https://www.youtube.com/channel/" + model.YouTubeId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.FacebookId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "Facebook",
+                        Link = "https://www.facebook.com/" + model.FacebookId
+                    });
+                }
+           
+
                 //遍历一遍当前视图中 相关网站
                 foreach (var item in model.SocialPlatforms)
                 {
@@ -2937,7 +3104,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "年龄", DisplayValue = model.RoleAge });
                         break;
                     case EntryType.Staff:
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "昵称（官方称呼）", DisplayValue = model.Nickname });
+
                         break;
                 }
 
@@ -2972,6 +3139,80 @@ namespace CnGalWebSite.APIServer.Controllers
                         IsDelete = false,
                         Additional = addInfors,
                         Modifier = item.Modifier
+                    });
+                }
+
+                //加载在基本信息中的网站
+                if (string.IsNullOrWhiteSpace(model.WeiboId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "微博",
+                        Link = "https://weibo.com/u/" + model.WeiboId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.BilibiliId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "Bilibili",
+                        Link = "https://space.bilibili.com/" + model.BilibiliId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.AcFunId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "AcFun",
+                        Link = "https://www.acfun.cn/u/" + model.AcFunId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.ZhihuId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "知乎",
+                        Link = "https://www.zhihu.com/people/" + model.ZhihuId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.AfdianId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "爱发电",
+                        Link = "https://afdian.net/@" + model.AfdianId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.PixivId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "Pixiv",
+                        Link = "https://www.pixiv.net/users/" + model.PixivId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.TwitterId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "Twitter",
+                        Link = "https://twitter.com/" + model.TwitterId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.YouTubeId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "YouTube",
+                        Link = "https://www.youtube.com/channel/" + model.YouTubeId
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(model.FacebookId) == false)
+                {
+                    model.SocialPlatforms.Add(new SocialPlatform
+                    {
+                        Name = "Facebook",
+                        Link = "https://www.facebook.com/" + model.FacebookId
                     });
                 }
                 //序列化相关网站

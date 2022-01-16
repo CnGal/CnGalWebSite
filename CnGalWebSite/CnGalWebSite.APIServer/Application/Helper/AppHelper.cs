@@ -112,7 +112,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             }
         }
 
-        public string GetImagePath(string image, string defaultStr)
+        public string GetImagePath(string image, string defaultStr,bool mediumImage=false)
         {
 
             if (string.IsNullOrWhiteSpace(image) == true)
@@ -133,6 +133,11 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 //判断是否为绝对路径
                 if (image.Contains("http://") || image.Contains("https://") || image.Contains("//"))
                 {
+                    /*if(image.Contains("pic.cngal.top"))
+                    {
+                        return image.Replace(".png", ".md.png").Replace(".jpg", ".md.jpg").Replace(".jpeg", ".md.jpeg").Replace(".gif", ".md.gif");
+                    }*/
+
                     return image;
                 }
                 else
@@ -1291,7 +1296,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 Type = item.Type,
                 DisplayName = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName,
                 CreateUserName = item.CreateUser?.UserName,
-                MainImage = GetImagePath(item.MainPicture, "certificate.png"),
+                MainImage = GetImagePath(item.MainPicture, "certificate.png",true),
                 BriefIntroduction = item.BriefIntroduction,
                 LastEditTime = item.LastEditTime,
                 ReaderCount = item.ReaderCount,
@@ -1306,11 +1311,11 @@ namespace CnGalWebSite.APIServer.Application.Helper
             //预处理图片
             if (entry.Type == EntryType.Staff || entry.Type == EntryType.Role)
             {
-                entry.MainPicture = GetImagePath(entry.Thumbnail, "user.png");
+                entry.MainPicture = GetImagePath(entry.Thumbnail, "user.png",true);
             }
             else
             {
-                entry.MainPicture = GetImagePath(entry.MainPicture, "app.png");
+                entry.MainPicture = GetImagePath(entry.MainPicture, "app.png", true);
 
             }
             entry.BriefIntroduction = GetStringAbbreviation(entry.BriefIntroduction, 50);
@@ -1429,7 +1434,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 Id = item.Id,
                 Name = item.Name,
-                MainImage = GetImagePath(item.MainPicture, "app.png"),
+                MainImage = GetImagePath(item.MainPicture, "app.png", true),
                 BriefIntroduction = item.BriefIntroduction,
                 LastEditTime = item.LastEditTime,
                 ReaderCount = item.ReaderCount
@@ -1439,7 +1444,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         public PeripheryInforTipViewModel GetPeripheryInforTipViewModel(Periphery periphery)
         {
             //预处理图片
-            periphery.MainPicture = GetImagePath(periphery.MainPicture, "app.png");
+            periphery.MainPicture = GetImagePath(periphery.MainPicture, "app.png", true);
 
 
             periphery.BriefIntroduction = GetStringAbbreviation(periphery.BriefIntroduction, 50);

@@ -16,10 +16,11 @@ namespace CnGalWebSite.DrawingBed.Controllers
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfiguration _configuration;
-        private readonly HttpClient _httpClient;
-       public FileController(HttpClient httpClient, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
+        private readonly IHttpClientFactory _clientFactory;
+
+        public FileController(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
         {
-            _httpClient = httpClient;
+            _clientFactory = clientFactory;
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
         }
@@ -29,11 +30,11 @@ namespace CnGalWebSite.DrawingBed.Controllers
         {
             try
             {
-                var client = _httpClient;
+                using var client = _clientFactory.CreateClient();
                 double x = model.X;
                 double y = model.Y;
 
-                client.Timeout = TimeSpan.FromSeconds(10);
+                //client.Timeout = TimeSpan.FromSeconds(10);
 
                 var Bytes = await client.GetByteArrayAsync(model.Url);
 
@@ -95,7 +96,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
                 }
 
                 //上传文件到远程服务器
-                string UploadResults = null;
+                string UploadResults = "";
 
                 UploadResults = await UploadFileToBserver(filePath);
 
@@ -128,7 +129,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
                 content: new StringContent(GetFileBase64(filePath)),
                 name: "source");
 
-            var client = _httpClient;
+            using var client = _clientFactory.CreateClient();
 
             var url = _configuration["SliotsImageUrl"] + "api/1/upload/?format=txt&key=" + _configuration["SliotsImageAPIToken"];
            
@@ -142,7 +143,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             }
             else
             {
-                return null;
+                return "";
             }
         }
         private static string GetFileBase64(string path)
@@ -169,7 +170,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             {
                 fsForRead.Close();
             }
-            return null;
+            return "";
         }
 
         private static void SaveFile(IFormFile sourceFile, string destinationPath)
