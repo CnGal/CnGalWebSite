@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using CnGalWebSite.APIServer.Application.TimedTasks;
+﻿using CnGalWebSite.APIServer.Application.TimedTasks;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

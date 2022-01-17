@@ -1,8 +1,6 @@
 ﻿using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
-
-using System;
- using System.Collections.Generic;
+using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Entries
 {
     public class EditEntryInforBindModel

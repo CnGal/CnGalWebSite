@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-using System;
- using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.Model
 {
     public class Entry
@@ -99,7 +98,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 附加信息列表
         /// </summary>
-        public ICollection<BasicEntryInformation> Information { get; set; }=new List<BasicEntryInformation>();
+        public ICollection<BasicEntryInformation> Information { get; set; } = new List<BasicEntryInformation>();
 
         /// <summary>
         /// 主页
@@ -119,7 +118,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 图片列表
         /// </summary>
-        public ICollection<EntryPicture> Pictures { get; set; }=new List<EntryPicture>();
+        public ICollection<EntryPicture> Pictures { get; set; } = new List<EntryPicture>();
         /// <summary>
         /// 审核记录 也是编辑记录
         /// </summary>

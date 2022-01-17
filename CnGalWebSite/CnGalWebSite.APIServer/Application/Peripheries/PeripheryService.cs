@@ -1,5 +1,4 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.ExamineModel;
@@ -8,6 +7,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -60,16 +60,16 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                 items = items.Where(item => item.Material?.Contains(searchModel.Material, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
-        
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
-                                 || (item.BriefIntroduction?.Contains(options.SearchText) ?? false)
-                                 || (item.Author?.Contains(options.SearchText) ?? false)
-                                 || (item.Material?.Contains(options.SearchText) ?? false));
-                }
-       
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
+                             || (item.BriefIntroduction?.Contains(options.SearchText) ?? false)
+                             || (item.Author?.Contains(options.SearchText) ?? false)
+                             || (item.Material?.Contains(options.SearchText) ?? false));
+            }
+
 
             // 排序
             var isSorted = false;
@@ -77,7 +77,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCachePeriphery.GetOrAdd(typeof(Periphery), key => LambdaExtensions.GetSortLambda<Periphery>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 
@@ -430,8 +430,8 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                 model.Peripheries.Add(new PeripheryOverviewModel
                 {
                     Id = item.PeripheryId ?? 0,
-                    Image =_appHelper.GetImagePath( item.Periphery.MainPicture,"app.png"),
-                    Name = item.Periphery.DisplayName?? item.Periphery.Name,
+                    Image = _appHelper.GetImagePath(item.Periphery.MainPicture, "app.png"),
+                    Name = item.Periphery.DisplayName ?? item.Periphery.Name,
                     CollectedCount = item.Periphery.CollectedCount,
                 });
             }
@@ -462,7 +462,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             if (showUserPhoto == false)
             {
                 model.Image = _appHelper.GetImagePath((entry.Type == EntryType.Game || entry.Type == EntryType.ProductionGroup) ? entry.MainPicture : entry.Thumbnail, (entry.Type == EntryType.Game || entry.Type == EntryType.ProductionGroup) ? "app.png" : "user.png");
-                model.Name = entry.DisplayName??entry.Name;
+                model.Name = entry.DisplayName ?? entry.Name;
                 model.Type = (entry.Type == EntryType.Game || entry.Type == EntryType.ProductionGroup) ? PeripheryOverviewHeadType.GameOrGroup : PeripheryOverviewHeadType.RoleOrStaff;
             }
             model.EntryId = entry.Id;
@@ -474,13 +474,13 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
         {
             var model = new GameOverviewPeripheriesModel();
             //获取周边列表
-            foreach (var item in periphery.PeripheryRelationFromPeripheryNavigation.Select(s=>s.ToPeripheryNavigation).Where(s => s.IsHidden == false))
+            foreach (var item in periphery.PeripheryRelationFromPeripheryNavigation.Select(s => s.ToPeripheryNavigation).Where(s => s.IsHidden == false))
             {
                 model.Peripheries.Add(new PeripheryOverviewModel
                 {
                     Id = item.Id,
-                    Image =_appHelper.GetImagePath( item.MainPicture,"app.png"),
-                    Name = item.DisplayName??item.Name,
+                    Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                    Name = item.DisplayName ?? item.Name,
                     CollectedCount = item.CollectedCount,
                 });
             }
@@ -510,8 +510,8 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             //获取主周边信息信息
             if (showUserPhoto == false)
             {
-                model.Image = _appHelper.GetImagePath(periphery.MainPicture,"app.png" );
-                model.Name = periphery.DisplayName??periphery.Name;
+                model.Image = _appHelper.GetImagePath(periphery.MainPicture, "app.png");
+                model.Name = periphery.DisplayName ?? periphery.Name;
                 model.Type = PeripheryOverviewHeadType.Periphery;
             }
             model.PeripheryId = periphery.Id;

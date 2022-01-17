@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 
-using System;
-
 namespace CnGalWebSite.DataModel.ExamineModel
 {
     public class ArticleRelecancesModel_1_0

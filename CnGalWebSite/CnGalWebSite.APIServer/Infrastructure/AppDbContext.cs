@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.DataModel.Helper;
-using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Tables;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 

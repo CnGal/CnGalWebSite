@@ -1,6 +1,4 @@
-﻿using System;
- using System.Collections.Generic;
-namespace CnGalWebSite.DataModel.ViewModel.Theme
+﻿namespace CnGalWebSite.DataModel.ViewModel.Theme
 {
     public class ThemeModel
     {

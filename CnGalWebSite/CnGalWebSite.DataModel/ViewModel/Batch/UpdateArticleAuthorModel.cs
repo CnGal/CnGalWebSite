@@ -1,6 +1,4 @@
-﻿using System;
- using System.Collections.Generic;
-namespace CnGalWebSite.DataModel.ViewModel.Batch
+﻿namespace CnGalWebSite.DataModel.ViewModel.Batch
 {
     public class UpdateArticleAuthorModel
     {

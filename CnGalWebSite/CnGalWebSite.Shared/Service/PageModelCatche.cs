@@ -31,7 +31,7 @@ namespace CnGalWebSite.Shared.Service
             _baseUrl = baseUrl ?? string.Empty;
         }
 
-        public async Task<TModel> GetCatche(string apiUrl,bool noRefresh=false)
+        public async Task<TModel> GetCatche(string apiUrl, bool noRefresh = false)
         {
             //判断是否两次请求同一个API
             //是则清除缓存

@@ -1,5 +1,4 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.APIServer.Application.Articles.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
@@ -7,8 +6,12 @@ using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using Markdig;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -17,12 +20,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using CnGalWebSite.DataModel.ViewModel;
-using CnGalWebSite.DataModel.ViewModel.Articles;
-using Markdig;
-using Microsoft.AspNetCore.Identity;
-using Nest;
-using TencentCloud.Cme.V20191029.Models;
 
 namespace CnGalWebSite.APIServer.Application.Articles
 {
@@ -144,16 +141,16 @@ namespace CnGalWebSite.APIServer.Application.Articles
             }
 
             // 处理 Searchable=true 列与 SeachText 模糊搜索
-          
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
-                                 || (item.BriefIntroduction?.Contains(options.SearchText) ?? false)
-                                 || (item.OriginalAuthor?.Contains(options.SearchText) ?? false)
-                                 || (item.OriginalLink?.Contains(options.SearchText) ?? false));
-                }
-          
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
+                             || (item.BriefIntroduction?.Contains(options.SearchText) ?? false)
+                             || (item.OriginalAuthor?.Contains(options.SearchText) ?? false)
+                             || (item.OriginalLink?.Contains(options.SearchText) ?? false));
+            }
+
 
             // 排序
             var isSorted = false;
@@ -161,7 +158,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCacheArticle.GetOrAdd(typeof(Article), key => LambdaExtensions.GetSortLambda<Article>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 
@@ -190,7 +187,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                     OriginalLink = item.OriginalLink,
                     OriginalAuthor = item.OriginalAuthor,
                     PubishTime = item.PubishTime,
-                    CanComment = item.CanComment??true
+                    CanComment = item.CanComment ?? true
                     //ThumbsUpCount=item.ThumbsUps.Count()
                 });
             }
@@ -516,7 +513,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                         articleRelecances = (ArticleRelevances)serializer.Deserialize(str, typeof(ArticleRelevances));
                     }
 
-                   await UpdateArticleDataRelevances(article, articleRelecances);
+                    await UpdateArticleDataRelevances(article, articleRelecances);
                     break;
                 case Operation.EditArticleMainPage:
                     UpdateArticleDataMainPage(article, examine.Context);
@@ -607,7 +604,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             model.MainPage = Markdown.ToHtml(model.MainPage ?? "", pipeline);
 
 
-       
+
             //读取词条信息
             var relevances = new List<RelevancesViewModel>();
 

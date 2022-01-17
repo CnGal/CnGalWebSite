@@ -1,11 +1,6 @@
-﻿using CnGalWebSite.DataModel.ExamineModel;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CnGalUWP.Services
@@ -14,7 +9,7 @@ namespace CnGalUWP.Services
     {
         public const string ApiBaseUrl = "https://www.cngal.org/";
 
-        public async Task<T> GetDataAsync <T>(string url) where T : class
+        public async Task<T> GetDataAsync<T>(string url) where T : class
         {
             using (var client = new HttpClient())
             {
@@ -23,7 +18,7 @@ namespace CnGalUWP.Services
                 using (TextReader textReader = new StringReader(str))
                 {
                     var serializer = new JsonSerializer();
-                    model=(T)serializer.Deserialize(textReader, typeof(T));
+                    model = (T)serializer.Deserialize(textReader, typeof(T));
                 }
 
                 return model;

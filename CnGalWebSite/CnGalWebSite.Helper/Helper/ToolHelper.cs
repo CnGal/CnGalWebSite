@@ -66,7 +66,7 @@ namespace CnGalWebSite.DataModel.Helper
                     var temp = MidStrEx(linshi[i], "[image](", ")");
                     if (string.IsNullOrWhiteSpace(temp))
                     {
-                         temp = MidStrEx(linshi[i], "[](", ")");
+                        temp = MidStrEx(linshi[i], "[](", ")");
                     }
                     if (string.IsNullOrWhiteSpace(temp) == false && temp.Contains("data:image") == false)
                     {
@@ -433,8 +433,8 @@ namespace CnGalWebSite.DataModel.Helper
                 //创建
                 result.Add(new EditVoteOptionModel
                 {
-                    Text=name,
-                    Type=Subcategory.ToEnumValue<VoteOptionType>()
+                    Text = name,
+                    Type = Subcategory.ToEnumValue<VoteOptionType>()
                 });
 
 
@@ -789,13 +789,13 @@ namespace CnGalWebSite.DataModel.Helper
         /// <returns></returns>
         public static bool IsInSameWeek(this DateTime day1, DateTime day2)
         {
-            DateTime temp1 = day1.AddDays(-(int)day1.DayOfWeek).Date;
-            DateTime temp2 = day2.AddDays(-(int)day2.DayOfWeek).Date;
+            var temp1 = day1.AddDays(-(int)day1.DayOfWeek).Date;
+            var temp2 = day2.AddDays(-(int)day2.DayOfWeek).Date;
 
             return temp1 == temp2;
         }
 
-       
+
     }
 
     public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions
@@ -804,7 +804,7 @@ namespace CnGalWebSite.DataModel.Helper
         /// 隐式转换
         /// </summary>
         /// <param name="cat"></param>
-        public static implicit  operator QueryPageOptionsHelper(BootstrapBlazor.Components.QueryPageOptions cat)
+        public static implicit operator QueryPageOptionsHelper(BootstrapBlazor.Components.QueryPageOptions cat)
         {
             return new QueryPageOptionsHelper
             {

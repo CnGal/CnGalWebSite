@@ -1,10 +1,5 @@
-﻿using Markdig;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Articles;
+﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
@@ -17,15 +12,17 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CnGalWebSite.APIServer.Application.Entries;
-using TencentCloud.Cme.V20191029.Models;
-using CnGalWebSite.DataModel.ViewModel.Home;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -76,9 +73,9 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
             var article = await _articleRepository.GetAll().AsNoTracking()
-                .Include(s=>s.Entries)
-                .Include(s=>s.Outlinks)
-                .Include(s=>s.ArticleRelationFromArticleNavigation).ThenInclude(s=>s.ToArticleNavigation)
+                .Include(s => s.Entries)
+                .Include(s => s.Outlinks)
+                .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
                 .Include(s => s.Examines).AsSplitQuery().FirstOrDefaultAsync(x => x.Id == id);
 
             if (article == null)
@@ -120,9 +117,9 @@ namespace CnGalWebSite.APIServer.Controllers
             //通过Id获取文章
             var article = await _articleRepository.GetAll().AsNoTracking().Include(s => s.Disambig)
                 .Include(s => s.CreateUser).Include(s => s.ThumbsUps)
-                .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s=>s.ToArticleNavigation)
-                .Include(s=>s.Entries)
-                .Include(s=>s.Outlinks)
+                .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
+                .Include(s => s.Entries)
+                .Include(s => s.Outlinks)
                 .Include(s => s.Examines).FirstOrDefaultAsync(x => x.Id == id);
             if (article == null)
             {
@@ -522,7 +519,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 //判断审核是否为空
                 if (articleRelevances.Relevances.Count != 0)
                 {
-                    
+
                     //序列化JSON
                     resulte = "";
                     using (TextWriter text = new StringWriter())
@@ -532,7 +529,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         resulte = text.ToString();
                     }
 
-                        //判断是否是管理员
+                    //判断是否是管理员
                     if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         await _examineService.ExamineEditArticleRelevancesAsync(article, articleRelevances);
@@ -1245,8 +1242,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     GroupId = infor.GroupId,
                     UserId = infor.UserId,
                     Articles = new List<ArticleInforTipViewModel> { articleInfor },
-                    GroupImage=infor.Image,
-                    GroupName=infor.GroupName,
+                    GroupImage = infor.Image,
+                    GroupName = infor.GroupName,
                 };
 
                 model.Add(temp);

@@ -1,13 +1,13 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.JSInterop;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.Shared.Component.Errors;
 using CnGalWebSite.Shared.Component.Others;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -287,7 +287,7 @@ namespace CnGalWebSite.Shared.Shared
                 });
 
             }
-            else if(user.IsInRole("Editor"))
+            else if (user.IsInRole("Editor"))
             {
                 menus.Insert(0,
                 new MenuItem()

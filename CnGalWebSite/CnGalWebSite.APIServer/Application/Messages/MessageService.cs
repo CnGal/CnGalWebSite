@@ -1,10 +1,10 @@
 ﻿using BootstrapBlazor.Components;
-using Markdig;
-using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.APIServer.Application.Users.Dtos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using Markdig;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -125,26 +125,26 @@ namespace CnGalWebSite.APIServer.Application.Messages
             }
 
 
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    items = items.Where(item => (item.Text?.Contains(options.SearchText) ?? false)
-                                 || (item.ApplicationUserId?.Contains(options.SearchText) ?? false)
-                                 || (item.Title?.Contains(options.SearchText) ?? false)
-                                 || (item.Rank?.Contains(options.SearchText) ?? false)
-                                 || (item.AdditionalInfor?.Contains(options.SearchText) ?? false)
-                                 || (item.LinkTitle?.Contains(options.SearchText) ?? false)
-                                 || (item.Image?.Contains(options.SearchText) ?? false)
-                                 || (item.Link?.Contains(options.SearchText) ?? false));
-                }
-          
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Text?.Contains(options.SearchText) ?? false)
+                             || (item.ApplicationUserId?.Contains(options.SearchText) ?? false)
+                             || (item.Title?.Contains(options.SearchText) ?? false)
+                             || (item.Rank?.Contains(options.SearchText) ?? false)
+                             || (item.AdditionalInfor?.Contains(options.SearchText) ?? false)
+                             || (item.LinkTitle?.Contains(options.SearchText) ?? false)
+                             || (item.Image?.Contains(options.SearchText) ?? false)
+                             || (item.Link?.Contains(options.SearchText) ?? false));
+            }
+
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCache.GetOrAdd(typeof(DataModel.Model.Message), key => LambdaExtensions.GetSortLambda<DataModel.Model.Message>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 

@@ -1,5 +1,4 @@
 ﻿using System;
- using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Peripheries
 {
     public class EditPeripheryPriorityViewModel

@@ -1,6 +1,4 @@
-﻿using System;
- using System.Collections.Generic;
-namespace CnGalWebSite.DataModel.ViewModel.Ranks
+﻿namespace CnGalWebSite.DataModel.ViewModel.Ranks
 {
     public class AddUserRankModel
     {

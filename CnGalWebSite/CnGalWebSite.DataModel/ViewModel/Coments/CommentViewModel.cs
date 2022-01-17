@@ -3,7 +3,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 
 using System;
- using System.Collections.Generic;
+using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Coments
 {
     public class CommentViewModel

@@ -1,4 +1,12 @@
-﻿using Gt3_server_csharp_aspnetcoremvc_bypass.Controllers.Sdk;
+﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.Helper;
+using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.Models;
+using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Search;
+using Gt3_server_csharp_aspnetcoremvc_bypass.Controllers.Sdk;
 using Markdig;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -7,13 +15,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NETCore.MailKit.Core;
-using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.ExamineModel;
-using CnGalWebSite.DataModel.Helper;
-using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.Models;
-using CnGalWebSite.DataModel.ViewModel.Admin;
-using CnGalWebSite.DataModel.ViewModel.Search;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SixLabors.ImageSharp;
@@ -26,12 +27,9 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using CnGalWebSite.DataModel.ViewModel;
 
 namespace CnGalWebSite.APIServer.Application.Helper
 {
@@ -113,7 +111,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             }
         }
 
-        public string GetImagePath(string image, string defaultStr,bool mediumImage=false)
+        public string GetImagePath(string image, string defaultStr, bool mediumImage = false)
         {
 
             if (string.IsNullOrWhiteSpace(image) == true)
@@ -606,7 +604,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             }
         }
 
-     
+
 
         private async Task<string> UploadFileToBserver(string filePath)
         {
@@ -1297,7 +1295,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 Type = item.Type,
                 DisplayName = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName,
                 CreateUserName = item.CreateUser?.UserName,
-                MainImage = GetImagePath(item.MainPicture, "certificate.png",true),
+                MainImage = GetImagePath(item.MainPicture, "certificate.png", true),
                 BriefIntroduction = item.BriefIntroduction,
                 LastEditTime = item.LastEditTime,
                 ReaderCount = item.ReaderCount,
@@ -1307,12 +1305,12 @@ namespace CnGalWebSite.APIServer.Application.Helper
             };
         }
 
-        public async Task< EntryInforTipViewModel> GetEntryInforTipViewModel(Entry entry)
+        public async Task<EntryInforTipViewModel> GetEntryInforTipViewModel(Entry entry)
         {
             //预处理图片
             if (entry.Type == EntryType.Staff || entry.Type == EntryType.Role)
             {
-                entry.MainPicture = GetImagePath(entry.Thumbnail, "user.png",true);
+                entry.MainPicture = GetImagePath(entry.Thumbnail, "user.png", true);
             }
             else
             {
@@ -1346,13 +1344,13 @@ namespace CnGalWebSite.APIServer.Application.Helper
                         if (item.Modifier == "基本信息" && item.DisplayName == "声优" && string.IsNullOrWhiteSpace(item.DisplayValue) == false)
                         {
                             var cvs = item.DisplayValue.Replace(",", "、").Replace("，", "、").Split("、").ToList();
-                            var cvEntries=await _entryRepository.GetAll().Where(s => cvs.Contains(s.Name)).Select(s => new KeyValuePair<int,string>(s.Id, s.DisplayName)).ToListAsync();
+                            var cvEntries = await _entryRepository.GetAll().Where(s => cvs.Contains(s.Name)).Select(s => new KeyValuePair<int, string>(s.Id, s.DisplayName)).ToListAsync();
 
-                            if(cvEntries.Count!=cvs.Count)
+                            if (cvEntries.Count != cvs.Count)
                             {
-                                foreach(var temp in cvs)
+                                foreach (var temp in cvs)
                                 {
-                                    if(cvEntries.Select(s=>s.Value).Contains(temp) ==false)
+                                    if (cvEntries.Select(s => s.Value).Contains(temp) == false)
                                     {
                                         cvEntries.Add(new KeyValuePair<int, string>(-1, temp));
                                     }
@@ -1366,7 +1364,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                                     DisplayName = s.Value,
                                     Id = s.Key
                                 }).ToList()
-                            }) ;
+                            });
                             break;
                         }
                     }
@@ -1375,7 +1373,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                     foreach (var nav in entry.EntryRelationFromEntryNavigation)
                     {
                         var item = nav.ToEntryNavigation;
-                        if (item.Type==EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)
+                        if (item.Type == EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)
                         {
                             gameNames.Add(new StaffNameModel
                             {
@@ -1404,13 +1402,13 @@ namespace CnGalWebSite.APIServer.Application.Helper
                     var gameNames = new List<StaffNameModel>();
                     foreach (var nav in entry.EntryRelationFromEntryNavigation)
                     {
-                        var item =nav.ToEntryNavigation;
+                        var item = nav.ToEntryNavigation;
                         if (item.Type == EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)
                         {
                             gameNames.Add(new StaffNameModel
                             {
-                                DisplayName=item.DisplayName,
-                                Id=item.Id
+                                DisplayName = item.DisplayName,
+                                Id = item.Id
                             });
                             if (gameNames.Count >= 3)
                             {
@@ -1486,7 +1484,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             var model = new PeripheryInforTipViewModel
             {
                 Id = periphery.Id,
-                Name = periphery.DisplayName??periphery.Name,
+                Name = periphery.DisplayName ?? periphery.Name,
                 MainImage = periphery.MainPicture,
                 BriefIntroduction = periphery.BriefIntroduction,
                 LastEditTime = periphery.LastEditTime,
@@ -1501,15 +1499,15 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 var temp = new EntryInforTipAddInforModel
                 {
                     Modifier = "关联词条",
-                    Contents =new List<StaffNameModel>()
+                    Contents = new List<StaffNameModel>()
                 };
                 model.AddInfors.Add(temp); ;
                 foreach (var item in periphery.Entries)
                 {
                     temp.Contents.Add(new StaffNameModel
                     {
-                        DisplayName=item.Entry.DisplayName,
-                        Id= item.Entry.Id,
+                        DisplayName = item.Entry.DisplayName,
+                        Id = item.Entry.Id,
                     });
 
 

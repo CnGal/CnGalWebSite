@@ -65,9 +65,9 @@ namespace CnGalWebSite.HistoryData
             LoadCurrentDatabaseData();
 
             //匹配数据
-            foreach (Article_Database item in articles)
+            foreach (var item in articles)
             {
-                NameIdPairModel temp = CurrentArticles.Find(s => s.Name == item.Title);
+                var temp = CurrentArticles.Find(s => s.Name == item.Title);
 
                 Urls.Add(new OldAndNewUrlModel
                 {
@@ -78,9 +78,9 @@ namespace CnGalWebSite.HistoryData
             }
 
             //匹配数据
-            foreach (Guide item in guides)
+            foreach (var item in guides)
             {
-                NameIdPairModel temp = CurrentArticles.Find(s => s.Name == item.Title);
+                var temp = CurrentArticles.Find(s => s.Name == item.Title);
 
                 Urls.Add(new OldAndNewUrlModel
                 {
@@ -92,13 +92,13 @@ namespace CnGalWebSite.HistoryData
 
 
             //匹配数据
-            foreach (Game item in games)
+            foreach (var item in games)
             {
-                NameIdPairModel temp = CurrentGames.Find(s => s.Name == item.Title);
+                var temp = CurrentGames.Find(s => s.Name == item.Title);
 
                 if (temp == null)
                 {
-                    Entry entry = new Entry
+                    var entry = new Entry
                     {
                         Name = item.Title,
                         DisplayName = item.Title,
@@ -200,8 +200,8 @@ namespace CnGalWebSite.HistoryData
                     entry.MainPicture = string.IsNullOrWhiteSpace(entry.SteamId) ? item.CoverImg : "https://media.st.dl.pinyuncloud.com/steam/apps/" + entry.SteamId + "/header.jpg";// linshi[linshi.Length - 1];
 
                     entry.MainPage = item.Content.Replace("_ueditor_page_break_tag_", "");
-                    string sss2 = Regex.Replace(item.Content, "[a-zA-Z0-9]", "");
-                    string tempStr = sss2.Replace("<", "").Replace(">", "").Replace("/", "").Replace("\\", "").Replace(";", "").Replace(":", "").Replace("\"", "").Replace(" ", "").Replace(".", "").Replace("=", "").Replace("-", "").Replace("_", "");
+                    var sss2 = Regex.Replace(item.Content, "[a-zA-Z0-9]", "");
+                    var tempStr = sss2.Replace("<", "").Replace(">", "").Replace("/", "").Replace("\\", "").Replace(";", "").Replace(":", "").Replace("\"", "").Replace(" ", "").Replace(".", "").Replace("=", "").Replace("-", "").Replace("_", "");
                     entry.BriefIntroduction = tempStr.Substring(0, tempStr.Length > 120 ? 120 : tempStr.Length) + "......";
 
                     Entry_s.Add(entry);
@@ -217,25 +217,25 @@ namespace CnGalWebSite.HistoryData
             }
 
             //输出
-            using (StreamWriter file = File.CreateText($"{path}\\输出文件夹\\OldUrl_NewUrl.json"))
+            using (var file = File.CreateText($"{path}\\输出文件夹\\OldUrl_NewUrl.json"))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, Urls);
             }
 
-            using (StreamWriter file = File.CreateText($"{path}\\输出文件夹\\NewEntries.json"))
+            using (var file = File.CreateText($"{path}\\输出文件夹\\NewEntries.json"))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, Entry_s);
             }
 
             //自定义输出
             // 创建文件
-            FileStream fs = new FileStream($"{path}\\输出文件夹\\oldurls.conf", FileMode.OpenOrCreate, FileAccess.ReadWrite); //可以指定盘符，也可以指定任意文件名，还可以为word等文件
-            StreamWriter sw = new StreamWriter(fs); // 创建写入流
+            var fs = new FileStream($"{path}\\输出文件夹\\oldurls.conf", FileMode.OpenOrCreate, FileAccess.ReadWrite); //可以指定盘符，也可以指定任意文件名，还可以为word等文件
+            var sw = new StreamWriter(fs); // 创建写入流
 
-            string tempStr1 = "";
-            foreach (OldAndNewUrlModel item in Urls)
+            var tempStr1 = "";
+            foreach (var item in Urls)
             {
                 tempStr1 += ("location " + item.OldUrl + " {\n");
                 tempStr1 += ("    return 301 " + item.NewUrl + ";\n");
@@ -247,10 +247,10 @@ namespace CnGalWebSite.HistoryData
 
             //自定义输出
             // 创建文件
-            FileStream fs1 = new FileStream($"{path}\\输出文件夹\\baidu.text", FileMode.OpenOrCreate, FileAccess.ReadWrite); //可以指定盘符，也可以指定任意文件名，还可以为word等文件
-            StreamWriter sw1 = new StreamWriter(fs1); // 创建写入流
+            var fs1 = new FileStream($"{path}\\输出文件夹\\baidu.text", FileMode.OpenOrCreate, FileAccess.ReadWrite); //可以指定盘符，也可以指定任意文件名，还可以为word等文件
+            var sw1 = new StreamWriter(fs1); // 创建写入流
             tempStr1 = "";
-            foreach (OldAndNewUrlModel item in Urls)
+            foreach (var item in Urls)
             {
                 tempStr1 += ("https://www.cngal.org" + item.OldUrl + " https://www.cngal.org" + item.NewUrl + "\n");
             }
@@ -263,17 +263,17 @@ namespace CnGalWebSite.HistoryData
 
         public static void LoadCurrentDatabaseData()
         {
-            using (StreamReader file = File.OpenText(path + "\\数据源文件夹\\CurrentArticles.json"))
+            using (var file = File.OpenText(path + "\\数据源文件夹\\CurrentArticles.json"))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 CurrentArticles = (List<NameIdPairModel>)serializer.Deserialize(file, typeof(List<NameIdPairModel>));
             }
 
 
 
-            using (StreamReader file = File.OpenText(path + "\\数据源文件夹\\CurrentGames.json"))
+            using (var file = File.OpenText(path + "\\数据源文件夹\\CurrentGames.json"))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 CurrentGames = (List<NameIdPairModel>)serializer.Deserialize(file, typeof(List<NameIdPairModel>));
             }
 
@@ -288,27 +288,27 @@ namespace CnGalWebSite.HistoryData
             Directory.CreateDirectory(path + "\\输出文件夹");
             Directory.CreateDirectory(path + "\\输出文件夹\\图片");
             //第一步 加载表格
-            Workbook linshi_ = new Workbook();
+            var linshi_ = new Workbook();
             linshi_.LoadFromFile(path + "\\数据源文件夹\\周边.xlsx");
             PeripheriesSheet = linshi_.Worksheets[0];
 
 
             //第二步 从基本信息表中创建周边
-            for (int i = 3; i <= 5; i++)
+            for (var i = 3; i <= 5; i++)
             {
                 peripheries.Add(CreatePeripheriy(PeripheriesSheet, i));
-                Console.WriteLine("[第二步]   <" + (i-2) + ">");
+                Console.WriteLine("[第二步]   <" + (i - 2) + ">");
             }
 
             //第二步 添加关联词条
-            for (int i = 3; i <= 5; i++)
+            for (var i = 3; i <= 5; i++)
             {
                 GetRelatedEntry(PeripheriesSheet, i);
                 Console.WriteLine("[第三步]   <" + (i - 2) + ">");
             }
 
             //第三步 添加关联周边
-            for (int i = 3; i <= 5; i++)
+            for (var i = 3; i <= 5; i++)
             {
                 GetRelatedPeriphery(PeripheriesSheet, i);
                 Console.WriteLine("[第四步]   <" + (i - 2) + ">");
@@ -316,9 +316,9 @@ namespace CnGalWebSite.HistoryData
 
 
             //输出
-            using (StreamWriter file = File.CreateText($"{path}\\输出文件夹\\Peripheries.json"))
+            using (var file = File.CreateText($"{path}\\输出文件夹\\Peripheries.json"))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, peripheries);
             }
             Console.WriteLine("=====================================");
@@ -329,7 +329,7 @@ namespace CnGalWebSite.HistoryData
 
         public static Periphery CreatePeripheriy(IWorksheet sheet, int index)
         {
-            Periphery model = new Periphery();
+            var model = new Periphery();
             //查找是否同名
             var name = sheet.GetStringValue("A" + index);
             if (name == null)
@@ -342,7 +342,7 @@ namespace CnGalWebSite.HistoryData
                 throw new Exception("周边重名");
             }
 
-            model.Name= name;
+            model.Name = name;
 
             //导入基本信息
             model.DisplayName = sheet.GetStringValue("B" + index) ?? model.Name;
@@ -352,7 +352,7 @@ namespace CnGalWebSite.HistoryData
             model.Price = sheet.GetStringValue("F" + index);
 
             var type = sheet.GetStringValue("H" + index);
-            if(type.Contains("画册"))
+            if (type.Contains("画册"))
             {
                 model.Type = PeripheryType.SetorAlbumEtc;
             }
@@ -375,10 +375,9 @@ namespace CnGalWebSite.HistoryData
             model.Author = sheet.GetStringValue("L" + index);
             model.Material = sheet.GetStringValue("M" + index);
             model.IndividualParts = sheet.GetStringValue("N" + index);
-            model.IsReprint = sheet.GetStringValue("O" + index)=="是";
+            model.IsReprint = sheet.GetStringValue("O" + index) == "是";
             model.IsAvailableItem = sheet.GetStringValue("P" + index) == "是";
-            int count = 0;
-            int.TryParse(sheet.GetStringValue("Q" + index), out count);
+            int.TryParse(sheet.GetStringValue("Q" + index), out var count);
             model.PageCount = count;
             int.TryParse(sheet.GetStringValue("R" + index), out count);
             model.SongCount = count;
@@ -390,14 +389,14 @@ namespace CnGalWebSite.HistoryData
 
         public static void GetRelatedEntry(IWorksheet sheet, int index)
         {
-            Periphery model = peripheries.FirstOrDefault(s => s.Name == sheet.GetStringValue("A" + index));
-            if(model == null)
+            var model = peripheries.FirstOrDefault(s => s.Name == sheet.GetStringValue("A" + index));
+            if (model == null)
             {
                 return;
             }
 
             var entriesString = sheet.GetStringValue("S" + index);
-            if(entriesString==null)
+            if (entriesString == null)
             {
                 return;
             }
@@ -415,7 +414,7 @@ namespace CnGalWebSite.HistoryData
 
         public static void GetRelatedPeriphery(IWorksheet sheet, int index)
         {
-            Periphery model = peripheries.FirstOrDefault(s => s.Name == sheet.GetStringValue("A" + index));
+            var model = peripheries.FirstOrDefault(s => s.Name == sheet.GetStringValue("A" + index));
             if (model == null)
             {
                 return;
@@ -447,7 +446,7 @@ namespace CnGalWebSite.HistoryData
             Directory.CreateDirectory(path + "\\输出文件夹");
             Directory.CreateDirectory(path + "\\输出文件夹\\图片");
             //第一步 加载表格
-            Workbook linshi_ = new Workbook();
+            var linshi_ = new Workbook();
             linshi_.LoadFromFile(path + "\\数据源文件夹\\基础.xlsx");
             biaoge_jichu = linshi_.Worksheets[0];
 
@@ -464,7 +463,7 @@ namespace CnGalWebSite.HistoryData
             biaoge_juese = linshi_.Worksheets[0];
 
             //第二步 从基本信息表中创建词条
-            for (int i = 2; i <= 282; i++)
+            for (var i = 2; i <= 282; i++)
             {
                 if (biaoge_jichu.Range["C" + i].Value2 != null && biaoge_jichu.Range["C" + i].Value2.ToString() != "")
                 {
@@ -473,7 +472,7 @@ namespace CnGalWebSite.HistoryData
                 }
             }
             //第三步 添加Staff列表到基本信息和关联信息中
-            for (int i = 2; i <= 2272; i++)
+            for (var i = 2; i <= 2272; i++)
             {
                 if (biaoge_staff.Range["D" + i].Value2 != null && biaoge_staff.Range["D" + i].Value2.ToString() != "")
                 {
@@ -483,13 +482,13 @@ namespace CnGalWebSite.HistoryData
                 }
             }
             //第四步 创建制作组词条 并添加游戏到自己的关联词条中
-            for (int i = 2; i <= 282; i++)
+            for (var i = 2; i <= 282; i++)
             {
                 if (biaoge_jichu.Range["C" + i].Value2 != null && biaoge_jichu.Range["B" + i].Value2 != null && !string.IsNullOrWhiteSpace(biaoge_jichu.Range["B" + i].Value2.ToString()) && !string.IsNullOrWhiteSpace(biaoge_jichu.Range["C" + i].Value2.ToString()))
                 {
-                    string groupNames = biaoge_jichu.Range["B" + i].Value2.ToString();
-                    string[] groupName = groupNames.Replace(", ", ",").Replace("，", ",").Replace("、", ",").Split(',');
-                    foreach (string item in groupName)
+                    var groupNames = biaoge_jichu.Range["B" + i].Value2.ToString();
+                    var groupName = groupNames.Replace(", ", ",").Replace("，", ",").Replace("、", ",").Split(',');
+                    foreach (var item in groupName)
                     {
                         CreateEntryGroup(i, biaoge_jichu, item);
                     }
@@ -498,7 +497,7 @@ namespace CnGalWebSite.HistoryData
                 }
             }
             //第五步 添加Staff词条自己的基本信息
-            for (int i = 2; i <= 146; i++)
+            for (var i = 2; i <= 146; i++)
             {
                 if (biaoge_zhizuoren.Range["A" + i].Value2 != null && !string.IsNullOrWhiteSpace(biaoge_zhizuoren.Range["A" + i].Value2.ToString()))
                 {
@@ -508,7 +507,7 @@ namespace CnGalWebSite.HistoryData
                 }
             }
             //第六步 创建角色词条 并为它自己添加基本信息和关联词条
-            for (int i = 2; i <= 79; i++)
+            for (var i = 2; i <= 79; i++)
             {
                 if (biaoge_juese.Range["A" + i].Value2 != null && !string.IsNullOrWhiteSpace(biaoge_juese.Range["A" + i].Value2.ToString()))
                 {
@@ -531,11 +530,11 @@ namespace CnGalWebSite.HistoryData
 
             //第十步 遍历添加显示名称
             Console.WriteLine("[第十步]   <复制显示名称>");
-            foreach (Entry item in Entry_s)
+            foreach (var item in Entry_s)
             {
                 item.DisplayName = item.Name;
             }
-            foreach (Article item in Article_s)
+            foreach (var item in Article_s)
             {
                 item.DisplayName = item.Name;
             }
@@ -548,9 +547,9 @@ namespace CnGalWebSite.HistoryData
             SaveArticle();
             SaveEntry();
 
-            using (StreamWriter file = File.CreateText(path + "\\输出文件夹\\Users.json"))
+            using (var file = File.CreateText(path + "\\输出文件夹\\Users.json"))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, users);
             }
             Console.WriteLine("导出数据成功！");
@@ -559,15 +558,15 @@ namespace CnGalWebSite.HistoryData
 
         public static void SaveArticle()
         {
-            int MaxCount = 2000;
-            int temp = 1;
-            int i = 0;
+            var MaxCount = 2000;
+            var temp = 1;
+            var i = 0;
             for (; i + MaxCount < Article_s.Count; temp++)
             {
-                List<Article> list = Article_s.GetRange(i, MaxCount);
-                using (StreamWriter file = File.CreateText($"{path}\\输出文件夹\\Articles_{temp}.json"))
+                var list = Article_s.GetRange(i, MaxCount);
+                using (var file = File.CreateText($"{path}\\输出文件夹\\Articles_{temp}.json"))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     serializer.Serialize(file, list);
                 }
                 Console.WriteLine("[第十二步]   <" + temp + ">");
@@ -579,10 +578,10 @@ namespace CnGalWebSite.HistoryData
             }
             if (i >= Article_s.Count)
             {
-                List<Article> list = Article_s.GetRange(i - MaxCount, Article_s.Count - 1);
-                using (StreamWriter file = File.CreateText($"{path}\\输出文件夹\\Articles_{temp}.json"))
+                var list = Article_s.GetRange(i - MaxCount, Article_s.Count - 1);
+                using (var file = File.CreateText($"{path}\\输出文件夹\\Articles_{temp}.json"))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     serializer.Serialize(file, list);
                 }
                 Console.WriteLine("[第十二步]   <" + temp + ">");
@@ -591,15 +590,15 @@ namespace CnGalWebSite.HistoryData
 
         public static void SaveEntry()
         {
-            int MaxCount = 5000;
-            int temp = 1;
-            int i = 0;
+            var MaxCount = 5000;
+            var temp = 1;
+            var i = 0;
             for (; i + MaxCount < Entry_s.Count; temp++)
             {
-                List<Entry> list = Entry_s.GetRange(i, MaxCount);
-                using (StreamWriter file = File.CreateText($"{path}\\输出文件夹\\Entries_{temp}.json"))
+                var list = Entry_s.GetRange(i, MaxCount);
+                using (var file = File.CreateText($"{path}\\输出文件夹\\Entries_{temp}.json"))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     serializer.Serialize(file, list);
                 }
                 Console.WriteLine("[第十三步]   <" + temp + ">");
@@ -612,10 +611,10 @@ namespace CnGalWebSite.HistoryData
             }
             if (i >= Entry_s.Count)
             {
-                List<Entry> list = Entry_s.GetRange(i - MaxCount, Entry_s.Count - 1);
-                using (StreamWriter file = File.CreateText($"{path}\\输出文件夹\\Entries_{temp}.json"))
+                var list = Entry_s.GetRange(i - MaxCount, Entry_s.Count - 1);
+                using (var file = File.CreateText($"{path}\\输出文件夹\\Entries_{temp}.json"))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     serializer.Serialize(file, list);
                 }
                 Console.WriteLine("[第十二步]   <" + temp + ">");
@@ -624,14 +623,14 @@ namespace CnGalWebSite.HistoryData
 
         public static void GetGameDataFromAsync()
         {
-            int jishu = 0;
-            foreach (Game item in games)
+            var jishu = 0;
+            foreach (var item in games)
             {
                 jishu++;
                 Console.WriteLine("[第九步]   <" + jishu + ">");
                 //找到对应词条
 
-                Entry entry_ = Entry_s.Find(s => s.Type == EntryType.Game && s.Name == item.Title);
+                var entry_ = Entry_s.Find(s => s.Type == EntryType.Game && s.Name == item.Title);
                 if (entry_ != null)
                 {
                     //赋值
@@ -644,8 +643,8 @@ namespace CnGalWebSite.HistoryData
 
 
                     entry_.MainPage = item.Content.Replace("_ueditor_page_break_tag_", "");
-                    string sss2 = Regex.Replace(item.Content, "[a-zA-Z0-9]", "");
-                    string tempStr = sss2.Replace("<", "").Replace(">", "").Replace("/", "").Replace("\\", "").Replace(";", "").Replace(":", "").Replace("\"", "").Replace(" ", "").Replace(".", "").Replace("=", "").Replace("-", "").Replace("_", "");
+                    var sss2 = Regex.Replace(item.Content, "[a-zA-Z0-9]", "");
+                    var tempStr = sss2.Replace("<", "").Replace(">", "").Replace("/", "").Replace("\\", "").Replace(";", "").Replace(":", "").Replace("\"", "").Replace(" ", "").Replace(".", "").Replace("=", "").Replace("-", "").Replace("_", "");
                     entry_.BriefIntroduction = tempStr.Substring(0, tempStr.Length > 120 ? 120 : tempStr.Length) + "......";
                 }
 
@@ -654,8 +653,8 @@ namespace CnGalWebSite.HistoryData
 
         public static void GetGuideDataFrom()
         {
-            int jishu = 0;
-            foreach (Guide item in guides)
+            var jishu = 0;
+            foreach (var item in guides)
             {
                 if (item.Title.Contains("deleted"))
                 {
@@ -663,7 +662,7 @@ namespace CnGalWebSite.HistoryData
                 }
                 jishu++;
                 Console.WriteLine("[第八步]   <" + jishu + ">");
-                Article article_ = new Article
+                var article_ = new Article
                 {
                     Type = ArticleType.Strategy,
                     MainPage = item.Content.Replace("_ueditor_page_break_tag_", ""),
@@ -677,13 +676,13 @@ namespace CnGalWebSite.HistoryData
                 };
                 Article_s.Add(article_);
                 //寻找关联词条
-                string[] linshi = item.GameIds.Replace(", ", ",").Split(',');
-                foreach (string infor in linshi)
+                var linshi = item.GameIds.Replace(", ", ",").Split(',');
+                foreach (var infor in linshi)
                 {
-                    Game game_ = games.Find(s => s.Id.ToString() == infor);
+                    var game_ = games.Find(s => s.Id.ToString() == infor);
                     if (game_ != null)
                     {
-                        Entry entry_ = Entry_s.Find(s => s.Name == game_.Title && s.Type == EntryType.Game);
+                        var entry_ = Entry_s.Find(s => s.Name == game_.Title && s.Type == EntryType.Game);
                         if (entry_ != null)
                         {
                             entry_.Relevances.Add(new EntryRelevance { Modifier = "文章", DisplayName = item.Title });
@@ -693,16 +692,16 @@ namespace CnGalWebSite.HistoryData
 
                     }
                 }
-                string sss2 = Regex.Replace(item.Content, "[a-zA-Z0-9]", "");
-                string tempStr = sss2.Replace("<", "").Replace(">", "").Replace("/", "").Replace("\\", "").Replace(";", "").Replace(":", "").Replace("\"", "").Replace(" ", "").Replace(".", "").Replace("=", "").Replace("-", "").Replace("_", "");
+                var sss2 = Regex.Replace(item.Content, "[a-zA-Z0-9]", "");
+                var tempStr = sss2.Replace("<", "").Replace(">", "").Replace("/", "").Replace("\\", "").Replace(";", "").Replace(":", "").Replace("\"", "").Replace(" ", "").Replace(".", "").Replace("=", "").Replace("-", "").Replace("_", "");
                 article_.BriefIntroduction = tempStr.Substring(0, tempStr.Length > 120 ? 120 : tempStr.Length) + "......";
             }
         }
 
         public static void GetArticleDateFrom()
         {
-            int jishu = 0;
-            foreach (Article_Database item in articles)
+            var jishu = 0;
+            foreach (var item in articles)
             {
                 if (item.Title.Contains("deleted"))
                 {
@@ -711,7 +710,7 @@ namespace CnGalWebSite.HistoryData
                 jishu++;
                 Console.WriteLine("[第七步]   <" + jishu + ">");
 
-                Article article_ = new Article
+                var article_ = new Article
                 {
                     Type = ArticleType.Tought,
                     MainPage = item.Content.Replace("_ueditor_page_break_tag_", ""),
@@ -738,13 +737,13 @@ namespace CnGalWebSite.HistoryData
                     article_.Type = ArticleType.Interview;
                 }
                 //寻找关联词条
-                string[] linshi = item.GameIds.Replace(", ", ",").Split(',');
-                foreach (string infor in linshi)
+                var linshi = item.GameIds.Replace(", ", ",").Split(',');
+                foreach (var infor in linshi)
                 {
-                    Game game_ = games.Find(s => s.Id.ToString() == infor);
+                    var game_ = games.Find(s => s.Id.ToString() == infor);
                     if (game_ != null)
                     {
-                        Entry entry_ = Entry_s.Find(s => s.Name == game_.Title && s.Type == EntryType.Game);
+                        var entry_ = Entry_s.Find(s => s.Name == game_.Title && s.Type == EntryType.Game);
                         if (entry_ != null)
                         {
                             entry_.Relevances.Add(new EntryRelevance { Modifier = "动态", DisplayName = item.Title });
@@ -757,8 +756,8 @@ namespace CnGalWebSite.HistoryData
                     {
                         article_.Type = ArticleType.News;
                     }
-                    string sss2 = Regex.Replace(item.Content, "[a-zA-Z0-9]", "");
-                    string tempStr = sss2.Replace("<", "").Replace(">", "").Replace("/", "").Replace("\\", "").Replace(";", "").Replace(":", "").Replace("\"", "").Replace(" ", "").Replace(".", "").Replace("=", "").Replace("-", "").Replace("_", "");
+                    var sss2 = Regex.Replace(item.Content, "[a-zA-Z0-9]", "");
+                    var tempStr = sss2.Replace("<", "").Replace(">", "").Replace("/", "").Replace("\\", "").Replace(";", "").Replace(":", "").Replace("\"", "").Replace(" ", "").Replace(".", "").Replace("=", "").Replace("-", "").Replace("_", "");
                     article_.BriefIntroduction = tempStr.Substring(0, tempStr.Length > 120 ? 120 : tempStr.Length) + "......";
                 }
                 Article_s.Add(article_);
@@ -767,28 +766,28 @@ namespace CnGalWebSite.HistoryData
 
         public static void LoadHistoryDatabaseData()
         {
-            using (StreamReader file = File.OpenText(path + "\\数据源文件夹\\Articles.json"))
+            using (var file = File.OpenText(path + "\\数据源文件夹\\Articles.json"))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 articles = (List<Article_Database>)serializer.Deserialize(file, typeof(List<Article_Database>));
             }
             //筛选
             articles = articles.Where(s => s.State == 1).ToList();
-            using (StreamReader file = File.OpenText(path + "\\数据源文件夹\\Guides.json"))
+            using (var file = File.OpenText(path + "\\数据源文件夹\\Guides.json"))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 guides = (List<Guide>)serializer.Deserialize(file, typeof(List<Guide>));
             }
             guides = guides.Where(s => s.State == 1).ToList();
-            using (StreamReader file = File.OpenText(path + "\\数据源文件夹\\Games.json"))
+            using (var file = File.OpenText(path + "\\数据源文件夹\\Games.json"))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 games = (List<Game>)serializer.Deserialize(file, typeof(List<Game>));
             }
             games = games.Where(s => s.State == 1).ToList();
-            using (StreamReader file = File.OpenText(path + "\\数据源文件夹\\cngal_users.json"))
+            using (var file = File.OpenText(path + "\\数据源文件夹\\cngal_users.json"))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 historyUsers = (List<HistoryUser>)serializer.Deserialize(file, typeof(List<HistoryUser>));
             }
             historyUsers = historyUsers.Where(s => s.state == 1).ToList();
@@ -796,7 +795,7 @@ namespace CnGalWebSite.HistoryData
 
         public static void GetArticleCreateUser()
         {
-            foreach (HistoryUser item in historyUsers)
+            foreach (var item in historyUsers)
             {
                 users.Add(new ImportUserModel
                 {
@@ -838,19 +837,19 @@ namespace CnGalWebSite.HistoryData
         /// <returns></returns>
         public static async Task<string> DownLoadFile(string url, string savePath)
         {
-            string newFileName = savePath;
-            using (HttpClient httpClient = new HttpClient())
+            var newFileName = savePath;
+            using (var httpClient = new HttpClient())
             {
                 try
                 {
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    HttpResponseMessage response = httpClient.GetAsync(url).Result;
+                    var response = httpClient.GetAsync(url).Result;
                     if (response.IsSuccessStatusCode)
                     {
-                        Stream ms = await response.Content.ReadAsStreamAsync();
-                        using (BinaryReader br = new BinaryReader(ms))
+                        var ms = await response.Content.ReadAsStreamAsync();
+                        using (var br = new BinaryReader(ms))
                         {
-                            byte[] data = br.ReadBytes((int)ms.Length);
+                            var data = br.ReadBytes((int)ms.Length);
                             File.WriteAllBytes(newFileName, data);
 
                         }
@@ -902,7 +901,7 @@ namespace CnGalWebSite.HistoryData
                 throw new Exception("数据不能为空");
             }
             //删除重名的角色
-            Entry entry = Entry_s.Find(s => s.Name == worksheet.Range["A" + hang].Value2.ToString());
+            var entry = Entry_s.Find(s => s.Name == worksheet.Range["A" + hang].Value2.ToString());
             if (entry == null)
             {
                 //第二步 读取标题和简介
@@ -1044,7 +1043,7 @@ namespace CnGalWebSite.HistoryData
                 });
                 //查找关联作品 添加
                 // 寻找对应的游戏词条 添加自己关联信息
-                foreach (Entry item in Entry_s)
+                foreach (var item in Entry_s)
                 {
                     if (item.Name == worksheet.Range["M" + hang].Value2.ToString())
                     {
@@ -1070,8 +1069,8 @@ namespace CnGalWebSite.HistoryData
             }
             //第一步 寻找或创建词条
             Entry entry = null;
-            string name = staff.Range["A" + hang].Value2.ToString();
-            foreach (Entry item in Entry_s)
+            var name = staff.Range["A" + hang].Value2.ToString();
+            foreach (var item in Entry_s)
             {
                 if (item.Name == name)
                 {
@@ -1109,10 +1108,10 @@ namespace CnGalWebSite.HistoryData
 
         private static void AddStaffWeb(Entry entry, string str)
         {
-            string[] linshi1 = str.Replace(", ", ",").Split(',');
-            foreach (string item in linshi1)
+            var linshi1 = str.Replace(", ", ",").Split(',');
+            foreach (var item in linshi1)
             {
-                string[] linshi2 = item.Split('|');
+                var linshi2 = item.Split('|');
                 if (linshi2.Length == 2)
                 {
                     entry.Information.Add(new BasicEntryInformation
@@ -1129,7 +1128,7 @@ namespace CnGalWebSite.HistoryData
         {
             //第一步创建制作组词条并赋值
             //查找这个制作组书否存在
-            Entry entry = Entry_s.Find(s => s.Name == name);
+            var entry = Entry_s.Find(s => s.Name == name);
             if (entry == null)
             {
                 entry = new Entry
@@ -1150,9 +1149,9 @@ namespace CnGalWebSite.HistoryData
             //把游戏添加到关联词条中
             if (game.Range["C" + hang].Value2 != null && !string.IsNullOrWhiteSpace(game.Range["C" + hang].Value2.ToString()))
             {
-                string gameName = game.Range["C" + hang].Value2.ToString();
-                bool isAdded = false;
-                foreach (EntryRelevance item in entry.Relevances)
+                var gameName = game.Range["C" + hang].Value2.ToString();
+                var isAdded = false;
+                foreach (var item in entry.Relevances)
                 {
                     if (item.DisplayValue == gameName)
                     {
@@ -1181,26 +1180,26 @@ namespace CnGalWebSite.HistoryData
             {
                 throw new Exception("数据不能为空");
             }
-            string[] linshi1 = staff.Range["D" + hang].Value2.ToString().Replace(", ", ",").Split(',');
-            foreach (string item in linshi1)
+            var linshi1 = staff.Range["D" + hang].Value2.ToString().Replace(", ", ",").Split(',');
+            foreach (var item in linshi1)
             {
                 CreateEntryStaffIn(hang, item, staff);
             }
             // 第二步 添加STAFF表关联
-            foreach (Entry item in Entry_s)
+            foreach (var item in Entry_s)
             {
                 if (item.Name == staff.Range["A" + hang].Value2.ToString())
                 {
-                    string str1 = staff.Range["C" + hang].Value2.ToString().Replace("、", ",");
-                    string str2 = staff.Range["D" + hang].Value2.ToString();
-                    string 子项目 = staff.Range["B" + hang].Value2.ToString();
-                    string 角色 = staff.Range["E" + hang].Value2.ToString();
-                    string 组织 = staff.Range["F" + hang].Value2.ToString();
-                    string str3 = staff.Range["G" + hang].Value2.ToString();
+                    var str1 = staff.Range["C" + hang].Value2.ToString().Replace("、", ",");
+                    var str2 = staff.Range["D" + hang].Value2.ToString();
+                    var 子项目 = staff.Range["B" + hang].Value2.ToString();
+                    var 角色 = staff.Range["E" + hang].Value2.ToString();
+                    var 组织 = staff.Range["F" + hang].Value2.ToString();
+                    var str3 = staff.Range["G" + hang].Value2.ToString();
 
 
-                    string[] linshi = str2.Replace(", ", ",").Split(',');
-                    foreach (string temp in linshi)
+                    var linshi = str2.Replace(", ", ",").Split(',');
+                    foreach (var temp in linshi)
                     {
                         if (string.IsNullOrWhiteSpace(temp))
                         {
@@ -1210,9 +1209,9 @@ namespace CnGalWebSite.HistoryData
                         {
                             str3 = temp;
                         }
-                        string 职位通用 = GetPositionGeneralType_(str3).ToString();
+                        var 职位通用 = GetPositionGeneralType_(str3).ToString();
                         //STAFF表
-                        List<BasicEntryInformationAdditional> linshi3 = new List<BasicEntryInformationAdditional>();
+                        var linshi3 = new List<BasicEntryInformationAdditional>();
                         if (子项目 != null && !string.IsNullOrWhiteSpace(子项目))
                         {
 
@@ -1357,7 +1356,7 @@ namespace CnGalWebSite.HistoryData
         private static void CreateEntryStaffIn(int hang, string name, IWorksheet staff)
         {
             //第一步 检查该词条是否被创建
-            Entry entry = Entry_s.Find(s => s.Name == name);
+            var entry = Entry_s.Find(s => s.Name == name);
             if (entry == null)
             {
                 entry = new Entry
@@ -1374,9 +1373,9 @@ namespace CnGalWebSite.HistoryData
             //第二步 在staff词条中添加关联作品
             if (staff.Range["A" + hang].Value2 != null && staff.Range["A" + hang].Value2.ToString() != "")
             {
-                bool isAdd = false;
-                string temp = staff.Range["A" + hang].Value2.ToString();
-                foreach (EntryRelevance item in entry.Relevances)
+                var isAdd = false;
+                var temp = staff.Range["A" + hang].Value2.ToString();
+                foreach (var item in entry.Relevances)
                 {
                     if (item.DisplayName == temp)
                     {
@@ -1398,12 +1397,12 @@ namespace CnGalWebSite.HistoryData
             if (staff.Range["E" + hang].Value2 != null && staff.Range["E" + hang].Value2.ToString() != "")
             {
 
-                string temp_ = staff.Range["E" + hang].Value2.ToString();
-                string[] temps = temp_.Replace(", ", ",").Split(',');
-                foreach (string temp in temps)
+                var temp_ = staff.Range["E" + hang].Value2.ToString();
+                var temps = temp_.Replace(", ", ",").Split(',');
+                foreach (var temp in temps)
                 {
-                    bool isAdd = false;
-                    foreach (EntryRelevance item in entry.Relevances)
+                    var isAdd = false;
+                    foreach (var item in entry.Relevances)
                     {
                         if (item.DisplayName == temp)
                         {
@@ -1421,7 +1420,7 @@ namespace CnGalWebSite.HistoryData
 
                         //创建角色
                         //删除重名的角色
-                        Entry entry_role = Entry_s.Find(s => s.Name == temp);
+                        var entry_role = Entry_s.Find(s => s.Name == temp);
                         if (entry_role == null)
                         {
                             entry_role = new Entry()
@@ -1437,7 +1436,7 @@ namespace CnGalWebSite.HistoryData
                             Entry_s.Add(entry_role);
                         }
                         isAdd = false;
-                        foreach (EntryRelevance item in entry_role.Relevances)
+                        foreach (var item in entry_role.Relevances)
                         {
                             if (item.DisplayName == name)
                             {
@@ -1508,7 +1507,7 @@ namespace CnGalWebSite.HistoryData
             }
 
             //第二步 读取标题和简介
-            Entry entry = new Entry()
+            var entry = new Entry()
             {
                 Information = new List<BasicEntryInformation>(),
                 Relevances = new List<EntryRelevance>(),
@@ -1526,7 +1525,7 @@ namespace CnGalWebSite.HistoryData
             //第三步读取附加信息
             if (worksheet.Range["A" + hang].Value2 != null && worksheet.Range["A" + hang].Value2.ToString() != "")
             {
-                string timeString = worksheet.Range["A" + hang].Value2.ToString();
+                var timeString = worksheet.Range["A" + hang].Value2.ToString();
                 try
                 {
                     entry.PubulishTime = DateTime.ParseExact(timeString, "G", null);
@@ -1555,9 +1554,9 @@ namespace CnGalWebSite.HistoryData
             }
             if (worksheet.Range["B" + hang].Value2 != null && worksheet.Range["B" + hang].Value2.ToString() != "")
             {
-                string groupNames = worksheet.Range["B" + hang].Value2.ToString();
-                string[] groupName = groupNames.Replace("，", ",").Replace("、", ",").Replace(", ", ",").Split(',');
-                foreach (string item in groupName)
+                var groupNames = worksheet.Range["B" + hang].Value2.ToString();
+                var groupName = groupNames.Replace("，", ",").Replace("、", ",").Replace(", ", ",").Split(',');
+                foreach (var item in groupName)
                 {
 
                     entry.Relevances.Add(new EntryRelevance
@@ -1661,8 +1660,8 @@ namespace CnGalWebSite.HistoryData
 
         private static void HuoquGuanlianZuoping_In_Jiben(string guan, Entry entry)
         {
-            string[] linshi1 = guan.Replace(", ", ",").Split(',');
-            foreach (string item in linshi1)
+            var linshi1 = guan.Replace(", ", ",").Split(',');
+            foreach (var item in linshi1)
             {
                 entry.Relevances.Add(new EntryRelevance
                 {
@@ -1687,11 +1686,11 @@ namespace CnGalWebSite.HistoryData
             }
             else
             {
-                bool isFirst = true;
-                string[] linshi1 = web.Replace(", ", ",").Split(',');
-                foreach (string item in linshi1)
+                var isFirst = true;
+                var linshi1 = web.Replace(", ", ",").Split(',');
+                foreach (var item in linshi1)
                 {
-                    string[] linshi2 = item.Split('|');
+                    var linshi2 = item.Split('|');
                     if (linshi2.Length == 2)
                     {
                         entry.Information.Add(new BasicEntryInformation
@@ -1718,15 +1717,15 @@ namespace CnGalWebSite.HistoryData
 
         private static void GetOtherLink(string links, Entry entry)
         {
-            string[] temps = links.Split(',');
-            foreach (string temp in temps)
+            var temps = links.Split(',');
+            foreach (var temp in temps)
             {
-                string[] infors = temp.Split('|');
+                var infors = temp.Split('|');
                 if (infors.Length == 2)
                 {
                     if (infors[0] != "Steam")
                     {
-                        string[] infor = infors[1].Split('(');
+                        var infor = infors[1].Split('(');
                         string link;
                         if (infor.Length == 0)
                         {

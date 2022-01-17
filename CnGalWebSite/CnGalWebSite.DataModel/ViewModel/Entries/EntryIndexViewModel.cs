@@ -1,10 +1,9 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Search;
-using System.ComponentModel.DataAnnotations;
-
 using System;
- using System.Collections.Generic;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel
 {
     public class EntryIndexViewModel
@@ -86,22 +85,22 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// <summary>
         /// Staff信息 
         /// </summary>
-        public List<StaffInforModel> Staffs { get; set; }=new List<StaffInforModel> { };
+        public List<StaffInforModel> Staffs { get; set; } = new List<StaffInforModel> { };
 
         /// <summary>
         /// 动态动态
         /// </summary>
-        public List<NewsModel> NewsOfEntry { get; set; }=new List<NewsModel> { };
+        public List<NewsModel> NewsOfEntry { get; set; } = new List<NewsModel> { };
 
         /// <summary>
         /// 角色信息 
         /// </summary>
-        public List<EntryInforTipViewModel> Roles { get; set; }=new List<EntryInforTipViewModel> {};
+        public List<EntryInforTipViewModel> Roles { get; set; } = new List<EntryInforTipViewModel> { };
 
         /// <summary>
         /// STAFF的关联游戏列表
         /// </summary>
-        public List<EntryInforTipViewModel> StaffGames { get; set; }=new List<EntryInforTipViewModel> {};
+        public List<EntryInforTipViewModel> StaffGames { get; set; } = new List<EntryInforTipViewModel> { };
 
         /// <summary>
         /// 主页
@@ -111,7 +110,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// <summary>
         /// 相关词条
         /// </summary>
-        public List<EntryInforTipViewModel> EntryRelevances { get; set; }=new List<EntryInforTipViewModel>();
+        public List<EntryInforTipViewModel> EntryRelevances { get; set; } = new List<EntryInforTipViewModel>();
 
         /// <summary>
         /// 相关文章
@@ -121,7 +120,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// <summary>
         /// 外部链接
         /// </summary>
-        public List<RelevancesKeyValueModel> OtherRelevances { get; set; }=new List<RelevancesKeyValueModel> { };
+        public List<RelevancesKeyValueModel> OtherRelevances { get; set; } = new List<RelevancesKeyValueModel> { };
 
 
         /// <summary>
@@ -131,12 +130,12 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// <summary>
         /// 审核记录 也是编辑记录
         /// </summary>
-        public List<ExaminedNormalListModel> Examines { get; set; }=new List<ExaminedNormalListModel> { };
+        public List<ExaminedNormalListModel> Examines { get; set; } = new List<ExaminedNormalListModel> { };
 
         /// <summary>
         /// 标签列表
         /// </summary>
-        public List<TagsViewModel> Tags { get; set; }=new List<TagsViewModel> { };
+        public List<TagsViewModel> Tags { get; set; } = new List<TagsViewModel> { };
     }
     public class TagsViewModel
     {

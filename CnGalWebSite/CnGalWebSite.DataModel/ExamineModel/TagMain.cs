@@ -1,6 +1,4 @@
-﻿using System;
- using System.Collections.Generic;
-namespace CnGalWebSite.DataModel.ExamineModel
+﻿namespace CnGalWebSite.DataModel.ExamineModel
 {
     public class TagMain
     {

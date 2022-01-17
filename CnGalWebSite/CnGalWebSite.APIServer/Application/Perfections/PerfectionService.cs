@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Helper;
-using CnGalWebSite.APIServer.DataReositories;
+﻿using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -263,7 +262,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                                 (level == PerfectionCheckLevel.High) ?
                                 (
                                      (s.CheckType == PerfectionCheckType.BriefIntroduction || s.CheckType == PerfectionCheckType.MainImage
-                                       || s.CheckType == PerfectionCheckType.IssueTime || s.CheckType == PerfectionCheckType.MainPage) 
+                                       || s.CheckType == PerfectionCheckType.IssueTime || s.CheckType == PerfectionCheckType.MainPage)
                                  )
                                 :
                                 (
@@ -277,7 +276,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                                          (s.CheckType != PerfectionCheckType.BriefIntroduction && s.CheckType != PerfectionCheckType.MainImage
                                         && s.CheckType != PerfectionCheckType.IssueTime && s.CheckType != PerfectionCheckType.MainPage
                                         && s.CheckType != PerfectionCheckType.Staff && s.CheckType != PerfectionCheckType.SteamId
-                                        && s.CheckType != PerfectionCheckType.ProductionGroup) 
+                                        && s.CheckType != PerfectionCheckType.ProductionGroup)
 
                                       )
                                  )
@@ -381,7 +380,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 //检查图片
                 results.Add(CheckEntryImages(entry));
                 //检查关联信息
-                results.AddRange( CheckEntryRelevances(entry));
+                results.AddRange(CheckEntryRelevances(entry));
                 //检查标签
                 results.Add(CheckEntryTags(entry));
 
@@ -499,7 +498,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 });
             }
 
-             if ( entry.Articles.Count == 0)
+            if (entry.Articles.Count == 0)
             {
                 results.Add(new PerfectionCheck
                 {
@@ -517,9 +516,9 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                     Grade = 10,
                 });
             }
-         
 
-         
+
+
             return results;
         }
 

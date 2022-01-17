@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using System;
- using System.Collections.Generic;
-namespace CnGalWebSite.DataModel.ViewModel.Search
+﻿namespace CnGalWebSite.DataModel.ViewModel.Search
 {
     public enum SearchScreenType
     {
@@ -15,6 +7,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Search
         Article,
         Periphery,
         Tag
-            
+
     }
 }

@@ -1,18 +1,12 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.ExamineModel;
-using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
-using CnGalWebSite.DataModel.ViewModel.Peripheries;
-using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -20,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Votes
 {
-    public class VoteService:IVoteService
+    public class VoteService : IVoteService
     {
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IAppHelper _appHelper;
@@ -44,7 +38,7 @@ namespace CnGalWebSite.APIServer.Application.Votes
             {
                 items = items.Where(item => item.BriefIntroduction?.Contains(searchModel.BriefIntroduction, StringComparison.OrdinalIgnoreCase) ?? false);
             }
-     
+
 
 
             // 处理 SearchText 模糊搜索

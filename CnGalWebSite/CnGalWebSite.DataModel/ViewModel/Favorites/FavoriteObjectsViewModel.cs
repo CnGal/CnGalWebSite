@@ -1,7 +1,4 @@
 ﻿using CnGalWebSite.DataModel.ViewModel.Search;
-
-using System;
- using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Favorites
 {
     public class FavoriteObjectAloneViewModel

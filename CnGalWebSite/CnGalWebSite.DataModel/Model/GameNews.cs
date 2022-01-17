@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CnGalWebSite.DataModel.Model
 {
@@ -50,7 +47,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 关联词条
         /// </summary>
-        public List<GameNewsRelatedEntry> Entries { get; set; }=new List<GameNewsRelatedEntry>();
+        public List<GameNewsRelatedEntry> Entries { get; set; } = new List<GameNewsRelatedEntry>();
     }
 
     public class GameNewsRelatedEntry
@@ -66,7 +63,7 @@ namespace CnGalWebSite.DataModel.Model
         Edit,
         [Display(Name = "已发表")]
         Publish,
-        [Display(Name ="已忽略")]
+        [Display(Name = "已忽略")]
         Ignore
     }
 
@@ -89,7 +86,7 @@ namespace CnGalWebSite.DataModel.Model
 
     public enum OriginalRSSType
     {
-        [Display(Name ="微博")]
+        [Display(Name = "微博")]
         Weibo,
         [Display(Name = "自定义")]
         Custom,

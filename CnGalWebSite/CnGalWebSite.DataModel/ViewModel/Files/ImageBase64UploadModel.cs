@@ -1,6 +1,4 @@
-﻿using System;
- using System.Collections.Generic;
-namespace CnGalWebSite.DataModel.ViewModel.Files
+﻿namespace CnGalWebSite.DataModel.ViewModel.Files
 {
     public class ImageBase64UploadModel
     {

@@ -1,4 +1,11 @@
 ﻿using AspNetCoreRateLimit;
+using CnGalWebSite.APIServer.Application.BackgroundTasks;
+using CnGalWebSite.APIServer.Application.ElasticSearches;
+using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.News;
+using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.APIServer.Infrastructure;
+using CnGalWebSite.DataModel.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -15,19 +22,12 @@ using Microsoft.OpenApi.Models;
 using NetCore.AutoRegisterDi;
 using NETCore.MailKit.Extensions;
 using NETCore.MailKit.Infrastructure.Internal;
-using CnGalWebSite.APIServer.Application.BackgroundTasks;
-using CnGalWebSite.APIServer.Application.Helper;
-using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.APIServer.Infrastructure;
-using CnGalWebSite.DataModel.Model;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using CnGalWebSite.APIServer.Application.ElasticSearches;
-using CnGalWebSite.APIServer.Application.News;
 
 namespace CnGalWebSite.APIServer
 {

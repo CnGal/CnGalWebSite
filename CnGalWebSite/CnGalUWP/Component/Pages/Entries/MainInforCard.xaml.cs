@@ -1,18 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
+﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 //https://go.microsoft.com/fwlink/?LinkId=234236 上介绍了“用户控件”项模板
 
@@ -22,7 +9,7 @@ namespace CnGalUWP.Component.Pages.Entries
     {
         public MainInforCard()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         private void GroupLink_Click(object sender, RoutedEventArgs e)
@@ -32,7 +19,7 @@ namespace CnGalUWP.Component.Pages.Entries
 
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (e.NewSize.Width <700||e.NewSize.Width>1000)
+            if (e.NewSize.Width < 700 || e.NewSize.Width > 1000)
             {
                 //设置布局概览
                 MainImage.Margin = new Thickness(0, 70, 0, 0);
@@ -84,7 +71,7 @@ namespace CnGalUWP.Component.Pages.Entries
 
 
                 //设置边距
-                if (e.NewSize.Height > 800|| (e.NewSize.Width < 700&&e.NewSize.Width!=400))
+                if (e.NewSize.Height > 800 || (e.NewSize.Width < 700 && e.NewSize.Width != 400))
                 {
                     RecordButton.Margin = new Thickness(0, 60, 0, 0);
                     CountShowPanel.Margin = new Thickness(0, 70, 0, 0);
@@ -154,14 +141,14 @@ namespace CnGalUWP.Component.Pages.Entries
                 TitleCard.SetValue(RelativePanel.AlignRightWithPanelProperty, true);
 
                 NameText.Margin = new Thickness(0, 18, 0, 0);
-                NameText.TextAlignment= TextAlignment.Left;
+                NameText.TextAlignment = TextAlignment.Left;
                 NameText.HorizontalAlignment = HorizontalAlignment.Left;
                 NameText.Width = double.NaN;
 
                 GroupLink.Padding = new Thickness(0, 0, 0, 0);
                 GroupLink.HorizontalAlignment = HorizontalAlignment.Left;
 
-                RecordButton.Margin = new Thickness(25,25,25,0);
+                RecordButton.Margin = new Thickness(25, 25, 25, 0);
 
                 spRecord.SetValue(RelativePanel.BelowProperty, null);
                 spRecord.SetValue(RelativePanel.AlignTopWithPanelProperty, true);

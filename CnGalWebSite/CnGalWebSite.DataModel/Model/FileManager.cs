@@ -1,7 +1,7 @@
 ﻿using CnGalWebSite.DataModel.Model;
 
 using System;
- using System.Collections.Generic;
+using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.Models
 {
     public class FileManager

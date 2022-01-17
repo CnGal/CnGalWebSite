@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CnGalWebSite.DataModel.ViewModel.Votes
+﻿namespace CnGalWebSite.DataModel.ViewModel.Votes
 {
     public class HiddenVoteModel
     {

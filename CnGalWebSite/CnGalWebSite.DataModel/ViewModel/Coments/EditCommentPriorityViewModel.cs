@@ -1,6 +1,4 @@
-﻿using System;
- using System.Collections.Generic;
-namespace CnGalWebSite.DataModel.ViewModel.Coments
+﻿namespace CnGalWebSite.DataModel.ViewModel.Coments
 {
     public class EditCommentPriorityViewModel
     {

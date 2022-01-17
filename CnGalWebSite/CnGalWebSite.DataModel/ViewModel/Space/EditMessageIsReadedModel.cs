@@ -1,6 +1,4 @@
-﻿using System;
- using System.Collections.Generic;
-namespace CnGalWebSite.DataModel.ViewModel.Space
+﻿namespace CnGalWebSite.DataModel.ViewModel.Space
 {
     public class EditMessageIsReadedModel
     {

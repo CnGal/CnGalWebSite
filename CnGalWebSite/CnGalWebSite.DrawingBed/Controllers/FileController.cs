@@ -1,10 +1,6 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Files;
-using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
-using System.Security.Policy;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
@@ -31,8 +27,8 @@ namespace CnGalWebSite.DrawingBed.Controllers
             try
             {
                 using var client = _clientFactory.CreateClient();
-                double x = model.X;
-                double y = model.Y;
+                var x = model.X;
+                var y = model.Y;
 
                 //client.Timeout = TimeSpan.FromSeconds(10);
 
@@ -96,11 +92,11 @@ namespace CnGalWebSite.DrawingBed.Controllers
                 }
 
                 //上传文件到远程服务器
-                string UploadResults = "";
+                var UploadResults = "";
 
                 UploadResults = await UploadFileToBserver(filePath);
 
-                if(string.IsNullOrWhiteSpace(UploadResults))
+                if (string.IsNullOrWhiteSpace(UploadResults))
                 {
                     return new Result { Successful = false, Error = "文件上传失败" };
                 }
@@ -113,7 +109,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("> "+DateTime.Now.ToString("G"));
+                Console.WriteLine("> " + DateTime.Now.ToString("G"));
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
@@ -132,7 +128,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             using var client = _clientFactory.CreateClient();
 
             var url = _configuration["SliotsImageUrl"] + "api/1/upload/?format=txt&key=" + _configuration["SliotsImageAPIToken"];
-           
+
             var response = await client.PostAsync(url, content);
 
             var newUploadResults = await response.Content.ReadAsStringAsync();
@@ -241,8 +237,8 @@ namespace CnGalWebSite.DrawingBed.Controllers
                 Console.WriteLine("Path is not Existed!");
                 return false;
             }
-            DirectoryInfo dir = new DirectoryInfo(path);
-            FileInfo[] files = dir.GetFiles();
+            var dir = new DirectoryInfo(path);
+            var files = dir.GetFiles();
             try
             {
                 foreach (var item in files)
@@ -261,7 +257,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
                         }
                     }
                 }
-                
+
 
                 return true;
             }

@@ -1,11 +1,11 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -54,7 +54,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCache.GetOrAdd(typeof(FavoriteObject), key => LambdaExtensions.GetSortLambda<FavoriteObject>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 
@@ -120,7 +120,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
             if (count != 0)
             {
                 models = await query.AsNoTracking().Include(s => s.Entry).ThenInclude(s => s.Information).Include(s => s.Entry)
-                    .ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                    .ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.Article).ThenInclude(s => s.CreateUser).Include(s => s.Periphery).ToListAsync();
             }
             else
@@ -142,7 +142,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
                 {
                     dtos.Add(new FavoriteObjectAloneViewModel
                     {
-                        entry =await _appHelper.GetEntryInforTipViewModel(item.Entry)
+                        entry = await _appHelper.GetEntryInforTipViewModel(item.Entry)
                     });
                 }
                 else if (item.Type == FavoriteObjectType.Periphery)

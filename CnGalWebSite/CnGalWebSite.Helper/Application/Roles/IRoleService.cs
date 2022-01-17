@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using CnGalWebSite.DataModel.Application.Dtos;
+﻿using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Application.Roles.Dtos;
+using Microsoft.AspNetCore.Identity;
 
 namespace CnGalWebSite.DataModel.Application.Roles
 {

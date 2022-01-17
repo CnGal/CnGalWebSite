@@ -1,6 +1,4 @@
-﻿using System;
- using System.Collections.Generic;
-namespace CnGalWebSite.DataModel.ViewModel.BackUpArchives
+﻿namespace CnGalWebSite.DataModel.ViewModel.BackUpArchives
 {
     public class RunBackUpArchiveModel
     {

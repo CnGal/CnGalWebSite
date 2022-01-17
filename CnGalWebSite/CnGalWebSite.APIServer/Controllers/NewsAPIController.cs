@@ -32,7 +32,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TencentCloud.Ame.V20190916.Models;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers

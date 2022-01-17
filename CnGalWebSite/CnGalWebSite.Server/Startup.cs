@@ -1,17 +1,16 @@
 ﻿using Blazored.LocalStorage;
-using BootstrapBlazor.Components;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using CnGalWebSite.DataModel.Application.Examines;
 using CnGalWebSite.DataModel.Application.Helper;
 using CnGalWebSite.DataModel.Application.Roles;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
 using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.Net.Http;
 using System.Text;
 

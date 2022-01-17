@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Disambigs;
+﻿using CnGalWebSite.APIServer.Application.Disambigs;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
@@ -13,6 +8,11 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Disambig;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
@@ -140,7 +140,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 relevances.Add(new DisambigAloneModel
                 {
-                    entry =await _appHelper.GetEntryInforTipViewModel(item)
+                    entry = await _appHelper.GetEntryInforTipViewModel(item)
                 });
             }
             foreach (var item in disambig.Articles)

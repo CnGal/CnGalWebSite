@@ -1,17 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Articles;
-using CnGalWebSite.APIServer.Application.Comments;
-using CnGalWebSite.APIServer.Application.ErrorCounts;
-using CnGalWebSite.APIServer.Application.Favorites;
-using CnGalWebSite.APIServer.Application.Files;
-using CnGalWebSite.APIServer.Application.Helper;
-using CnGalWebSite.APIServer.Application.Messages;
-using CnGalWebSite.APIServer.Application.Users;
-using CnGalWebSite.APIServer.DataReositories;
+﻿using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Tables;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +21,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
         private readonly IRepository<SteamInforTableModel, long> _steamInforTableModelRepository;
 
 
-        public TableService( IRepository<BasicInforTableModel, long> basicInforTableModelRepository,IRepository<Entry, int> entryRepository,
+        public TableService(IRepository<BasicInforTableModel, long> basicInforTableModelRepository, IRepository<Entry, int> entryRepository,
         IRepository<GroupInforTableModel, long> groupInforTableModelRepository, IRepository<MakerInforTableModel, long> makerInforTableModelRepository,
         IRepository<StaffInforTableModel, long> staffInforTableModelRepository, IRepository<RoleInforTableModel, long> roleInforTableModelRepository,
         IRepository<SteamInforTableModel, long> steamInforTableModelRepository, IRepository<SteamInfor, long> steamInforRepository)
@@ -562,7 +552,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 foreach (var nav in infor.EntryRelationFromEntryNavigation)
                 {
                     var item = nav.ToEntryNavigation;
-                    if (item.Type == EntryType.Game&& string.IsNullOrWhiteSpace(item.DisplayName) == false)
+                    if (item.Type == EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)
                     {
                         if (string.IsNullOrWhiteSpace(tableModel.GameName))
                         {

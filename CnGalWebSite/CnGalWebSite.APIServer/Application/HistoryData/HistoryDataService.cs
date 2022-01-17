@@ -1,29 +1,13 @@
-﻿using HtmlAgilityPack;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System;
-using CnGalWebSite.APIServer.Application.Files;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Hosting;
-using System.IO;
-using TencentCloud.Ocr.V20181119.Models;
-using Newtonsoft.Json;
-using CnGalWebSite.DataModel.ViewModel.Entries;
-using System.Security.Policy;
-using CnGalWebSite.DataModel.ViewModel.HistoryData;
-using TencentCloud.Mrs.V20200910.Models;
-using CnGalWebSite.DataModel.Helper;
-using System.Linq;
-using CnGalWebSite.DataModel.Model;
-using Markdig;
+﻿using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
-using System.Linq.Dynamic.Core;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.DataModel.ExamineModel;
-using Microsoft.AspNetCore.Identity;
+using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.HistoryData;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Net.Http;
 
 namespace CnGalWebSite.APIServer.Application.HistoryData
 {
@@ -35,7 +19,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
         private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private List<OriginalImageToDrawingBedUrl> _images;
+        private readonly List<OriginalImageToDrawingBedUrl> _images;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
 
@@ -70,7 +54,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
     public class LevenshteinDistance
     {
 
-        private static LevenshteinDistance _instance = null;
+        private static readonly LevenshteinDistance _instance = null;
         public static LevenshteinDistance Instance
         {
             get
@@ -93,25 +77,31 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
         /// <returns></returns>
         public int LowerOfThree(int first, int second, int third)
         {
-            int min = first;
+            var min = first;
             if (second < min)
+            {
                 min = second;
+            }
+
             if (third < min)
+            {
                 min = third;
+            }
+
             return min;
         }
 
         public int Levenshtein_Distance(string str1, string str2)
         {
             int[,] Matrix;
-            int n = str1.Length;
-            int m = str2.Length;
+            var n = str1.Length;
+            var m = str2.Length;
 
-            int temp = 0;
+            var temp = 0;
             char ch1;
             char ch2;
-            int i = 0;
-            int j = 0;
+            var i = 0;
+            var j = 0;
             if (n == 0)
             {
                 return m;
@@ -159,7 +149,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
             {
                 for (j = 0; j <= m; j++)
                 {
-                   // Console.Write(" {0} ", Matrix[i, j]);
+                    // Console.Write(" {0} ", Matrix[i, j]);
                 }
                 //Console.WriteLine("");
             }
@@ -179,8 +169,8 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
             {
                 return 0;
             }
-            int maxLenth = str1.Length > str2.Length ? str1.Length : str2.Length;
-            int val = Levenshtein_Distance(str1, str2);
+            var maxLenth = str1.Length > str2.Length ? str1.Length : str2.Length;
+            var val = Levenshtein_Distance(str1, str2);
             return 1 - (decimal)val / maxLenth;
         }
     }

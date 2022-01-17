@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Tags;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
@@ -13,6 +8,11 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Tags;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -819,7 +819,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
             }
             //判断是否为锁定状态
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id&&s.Id==model.Id && s.IsPassed == null && (s.Operation == Operation.EditTagChildEntries)))
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id == model.Id && s.IsPassed == null && (s.Operation == Operation.EditTagChildEntries)))
             {
                 return new Result { Error = "当前标签该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }

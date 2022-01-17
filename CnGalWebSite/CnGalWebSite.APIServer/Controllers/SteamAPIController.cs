@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,21 +1,19 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Articles;
+﻿using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Comments;
+using CnGalWebSite.APIServer.Application.ElasticSearches;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.ErrorCounts;
 using CnGalWebSite.APIServer.Application.Favorites;
 using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.HistoryData;
 using CnGalWebSite.APIServer.Application.Messages;
+using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Users;
+using CnGalWebSite.APIServer.Application.Votes;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.ExamineModel;
@@ -23,17 +21,19 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CnGalWebSite.APIServer.Application.ElasticSearches;
-using CnGalWebSite.APIServer.Application.News;
-using CnGalWebSite.APIServer.Application.HistoryData;
-using CnGalWebSite.APIServer.Application.Votes;
-using Microsoft.Extensions.Configuration;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -837,7 +837,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     case Operation.EditArticleRelevanes:
 
                         article = await _articleRepository.GetAll()
-                            .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s=>s.ToArticleNavigation)
+                            .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
                             .FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
                         if (article == null)
                         {
@@ -1498,7 +1498,7 @@ namespace CnGalWebSite.APIServer.Controllers
             try
             {
                 //await _examineService.MigrationEditEntryRelevanceExamineRecord();
-                await _examineService.MigrationEditArticleRelevanceExamineRecord();
+                //await _examineService.MigrationEditArticleRelevanceExamineRecord();
                 //string temp= await _fileService.SaveImageAsync("https://wx4.sinaimg.cn/mw2000/008qAv3ngy1gyem1zkfwqj31cr0s9hbg.jpg", _configuration["NewsAdminId"]);
                 //await _elasticsearchService.DeleteDataOfElasticsearch();
                 //await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
@@ -1514,11 +1514,19 @@ namespace CnGalWebSite.APIServer.Controllers
                 }*/
 
                 //await _historyDataService.GenerateZhiHuArticleImportJson();
+
+              /*  var examines = await _examineRepository.GetAll().Where(s => s.Operation == Operation.EstablishImages).ToListAsync();
+                foreach(var item in examines)
+                {
+                    item.Context=item.Context.Replace("pic.sliots.top", "pic.cngal.top");
+                    await _examineRepository.UpdateAsync(item);
+                }*/
+
                 return new Result { Successful = true };
             }
             catch (Exception ex)
             {
-                return new Result { Successful = false, Error = ex.Message+"\n"+ex.StackTrace+"\n"+ex.Source };
+                return new Result { Successful = false, Error = ex.Message + "\n" + ex.StackTrace + "\n" + ex.Source };
             }
 
         }

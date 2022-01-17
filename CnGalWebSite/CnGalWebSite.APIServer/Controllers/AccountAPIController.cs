@@ -1,17 +1,17 @@
-﻿using Gt3_server_csharp_aspnetcoremvc_bypass.Controllers.Sdk;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using Gt3_server_csharp_aspnetcoremvc_bypass.Controllers.Sdk;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -1142,7 +1142,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new ThirdPartyLoginResult { Code = ThirdPartyLoginResultType.Failed, Error = "Code不能为空" };
             }
             //获取token_id
-           var  token = await _userService.GetThirdPartyLoginIdToken(model.Code, model.ReturnUrl, model.IsSSR, model.Type);
+            var token = await _userService.GetThirdPartyLoginIdToken(model.Code, model.ReturnUrl, model.IsSSR, model.Type);
 
 
             if (string.IsNullOrWhiteSpace(token))

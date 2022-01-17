@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace CnGalWebSite.HistoryData.Model
 {
@@ -148,9 +144,9 @@ namespace CnGalWebSite.HistoryData.Model
         /// 关联周边列表
         /// </summary>
         public List<string> Peripheries { get; set; } = new List<string>();
-}
+    }
     public enum PeripheryType
-{
+    {
         [Display(Name = "其他")]
         None,
         [Display(Name = "设定集或画册等")]

@@ -1,5 +1,4 @@
 ﻿using System;
- using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Entries
 {
     public class EditEntryCanCommentModel

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace CnGalWebSite.DataModel.ViewModel.Search
+﻿namespace CnGalWebSite.DataModel.ViewModel.Search
 {
     public class QueryPageOptions
     {
@@ -82,7 +77,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Search
             set;
         }
 
-       
+
     }
 
     public enum SortOrder

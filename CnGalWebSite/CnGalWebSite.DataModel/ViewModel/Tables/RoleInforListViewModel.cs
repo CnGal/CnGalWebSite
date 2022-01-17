@@ -1,13 +1,12 @@
 ﻿using CnGalWebSite.DataModel.Model;
-using System.ComponentModel.DataAnnotations;
-
 using System;
- using System.Collections.Generic;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Tables
 {
     public class RoleInforListViewModel
     {
-        public List<RoleInforTableModel> RoleInfors { get; set; }= new List<RoleInforTableModel>();
+        public List<RoleInforTableModel> RoleInfors { get; set; } = new List<RoleInforTableModel>();
     }
 
     public class RoleInforTableModel

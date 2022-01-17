@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
@@ -11,6 +6,10 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,8 +30,8 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IExamineService _examineService;
 
 
-        public PerfectionAPIController( IRepository<Examine, long> examineRepository,
-        IAppHelper appHelper, 
+        public PerfectionAPIController(IRepository<Examine, long> examineRepository,
+        IAppHelper appHelper,
        IPerfectionService perfectionService, IRepository<PerfectionOverview, long> perfectionOverviewRepository,
          IExamineService examineService)
         {

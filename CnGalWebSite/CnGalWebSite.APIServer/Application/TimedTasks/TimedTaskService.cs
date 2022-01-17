@@ -1,6 +1,7 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.APIServer.Application.BackUpArchives;
+using CnGalWebSite.APIServer.Application.ElasticSearches;
+using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Tables;
@@ -8,13 +9,12 @@ using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.TimedTasks;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CnGalWebSite.APIServer.Application.ElasticSearches;
-using CnGalWebSite.APIServer.Application.News;
 
 namespace CnGalWebSite.APIServer.Application.TimedTasks
 {
@@ -61,13 +61,13 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
 
 
 
-          
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false));
-                }
-           
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false));
+            }
+
 
             // 排序
             var isSorted = false;
@@ -75,7 +75,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCacheApplicationUser.GetOrAdd(typeof(TimedTask), key => LambdaExtensions.GetSortLambda<TimedTask>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 
@@ -180,7 +180,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         await _perfectionService.UpdateAllEntryPerfectionsAsync();
                         break;
                     case TimedTaskType.UpdateDataToElasticsearch:
-                        await _elasticsearchService.UpdateDataToElasticsearch(item.LastExecutedTime??DateTime.MinValue);
+                        await _elasticsearchService.UpdateDataToElasticsearch(item.LastExecutedTime ?? DateTime.MinValue);
                         break;
                     case TimedTaskType.UpdateGameNews:
                         await _newsService.UpdateNewestGameNews();

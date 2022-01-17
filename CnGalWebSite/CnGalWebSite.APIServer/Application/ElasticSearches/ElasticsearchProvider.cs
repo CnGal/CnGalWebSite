@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Nest;
-using SixLabors.ImageSharp;
 using System;
-using TencentCloud.Emr.V20190103.Models;
 
 namespace CnGalWebSite.APIServer.Application.ElasticSearches
 {
@@ -16,7 +14,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
         }
 
         public IElasticClient GetClient()
-{
+        {
             var url = _configuration["ElasticSearchContextUrl"];
             //如果有多个节点以|分开
             //var urls = url.Split('|').Select(x => new Uri(x)).ToList();

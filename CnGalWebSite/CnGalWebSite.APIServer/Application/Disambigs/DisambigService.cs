@@ -1,9 +1,9 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -46,14 +46,14 @@ namespace CnGalWebSite.APIServer.Application.Disambigs
                 items = items.Where(item => item.BriefIntroduction?.Contains(searchModel.BriefIntroduction, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
-          
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
-                                 || (item.BriefIntroduction?.Contains(options.SearchText) ?? false));
-                }
-         
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
+                             || (item.BriefIntroduction?.Contains(options.SearchText) ?? false));
+            }
+
 
             // 排序
             var isSorted = false;
@@ -61,7 +61,7 @@ namespace CnGalWebSite.APIServer.Application.Disambigs
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCache.GetOrAdd(typeof(Disambig), key => LambdaExtensions.GetSortLambda<Disambig>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 

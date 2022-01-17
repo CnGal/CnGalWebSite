@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.DataReositories;
@@ -13,14 +9,17 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using TencentCloud.Ame.V20190916.Models;
-using CnGalWebSite.APIServer.Application.Entries;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -66,7 +65,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 //通过Id获取周边
                 var periphery = await _peripheryRepository.GetAll().AsNoTracking()
                     .Include(s => s.Pictures).Include(s => s.Examines).Include(s => s.Entries)
-                    .Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation).ThenInclude(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s=>s.ToPeripheryNavigation)
+                    .Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation).ThenInclude(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (periphery == null)
@@ -409,7 +408,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
 
                 //检查周边是否重名
-                if(await _peripheryRepository.GetAll().AnyAsync(s=>s.Name==model.Name))
+                if (await _peripheryRepository.GetAll().AnyAsync(s => s.Name == model.Name))
                 {
                     return new Result { Successful = false, Error = "该周边的名称与其他周边重复" };
                 }
@@ -438,7 +437,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = "至少需要关联一个词条" };
                 }
 
-            
+
                 //预处理 建立周边关联信息
                 //判断关联是否存在
                 var peripheryIds = new List<long>();
@@ -636,10 +635,10 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 }
 
-           
+
                 return new Result { Successful = true, Error = periphery.Id.ToString() };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new Result { Error = "创建周边的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
             }
@@ -716,7 +715,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = "当前周边该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }
             //检查周边是否重名
-            if (await _peripheryRepository.GetAll().AnyAsync(s => s.Name == model.Name&&s.Id!=model.Id))
+            if (await _peripheryRepository.GetAll().AnyAsync(s => s.Name == model.Name && s.Id != model.Id))
             {
                 return new Result { Successful = false, Error = "该周边的名称与其他周边重复" };
             }
@@ -1145,7 +1144,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //获取词条
-            var periphery = await _peripheryRepository.GetAll().AsNoTracking().Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s=>s.ToPeripheryNavigation).ThenInclude(s=>s.PeripheryRelationFromPeripheryNavigation).FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
+            var periphery = await _peripheryRepository.GetAll().AsNoTracking().Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation).ThenInclude(s => s.PeripheryRelationFromPeripheryNavigation).FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
             if (periphery == null)
             {
                 return NotFound();
@@ -1170,7 +1169,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //处理附加信息
             var peripheries = new List<RelevancesModel>();
 
-            foreach (var item in periphery.PeripheryRelationFromPeripheryNavigation.Select(s=>s.ToPeripheryNavigation))
+            foreach (var item in periphery.PeripheryRelationFromPeripheryNavigation.Select(s => s.ToPeripheryNavigation))
             {
 
                 peripheries.Add(new RelevancesModel
@@ -1202,7 +1201,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //查找当前周边
             var periphery = await _peripheryRepository.GetAll()
                 .Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation).ThenInclude(s => s.PeripheryRelationFromPeripheryNavigation)
-                .Include(s=>s.PeripheryRelationToPeripheryNavigation)
+                .Include(s => s.PeripheryRelationToPeripheryNavigation)
                 .FirstOrDefaultAsync(s => s.Id == model.Id);
             if (periphery == null)
             {
@@ -1236,7 +1235,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var examinedModel = new PeripheryRelatedPeripheries();
 
             //遍历当前词条数据 打上删除标签
-            foreach (var item in periphery.PeripheryRelationFromPeripheryNavigation.Select(s=>s.ToPeripheryNavigation))
+            foreach (var item in periphery.PeripheryRelationFromPeripheryNavigation.Select(s => s.ToPeripheryNavigation))
             {
                 examinedModel.Relevances.Add(new PeripheryRelatedPeripheriesAloneModel
                 {

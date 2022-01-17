@@ -1,8 +1,5 @@
 ﻿
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.ElasticSearches;
 using CnGalWebSite.APIServer.Application.Home;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.DataReositories;
@@ -10,12 +7,14 @@ using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Home;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using CnGalWebSite.APIServer.Application.ElasticSearches;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -30,7 +29,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IElasticsearchService _elasticsearchService;
 
         public HomeAPIController(ISearchService searchService, IElasticsearchService elasticsearchService,
-        IRepository<Entry, int> entryRepository,IHomeService homeService)
+        IRepository<Entry, int> entryRepository, IHomeService homeService)
         {
             _searchService = searchService;
             _entryRepository = entryRepository;
@@ -159,8 +158,8 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var model = new SearchViewModel();
                 var dtos = input.StartIndex == -1 ?
-                    await _elasticsearchService.QueryAsync(input.CurrentPage, input.MaxResultCount,input.FilterText, input.ScreeningConditions,input.Sorting, QueryType.Page) :
-                    await _elasticsearchService.QueryAsync(input.StartIndex, input.MaxResultCount,input.FilterText, input.ScreeningConditions,input.Sorting, QueryType.Index);
+                    await _elasticsearchService.QueryAsync(input.CurrentPage, input.MaxResultCount, input.FilterText, input.ScreeningConditions, input.Sorting, QueryType.Page) :
+                    await _elasticsearchService.QueryAsync(input.StartIndex, input.MaxResultCount, input.FilterText, input.ScreeningConditions, input.Sorting, QueryType.Index);
                 dtos.Data = dtos.Data.ToList();
 
                 model.pagedResultDto = dtos;

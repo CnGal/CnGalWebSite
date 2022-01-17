@@ -1,7 +1,5 @@
 ﻿using CnGalWebSite.DataModel.ViewModel.Search;
-
-using System;
- using System.Collections.Generic;
+using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Tags
 {
     public class TagIndexViewModel

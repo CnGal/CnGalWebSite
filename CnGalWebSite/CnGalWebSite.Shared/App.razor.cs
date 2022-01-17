@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using CnGalWebSite.DataModel.ViewModel.Theme;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using CnGalWebSite.DataModel.ViewModel.Theme;
 using System;
 using System.Threading.Tasks;
 

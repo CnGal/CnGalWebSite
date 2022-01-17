@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Perfections;
@@ -15,6 +11,11 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -22,11 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TencentCloud.Ame.V20190916.Models;
-using Nest;
 using Result = CnGalWebSite.DataModel.Model.Result;
-using CnGalWebSite.APIServer.Application.Articles;
-using NuGet.Packaging;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -142,7 +139,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
                     .AsSplitQuery().FirstOrDefaultAsync(x => x.Id == id);
             }
-            catch(Exception ex)
+            catch (Exception)
             {
                 entry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Disambig)
                     .Include(s => s.Outlinks)
@@ -216,9 +213,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     await _entryService.UpdateEntryDataAsync(entry, examine);
                 }
             }
-        
+
             //建立视图模型
-            var model =await _entryService.GetEntryIndexViewModelAsync(entry);
+            var model = await _entryService.GetEntryIndexViewModelAsync(entry);
             model.Examines = await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => s.EntryId == entry.Id && s.IsPassed == true), true);
 
             if (user != null)
@@ -248,7 +245,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     model.TagState = EditState.Preview;
                 }
             }
-          
+
             //获取各部分状态
             var examiningList = new List<Operation>();
             if (user != null)
@@ -926,12 +923,12 @@ namespace CnGalWebSite.APIServer.Controllers
                                 model.BilibiliId = item.DisplayValue.Replace("https://space.bilibili.com/", "").Split('/').FirstOrDefault();
 
                             }
-                            else  if (item.DisplayValue.Contains("acfun.cn"))
+                            else if (item.DisplayValue.Contains("acfun.cn"))
                             {
                                 model.AcFunId = item.DisplayValue.Replace("https://www.acfun.cn/u/", "").Split('/').FirstOrDefault();
 
                             }
-                            else  if (item.DisplayValue.Contains("zhihu.com"))
+                            else if (item.DisplayValue.Contains("zhihu.com"))
                             {
                                 model.ZhihuId = item.DisplayValue.Replace("https://www.zhihu.com/people/", "").Split('/').FirstOrDefault();
 
@@ -1367,7 +1364,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                 }
                 //加载在基本信息中的网站
-                if(string.IsNullOrWhiteSpace(model.WeiboId)==false)
+                if (string.IsNullOrWhiteSpace(model.WeiboId) == false)
                 {
                     model.SocialPlatforms.Add(new SocialPlatform
                     {
@@ -1439,7 +1436,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         Link = "https://www.facebook.com/" + model.FacebookId
                     });
                 }
-           
+
 
                 //遍历一遍当前视图中 相关网站
                 foreach (var item in model.SocialPlatforms)
@@ -1678,9 +1675,9 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //获取词条
             var entry = await _entryRepository.GetAll().AsNoTracking()
-                .Include(s=>s.Outlinks)
-                .Include(s=>s.Articles)
-                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                .Include(s => s.Outlinks)
+                .Include(s => s.Articles)
+                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
             if (entry == null)
             {
@@ -1761,7 +1758,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         break;
                 }
             }
-            foreach(var item in entry.Outlinks)
+            foreach (var item in entry.Outlinks)
             {
                 others.Add(new RelevancesModel
                 {
@@ -1857,7 +1854,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     DisplayName = item.Id.ToString(),
                     DisplayValue = item.Name,
-                    Type=RelevancesType.Entry,
+                    Type = RelevancesType.Entry,
                     IsDelete = true,
                 });
             }
@@ -1865,7 +1862,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //再遍历视图 对应修改
 
             //添加新建项目
-            foreach (var item in entryIds.Where(s => examinedModel.Relevances.Where(s=>s.Type==RelevancesType.Entry).Select(s => s.DisplayName).Contains(s.ToString()) == false))
+            foreach (var item in entryIds.Where(s => examinedModel.Relevances.Where(s => s.Type == RelevancesType.Entry).Select(s => s.DisplayName).Contains(s.ToString()) == false))
             {
                 examinedModel.Relevances.Add(new EntryRelevancesAloneModel
                 {
@@ -1876,7 +1873,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             }
             //删除不存在的老项目
-            examinedModel.Relevances.RemoveAll(s => entryIds.Select(s=>s.ToString()).Contains(s.DisplayName) && s.IsDelete && s.Type == RelevancesType.Entry);
+            examinedModel.Relevances.RemoveAll(s => entryIds.Select(s => s.ToString()).Contains(s.DisplayName) && s.IsDelete && s.Type == RelevancesType.Entry);
 
 
             //处理关联文章
@@ -1906,7 +1903,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             }
             //删除不存在的老项目
-            examinedModel.Relevances.RemoveAll(s => articleIds.Select(s => s.ToString()).Contains(s.DisplayName) && s.IsDelete&&s.Type==RelevancesType.Article);
+            examinedModel.Relevances.RemoveAll(s => articleIds.Select(s => s.ToString()).Contains(s.DisplayName) && s.IsDelete && s.Type == RelevancesType.Article);
             //处理外部链接
 
 
@@ -1918,7 +1915,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     DisplayName = item.Name,
                     DisplayValue = item.BriefIntroduction,
                     IsDelete = true,
-                    Type=RelevancesType.Outlink,
+                    Type = RelevancesType.Outlink,
                     Link = item.Link
                 });
             }
@@ -1933,7 +1930,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     if (item.DisplayName == infor.Name && item.DisPlayValue == infor.BriefIntroduction && item.Link == infor.Link)
                     {
                         //如果两次一致 删除上一步中的项目
-                        foreach (var temp in examinedModel.Relevances.Where(s=>s.Type==RelevancesType.Outlink))
+                        foreach (var temp in examinedModel.Relevances.Where(s => s.Type == RelevancesType.Outlink))
                         {
                             if (temp.DisplayName == infor.Name && temp.DisplayValue == infor.BriefIntroduction && temp.Link == infor.Link)
                             {
@@ -2497,7 +2494,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     });
 
                 }
-            
+
 
 
                 //处理关联文章
@@ -2520,14 +2517,14 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
 
                     entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
-                        {
-                            DisplayName = item.DisplayName,
-                            DisplayValue = item.DisPlayValue,
-                            Type = RelevancesType.Outlink,
-                            Link = item.Link,
-                            IsDelete = false
-                        });
-                    
+                    {
+                        DisplayName = item.DisplayName,
+                        DisplayValue = item.DisPlayValue,
+                        Type = RelevancesType.Outlink,
+                        Link = item.Link,
+                        IsDelete = false
+                    });
+
                 }
 
 
@@ -2536,7 +2533,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 //判断审核是否为空
                 if (entryRelevances.Relevances.Count != 0)
                 {
-                  
+
                     //序列化JSON
                     resulte = "";
                     using (TextWriter text = new StringWriter())
@@ -2848,7 +2845,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<NameIdPairModel>>> GetAllEntriesIdNameAsync()
         {
-            return await _entryRepository.GetAll().AsNoTracking().Where(s =>  s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => new NameIdPairModel { Name = s.Name, Id = s.Id }).ToArrayAsync();
+            return await _entryRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => new NameIdPairModel { Name = s.Name, Id = s.Id }).ToArrayAsync();
         }
 
         /// <summary>
@@ -2861,7 +2858,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var model = new List<KeyValuePair<string, string>>();
             model.AddRange(await _entryRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false && string.IsNullOrWhiteSpace(s.MainPicture) == false)
-               .Select(s => new KeyValuePair<string, string>("Entry_"+s.Id, s.MainPicture))
+               .Select(s => new KeyValuePair<string, string>("Entry_" + s.Id, s.MainPicture))
                .ToListAsync());
             model.AddRange(await _articleRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false && string.IsNullOrWhiteSpace(s.MainPicture) == false)
                .Select(s => new KeyValuePair<string, string>("Article_" + s.Id, s.MainPicture))
@@ -2869,10 +2866,10 @@ namespace CnGalWebSite.APIServer.Controllers
             model.AddRange(await _peripheryRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false && string.IsNullOrWhiteSpace(s.MainPicture) == false)
                .Select(s => new KeyValuePair<string, string>("Periphery_" + s.Id, s.MainPicture))
                .ToListAsync());
-            string result = "Key,Value\n";
-            foreach(var item in model)
+            var result = "Key,Value\n";
+            foreach (var item in model)
             {
-                result += (item.Key + "," + item.Value+"\n");
+                result += (item.Key + "," + item.Value + "\n");
             }
             return result;
         }

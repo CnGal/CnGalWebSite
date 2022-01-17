@@ -1,9 +1,8 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -18,7 +17,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<FavoriteFolder>, string, SortOrder, IEnumerable<FavoriteFolder>>> SortLambdaCache = new();
 
 
-        public FavoriteFolderService( IRepository<FavoriteFolder, long> favoriteFolderRepository)
+        public FavoriteFolderService(IRepository<FavoriteFolder, long> favoriteFolderRepository)
         {
             _favoriteFolderRepository = favoriteFolderRepository;
         }
@@ -30,11 +29,11 @@ namespace CnGalWebSite.APIServer.Application.Favorites
             //是否限定用户
             if (string.IsNullOrWhiteSpace(userId) == false)
             {
-                items =await _favoriteFolderRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == userId).ToListAsync();
+                items = await _favoriteFolderRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == userId).ToListAsync();
             }
             else
             {
-                items =await _favoriteFolderRepository.GetAll().AsNoTracking().ToListAsync();
+                items = await _favoriteFolderRepository.GetAll().AsNoTracking().ToListAsync();
             }
 
             // 处理高级搜索
@@ -48,21 +47,21 @@ namespace CnGalWebSite.APIServer.Application.Favorites
                 items = items.Where(item => item.BriefIntroduction?.Contains(searchModel.BriefIntroduction, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
-                                 || (item.BriefIntroduction?.Contains(options.SearchText) ?? false)
-                                 || (item.ApplicationUserId.ToString()?.Contains(options.SearchText) ?? false));
-                }
-         
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
+                             || (item.BriefIntroduction?.Contains(options.SearchText) ?? false)
+                             || (item.ApplicationUserId.ToString()?.Contains(options.SearchText) ?? false));
+            }
+
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCache.GetOrAdd(typeof(FavoriteFolder), key => LambdaExtensions.GetSortLambda<FavoriteFolder>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 

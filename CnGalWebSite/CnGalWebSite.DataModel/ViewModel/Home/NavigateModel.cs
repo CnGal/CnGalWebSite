@@ -1,6 +1,4 @@
-﻿using System;
- using System.Collections.Generic;
-namespace CnGalWebSite.DataModel.ViewModel.Home
+﻿namespace CnGalWebSite.DataModel.ViewModel.Home
 {
     public class NavigateModel
     {

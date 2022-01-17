@@ -1,6 +1,4 @@
-﻿using System;
- using System.Collections.Generic;
-namespace CnGalWebSite.DataModel.ViewModel.Search
+﻿namespace CnGalWebSite.DataModel.ViewModel.Search
 {
     public class UserInforTipViewModel
     {

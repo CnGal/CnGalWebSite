@@ -1,6 +1,4 @@
-﻿using System;
- using System.Collections.Generic;
-namespace CnGalWebSite.DataModel.ViewModel.Articles
+﻿namespace CnGalWebSite.DataModel.ViewModel.Articles
 {
     public class ThumbsUpArticleModel
     {

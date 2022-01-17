@@ -1,7 +1,5 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Ranks;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.Votes
 {

@@ -1,5 +1,5 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.EntityFrameworkCore;
+using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
@@ -11,6 +11,7 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -19,8 +20,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using Nest;
-using CnGalWebSite.APIServer.Application.Articles;
 
 namespace CnGalWebSite.APIServer.Application.Entries
 {
@@ -127,21 +126,21 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
 
 
-          
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
-                                 || (item.BriefIntroduction?.Contains(options.SearchText) ?? false));
-                }
-       
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
+                             || (item.BriefIntroduction?.Contains(options.SearchText) ?? false));
+            }
+
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCacheEntry.GetOrAdd(typeof(Entry), key => LambdaExtensions.GetSortLambda<Entry>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 
@@ -216,7 +215,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             if (count != 0)
             {
                 models = await query.AsNoTracking().Include(s => s.Information)
-                    .Include(s=>s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .ToListAsync();
             }
             else
@@ -437,7 +436,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 var isAdd = false;
                 foreach (var pic in pictures)
                 {
-                    if ( pic.Url == item.Url)
+                    if (pic.Url == item.Url)
                     {
                         if (item.IsDelete == true)
                         {
@@ -446,8 +445,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         }
                         else
                         {
-                            pic.Modifier= item.Modifier;
-                            pic.Note= item.Note;
+                            pic.Modifier = item.Modifier;
+                            pic.Note = item.Note;
                         }
                         isAdd = true;
                         break;
@@ -472,8 +471,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
         public async Task UpdateEntryDataRelevances(Entry entry, EntryRelevances examine)
         {
             UpdateEntryDataOutlinks(entry, examine);
-           await UpdateEntryDataRelatedEntriesAsync(entry, examine);
-           await UpdateEntryDataRelatedArticles(entry, examine);
+            await UpdateEntryDataRelatedEntriesAsync(entry, examine);
+            await UpdateEntryDataRelatedArticles(entry, examine);
         }
 
 
@@ -483,7 +482,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //先读取词条信息
             var relevances = entry.Outlinks;
 
-            foreach (var item in examine.Relevances.Where(s=>s.Type==RelevancesType.Outlink))
+            foreach (var item in examine.Relevances.Where(s => s.Type == RelevancesType.Outlink))
             {
                 var isAdd = false;
 
@@ -491,7 +490,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 foreach (var infor in relevances)
                 {
 
-                    if (infor.Name == item.DisplayName )
+                    if (infor.Name == item.DisplayName)
                     {
                         //查看是否为删除操作
                         if (item.IsDelete == true)
@@ -535,7 +534,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //先读取周边信息
             var relevances = entry.EntryRelationFromEntryNavigation;
 
-            foreach (var item in examine.Relevances.Where(s=>s.Type==RelevancesType.Entry))
+            foreach (var item in examine.Relevances.Where(s => s.Type == RelevancesType.Entry))
             {
                 var isAdd = false;
 
@@ -724,7 +723,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         entryRelevances = (EntryRelevances)serializer.Deserialize(str, typeof(EntryRelevances));
                     }
 
-                   await UpdateEntryDataRelevances(entry, entryRelevances);
+                    await UpdateEntryDataRelevances(entry, entryRelevances);
                     break;
                 case Operation.EstablishTags:
                     EntryTags entryTags = null;
@@ -888,7 +887,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 AnotherName = entry.AnotherName,
                 IsHidden = entry.IsHidden,
             };
-           
+
 
             //初始化图片链接
             model.MainPicture = _appHelper.GetImagePath(entry.MainPicture, (entry.Type == EntryType.Staff || entry.Type == EntryType.Role) ? "" : "app.png");
@@ -902,7 +901,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
 
 
-         
+
             //读取词条信息
             var tempInformation = entry.Information.Where(s => s.Modifier != "STAFF").ToList();
             //添加别称到附加信息
@@ -1152,7 +1151,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
 
             //为Staff匹配Id
-            List<StaffNameModel> staffRealNames = new List<StaffNameModel>();
+            var staffRealNames = new List<StaffNameModel>();
             staffRealNames.AddRange(model.Publishers);
             staffRealNames.AddRange(model.ProductionGroups);
             foreach (var item in staffInforModel)
@@ -1181,7 +1180,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
 
             //序列化图片列表
-          
+
             //读取词条信息
             var pictures = new List<EntryPicture>();
             foreach (var item in entry.Pictures)
@@ -1244,9 +1243,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
 
 
-       
+
             //序列化标签列表
-         
+
             //读取词条信息
             var tags = new List<TagsViewModel>();
             foreach (var item in entry.Tags)
@@ -1275,7 +1274,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                 }
             }
-            foreach(var nav in entry.EntryRelationFromEntryNavigation)
+            foreach (var nav in entry.EntryRelationFromEntryNavigation)
             {
                 var item = nav.ToEntryNavigation;
                 if (item.Type == EntryType.Role)
@@ -1350,7 +1349,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
             }
 
-            foreach(var item in entry.Outlinks)
+            foreach (var item in entry.Outlinks)
             {
                 relevanceOther.Add(new RelevancesKeyValueModel
                 {

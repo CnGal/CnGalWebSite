@@ -1,16 +1,15 @@
 ﻿using BootstrapBlazor.Components;
-using Markdig;
-using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.APIServer.Application.Comments.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
-using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
+using Markdig;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -226,24 +225,24 @@ namespace CnGalWebSite.APIServer.Application.Comments
                }*/
 
             // 处理 Searchable=true 列与 SeachText 模糊搜索
-          
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    items = items.Where(item => (item.Text?.Contains(options.SearchText) ?? false)
-                                 || (item.ApplicationUserId?.Contains(options.SearchText) ?? false)
-                                 || (item.EntryId.ToString()?.Contains(options.SearchText) ?? false)
-                                 || (item.ArticleId.ToString()?.Contains(options.SearchText) ?? false)
-                                /* || (item.ParentCodeNavigationId.ToString()?.Contains(options.SearchText) ?? false)*/);
-                }
-         
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Text?.Contains(options.SearchText) ?? false)
+                             || (item.ApplicationUserId?.Contains(options.SearchText) ?? false)
+                             || (item.EntryId.ToString()?.Contains(options.SearchText) ?? false)
+                             || (item.ArticleId.ToString()?.Contains(options.SearchText) ?? false)
+                            /* || (item.ParentCodeNavigationId.ToString()?.Contains(options.SearchText) ?? false)*/);
+            }
+
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCache.GetOrAdd(typeof(Comment), key => LambdaExtensions.GetSortLambda<Comment>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 

@@ -18,11 +18,6 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel;
-using CnGalWebSite.DataModel.ViewModel.Admin;
-using CnGalWebSite.DataModel.ViewModel.Articles;
-using CnGalWebSite.DataModel.ViewModel.Home;
-using CnGalWebSite.DataModel.ViewModel.News;
-using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -31,7 +26,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -154,8 +148,8 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<VoteViewModel>> GetVoteViewAsync(long id)
         {
             var vote = await _voteRepository.GetAll().Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
-                .Include(s => s.Articles).ThenInclude(s=>s.CreateUser)
-                .Include(s => s.Entries).ThenInclude(s=>s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
+                .Include(s => s.Entries).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.Entries).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s => s.Peripheries)
                .Include(s => s.VoteUsers).ThenInclude(s => s.SeletedOptions)
@@ -196,7 +190,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 MinimumSelectionCount = vote.MinimumSelectionCount,
             };
             //核对选项数
-            if(model.Type==VoteType.SingleChoice)
+            if (model.Type == VoteType.SingleChoice)
             {
                 model.MaximumSelectionCount = 1;
                 model.MinimumSelectionCount = 1;
@@ -296,10 +290,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     model.UserSelections = new List<long>();
                 }
-               
+
             }
             //计算是否展示结果
-            if(model.UserSelections.Count > 0||DateTime.Now.ToCstTime()>model.EndTime)
+            if (model.UserSelections.Count > 0 || DateTime.Now.ToCstTime() > model.EndTime)
             {
                 model.ShowResult = true;
             }
@@ -343,7 +337,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         });
                     }
                 }
-             
+
                 model.Add(temp);
             }
 
@@ -379,7 +373,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
             }
             //检查时间
-            if(model.BeginTime>model.EndTime)
+            if (model.BeginTime > model.EndTime)
             {
                 return new Result { Successful = false, Error = "开始时间必须早于结束时间" };
             }
@@ -389,7 +383,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.MaximumSelectionCount = 1;
                 model.MinimumSelectionCount = 1;
             }
-            Vote vote = new Vote
+            var vote = new Vote
             {
                 Name = model.Name,
                 DisplayName = model.DisplayName,
@@ -477,7 +471,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 vote.VoteOptions.Add(new VoteOption
                 {
                     EntryId = item,
-                    Type=VoteOptionType.Entry
+                    Type = VoteOptionType.Entry
                 });
             }
             foreach (var item in articleIds)
@@ -753,10 +747,10 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //删除在新选项中没有的旧项目
-            List<VoteOption> deleteOptions = new List<VoteOption>();
+            var deleteOptions = new List<VoteOption>();
             foreach (var item in vote.VoteOptions.Where(s => s.Type != VoteOptionType.Text))
             {
-                bool isExist = false;
+                var isExist = false;
                 if (item.EntryId != null && entryIds.Contains(item.EntryId.Value))
                 {
                     isExist = true;
@@ -795,7 +789,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
             }
             //删除没有选项的用户
-            List<VoteUser> deleteUsers = new List<VoteUser>();
+            var deleteUsers = new List<VoteUser>();
             foreach (var item in vote.VoteUsers)
             {
                 if (item.SeletedOptions.Any() == false)
@@ -812,7 +806,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //添加新选项
             foreach (var item in entryIds)
             {
-                if (vote.VoteOptions.Where(s=>s.EntryId!=null).Any(s => entryIds.Contains(s.EntryId.Value)) == false)
+                if (vote.VoteOptions.Where(s => s.EntryId != null).Any(s => entryIds.Contains(s.EntryId.Value)) == false)
                 {
                     vote.VoteOptions.Add(new VoteOption
                     {
@@ -961,14 +955,14 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet("{type}/{id}")]
-        public async Task<ActionResult<List<VoteCardViewModel>>> GetRelatedVotesAsync(VoteOptionType type,long id)
+        public async Task<ActionResult<List<VoteCardViewModel>>> GetRelatedVotesAsync(VoteOptionType type, long id)
         {
             var votes = new List<Vote>();
             switch (type)
             {
                 case VoteOptionType.Entry:
-                    var entry = await _entryRepository.GetAll().Include(s => s.Votes).ThenInclude(s=>s.VoteUsers).AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
-                    if(entry == null)
+                    var entry = await _entryRepository.GetAll().Include(s => s.Votes).ThenInclude(s => s.VoteUsers).AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+                    if (entry == null)
                     {
                         return NotFound();
                     }

@@ -1,22 +1,15 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Home;
+using Microsoft.EntityFrameworkCore;
 using Nest;
 using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using TencentCloud.Cme.V20191029.Models;
-using CnGalWebSite.DataModel.Application.Dtos;
-using CnGalWebSite.DataModel.ViewModel.Home;
-using CnGalWebSite.APIServer.Application.Helper;
-using CnGalWebSite.APIServer.Migrations;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using CnGalWebSite.DataModel.Helper;
-using TencentCloud.Ssl.V20191205.Models;
-using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.ElasticSearches
 {
@@ -66,10 +59,10 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
                 await _entryElasticsearchBaseService.InsertRangeAsync(entries);
             }
 
-            var deleted = await _entryRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s=>s.Id).ToListAsync();
-            foreach(var item in deleted)
+            var deleted = await _entryRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => s.Id).ToListAsync();
+            foreach (var item in deleted)
             {
-               await _entryElasticsearchBaseService.DeleteAsync(item.ToString());
+                await _entryElasticsearchBaseService.DeleteAsync(item.ToString());
             }
         }
 
@@ -85,7 +78,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
             var deleted = await _articleRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => s.Id).ToListAsync();
             foreach (var item in deleted)
             {
-               await _articleElasticsearchBaseService.DeleteAsync(item.ToString());
+                await _articleElasticsearchBaseService.DeleteAsync(item.ToString());
             }
         }
 
@@ -100,7 +93,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
             var deleted = await _tagRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => s.Id).ToListAsync();
             foreach (var item in deleted)
             {
-            await    _tagElasticsearchBaseService.DeleteAsync(item.ToString());
+                await _tagElasticsearchBaseService.DeleteAsync(item.ToString());
             }
         }
 
@@ -116,7 +109,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
             var deleted = await _peripheryRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => s.Id).ToListAsync();
             foreach (var item in deleted)
             {
-               await _peripheryElasticsearchBaseService.DeleteAsync(item.ToString());
+                await _peripheryElasticsearchBaseService.DeleteAsync(item.ToString());
             }
         }
 
@@ -131,13 +124,13 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
         public async Task<PagedResultDto<SearchAloneModel>> QueryAsync(int page, int limit, string text, string screeningConditions, string sort, QueryType type)
         {
-            string sortString = "id";
-            SortOrder order = SortOrder.Descending;
+            var sortString = "id";
+            var order = SortOrder.Descending;
             if (string.IsNullOrWhiteSpace(sort) != true)
             {
                 if (sort == "Default")
                 {
-                    if(string.IsNullOrWhiteSpace(text))
+                    if (string.IsNullOrWhiteSpace(text))
                     {
                         sortString = "lastEditTime";
                     }
@@ -148,8 +141,8 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
                 }
                 else
                 {
-                    string[] temp = sort.Split(' ');
-                    string f = temp[0][0].ToString();
+                    var temp = sort.Split(' ');
+                    var f = temp[0][0].ToString();
                     sortString = f.ToLower() + temp[0][1..^0];
                     if (temp.Length == 1)
                     {
@@ -162,15 +155,15 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
             PagedResultDto<SearchAloneModel> model = null;
 
             if (screeningConditions == "词条" || screeningConditions == "游戏" || screeningConditions == "角色" || screeningConditions == "STAFF" || screeningConditions == "制作组")
-{
-                model= await QueryEntryAsync(page, limit, text, screeningConditions, sortString, order, type);
+            {
+                model = await QueryEntryAsync(page, limit, text, screeningConditions, sortString, order, type);
             }
             else if (screeningConditions == "文章" || screeningConditions == "感想" || screeningConditions == "访谈" || screeningConditions == "攻略" || screeningConditions == "动态" || screeningConditions == "评测" ||
                 screeningConditions == "文章周边" || screeningConditions == "公告" || screeningConditions == "杂谈" || screeningConditions == "二创")
             {
                 model = await QueryArticleAsync(page, limit, text, screeningConditions, sortString, order, type);
             }
-            else if (screeningConditions == "周边"|| screeningConditions == "设定集或画册等" || screeningConditions == "原声集" || screeningConditions == "套装" || screeningConditions == "其他")
+            else if (screeningConditions == "周边" || screeningConditions == "设定集或画册等" || screeningConditions == "原声集" || screeningConditions == "套装" || screeningConditions == "其他")
             {
                 model = await QueryPeripheryAsync(page, limit, text, screeningConditions, sortString, order, type);
             }
@@ -187,10 +180,10 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
             return model;
         }
 
-        public async Task<PagedResultDto<SearchAloneModel>> QueryAllAsync(int page, int limit, string text, string screeningConditions,string sort, SortOrder sortOrder, QueryType type)
+        public async Task<PagedResultDto<SearchAloneModel>> QueryAllAsync(int page, int limit, string text, string screeningConditions, string sort, SortOrder sortOrder, QueryType type)
         {
             //根据不同分页方案初始化
-            int from = type == QueryType.Index ? page : ((page - 1) * limit);
+            var from = type == QueryType.Index ? page : ((page - 1) * limit);
             //添加索引
 
             Indices indices = new string[]{
@@ -199,8 +192,8 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
                         _tagElasticsearchBaseService.GetIndex(),
                         _peripheryElasticsearchBaseService.GetIndex(),
                     };
-            var sortDescriptor = new SortDescriptor<dynamic> ();
-            if (string.IsNullOrEmpty(sort)==false)
+            var sortDescriptor = new SortDescriptor<dynamic>();
+            if (string.IsNullOrEmpty(sort) == false)
             {
                 sortDescriptor.Field(sort, sortOrder);
             }
@@ -256,7 +249,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
                 {
                     result.Data.Add(new SearchAloneModel
                     {
-                        entry =await _appHelper.GetEntryInforTipViewModel(entries.FirstOrDefault(s => s.Id == (long)item.Source["id"]))
+                        entry = await _appHelper.GetEntryInforTipViewModel(entries.FirstOrDefault(s => s.Id == (long)item.Source["id"]))
                     });
                 }
                 else if (_articleElasticsearchBaseService.GetIndex() == item.Index)
@@ -288,18 +281,18 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
         public async Task<PagedResultDto<SearchAloneModel>> QueryEntryAsync(int page, int limit, string text, string screeningConditions, string sort, SortOrder sortOrder, QueryType type)
         {
-            List<Entry> entries = new List<Entry>();
+            var entries = new List<Entry>();
 
             var entryType = screeningConditions switch
             {
-                "游戏" =>new EntryType[] { EntryType.Game },
+                "游戏" => new EntryType[] { EntryType.Game },
                 "角色" => new EntryType[] { EntryType.Role },
                 "STAFF" => new EntryType[] { EntryType.Staff },
                 "制作组" => new EntryType[] { EntryType.ProductionGroup },
                 _ => new EntryType[] { EntryType.Game, EntryType.Role, EntryType.Staff, EntryType.ProductionGroup },
             };
 
-            var result = await _entryElasticsearchBaseService.QueryAsync(page, limit, text,sort,sortOrder, s => s.Filter(s => s.Terms(s => s.Field(s => s.Type).Terms(entryType))), type);
+            var result = await _entryElasticsearchBaseService.QueryAsync(page, limit, text, sort, sortOrder, s => s.Filter(s => s.Terms(s => s.Field(s => s.Type).Terms(entryType))), type);
             var query = result.Item2;
 
             var entryIds = query.Select(s => s.Id).ToList();
@@ -312,7 +305,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
             var model = new PagedResultDto<SearchAloneModel>
             {
-                TotalCount = (int)result.Item1,
+                TotalCount = result.Item1,
                 CurrentPage = page,
                 MaxResultCount = limit,
                 FilterText = text,
@@ -325,7 +318,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
                 model.Data.Add(new SearchAloneModel
                 {
-                    entry =await _appHelper.GetEntryInforTipViewModel(entries.FirstOrDefault(s => s.Id == item.Id))
+                    entry = await _appHelper.GetEntryInforTipViewModel(entries.FirstOrDefault(s => s.Id == item.Id))
                 });
 
             }
@@ -335,17 +328,17 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
         public async Task<PagedResultDto<SearchAloneModel>> QueryArticleAsync(int page, int limit, string text, string screeningConditions, string sort, SortOrder sortOrder, QueryType type)
         {
-            List<Article> articles = new List<Article>();
+            var articles = new List<Article>();
 
             var articleType = screeningConditions switch
             {
                 "感想" => new ArticleType[] { ArticleType.Tought },
-                "访谈" =>  new ArticleType[] {ArticleType.Interview },
+                "访谈" => new ArticleType[] { ArticleType.Interview },
                 "攻略" => new ArticleType[] { ArticleType.Strategy },
                 "动态" => new ArticleType[] { ArticleType.News },
-                "评测" =>  new ArticleType[] {ArticleType.Evaluation },
+                "评测" => new ArticleType[] { ArticleType.Evaluation },
                 "文章周边" => new ArticleType[] { ArticleType.Peripheral },
-                "公告" =>  new ArticleType[] {ArticleType.Notice },
+                "公告" => new ArticleType[] { ArticleType.Notice },
                 "杂谈" => new ArticleType[] { ArticleType.None },
                 "二创" => new ArticleType[] { ArticleType.Fan },
                 _ => new ArticleType[] { ArticleType.Notice, ArticleType.Peripheral, ArticleType.Evaluation, ArticleType.News, ArticleType.Interview, ArticleType.Tought, ArticleType.None },
@@ -361,7 +354,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
             var model = new PagedResultDto<SearchAloneModel>
             {
-                TotalCount = (int)result.Item1,
+                TotalCount = result.Item1,
                 CurrentPage = page,
                 MaxResultCount = limit,
                 FilterText = text,
@@ -384,14 +377,14 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
         public async Task<PagedResultDto<SearchAloneModel>> QueryPeripheryAsync(int page, int limit, string text, string screeningConditions, string sort, SortOrder sortOrder, QueryType type)
         {
-            List<Periphery> peripheries = new List<Periphery>();
+            var peripheries = new List<Periphery>();
 
             var peripheryType = screeningConditions switch
             {
                 "其他" => new PeripheryType[] { PeripheryType.None },
                 "设定集或画册等" => new PeripheryType[] { PeripheryType.SetorAlbumEtc },
                 "原声集" => new PeripheryType[] { PeripheryType.Ost },
-                "套装" => new PeripheryType[] {PeripheryType.Set },
+                "套装" => new PeripheryType[] { PeripheryType.Set },
                 _ => new PeripheryType[] { PeripheryType.Set, PeripheryType.Ost, PeripheryType.SetorAlbumEtc, PeripheryType.None },
             };
 
@@ -405,7 +398,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
             var model = new PagedResultDto<SearchAloneModel>
             {
-                TotalCount = (int)result.Item1,
+                TotalCount = result.Item1,
                 CurrentPage = page,
                 MaxResultCount = limit,
                 FilterText = text,
@@ -428,7 +421,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
         public async Task<PagedResultDto<SearchAloneModel>> QueryTagAsync(int page, int limit, string text, string screeningConditions, string sort, SortOrder sortOrder, QueryType type)
         {
-            List<Tag> tags = new List<Tag>();
+            var tags = new List<Tag>();
 
             var result = await _tagElasticsearchBaseService.QueryAsync(page, limit, text, sort, sortOrder, null, type);
             var query = result.Item2;
@@ -440,7 +433,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
             var model = new PagedResultDto<SearchAloneModel>
             {
-                TotalCount = (int)result.Item1,
+                TotalCount = result.Item1,
                 CurrentPage = page,
                 MaxResultCount = limit,
                 FilterText = text,

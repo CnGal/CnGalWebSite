@@ -1,7 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
-using System;
- using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
 {
     public class ScoreGameModel

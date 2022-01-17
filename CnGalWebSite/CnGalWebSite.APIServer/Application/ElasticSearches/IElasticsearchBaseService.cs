@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Nest;
 using System;
-using CnGalWebSite.DataModel.Model;
-using Nest;
-using System.Linq.Expressions;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.ElasticSearches
 {

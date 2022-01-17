@@ -1,19 +1,18 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.EntityFrameworkCore;
+using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Home;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Carousel = CnGalWebSite.DataModel.Model.Carousel;
-using CnGalWebSite.APIServer.Application.Articles;
 
 namespace CnGalWebSite.APIServer.Application.Home
 {
@@ -35,7 +34,7 @@ namespace CnGalWebSite.APIServer.Application.Home
             _articleRepository = articleRepository;
             _carouselRepository = carouselRepository;
             _friendLinkRepository = friendLinkRepository;
-            _articleService= articleService;
+            _articleService = articleService;
         }
 
         public async Task<List<EntryHomeAloneViewModel>> GetHomeNewestGameViewAsync()
@@ -53,7 +52,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                     model.Add(new EntryHomeAloneViewModel
                     {
                         Id = item.Id,
-                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png",true),
+                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png", true),
                         DisPlayName = item.DisplayName ?? item.Name,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
@@ -161,8 +160,8 @@ namespace CnGalWebSite.APIServer.Application.Home
                         Image = _appHelper.GetImagePath(item.Image, "app.png", true),
                         DisPlayValue = item.Link,
                         DisPlayName = item.Name,
-                        CommentCount=-1,
-                        ReadCount=-1
+                        CommentCount = -1,
+                        ReadCount = -1
                         //DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
                     });
                 }
@@ -234,18 +233,18 @@ namespace CnGalWebSite.APIServer.Application.Home
             {
                 foreach (var item in article_result2)
                 {
-                    var infor =await _articleService.GetNewsModelAsync(item);
+                    var infor = await _articleService.GetNewsModelAsync(item);
                     var temp = new HomeNewsAloneViewModel
                     {
                         ArticleId = item.Id,
                         Text = infor.Title,
                         Time = infor.HappenedTime,
                         Type = infor.NewsType ?? "动态",
-                        GroupId=infor.GroupId,
-                        Image=infor.Image,
-                        Link=infor.Link,
-                        Title=infor.GroupName,
-                        UserId=infor.UserId,
+                        GroupId = infor.GroupId,
+                        Image = infor.Image,
+                        Link = infor.Link,
+                        Title = infor.GroupName,
+                        UserId = infor.UserId,
                     };
                     model.Add(temp);
                 }

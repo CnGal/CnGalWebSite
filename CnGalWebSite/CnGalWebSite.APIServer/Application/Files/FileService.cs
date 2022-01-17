@@ -1,26 +1,24 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
+using CnGalWebSite.DataModel.Helper;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Files;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using System.IO;
 using System.Net.Http;
-using SortOrder = BootstrapBlazor.Components.SortOrder;
 using System.Net.Http.Json;
 using System.Text.Json;
-using CnGalWebSite.DataModel.Helper;
-using Microsoft.Extensions.Configuration;
-using CnGalWebSite.DataModel.Model;
+using System.Threading.Tasks;
+using SortOrder = BootstrapBlazor.Components.SortOrder;
 
 namespace CnGalWebSite.APIServer.Application.Files
 {
@@ -107,21 +105,21 @@ namespace CnGalWebSite.APIServer.Application.Files
                 items = items.Where(item => item.UserId?.Contains(searchModel.UserId, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
-          
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    items = items.Where(item => (item.FileName?.Contains(options.SearchText) ?? false)
-                                 || (item.UserId?.Contains(options.SearchText) ?? false));
-                }
-         
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.FileName?.Contains(options.SearchText) ?? false)
+                             || (item.UserId?.Contains(options.SearchText) ?? false));
+            }
+
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCache.GetOrAdd(typeof(UserFile), key => LambdaExtensions.GetSortLambda<UserFile>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 
@@ -167,23 +165,23 @@ namespace CnGalWebSite.APIServer.Application.Files
                     X = x,
                     Y = y
                 });
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var jsonContent = result.Content.ReadAsStringAsync().Result;
+                var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
 
                 if (obj.Successful)
                 {
-                    return obj.Error.Replace("http://local.host/","https://pic.cngal.top/");
+                    return obj.Error.Replace("http://local.host/", "https://pic.cngal.top/");
                 }
                 else
                 {
                     return url;
                 }
             }
-            catch(Exception ex)
+            catch (Exception)
             {
                 return url;
             }
-         
+
         }
     }
 }

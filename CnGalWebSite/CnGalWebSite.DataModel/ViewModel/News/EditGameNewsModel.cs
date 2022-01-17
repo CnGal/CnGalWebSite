@@ -2,17 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using System;
- using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.News
 {
     public class EditGameNewsModel
     {
-        [Display(Name ="Id")]
+        [Display(Name = "Id")]
         public long Id { get; set; }
         [Display(Name = "标题")]
         public string Title { get; set; }
@@ -34,7 +28,7 @@ namespace CnGalWebSite.DataModel.ViewModel.News
         [Display(Name = "作者")]
         public string Author { get; set; }
         [Display(Name = "微博Id")]
-        public string  WeiboId { get; set; }
+        public string WeiboId { get; set; }
         [Display(Name = "关联词条名称")]
         public string AuthorEntryName { get; set; }
 

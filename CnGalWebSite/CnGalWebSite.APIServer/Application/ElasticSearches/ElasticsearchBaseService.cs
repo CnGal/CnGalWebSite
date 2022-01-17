@@ -1,11 +1,8 @@
 ﻿using Nest;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System;
-using CnGalWebSite.DataModel.Model;
+using System.Collections.Generic;
 using System.Linq;
-using TencentCloud.Cme.V20191029.Models;
-using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.ElasticSearches
 {
@@ -38,7 +35,9 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
                 s => s.Index(_index));
 
             if (!response.IsValid)
+            {
                 throw new Exception("新增数据失败:" + response.OriginalException.Message);
+            }
         }
 
         public async Task InsertRangeAsync(IEnumerable<TEntity> entity)
@@ -52,14 +51,18 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
             var response = await _elasticClient.BulkAsync(bulkRequest);
 
             if (!response.IsValid)
+            {
                 throw new Exception("批量新增数据失败:" + response.OriginalException.Message);
+            }
         }
 
         public async Task UpdateAsync(TEntity entity, string Id)
         {
             var response = await _elasticClient.UpdateAsync<TEntity>(Id, x => x.Index(_index).Doc(entity));
             if (!response.IsValid)
+            {
                 throw new Exception("更新失败:" + response.OriginalException.Message);
+            }
         }
 
         public async Task DeleteAsync(string Id)
@@ -70,16 +73,22 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
         public async Task RemoveIndex()
         {
             var exists = await IndexExistsAsync();
-            if (!exists) return;
+            if (!exists)
+            {
+                return;
+            }
+
             var response = await _elasticClient.Indices.DeleteAsync(_index);
 
             if (!response.IsValid)
+            {
                 throw new Exception("删除index失败:" + response.OriginalException.Message);
+            }
         }
 
         public async Task<Tuple<int, IList<TEntity>>> QueryAsync(int page, int limit, string Text, string sort, SortOrder sortOrder, Func<BoolQueryDescriptor<TEntity>, IBoolQuery> field, QueryType type)
         {
-            int from = type == QueryType.Index ? page : ((page - 1) * limit);
+            var from = type == QueryType.Index ? page : ((page - 1) * limit);
             var sortDescriptor = new SortDescriptor<dynamic>();
             if (string.IsNullOrEmpty(sort) == false)
             {

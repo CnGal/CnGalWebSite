@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using CnGalWebSite.APIServer.Application.TimedTasks;
+﻿using CnGalWebSite.APIServer.Application.TimedTasks;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.TimedTasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

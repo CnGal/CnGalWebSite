@@ -1,7 +1,5 @@
 ﻿using CnGalWebSite.DataModel.ViewModel.Ranks;
-
-using System;
- using System.Collections.Generic;
+using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Space
 {
     public class UserInforViewModel

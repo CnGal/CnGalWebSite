@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using CnGalWebSite.APIServer.DataReositories;
+﻿using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -32,7 +32,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
         public async Task UpdateAllGameSteamInfor()
         {
-            var steams = await _steamInforRepository.GetAll().AsNoTracking().OrderByDescending(s=>s.PriceNow).ThenByDescending(s=>s.EntryId).Select(s => s.SteamId).ToListAsync();
+            var steams = await _steamInforRepository.GetAll().AsNoTracking().OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.EntryId).Select(s => s.SteamId).ToListAsync();
 
             foreach (var item in steams)
             {
@@ -152,7 +152,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     steam.CutNow = -2;
 
                     steam.CutLowest = steamLowestJson.cut;
-                    steam.PriceLowest = steamLowestJson.price*100;
+                    steam.PriceLowest = steamLowestJson.price * 100;
                     steam.PriceLowestString = "¥ " + ((double)steam.PriceLowest / 100).ToString("0.00");
                     steam.LowestTime = ToolHelper.GetDateTimeFrom1970Ticks(steamLowestJson.recorded);
 
@@ -208,7 +208,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     }
 
                     //比较是否偏差较大
-                    if(Math.Abs( steam.PriceLowest/100 -steamLowestJson.price)>2)
+                    if (Math.Abs(steam.PriceLowest / 100 - steamLowestJson.price) > 2)
                     {
                         steam.PriceLowest = steamLowestJson.price * 100;
                     }
@@ -220,12 +220,12 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     steam.PriceLowestString = "¥ 0";
                     steam.PriceLowest = -1;
                 }
-              
+
 
             }
 
             //临时补正
-            if (steamId== 1506340)
+            if (steamId == 1506340)
             {
                 steam.PriceNow = steam.OriginalPrice;
                 steam.CutNow = 0;
@@ -267,8 +267,8 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 //遍历列表更新已玩游戏信息
                 foreach (var item in userGames)
                 {
-                    var steamTemp= steams.FirstOrDefault(s=>s.EntryId==item.EntryId);
-                    if (steamTemp!=null)
+                    var steamTemp = steams.FirstOrDefault(s => s.EntryId == item.EntryId);
+                    if (steamTemp != null)
                     {
                         item.IsInSteam = true;
                         item.PlayDuration = steamGames.games.FirstOrDefault(s => s.appid == steamTemp.SteamId)?.playtime_forever ?? 0;
@@ -280,14 +280,14 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 }
 
                 //添加新游戏
-                foreach(var item in steams.Where(s=>userGames.Select(s=>s.EntryId).Contains(s.EntryId) ==false))
+                foreach (var item in steams.Where(s => userGames.Select(s => s.EntryId).Contains(s.EntryId) == false))
                 {
                     await _playedGameRepository.InsertAsync(new PlayedGame
                     {
                         IsInSteam = true,
                         PlayDuration = steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0,
                         EntryId = item.EntryId,
-                        Type = ((steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0)>0)?PlayedGameType.Played:PlayedGameType.WantToPlay,
+                        Type = ((steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0) > 0) ? PlayedGameType.Played : PlayedGameType.WantToPlay,
                         ApplicationUserId = user.Id,
                     });
                 }

@@ -3,13 +3,6 @@ using CnGalWebSite.DataModel.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-
-using System;
- using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Admin
 {
     public class ListWeeklyNewsInforViewModel
@@ -21,7 +14,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
     public class ListWeeklyNewsViewModel
     {
         public List<ListWeeklyNewAloneModel> WeeklyNews { get; set; }
-}
+    }
     public class ListWeeklyNewAloneModel
     {
         [Display(Name = "Id")]

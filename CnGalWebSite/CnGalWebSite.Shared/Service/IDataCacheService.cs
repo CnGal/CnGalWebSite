@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using CnGalWebSite.DataModel.ViewModel;
+﻿using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
@@ -8,9 +7,10 @@ using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Theme;
+using CnGalWebSite.DataModel.ViewModel.Votes;
+using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CnGalWebSite.DataModel.ViewModel.Votes;
 
 namespace CnGalWebSite.Shared.Service
 {

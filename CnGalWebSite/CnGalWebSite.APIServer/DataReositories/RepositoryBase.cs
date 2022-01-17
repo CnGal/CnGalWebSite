@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Infrastructure;
+﻿using CnGalWebSite.APIServer.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;

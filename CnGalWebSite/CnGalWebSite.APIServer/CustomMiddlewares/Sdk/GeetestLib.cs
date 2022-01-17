@@ -124,7 +124,7 @@ namespace Gt3_server_csharp_aspnetcoremvc_bypass.Controllers.Sdk
                     randomStr.Append(characters[rd.Next(characters.Length)]);
                 }
                 var challenge = randomStr.ToString();
-                var data = new { success = 0, gt = geetest_id,  challenge, new_captcha = NEW_CAPTCHA };
+                var data = new { success = 0, gt = geetest_id, challenge, new_captcha = NEW_CAPTCHA };
                 libResult.SetAll(0, JsonSerializer.Serialize(data), "bypass当前状态为fail，后续流程走宕机模式");
             }
             else

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
@@ -10,14 +10,14 @@ using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Theme;
+using CnGalWebSite.DataModel.ViewModel.Votes;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using CnGalWebSite.DataModel.Application.Dtos;
-using CnGalWebSite.DataModel.ViewModel.Votes;
 
 namespace CnGalWebSite.Shared.Service
 {
@@ -121,7 +121,7 @@ namespace CnGalWebSite.Shared.Service
 
         private readonly HttpClient _httpClient;
 
-        public DataCatcheService(HttpClient httpClient, IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche, IPageModelCatche<VoteViewModel> voteIndexPageCatche ,
+        public DataCatcheService(HttpClient httpClient, IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche, IPageModelCatche<VoteViewModel> voteIndexPageCatche,
         IPageModelCatche<PeripheryViewModel> peripheryIndexPageCatche, IPageModelCatche<TagIndexViewModel> tagIndexPageCatche, IPageModelCatche<List<HomeNewsAloneViewModel>> homePageNewsCatche,
         IPageModelCatche<List<DataModel.Model.Carousel>> homePageCarouselsCatche)
         {
@@ -187,7 +187,7 @@ namespace CnGalWebSite.Shared.Service
 
             LoginKey = null;
             ThirdPartyLoginTempModel = null;
-            UserInfor= new UserInforViewModel { Ranks = new List<RankViewModel>() };
+            UserInfor = new UserInforViewModel { Ranks = new List<RankViewModel>() };
         }
         public void RefreshSearchCatche()
         {

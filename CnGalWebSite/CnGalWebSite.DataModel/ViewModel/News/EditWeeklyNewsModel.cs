@@ -2,12 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using System;
- using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.News
 {
     public class EditWeeklyNewsModel
@@ -26,7 +20,7 @@ namespace CnGalWebSite.DataModel.ViewModel.News
         [Display(Name = "类型")]
         public ArticleType Type { get; set; }
 
-        public List<WeeklyNewsRelatedNewsEditModel> News { get; set; }=new List<WeeklyNewsRelatedNewsEditModel> { };
+        public List<WeeklyNewsRelatedNewsEditModel> News { get; set; } = new List<WeeklyNewsRelatedNewsEditModel> { };
         [Display(Name = "发布时间")]
         public DateTime PublishTime { get; set; }
         [Display(Name = "创建时间")]

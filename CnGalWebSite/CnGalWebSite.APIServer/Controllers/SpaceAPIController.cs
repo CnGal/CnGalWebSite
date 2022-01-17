@@ -1,12 +1,7 @@
-﻿using Markdig;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Messages;
 using CnGalWebSite.APIServer.Application.Ranks;
+using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Users.Dtos;
 using CnGalWebSite.APIServer.DataReositories;
@@ -17,6 +12,12 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Space;
+using Markdig;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using CnGalWebSite.APIServer.Application.SteamInfors;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -491,11 +491,11 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //检查重名
-            if(user.UserName!=model.UserName)
+            if (user.UserName != model.UserName)
             {
-                if(await _userRepository.GetAll().AnyAsync(s=>s.UserName == model.UserName))
+                if (await _userRepository.GetAll().AnyAsync(s => s.UserName == model.UserName))
                 {
-                    return new Result { Successful = false,Error="该用户名已被使用" };
+                    return new Result { Successful = false, Error = "该用户名已被使用" };
                 }
             }
 
@@ -504,11 +504,11 @@ namespace CnGalWebSite.APIServer.Controllers
             user.CanComment = model.CanComment;
 
             //判断SteamId是否改变
-            if(model.SteamId!=user.SteamId)
+            if (model.SteamId != user.SteamId)
             {
                 user.SteamId = model.SteamId;
-                user= await _userRepository.UpdateAsync(user);
-                if(string.IsNullOrWhiteSpace( model.SteamId)==false)
+                user = await _userRepository.UpdateAsync(user);
+                if (string.IsNullOrWhiteSpace(model.SteamId) == false)
                 {
                     //更新游戏信息
                     await _steamInforService.UpdateUserSteam(user);

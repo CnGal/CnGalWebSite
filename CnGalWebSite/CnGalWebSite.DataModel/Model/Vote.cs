@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace CnGalWebSite.DataModel.Model
 {
@@ -11,7 +10,7 @@ namespace CnGalWebSite.DataModel.Model
 
         public string Name { get; set; }
 
-        public string   DisplayName { get; set; }
+        public string DisplayName { get; set; }
         /// <summary>
         /// 简介
         /// </summary>
@@ -164,7 +163,7 @@ namespace CnGalWebSite.DataModel.Model
 
     public enum VoteType
     {
-        [Display(Name ="单选")]
+        [Display(Name = "单选")]
         SingleChoice,
         [Display(Name = "多选")]
         MultipleChoice

@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Home;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -330,7 +330,7 @@ namespace CnGalWebSite.APIServer.Application.Search
 
                     models.Add(new SearchAloneModel
                     {
-                        entry =await _appHelper.GetEntryInforTipViewModel(item)
+                        entry = await _appHelper.GetEntryInforTipViewModel(item)
                     });
 
                 }

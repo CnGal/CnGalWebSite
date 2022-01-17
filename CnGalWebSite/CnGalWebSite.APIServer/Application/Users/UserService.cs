@@ -1,6 +1,4 @@
 ﻿using BootstrapBlazor.Components;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using CnGalWebSite.APIServer.Application.Users.Dtos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
@@ -9,6 +7,8 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Space;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -104,23 +104,23 @@ namespace CnGalWebSite.APIServer.Application.Users
             {
                 items = items.Where(item => item.Id?.Contains(searchModel.Id, StringComparison.OrdinalIgnoreCase) ?? false);
             }
-       
-                // 处理 SearchText 模糊搜索
-                if (!string.IsNullOrWhiteSpace(options.SearchText))
-                {
-                    items = items.Where(item => (item.UserName?.Contains(options.SearchText) ?? false)
-                                 || (item.PersonalSignature?.Contains(options.SearchText) ?? false)
-                                  || (item.Email?.Contains(options.SearchText) ?? false)
-                                   || (item.Id?.Contains(options.SearchText) ?? false));
-                }
-         
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.UserName?.Contains(options.SearchText) ?? false)
+                             || (item.PersonalSignature?.Contains(options.SearchText) ?? false)
+                              || (item.Email?.Contains(options.SearchText) ?? false)
+                               || (item.Id?.Contains(options.SearchText) ?? false));
+            }
+
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
                 // 外部未进行排序，内部自动进行排序处理
                 var invoker = SortLambdaCacheApplicationUser.GetOrAdd(typeof(ApplicationUser), key => LambdaExtensions.GetSortLambda<ApplicationUser>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 
@@ -661,7 +661,7 @@ namespace CnGalWebSite.APIServer.Application.Users
 
             //拉取审核数据
             var examines = await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id)
-                .Select(n => new { n.IsPassed, n.Operation, n.Context, n.EntryId, n.ArticleId,  n.TagId, n.ApplyTime,  n.Id })
+                .Select(n => new { n.IsPassed, n.Operation, n.Context, n.EntryId, n.ArticleId, n.TagId, n.ApplyTime, n.Id })
                 .ToListAsync();
 
             model.EditCount = examines.Count;

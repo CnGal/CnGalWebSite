@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-using System;
- using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.Model
 {
     public class Article
@@ -124,13 +123,13 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 相关性列表
         /// </summary>
-        public ICollection<ArticleRelevance> Relevances { get; set; }=new List<ArticleRelevance>();
+        public ICollection<ArticleRelevance> Relevances { get; set; } = new List<ArticleRelevance>();
 
         public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
         /// <summary>
         /// 关联文章
         /// </summary>
-        public ICollection<Entry> Entries { get; set; }=new List<Entry>();
+        public ICollection<Entry> Entries { get; set; } = new List<Entry>();
         /// <summary>
         /// 关联外部链接
         /// </summary>

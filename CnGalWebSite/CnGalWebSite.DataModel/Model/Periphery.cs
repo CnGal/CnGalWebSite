@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-using System;
- using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.Model
 {
     public class Periphery
@@ -153,12 +152,12 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 关联周边列表
         /// </summary>
-        public virtual ICollection<PeripheryRelation> PeripheryRelationFromPeripheryNavigation { get; set; }=new List<PeripheryRelation>();
+        public virtual ICollection<PeripheryRelation> PeripheryRelationFromPeripheryNavigation { get; set; } = new List<PeripheryRelation>();
 
         /// <summary>
         /// To 指当前周边被关联的其他周边关联 呈现编辑视图时不使用
         /// </summary>
-        public virtual ICollection<PeripheryRelation> PeripheryRelationToPeripheryNavigation { get; set; }=new List<PeripheryRelation>();
+        public virtual ICollection<PeripheryRelation> PeripheryRelationToPeripheryNavigation { get; set; } = new List<PeripheryRelation>();
 
         public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
     }
@@ -193,7 +192,7 @@ namespace CnGalWebSite.DataModel.Model
         public long? FromPeriphery { get; set; }
         public long? ToPeriphery { get; set; }
 
-        public virtual Periphery FromPeripheryNavigation { get; set; }=new Periphery();
+        public virtual Periphery FromPeripheryNavigation { get; set; } = new Periphery();
         public virtual Periphery ToPeripheryNavigation { get; set; } = new Periphery();
     }
     public enum PeripheryType
