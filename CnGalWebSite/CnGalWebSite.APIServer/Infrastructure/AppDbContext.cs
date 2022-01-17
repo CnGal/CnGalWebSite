@@ -64,6 +64,8 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<Vote> Votes { get; set; }
         public DbSet<VoteOption> VoteOptions { get; set; }
         public DbSet<VoteUser> VoteUsers { get; set; }
+        public DbSet<EntryRelation> EntryRelations { get; set; }
+        public DbSet<ArticleRelation> ArticleRelations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -92,6 +94,8 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<Tag>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Rank>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Periphery>().HasIndex(g => g.Name).IsUnique();
+            modelBuilder.Entity<Vote>().HasIndex(g => g.Name).IsUnique();
+            modelBuilder.Entity<Disambig>().HasIndex(g => g.Name).IsUnique();
 
             //设定默认值
             modelBuilder.Entity<Article>().Property(b => b.CanComment).HasDefaultValue(true);
@@ -113,8 +117,36 @@ namespace CnGalWebSite.APIServer.Infrastructure
                     .HasForeignKey(d => d.ToPeriphery)
                     .HasConstraintName("FK_PeripheryRelation_Periphery_To");
             });
+            //设置词条自身多对多关系
+            modelBuilder.Entity<EntryRelation>(entity =>
+            {
+                entity.Property(e => e.EntryRelationId).HasColumnName("EntryRelationId");
 
+                entity.HasOne(d => d.FromEntryNavigation)
+                    .WithMany(p => p.EntryRelationFromEntryNavigation)
+                    .HasForeignKey(d => d.FromEntry)
+                    .HasConstraintName("FK_EntryRelation_Entry_From");
 
+                entity.HasOne(d => d.ToEntryNavigation)
+                    .WithMany(p => p.EntryRelationToEntryNavigation)
+                    .HasForeignKey(d => d.ToEntry)
+                    .HasConstraintName("FK_EntryRelation_Entry_To");
+            });
+            //设置文章自身多对多关系
+            modelBuilder.Entity<ArticleRelation>(entity =>
+            {
+                entity.Property(e => e.ArticleRelationId).HasColumnName("ArticleRelationId");
+
+                entity.HasOne(d => d.FromArticleNavigation)
+                    .WithMany(p => p.ArticleRelationFromArticleNavigation)
+                    .HasForeignKey(d => d.FromArticle)
+                    .HasConstraintName("FK_ArticleRelation_Article_From");
+
+                entity.HasOne(d => d.ToArticleNavigation)
+                    .WithMany(p => p.ArticleRelationToArticleNavigation)
+                    .HasForeignKey(d => d.ToArticle)
+                    .HasConstraintName("FK_ArticleRelation_Entry_To");
+            });
             //角色Id
             const string ADMIN_ID = "a18be9c0-aa65-4af8-bd17-00bd9344e575";
             const string ROLE_ID = ADMIN_ID;
@@ -149,7 +181,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
                 ContributionValue = 0,
                 MainPageContext = "### 这个人太懒了，什么也没写额(～￣▽￣)～",
                 Birthday = null,
-                RegistTime = DateTime.Now.ToCstTime(),
+                RegistTime = DateTime.MinValue,
                 PasswordHash = "AQAAAAEAACcQAAAAEDecloBliZOnB0dNPQmr8qhoodaLmPdrKN10/bvLDrHaAJSxqWOnrEsvBhl5kzrZmQ==",//hasher.HashPassword(null, "CngalAdmin123.."),
                 SecurityStamp = string.Empty
             });

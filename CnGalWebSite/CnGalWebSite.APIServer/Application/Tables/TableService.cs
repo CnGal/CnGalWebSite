@@ -474,7 +474,8 @@ namespace CnGalWebSite.APIServer.Application.Tables
             //通过Id获取词条 
             var entries = await _entryRepository.GetAll().AsNoTracking()
                  .Include(s => s.Information)
-                 .Include(s => s.Relevances)
+                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
+                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                  .Where(s => s.Type == EntryType.Role && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
                  .Select(s => new
                  {
@@ -483,7 +484,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
                      s.DisplayName,
                      s.AnotherName,
                      s.Information,
-                     s.Relevances
+                     s.EntryRelationFromEntryNavigation
                  })
                  .ToListAsync();
             var Infors = new List<RoleInforTableModel>();
@@ -558,9 +559,10 @@ namespace CnGalWebSite.APIServer.Application.Tables
 
                 }
 
-                foreach (var item in infor.Relevances)
+                foreach (var nav in infor.EntryRelationFromEntryNavigation)
                 {
-                    if (item.Modifier == "游戏" && string.IsNullOrWhiteSpace(item.DisplayName) == false)
+                    var item = nav.ToEntryNavigation;
+                    if (item.Type == EntryType.Game&& string.IsNullOrWhiteSpace(item.DisplayName) == false)
                     {
                         if (string.IsNullOrWhiteSpace(tableModel.GameName))
                         {

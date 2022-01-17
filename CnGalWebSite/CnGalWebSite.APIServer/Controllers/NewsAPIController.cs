@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TencentCloud.Ame.V20190916.Models;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -408,48 +409,19 @@ namespace CnGalWebSite.APIServer.Controllers
             model.MainPage = Markdown.ToHtml(model.MainPage ?? "", pipeline);
 
             //走动态的作者初始化流程
+            var infor = await _articleService.GetNewsModelAsync(article);
             var temp = new HomeNewsAloneViewModel
             {
                 ArticleId = article.Id,
-                Text = article.DisplayName ?? article.Name,
-                Time = article.RealNewsTime ?? article.PubishTime,
-                Type = article.NewsType ?? "动态",
+                Text = infor.Title,
+                Time = infor.HappenedTime,
+                Type = infor.NewsType ?? "动态",
+                GroupId = infor.GroupId,
+                Image = infor.Image,
+                Link = infor.Link,
+                Title = infor.GroupName,
+                UserId = infor.UserId,
             };
-
-            var infor = article.Relevances.FirstOrDefault(s => s.Modifier == "制作组");
-            if (infor == null)
-            {
-                infor = article.Relevances.FirstOrDefault(s => s.Modifier == "STAFF");
-                if (infor == null)
-                {
-                    infor = article.Relevances.FirstOrDefault(s => s.Modifier == "游戏");
-                    if (infor == null)
-                    {
-                        infor = article.Relevances.FirstOrDefault(s => s.Modifier == "角色");
-                    }
-                }
-            }
-
-
-            if (infor != null)
-            {
-                var group = await _entryRepository.FirstOrDefaultAsync(s => s.Name == infor.DisplayName);
-                if (group != null)
-                {
-                    temp.Image = string.IsNullOrWhiteSpace(group.Thumbnail) ? _appHelper.GetImagePath(article.CreateUser.PhotoPath, "user.png") : _appHelper.GetImagePath(group.Thumbnail, "user.png");
-                    temp.Title = group.DisplayName ?? group.Name;
-                }
-                else
-                {
-                    temp.Image = _appHelper.GetImagePath(article.CreateUser.PhotoPath, "user.png");
-                    temp.Title = article.CreateUser.UserName;
-                }
-            }
-            else
-            {
-                temp.Image = _appHelper.GetImagePath(article.CreateUser.PhotoPath, "user.png");
-                temp.Title = article.CreateUser.UserName;
-            }
 
             temp.Link = article.OriginalLink;
             if (temp.Title == "搬运姬" && string.IsNullOrWhiteSpace(article.OriginalAuthor) == false)

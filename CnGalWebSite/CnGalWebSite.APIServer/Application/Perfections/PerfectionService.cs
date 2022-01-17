@@ -321,7 +321,9 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 //查找词条
                 var entry = await _entryRepository.GetAll().Where(s => s.Type == EntryType.Game).AsNoTracking()
                     .Include(s => s.Information).ThenInclude(s => s.Additional)
-                    .Include(s => s.Relevances)
+                    .Include(s => s.Outlinks)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                    .Include(s => s.Articles)
                     .Include(s => s.Pictures)
                     .Include(s => s.Tags)
                     .Include(s => s.Perfection).ThenInclude(s => s.Checks)
@@ -379,7 +381,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 //检查图片
                 results.Add(CheckEntryImages(entry));
                 //检查关联信息
-                results.AddRange(await CheckEntryRelevances(entry));
+                results.AddRange( CheckEntryRelevances(entry));
                 //检查标签
                 results.Add(CheckEntryTags(entry));
 
@@ -472,118 +474,52 @@ namespace CnGalWebSite.APIServer.Application.Perfections
             }
         }
 
-        public async Task<List<PerfectionCheck>> CheckEntryRelevances(Entry entry)
+        public List<PerfectionCheck> CheckEntryRelevances(Entry entry)
         {
             var results = new List<PerfectionCheck>();
             //获取所有staff
-            var relevances = entry.Relevances.ToList();
+            var relevances = entry.EntryRelationFromEntryNavigation.ToList();
 
             if (relevances.Count == 0)
             {
-                return new List<PerfectionCheck>{
-                    new PerfectionCheck
-                    {
-                        CheckType = PerfectionCheckType.RelevanceArticles,
-                        DefectType = PerfectionDefectType.NotFilledIn,
-                        Grade = 0,
-                    },
-                     new PerfectionCheck
-                    {
-                        CheckType = PerfectionCheckType.RelevanceEntries,
-                        DefectType = PerfectionDefectType.NotFilledIn,
-                        Grade = 0,
-                    }
-                };
+                results.Add(new PerfectionCheck
+                {
+                    CheckType = PerfectionCheckType.RelevanceEntries,
+                    DefectType = PerfectionDefectType.NotFilledIn,
+                    Grade = 0,
+                });
             }
-
-            //只判断关联词条 不判断链接
-            var score = (double)20 / relevances.Count(s => s.Modifier == "游戏" || s.Modifier == "制作组" || s.Modifier == "角色" || s.Modifier == "文章" || s.Modifier == "动态");
-
-            //判断词条 不考虑Staff
-            var entries = relevances.Where(s => s.Modifier == "游戏" || s.Modifier == "制作组" || s.Modifier == "角色").Select(s => new { s.DisplayName, s.Modifier }).ToList();
-            var entrynames = entries.Select(s => s.DisplayName);
-            //拿到存在和不存在的名单
-            var existentialEntries = await _entryRepository.GetAll().Where(s => entrynames.Contains(s.Name)).Select(s => new { s.Name, s.Type }).ToListAsync();
-
-            var existentialEntryCount = 0;
-
-            foreach (var item in entries)
-            {
-                var temp = existentialEntries.FirstOrDefault(s => s.Name.ToLower() == item.DisplayName.ToLower());
-                if (temp == null)
-                {
-                    results.Add(new PerfectionCheck
-                    {
-                        CheckType = PerfectionCheckType.RelevanceEntries,
-                        DefectType = PerfectionDefectType.NonExistent,
-                        Infor = item.DisplayName,
-                        Grade = score / 2,
-                    });
-                }
-                else if ((temp.Type == EntryType.Game && item.Modifier != "游戏") || (temp.Type == EntryType.ProductionGroup && item.Modifier != "制作组") || (temp.Type == EntryType.Role && item.Modifier != "角色"))
-                {
-                    results.Add(new PerfectionCheck
-                    {
-                        CheckType = PerfectionCheckType.RelevanceEntries,
-                        DefectType = PerfectionDefectType.TypeError,
-                        Infor = item.DisplayName,
-                        Grade = score / 2,
-                    });
-                }
-                else
-                {
-                    existentialEntryCount++;
-                }
-            }
-
-            //添加总计存在的词条 分数
-            if (existentialEntryCount > 0)
+            else
             {
                 results.Add(new PerfectionCheck
                 {
                     CheckType = PerfectionCheckType.RelevanceEntries,
                     DefectType = PerfectionDefectType.None,
-                    Grade = score * existentialEntryCount,
+                    Grade = 10,
                 });
             }
 
-            //判断文章 
-            var articles = relevances.Where(s => s.Modifier == "文章" || s.Modifier == "动态").Select(s => s.DisplayName).ToList();
-            //拿到存在和不存在的名单
-            var existentialArticles = await _articleRepository.GetAll().Where(s => articles.Contains(s.Name)).Select(s => s.Name).ToListAsync();
-
-            var existentialArticleCount = 0;
-
-            foreach (var item in articles)
+             if ( entry.Articles.Count == 0)
             {
-                if (existentialArticles.Any(s => s.ToLower() == item.ToLower()))
+                results.Add(new PerfectionCheck
                 {
-                    existentialArticleCount++;
-
-                }
-                else
-                {
-                    results.Add(new PerfectionCheck
-                    {
-                        CheckType = PerfectionCheckType.RelevanceArticles,
-                        DefectType = PerfectionDefectType.NonExistent,
-                        Infor = item,
-                        Grade = score / 2,
-                    });
-                }
+                    CheckType = PerfectionCheckType.RelevanceArticles,
+                    DefectType = PerfectionDefectType.NotFilledIn,
+                    Grade = 0,
+                });
             }
-
-            //添加总计存在的词条 分数
-            if (existentialArticleCount > 0)
+            else
             {
                 results.Add(new PerfectionCheck
                 {
                     CheckType = PerfectionCheckType.RelevanceArticles,
                     DefectType = PerfectionDefectType.None,
-                    Grade = score * existentialArticleCount,
+                    Grade = 10,
                 });
             }
+         
 
+         
             return results;
         }
 

@@ -182,6 +182,8 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string NewsType { get; set; }
         public string Image { get; set; }
 
+        public string UserId { get; set; }
+
         public DateTime HappenedTime { get; set; }
     }
 

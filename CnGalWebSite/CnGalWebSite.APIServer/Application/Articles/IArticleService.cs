@@ -4,7 +4,9 @@ using CnGalWebSite.APIServer.Application.Articles.Dtos;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -21,12 +23,16 @@ namespace CnGalWebSite.APIServer.Application.Articles
 
         void UpdateArticleDataMain(Article article, ArticleMain examine);
 
-        void UpdateArticleDataRelevances(Article article, ArticleRelecancesModel examine);
+        Task UpdateArticleDataRelevances(Article article, ArticleRelevances examine);
 
         void UpdateArticleDataMainPage(Article article, string examine);
 
-        void UpdateArticleData(Article article, Examine examine);
+        Task UpdateArticleData(Article article, Examine examine);
 
         Task<List<long>> GetArticleIdsFromNames(List<string> names);
+
+        Task<NewsModel> GetNewsModelAsync(Article article);
+
+        ArticleViewModel GetArticleViewModelAsync(Article article);
     }
 }

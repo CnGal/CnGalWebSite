@@ -737,7 +737,6 @@ namespace CnGalWebSite.APIServer.Controllers
                         break;
                     case Operation.EstablishAddInfor:
                         entry = await _entryRepository.GetAll()
-                            .Include(s => s.Relevances)
                             .Include(s => s.Information)
                               .ThenInclude(s => s.Additional)
                             .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
@@ -777,19 +776,21 @@ namespace CnGalWebSite.APIServer.Controllers
                         break;
                     case Operation.EstablishRelevances:
 
-                        entry = await _entryRepository.GetAll().Include(s => s.Relevances).FirstOrDefaultAsync(s => s.Id == examine.EntryId);
+                        entry = await _entryRepository.GetAll()
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                            .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
                         if (entry == null)
                         {
                             return NotFound();
                         }
 
-                        EntryRelevancesModel entryRelevancesModel = null;
+                        EntryRelevances entryRelevances = null;
                         using (TextReader str = new StringReader(examine.Context))
                         {
                             var serializer = new JsonSerializer();
-                            entryRelevancesModel = (EntryRelevancesModel)serializer.Deserialize(str, typeof(EntryRelevancesModel));
+                            entryRelevances = (EntryRelevances)serializer.Deserialize(str, typeof(EntryRelevances));
                         }
-                        await _examineService.ExamineEstablishRelevancesAsync(entry, entryRelevancesModel);
+                        await _examineService.ExamineEstablishRelevancesAsync(entry, entryRelevances);
                         break;
                     case Operation.EstablishTags:
 
@@ -835,19 +836,21 @@ namespace CnGalWebSite.APIServer.Controllers
                         break;
                     case Operation.EditArticleRelevanes:
 
-                        article = await _articleRepository.GetAll().Include(s => s.Relevances).FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
+                        article = await _articleRepository.GetAll()
+                            .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s=>s.ToArticleNavigation)
+                            .FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
                         if (article == null)
                         {
                             return NotFound();
                         }
 
-                        ArticleRelecancesModel articleRelecancesModel = null;
+                        ArticleRelevances articleRelevances = null;
                         using (TextReader str = new StringReader(examine.Context))
                         {
                             var serializer = new JsonSerializer();
-                            articleRelecancesModel = (ArticleRelecancesModel)serializer.Deserialize(str, typeof(ArticleRelecancesModel));
+                            articleRelevances = (ArticleRelevances)serializer.Deserialize(str, typeof(ArticleRelevances));
                         }
-                        await _examineService.ExamineEditArticleRelevancesAsync(article, articleRelecancesModel);
+                        await _examineService.ExamineEditArticleRelevancesAsync(article, articleRelevances);
                         break;
                     case Operation.EditArticleMainPage:
 
@@ -1494,7 +1497,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _historyDataService.ImportBgmLink();
+                //await _examineService.MigrationEditEntryRelevanceExamineRecord();
+                await _examineService.MigrationEditArticleRelevanceExamineRecord();
                 //string temp= await _fileService.SaveImageAsync("https://wx4.sinaimg.cn/mw2000/008qAv3ngy1gyem1zkfwqj31cr0s9hbg.jpg", _configuration["NewsAdminId"]);
                 //await _elasticsearchService.DeleteDataOfElasticsearch();
                 //await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
@@ -1509,7 +1513,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     await _gameNewsRepository.UpdateAsync(item);
                 }*/
 
-               //await _historyDataService.GenerateZhiHuArticleImportJson();
+                //await _historyDataService.GenerateZhiHuArticleImportJson();
                 return new Result { Successful = true };
             }
             catch (Exception ex)

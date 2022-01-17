@@ -21,14 +21,12 @@
                             {
                                 <div class="@(Model.AddInfors.Count==1? "col-12":"col-12 col-lg-6")">
                                     <div class="h4 mt-2" style="margin-bottom: 0.1rem; display: flex;  flex-wrap: wrap; ">
-                                        <span class="badge  fw-bold  bg-title  @("bg-title-color-"+ColorNum)  me-2" style="margin-top: 5px; margin-bottom: 8px; height: 35px; ">
-                                            @item.Modifier
-                                        </span>
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" ColorNum="@ColorNum" />
                                         @foreach (var infor in item.Contents)
                                         {
-                                            <TabLink Text="@Model.Name" Url="@("/entries/index/" + ToolHelper.Base64EncodeName(infor))" Icon="fa fa-codepen"
-                                                     class="@("btn mb-2 me-2  bg-context-"+ColorNum)" style="transition: all .6s ease; margin-top: 5px; word-break: keep-all;">@infor</TabLink>
-                                                }
+                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id>0)" IsShowExistTag="@IsEdit"
+                                                           Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" Icon="fa fa-codepen"  IsNotShowTip="@(infor.Id==-1)" />
+                                        }
                                     </div>
                                 </div>
 
@@ -60,4 +58,6 @@
     public PeripheryInforTipViewModel Model { get; set; }
     [Parameter]
     public string ColorNum { get; set; }
+    [Parameter]
+    public bool IsEdit { get; set; }
 }

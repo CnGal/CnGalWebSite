@@ -31,6 +31,9 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Markdown = Markdig.Markdown;
 using Tag = CnGalWebSite.DataModel.Model.Tag;
+using Microsoft.Extensions.Configuration;
+using TencentCloud.Cme.V20191029.Models;
+using StackExchange.Redis;
 
 namespace CnGalWebSite.APIServer.ExamineX
 {
@@ -53,13 +56,15 @@ namespace CnGalWebSite.APIServer.ExamineX
         private readonly IUserService _userService;
         private readonly IRankService _rankService;
         private readonly IPerfectionService _perfectionService;
+        private readonly IConfiguration _configuration;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Examine>, string, SortOrder, IEnumerable<Examine>>> SortLambdaCacheEntry = new();
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService,
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository,
         IRepository<Article, long> articleRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService,
-        IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository)
+        IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository,
+        IConfiguration configuration)
         {
             _examineRepository = examineRepository;
             _appHelper = appHelper;
@@ -78,6 +83,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             _perfectionService = perfectionService;
             _peripheryRepository = peripheryRepository;
             _peripheryService = peripheryService;
+            _configuration = configuration;
         }
 
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "")
@@ -607,44 +613,64 @@ namespace CnGalWebSite.APIServer.ExamineX
         private static List<RelevancesViewModel> InitExamineViewEntryRelevances(Entry entry)
         {
             var relevances = new List<RelevancesViewModel>();
-            foreach (var item in entry.Relevances)
+            if(entry.Articles.Count>0)
             {
-                var isAdd = false;
-
-                //遍历信息列表寻找关键词
-                foreach (var infor in relevances)
+                var temp = new List<RelevancesKeyValueModel>();
+                relevances.Add(new RelevancesViewModel
                 {
-                    if (infor.Modifier == item.Modifier)
-                    {
-                        //关键词相同则添加
-                        infor.Informations.Add(new RelevancesKeyValueModel
-                        {
-                            DisplayName = item.DisplayName,
-                            DisplayValue = item.DisplayValue,
-                            Link = item.Link
-                        });
-                        isAdd = true;
-                        break;
-                    }
-                }
-                if (isAdd == false)
+                    Informations = temp,
+                   Modifier= "文章"
+                });
+                foreach (var item in entry.Articles)
                 {
-                    //没有找到关键词 则新建关键词
-                    var temp = new RelevancesViewModel
-                    {
-                        Modifier = item.Modifier,
-                        Informations = new List<RelevancesKeyValueModel>()
-                    };
-                    temp.Informations.Add(new RelevancesKeyValueModel
+                    temp.Add(new RelevancesKeyValueModel
                     {
                         DisplayName = item.DisplayName,
-                        DisplayValue = item.DisplayValue,
-                        Link = item.Link
-
+                        DisplayValue = item.BriefIntroduction,
+                        Link = "/articles/index/" + item.Id
                     });
-                    relevances.Add(temp);
                 }
             }
+            if (entry.EntryRelationFromEntryNavigation.Count > 0)
+            {
+                
+                var temp = new List<RelevancesKeyValueModel>();
+                relevances.Add(new RelevancesViewModel
+                {
+                    Informations = temp,
+                    Modifier = "词条"
+                });
+                foreach (var nav in entry.EntryRelationFromEntryNavigation)
+                {
+                    var item = nav.ToEntryNavigation;
+                    temp.Add(new RelevancesKeyValueModel
+                    {
+                        DisplayName = item.DisplayName,
+                        DisplayValue = item.BriefIntroduction,
+                        Link = "/entries/index/" + item.Id
+                    });
+                }
+            }
+            if (entry.Outlinks.Count > 0)
+            {
+
+                var temp = new List<RelevancesKeyValueModel>();
+                relevances.Add(new RelevancesViewModel
+                {
+                    Informations = temp,
+                    Modifier = "外部链接"
+                });
+                foreach (var item in entry.Outlinks)
+                {
+                    temp.Add(new RelevancesKeyValueModel
+                    {
+                        DisplayName = item.Name,
+                        DisplayValue = item.BriefIntroduction,
+                        Link=item.Link
+                    });
+                }
+            }
+           
             return relevances;
         }
 
@@ -652,8 +678,11 @@ namespace CnGalWebSite.APIServer.ExamineX
         {
             model.Type = "词条";
             var entry = await _entryRepository.GetAll()
-                 .Include(s => s.Relevances)
-                 .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
+                    .Include(s => s.Outlinks)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                    .Include(s => s.Articles)
+                    .ThenInclude(s => s.CreateUser)
+                    .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
             if (entry == null)
             {
 
@@ -879,12 +908,79 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
+        private static List<RelevancesViewModel> InitExamineViewArticleRelevances(Article article)
+        {
+            var relevances = new List<RelevancesViewModel>();
+            if (article.Entries.Count > 0)
+            {
+                var temp = new List<RelevancesKeyValueModel>();
+                relevances.Add(new RelevancesViewModel
+                {
+                    Informations = temp,
+                    Modifier = "词条"
+                });
+                foreach (var item in article.Entries)
+                {
+                    temp.Add(new RelevancesKeyValueModel
+                    {
+                        DisplayName = item.DisplayName,
+                        DisplayValue = item.BriefIntroduction,
+                        Link = "/entries/index/" + item.Id
+                    });
+                }
+            }
+            if (article.ArticleRelationFromArticleNavigation.Count > 0)
+            {
+
+                var temp = new List<RelevancesKeyValueModel>();
+                relevances.Add(new RelevancesViewModel
+                {
+                    Informations = temp,
+                    Modifier = "文章"
+                });
+                foreach (var nav in article.ArticleRelationFromArticleNavigation)
+                {
+                    var item = nav.ToArticleNavigation;
+                    temp.Add(new RelevancesKeyValueModel
+                    {
+                        DisplayName = item.DisplayName,
+                        DisplayValue = item.BriefIntroduction,
+                        Link = "/articles/index/" + item.Id
+                    });
+                }
+            }
+            if (article.Outlinks.Count > 0)
+            {
+
+                var temp = new List<RelevancesKeyValueModel>();
+                relevances.Add(new RelevancesViewModel
+                {
+                    Informations = temp,
+                    Modifier = "外部链接"
+                });
+                foreach (var item in article.Outlinks)
+                {
+                    temp.Add(new RelevancesKeyValueModel
+                    {
+                        DisplayName = item.Name,
+                        DisplayValue = item.BriefIntroduction,
+                        Link = item.Link
+                    });
+                }
+            }
+
+            return relevances;
+        }
+
+
         public async Task<bool> GetEditArticleRelevanesExamineView(Models.ExaminedViewModel model, Examine examine)
         {
             model.Type = "文章";
             var article = await _articleRepository.GetAll()
-                   .Include(s => s.Relevances)
-                   .FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
+                .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
+                .Include(s => s.Entries)
+                .Include(s => s.Outlinks)
+                .FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
             if (article == null)
             {
 
@@ -894,167 +990,12 @@ namespace CnGalWebSite.APIServer.ExamineX
             model.EntryName = article.Name;
             //序列化相关性列表
             //先读取词条信息
-            var relevances = new List<RelevancesViewModel>();
-            foreach (var item in article.Relevances)
-            {
-                var isAdd = false;
+            var relevances = InitExamineViewArticleRelevances(article);
 
-                //遍历信息列表寻找关键词
-                foreach (var infor in relevances)
-                {
-                    if (infor.Modifier == item.Modifier)
-                    {
-                        //关键词相同则添加
-                        infor.Informations.Add(new RelevancesKeyValueModel
-                        {
-                            DisplayName = item.DisplayName,
-                            DisplayValue = item.DisplayValue,
-                            Link = item.Link
-                        });
-                        isAdd = true;
-                        break;
-                    }
-                }
-                if (isAdd == false)
-                {
-                    //没有找到关键词 则新建关键词
-                    var temp = new RelevancesViewModel
-                    {
-                        Modifier = item.Modifier,
-                        Informations = new List<RelevancesKeyValueModel>()
-                    };
-                    temp.Informations.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.DisplayValue,
-                        Link = item.Link
+            //添加修改记录 
+            await _articleService.UpdateArticleData(article, examine);
 
-                    });
-                    relevances.Add(temp);
-                }
-            }
-
-
-            //序列化相关性列表
-            //先读取词条信息
-            var relevances_examine = new List<RelevancesViewModel>();
-            foreach (var item in article.Relevances)
-            {
-                var isAdd = false;
-
-                //遍历信息列表寻找关键词
-                foreach (var infor in relevances_examine)
-                {
-                    if (infor.Modifier == item.Modifier)
-                    {
-                        //关键词相同则添加
-                        infor.Informations.Add(new RelevancesKeyValueModel
-                        {
-                            DisplayName = item.DisplayName,
-                            DisplayValue = item.DisplayValue,
-                            Link = item.Link
-                        });
-                        isAdd = true;
-                        break;
-                    }
-                }
-                if (isAdd == false)
-                {
-                    //没有找到关键词 则新建关键词
-                    var temp = new RelevancesViewModel
-                    {
-                        Modifier = item.Modifier,
-                        Informations = new List<RelevancesKeyValueModel>()
-                    };
-                    temp.Informations.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.DisplayValue,
-                        Link = item.Link
-
-                    });
-                    relevances_examine.Add(temp);
-                }
-            }
-            //再读取当前用户等待审核的信息
-            //序列化数据
-            ArticleRelecancesModel articleRelevancesModel = null;
-            using (TextReader str = new StringReader(examine.Context))
-            {
-                var serializer = new JsonSerializer();
-                articleRelevancesModel = (ArticleRelecancesModel)serializer.Deserialize(str, typeof(ArticleRelecancesModel));
-            }
-            foreach (var item in articleRelevancesModel.Relevances)
-            {
-                var isAdd = false;
-
-                //遍历信息列表寻找关键词
-                foreach (var infor in relevances_examine)
-                {
-                    //如果关键词相同
-                    if (infor.Modifier == item.Modifier)
-                    {
-                        //继续查找是否存在主索引相同的项目
-                        foreach (var mod in infor.Informations)
-                        {
-                            if (mod.DisplayName == item.DisplayName)
-                            {
-                                //查看是否为删除操作
-                                if (item.IsDelete == true)
-                                {
-                                    infor.Informations.Remove(mod);
-                                    isAdd = true;
-                                    break;
-                                }
-                                else
-                                {
-                                    mod.DisplayValue = item.DisplayValue;
-                                    mod.DisplayName = item.DisplayName;
-                                    mod.Link = item.Link;
-
-                                    isAdd = true;
-                                    break;
-                                }
-                            }
-                        }
-                        //没有找到 
-                        if (isAdd == false)
-                        {
-                            //查看是否为删除操作
-                            if (item.IsDelete == false)
-                            {
-                                //添加
-                                infor.Informations.Add(new RelevancesKeyValueModel
-                                {
-                                    DisplayName = item.DisplayName,
-                                    DisplayValue = item.DisplayValue,
-                                    Link = item.Link,
-
-                                });
-                                isAdd = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (isAdd == false && item.IsDelete == false)
-                {
-                    //没有找到关键词 则新建关键词
-                    var temp = new RelevancesViewModel
-                    {
-                        Modifier = item.Modifier,
-                        Informations = new List<RelevancesKeyValueModel>()
-                    };
-                    temp.Informations.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.DisplayValue,
-                        Link = item.Link
-                    });
-                    relevances_examine.Add(temp);
-                }
-
-            }
+            var relevances_examine = InitExamineViewArticleRelevances(article);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -1587,11 +1528,11 @@ namespace CnGalWebSite.APIServer.ExamineX
             var disambigAloneModels = new List<DisambigAloneModel>();
             foreach (var item in disambig.Entries)
             {
-                disambigAloneModels.Add(new DisambigAloneModel { entry = _appHelper.GetEntryInforTipViewModel(item) });
+                disambigAloneModels.Add(new DisambigAloneModel { entry =await _appHelper.GetEntryInforTipViewModel(item) });
             }
             foreach (var item in disambig.Articles)
             {
-                disambigAloneModels.Add(new DisambigAloneModel { article = _appHelper.GetArticleInforTipViewModel(item) });
+                disambigAloneModels.Add(new DisambigAloneModel { article =  _appHelper.GetArticleInforTipViewModel(item) });
             }
 
             //序列化相关性列表
@@ -1658,7 +1599,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         var temp = await _entryRepository.GetAll().Where(s => s.Id == item.EntryId).FirstOrDefaultAsync();
                         if (temp != null)
                         {
-                            disambigAloneModels_examine.Add(new DisambigAloneModel { entry = _appHelper.GetEntryInforTipViewModel(temp) });
+                            disambigAloneModels_examine.Add(new DisambigAloneModel { entry =await _appHelper.GetEntryInforTipViewModel(temp) });
                         }
                     }
                     else if (item.Type == DisambigRelevanceType.Article)
@@ -2120,6 +2061,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         {
             //更新数据
             _entryService.UpdateEntryDataAddInfor(entry, examine);
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
 
             //反向关联
             foreach (var item in examine.Information)
@@ -2130,16 +2072,31 @@ namespace CnGalWebSite.APIServer.ExamineX
                     {
                         if (item.Modifier == "STAFF")
                         {
-                            var temp = await _entryRepository.GetAll().Include(s => s.Relevances).FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
+                            var temp = await _entryRepository.GetAll().Include(s => s.EntryRelationFromEntryNavigation).FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
 
-                            if (temp != null)
+                            if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
                             {
-                                if (temp.Relevances.Where(s => s.Modifier == "游戏").Any(s => s.DisplayName == entry.Name) == false)
+                                //补全审核记录
+                                //创建审核数据模型
+                                var examinedModel = new EntryRelevances();
+
+                                examinedModel.Relevances.Add(new EntryRelevancesAloneModel
                                 {
-                                    //如果没有关联则添加关联
-                                    temp.Relevances.Add(new EntryRelevance { Modifier = "游戏", DisplayName = entry.Name });
-                                    await _entryRepository.UpdateAsync(temp);
+                                    DisplayName = entry.Id.ToString(),
+                                    DisplayValue = entry.Name,
+                                    IsDelete = false,
+                                    Type = RelevancesType.Entry,
+                                });
+                                var resulte = "";
+                                using (TextWriter text = new StringWriter())
+                                {
+                                    var serializer = new JsonSerializer();
+                                    serializer.Serialize(text, examinedModel);
+                                    resulte = text.ToString();
                                 }
+
+                                await ExamineEstablishRelevancesAsync(temp, examinedModel);
+                                await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
 
                             }
                         }
@@ -2148,24 +2105,31 @@ namespace CnGalWebSite.APIServer.ExamineX
                     {
                         if (item.Modifier == "基本信息" && item.DisplayName == "声优" && string.IsNullOrWhiteSpace(item.DisplayValue) == false)
                         {
-                            var temp = await _entryRepository.GetAll().Include(s => s.Relevances).FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
+                            var temp = await _entryRepository.GetAll().Include(s => s.EntryRelationFromEntryNavigation).FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
 
-                            if (temp != null)
+                            if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
                             {
-                                //给配音关联角色
-                                if (temp.Relevances.Where(s => s.Modifier == "角色").Any(s => s.DisplayName == entry.Name) == false)
+                                //补全审核记录
+                                //创建审核数据模型
+                                var examinedModel = new EntryRelevances();
+
+                                examinedModel.Relevances.Add(new EntryRelevancesAloneModel
                                 {
-                                    //如果没有关联则添加关联
-                                    temp.Relevances.Add(new EntryRelevance { Modifier = "角色", DisplayName = entry.Name });
-                                    await _entryRepository.UpdateAsync(temp);
-                                }
-                                //给角色关联配音
-                                if (entry.Relevances.Where(s => s.Modifier == "STAFF").Any(s => s.DisplayName == temp.Name) == false)
+                                    DisplayName = entry.Id.ToString(),
+                                    DisplayValue = entry.Name,
+                                    IsDelete = false,
+                                    Type = RelevancesType.Entry,
+                                });
+                                var resulte = "";
+                                using (TextWriter text = new StringWriter())
                                 {
-                                    //如果没有关联则添加关联
-                                    entry.Relevances.Add(new EntryRelevance { Modifier = "STAFF", DisplayName = temp.Name });
+                                    var serializer = new JsonSerializer();
+                                    serializer.Serialize(text, examinedModel);
+                                    resulte = text.ToString();
                                 }
 
+                                await ExamineEstablishRelevancesAsync(temp, examinedModel);
+                                await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
                             }
                         }
                     }
@@ -2191,142 +2155,79 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         }
 
-        public async Task ExamineEstablishRelevancesAsync(Entry entry, EntryRelevancesModel examine)
+        public async Task ExamineEstablishRelevancesAsync(Entry entry, EntryRelevances examine)
         {
             //更新数据
-            _entryService.UpdateEntryDataRelevances(entry, examine);
-
-            //反向关联
-            foreach (var item in examine.Relevances)
-            {
-                //进行双向绑定
-                if (item.IsDelete == false)
-                {
-                    if (item.Modifier == "游戏" || item.Modifier == "角色" || item.Modifier == "STAFF" || item.Modifier == "制作组")
-                    {
-                        //查找关联词条
-                        var temp = await _entryRepository.GetAll().Include(s => s.Relevances).FirstOrDefaultAsync(s => s.Name == item.DisplayName);
-                        switch (entry.Type)
-                        {
-                            case EntryType.Game:
-                                if (temp != null)
-                                {
-                                    //查找是否已经关联
-                                    if (temp.Relevances.Where(s => s.Modifier == "游戏").Any(s => s.DisplayName == entry.Name) == false)
-                                    {
-                                        //如果没有关联则添加关联
-                                        temp.Relevances.Add(new EntryRelevance { Modifier = "游戏", DisplayName = entry.Name });
-                                        await _entryRepository.UpdateAsync(temp);
-                                    }
-
-                                }
-                                break;
-                            case EntryType.Staff:
-
-                                if (temp != null)
-                                {
-                                    //查找是否已经关联
-                                    if (temp.Relevances.Where(s => s.Modifier == "STAFF").Any(s => s.DisplayName == entry.Name) == false)
-                                    {
-                                        //如果没有关联则添加关联
-                                        temp.Relevances.Add(new EntryRelevance { Modifier = "STAFF", DisplayName = entry.Name });
-                                        await _entryRepository.UpdateAsync(temp);
-                                    }
-
-                                }
-                                break;
-                            case EntryType.Role:
-                                if (temp != null)
-                                {
-                                    //查找是否已经关联
-                                    if (temp.Relevances.Where(s => s.Modifier == "角色").Any(s => s.DisplayName == entry.Name) == false)
-                                    {
-                                        //如果没有关联则添加关联
-                                        temp.Relevances.Add(new EntryRelevance { Modifier = "角色", DisplayName = entry.Name });
-                                        await _entryRepository.UpdateAsync(temp);
-                                    }
-
-                                }
-                                break;
-                            case EntryType.ProductionGroup:
-                                if (temp != null)
-                                {
-                                    //查找是否已经关联
-                                    if (temp.Relevances.Where(s => s.Modifier == "制作组").Any(s => s.DisplayName == entry.Name) == false)
-                                    {
-                                        //如果没有关联则添加关联
-                                        temp.Relevances.Add(new EntryRelevance { Modifier = "制作组", DisplayName = entry.Name });
-                                        await _entryRepository.UpdateAsync(temp);
-                                    }
-                                }
-                                break;
-                        }
-                    }
-                    else if (item.Modifier == "文章" || item.Modifier == "动态")
-                    {
-                        //查找关联文章
-                        var temp = await _articleRepository.GetAll().Include(s => s.Relevances).FirstOrDefaultAsync(s => s.Name == item.DisplayName);
-                        switch (entry.Type)
-                        {
-                            case EntryType.Game:
-                                if (temp != null)
-                                {
-                                    //查找是否已经关联
-                                    if (temp.Relevances.Where(s => s.Modifier == "游戏").Any(s => s.DisplayName == entry.Name) == false)
-                                    {
-                                        //如果没有关联则添加关联
-                                        temp.Relevances.Add(new ArticleRelevance { Modifier = "游戏", DisplayName = entry.Name });
-                                        await _articleRepository.UpdateAsync(temp);
-                                    }
-
-                                }
-                                break;
-                            case EntryType.Staff:
-
-                                if (temp != null)
-                                {
-                                    //查找是否已经关联
-                                    if (temp.Relevances.Where(s => s.Modifier == "STAFF").Any(s => s.DisplayName == entry.Name) == false)
-                                    {
-                                        //如果没有关联则添加关联
-                                        temp.Relevances.Add(new ArticleRelevance { Modifier = "STAFF", DisplayName = entry.Name });
-                                        await _articleRepository.UpdateAsync(temp);
-                                    }
-
-                                }
-                                break;
-                            case EntryType.Role:
-                                if (temp != null)
-                                {
-                                    //查找是否已经关联
-                                    if (temp.Relevances.Where(s => s.Modifier == "角色").Any(s => s.DisplayName == entry.Name) == false)
-                                    {
-                                        //如果没有关联则添加关联
-                                        temp.Relevances.Add(new ArticleRelevance { Modifier = "角色", DisplayName = entry.Name });
-                                        await _articleRepository.UpdateAsync(temp);
-                                    }
-
-                                }
-                                break;
-                            case EntryType.ProductionGroup:
-                                if (temp != null)
-                                {
-                                    //查找是否已经关联
-                                    if (temp.Relevances.Where(s => s.Modifier == "制作组").Any(s => s.DisplayName == entry.Name) == false)
-                                    {
-                                        //如果没有关联则添加关联
-                                        temp.Relevances.Add(new ArticleRelevance { Modifier = "制作组", DisplayName = entry.Name });
-                                        await _articleRepository.UpdateAsync(temp);
-                                    }
-                                }
-                                break;
-                        }
-                    }
-
-                }
-            }
-
+            await _entryService.UpdateEntryDataRelevances(entry, examine);
             await _entryRepository.UpdateAsync(entry);
+
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            //反向关联 词条
+            foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Entry))
+            {
+                //查找关联词条
+                var temp = await _entryRepository.GetAll().Include(s => s.EntryRelationFromEntryNavigation).FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false
+                    && (entry.Type == EntryType.Game && temp.Type == EntryType.Staff) == false)
+                {
+                    //补全审核记录
+                    //创建审核数据模型
+                    var examinedModel = new EntryRelevances();
+
+                    examinedModel.Relevances.Add(new EntryRelevancesAloneModel
+                    {
+                        DisplayName = entry.Id.ToString(),
+                        DisplayValue = entry.Name,
+                        IsDelete = false,
+                        Type = RelevancesType.Entry,
+                    });
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, examinedModel);
+                        resulte = text.ToString();
+                    }
+
+                    await ExamineEstablishRelevancesAsync(temp, examinedModel);
+                    await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
+                }
+
+
+            }
+            //反向关联 文章
+            foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Article))
+            {
+                //查找关联词条
+                var temp = await _articleRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                if (temp != null && temp.Entries.Any(s => s.Id == entry.Id) == false)
+                {
+                    //补全审核记录
+                    //创建审核数据模型
+                    var examinedModel = new ArticleRelevances();
+
+                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
+                    {
+                        DisplayName = entry.Id.ToString(),
+                        DisplayValue = entry.Name,
+                        IsDelete = false,
+                        Type = RelevancesType.Entry,
+                    });
+
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, examinedModel);
+                        resulte = text.ToString();
+                    }
+
+                    await ExamineEditArticleRelevancesAsync(temp, examinedModel);
+                    await UniversalEditArticleExaminedAsync(temp, admin, true, resulte, Operation.EditArticleRelevanes, "自动反向关联");
+                }
+
+
+            }
 
             //更新完善度
             await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
@@ -2366,47 +2267,79 @@ namespace CnGalWebSite.APIServer.ExamineX
             await _articleRepository.UpdateAsync(article);
         }
 
-        public async Task ExamineEditArticleRelevancesAsync(Article article, ArticleRelecancesModel examine)
+        public async Task ExamineEditArticleRelevancesAsync(Article article, ArticleRelevances examine)
         {
-            _articleService.UpdateArticleDataRelevances(article, examine);
-            //进行双向绑定
-            foreach (var item in examine.Relevances)
+            await _articleService.UpdateArticleDataRelevances(article, examine);
+            await _articleRepository.UpdateAsync(article);
+
+
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            //反向关联 词条
+            foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Article))
             {
-                if (item.IsDelete == false && (item.Modifier == "游戏" || item.Modifier == "角色" || item.Modifier == "STAFF" || item.Modifier == "制作组"))
+                //查找关联词条
+                var temp = await _articleRepository.GetAll().Include(s => s.ArticleRelationFromArticleNavigation).FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                if (temp != null && temp.ArticleRelationFromArticleNavigation.Any(s => s.ToArticle == article.Id) == false)
                 {
-                    Entry temp = null;
-                    var isExist = false;
+                    //补全审核记录
+                    //创建审核数据模型
+                    var examinedModel = new ArticleRelevances();
 
-                    //查找关联词条
-                    temp = await _entryRepository.GetAll().Include(s => s.Relevances).FirstOrDefaultAsync(s => s.Name == item.DisplayName);
-                    if (temp != null)
+                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
                     {
-                        //查找是否已经关联
-                        foreach (var value in temp.Relevances.Where(s => s.Modifier == "文章" || s.Modifier == "动态"))
-                        {
-                            if (value.DisplayName == article.Name)
-                            {
-                                isExist = true;
-                                break;
-                            }
-                        }
-                        if (isExist == false)
-                        {
-                            //如果没有关联则添加关联
-                            var typeString = "文章";
-                            if (article.Type == ArticleType.News)
-                            {
-                                typeString = "动态";
-                            }
-                            temp.Relevances.Add(new EntryRelevance { Modifier = typeString, DisplayName = article.Name });
-                            await _entryRepository.UpdateAsync(temp);
-                        }
+                        DisplayName = article.Id.ToString(),
+                        DisplayValue = article.Name,
+                        IsDelete = false,
+                        Type = RelevancesType.Article,
+                    });
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, examinedModel);
+                        resulte = text.ToString();
+}
 
-                    }
+                    await ExamineEditArticleRelevancesAsync(temp, examinedModel);
+                    await UniversalEditArticleExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
                 }
+
+
+            }
+            //反向关联 文章
+            foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Entry))
+            {
+                //查找关联词条
+                var temp = await _entryRepository.GetAll().Include(s => s.Articles).FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                if (temp != null && temp.Articles.Any(s => s.Id == article.Id) == false)
+                {
+                    //补全审核记录
+                    //创建审核数据模型
+                    var examinedModel = new EntryRelevances();
+
+                    examinedModel.Relevances.Add(new EntryRelevancesAloneModel
+                    {
+                        DisplayName = article.Id.ToString(),
+                        DisplayValue = article.Name,
+                        IsDelete = false,
+                        Type = RelevancesType.Article,
+                    });
+
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, examinedModel);
+                        resulte = text.ToString();
+                    }
+
+                    await ExamineEstablishRelevancesAsync(temp, examinedModel);
+                    await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
+                }
+
+
             }
 
-            await _articleRepository.UpdateAsync(article);
         }
 
         public async Task ExamineEditArticleMainPageAsync(Article article, string examine)
@@ -3119,9 +3052,6 @@ namespace CnGalWebSite.APIServer.ExamineX
             };
             entry = await _entryRepository.InsertAsync(entry);
             //初始化列表
-            entry.Information = new List<BasicEntryInformation>();
-            entry.Relevances = new List<EntryRelevance>();
-            entry.Pictures = new List<EntryPicture>();
 
 
             await ExamineEstablishMainAsync(entry, entryMain);
@@ -3231,17 +3161,26 @@ namespace CnGalWebSite.APIServer.ExamineX
             if (entryRelevances != null && entryRelevances.Count != 0)
             {
                 //创建审核数据模型
-                var examinedModel = new EntryRelevancesModel
+                var examinedModel = new EntryRelevances();
+                List<string> entryTyps = new List<string>
                 {
-                    Relevances = new List<EntryRelevancesExaminedModel>()
+                    "词条",
+                    "游戏",
+                    "制作组",
+                    "STAFF"
+                };
+                List<string> articleTyps = new List<string>
+                {
+                    "文章",
+                    "动态",
                 };
                 foreach (var item in entryRelevances)
                 {
-                    examinedModel.Relevances.Add(new EntryRelevancesExaminedModel
+                    examinedModel.Relevances.Add(new EntryRelevancesAloneModel
                     {
                         IsDelete = false,
                         DisplayName = item.DisplayName,
-                        Modifier = item.Modifier,
+                        Type = (entryTyps.Contains( item.Modifier)?RelevancesType.Entry:(articleTyps.Contains(item.Modifier)?RelevancesType.Article:RelevancesType.Outlink)),
                         DisplayValue = item.DisplayValue,
                         Link = item.Link
                     });
@@ -3345,19 +3284,29 @@ namespace CnGalWebSite.APIServer.ExamineX
             //判断审核是否为空
             if (articleRelevance != null && articleRelevance.Count != 0)
             {
-                //创建审核数据模型
-                var examinedModel = new ArticleRelecancesModel
+                List<string> entryTyps = new List<string>
                 {
-                    Relevances = new List<ArticleRelevancesExaminedModel>()
+                    "词条",
+                    "游戏",
+                    "制作组",
+                    "STAFF"
                 };
+                List<string> articleTyps = new List<string>
+                {
+                    "文章",
+                    "动态",
+                };
+                //创建审核数据模型
+                var examinedModel = new ArticleRelevances();
                 foreach (var item in articleRelevance)
                 {
-                    examinedModel.Relevances.Add(new ArticleRelevancesExaminedModel
+                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
                     {
                         IsDelete = false,
                         DisplayName = item.DisplayName,
-                        Modifier = item.Modifier
-
+                        Type = (entryTyps.Contains(item.Modifier) ? RelevancesType.Entry : (articleTyps.Contains(item.Modifier) ? RelevancesType.Article : RelevancesType.Outlink)),
+                        DisplayValue = item.DisplayValue,
+                        Link = item.Link
                     });
                 }
                 //序列化JSON
@@ -3628,6 +3577,317 @@ namespace CnGalWebSite.APIServer.ExamineX
             await ReplaceEditEntryTagsExamineContext();
         }
 
+        public async Task MigrationEditArticleRelevanceExamineRecord()
+        {
+           // await ReplaceArticleRelevances();
+            await ReplaceEditArticleRelevancesExamineContext();
+        }
+   public async Task MigrationEditEntryRelevanceExamineRecord()
+        {
+            await ReplaceEntryRelevances();
+            await ReplaceEditEntryRelevancesExamineContext();
+        }
+
+        /// <summary>
+        /// 迁移词条审核数据 关联部分
+        /// </summary>
+        /// <returns></returns>
+        private async Task ReplaceEditArticleRelevancesExamineContext()
+        {
+            ArticleRelecancesModel_1_0 oldExamineModel = null;
+            ArticleRelevances newExamineModel = null;
+            //获取要替换的所有审核记录ID
+            var ids = await _examineRepository.GetAll().AsNoTracking().Where(s => s.Operation == Operation.EditArticleRelevanes && s.Version == ExamineVersion.V1_0).Select(s => s.Id).ToListAsync();
+
+            //遍历列表 依次替换
+            foreach (var id in ids)
+            {
+                var examine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == id);
+                if (examine != null)
+                {
+                    //反序列化旧数据模型                   
+                    using (TextReader str = new StringReader(examine.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        oldExamineModel = (ArticleRelecancesModel_1_0)serializer.Deserialize(str, typeof(ArticleRelecancesModel_1_0));
+                    }
+
+                    newExamineModel = new ArticleRelevances();
+
+                    //遍历对应复制
+                    foreach (var item in oldExamineModel.Relevances)
+                    {
+                        if (item.Modifier == "词条" || item.Modifier == "游戏" || item.Modifier == "制作组" || item.Modifier == "STAFF" || item.Modifier == "角色")
+                        {
+                            var newEntry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayName);
+                            if (newEntry != null)
+                            {
+                                newExamineModel.Relevances.Add(new ArticleRelevancesAloneModel
+                                {
+                                    DisplayName = newEntry.Id.ToString(),
+                                    DisplayValue = newEntry.DisplayName,
+                                    IsDelete = item.IsDelete,
+                                    Type = RelevancesType.Entry
+                                });
+                            }
+
+                        }
+                        else if (item.Modifier == "文章" || item.Modifier == "动态")
+                        {
+                            var newArticle = await _articleRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayName);
+                            newExamineModel.Relevances.Add(new ArticleRelevancesAloneModel
+                            {
+                                DisplayName = newArticle.Id.ToString(),
+                                DisplayValue = newArticle.DisplayName,
+                                IsDelete = item.IsDelete,
+                                Type = RelevancesType.Article
+                            });
+                        }
+                        else
+                        {
+                            newExamineModel.Relevances.Add(new ArticleRelevancesAloneModel
+                            {
+
+                                DisplayName = item.DisplayName,
+                                DisplayValue = item.DisplayValue,
+                                IsDelete = item.IsDelete,
+                                Type = RelevancesType.Outlink
+                            });
+                        }
+
+                    }
+
+                    //序列化新数据模型
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, newExamineModel);
+                        resulte = text.ToString();
+                    }
+
+                    //保存
+                    if (newExamineModel.Relevances.Count == 0)
+                    {
+                        examine.Note += ("\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移文章关联信息编辑记录");
+                    }
+                    examine.Version = ExamineVersion.V1_1;
+                    examine.Context = resulte;
+                    await _examineRepository.UpdateAsync(examine);
+                }
+            }
+        }
+        /// <summary>
+        /// 迁移词条关联数据
+        /// </summary>
+        /// <returns></returns>
+        private async Task ReplaceArticleRelevances()
+        {
+            var articles = await _articleRepository.GetAll().Where(s => s.Relevances.Any()).Include(s => s.Relevances)
+                 .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
+                 .Include(s => s.Entries)
+                 .Include(s => s.Outlinks)
+                 .ToListAsync();
+
+            foreach (var item in articles)
+            {
+                foreach (var temp in item.Relevances)
+                {
+                    if (temp.Modifier == "词条" || temp.Modifier == "游戏" || temp.Modifier == "制作组" || temp.Modifier == "STAFF" || temp.Modifier == "角色")
+                    {
+                        var newEntry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == temp.DisplayName);
+                        if(newEntry != null)
+                        {
+                        item.Entries.Add(newEntry);
+
+                        }
+                    }
+                    else if (temp.Modifier == "文章" || temp.Modifier == "动态")
+                    {
+                        var newArticle = await _articleRepository.FirstOrDefaultAsync(s => s.Name == temp.DisplayName);
+                        if (newArticle != null)
+                        {
+                            item.ArticleRelationFromArticleNavigation.Add(new ArticleRelation
+                            {
+                                FromArticle = item.Id,
+                                FromArticleNavigation = item,
+                                ToArticle = newArticle.Id,
+                                ToArticleNavigation = newArticle
+                            });
+                        }
+                    }
+                    else
+                    {
+                        item.Outlinks.Add(new Outlink
+                        {
+                            BriefIntroduction = temp.DisplayValue,
+                            Name = temp.DisplayName,
+                            Link = temp.Link,
+                        });
+                    }
+                }
+                item.Relevances.Clear();
+                await _articleRepository.UpdateAsync(item);
+            }
+        }
+
+     
+        /// <summary>
+        /// 迁移词条审核数据 关联部分
+        /// </summary>
+        /// <returns></returns>
+        private async Task ReplaceEditEntryRelevancesExamineContext()
+        {
+            EntryRelevancesModel_1_0 oldExamineModel = null;
+            EntryRelevances newExamineModel = null;
+            //获取要替换的所有审核记录ID
+            var ids = await _examineRepository.GetAll().AsNoTracking()
+                .Where(s => s.Operation == Operation.EstablishRelevances && s.Version == ExamineVersion.V1_0).Select(s => s.Id).ToListAsync();
+
+            //遍历列表 依次替换
+            foreach (var id in ids)
+            {
+                var examine = await _examineRepository.GetAll().Include(s=>s.Entry).FirstOrDefaultAsync(s => s.Id == id);
+                if (examine != null)
+                {
+                    //反序列化旧数据模型                   
+                    using (TextReader str = new StringReader(examine.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        oldExamineModel = (EntryRelevancesModel_1_0)serializer.Deserialize(str, typeof(EntryRelevancesModel_1_0));
+                    }
+
+                    newExamineModel = new EntryRelevances();
+
+                    //遍历对应复制
+                    foreach (var item in oldExamineModel.Relevances)
+                    {
+                        if (item.Modifier == "词条" || item.Modifier == "游戏" || item.Modifier == "制作组" || item.Modifier == "STAFF" || item.Modifier == "角色")
+                        {
+                            if (examine.Entry.Type == EntryType.Game && item.Modifier == "STAFF")
+                            {
+                                continue;
+                            }
+                            var newEntry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayName);
+                            if (newEntry != null)
+                            {
+                                newExamineModel.Relevances.Add(new EntryRelevancesAloneModel
+                                {
+                                    DisplayName = newEntry.Id.ToString(),
+                                    DisplayValue = newEntry.DisplayName,
+                                    IsDelete = item.IsDelete,
+                                    Type = RelevancesType.Entry
+                                });
+                            }
+
+                        }
+                        else if (item.Modifier == "文章" || item.Modifier == "动态")
+                        {
+                            var newArticle = await _articleRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayName);
+                            if (newArticle != null)
+                            {
+                                newExamineModel.Relevances.Add(new EntryRelevancesAloneModel
+                                {
+                                    DisplayName = newArticle.Id.ToString(),
+                                    DisplayValue = newArticle.DisplayName,
+                                    IsDelete = item.IsDelete,
+                                    Type = RelevancesType.Article
+                                });
+                            }
+                        }
+                        else
+                        {
+                            newExamineModel.Relevances.Add(new EntryRelevancesAloneModel
+                            {
+
+                                DisplayName = item.DisplayName,
+                                DisplayValue =item.DisplayValue,
+                                IsDelete = item.IsDelete,
+                                Type = RelevancesType.Outlink
+                            });
+                        }
+
+                    }
+
+                    //序列化新数据模型
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, newExamineModel);
+                        resulte = text.ToString();
+                    }
+
+                    //保存
+                    if(newExamineModel.Relevances.Count==0)
+                    {
+                        examine.Note += ("\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm")+" 迁移词条关联信息编辑记录");
+                    }
+                    examine.Version = ExamineVersion.V1_1;
+                    examine.Context = resulte;
+                    await _examineRepository.UpdateAsync(examine);
+                }
+            }
+        }
+        /// <summary>
+        /// 迁移词条关联数据
+        /// </summary>
+        /// <returns></returns>
+        private async Task ReplaceEntryRelevances()
+        {
+           var entries= await _entryRepository.GetAll().Where(s=>s.Relevances.Any()).Include(s => s.Relevances)
+                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s => s.Articles)
+                .Include(s => s.Outlinks)
+                .ToListAsync();
+
+            foreach(var item in entries)
+            {
+                foreach(var temp    in item.Relevances)
+                {
+                    if(temp.Modifier=="词条"|| temp.Modifier == "游戏" || temp.Modifier == "制作组" || temp.Modifier == "STAFF" || temp.Modifier == "角色")
+                    {
+                        if(item.Type==EntryType.Game && temp.Modifier == "STAFF")
+                        {
+                            continue;
+                        }
+                        var newEntry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == temp.DisplayName);
+                        if(newEntry!=null)
+                        {
+                            item.EntryRelationFromEntryNavigation.Add(new EntryRelation
+                            {
+                                FromEntry = item.Id,
+                                FromEntryNavigation = item,
+                                ToEntry = newEntry.Id,
+                                ToEntryNavigation = newEntry
+                            });
+                        }
+                       
+                    }
+                    else if(temp.Modifier == "文章" || temp.Modifier == "动态")
+                    {
+                        var newArticle = await _articleRepository.FirstOrDefaultAsync(s => s.Name == temp.DisplayName);
+                        if (newArticle != null)
+                        {
+                            item.Articles.Add(newArticle);
+
+                        }
+                    }
+                    else
+                    {
+                        item.Outlinks.Add(new Outlink
+                        {
+                            BriefIntroduction = temp.DisplayValue,
+                            Name = temp.DisplayName,
+                            Link = temp.Link,
+                        });
+                    }
+                }
+                item.Relevances.Clear();
+                await _entryRepository.UpdateAsync(item);
+            }
+        }
+
         /// <summary>
         /// 替换 EditEntryTags 类型 旧版 审核记录 到 新版
         /// </summary>
@@ -3680,7 +3940,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     }
 
                     //保存
-
+                    examine.Version = ExamineVersion.V1_1;
                     examine.Context = resulte;
                     await _examineRepository.UpdateAsync(examine);
                 }

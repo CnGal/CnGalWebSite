@@ -22,7 +22,7 @@
                 Image = item.MainImage,
                 Link ="entries/index/"+ item.Id,
                 Name = item.Name,
-                Positions = item.AddInfors.FirstOrDefault()?.Contents ?? new List<string>()
+                Positions = item.AddInfors.FirstOrDefault()?.Contents.Select(s=>s.DisplayName).ToList() ?? new List<string>()
             });
         }
 

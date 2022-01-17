@@ -444,19 +444,11 @@ namespace CnGalWebSite.APIServer.Application.News
             if (gameNews.Entries.Any())
             {
                 var entryNames = gameNews.Entries.Select(s => s.EntryName);
-                var entries = await _entryRepository.GetAll().Where(s => entryNames.Contains(s.Name)).Select(s => new
-                {
-                    s.Name,
-                    s.Type
-                }).ToListAsync();
+                var entries = await _entryRepository.GetAll().Where(s => entryNames.Contains(s.Name)).ToListAsync();
 
                 foreach (var entry in entries)
                 {
-                    article.Relevances.Add(new ArticleRelevance
-                    {
-                        Modifier = entry.Type.GetDisplayName(),
-                        DisplayName = entry.Name,
-                    });
+                    article.Entries.Add(entry);
                 }
             }
 

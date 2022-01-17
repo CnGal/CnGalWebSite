@@ -47,6 +47,9 @@ else
     [Parameter]
     public bool IsExist { get; set; }
     [Parameter]
+    public bool IsNotShowTip { get; set; }
+
+    [Parameter]
     public bool IsShowExistTag { get; set; }
 
     [Parameter]
@@ -54,15 +57,19 @@ else
 
     public async Task OnClickNull()
     {
-        if (IsShowExistTag)
+        if(IsNotShowTip==false)
         {
-            NavigationManager.NavigateTo(Provider, "/entries/establishentry?Name=" + Text, "创建词条", "fa-pencil");
-        }
-        else
-        {
-            await ToastService.Error("该词条不存在", "你可以亲自创建“" + Text + "”哦~");
+            if (IsShowExistTag)
+            {
+                NavigationManager.NavigateTo(Provider, "/entries/establishentry?Name=" + Text, "创建词条", "fa-pencil");
+            }
+            else
+            {
+                await ToastService.Error("该词条不存在", "你可以亲自创建“" + Text + "”哦~");
 
+            }
         }
+
 
     }
 }

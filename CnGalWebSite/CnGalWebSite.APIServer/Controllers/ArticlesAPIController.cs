@@ -23,6 +23,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CnGalWebSite.APIServer.Application.Entries;
+using TencentCloud.Cme.V20191029.Models;
+using CnGalWebSite.DataModel.ViewModel.Home;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -38,12 +41,13 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Comment, long> _commentUpRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IArticleService _articleService;
+        private readonly IEntryService _entryService;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
 
 
         public ArticlesAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository,
-            IExamineService examineService,
+            IExamineService examineService, IEntryService entryService,
         UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
         {
@@ -56,6 +60,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _articleService = articleService;
             _examineRepository = examineRepository;
             _examineService = examineService;
+            _entryService = entryService;
         }
 
         /// <summary>
@@ -70,7 +75,11 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            var article = await _articleRepository.GetAll().AsNoTracking().Include(s => s.Relevances).Include(s => s.Examines).AsSplitQuery().FirstOrDefaultAsync(x => x.Id == id);
+            var article = await _articleRepository.GetAll().AsNoTracking()
+                .Include(s=>s.Entries)
+                .Include(s=>s.Outlinks)
+                .Include(s=>s.ArticleRelationFromArticleNavigation).ThenInclude(s=>s.ToArticleNavigation)
+                .Include(s => s.Examines).AsSplitQuery().FirstOrDefaultAsync(x => x.Id == id);
 
             if (article == null)
             {
@@ -110,13 +119,29 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //通过Id获取文章
             var article = await _articleRepository.GetAll().AsNoTracking().Include(s => s.Disambig)
-                .Include(s => s.CreateUser).Include(s => s.ThumbsUps).Include(s => s.Relevances).Include(s => s.Examines).FirstOrDefaultAsync(x => x.Id == id);
+                .Include(s => s.CreateUser).Include(s => s.ThumbsUps)
+                .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s=>s.ToArticleNavigation)
+                .Include(s=>s.Entries)
+                .Include(s=>s.Outlinks)
+                .Include(s => s.Examines).FirstOrDefaultAsync(x => x.Id == id);
             if (article == null)
             {
                 return NotFound();
             }
 
+
+            //判断当前是否隐藏
+            if (article.IsHidden == true)
+            {
+                if (user == null || await _userManager.IsInRoleAsync(user, "Admin") != true)
+                {
+                    return NotFound();
+                }
+            }
+
             List<Examine> examineQuery = null;
+
+
             //读取审核信息
             if (user != null)
             {
@@ -135,79 +160,43 @@ namespace CnGalWebSite.APIServer.Controllers
             Examine examine = null;
             if (user != null)
             {
-                examine = examineQuery.Find(s => s.Operation == Operation.EditArticleMain);
+                examine = examineQuery.FirstOrDefault(s => s.Operation == Operation.EditArticleMain);
                 if (examine != null)
                 {
-                    _articleService.UpdateArticleData(article, examine);
+                    await _articleService.UpdateArticleData(article, examine);
                 }
-                examine = examineQuery.Find(s => s.Operation == Operation.EditArticleMainPage);
+                examine = examineQuery.FirstOrDefault(s => s.Operation == Operation.EditArticleMainPage);
 
                 if (examine != null)
                 {
-                    _articleService.UpdateArticleData(article, examine);
+                    await _articleService.UpdateArticleData(article, examine);
+                }
+                examine = examineQuery.FirstOrDefault(s => s.Operation == Operation.EditArticleRelevanes);
+                if (examine != null)
+                {
+                    await _articleService.UpdateArticleData(article, examine);
                 }
             }
+
             //建立视图模型
-            var model = new ArticleViewModel
-            {
-                Id = article.Id,
-                Name = article.DisplayName ?? article.Name,
-                Type = article.Type,
-                MainPage = article.MainPage,
-                PubishTime = article.RealNewsTime ?? article.PubishTime,
-                OriginalLink = article.OriginalLink,
-                OriginalAuthor = article.OriginalAuthor,
-                CreateTime = article.CreateTime,
-                ThumbsUpCount = article.ThumbsUps.Count,
-                ReaderCount = article.ReaderCount,
-                EditDate = article.LastEditTime,
-                CommentCount = await _commentUpRepository.LongCountAsync(s => s.ArticleId == id),
-                CanComment = article.CanComment ?? true,
-                DisambigId = article.DisambigId ?? 0,
-                DisambigName = article.Disambig?.Name,
-                BriefIntroduction = article.BriefIntroduction
-            };
+            var model = _articleService.GetArticleViewModelAsync(article);
+            model.CommentCount = await _commentUpRepository.LongCountAsync(s => s.ArticleId == id);
 
             if (user != null)
             {
-                examine = examineQuery.Find(s => s.Operation == Operation.EditArticleMain);
-                if (examine != null)
+                if (examineQuery.Any(s => s.Operation == Operation.EditArticleMain))
                 {
                     model.MainState = EditState.Preview;
                 }
-                examine = examineQuery.Find(s => s.Operation == Operation.EditArticleMainPage);
-
-                if (examine != null)
+                if (examineQuery.Any(s => s.Operation == Operation.EditArticleMain))
                 {
                     model.MainPageState = EditState.Preview;
                 }
-            }
-
-
-            //判断当前是否隐藏
-            if (article.IsHidden == true)
-            {
-                if (user == null || await _userManager.IsInRoleAsync(user, "Admin") != true)
+                if (examineQuery.Any(s => s.Operation == Operation.EditArticleRelevanes))
                 {
-                    return NotFound();
+                    model.RelevancesState = EditState.Preview;
                 }
-                model.IsHidden = true;
             }
-            else
-            {
-                model.IsHidden = false;
-            }
-
-
-
-            //初始化图片
-            model.MainPicture = _appHelper.GetImagePath(article.MainPicture, "");
-            model.BackgroundPicture = _appHelper.GetImagePath(article.BackgroundPicture, "");
-            model.SmallBackgroundPicture = _appHelper.GetImagePath(article.SmallBackgroundPicture, "");
-
-            //初始化主页Html代码
-            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
-            model.MainPage = Markdown.ToHtml(model.MainPage ?? "", pipeline);
 
             //复制数据
             var createUser = article.CreateUser;
@@ -265,146 +254,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 if (examine != null)
                 {
                     model.RelevancesState = EditState.Preview;
-                    _articleService.UpdateArticleData(article, examine);
-                }
-            }
-            //读取词条信息
-            var relevances = new List<RelevancesViewModel>();
-            foreach (var item in article.Relevances)
-            {
-                var isAdd = false;
-
-                //遍历信息列表寻找关键词
-                foreach (var infor in relevances)
-                {
-                    if (infor.Modifier == item.Modifier)
-                    {
-                        //关键词相同则添加
-                        infor.Informations.Add(new RelevancesKeyValueModel
-                        {
-                            DisplayName = item.DisplayName,
-                            DisplayValue = item.DisplayValue,
-                            Link = item.Link
-                        });
-                        isAdd = true;
-                        break;
-                    }
-                }
-                if (isAdd == false)
-                {
-                    //没有找到关键词 则新建关键词
-                    var temp = new RelevancesViewModel
-                    {
-                        Modifier = item.Modifier,
-                        Informations = new List<RelevancesKeyValueModel>()
-                    };
-                    temp.Informations.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.DisplayValue,
-                        Link = item.Link
-
-                    });
-                    relevances.Add(temp);
+                    await _articleService.UpdateArticleData(article, examine);
                 }
             }
 
-
-            //加载附加信息 关联词条获取
-            foreach (var item in relevances)
-            {
-                switch (item.Modifier)
-                {
-                    case "角色":
-                        foreach (var infor in item.Informations)
-                        {
-                            //获取角色词条
-                            var temp = await _entryRepository.FirstOrDefaultAsync(x => x.Name == infor.DisplayName && x.Type == EntryType.Role);
-                            if (temp != null)
-                            {
-                                infor.DisplayName = temp.DisplayName ?? infor.DisplayName;
-                                infor.Image = _appHelper.GetImagePath(temp.Thumbnail, "user.png");
-                                infor.Link = "/entries/index/" + temp.Id;
-                            }
-                            else
-                            {
-                                infor.Image = _appHelper.GetImagePath(null, "user.png");
-                            }
-                        }
-                        break;
-                    case "STAFF":
-                        foreach (var infor in item.Informations)
-                        {
-                            //获取STAFF词条
-                            var temp = await _entryRepository.FirstOrDefaultAsync(x => x.Name == infor.DisplayName && x.Type == EntryType.Staff);
-                            if (temp != null)
-                            {
-                                infor.DisplayName = temp.DisplayName ?? infor.DisplayName;
-                                infor.Image = _appHelper.GetImagePath(temp.Thumbnail, "user.png");
-                                infor.Link = "/entries/index/" + temp.Id;
-                            }
-                            else
-                            {
-                                infor.Image = _appHelper.GetImagePath(null, "user.png");
-                            }
-                        }
-                        break;
-                    case "游戏":
-                        foreach (var infor in item.Informations)
-                        {
-                            //获取STAFF词条
-                            var temp = await _entryRepository.FirstOrDefaultAsync(x => x.Name == infor.DisplayName && x.Type == EntryType.Game);
-                            if (temp != null)
-                            {
-                                infor.DisplayName = temp.DisplayName ?? infor.DisplayName;
-                                infor.DisplayValue = _appHelper.GetStringAbbreviation(temp.BriefIntroduction, 20);
-                                infor.Image = _appHelper.GetImagePath(temp.MainPicture, "app.png");
-                                infor.Link = "/entries/index/" + temp.Id;
-                            }
-                            else
-                            {
-                                infor.Image = _appHelper.GetImagePath(null, "app.png");
-                            }
-                        }
-                        break;
-                    case "制作组":
-                        foreach (var infor in item.Informations)
-                        {
-                            //获取STAFF词条
-                            var temp = await _entryRepository.FirstOrDefaultAsync(x => x.Name == infor.DisplayName && x.Type == EntryType.ProductionGroup);
-                            if (temp != null)
-                            {
-                                infor.DisplayName = temp.DisplayName ?? infor.DisplayName;
-                                infor.DisplayValue = _appHelper.GetStringAbbreviation(temp.BriefIntroduction, 20);
-                                infor.Image = _appHelper.GetImagePath(temp.MainPicture, "app.png");
-                                infor.Link = "/entries/index/" + temp.Id;
-                            }
-                            else
-                            {
-                                infor.Image = _appHelper.GetImagePath(null, "app.png");
-                            }
-                        }
-                        break;
-                    case "文章":
-                        foreach (var infor in item.Informations)
-                        {
-                            //获取STAFF词条
-                            var temp = await _articleRepository.FirstOrDefaultAsync(x => x.Name == infor.DisplayName);
-                            if (temp != null)
-                            {
-                                infor.DisplayName = temp.DisplayName ?? infor.DisplayName;
-                                infor.DisplayValue = _appHelper.GetStringAbbreviation(temp.BriefIntroduction, 20);
-                                infor.Image = _appHelper.GetImagePath(temp.MainPicture, "certificate.png");
-                                infor.Link = "/articles/index/" + temp.Id;
-                            }
-                            else
-                            {
-                                infor.Image = _appHelper.GetImagePath(null, "certificate.png");
-                            }
-                        }
-                        break;
-                }
-            }
 
             var examiningList = new List<Operation>();
             if (user != null)
@@ -450,9 +303,6 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                 }
             }
-
-            //赋值
-            model.Relevances = relevances;
 
 
             //增加文章阅读次数
@@ -536,6 +386,41 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Error = "只有管理员才有权限发布公告", Successful = false };
                 }
 
+                //处理原始数据 删除空项目
+                model.Roles.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.staffs.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.Groups.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.Games.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.articles.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.others.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+
+
+                //预处理 建立词条关联信息
+                //判断关联是否存在
+                var entryIds = new List<int>();
+                var entryNames = new List<string>();
+
+                var articleIds = new List<long>();
+                var articleNames = new List<string>();
+
+                entryNames.AddRange(model.Games.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.Groups.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.staffs.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.Roles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+
+                //建立文章关联信息
+                articleNames.AddRange(model.articles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+
+                try
+                {
+                    entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
+                    articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
+                }
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
+                }
+
                 //第一步 处理主要信息
 
                 //新建审核数据对象
@@ -585,127 +470,72 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 //第二步 处理关联词条
 
-                //转化为标准词条相关性列表格式
-                var entryRelevances = new List<EntryRelevance>();
-                if (model.Roles != null)
-                {
-                    foreach (var item in model.Roles)
-                    {
-                        if (string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            entryRelevances.Add(new EntryRelevance
-                            {
-                                Modifier = "角色",
-                                DisplayName = item.DisplayName
-                            });
-                        }
+                //创建审核数据模型
+                var articleRelevances = new ArticleRelevances();
 
-                    }
-                }
-                if (model.staffs != null)
+                //处理关联词条
+
+                //添加新建项目
+                foreach (var item in entryIds.Where(s => articleRelevances.Relevances.Where(s => s.Type == RelevancesType.Entry).Select(s => s.DisplayName).Contains(s.ToString()) == false))
                 {
-                    foreach (var item in model.staffs)
+                    articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
                     {
-                        if (string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            entryRelevances.Add(new EntryRelevance
-                            {
-                                Modifier = "STAFF",
-                                DisplayName = item.DisplayName
-                            });
-                        }
-                    }
+                        DisplayName = item.ToString(),
+                        Type = RelevancesType.Entry,
+                        IsDelete = false
+                    });
+
                 }
-                if (model.articles != null)
+
+
+
+                //处理关联文章
+
+                //添加新建项目
+                foreach (var item in articleIds.Where(s => articleRelevances.Relevances.Where(s => s.Type == RelevancesType.Article).Select(s => s.DisplayName).Contains(s.ToString()) == false))
                 {
-                    foreach (var item in model.articles)
+                    articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
                     {
-                        if (string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            entryRelevances.Add(new EntryRelevance
-                            {
-                                Modifier = "文章",
-                                DisplayName = item.DisplayName
-                            });
-                        }
-                    }
+                        DisplayName = item.ToString(),
+                        Type = RelevancesType.Article,
+                        IsDelete = false
+                    });
+
                 }
-                if (model.Groups != null)
+                //处理外部链接
+
+                //循环查找外部链接是否相同
+                foreach (var item in model.others)
                 {
-                    foreach (var item in model.Groups)
+
+                    articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
                     {
-                        if (string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            entryRelevances.Add(new EntryRelevance
-                            {
-                                Modifier = "制作组",
-                                DisplayName = item.DisplayName
-                            });
-                        }
-                    }
+                        DisplayName = item.DisplayName,
+                        DisplayValue = item.DisPlayValue,
+                        Type = RelevancesType.Outlink,
+                        Link = item.Link,
+                        IsDelete = false
+                    });
+
                 }
-                if (model.Games != null)
-                {
-                    foreach (var item in model.Games)
-                    {
-                        if (string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            entryRelevances.Add(new EntryRelevance
-                            {
-                                Modifier = "游戏",
-                                DisplayName = item.DisplayName
-                            });
-                        }
-                    }
-                }
-                if (model.others != null)
-                {
-                    foreach (var item in model.others)
-                    {
-                        if (string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            entryRelevances.Add(new EntryRelevance
-                            {
-                                Modifier = "其他",
-                                DisplayName = item.DisplayName,
-                                DisplayValue = item.DisPlayValue,
-                                Link = item.Link
-                            });
-                        }
-                    }
-                }
+
                 //判断审核是否为空
-                if (entryRelevances.Count != 0)
+                if (articleRelevances.Relevances.Count != 0)
                 {
-                    //创建审核数据模型
-                    var examinedModel = new ArticleRelecancesModel
-                    {
-                        Relevances = new List<ArticleRelevancesExaminedModel>()
-                    };
-                    foreach (var item in entryRelevances)
-                    {
-                        examinedModel.Relevances.Add(new ArticleRelevancesExaminedModel
-                        {
-                            IsDelete = false,
-                            DisplayName = item.DisplayName,
-                            Modifier = item.Modifier,
-                            DisplayValue = item.DisplayValue,
-                            Link = item.Link
-                        });
-                    }
+                    
                     //序列化JSON
                     resulte = "";
                     using (TextWriter text = new StringWriter())
                     {
                         var serializer = new JsonSerializer();
-                        serializer.Serialize(text, examinedModel);
+                        serializer.Serialize(text, articleRelevances);
                         resulte = text.ToString();
                     }
-                    article = await _articleRepository.GetAll().Include(s => s.Relevances).FirstOrDefaultAsync(s => s.Id == article.Id);
-                    //判断是否是管理员
+
+                        //判断是否是管理员
                     if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
-                        await _examineService.ExamineEditArticleRelevancesAsync(article, examinedModel);
+                        await _examineService.ExamineEditArticleRelevancesAsync(article, articleRelevances);
                         await _examineService.UniversalCreateArticleExaminedAsync(article, user, true, resulte, Operation.EditArticleRelevanes, model.Note);
                         await _appHelper.AddUserContributionValueAsync(user.Id, article.Id, Operation.EditArticleRelevanes);
 
@@ -751,7 +581,11 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
             //获取词条
-            var article = await _articleRepository.GetAll().AsNoTracking().Include(s => s.Relevances).FirstOrDefaultAsync(s => s.Id == Id);
+            var article = await _articleRepository.GetAll().AsNoTracking()
+                .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
+                .Include(s => s.Entries)
+                .Include(s => s.Outlinks)
+                .FirstOrDefaultAsync(s => s.Id == Id);
             if (article == null)
             {
                 return NotFound();
@@ -773,7 +607,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var examine = examines.FirstOrDefault(s => s.Operation == Operation.EditArticleMain);
             if (examine != null)
             {
-                _articleService.UpdateArticleData(article, examine);
+                await _articleService.UpdateArticleData(article, examine);
             }
             model.MainPicturePath = _appHelper.GetImagePath(article.MainPicture, "app.png");
             model.BackgroundPicturePath = _appHelper.GetImagePath(article.BackgroundPicture, "app.png");
@@ -800,60 +634,67 @@ namespace CnGalWebSite.APIServer.Controllers
             examine = examines.FirstOrDefault(s => s.Operation == Operation.EditArticleRelevanes);
             if (examine != null)
             {
-                _articleService.UpdateArticleData(article, examine);
+                await _articleService.UpdateArticleData(article, examine);
             }
-
 
             var roles = new List<RelevancesModel>();
             var staffs = new List<RelevancesModel>();
             var articles = new List<RelevancesModel>();
             var groups = new List<RelevancesModel>();
             var games = new List<RelevancesModel>();
+            var news = new List<RelevancesModel>();
             var others = new List<RelevancesModel>();
-            foreach (var item in article.Relevances)
+
+            foreach (var nav in article.ArticleRelationFromArticleNavigation)
             {
-                switch (item.Modifier)
+                var item = nav.ToArticleNavigation;
+
+                articles.Add(new RelevancesModel
                 {
-                    case "角色":
+                    DisplayName = item.Name
+                });
+
+            }
+            foreach (var item in article.Entries)
+            {
+                switch (item.Type)
+                {
+                    case EntryType.Role:
                         roles.Add(new RelevancesModel
                         {
-                            DisplayName = item.DisplayName
+                            DisplayName = item.Name
                         });
                         break;
-                    case "STAFF":
+                    case EntryType.Staff:
                         staffs.Add(new RelevancesModel
                         {
-                            DisplayName = item.DisplayName
+                            DisplayName = item.Name
                         });
                         break;
-                    case "文章":
-                        articles.Add(new RelevancesModel
-                        {
-                            DisplayName = item.DisplayName
-                        });
-                        break;
-                    case "制作组":
+                    case EntryType.ProductionGroup:
                         groups.Add(new RelevancesModel
                         {
-                            DisplayName = item.DisplayName
+                            DisplayName = item.Name
                         });
                         break;
-                    case "游戏":
+                    case EntryType.Game:
                         games.Add(new RelevancesModel
                         {
-                            DisplayName = item.DisplayName
-                        });
-                        break;
-                    case "其他":
-                        others.Add(new RelevancesModel
-                        {
-                            DisplayName = item.DisplayName,
-                            DisPlayValue = item.DisplayValue,
-                            Link = item.Link
+                            DisplayName = item.Name
                         });
                         break;
                 }
             }
+            foreach (var item in article.Outlinks)
+            {
+                others.Add(new RelevancesModel
+                {
+                    DisplayName = item.Name,
+                    DisPlayValue = item.BriefIntroduction,
+                    Link = item.Link
+                });
+            }
+
             model.Roles = roles;
             model.staffs = staffs;
             model.articles = articles;
@@ -865,7 +706,7 @@ namespace CnGalWebSite.APIServer.Controllers
             examine = examines.FirstOrDefault(s => s.Operation == Operation.EditArticleMainPage);
             if (examine != null)
             {
-                _articleService.UpdateArticleData(article, examine);
+                await _articleService.UpdateArticleData(article, examine);
             }
 
 
@@ -900,7 +741,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
 
                 //查找当前文章
-                var article = await _articleRepository.GetAll().Include(s => s.Relevances).FirstOrDefaultAsync(s => s.Id == model.Id);
+                var article = await _articleRepository.GetAll()
+                    .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
+                    .Include(s => s.Entries)
+                    .Include(s => s.Outlinks)
+                    .FirstOrDefaultAsync(s => s.Id == model.Id);
                 if (article == null)
                 {
                     return new Result { Error = $"无法找到ID为{model.Id}的文章", Successful = false };
@@ -910,6 +755,42 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     return new Result { Error = "该文章的名称与其他文章重复", Successful = false };
                 }
+
+                //处理原始数据 删除空项目
+                model.Roles.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.staffs.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.Groups.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.Games.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.articles.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.others.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+
+
+                //预处理 建立词条关联信息
+                //判断关联是否存在
+                var entryIds = new List<int>();
+                var entryNames = new List<string>();
+
+                var articleIds = new List<long>();
+                var articleNames = new List<string>();
+
+                entryNames.AddRange(model.Games.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.Groups.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.staffs.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.Roles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+
+                //建立文章关联信息
+                articleNames.AddRange(model.articles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+
+                try
+                {
+                    entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
+                    articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
+                }
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
+                }
+
 
                 //第一步 修改文章主要信息
 
@@ -962,230 +843,116 @@ namespace CnGalWebSite.APIServer.Controllers
                 //第二步 修改文章关联词条
 
                 //创建审核数据模型
-                var examinedModel = new ArticleRelecancesModel
-                {
-                    Relevances = new List<ArticleRelevancesExaminedModel>()
-                };
+                var examinedModel = new ArticleRelevances();
+
+                //处理关联词条
+
                 //遍历当前词条数据 打上删除标签
-                foreach (var item in article.Relevances)
+                foreach (var item in article.ArticleRelationFromArticleNavigation.Select(s => s.ToArticleNavigation))
                 {
-                    examinedModel.Relevances.Add(new ArticleRelevancesExaminedModel
+                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
                     {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.DisplayValue,
+                        DisplayName = item.Id.ToString(),
+                        DisplayValue = item.Name,
+                        Type = RelevancesType.Article,
                         IsDelete = true,
-                        Link = item.Link
                     });
                 }
 
                 //再遍历视图 对应修改
-                if (model.Roles != null)
+
+                //添加新建项目
+                foreach (var item in articleIds.Where(s => examinedModel.Relevances.Where(s => s.Type == RelevancesType.Article).Select(s => s.DisplayName).Contains(s.ToString()) == false))
                 {
-                    //循环查找是否相同
-                    foreach (var item in model.Roles)
+                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
                     {
-                        var isSame = false;
-                        foreach (var infor in article.Relevances.Where(s => s.Modifier == "角色"))
+                        DisplayName = item.ToString(),
+                        Type = RelevancesType.Article,
+                        IsDelete = false
+                    });
+
+                }
+                //删除不存在的老项目
+                examinedModel.Relevances.RemoveAll(s => articleIds.Select(s => s.ToString()).Contains(s.DisplayName) && s.IsDelete && s.Type == RelevancesType.Article);
+
+
+                //处理关联文章
+                //遍历当前文章数据 打上删除标签
+                foreach (var item in article.Entries)
+                {
+                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
+                    {
+                        DisplayName = item.Id.ToString(),
+                        DisplayValue = item.Name,
+                        Type = RelevancesType.Entry,
+                        IsDelete = true,
+                    });
+                }
+
+                //再遍历视图 对应修改
+
+                //添加新建项目
+                foreach (var item in entryIds.Where(s => examinedModel.Relevances.Where(s => s.Type == RelevancesType.Entry).Select(s => s.DisplayName).Contains(s.ToString()) == false))
+                {
+                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
+                    {
+                        DisplayName = item.ToString(),
+                        Type = RelevancesType.Entry,
+                        IsDelete = false
+                    });
+
+                }
+                //删除不存在的老项目
+                examinedModel.Relevances.RemoveAll(s => entryIds.Select(s => s.ToString()).Contains(s.DisplayName) && s.IsDelete && s.Type == RelevancesType.Entry);
+                //处理外部链接
+
+
+                //遍历当前词条外部链接 打上删除标签
+                foreach (var item in article.Outlinks)
+                {
+                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
+                    {
+                        DisplayName = item.Name,
+                        DisplayValue = item.BriefIntroduction,
+                        IsDelete = true,
+                        Type = RelevancesType.Outlink,
+                        Link = item.Link
+                    });
+                }
+
+
+                //循环查找外部链接是否相同
+                foreach (var item in model.others)
+                {
+                    var isSame = false;
+                    foreach (var infor in article.Outlinks)
+                    {
+                        if (item.DisplayName == infor.Name && item.DisPlayValue == infor.BriefIntroduction && item.Link == infor.Link)
                         {
-                            if (item.DisplayName == infor.DisplayName)
+                            //如果两次一致 删除上一步中的项目
+                            foreach (var temp in examinedModel.Relevances.Where(s => s.Type == RelevancesType.Outlink))
                             {
-                                //如果两次一致 删除上一步中的项目
-                                foreach (var temp in examinedModel.Relevances)
+                                if (temp.DisplayName == infor.Name && temp.DisplayValue == infor.BriefIntroduction && temp.Link == infor.Link)
                                 {
-                                    if (temp.DisplayName == infor.DisplayName)
-                                    {
-                                        examinedModel.Relevances.Remove(temp);
-                                        isSame = true;
-                                        break;
-                                    }
+                                    examinedModel.Relevances.Remove(temp);
+                                    isSame = true;
+                                    break;
                                 }
-                                isSame = true;
-                                break;
                             }
-                        }
-                        if (isSame == false && string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            examinedModel.Relevances.Add(new ArticleRelevancesExaminedModel
-                            {
-                                DisplayName = item.DisplayName,
-                                Modifier = "角色",
-                                IsDelete = false
-                            });
+                            isSame = true;
+                            break;
                         }
                     }
-                }
-                if (model.staffs != null)
-                {
-                    //循环查找是否相同
-                    foreach (var item in model.staffs)
+                    if (isSame == false && string.IsNullOrWhiteSpace(item.DisplayName) == false)
                     {
-                        var isSame = false;
-                        foreach (var infor in article.Relevances.Where(s => s.Modifier == "STAFF"))
+                        examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
                         {
-                            if (item.DisplayName == infor.DisplayName)
-                            {
-                                //如果两次一致 删除上一步中的项目
-                                foreach (var temp in examinedModel.Relevances)
-                                {
-                                    if (temp.DisplayName == infor.DisplayName)
-                                    {
-                                        examinedModel.Relevances.Remove(temp);
-                                        isSame = true;
-                                        break;
-                                    }
-                                }
-                                isSame = true;
-                                break;
-                            }
-                        }
-                        if (isSame == false && string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            examinedModel.Relevances.Add(new ArticleRelevancesExaminedModel
-                            {
-                                DisplayName = item.DisplayName,
-                                Modifier = "STAFF",
-                                IsDelete = false
-                            });
-                        }
-                    }
-                }
-                if (model.articles != null)
-                {
-                    //循环查找是否相同
-                    foreach (var item in model.articles)
-                    {
-                        var isSame = false;
-                        foreach (var infor in article.Relevances.Where(s => s.Modifier == "文章"))
-                        {
-                            if (item.DisplayName == infor.DisplayName)
-                            {
-                                //如果两次一致 删除上一步中的项目
-                                foreach (var temp in examinedModel.Relevances)
-                                {
-                                    if (temp.DisplayName == infor.DisplayName)
-                                    {
-                                        examinedModel.Relevances.Remove(temp);
-                                        isSame = true;
-                                        break;
-                                    }
-                                }
-                                isSame = true;
-                                break;
-                            }
-                        }
-                        if (isSame == false && string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            examinedModel.Relevances.Add(new ArticleRelevancesExaminedModel
-                            {
-                                DisplayName = item.DisplayName,
-                                Modifier = "文章",
-                                IsDelete = false
-                            });
-                        }
-                    }
-                }
-                if (model.Groups != null)
-                {
-                    //循环查找是否相同
-                    foreach (var item in model.Groups)
-                    {
-                        var isSame = false;
-                        foreach (var infor in article.Relevances.Where(s => s.Modifier == "制作组"))
-                        {
-                            if (item.DisplayName == infor.DisplayName)
-                            {
-                                //如果两次一致 删除上一步中的项目
-                                foreach (var temp in examinedModel.Relevances)
-                                {
-                                    if (temp.DisplayName == infor.DisplayName)
-                                    {
-                                        examinedModel.Relevances.Remove(temp);
-                                        isSame = true;
-                                        break;
-                                    }
-                                }
-                                isSame = true;
-                                break;
-                            }
-                        }
-                        if (isSame == false && string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            examinedModel.Relevances.Add(new ArticleRelevancesExaminedModel
-                            {
-                                DisplayName = item.DisplayName,
-                                Modifier = "制作组",
-                                IsDelete = false
-                            });
-                        }
-                    }
-                }
-                if (model.Games != null)
-                {
-                    //循环查找是否相同
-                    foreach (var item in model.Games)
-                    {
-                        var isSame = false;
-                        foreach (var infor in article.Relevances.Where(s => s.Modifier == "游戏"))
-                        {
-                            if (item.DisplayName == infor.DisplayName)
-                            {
-                                //如果两次一致 删除上一步中的项目
-                                foreach (var temp in examinedModel.Relevances)
-                                {
-                                    if (temp.DisplayName == infor.DisplayName)
-                                    {
-                                        examinedModel.Relevances.Remove(temp);
-                                        isSame = true;
-                                        break;
-                                    }
-                                }
-                                isSame = true;
-                                break;
-                            }
-                        }
-                        if (isSame == false && string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            examinedModel.Relevances.Add(new ArticleRelevancesExaminedModel
-                            {
-                                DisplayName = item.DisplayName,
-                                Modifier = "游戏",
-                                IsDelete = false
-                            });
-                        }
-                    }
-                }
-                if (model.others != null)
-                {
-                    //循环查找是否相同
-                    foreach (var item in model.others)
-                    {
-                        foreach (var infor in article.Relevances.Where(s => s.Modifier == "其他"))
-                        {
-                            if (item.DisplayName == infor.DisplayName)
-                            {
-                                //如果两次一致 删除上一步中的项目
-                                foreach (var temp in examinedModel.Relevances)
-                                {
-                                    if (temp.DisplayName == infor.DisplayName && item.DisPlayValue == infor.DisplayValue)
-                                    {
-                                        examinedModel.Relevances.Remove(temp);
-                                        break;
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                        if (string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            examinedModel.Relevances.Add(new ArticleRelevancesExaminedModel
-                            {
-                                DisplayName = item.DisplayName,
-                                DisplayValue = item.DisPlayValue,
-                                Modifier = "其他",
-                                Link = item.Link,
-                                IsDelete = false
-                            });
-                        }
+                            DisplayName = item.DisplayName,
+                            DisplayValue = item.DisPlayValue,
+                            Type = RelevancesType.Outlink,
+                            Link = item.Link,
+                            IsDelete = false
+                        });
                     }
                 }
 
@@ -1457,7 +1224,9 @@ namespace CnGalWebSite.APIServer.Controllers
             };
             var nowTime = DateTime.Now.ToCstTime();
 
-            var articles = await _articleRepository.GetAll().Include(s => s.Relevances).Include(s => s.CreateUser)
+            var articles = await _articleRepository.GetAll()
+                .Include(s => s.Entries)
+                .Include(s => s.CreateUser)
                 .Where(s => s.Type == ArticleType.News && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false && (s.RealNewsTime != null ? (s.RealNewsTime.Value.Date.AddDays(days) > nowTime.Date) : (s.PubishTime.Date.AddDays(days) > nowTime.Date)))
                 .OrderByDescending(s => s.RealNewsTime)
                 .ThenByDescending(s => s.PubishTime)
@@ -1470,49 +1239,16 @@ namespace CnGalWebSite.APIServer.Controllers
                 var articleInfor = _appHelper.GetArticleInforTipViewModel(item);
                 articleInfor.LastEditTime = item.PubishTime;
 
+                var infor = await _articleService.GetNewsModelAsync(item);
                 var temp = new NewsSummaryAloneViewModel
                 {
-                    Articles = new List<ArticleInforTipViewModel> { articleInfor }
+                    GroupId = infor.GroupId,
+                    UserId = infor.UserId,
+                    Articles = new List<ArticleInforTipViewModel> { articleInfor },
+                    GroupImage=infor.Image,
+                    GroupName=infor.GroupName,
                 };
 
-                var infor = item.Relevances.FirstOrDefault(s => s.Modifier == "制作组");
-                if (infor == null)
-                {
-                    infor = item.Relevances.FirstOrDefault(s => s.Modifier == "STAFF");
-                    if (infor == null)
-                    {
-                        infor = item.Relevances.FirstOrDefault(s => s.Modifier == "游戏");
-                        if (infor == null)
-                        {
-                            infor = item.Relevances.FirstOrDefault(s => s.Modifier == "角色");
-                        }
-                    }
-                }
-
-                if (infor != null)
-                {
-                    var group = await _entryRepository.FirstOrDefaultAsync(s => s.Name == infor.DisplayName);
-                    if (group != null)
-                    {
-                        temp.GroupImage = string.IsNullOrWhiteSpace(group.Thumbnail) ? _appHelper.GetImagePath(item.CreateUser.PhotoPath, "user.png") : _appHelper.GetImagePath(group.Thumbnail, "user.png");
-                        temp.GroupName = group.DisplayName ?? group.Name;
-                        temp.GroupId = group.Id;
-                    }
-                    else
-                    {
-                        temp.GroupImage = _appHelper.GetImagePath(item.CreateUser.PhotoPath, "user.png");
-                        temp.UserId = item.CreateUser.Id;
-                        temp.GroupName = item.CreateUser.UserName;
-                        temp.GroupId = -1;
-                    }
-                }
-                else
-                {
-                    temp.GroupImage = _appHelper.GetImagePath(item.CreateUser.PhotoPath, "user.png");
-                    temp.UserId = item.CreateUser.Id;
-                    temp.GroupName = item.CreateUser.UserName;
-                    temp.GroupId = -1;
-                }
                 model.Add(temp);
             }
 

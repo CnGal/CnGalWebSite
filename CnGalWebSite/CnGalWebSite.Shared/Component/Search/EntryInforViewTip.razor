@@ -28,8 +28,8 @@
                                         </span>
                                         @foreach (var infor in item.Contents)
                                         {
-                                            <TabLink Text="@Model.Name" Url="@("/entries/index/" + ToolHelper.Base64EncodeName(infor))" Icon="fa fa-codepen"
-                                                     class="@("btn mb-2 me-2  bg-context-"+ColorNum)" style="transition: all .6s ease; margin-top: 5px; word-break: keep-all;">@infor</TabLink>
+                                            <TabLink Text="@Model.Name" Url="@("/entries/index/" + infor.Id)" Icon="fa fa-codepen"
+                                                     class="@("btn mb-2 me-2  bg-context-"+ColorNum)" style="transition: all .6s ease; margin-top: 5px; word-break: keep-all;">@infor.DisplayName</TabLink>
                                                 }
                                     </div>
                                 </div>
@@ -83,8 +83,8 @@
                                         </span>
                                         @foreach (var infor in item.Contents)
                                         {
-                                            <TabLink Text="@Model.Name" Url="@("/entries/index/" + ToolHelper.Base64EncodeName(infor))" Icon="fa fa-codepen" 
-                                                     class="@("btn mb-2 me-2  bg-context-"+ColorNum)" style="transition: all .6s ease; margin-top: 5px; word-break: keep-all;">@infor</TabLink>
+                                            <TabLink Text="@Model.Name" Url="@("/entries/index/" + infor.Id)" Icon="fa fa-codepen" 
+                                                     class="@("btn mb-2 me-2  bg-context-"+ColorNum)" style="transition: all .6s ease; margin-top: 5px; word-break: keep-all;">@infor.DisplayName</TabLink>
                                                 }
                                     </div>
                                 </div>

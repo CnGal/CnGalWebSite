@@ -119,7 +119,9 @@ namespace CnGalWebSite.APIServer.Application.Favorites
             List<FavoriteObject> models = null;
             if (count != 0)
             {
-                models = await query.AsNoTracking().Include(s => s.Entry).ThenInclude(s => s.Information).Include(s => s.Entry).ThenInclude(s => s.Relevances).Include(s => s.Article).ThenInclude(s => s.CreateUser).Include(s => s.Periphery).ToListAsync();
+                models = await query.AsNoTracking().Include(s => s.Entry).ThenInclude(s => s.Information).Include(s => s.Entry)
+                    .ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                    .Include(s => s.Article).ThenInclude(s => s.CreateUser).Include(s => s.Periphery).ToListAsync();
             }
             else
             {
@@ -140,7 +142,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
                 {
                     dtos.Add(new FavoriteObjectAloneViewModel
                     {
-                        entry = _appHelper.GetEntryInforTipViewModel(item.Entry)
+                        entry =await _appHelper.GetEntryInforTipViewModel(item.Entry)
                     });
                 }
                 else if (item.Type == FavoriteObjectType.Periphery)

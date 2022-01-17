@@ -25,27 +25,30 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var user = await authenticationStateTask;
-
-        string userId = "";
-        if (user.User.Identity.IsAuthenticated)
+        if(firstRender)
         {
+            var user = await authenticationStateTask;
+
+            string userId = "";
             if (user.User.Identity.IsAuthenticated)
             {
-                foreach (var item in user.User.Claims)
+                if (user.User.Identity.IsAuthenticated)
                 {
-                    if (item.Type == "userid")
+                    foreach (var item in user.User.Claims)
                     {
-                        userId = item.Value;
+                        if (item.Type == "userid")
+                        {
+                            userId = item.Value;
+                        }
+
                     }
-
                 }
-            }
 
-            await GetUserIsFavorited();
-            await GetUserFavoriteInfor(userId);
+                await GetUserIsFavorited();
+                await GetUserFavoriteInfor(userId);
+            }
         }
     }
 

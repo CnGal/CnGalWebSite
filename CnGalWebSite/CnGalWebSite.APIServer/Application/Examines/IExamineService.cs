@@ -53,7 +53,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="entry">关联词条</param>
         /// <param name="examine">审核数据模型</param>
         /// <returns></returns>
-        Task ExamineEstablishRelevancesAsync(Entry entry, EntryRelevancesModel examine);
+        Task ExamineEstablishRelevancesAsync(Entry entry, EntryRelevances examine);
         /// <summary>
         /// 处理 EstablishTags 审核成功后调用更新数据
         /// </summary>
@@ -150,7 +150,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="article">关联文章</param>
         /// <param name="articleRelecancesModel">审核数据模型</param>
         /// <returns></returns>
-        Task ExamineEditArticleRelevancesAsync(Article article, ArticleRelecancesModel articleRelecancesModel);
+        Task ExamineEditArticleRelevancesAsync(Article article, ArticleRelevances examine);
         /// <summary>
         /// 处理 EditArticleMainPage 审核成功后调用更新数据
         /// </summary>
@@ -359,6 +359,10 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// </summary>
         /// <returns></returns>
         Task MigrationEditEntryTagsExamineRecord();
+        Task MigrationEditArticleRelevanceExamineRecord();
+        Task MigrationEditEntryRelevanceExamineRecord();
+
+
         /// <summary>
         /// 处理 PeripheryRelatedPeripheries 审核成功后调用更新数据
         /// </summary>
@@ -366,5 +370,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="examine">审核数据模型</param>
         /// <returns></returns>
         Task ExamineEditPeripheryRelatedPeripheriesAsync(Periphery periphery, PeripheryRelatedPeripheries examine);
+
+
     }
 }

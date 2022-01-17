@@ -233,9 +233,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <summary>
         /// 获取为卡片展示优化的词条数据模型
         /// </summary>
-        /// <param name="item">词条</param>
+        /// <param name="entry">词条</param>
         /// <returns></returns>
-        EntryInforTipViewModel GetEntryInforTipViewModel(Entry item);
+        Task<EntryInforTipViewModel> GetEntryInforTipViewModel(Entry entry);
         /// <summary>
         /// 获取为卡片展示优化的标签数据模型
         /// </summary>

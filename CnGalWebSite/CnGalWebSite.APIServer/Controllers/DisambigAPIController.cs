@@ -140,7 +140,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 relevances.Add(new DisambigAloneModel
                 {
-                    entry = _appHelper.GetEntryInforTipViewModel(item)
+                    entry =await _appHelper.GetEntryInforTipViewModel(item)
                 });
             }
             foreach (var item in disambig.Articles)

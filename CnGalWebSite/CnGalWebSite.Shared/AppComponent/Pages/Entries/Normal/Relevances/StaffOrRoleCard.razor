@@ -12,7 +12,7 @@
         <div style=" word-break: keep-all;">@(Model.InforModel.Modifier+"：")</div>
         @foreach (var item in Model.InforModel.Contents)
         {
-            <a href="@("entries/index/"+ToolHelper.Base64EncodeName(item))">@item</a>
+            <a href="@("entries/index/"+item.Id)">@item.DisplayName</a>
         }
     </div>
         }

@@ -99,7 +99,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 附加信息列表
         /// </summary>
-        public ICollection<BasicEntryInformation> Information { get; set; }
+        public ICollection<BasicEntryInformation> Information { get; set; }=new List<BasicEntryInformation>();
 
         /// <summary>
         /// 主页
@@ -119,7 +119,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 图片列表
         /// </summary>
-        public ICollection<EntryPicture> Pictures { get; set; }
+        public ICollection<EntryPicture> Pictures { get; set; }=new List<EntryPicture>();
         /// <summary>
         /// 审核记录 也是编辑记录
         /// </summary>
@@ -127,7 +127,16 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 标签
         /// </summary>
-        public ICollection<Tag> Tags { get; set; }
+        public ICollection<Tag> Tags { get; set; } = new List<Tag>();
+        /// <summary>
+        /// 关联文章
+        /// </summary>
+        public ICollection<Article> Articles { get; set; } = new List<Article>();
+        /// <summary>
+        /// 关联外部链接
+        /// </summary>
+        public ICollection<Outlink> Outlinks { get; set; } = new List<Outlink>();
+
         /// <summary>
         /// 评分列表 也是已玩用户列表
         /// </summary>
@@ -135,6 +144,37 @@ namespace CnGalWebSite.DataModel.Model
 
         public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
 
+        /// <summary>
+        /// 关联词条列表
+        /// </summary>
+        public virtual ICollection<EntryRelation> EntryRelationFromEntryNavigation { get; set; } = new List<EntryRelation>();
+
+        /// <summary>
+        /// To 指当前词条被关联的其他词条关联 呈现编辑视图时不使用
+        /// </summary>
+        public virtual ICollection<EntryRelation> EntryRelationToEntryNavigation { get; set; } = new List<EntryRelation>();
+
+    }
+    public class Outlink
+    {
+        public long Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string BriefIntroduction { get; set; }
+
+        public string Link { get; set; }
+    }
+
+    public partial class EntryRelation
+    {
+        public long EntryRelationId { get; set; }
+
+        public int? FromEntry { get; set; }
+        public int? ToEntry { get; set; }
+
+        public virtual Entry FromEntryNavigation { get; set; } = new Entry();
+        public virtual Entry ToEntryNavigation { get; set; } = new Entry();
     }
 
     public class EditionModel

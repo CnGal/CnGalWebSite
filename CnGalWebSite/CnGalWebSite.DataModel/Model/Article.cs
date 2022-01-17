@@ -127,12 +127,39 @@ namespace CnGalWebSite.DataModel.Model
         public ICollection<ArticleRelevance> Relevances { get; set; }=new List<ArticleRelevance>();
 
         public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
-
+        /// <summary>
+        /// 关联文章
+        /// </summary>
+        public ICollection<Entry> Entries { get; set; }=new List<Entry>();
+        /// <summary>
+        /// 关联外部链接
+        /// </summary>
+        public ICollection<Outlink> Outlinks { get; set; } = new List<Outlink>();
         /// <summary>
         /// 审核记录 也是编辑记录
         /// </summary>
-        public ICollection<Examine> Examines { get; set; }
+        public ICollection<Examine> Examines { get; set; } = new List<Examine>();
+        /// <summary>
+        /// 关联词条列表
+        /// </summary>
+        public virtual ICollection<ArticleRelation> ArticleRelationFromArticleNavigation { get; set; } = new List<ArticleRelation>();
+
+        /// <summary>
+        /// To 指当前词条被关联的其他词条关联 呈现编辑视图时不使用
+        /// </summary>
+        public virtual ICollection<ArticleRelation> ArticleRelationToArticleNavigation { get; set; } = new List<ArticleRelation>();
     }
+    public partial class ArticleRelation
+    {
+        public long ArticleRelationId { get; set; }
+
+        public long? FromArticle { get; set; }
+        public long? ToArticle { get; set; }
+
+        public virtual Article FromArticleNavigation { get; set; } = new Article();
+        public virtual Article ToArticleNavigation { get; set; } = new Article();
+    }
+
     public enum ArticleType
     {
         [Display(Name = "感想")]

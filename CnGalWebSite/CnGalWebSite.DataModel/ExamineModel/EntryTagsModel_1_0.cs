@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 
-using System;
- using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ExamineModel
 {
     public class EntryTagsModel_1_0

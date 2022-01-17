@@ -38,7 +38,10 @@ namespace CnGalWebSite.APIServer.Application.Search
             if (input.ScreeningConditions == "词条" || input.ScreeningConditions == "游戏" || input.ScreeningConditions == "角色" || input.ScreeningConditions == "STAFF"
                 || input.ScreeningConditions == "制作组")
             {
-                query1 = _entryRepository.GetAll().AsNoTracking().Include(s => s.Information).Include(s => s.Relevances).Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false);
+                query1 = _entryRepository.GetAll().AsNoTracking().Include(s => s.Information)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                    .Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false);
             }
             else if (input.ScreeningConditions == "文章" || input.ScreeningConditions == "感想" || input.ScreeningConditions == "访谈" || input.ScreeningConditions == "攻略"
                 || input.ScreeningConditions == "动态" || input.ScreeningConditions == "评测" || input.ScreeningConditions == "周边" || input.ScreeningConditions == "公告"
@@ -52,7 +55,10 @@ namespace CnGalWebSite.APIServer.Application.Search
             }
             else
             {
-                query1 = _entryRepository.GetAll().AsNoTracking().Include(s => s.Information).Include(s => s.Relevances).Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false);
+                query1 = _entryRepository.GetAll().AsNoTracking().Include(s => s.Information)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                    .Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false);
                 query2 = _articleRepository.GetAll().AsNoTracking().Include(s => s.CreateUser).Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false);
                 query3 = _userRepository.GetAll().AsNoTracking();
             }
@@ -324,7 +330,7 @@ namespace CnGalWebSite.APIServer.Application.Search
 
                     models.Add(new SearchAloneModel
                     {
-                        entry = _appHelper.GetEntryInforTipViewModel(item)
+                        entry =await _appHelper.GetEntryInforTipViewModel(item)
                     });
 
                 }

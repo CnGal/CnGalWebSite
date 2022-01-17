@@ -19,7 +19,7 @@
         {
             Items.Add(new RoleCardModel
             {
-                CVs = item.AddInfors.FirstOrDefault()?.Contents??new List<string>(),
+                CVs = item.AddInfors.FirstOrDefault()?.Contents.Select(s=>s.DisplayName).ToList()??new List<string>(),
                 Image = item.MainImage,
                 Name = item.DisplayName,
                 EntryId=item.Id,

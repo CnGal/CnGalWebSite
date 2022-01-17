@@ -33,6 +33,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Search
     {
         public string Modifier { get; set; }
 
-        public List<string> Contents { get; set; } = new List<string>() { };
+        public List<StaffNameModel> Contents { get; set; } = new List<StaffNameModel>() { };
     }
 }

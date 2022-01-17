@@ -262,7 +262,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 foreach (var item in entries)
                 {
-                    model.Entries.Add(_appHelper.GetEntryInforTipViewModel(item));
+                    model.Entries.Add(await _appHelper.GetEntryInforTipViewModel(item));
                 }
 
                 //序列化关联周边列表

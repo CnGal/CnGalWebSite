@@ -3,6 +3,7 @@ using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
@@ -25,7 +26,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         void UpdateEntryDataImages(Entry entry, EntryImages examine);
 
-        void UpdateEntryDataRelevances(Entry entry, EntryRelevancesModel examine);
+        Task UpdateEntryDataRelevances(Entry entry, EntryRelevances examine);
 
         Task UpdateEntryDataTagsAsync(Entry entry, EntryTags examine);
 
@@ -36,5 +37,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
         Task<List<int>> GetEntryIdsFromNames(List<string> names);
 
         Task<EntryEditState> GetEntryEditState(ApplicationUser user, int entryId);
+
+        Task<EntryIndexViewModel> GetEntryIndexViewModelAsync(Entry entry);
     }
 }

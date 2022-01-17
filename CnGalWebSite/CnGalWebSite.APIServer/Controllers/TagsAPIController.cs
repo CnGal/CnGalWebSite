@@ -376,7 +376,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             foreach (var item in tag.Entries)
             {
-                model.ChildrenEntries.Add(_appHelper.GetEntryInforTipViewModel(item));
+                model.ChildrenEntries.Add(await _appHelper.GetEntryInforTipViewModel(item));
             }
 
 

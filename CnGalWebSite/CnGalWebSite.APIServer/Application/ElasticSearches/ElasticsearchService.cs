@@ -222,7 +222,10 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
             var entryIds = query.Hits.Where(s => s.Index == _entryElasticsearchBaseService.GetIndex()).Select(s => (int)s.Source["id"]).ToList();
 
-            var entries = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Information).Include(s => s.Relevances).Where(s => entryIds.Contains(s.Id) && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
+            var entries = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Information)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Where(s => entryIds.Contains(s.Id) && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
 
             var articleIds = query.Hits.Where(s => s.Index == _articleElasticsearchBaseService.GetIndex()).Select(s => (long)s.Source["id"]).ToList();
 
@@ -253,7 +256,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
                 {
                     result.Data.Add(new SearchAloneModel
                     {
-                        entry = _appHelper.GetEntryInforTipViewModel(entries.FirstOrDefault(s => s.Id == (long)item.Source["id"]))
+                        entry =await _appHelper.GetEntryInforTipViewModel(entries.FirstOrDefault(s => s.Id == (long)item.Source["id"]))
                     });
                 }
                 else if (_articleElasticsearchBaseService.GetIndex() == item.Index)
@@ -301,7 +304,10 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
             var entryIds = query.Select(s => s.Id).ToList();
 
-            entries = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Information).Include(s => s.Relevances).Where(s => entryIds.Contains(s.Id) && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
+            entries = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Information)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Where(s => entryIds.Contains(s.Id) && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
 
 
             var model = new PagedResultDto<SearchAloneModel>
@@ -319,7 +325,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
                 model.Data.Add(new SearchAloneModel
                 {
-                    entry = _appHelper.GetEntryInforTipViewModel(entries.FirstOrDefault(s => s.Id == item.Id))
+                    entry =await _appHelper.GetEntryInforTipViewModel(entries.FirstOrDefault(s => s.Id == item.Id))
                 });
 
             }

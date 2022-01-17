@@ -13,6 +13,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Carousel = CnGalWebSite.DataModel.Model.Carousel;
+using CnGalWebSite.APIServer.Application.Articles;
 
 namespace CnGalWebSite.APIServer.Application.Home
 {
@@ -23,14 +24,18 @@ namespace CnGalWebSite.APIServer.Application.Home
         private readonly IRepository<Carousel, int> _carouselRepository;
         private readonly IRepository<FriendLink, int> _friendLinkRepository;
         private readonly IAppHelper _appHelper;
+        private readonly IArticleService _articleService;
 
-        public HomeService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Article, long> articleRepository, IRepository<Carousel, int> carouselRepository, IRepository<FriendLink, int> friendLinkRepository)
+        public HomeService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Article, long> articleRepository,
+            IArticleService articleService,
+        IRepository<Carousel, int> carouselRepository, IRepository<FriendLink, int> friendLinkRepository)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
             _articleRepository = articleRepository;
             _carouselRepository = carouselRepository;
             _friendLinkRepository = friendLinkRepository;
+            _articleService= articleService;
         }
 
         public async Task<List<EntryHomeAloneViewModel>> GetHomeNewestGameViewAsync()
@@ -220,64 +225,28 @@ namespace CnGalWebSite.APIServer.Application.Home
             var model = new List<HomeNewsAloneViewModel>();
 
             //获取近期发布的文章
-            var article_result2 = await _articleRepository.GetAll().Include(s => s.CreateUser).Where(s => s.IsHidden != true && s.Type == ArticleType.News).Include(s => s.Relevances).AsNoTracking().OrderByDescending(s => s.RealNewsTime).ThenByDescending(s => s.PubishTime)
+            var article_result2 = await _articleRepository.GetAll().Include(s => s.CreateUser).Where(s => s.IsHidden != true && s.Type == ArticleType.News).AsNoTracking()
+                .Include(s => s.CreateUser)
+                .Include(s => s.Entries)
+                .OrderByDescending(s => s.RealNewsTime).ThenByDescending(s => s.PubishTime)
                 .Where(s => s.Name != null && s.Name != "").Take(12).ToListAsync();
             if (article_result2 != null)
             {
                 foreach (var item in article_result2)
                 {
+                    var infor =await _articleService.GetNewsModelAsync(item);
                     var temp = new HomeNewsAloneViewModel
                     {
                         ArticleId = item.Id,
-                        Text = item.DisplayName ?? item.Name,
-                        Time = item.RealNewsTime ?? item.PubishTime,
-                        Type = item.NewsType ?? "动态",
+                        Text = infor.Title,
+                        Time = infor.HappenedTime,
+                        Type = infor.NewsType ?? "动态",
+                        GroupId=infor.GroupId,
+                        Image=infor.Image,
+                        Link=infor.Link,
+                        Title=infor.GroupName,
+                        UserId=infor.UserId,
                     };
-
-                    var infor = item.Relevances.FirstOrDefault(s => s.Modifier == "制作组");
-                    if(infor == null)
-                    {
-                        infor = item.Relevances.FirstOrDefault(s => s.Modifier == "STAFF");
-                        if (infor == null)
-                        {
-                            infor = item.Relevances.FirstOrDefault(s => s.Modifier == "游戏");
-                            if (infor == null)
-                            {
-                                infor = item.Relevances.FirstOrDefault(s => s.Modifier == "角色");
-                            }
-                        }
-                    }
-
-
-                    if (infor != null)
-                    {
-                        var group = await _entryRepository.FirstOrDefaultAsync(s => s.Name == infor.DisplayName);
-                        if (group != null)
-                        {
-                            temp.Image = string.IsNullOrWhiteSpace(group.Thumbnail) ? _appHelper.GetImagePath(item.CreateUser.PhotoPath, "user.png") : _appHelper.GetImagePath(group.Thumbnail, "user.png");
-                            temp.Title = group.DisplayName ?? group.Name;
-                            temp.GroupId = group.Id;
-                        }
-                        else
-                        {
-                            temp.Image = _appHelper.GetImagePath(item.CreateUser.PhotoPath, "user.png");
-                            temp.Title = item.CreateUser.UserName;
-                            temp.UserId = item.CreateUser.Id;
-                        }
-                    }
-                    else
-                    {
-                        temp.Image = _appHelper.GetImagePath(item.CreateUser.PhotoPath, "user.png");
-                        temp.Title = item.CreateUser.UserName;
-                        temp.UserId = item.CreateUser.Id;
-                    }
-
-                    temp.Link = item.OriginalLink;
-                    if(temp.Title=="搬运姬"&&string.IsNullOrWhiteSpace(item.OriginalAuthor)==false)
-                    {
-                        temp.Title = item.OriginalAuthor;
-                    }
-
                     model.Add(temp);
                 }
             }

@@ -155,7 +155,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var vote = await _voteRepository.GetAll().Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Include(s => s.Articles).ThenInclude(s=>s.CreateUser)
-                .Include(s => s.Entries).ThenInclude(s=>s.Relevances)
+                .Include(s => s.Entries).ThenInclude(s=>s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
                 .Include(s => s.Entries).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s => s.Peripheries)
                .Include(s => s.VoteUsers).ThenInclude(s => s.SeletedOptions)
@@ -207,7 +207,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             foreach (var item in vote.Entries)
             {
-                model.Entries.Add(_appHelper.GetEntryInforTipViewModel(item));
+                model.Entries.Add(await _appHelper.GetEntryInforTipViewModel(item));
             }
             foreach (var item in vote.Articles)
             {
