@@ -3575,7 +3575,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         public async Task MigrationEditArticleRelevanceExamineRecord()
         {
-            // await ReplaceArticleRelevances();
+            await ReplaceArticleRelevances();
             await ReplaceEditArticleRelevancesExamineContext();
         }
         public async Task MigrationEditEntryRelevanceExamineRecord()
@@ -3585,7 +3585,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         }
 
         /// <summary>
-        /// 迁移词条审核数据 关联部分
+        /// 迁移文章审核数据 关联部分
         /// </summary>
         /// <returns></returns>
         private async Task ReplaceEditArticleRelevancesExamineContext()
@@ -3674,7 +3674,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             }
         }
         /// <summary>
-        /// 迁移词条关联数据
+        /// 迁移文章关联数据
         /// </summary>
         /// <returns></returns>
         private async Task ReplaceArticleRelevances()
@@ -3941,6 +3941,122 @@ namespace CnGalWebSite.APIServer.ExamineX
                     await _examineRepository.UpdateAsync(examine);
                 }
             }
+        }
+
+        #endregion
+
+        #region 通过审核记录生成模型 用于对比编辑
+
+        public async Task ExaminesCompletion()
+        {
+            //补全词条
+            var entryIds = await _entryRepository.GetAll().Where(s=>string.IsNullOrWhiteSpace(s.Name)==false).Select(s => s.Id).ToListAsync();
+            foreach (var entryId in entryIds)
+            {
+                var entry = await _entryRepository.GetAll().AsNoTracking()
+                 .Include(s => s.Outlinks)
+                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
+                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                 .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
+                 .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
+                 .FirstOrDefaultAsync(s => s.Id == entryId);
+                //获取通过审核记录叠加的旧模型
+                var examineModel = await GenerateModelFromExamines(entry);
+                //应用审核记录
+                await ExaminesCompletionEntry(entry, examineModel as Entry);
+
+            }
+      
+        }
+        private async Task ExaminesCompletionEntry(Entry newEntry, Entry currentEntry)
+        {
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+
+            //将当前模型和新模型对比 获取差异审核 并补全
+            var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
+            if (examines.Count == 0)
+            {
+                return;
+            }
+            var entry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == newEntry.Id);
+            foreach (var item in examines)
+            {
+               
+                var resulte = "";
+                using (TextWriter text = new StringWriter())
+                {
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(text, item.Key);
+                    resulte = text.ToString();
+                }
+                await UniversalEditExaminedAsync(entry, admin, true, resulte, item.Value, "补全审核记录");
+            }
+        }
+
+        public async Task<object> GenerateModelFromExamines(long examineId)
+        {
+            var examine = await _examineRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examineId);
+            if(examine==null)
+            {
+                throw new Exception("该审核记录不存在");
+            }
+            if (examine.EntryId!=0)
+            {
+                var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.EntryId == examine.EntryId&&s.IsPassed==true).OrderBy(s => s.Id).ToListAsync();
+                if (exammines.Any())
+                {
+                    return await GenerateModelFromExamines(exammines);
+                }
+                else
+                {
+                    throw new Exception("未找到该词条");
+                }
+
+            }
+            else
+            {
+                throw new Exception("不支持的类型");
+            }
+        }
+
+        public async Task<object> GenerateModelFromExamines(object model)
+        {
+            if (model is Entry)
+            {
+                var entry = model as Entry;
+                var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.EntryId == entry.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
+                if (exammines.Any())
+                {
+                    return await GenerateModelFromExamines(exammines);
+                }
+                else
+                {
+                    throw new Exception("未找到该词条");
+                }
+
+            }
+            else
+            {
+                throw new Exception("不支持的类型");
+            }
+        }
+
+        public async Task<object> GenerateModelFromExamines(List<Examine> examines)
+        {
+            if (examines.FirstOrDefault().EntryId != 0)
+            {
+                var entry = new Entry();
+                foreach (var item in examines)
+                {
+                    await _entryService.UpdateEntryDataAsync(entry, item);
+                }
+                return entry;
+            }
+            else
+            {
+                throw new Exception("不支持的类型");
+            }
+          
         }
 
         #endregion

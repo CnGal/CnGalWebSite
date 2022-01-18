@@ -1497,8 +1497,15 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                //await _examineService.MigrationEditEntryRelevanceExamineRecord();
-                //await _examineService.MigrationEditArticleRelevanceExamineRecord();
+                var examines = await _examineRepository.GetAll().Where(s => s.Operation == Operation.EstablishImages).ToListAsync();
+                foreach (var item in examines)
+                {
+                    item.Context = item.Context.Replace("pic.sliots.top", "pic.cngal.top");
+                    await _examineRepository.UpdateAsync(item);
+                }
+
+                await _examineService.MigrationEditEntryRelevanceExamineRecord();
+                await _examineService.MigrationEditArticleRelevanceExamineRecord();
                 //string temp= await _fileService.SaveImageAsync("https://wx4.sinaimg.cn/mw2000/008qAv3ngy1gyem1zkfwqj31cr0s9hbg.jpg", _configuration["NewsAdminId"]);
                 //await _elasticsearchService.DeleteDataOfElasticsearch();
                 //await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
@@ -1515,12 +1522,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 //await _historyDataService.GenerateZhiHuArticleImportJson();
 
-              /*  var examines = await _examineRepository.GetAll().Where(s => s.Operation == Operation.EstablishImages).ToListAsync();
-                foreach(var item in examines)
-                {
-                    item.Context=item.Context.Replace("pic.sliots.top", "pic.cngal.top");
-                    await _examineRepository.UpdateAsync(item);
-                }*/
+
 
                 return new Result { Successful = true };
             }

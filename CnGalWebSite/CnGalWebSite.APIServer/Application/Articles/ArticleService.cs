@@ -401,13 +401,9 @@ namespace CnGalWebSite.APIServer.Application.Articles
                         if (item.IsDelete == true)
                         {
                             relevances.Remove(infor);
-                            isAdd = true;
-                            break;
                         }
-                        else
-                        {
-                            break;
-                        }
+                        isAdd = true;
+                        break;
                     }
                 }
                 if (isAdd == false && item.IsDelete == false)
@@ -454,13 +450,9 @@ namespace CnGalWebSite.APIServer.Application.Articles
                         if (item.IsDelete == true)
                         {
                             relevances.Remove(infor);
-                            isAdd = true;
-                            break;
                         }
-                        else
-                        {
-                            break;
-                        }
+                        isAdd = true;
+                        break;
                     }
                 }
                 if (isAdd == false && item.IsDelete == false)

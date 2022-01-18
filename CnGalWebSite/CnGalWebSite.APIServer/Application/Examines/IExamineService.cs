@@ -370,7 +370,10 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="examine">审核数据模型</param>
         /// <returns></returns>
         Task ExamineEditPeripheryRelatedPeripheriesAsync(Periphery periphery, PeripheryRelatedPeripheries examine);
-
-
+        /// <summary>
+        /// 补全审核记录
+        /// </summary>
+        /// <returns></returns>
+        Task ExaminesCompletion();
     }
 }

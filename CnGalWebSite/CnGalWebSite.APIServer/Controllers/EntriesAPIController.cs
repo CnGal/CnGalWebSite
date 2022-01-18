@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Result = CnGalWebSite.DataModel.Model.Result;
@@ -107,6 +108,22 @@ namespace CnGalWebSite.APIServer.Controllers
                 foreach (var item in entry.Examines)
                 {
                     item.Entry = null;
+                }
+                //需要清除环回引用
+                foreach (var item in entry.Tags)
+                {
+                    item.Entries = null;
+                }
+                //需要清除环回引用
+                foreach (var item in entry.Articles)
+                {
+                    item.Entries = null;
+                }
+                //需要清除环回引用
+                foreach (var item in entry.EntryRelationFromEntryNavigation)
+                {
+                    item.FromEntryNavigation = null;
+                    item.ToEntryNavigation = null;
                 }
                 return entry;
             }
@@ -439,57 +456,58 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Error = "当前词条该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }
-
-            //查找当前词条
-            var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == model.Id);
-            if (entry == null)
-            {
-                return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
-            }
             //判断名称是否重复
-            if (model.Name != entry.Name && await _entryRepository.FirstOrDefaultAsync(s => s.Name == model.Name && s.Id != model.Id) != null)
+            if (await _entryRepository.GetAll().AnyAsync(s => s.Name == model.Name && s.Id != model.Id))
             {
                 return new Result { Error = "该词条的名称与其他词条重复", Successful = false };
             }
-            //判断是否被修改
-            if (model.SmallBackgroundPicture != entry.SmallBackgroundPicture || model.Name != entry.Name || model.BriefIntroduction != entry.BriefIntroduction
-                || model.MainPicture != entry.MainPicture || model.Thumbnail != entry.Thumbnail || model.BackgroundPicture != entry.BackgroundPicture
-                || model.Type != entry.Type || model.DisplayName != entry.DisplayName || model.AnotherName != entry.AnotherName)
+
+            //查找当前词条
+            var currentEntry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == model.Id);
+            var newEntry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == model.Id);
+
+            if (currentEntry == null)
             {
-                //添加修改记录
-                //新建审核数据对象
-                var entryMain = new EntryMain
-                {
-                    Name = model.Name,
-                    BriefIntroduction = model.BriefIntroduction,
-                    MainPicture = model.MainPicture,
-                    Thumbnail = model.Thumbnail,
-                    BackgroundPicture = model.BackgroundPicture,
-                    Type = model.Type,
-                    DisplayName = model.DisplayName,
-                    SmallBackgroundPicture = model.SmallBackgroundPicture,
-                    AnotherName = model.AnotherName
-                };
-                //序列化
-                var resulte = "";
-                using (TextWriter text = new StringWriter())
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(text, entryMain);
-                    resulte = text.ToString();
-                }
-                //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                {
-                    await _examineService.ExamineEstablishMainAsync(entry, entryMain);
-                    await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishMain, model.Note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, Operation.EstablishMain);
-                }
-                else
-                {
-                    await _examineService.UniversalEditExaminedAsync(entry, user, false, resulte, Operation.EstablishMain, model.Note);
-                }
+                return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
             }
+
+            newEntry.Name = model.Name;
+            newEntry.BriefIntroduction = model.BriefIntroduction;
+            newEntry.MainPicture = model.MainPicture;
+            newEntry.Thumbnail = model.Thumbnail;
+            newEntry.BackgroundPicture = model.BackgroundPicture;
+            newEntry.Type = model.Type;
+            newEntry.DisplayName = model.DisplayName;
+            newEntry.SmallBackgroundPicture = model.SmallBackgroundPicture;
+            newEntry.AnotherName = model.AnotherName;
+
+            var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
+
+            if(examines.Any(s => s.Value == Operation.EstablishMain)==false)
+            {
+                return new Result { Successful = true };
+            }
+            var examine=examines.FirstOrDefault(s => s.Value == Operation.EstablishMain);
+            //序列化
+            var resulte = "";
+            using (TextWriter text = new StringWriter())
+            {
+                var serializer = new JsonSerializer();
+                serializer.Serialize(text, examine.Key);
+                resulte = text.ToString();
+            }
+            //判断是否是管理员
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
+            {
+                await _examineService.ExamineEstablishMainAsync(currentEntry, examine.Key as EntryMain);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishMain, model.Note);
+                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishMain);
+            }
+            else
+            {
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishMain, model.Note);
+            }
+
 
             return new Result { Successful = true };
 
@@ -996,171 +1014,38 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //查找词条
-            var entry = await _entryRepository.GetAll()
-              .Include(s => s.Information)
-                .ThenInclude(s => s.Additional)
-              .FirstOrDefaultAsync(x => x.Id == model.Id);
-            if (entry == null)
+            var currentEntry = await _entryRepository.GetAll().Include(s => s.Information).ThenInclude(s => s.Additional).FirstOrDefaultAsync(x => x.Id == model.Id);
+            var newEntry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Information).ThenInclude(s => s.Additional).FirstOrDefaultAsync(x => x.Id == model.Id);
+            if (currentEntry == null)
             {
                 return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
             }
+            newEntry.Information.Clear();
             //根据类别进行序列化操作
-            var basics1 = new List<BasicEntryInformation>();
-            var basics = new List<BasicEntryInformation_>();
             switch (model.Type)
             {
                 case EntryType.Game:
-
-                    if (model.Staffs != null)
+                    //遍历一遍当前视图中staffs 
+                    foreach (var item in model.Staffs)
                     {
-                        //先读取当前词条 把staff信息全部删除
-                        foreach (var item in entry.Information)
+
+                        var staffs = new List<BasicEntryInformationAdditional>
                         {
-                            if (item.Modifier == "STAFF")
-                            {
-                                var additional_s = new List<BasicEntryInformationAdditional_>();
-                                foreach (var temp in item.Additional)
-                                {
-                                    additional_s.Add(new BasicEntryInformationAdditional_ { DisplayName = temp.DisplayName, DisplayValue = temp.DisplayValue, IsDelete = true });
-                                }
-                                basics.Add(new BasicEntryInformation_ { Modifier = "STAFF", DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = true, Additional = additional_s });
-                            }
-                        }
-                        //遍历一遍当前视图中staffs 
-                        foreach (var item in model.Staffs)
+                            new BasicEntryInformationAdditional { DisplayName = "职位（官方称呼）", DisplayValue = item.PositionOfficial },
+                            new BasicEntryInformationAdditional { DisplayName = "昵称（官方称呼）", DisplayValue = item.NicknameOfficial },
+                            new BasicEntryInformationAdditional { DisplayName = "职位（通用）", DisplayValue = item.PositionGeneral.ToString() },
+                            new BasicEntryInformationAdditional { DisplayName = "角色", DisplayValue = item.Role },
+                            new BasicEntryInformationAdditional { DisplayName = "隶属组织", DisplayValue = item.SubordinateOrganization },
+                            new BasicEntryInformationAdditional { DisplayName = "子项目", DisplayValue = item.Subcategory }
+                        };
+                        newEntry.Information.Add(new BasicEntryInformation
                         {
-                            var isSame = false;
-                            for (var i = 0; i < basics.Count; i++)
-                            {
-                                var infor = basics[i];
-                                if (item.Subcategory + item.PositionOfficial == infor.DisplayName && item.NicknameOfficial == infor.DisplayValue && infor.Modifier == "STAFF")
-                                {
-                                    //如果两次一致 继续查看附加信息是否一致
-                                    infor.IsDelete = false;
-                                    var allSame = true;
-
-                                    #region 查找职位（官方称呼）是否一致
-                                    var temp = infor.Additional.Find(s => s.DisplayName == "职位（官方称呼）");
-                                    if (temp == null)
-                                    {
-                                        infor.Additional.Add(new BasicEntryInformationAdditional_ { DisplayName = "职位（官方称呼）", DisplayValue = item.PositionOfficial });
-                                    }
-                                    else if (temp.DisplayValue != item.PositionOfficial)
-                                    {
-                                        infor.Additional.Add(new BasicEntryInformationAdditional_ { DisplayName = "职位（官方称呼）", DisplayValue = item.PositionOfficial });
-                                        allSame = false;
-                                    }
-                                    else
-                                    {
-                                        infor.Additional.Remove(temp);
-                                    }
-
-                                    temp = infor.Additional.Find(s => s.DisplayName == "昵称（官方称呼）");
-                                    if (temp == null)
-                                    {
-                                        infor.Additional.Add(new BasicEntryInformationAdditional_ { DisplayName = "昵称（官方称呼）", DisplayValue = item.NicknameOfficial });
-                                    }
-                                    else if (temp.DisplayValue != item.NicknameOfficial)
-                                    {
-                                        infor.Additional.Add(new BasicEntryInformationAdditional_ { DisplayName = "昵称（官方称呼）", DisplayValue = item.NicknameOfficial });
-                                        allSame = false;
-                                    }
-                                    else
-                                    {
-                                        infor.Additional.Remove(temp);
-                                    }
-
-
-                                    temp = infor.Additional.Find(s => s.DisplayName == "职位（通用）");
-                                    if (temp == null)
-                                    {
-                                        infor.Additional.Add(new BasicEntryInformationAdditional_ { DisplayName = "职位（通用）", DisplayValue = item.PositionGeneral.ToString() });
-                                    }
-                                    else if (temp.DisplayValue != item.PositionGeneral.ToString())
-                                    {
-                                        infor.Additional.Add(new BasicEntryInformationAdditional_ { DisplayName = "职位（通用）", DisplayValue = item.PositionGeneral.ToString() });
-                                        allSame = false;
-                                    }
-                                    else
-                                    {
-                                        infor.Additional.Remove(temp);
-                                    }
-
-
-                                    temp = infor.Additional.Find(s => s.DisplayName == "角色");
-                                    if (temp == null)
-                                    {
-                                        infor.Additional.Add(new BasicEntryInformationAdditional_ { DisplayName = "角色", DisplayValue = item.Role });
-                                    }
-                                    else if (temp.DisplayValue != item.Role)
-                                    {
-                                        infor.Additional.Add(new BasicEntryInformationAdditional_ { DisplayName = "角色", DisplayValue = item.Role });
-                                        allSame = false;
-                                    }
-                                    else
-                                    {
-                                        infor.Additional.Remove(temp);
-                                    }
-
-
-                                    temp = infor.Additional.Find(s => s.DisplayName == "隶属组织");
-                                    if (temp == null)
-                                    {
-                                        infor.Additional.Add(new BasicEntryInformationAdditional_ { DisplayName = "隶属组织", DisplayValue = item.SubordinateOrganization });
-                                    }
-                                    else if (temp.DisplayValue != item.SubordinateOrganization)
-                                    {
-                                        infor.Additional.Add(new BasicEntryInformationAdditional_ { DisplayName = "隶属组织", DisplayValue = item.SubordinateOrganization });
-                                        allSame = false;
-                                    }
-                                    else
-                                    {
-                                        infor.Additional.Remove(temp);
-                                    }
-
-
-                                    temp = infor.Additional.Find(s => s.DisplayName == "子项目");
-                                    if (temp == null)
-                                    {
-                                        infor.Additional.Add(new BasicEntryInformationAdditional_ { DisplayName = "子项目", DisplayValue = item.Subcategory });
-                                    }
-                                    else if (temp.DisplayValue != item.Subcategory)
-                                    {
-                                        infor.Additional.Add(new BasicEntryInformationAdditional_ { DisplayName = "子项目", DisplayValue = item.Subcategory });
-                                        allSame = false;
-                                    }
-                                    else
-                                    {
-                                        infor.Additional.Remove(temp);
-                                    }
-                                    #endregion
-
-                                    if (allSame == true)
-                                    {
-                                        basics.Remove(infor);
-                                    }
-                                    isSame = true;
-                                    break;
-                                }
-                            }
-                            if (isSame == false)
-                            {
-                                var staffs = new List<BasicEntryInformationAdditional_>
-                                {
-                                    new BasicEntryInformationAdditional_ { DisplayName = "职位（官方称呼）", DisplayValue = item.PositionOfficial },
-                                    new BasicEntryInformationAdditional_ { DisplayName = "昵称（官方称呼）", DisplayValue = item.NicknameOfficial },
-                                    new BasicEntryInformationAdditional_ { DisplayName = "职位（通用）", DisplayValue = item.PositionGeneral.ToString() },
-                                    new BasicEntryInformationAdditional_ { DisplayName = "角色", DisplayValue = item.Role },
-                                    new BasicEntryInformationAdditional_ { DisplayName = "隶属组织", DisplayValue = item.SubordinateOrganization },
-                                    new BasicEntryInformationAdditional_ { DisplayName = "子项目", DisplayValue = item.Subcategory }
-                                };
-                                basics.Add(new BasicEntryInformation_ { Modifier = "STAFF", DisplayName = item.Subcategory + item.PositionOfficial, DisplayValue = item.NicknameOfficial, IsDelete = false, Additional = staffs });
-                            }
-                        }
-                        //再遍历视图模型 添加
+                            Modifier = "STAFF",
+                            DisplayName = item.Subcategory + item.PositionOfficial,
+                            DisplayValue = item.NicknameOfficial,
+                            Additional = staffs
+                        });
                     }
-
-
                     //序列化游戏平台
                     string gamePlatforms = null;
                     var isFirst = true;
@@ -1180,332 +1065,160 @@ namespace CnGalWebSite.APIServer.Controllers
                         }
                     }
                     //添加基本信息
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行时间", DisplayValue = model.IssueTime?.ToString("yyyy年M月d日") });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行时间备注", DisplayValue = model.IssueTimeString });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "原作", DisplayValue = model.Original });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "制作组", DisplayValue = model.ProductionGroup });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "游戏平台", DisplayValue = gamePlatforms });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "引擎", DisplayValue = model.Engine });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行商", DisplayValue = model.Publisher });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行方式", DisplayValue = model.IssueMethod });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "官网", DisplayValue = model.OfficialWebsite });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "Steam平台Id", DisplayValue = model.SteamId });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "QQ群", DisplayValue = model.QQgroupGame });
-                    //循环添加 删除标签 到原有信息列表的每一各项目中
-                    foreach (var item in entry.Information)
-                    {
-                        if (item.Modifier == "基本信息")
-                        {
-                            basics.Add(new BasicEntryInformation_ { Modifier = "基本信息", DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = true });
-                        }
-                    }
-                    //循环查找是否相同
-                    foreach (var item in basics1)
-                    {
-                        var isSame = false;
-                        foreach (var infor in entry.Information)
-                        {
-                            if (infor.DisplayName + infor.DisplayValue == item.DisplayName + item.DisplayValue && infor.Modifier == "基本信息")
-                            {
-                                //如果两次一致 删除上一步中的项目
-                                foreach (var temp in basics)
-                                {
-                                    if (temp.Modifier == infor.Modifier && temp.DisplayName == infor.DisplayName && temp.DisplayValue == infor.DisplayValue)
-                                    {
-                                        basics.Remove(temp);
-                                        isSame = true;
-                                        break;
-                                    }
-                                }
-                                isSame = true;
-                                break;
-                            }
-                        }
-                        if (isSame == false)
-                        {
-                            basics.Add(new BasicEntryInformation_ { Modifier = "基本信息", DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = false, });
-                        }
-                    }
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行时间", DisplayValue = model.IssueTime?.ToString("yyyy年M月d日") });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行时间备注", DisplayValue = model.IssueTimeString });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "原作", DisplayValue = model.Original });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "制作组", DisplayValue = model.ProductionGroup });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "游戏平台", DisplayValue = gamePlatforms });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "引擎", DisplayValue = model.Engine });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行商", DisplayValue = model.Publisher });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行方式", DisplayValue = model.IssueMethod });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "官网", DisplayValue = model.OfficialWebsite });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "Steam平台Id", DisplayValue = model.SteamId });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "QQ群", DisplayValue = model.QQgroupGame });
                     break;
                 case EntryType.ProductionGroup:
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "QQ群", DisplayValue = model.QQgroupGroup });
-                    //循环添加 删除标签 到原有信息列表的每一各项目中
-                    foreach (var item in entry.Information)
-                    {
-                        if (item.Modifier == "基本信息")
-                        {
-                            basics.Add(new BasicEntryInformation_ { Modifier = "基本信息", DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = true });
-                        }
-                    }
-                    //循环查找是否相同
-                    foreach (var item in basics1)
-                    {
-                        var isSame = false;
-                        foreach (var infor in entry.Information)
-                        {
-                            if (infor.DisplayName + infor.DisplayValue == item.DisplayName + item.DisplayValue && infor.Modifier == "基本信息")
-                            {
-                                //如果两次一致 删除上一步中的项目
-                                foreach (var temp in basics)
-                                {
-                                    if (temp.Modifier == infor.Modifier && temp.DisplayName == infor.DisplayName && temp.DisplayValue == infor.DisplayValue)
-                                    {
-                                        basics.Remove(temp);
-                                        break;
-                                    }
-                                }
-                                isSame = true;
-                                break;
-                            }
-                        }
-                        if (isSame == false)
-                        {
-                            basics.Add(new BasicEntryInformation_ { Modifier = "基本信息", DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = false, });
-                        }
-                    }
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "QQ群", DisplayValue = model.QQgroupGroup });
                     break;
                 case EntryType.Role:
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "声优", DisplayValue = model.CV });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "性别", DisplayValue = model.Gender.ToString() });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身材数据", DisplayValue = model.FigureData });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身材(主观)", DisplayValue = model.FigureSubjective });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "生日", DisplayValue = model.Birthday?.ToString("M月d日") });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发色", DisplayValue = model.Haircolor });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "瞳色", DisplayValue = model.Pupilcolor });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "性格", DisplayValue = model.Character });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "角色身份", DisplayValue = model.RoleIdentity });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "血型", DisplayValue = model.BloodType });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身高", DisplayValue = model.RoleHeight });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "兴趣", DisplayValue = model.RoleTaste });
-                    basics1.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "年龄", DisplayValue = model.RoleAge });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "声优", DisplayValue = model.CV });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "性别", DisplayValue = model.Gender.ToString() });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身材数据", DisplayValue = model.FigureData });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身材(主观)", DisplayValue = model.FigureSubjective });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "生日", DisplayValue = model.Birthday?.ToString("M月d日") });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发色", DisplayValue = model.Haircolor });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "瞳色", DisplayValue = model.Pupilcolor });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "性格", DisplayValue = model.Character });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "角色身份", DisplayValue = model.RoleIdentity });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "血型", DisplayValue = model.BloodType });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身高", DisplayValue = model.RoleHeight });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "兴趣", DisplayValue = model.RoleTaste });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "年龄", DisplayValue = model.RoleAge });
 
-                    //循环添加 删除标签 到原有信息列表的每一各项目中
-                    foreach (var item in entry.Information)
-                    {
-                        if (item.Modifier == "基本信息")
-                        {
-                            basics.Add(new BasicEntryInformation_ { Modifier = "基本信息", DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = true });
-                        }
-                    }
-                    //循环查找是否相同
-                    foreach (var item in basics1)
-                    {
-                        var isSame = false;
-                        foreach (var infor in entry.Information)
-                        {
-                            if (infor.DisplayName + infor.DisplayValue == item.DisplayName + item.DisplayValue && infor.Modifier == "基本信息")
-                            {
-                                //如果两次一致 删除上一步中的项目
-                                foreach (var temp in basics)
-                                {
-                                    if (temp.Modifier == infor.Modifier && temp.DisplayName == infor.DisplayName && temp.DisplayValue == infor.DisplayValue)
-                                    {
-                                        basics.Remove(temp);
-                                        break;
-                                    }
-                                }
-                                isSame = true;
-                                break;
-                            }
-                        }
-                        if (isSame == false)
-                        {
-                            basics.Add(new BasicEntryInformation_ { Modifier = "基本信息", DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = false, });
-                        }
-                    }
+
                     break;
                 case EntryType.Staff:
-
-                    //循环添加 删除标签 到原有信息列表的每一各项目中
-                    foreach (var item in entry.Information)
-                    {
-                        if (item.Modifier == "基本信息")
-                        {
-                            basics.Add(new BasicEntryInformation_ { Modifier = "基本信息", DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = true });
-                        }
-                    }
-                    //循环查找是否相同
-                    foreach (var item in basics1)
-                    {
-                        var isSame = false;
-                        foreach (var infor in entry.Information)
-                        {
-                            if (infor.DisplayName + infor.DisplayValue == item.DisplayName + item.DisplayValue && infor.Modifier == "基本信息")
-                            {
-                                //如果两次一致 删除上一步中的项目
-                                foreach (var temp in basics)
-                                {
-                                    if (temp.Modifier == infor.Modifier && temp.DisplayName == infor.DisplayName && temp.DisplayValue == infor.DisplayValue)
-                                    {
-                                        basics.Remove(temp);
-                                        break;
-                                    }
-                                }
-                                isSame = true;
-                                break;
-                            }
-                        }
-                        if (isSame == false)
-                        {
-                            basics.Add(new BasicEntryInformation_ { Modifier = "基本信息", DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = false, });
-                        }
-                    }
                     break;
             }
             //序列化相关网站
-            if (model.SocialPlatforms != null)
+
+            //加载在基本信息中的网站
+            if (string.IsNullOrWhiteSpace(model.WeiboId) == false)
             {
-                //先读取当前词条 把 相关网站 全部删除
-                foreach (var item in entry.Information)
+                model.SocialPlatforms.Add(new SocialPlatform
                 {
-                    if (item.Modifier == "相关网站")
-                    {
-                        basics.Add(new BasicEntryInformation_ { Modifier = "相关网站", DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = true });
-                    }
-                }
-                //加载在基本信息中的网站
-                if (string.IsNullOrWhiteSpace(model.WeiboId) == false)
+                    Name = "微博",
+                    Link = "https://weibo.com/u/" + model.WeiboId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.BilibiliId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
                 {
-                    model.SocialPlatforms.Add(new SocialPlatform
-                    {
-                        Name = "微博",
-                        Link = "https://weibo.com/u/" + model.WeiboId
-                    });
-                }
-                if (string.IsNullOrWhiteSpace(model.BilibiliId) == false)
+                    Name = "Bilibili",
+                    Link = "https://space.bilibili.com/" + model.BilibiliId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.AcFunId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
                 {
-                    model.SocialPlatforms.Add(new SocialPlatform
-                    {
-                        Name = "Bilibili",
-                        Link = "https://space.bilibili.com/" + model.BilibiliId
-                    });
-                }
-                if (string.IsNullOrWhiteSpace(model.AcFunId) == false)
+                    Name = "AcFun",
+                    Link = "https://www.acfun.cn/u/" + model.AcFunId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.ZhihuId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
                 {
-                    model.SocialPlatforms.Add(new SocialPlatform
-                    {
-                        Name = "AcFun",
-                        Link = "https://www.acfun.cn/u/" + model.AcFunId
-                    });
-                }
-                if (string.IsNullOrWhiteSpace(model.ZhihuId) == false)
+                    Name = "知乎",
+                    Link = "https://www.zhihu.com/people/" + model.ZhihuId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.AfdianId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
                 {
-                    model.SocialPlatforms.Add(new SocialPlatform
-                    {
-                        Name = "知乎",
-                        Link = "https://www.zhihu.com/people/" + model.ZhihuId
-                    });
-                }
-                if (string.IsNullOrWhiteSpace(model.AfdianId) == false)
+                    Name = "爱发电",
+                    Link = "https://afdian.net/@" + model.AfdianId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.PixivId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
                 {
-                    model.SocialPlatforms.Add(new SocialPlatform
-                    {
-                        Name = "爱发电",
-                        Link = "https://afdian.net/@" + model.AfdianId
-                    });
-                }
-                if (string.IsNullOrWhiteSpace(model.PixivId) == false)
+                    Name = "Pixiv",
+                    Link = "https://www.pixiv.net/users/" + model.PixivId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.TwitterId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
                 {
-                    model.SocialPlatforms.Add(new SocialPlatform
-                    {
-                        Name = "Pixiv",
-                        Link = "https://www.pixiv.net/users/" + model.PixivId
-                    });
-                }
-                if (string.IsNullOrWhiteSpace(model.TwitterId) == false)
+                    Name = "Twitter",
+                    Link = "https://twitter.com/" + model.TwitterId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.YouTubeId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
                 {
-                    model.SocialPlatforms.Add(new SocialPlatform
-                    {
-                        Name = "Twitter",
-                        Link = "https://twitter.com/" + model.TwitterId
-                    });
-                }
-                if (string.IsNullOrWhiteSpace(model.YouTubeId) == false)
+                    Name = "YouTube",
+                    Link = "https://www.youtube.com/channel/" + model.YouTubeId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.FacebookId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
                 {
-                    model.SocialPlatforms.Add(new SocialPlatform
-                    {
-                        Name = "YouTube",
-                        Link = "https://www.youtube.com/channel/" + model.YouTubeId
-                    });
-                }
-                if (string.IsNullOrWhiteSpace(model.FacebookId) == false)
-                {
-                    model.SocialPlatforms.Add(new SocialPlatform
-                    {
-                        Name = "Facebook",
-                        Link = "https://www.facebook.com/" + model.FacebookId
-                    });
-                }
-
-
-                //遍历一遍当前视图中 相关网站
-                foreach (var item in model.SocialPlatforms)
-                {
-                    var isSame = false;
-                    foreach (var infor in basics)
-                    {
-                        if (item.Name == infor.DisplayName && item.Link == infor.DisplayValue && infor.Modifier == "相关网站")
-                        {
-                            //如果两次一致 删除上一步中的项目
-                            foreach (var temp in basics)
-                            {
-                                if (temp.Modifier == infor.Modifier && temp.DisplayName == infor.DisplayName && temp.DisplayValue == infor.DisplayValue)
-                                {
-                                    basics.Remove(temp);
-                                    break;
-                                }
-                            }
-                            isSame = true;
-                            break;
-                        }
-                    }
-                    if (isSame == false)
-                    {
-                        var staffs = new List<BasicEntryInformationAdditional_>();
-                        basics.Add(new BasicEntryInformation_ { Modifier = "相关网站", DisplayName = item.Name, DisplayValue = item.Link, IsDelete = false });
-                    }
-                }
+                    Name = "Facebook",
+                    Link = "https://www.facebook.com/" + model.FacebookId
+                });
             }
 
-            //新建审核数据对象
-            var entryAddInfor = new EntryAddInfor
+
+            //遍历一遍当前视图中 相关网站
+            foreach (var item in model.SocialPlatforms)
             {
-                Information = basics
-            };
-            //如果 DisplayValue 为null 则不添加审核记录
-            for (var i = 0; i < entryAddInfor.Information.Count; i++)
-            {
-                if (entryAddInfor.Information[i].IsDelete == false && entryAddInfor.Information[i].DisplayValue == null)
+                newEntry.Information.Add(new BasicEntryInformation
                 {
-                    entryAddInfor.Information.RemoveAt(i);
-                    i--;
-                }
+                    Modifier = "相关网站",
+                    DisplayName = item.Name,
+                    DisplayValue = item.Link
+                });
             }
-            //判断审核列表是否为空
-            if (entryAddInfor.Information.Count == 0)
+
+            var tempList = newEntry.Information.ToList();
+            tempList.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayValue));
+            newEntry.Information = tempList;
+
+            var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
+
+            if (examines.Any(s => s.Value == Operation.EstablishAddInfor) == false)
             {
                 return new Result { Successful = true };
             }
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishAddInfor);
             //序列化
             var resulte = "";
             using (TextWriter text = new StringWriter())
             {
                 var serializer = new JsonSerializer();
-                serializer.Serialize(text, entryAddInfor);
+                serializer.Serialize(text, examine.Key);
                 resulte = text.ToString();
             }
             //判断是否是管理员
             if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
-                await _examineService.ExamineEstablishAddInforAsync(entry, entryAddInfor);
-                await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishAddInfor, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, Operation.EstablishAddInfor);
-
+                await _examineService.ExamineEstablishAddInforAsync(currentEntry, examine.Key as EntryAddInfor);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishAddInfor, model.Note);
+                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishAddInfor);
             }
             else
             {
-                await _examineService.UniversalEditExaminedAsync(entry, user, false, resulte, Operation.EstablishAddInfor, model.Note);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishAddInfor, model.Note);
             }
+
             return new Result { Successful = true };
         }
 
@@ -1568,101 +1281,62 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Error = "当前词条该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }
-            //查找词条
-            var entry = await _entryRepository.GetAll()
-              .Include(s => s.Pictures)
-              .FirstOrDefaultAsync(x => x.Id == model.Id);
-            if (entry == null)
-            {
-                return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
-            }
-
-            //创建审核数据模型
-
-            var entryImages = new EntryImages
-            {
-                Images = new List<EntryImage>()
-            };
-            //先把 当前词条中的图片 都 打上删除标签
-            foreach (var item in entry.Pictures)
-            {
-                entryImages.Images.Add(new EntryImage
-                {
-                    Url = item.Url,
-                    Note = item.Note,
-                    Modifier = item.Modifier,
-                    IsDelete = true
-                });
-            }
-            //再遍历视图模型中的图片 对应修改
-            if (model.Images != null)
-            {
-                //循环查找是否相同
-                foreach (var item in model.Images)
-                {
-                    var isSame = false;
-                    foreach (var infor in entry.Pictures)
-                    {
-                        if (item.Url == infor.Url && item.Note == infor.Note && item.Modifier == infor.Modifier)
-                        {
-                            //如果两次一致 删除上一步中的项目
-                            foreach (var temp in entryImages.Images)
-                            {
-                                if (temp.Url == infor.Url && temp.Note == infor.Note && temp.Modifier == infor.Modifier)
-                                {
-                                    entryImages.Images.Remove(temp);
-                                    isSame = true;
-                                    break;
-                                }
-                            }
-                            isSame = true;
-                            break;
-                        }
-                    }
-                    if (isSame == false)
-                    {
-                        entryImages.Images.Add(new EntryImage
-                        {
-                            Url = _appHelper.GetImagePath(item.Url, ""),
-                            Modifier = item.Modifier,
-                            Note = item.Note
-                        });
-                    }
-                }
-            }
-
-            //判断审核是否为空
-            if (entryImages.Images.Count == 0)
-            {
-                return new Result { Successful = true };
-            }
             //检查图片链接 是否包含外链
-            foreach (var item in entryImages.Images)
+            foreach (var item in model.Images)
             {
                 if (item.Url.Contains("image.cngal.org") == false && item.Url.Contains("pic.cngal.top") == false)
                 {
                     return new Result { Successful = false, Error = "相册中不能添加外部图片：" + item.Url };
                 }
             }
-            //序列化JSON
+            //查找词条
+            var currentEntry = await _entryRepository.GetAll().Include(s => s.Pictures).FirstOrDefaultAsync(x => x.Id == model.Id);
+            var newEntry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Pictures).FirstOrDefaultAsync(x => x.Id == model.Id);
+            if (currentEntry == null)
+            {
+                return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
+            }
+
+
+            //再遍历视图模型中的图片 对应修改
+
+            foreach (var item in model.Images)
+            {
+
+                newEntry.Pictures.Add(new EntryPicture
+                {
+                    Url = item.Url,
+                    Modifier = item.Modifier,
+                    Note = item.Note
+                });
+
+            }
+
+            var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
+
+            if (examines.Any(s => s.Value == Operation.EstablishImages) == false)
+            {
+                return new Result { Successful = true };
+            }
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishImages);
+            //序列化
             var resulte = "";
             using (TextWriter text = new StringWriter())
             {
                 var serializer = new JsonSerializer();
-                serializer.Serialize(text, entryImages);
+                serializer.Serialize(text, examine.Key);
                 resulte = text.ToString();
             }
             //判断是否是管理员
             if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
-                await _examineService.ExamineEstablishImagesAsync(entry, entryImages);
-                await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishImages, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, Operation.EstablishImages);
-
+                await _examineService.ExamineEstablishImagesAsync(currentEntry, examine.Key as EntryImages);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishImages, model.Note);
+                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishImages);
             }
             else
             {
-                await _examineService.UniversalEditExaminedAsync(entry, user, false, resulte, Operation.EstablishImages, model.Note);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishImages, model.Note);
             }
             return new Result { Successful = true };
 
@@ -1795,12 +1469,18 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = "当前词条该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }
             //查找词条
-            var entry = await _entryRepository.GetAll()
+            var currentEntry = await _entryRepository.GetAll()
               .Include(s => s.Outlinks)
               .Include(s => s.Articles)
               .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
               .FirstOrDefaultAsync(x => x.Id == model.Id);
-            if (entry == null)
+            var newEntry = await _entryRepository.GetAll().AsNoTracking()
+              .Include(s => s.Outlinks)
+              .Include(s => s.Articles)
+              .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+              .FirstOrDefaultAsync(x => x.Id == model.Id);
+
+            if (currentEntry == null)
             {
                 return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
             }
@@ -1840,149 +1520,56 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
+            //获取词条文章
+            var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
+            var articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
 
-
-            //创建审核数据模型
-            var examinedModel = new EntryRelevances();
-
-            //处理关联词条
-
-            //遍历当前词条数据 打上删除标签
-            foreach (var item in entry.EntryRelationFromEntryNavigation.Select(s => s.ToEntryNavigation))
+            newEntry.Articles = articles;
+            newEntry.EntryRelationFromEntryNavigation = entries.Select(s => new EntryRelation
             {
-                examinedModel.Relevances.Add(new EntryRelevancesAloneModel
-                {
-                    DisplayName = item.Id.ToString(),
-                    DisplayValue = item.Name,
-                    Type = RelevancesType.Entry,
-                    IsDelete = true,
-                });
-            }
-
-            //再遍历视图 对应修改
-
-            //添加新建项目
-            foreach (var item in entryIds.Where(s => examinedModel.Relevances.Where(s => s.Type == RelevancesType.Entry).Select(s => s.DisplayName).Contains(s.ToString()) == false))
-            {
-                examinedModel.Relevances.Add(new EntryRelevancesAloneModel
-                {
-                    DisplayName = item.ToString(),
-                    Type = RelevancesType.Entry,
-                    IsDelete = false
-                });
-
-            }
-            //删除不存在的老项目
-            examinedModel.Relevances.RemoveAll(s => entryIds.Select(s => s.ToString()).Contains(s.DisplayName) && s.IsDelete && s.Type == RelevancesType.Entry);
-
-
-            //处理关联文章
-            //遍历当前文章数据 打上删除标签
-            foreach (var item in entry.Articles)
-            {
-                examinedModel.Relevances.Add(new EntryRelevancesAloneModel
-                {
-                    DisplayName = item.Id.ToString(),
-                    DisplayValue = item.Name,
-                    Type = RelevancesType.Article,
-                    IsDelete = true,
-                });
-            }
-
-            //再遍历视图 对应修改
-
-            //添加新建项目
-            foreach (var item in articleIds.Where(s => examinedModel.Relevances.Where(s => s.Type == RelevancesType.Article).Select(s => s.DisplayName).Contains(s.ToString()) == false))
-            {
-                examinedModel.Relevances.Add(new EntryRelevancesAloneModel
-                {
-                    DisplayName = item.ToString(),
-                    Type = RelevancesType.Article,
-                    IsDelete = false
-                });
-
-            }
-            //删除不存在的老项目
-            examinedModel.Relevances.RemoveAll(s => articleIds.Select(s => s.ToString()).Contains(s.DisplayName) && s.IsDelete && s.Type == RelevancesType.Article);
-            //处理外部链接
-
-
-            //遍历当前词条外部链接 打上删除标签
-            foreach (var item in entry.Outlinks)
-            {
-                examinedModel.Relevances.Add(new EntryRelevancesAloneModel
-                {
-                    DisplayName = item.Name,
-                    DisplayValue = item.BriefIntroduction,
-                    IsDelete = true,
-                    Type = RelevancesType.Outlink,
-                    Link = item.Link
-                });
-            }
-
+                ToEntry = s.Id,
+                ToEntryNavigation = s
+            }).ToList();
 
             //循环查找外部链接是否相同
             foreach (var item in model.others)
             {
-                var isSame = false;
-                foreach (var infor in entry.Outlinks)
+
+                newEntry.Outlinks.Add(new Outlink
                 {
-                    if (item.DisplayName == infor.Name && item.DisPlayValue == infor.BriefIntroduction && item.Link == infor.Link)
-                    {
-                        //如果两次一致 删除上一步中的项目
-                        foreach (var temp in examinedModel.Relevances.Where(s => s.Type == RelevancesType.Outlink))
-                        {
-                            if (temp.DisplayName == infor.Name && temp.DisplayValue == infor.BriefIntroduction && temp.Link == infor.Link)
-                            {
-                                examinedModel.Relevances.Remove(temp);
-                                isSame = true;
-                                break;
-                            }
-                        }
-                        isSame = true;
-                        break;
-                    }
-                }
-                if (isSame == false && string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                {
-                    examinedModel.Relevances.Add(new EntryRelevancesAloneModel
-                    {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.DisPlayValue,
-                        Type = RelevancesType.Outlink,
-                        Link = item.Link,
-                        IsDelete = false
-                    });
-                }
+                    Name = item.DisplayName,
+                    BriefIntroduction = item.DisPlayValue,
+                    Link = item.Link,
+                });
             }
 
+            var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
 
-
-            //判断审核是否为空
-            if (examinedModel.Relevances.Count == 0)
+            if (examines.Any(s => s.Value == Operation.EstablishRelevances) == false)
             {
                 return new Result { Successful = true };
             }
-
-            //序列化JSON
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishRelevances);
+            //序列化
             var resulte = "";
             using (TextWriter text = new StringWriter())
             {
                 var serializer = new JsonSerializer();
-                serializer.Serialize(text, examinedModel);
+                serializer.Serialize(text, examine.Key);
                 resulte = text.ToString();
             }
             //判断是否是管理员
             if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
-                await _examineService.ExamineEstablishRelevancesAsync(entry, examinedModel);
-                await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishRelevances, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, Operation.EstablishRelevances);
+                await _examineService.ExamineEstablishRelevancesAsync(currentEntry, examine.Key as EntryRelevances);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishRelevances, model.Note);
+                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishRelevances);
             }
             else
             {
-                await _examineService.UniversalEditExaminedAsync(entry, user, false, resulte, Operation.EstablishRelevances, model.Note);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishRelevances, model.Note);
             }
+
             return new Result { Successful = true };
 
         }
@@ -2035,34 +1622,43 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = "当前词条该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }
             //查找词条
-            var entry = await _entryRepository.GetAll()
-              .FirstOrDefaultAsync(x => x.Id == model.Id);
+            var currentEntry = await _entryRepository.GetAll().FirstOrDefaultAsync(x => x.Id == model.Id);
+            var newEntry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.Id == model.Id);
 
-            if (entry == null)
+            if (currentEntry == null)
             {
                 return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
             }
 
-            //判断是否一致
-            if (model.Context == entry.MainPage)
+            newEntry.MainPage = model.Context;
+
+            var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
+
+            if (examines.Any(s => s.Value == Operation.EstablishMainPage) == false)
             {
                 return new Result { Successful = true };
             }
-            if (model.Context == null)
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishMainPage);
+            //序列化
+            var resulte = "";
+            using (TextWriter text = new StringWriter())
             {
-                model.Context = "";
+                var serializer = new JsonSerializer();
+                serializer.Serialize(text, examine.Key);
+                resulte = text.ToString();
             }
             //判断是否是管理员
             if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
-                await _examineService.ExamineEstablishMainPageAsync(entry, model.Context);
-                await _examineService.UniversalEditExaminedAsync(entry, user, true, model.Context, Operation.EstablishMainPage, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, Operation.EstablishMainPage);
+                await _examineService.ExamineEstablishMainPageAsync(currentEntry, examine.Key as string);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishMainPage, model.Note);
+                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishMainPage);
             }
             else
             {
-                await _examineService.UniversalEditExaminedAsync(entry, user, false, model.Context, Operation.EstablishMainPage, model.Note);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishRelevances, model.Note);
             }
+
             return new Result { Successful = true };
         }
 
@@ -2086,25 +1682,25 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 //预处理 建立词条关联信息
                 //判断关联是否存在
-                var tagIds = new List<int>();
+                var tags = new List<Tag>();
 
                 var tagNames = new List<string>();
                 tagNames.AddRange(model.Tags.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                tagNames = tagNames.Distinct().ToList();
 
                 foreach (var item in tagNames)
                 {
-                    var infor = await _tagRepository.GetAll().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
-                    if (infor <= 0)
+                    var infor = await _tagRepository.GetAll().Where(s => s.Name == item).FirstOrDefaultAsync();
+                    if (infor == null)
                     {
                         return new Result { Successful = false, Error = "标签 " + item + " 不存在" };
                     }
                     else
                     {
-                        tagIds.Add(infor);
+                        tags.Add(infor);
                     }
                 }
-                //删除重复数据
-                tagIds = tagIds.Distinct().ToList();
+
                 //处理原始数据 删除空项目
                 model.Roles.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
                 model.ReStaffs.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
@@ -2142,62 +1738,46 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = ex.Message };
                 }
 
+                var newEntry = new Entry();
 
                 //第一步 建立词条主要信息
 
-                //添加修改记录
-                //新建审核数据对象
-                var entryMain = new EntryMain
-                {
-                    Name = model.Name,
-                    BriefIntroduction = model.BriefIntroduction,
-                    MainPicture = model.MainPicture,
-                    Thumbnail = model.Thumbnail,
-                    BackgroundPicture = model.BackgroundPicture,
-                    Type = model.Type,
-                    DisplayName = model.DisplayName,
-                    SmallBackgroundPicture = model.SmallBackgroundPicture,
-                    AnotherName = model.AnotherName
-                };
-                //序列化
-                var resulte = "";
-                using (TextWriter text = new StringWriter())
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(text, entryMain);
-                    resulte = text.ToString();
-                }
-                //将空词条添加到数据库中 目的是为了获取索引
-                var entry = new Entry
-                {
-                    Type = model.Type,
-                    LastEditTime = DateTime.Now.ToCstTime()
-                };
-                entry = await _entryRepository.InsertAsync(entry);
-                //初始化列表
-                entry.Information = new List<BasicEntryInformation>();
-                entry.Relevances = new List<EntryRelevance>();
-                entry.Pictures = new List<EntryPicture>();
-
-                //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                {
-                    await _examineService.ExamineEstablishMainAsync(entry, entryMain);
-                    await _examineService.UniversalEstablishExaminedAsync(entry, user, true, resulte, Operation.EstablishMain, model.Note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, Operation.EstablishMain);
-
-                }
-                else
-                {
-                    await _examineService.UniversalEstablishExaminedAsync(entry, user, false, resulte, Operation.EstablishMain, model.Note);
-                }
+                newEntry.Name = model.Name;
+                newEntry.BriefIntroduction = model.BriefIntroduction;
+                newEntry.MainPicture = model.MainPicture;
+                newEntry.Thumbnail = model.Thumbnail;
+                newEntry.BackgroundPicture = model.BackgroundPicture;
+                newEntry.Type = model.Type;
+                newEntry.DisplayName = model.DisplayName;
+                newEntry.SmallBackgroundPicture = model.SmallBackgroundPicture;
+                newEntry.AnotherName = model.AnotherName;
 
                 //第二步 建立词条附加信息
                 //根据类别进行序列化操作
-                var basics = new List<BasicEntryInformation>();
                 switch (model.Type)
                 {
                     case EntryType.Game:
+                        //遍历一遍当前视图中staffs 
+                        foreach (var item in model.InforStaffs)
+                        {
+
+                            var staffs = new List<BasicEntryInformationAdditional>
+                        {
+                            new BasicEntryInformationAdditional { DisplayName = "职位（官方称呼）", DisplayValue = item.PositionOfficial },
+                            new BasicEntryInformationAdditional { DisplayName = "昵称（官方称呼）", DisplayValue = item.NicknameOfficial },
+                            new BasicEntryInformationAdditional { DisplayName = "职位（通用）", DisplayValue = item.PositionGeneral.ToString() },
+                            new BasicEntryInformationAdditional { DisplayName = "角色", DisplayValue = item.Role },
+                            new BasicEntryInformationAdditional { DisplayName = "隶属组织", DisplayValue = item.SubordinateOrganization },
+                            new BasicEntryInformationAdditional { DisplayName = "子项目", DisplayValue = item.Subcategory }
+                        };
+                            newEntry.Information.Add(new BasicEntryInformation
+                            {
+                                Modifier = "STAFF",
+                                DisplayName = item.Subcategory + item.PositionOfficial,
+                                DisplayValue = item.NicknameOfficial,
+                                Additional = staffs
+                            });
+                        }
                         //序列化游戏平台
                         string gamePlatforms = null;
                         var isFirst = true;
@@ -2216,96 +1796,43 @@ namespace CnGalWebSite.APIServer.Controllers
                                 gamePlatforms += item.GamePlatformType.ToString();
                             }
                         }
-                        if (model.InforStaffs != null)
-                        {
-                            //序列化STAFF
-                            foreach (var item in model.InforStaffs)
-                            {
-
-                                var staffs = new List<BasicEntryInformationAdditional>
-                                {
-                                    new BasicEntryInformationAdditional { DisplayName = "职位（官方称呼）", DisplayValue = item.PositionOfficial },
-                                    new BasicEntryInformationAdditional { DisplayName = "昵称（官方称呼）", DisplayValue = item.NicknameOfficial },
-                                    new BasicEntryInformationAdditional { DisplayName = "职位（通用）", DisplayValue = item.PositionGeneral.ToString() },
-                                    new BasicEntryInformationAdditional { DisplayName = "角色", DisplayValue = item.Role },
-                                    new BasicEntryInformationAdditional { DisplayName = "子项目", DisplayValue = item.Subcategory },
-                                    new BasicEntryInformationAdditional { DisplayName = "隶属组织", DisplayValue = item.SubordinateOrganization }
-                                };
-                                basics.Add(new BasicEntryInformation { Modifier = "STAFF", DisplayName = item.PositionOfficial, DisplayValue = item.NicknameOfficial, Additional = staffs });
-
-                            }
-                        }
-
-
                         //添加基本信息
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行时间", DisplayValue = model.IssueTime?.ToString("yyyy年M月d日") });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行时间备注", DisplayValue = model.IssueTimeString });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "原作", DisplayValue = model.Original });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "制作组", DisplayValue = model.ProductionGroup });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "游戏平台", DisplayValue = gamePlatforms });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "引擎", DisplayValue = model.Engine });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行商", DisplayValue = model.Publisher });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行方式", DisplayValue = model.IssueMethod });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "官网", DisplayValue = model.OfficialWebsite });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "Steam平台Id", DisplayValue = model.SteamId });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "QQ群", DisplayValue = model.QQgroupGame });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行时间", DisplayValue = model.IssueTime?.ToString("yyyy年M月d日") });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行时间备注", DisplayValue = model.IssueTimeString });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "原作", DisplayValue = model.Original });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "制作组", DisplayValue = model.ProductionGroup });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "游戏平台", DisplayValue = gamePlatforms });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "引擎", DisplayValue = model.Engine });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行商", DisplayValue = model.Publisher });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行方式", DisplayValue = model.IssueMethod });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "官网", DisplayValue = model.OfficialWebsite });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "Steam平台Id", DisplayValue = model.SteamId });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "QQ群", DisplayValue = model.QQgroupGame });
                         break;
                     case EntryType.ProductionGroup:
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "QQ群", DisplayValue = model.QQgroupGroup });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "QQ群", DisplayValue = model.QQgroupGroup });
                         break;
                     case EntryType.Role:
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "声优", DisplayValue = model.CV });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "性别", DisplayValue = model.Gender.ToString() });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身材数据", DisplayValue = model.FigureData });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身材(主观)", DisplayValue = model.FigureSubjective });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "生日", DisplayValue = model.Birthday?.ToString("M月d日") });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发色", DisplayValue = model.Haircolor });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "瞳色", DisplayValue = model.Pupilcolor });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "性格", DisplayValue = model.Character });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "角色身份", DisplayValue = model.RoleIdentity });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "血型", DisplayValue = model.BloodType });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身高", DisplayValue = model.RoleHeight });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "兴趣", DisplayValue = model.RoleTaste });
-                        basics.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "年龄", DisplayValue = model.RoleAge });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "声优", DisplayValue = model.CV });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "性别", DisplayValue = model.Gender.ToString() });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身材数据", DisplayValue = model.FigureData });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身材(主观)", DisplayValue = model.FigureSubjective });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "生日", DisplayValue = model.Birthday?.ToString("M月d日") });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发色", DisplayValue = model.Haircolor });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "瞳色", DisplayValue = model.Pupilcolor });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "性格", DisplayValue = model.Character });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "角色身份", DisplayValue = model.RoleIdentity });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "血型", DisplayValue = model.BloodType });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身高", DisplayValue = model.RoleHeight });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "兴趣", DisplayValue = model.RoleTaste });
+                        newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "年龄", DisplayValue = model.RoleAge });
+
+
                         break;
                     case EntryType.Staff:
-
                         break;
                 }
-
-
-                //新建审核数据对象
-                var entryAddInfor = new EntryAddInfor
-                {
-                    Information = new List<BasicEntryInformation_>()
-                };
-                //添加修改记录
-                foreach (var item in basics)
-                {
-                    List<BasicEntryInformationAdditional_> addInfors = null;
-                    if (item.Additional != null)
-                    {
-                        addInfors = new List<BasicEntryInformationAdditional_>();
-                        foreach (var item_1 in item.Additional)
-                        {
-                            addInfors.Add(new BasicEntryInformationAdditional_
-                            {
-                                DisplayName = item_1.DisplayName,
-                                DisplayValue = item_1.DisplayValue,
-                                IsDelete = false
-                            });
-                        }
-
-                    }
-                    entryAddInfor.Information.Add(new BasicEntryInformation_
-                    {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.DisplayValue,
-                        IsDelete = false,
-                        Additional = addInfors,
-                        Modifier = item.Modifier
-                    });
-                }
+                //序列化相关网站
 
                 //加载在基本信息中的网站
                 if (string.IsNullOrWhiteSpace(model.WeiboId) == false)
@@ -2380,245 +1907,130 @@ namespace CnGalWebSite.APIServer.Controllers
                         Link = "https://www.facebook.com/" + model.FacebookId
                     });
                 }
-                //序列化相关网站
-                if (model.SocialPlatforms != null)
-                {
-                    //遍历一遍当前视图中 相关网站
-                    foreach (var item in model.SocialPlatforms)
-                    {
-                        entryAddInfor.Information.Add(new BasicEntryInformation_ { Modifier = "相关网站", DisplayName = item.Name, DisplayValue = item.Link, IsDelete = false });
-                    }
-                }
-                //如果 DisplayValue 为null 则不添加审核记录
-                for (var i = 0; i < entryAddInfor.Information.Count; i++)
-                {
-                    if (entryAddInfor.Information[i].IsDelete == false && entryAddInfor.Information[i].DisplayValue == null)
-                    {
-                        entryAddInfor.Information.RemoveAt(i);
-                        i--;
-                    }
-                }
-                //判断审核是否为空
-                if (entryAddInfor.Information.Count != 0)
-                { //序列化
-                    resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, entryAddInfor);
-                        resulte = text.ToString();
-                    }
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEstablishAddInforAsync(entry, entryAddInfor);
-                        await _examineService.UniversalEstablishExaminedAsync(entry, user, true, resulte, Operation.EstablishAddInfor, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, Operation.EstablishAddInfor);
 
-                    }
-                    else
+
+                //遍历一遍当前视图中 相关网站
+                foreach (var item in model.SocialPlatforms)
+                {
+                    newEntry.Information.Add(new BasicEntryInformation
                     {
-                        await _examineService.UniversalEstablishExaminedAsync(entry, user, false, resulte, Operation.EstablishAddInfor, model.Note);
-                    }
+                        Modifier = "相关网站",
+                        DisplayName = item.Name,
+                        DisplayValue = item.Link
+                    });
                 }
+
+                var tempList = newEntry.Information.ToList();
+                tempList.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayValue));
+                newEntry.Information = tempList;
 
                 //第三步 建立词条图片
 
-                //创建审核数据模型
-                entry.Pictures = new List<EntryPicture>();
+                foreach (var item in model.Images)
+                {
 
-                var entryImages = new EntryImages
-                {
-                    Images = new List<EntryImage>()
-                };
-                if (model.Images != null)
-                {
-                    foreach (var item in model.Images)
+                    newEntry.Pictures.Add(new EntryPicture
                     {
-                        if (item.Url != "app.png")
-                        {
-                            //复制到审核的列表中
-                            entryImages.Images.Add(new EntryImage
-                            {
-                                Url = item.Url,
-                                Note = item.Note,
-                                Modifier = item.Modifier,
-                                IsDelete = false
-                            });
-                        }
-                    }
+                        Url = item.Url,
+                        Modifier = item.Modifier,
+                        Note = item.Note
+                    });
+
                 }
-
-                //判断审核是否为空
-                if (entryImages.Images.Count != 0)
-                {
-                    //序列化JSON
-                    resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, entryImages);
-                        resulte = text.ToString();
-                    }
-
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEstablishImagesAsync(entry, entryImages);
-                        await _examineService.UniversalEstablishExaminedAsync(entry, user, true, resulte, Operation.EstablishImages, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, Operation.EstablishImages);
-
-                    }
-                    else
-                    {
-                        await _examineService.UniversalEstablishExaminedAsync(entry, user, false, resulte, Operation.EstablishImages, model.Note);
-                    }
-                }
-
 
                 //第四步 建立词条关联信息
 
-                //创建审核数据模型
-                var entryRelevances = new EntryRelevances();
+                //获取词条文章
+                var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
+                var articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
 
-                //处理关联词条
-
-                //添加新建项目
-                foreach (var item in entryIds.Where(s => entryRelevances.Relevances.Where(s => s.Type == RelevancesType.Entry).Select(s => s.DisplayName).Contains(s.ToString()) == false))
+                newEntry.Articles = articles;
+                newEntry.EntryRelationFromEntryNavigation = entries.Select(s => new EntryRelation
                 {
-                    entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
-                    {
-                        DisplayName = item.ToString(),
-                        Type = RelevancesType.Entry,
-                        IsDelete = false
-                    });
-
-                }
-
-
-
-                //处理关联文章
-
-                //添加新建项目
-                foreach (var item in articleIds.Where(s => entryRelevances.Relevances.Where(s => s.Type == RelevancesType.Article).Select(s => s.DisplayName).Contains(s.ToString()) == false))
-                {
-                    entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
-                    {
-                        DisplayName = item.ToString(),
-                        Type = RelevancesType.Article,
-                        IsDelete = false
-                    });
-
-                }
-                //处理外部链接
+                    ToEntry = s.Id,
+                    ToEntryNavigation = s
+                }).ToList();
 
                 //循环查找外部链接是否相同
                 foreach (var item in model.Others)
                 {
 
-                    entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                    newEntry.Outlinks.Add(new Outlink
                     {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.DisPlayValue,
-                        Type = RelevancesType.Outlink,
+                        Name = item.DisplayName,
+                        BriefIntroduction = item.DisPlayValue,
                         Link = item.Link,
-                        IsDelete = false
                     });
-
                 }
 
-
-
-
-                //判断审核是否为空
-                if (entryRelevances.Relevances.Count != 0)
-                {
-
-                    //序列化JSON
-                    resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, entryRelevances);
-                        resulte = text.ToString();
-                    }
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEstablishRelevancesAsync(entry, entryRelevances);
-                        await _examineService.UniversalEstablishExaminedAsync(entry, user, true, resulte, Operation.EstablishRelevances, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, Operation.EstablishRelevances);
-
-                    }
-                    else
-                    {
-                        await _examineService.UniversalEstablishExaminedAsync(entry, user, false, resulte, Operation.EstablishRelevances, model.Note);
-                    }
-                }
 
                 //第五步 建立词条主页
-                //判断是否为空
-                if (string.IsNullOrWhiteSpace(model.Context) == false)
-                {
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEstablishMainPageAsync(entry, model.Context);
-                        await _examineService.UniversalEstablishExaminedAsync(entry, user, true, model.Context, Operation.EstablishMainPage, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, Operation.EstablishMainPage);
-
-                    }
-                    else
-                    {
-                        await _examineService.UniversalEstablishExaminedAsync(entry, user, false, model.Context, Operation.EstablishMainPage, model.Note);
-                    }
-                }
+                newEntry.MainPage = model.Context;
 
                 //第六步 建立词条标签
-                //创建审核数据模型
-                var examinedModel = new EntryTags();
+                newEntry.Tags = tags;
 
-                //添加新建项目
-                foreach (var item in tagIds)
+                //获取审核记录
+                var examines = _entryService.ExaminesCompletion(new Entry(), newEntry);
+
+                if (examines.Any(s => s.Value == Operation.EstablishMain) == false)
                 {
-                    examinedModel.Tags.Add(new EntryTagsAloneModel
-                    {
-                        TagId = item,
-                        IsDelete = false
-                    });
-
+                    return new Result { Successful = false, Error = "无法获取主要信息审核记录，请联系管理员" };
                 }
+                var entry = new Entry();
 
-                //判断审核是否为空
-                if (examinedModel.Tags.Count != 0)
+                entry = await _entryRepository.InsertAsync(entry);
+
+                examines = examines.OrderBy(s => s.Value).ToList();
+                foreach (var item in examines)
                 {
-                    //序列化JSON
-                    resulte = "";
+
+                    var resulte = "";
                     using (TextWriter text = new StringWriter())
                     {
                         var serializer = new JsonSerializer();
-                        serializer.Serialize(text, examinedModel);
+                        serializer.Serialize(text, item.Key);
                         resulte = text.ToString();
                     }
-                    //判断是否是管理员
                     if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
-                        await _examineService.ExamineEstablishTagsAsync(entry, examinedModel);
-                        await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishTags, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, Operation.EstablishTags);
+                        switch (item.Value)
+                        {
+                            case Operation.EstablishMain:
+                                await _examineService.ExamineEstablishMainAsync(entry, item.Key as EntryMain);
+                                break;
+                            case Operation.EstablishAddInfor:
+                                await _examineService.ExamineEstablishAddInforAsync(entry, item.Key as EntryAddInfor);
+                                break;
+                            case Operation.EstablishMainPage:
+                                await _examineService.ExamineEstablishMainPageAsync(entry, item.Key as string);
+                                break;
+                            case Operation.EstablishImages:
+                                await _examineService.ExamineEstablishImagesAsync(entry, item.Key as EntryImages);
+                                break;
+                            case Operation.EstablishRelevances:
+                                await _examineService.ExamineEstablishRelevancesAsync(entry, item.Key as EntryRelevances);
+                                break;
+                            case Operation.EstablishTags:
+                                await _examineService.ExamineEstablishTagsAsync(entry, item.Key as EntryTags);
+                                break;
+                            default:
+                                throw new Exception("不支持的类型");
+                        }
+
+                        await _examineService.UniversalEstablishExaminedAsync(entry, user, true, resulte, item.Value, model.Note);
+                        await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, item.Value);
                     }
                     else
                     {
-                        await _examineService.UniversalEditExaminedAsync(entry, user, false, resulte, Operation.EstablishTags, model.Note);
+                        await _examineService.UniversalEditExaminedAsync(entry, user, false, resulte, item.Value, model.Note);
                     }
-
                 }
-
 
                 //创建词条成功
                 return new Result { Successful = true, Error = entry.Id.ToString() };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return new Result { Error = "创建词条的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
             }
@@ -2699,90 +2111,62 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = "当前词条该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }
             //查找词条
-            var entry = await _entryRepository.GetAll()
-                  .Include(s => s.Tags)
-                  .FirstOrDefaultAsync(x => x.Id == model.Id);
-            if (entry == null)
+            var newEntry = await _entryRepository.GetAll().Include(s => s.Tags).FirstOrDefaultAsync(x => x.Id == model.Id);
+            var currentEntry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Tags).FirstOrDefaultAsync(x => x.Id == model.Id);
+            if (newEntry == null)
             {
                 return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
             }
 
             //预处理 建立词条关联信息
             //判断关联是否存在
-            var tagIds = new List<int>();
+            var tags = new List<Tag>();
 
             var tagNames = new List<string>();
             tagNames.AddRange(model.Tags.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+            tagNames = tagNames.Distinct().ToList();
 
             foreach (var item in tagNames)
             {
-                var infor = await _tagRepository.GetAll().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
-                if (infor <= 0)
+                var infor = await _tagRepository.GetAll().Where(s => s.Name == item).FirstOrDefaultAsync();
+                if (infor==null)
                 {
                     return new Result { Successful = false, Error = "标签 " + item + " 不存在" };
                 }
                 else
                 {
-                    tagIds.Add(infor);
+                    tags.Add(infor);
                 }
             }
-            //删除重复数据
-            tagIds = tagIds.Distinct().ToList();
+            newEntry.Tags = tags;
 
+            var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
 
-            //创建审核数据模型
-            var examinedModel = new EntryTags();
-
-            //遍历当前词条数据 打上删除标签
-            foreach (var item in entry.Tags)
-            {
-                examinedModel.Tags.Add(new EntryTagsAloneModel
-                {
-                    TagId = item.Id,
-                    IsDelete = true,
-                });
-            }
-
-            //再遍历视图 对应修改
-
-            //添加新建项目
-            foreach (var item in tagIds.Where(s => examinedModel.Tags.Select(s => s.TagId).Contains(s) == false))
-            {
-                examinedModel.Tags.Add(new EntryTagsAloneModel
-                {
-                    TagId = item,
-                    IsDelete = false
-                });
-
-            }
-            //删除不存在的老项目
-            examinedModel.Tags.RemoveAll(s => tagIds.Contains(s.TagId) && s.IsDelete);
-
-            //判断审核是否为空
-            if (examinedModel.Tags.Count == 0)
+            if (examines.Any(s => s.Value == Operation.EstablishTags) == false)
             {
                 return new Result { Successful = true };
             }
-
-            //序列化JSON
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishTags);
+            //序列化
             var resulte = "";
             using (TextWriter text = new StringWriter())
             {
                 var serializer = new JsonSerializer();
-                serializer.Serialize(text, examinedModel);
+                serializer.Serialize(text, examine.Key);
                 resulte = text.ToString();
             }
             //判断是否是管理员
             if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
-                await _examineService.ExamineEstablishTagsAsync(entry, examinedModel);
-                await _examineService.UniversalEditExaminedAsync(entry, user, true, resulte, Operation.EstablishTags, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, Operation.EstablishTags);
+                await _examineService.ExamineEstablishTagsAsync(currentEntry, examine.Key as EntryTags);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishTags, model.Note);
+                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishTags);
             }
             else
             {
-                await _examineService.UniversalEditExaminedAsync(entry, user, false, resulte, Operation.EstablishTags, model.Note);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishRelevances, model.Note);
             }
+
             return new Result { Successful = true };
 
         }

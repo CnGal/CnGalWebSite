@@ -39,5 +39,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
         Task<EntryEditState> GetEntryEditState(ApplicationUser user, int entryId);
 
         Task<EntryIndexViewModel> GetEntryIndexViewModelAsync(Entry entry);
+
+        List<KeyValuePair<object, Operation>> ExaminesCompletion(Entry currentEntry, Entry newEntry);
     }
 }

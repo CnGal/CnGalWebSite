@@ -3,6 +3,7 @@ using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
@@ -12,6 +13,7 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -20,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using TencentCloud.Cme.V20191029.Models;
 
 namespace CnGalWebSite.APIServer.Application.Entries
 {
@@ -284,140 +287,115 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         public void UpdateEntryDataAddInfor(Entry entry, EntryAddInfor examine)
         {
-            try
+
+            foreach (var item in examine.Information)
             {
-                //序列化附加信息列表
-                //先读取词条信息
-                var information = entry.Information;
-
-                foreach (var item in examine.Information)
+                var entryInformation = entry.Information.FirstOrDefault(s => s.Modifier == item.Modifier && s.DisplayValue == item.DisplayValue && s.DisplayName == item.DisplayName);
+                if (entryInformation != null)
                 {
-                    var isAdd = false;
-
-                    //遍历信息列表寻找关键词
-                    foreach (var infor in information)
+                    if (item.IsDelete)
                     {
-                        //主键值判断条件要修改
-                        if (infor.DisplayName == item.DisplayName && infor.DisplayValue == item.DisplayValue)
-                        {
-                            //查看是否为删除操作
-                            if (item.IsDelete == true)
-                            {
-                                information.Remove(infor);
-                                isAdd = true;
-                                break;
-                            }
-                            else
-                            {
-                                infor.DisplayName = item.DisplayName;
-                                infor.DisplayValue = item.DisplayValue;
-                                if (item.Additional != null)
-                                {
-                                    for (var i = 0; i < item.Additional.Count; i++)
-                                    {
-                                        if (item.Additional[i].IsDelete == false)
-                                        {
-                                            infor.Additional.Add(new BasicEntryInformationAdditional
-                                            {
-                                                DisplayName = item.Additional[i].DisplayName,
-                                                DisplayValue = item.Additional[i].DisplayValue
-                                            });
-                                        }
-                                        else
-                                        {
-                                            //如果是删除则循环查找
-                                            foreach (var nal in infor.Additional)
-                                            {
-                                                if (nal.DisplayName == item.Additional[i].DisplayName && nal.DisplayValue == item.Additional[i].DisplayValue)
-                                                {
-                                                    infor.Additional.Remove(nal);
-                                                    break;
-                                                }
-                                            }
-
-                                        }
-
-                                    }
-                                }
-
-                                isAdd = true;
-                                break;
-                            }
-                        }
-
-
+                        entry.Information.Remove(entryInformation);
+                        continue;
                     }
-                    if (isAdd == false && item.IsDelete == false)
+                    if(item.Additional==null)
                     {
-                        //没有找到关键词 则新建关键词
-                        var temp = new BasicEntryInformation
+                        continue;
+                    }
+                    foreach (var temp in item.Additional)
+                    {
+                        var entryAdditional = entryInformation.Additional.FirstOrDefault(s => s.DisplayName == temp.DisplayName);
+                        if (entryAdditional != null)
+                        {
+                            if (temp.IsDelete)
+                            {
+                                entryInformation.Additional.Remove(entryAdditional);
+                                continue;
+                            }
+
+                            entryAdditional.DisplayValue = temp.DisplayValue;
+                        }
+                        else
+                        {
+                            if (temp.IsDelete == false)
+                            {
+                                entryInformation.Additional.Add(new BasicEntryInformationAdditional
+                                {
+                                    DisplayName = temp.DisplayName,
+                                    DisplayValue = temp.DisplayValue,
+                                });
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    if (item.IsDelete == false)
+                    {
+                        entryInformation = new BasicEntryInformation
                         {
                             Modifier = item.Modifier,
                             DisplayName = item.DisplayName,
                             DisplayValue = item.DisplayValue,
-                            Additional = new List<BasicEntryInformationAdditional>()
                         };
-                        if (item.Additional != null)
+                        entry.Information.Add(entryInformation);
+
+                        if (item.Additional == null)
                         {
-                            for (var i = 0; i < item.Additional.Count; i++)
+                            continue;
+                        }
+                        foreach (var temp in item.Additional)
+                        {
+                            if (temp.IsDelete == false)
                             {
-                                if (item.Additional[i].IsDelete == false)
+                                entryInformation.Additional.Add(new BasicEntryInformationAdditional
                                 {
-                                    temp.Additional.Add(new BasicEntryInformationAdditional
-                                    {
-                                        DisplayName = item.Additional[i].DisplayName,
-                                        DisplayValue = item.Additional[i].DisplayValue
-                                    });
-                                }
+                                    DisplayName = temp.DisplayName,
+                                    DisplayValue = temp.DisplayValue,
+                                });
                             }
                         }
-
-                        information.Add(temp);
                     }
+                }
 
-
-                    if (item.IsDelete == false)
+                //更新部分重要信息缓存
+                if (item.IsDelete == false)
+                {
+                    if (entry.Type == EntryType.Game)
                     {
-                        if (entry.Type == EntryType.Game)
+                        if (item.Modifier == "基本信息")
                         {
-                            if (item.Modifier == "基本信息")
+                            //查找是否修改发行时间 对下文不影响 只是更新字段缓存
+                            if (item.DisplayName == "发行时间")
                             {
-                                //查找是否修改发行时间 对下文不影响 只是更新字段缓存
-                                if (item.DisplayName == "发行时间")
+                                try
+                                {
+                                    entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy年M月d日", null);
+                                }
+                                catch
                                 {
                                     try
                                     {
-                                        entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy年M月d日", null);
+                                        entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy/M/d", null);
                                     }
                                     catch
                                     {
-                                        try
-                                        {
-                                            entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy/M/d", null);
-                                        }
-                                        catch
-                                        {
 
-                                        }
                                     }
                                 }
-                                else if (item.DisplayName == "Steam平台Id")
-                                {
-                                    if (string.IsNullOrWhiteSpace(item.DisplayValue) == false && string.IsNullOrWhiteSpace(entry.MainPicture))
-                                    {
-                                        entry.MainPicture = "https://media.st.dl.pinyuncloud.com/steam/apps/" + item.DisplayValue + "/header.jpg";
-                                    }
-                                }
-
                             }
+                            else if (item.DisplayName == "Steam平台Id")
+                            {
+                                if (string.IsNullOrWhiteSpace(item.DisplayValue) == false && string.IsNullOrWhiteSpace(entry.MainPicture))
+                                {
+                                    entry.MainPicture = "https://media.st.dl.pinyuncloud.com/steam/apps/" + item.DisplayValue + "/header.jpg";
+                                }
+                            }
+
                         }
                     }
-
                 }
-            }
-            catch
-            {
-
             }
 
             //更新最后编辑时间
@@ -548,13 +526,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         if (item.IsDelete == true)
                         {
                             relevances.Remove(infor);
-                            isAdd = true;
-                            break;
                         }
-                        else
-                        {
-                            break;
-                        }
+                        isAdd = true;
+                        break;
                     }
                 }
                 if (isAdd == false && item.IsDelete == false)
@@ -600,13 +574,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         if (item.IsDelete == true)
                         {
                             relevances.Remove(infor);
-                            isAdd = true;
-                            break;
+                           
                         }
-                        else
-                        {
-                            break;
-                        }
+                        isAdd = true;
+                        break;
                     }
                 }
                 if (isAdd == false && item.IsDelete == false)
@@ -738,6 +709,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 case Operation.EstablishMainPage:
                     UpdateEntryDataMainPage(entry, examine.Context);
                     break;
+                default:
+                    throw new InvalidOperationException("不支持的操作");
             }
         }
 
@@ -1373,6 +1346,357 @@ namespace CnGalWebSite.APIServer.Application.Entries
             model.Staffs = staffInforModel;
 
             return model;
+        }
+
+        public List<KeyValuePair<object, Operation>> ExaminesCompletion(Entry currentEntry, Entry newEntry)
+        {
+            var examines = new List<KeyValuePair<object, Operation>>();
+            //第一部分 主要信息
+            //判断是否被修改
+            if (currentEntry.SmallBackgroundPicture != newEntry.SmallBackgroundPicture || currentEntry.Name != newEntry.Name || currentEntry.BriefIntroduction != newEntry.BriefIntroduction
+                || currentEntry.MainPicture != newEntry.MainPicture || currentEntry.Thumbnail != newEntry.Thumbnail || currentEntry.BackgroundPicture != newEntry.BackgroundPicture
+                || currentEntry.Type != newEntry.Type || currentEntry.DisplayName != newEntry.DisplayName || currentEntry.AnotherName != newEntry.AnotherName)
+            {
+                //添加修改记录
+                //新建审核数据对象
+                var entryMain = new EntryMain
+                {
+                    Name = newEntry.Name,
+                    BriefIntroduction = newEntry.BriefIntroduction,
+                    MainPicture = newEntry.MainPicture,
+                    Thumbnail = newEntry.Thumbnail,
+                    BackgroundPicture = newEntry.BackgroundPicture,
+                    Type = newEntry.Type,
+                    DisplayName = newEntry.DisplayName,
+                    SmallBackgroundPicture = newEntry.SmallBackgroundPicture,
+                    AnotherName = newEntry.AnotherName
+                };
+                examines.Add(new KeyValuePair<object, Operation>(entryMain, Operation.EstablishMain));
+            }
+
+            //第二部分 附加信息
+            var entryAddInfor = new EntryAddInfor();
+
+            //先将所有信息打上删除标签
+            foreach (var item in currentEntry.Information)
+            {
+                var additional_s = new List<BasicEntryInformationAdditional_>();
+                foreach (var temp in item.Additional)
+                {
+                    additional_s.Add(new BasicEntryInformationAdditional_ { DisplayName = temp.DisplayName, DisplayValue = temp.DisplayValue, IsDelete = true });
+                }
+                entryAddInfor.Information.Add(new BasicEntryInformation_ { Modifier = item.Modifier, DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = true, Additional = additional_s });
+            }
+            //再对比当前
+            foreach (var item in newEntry.Information)
+            {
+                var isSame = false;
+                foreach (var infor in entryAddInfor.Information)
+                {
+                    if (item.DisplayName == infor.DisplayName && item.DisplayValue == infor.DisplayValue && item.Modifier == infor.Modifier)
+                    {
+                        isSame = true;
+                        //如果两次一致 删除上一步中的项目
+                        foreach (var temp1 in item.Additional)
+                        {
+                            var isSameIn = false;
+                            foreach (var temp in infor.Additional)
+                            {
+                                if (temp.DisplayName == temp1.DisplayName)
+                                {
+                                    if (temp.DisplayValue == temp1.DisplayValue)
+                                    {
+                                        infor.Additional.Remove(temp);
+
+                                    }
+                                    else
+                                    {
+                                        temp.DisplayValue = temp1.DisplayValue;
+                                        temp.IsDelete = false;
+                                    }
+                                    isSameIn = true;
+                                    break;
+                                }
+                            }
+                            if (isSameIn == false)
+                            {
+                                infor.Additional.Add(new BasicEntryInformationAdditional_
+                                {
+                                    DisplayName = temp1.DisplayName,
+                                    DisplayValue = temp1.DisplayValue,
+                                    IsDelete = false,
+                                });
+                            }
+                        }
+                        if (infor.Additional.Any() == false)
+                        {
+                            entryAddInfor.Information.Remove(infor);
+                        }
+                        else
+                        {
+                            infor.IsDelete = false;
+                        }
+
+                        break;
+                    }
+                }
+                if (isSame == false)
+                {
+                    var staffs = new List<BasicEntryInformationAdditional_>();
+                    entryAddInfor.Information.Add(new BasicEntryInformation_
+                    {
+                        Modifier = item.Modifier,
+                        DisplayName = item.DisplayName,
+                        DisplayValue = item.DisplayValue,
+                        Additional = item.Additional.Select(s => new BasicEntryInformationAdditional_
+                        {
+                            DisplayName = s.DisplayName,
+                            DisplayValue = s.DisplayValue,
+                            IsDelete = false,
+                        }).ToList(),
+                        IsDelete = false
+                    });
+                }
+            }
+
+            if (entryAddInfor.Information.Count != 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(entryAddInfor, Operation.EstablishAddInfor));
+
+            }
+
+            //第三部分 图片
+            var entryImages = new EntryImages();
+            //先把 当前词条中的图片 都 打上删除标签
+            foreach (var item in currentEntry.Pictures)
+            {
+                entryImages.Images.Add(new EntryImage
+                {
+                    Url = item.Url,
+                    Note = item.Note,
+                    Modifier = item.Modifier,
+                    IsDelete = true
+                });
+            }
+            //再对比当前
+            foreach (var infor in newEntry.Pictures)
+            {
+                var isSame = false;
+                foreach (var item in entryImages.Images)
+                {
+                    if (item.Url == infor.Url)
+                    {
+                        if (item.Note != infor.Note || item.Modifier != infor.Modifier)
+                        {
+                            item.Modifier = infor.Modifier;
+                            item.IsDelete = false;
+                            item.Note = infor.Note;
+                        }
+                        else
+                        {
+                            entryImages.Images.Remove(item);
+                            isSame = true;
+
+                        }
+                        break;
+
+                    }
+                }
+                if (isSame == false)
+                {
+                    entryImages.Images.Add(new EntryImage
+                    {
+                        Url = infor.Url,
+                        Modifier = infor.Modifier,
+                        Note = infor.Note,
+                        IsDelete = false
+                    });
+                }
+            }
+
+            if (entryImages.Images.Count != 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(entryImages, Operation.EstablishImages));
+
+            }
+
+            //第四部分 关联信息
+            //创建审核数据模型
+            var entryRelevances = new EntryRelevances();
+
+            //处理关联词条
+
+            //遍历当前词条数据 打上删除标签
+            foreach (var item in currentEntry.EntryRelationFromEntryNavigation.Select(s => s.ToEntryNavigation))
+            {
+                entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                {
+                    DisplayName = item.Id.ToString(),
+                    DisplayValue = item.Name,
+                    Type = RelevancesType.Entry,
+                    IsDelete = true,
+                });
+            }
+
+            //再遍历视图 对应修改
+
+            //添加新建项目
+            foreach (var item in newEntry.EntryRelationFromEntryNavigation)
+            {
+                var temp = entryRelevances.Relevances.FirstOrDefault(s => s.Type == RelevancesType.Entry && s.DisplayName == item.ToEntry.ToString());
+                if (temp != null)
+                {
+                    entryRelevances.Relevances.Remove(temp);
+                }
+                else
+                {
+                    entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                    {
+                        DisplayName = item.ToEntry.ToString(),
+                        DisplayValue=item.ToEntryNavigation.Name,
+                        Type = RelevancesType.Entry,
+                        IsDelete = false
+                    });
+                }
+            }
+
+            //处理关联文章
+            //遍历当前文章数据 打上删除标签
+            foreach (var item in currentEntry.Articles)
+            {
+                entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                {
+                    DisplayName = item.Id.ToString(),
+                    DisplayValue = item.Name,
+                    Type = RelevancesType.Article,
+                    IsDelete = true,
+                });
+            }
+
+            //再遍历视图 对应修改
+
+            //添加新建项目
+            foreach (var item in newEntry.Articles)
+            {
+                var temp = entryRelevances.Relevances.FirstOrDefault(s => s.Type == RelevancesType.Article && s.DisplayName == item.Id.ToString());
+                if (temp != null)
+                {
+                    entryRelevances.Relevances.Remove(temp);
+                }
+                else
+                {
+                    entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                    {
+                        DisplayName = item.Id.ToString(),
+                        DisplayValue = item.Name,
+                        Type = RelevancesType.Article,
+                        IsDelete = false
+                    });
+                }
+            }
+
+            //处理外部链接
+
+            //遍历当前词条外部链接 打上删除标签
+            foreach (var item in currentEntry.Outlinks)
+            {
+                entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                {
+                    DisplayName = item.Name,
+                    DisplayValue = item.BriefIntroduction,
+                    IsDelete = true,
+                    Type = RelevancesType.Outlink,
+                    Link = item.Link
+                });
+            }
+
+
+            //循环查找外部链接是否相同
+            foreach (var infor in newEntry.Outlinks)
+            {
+                var isSame = false;
+                foreach (var item in entryRelevances.Relevances.Where(s=>s.Type==RelevancesType.Outlink))
+                {
+                    if (item.DisplayName == infor.Name)
+                    {
+                        if (item.DisplayValue != infor.BriefIntroduction || item.Link != infor.Link)
+                        {
+                            item.DisplayValue = infor.BriefIntroduction;
+                            item.IsDelete = false;
+                            item.Link = infor.Link;
+                        }
+                        else
+                        {
+                            entryRelevances.Relevances.Remove(item);
+                            isSame = true;
+                        }
+                        break;
+
+                    }
+                }
+                if (isSame == false)
+                {
+                    entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                    {
+                        DisplayName = infor.Name,
+                        DisplayValue = infor.BriefIntroduction,
+                        Link = infor.Link,
+                        Type= RelevancesType.Outlink,
+                        IsDelete = false
+                    });
+                }
+            }
+
+            if (entryRelevances.Relevances.Count != 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(entryRelevances, Operation.EstablishRelevances));
+            }
+
+            //第五部分 主页
+            if (newEntry.MainPage!=currentEntry.MainPage)
+            {
+                //序列化
+                var resulte = newEntry.MainPage;
+                examines.Add(new KeyValuePair<object, Operation>(resulte, Operation.EstablishMainPage));
+            }
+
+            //第六部分 标签
+            var entryTags = new EntryTags();
+
+            //遍历当前数据 打上删除标签
+            foreach (var item in currentEntry.Tags)
+            {
+                entryTags.Tags.Add(new EntryTagsAloneModel
+                {
+                    TagId = item.Id,
+                    IsDelete = true,
+                });
+            }
+
+            //添加新建项目
+            foreach (var item in newEntry.Tags)
+            {
+                var temp = entryTags.Tags.FirstOrDefault(s => s.TagId==item.Id);
+                if (temp != null)
+                {
+                    entryTags.Tags.Remove(temp);
+                }
+                else
+                {
+                    entryTags.Tags.Add(new EntryTagsAloneModel
+                    {
+                        TagId = item.Id,
+                        IsDelete = false
+                    });
+                }
+            }
+
+            if (entryTags.Tags.Count != 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(entryTags, Operation.EstablishTags));
+            }
+
+            return examines;
         }
 
     }

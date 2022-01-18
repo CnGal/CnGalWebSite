@@ -6,6 +6,7 @@ using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Tables;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.TimedTasks;
@@ -27,11 +28,12 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         private readonly IPerfectionService _perfectionService;
         private readonly IElasticsearchService _elasticsearchService;
         private readonly INewsService _newsService;
+        private readonly IExamineService _examineService;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<TimedTask>, string, SortOrder, IEnumerable<TimedTask>>> SortLambdaCacheApplicationUser = new();
 
         public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, ISteamInforService steamInforService, IBackUpArchiveService backUpArchiveService, ITableService tableService,
-            IPerfectionService perfectionService, IElasticsearchService elasticsearchService, INewsService newsService)
+            IPerfectionService perfectionService, IElasticsearchService elasticsearchService, INewsService newsService, IExamineService examineService)
         {
             _timedTaskRepository = timedTaskRepository;
             _steamInforService = steamInforService;
@@ -40,6 +42,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             _perfectionService = perfectionService;
             _elasticsearchService = elasticsearchService;
             _newsService = newsService;
+            _examineService = examineService;
         }
 
         public Task<QueryData<ListTimedTaskAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListTimedTaskAloneModel searchModel)
@@ -188,6 +191,9 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                     case TimedTaskType.UpdateWeiboUserInfor:
                         await _newsService.UpdateWeiboUserInforCache();
                         break;
+                    case TimedTaskType.ExaminesCompletion:
+                        await _examineService.ExaminesCompletion();
+                        break;
                 }
                 //记录执行时间
                 _timedTaskRepository.Clear();
@@ -200,7 +206,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                     await _timedTaskRepository.UpdateAsync(item);
                 }
             }
-            catch
+            catch(Exception ex)
             {
                 _timedTaskRepository.Clear();
                 item = await _timedTaskRepository.FirstOrDefaultAsync(s => s.Id == item.Id);

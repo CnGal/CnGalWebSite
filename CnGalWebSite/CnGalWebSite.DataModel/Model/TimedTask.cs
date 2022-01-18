@@ -65,7 +65,9 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "抓取RSS源动态")]
         UpdateGameNews,
         [Display(Name = "更新微博用户信息缓存")]
-        UpdateWeiboUserInfor
+        UpdateWeiboUserInfor,
+        [Display(Name = "补全审核记录")]
+        ExaminesCompletion
     }
     public enum TimedTaskExecuteType
     {
