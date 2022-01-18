@@ -4,7 +4,7 @@
     <div class="row">
         @foreach(var item in Examines.Data)
         {
-            <TabLink Icon="fa fa-pencil" Url="@("/home/examined/" +item.Id)" Text="@(item.RelatedName + " 编辑记录")" class="a-font-color col-12 col-lg-6">
+            <TabLink Icon="fa fa-pencil" Url="@("/home/editrecord?ContrastId=" +item.Id+"&CurrentId="+Examines.Data.Max(s=>s.Id))" Text="@(item.RelatedName + " 编辑记录")" class="a-font-color col-12 col-lg-6">
                <div class="rounded shadow-sm bg-opacity mb-3 p-3 ">
                     <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks"
                            Text="@("于 "+item.ApplyTime.ToString("yyyy年M月d日 HH:mm")+" "+item.Operation.GetDisplayName())"></UserRankTextViewTip>

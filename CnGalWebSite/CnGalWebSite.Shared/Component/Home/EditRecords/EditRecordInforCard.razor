@@ -1,0 +1,29 @@
+﻿<div class="@("p-2 "+(Model.IsSelected?"option-card-active":"option-card"))" style=" display: flex; flex-direction: column; border-radius: 5px;cursor:pointer">
+    <div>
+        @if (Model.IsSelected)
+        {
+            <i class="fa fa-check-circle fa-fw font-color"></i>
+        }
+        @Model.Operation.GetDisplayName()，总第『@Model.Id』次编辑
+
+    </div>
+    <div class="row" style="color: gray; ">
+        <div class="col-6">
+            <TabLink Url="@("/space/index/"+Model.UserId)" Text="@Model.UserName" Icon="fa fa-star-o">
+
+    <i class="fa fa-user fa-fw"></i>@Model.UserName
+</TabLink>
+            </div>  
+        <div class="col-6">
+            <i class="fa fa-calendar fa-fw"></i>@Model.ApplyTime.ToString("yyyy/M/d HH:mm")
+        </div>
+    </div>
+   
+</div>
+
+@code {
+    [Parameter]
+    public EditRecordAloneViewModel Model { get; set; }
+
+
+}

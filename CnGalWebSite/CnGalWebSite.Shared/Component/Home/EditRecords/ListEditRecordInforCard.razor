@@ -1,0 +1,86 @@
+﻿@inject ToastService? ToastService
+
+
+<style>
+    .option-card {
+        border: 1px solid var(--bs-secondary);
+    }
+
+    .option-card:hover {
+        border: 1px solid var( --main-color);
+    }
+
+    .option-card-active {
+        border: 1px solid var( --main-color) !important;
+    }
+
+    .option-card-show {
+        border: 1px solid var(--bs-secondary);
+    }
+
+    .option-background {
+        background-color: #EAEFF5;
+    }
+
+    .option-card-active .option-background {
+        background-color: var(--main-color) !important;
+        opacity: 0.5;
+    }
+</style>
+<div class="rounded shadow-sm bg-opacity rounded h-100 pt-3 pb-3">
+    <div class="mb-2 ps-3 pe-3" style="display: flex; justify-content: space-between; align-items: flex-end; ">
+        <div>
+            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-pencil"></i>&nbsp;&nbsp;编辑记录</h2>
+        </div>
+    </div>
+    <Scroll Height="600px">
+        <div>
+            <div class="row ps-3 pe-3">
+                @foreach (var item in Model.Examines.OrderByDescending(s => s.Id))
+                {
+                    <div class="col-12 col-md-6 col-xl-12">
+                        <div class="mb-2 pe-1" @onclick="@(()=>OnSeletedItemChanged(item))">
+                            <EditRecordInforCard Model="item" />
+                        </div>
+                    </div>
+
+                }
+            </div>
+        </div>
+      
+    </Scroll>
+</div>
+
+@code {
+    [Parameter]
+    public ExaminesOverviewViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback<EditRecordAloneViewModel> OnClickEditRecord { get; set; }
+
+    public string ImageMinWidth { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    public async Task OnSeletedItemChanged(EditRecordAloneViewModel item)
+    {
+        item.IsSelected = !item.IsSelected;
+        foreach(var temp in Model.Examines)
+        {
+            if(temp == item)
+            {
+                temp.IsSelected = true;
+            }
+            else
+            {
+                temp.IsSelected = false;
+            }
+        }
+        StateHasChanged();
+        await OnClickEditRecord.InvokeAsync(item);
+
+    }
+}

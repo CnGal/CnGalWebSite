@@ -1699,5 +1699,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
             return examines;
         }
 
+        public async Task<List<EntryIndexViewModel>> ConcompareAndGenerateModel(Entry currentEntry,Entry newEntry)
+        {
+            var model=new List<EntryIndexViewModel>();
+
+            model.Add(await GetEntryIndexViewModelAsync(currentEntry));
+            model.Add(await GetEntryIndexViewModelAsync(newEntry));
+
+            return model;
+        }
     }
 }

@@ -41,5 +41,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
         Task<EntryIndexViewModel> GetEntryIndexViewModelAsync(Entry entry);
 
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Entry currentEntry, Entry newEntry);
+
+        Task<List<EntryIndexViewModel>> ConcompareAndGenerateModel(Entry currentEntry, Entry newEntry);
     }
 }

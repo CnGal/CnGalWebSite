@@ -292,7 +292,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         public async Task<bool> GetExamineView(Models.ExaminedViewModel model, Examine examine)
         {
-            return model.Operation switch
+            return examine.Operation switch
             {
                 Operation.UserMainPage => GetUserMainPageExamineView(model, examine),
                 Operation.EditUserMain => await GetEditUserMainExamineView(model, examine),
