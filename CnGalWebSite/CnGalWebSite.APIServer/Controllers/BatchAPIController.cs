@@ -144,7 +144,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //导入数据
             try
             {
-                await _examineService.AddBatchEtryExaminesAsync(model, user, "批量导入历史数据");
+                await _examineService.AddNewEtryExaminesAsync(model, user, "批量导入历史数据");
             }
             catch (Exception exc)
             {
@@ -248,7 +248,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //导入数据
             try
             {
-                await _examineService.AddBatchArticleExaminesAsync(model, user, "批量导入历史数据");
+                await _examineService.AddNewArticleExaminesAsync(model, user, "批量导入历史数据");
                 //更新用户积分
                 await _appHelper.UpdateUserIntegral(user);
             }

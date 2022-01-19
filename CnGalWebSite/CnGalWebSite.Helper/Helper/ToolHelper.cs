@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using CnGalWebSite.DataModel.ViewModel.Votes;
@@ -22,9 +23,9 @@ namespace CnGalWebSite.DataModel.Helper
         //https://v3.cngal.org/
 
 
-        public const string WebApiPath = "http://localhost:45160/";
+        //public const string WebApiPath = "http://localhost:45160/";
         //public const string WebApiPath = "http://172.17.0.1:2001/";
-        //public const string WebApiPath = "https://www.cngal.org/";
+        public const string WebApiPath = "https://www.cngal.org/";
 
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";
 
@@ -795,7 +796,108 @@ namespace CnGalWebSite.DataModel.Helper
             return temp1 == temp2;
         }
 
+        public static void ModifyDataAccordingToEditingRecord<TResult>(TResult data, List<ExamineMainAlone> examines) where TResult:class
+        {
+            Type t=data.GetType();
+            foreach (var item in examines)
+            {
+                var pt = t.GetProperty(item.Key);
+                if (pt != null)
+                {
+                    if (pt.PropertyType == typeof(EntryType))
+                    {
+                        pt.SetValue(data, (EntryType)int.Parse(item.Value), null);
+                    }
+                    else if (pt.PropertyType == typeof(ArticleType))
+                    {
+                        pt.SetValue(data, (ArticleType)int.Parse(item.Value), null);
+                    }
+                    else if (pt.PropertyType == typeof(DateTime))
+                    {
+                        pt.SetValue(data, DateTime.FromBinary(long.Parse(item.Value)), null);
+                    }
+                    else if (pt.PropertyType == typeof(DateTime?))
+                    {
+                        pt.SetValue(data, item.Value != null ? DateTime.FromBinary(long.Parse(item.Value)) : null, null);
+                    }
+                    else if (pt.PropertyType == typeof(string))
+                    {
+                        pt.SetValue(data, item.Value, null);
+                    }
+                }
+            }
+        }
 
+        public static List<ExamineMainAlone> GetEditingRecordFromContrastData<TResult>(TResult currentItem, TResult newItem) where TResult : class
+        {
+            var model = new List<ExamineMainAlone>();
+
+            Type t = currentItem.GetType();
+            var pts = t.GetProperties();
+            foreach (var item in pts.Where(s => s.PropertyType == typeof(string) || s.PropertyType == typeof(DateTime) || s.PropertyType == typeof(DateTime?)
+            || s.PropertyType == typeof(EntryType) || s.PropertyType == typeof(ArticleType)))
+            {
+                //特殊字段跳过
+                if(item.Name=="MainPage"|| item.Name == "CreateTime" || item.Name == "LastEditTime")
+                {
+                    continue;
+                }
+
+                var currentValue = item.GetValue(currentItem);
+                var newValue = item.GetValue(newItem);
+
+                if (currentValue == null && newValue == null)
+                {
+                    continue;
+                }
+               
+                if (currentValue == null || newValue == null || currentValue.ToString() != newValue.ToString())
+                {
+                    if (item.PropertyType == typeof(DateTime))
+                    {
+                        model.Add(new ExamineMainAlone
+                        {
+                            Key = item.Name,
+                            Value = ((DateTime)newValue).ToBinary().ToString()
+                        });
+                    }
+                    if (item.PropertyType == typeof(DateTime?))
+                    {
+                        model.Add(new ExamineMainAlone
+                        {
+                            Key = item.Name,
+                            Value = ((DateTime?)newValue)?.ToBinary().ToString()
+                        });
+                    }
+                    else if (item.PropertyType == typeof(ArticleType)|| item.PropertyType == typeof(EntryType))
+                    {
+                        model.Add(new ExamineMainAlone
+                        {
+                            Key = item.Name,
+                            Value = ((int)(ArticleType)newValue).ToString()
+                        });
+                    }
+                    else if (item.PropertyType == typeof(EntryType))
+                    {
+                        model.Add(new ExamineMainAlone
+                        {
+                            Key = item.Name,
+                            Value = ((int)(EntryType)newValue).ToString()
+                        });
+                    }
+                    else if (item.PropertyType == typeof(string))
+                    {
+                        model.Add(new ExamineMainAlone
+                        {
+                            Key = item.Name,
+                            Value = newValue?.ToString() ?? ""
+                        });
+                    }
+                }
+            }
+
+            return model;
+        }
     }
 
     public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions

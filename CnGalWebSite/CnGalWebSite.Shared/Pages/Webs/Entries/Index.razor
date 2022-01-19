@@ -265,8 +265,8 @@ else
                             </div>
                         </div>
                         <div class="@("tab-pane fade"+(defaultIndex==4?" show active ":"") )" id="@("pills" + randomIndex + "-4")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-4-tab")">
-                            <div>
-                                <EntryExaminesViewTip Model="@EntryView.Examines" IsSmallScreen="IsSmallScreen"></EntryExaminesViewTip>
+                            <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity">
+                                <CnGalWebSite.Shared.Component.Entries.NewVersion.ExaminesInforCard Model="@EntryView.Examines" IsSmallScreen="IsSmallScreen"/>
                             </div>
                         </div>
                         <div class="@("tab-pane fade"+(defaultIndex==10?" show active ":"") )" id="@("pills" + randomIndex + "-10")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-10-tab")">
@@ -284,7 +284,7 @@ else
                                                 <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
                                                 break;
                                             case EditState.Normal:
-                                                @if (AlternateTimelineItems.Count == 0)
+                                                @if (EntryView.NewsOfEntry.Count == 0)
                                                 {
                                                     <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
                                                 }
@@ -295,11 +295,10 @@ else
 
                                                 break;
                                         }
-                                        <EntryAddNewsTip EntryName="@EntryView.Name"></EntryAddNewsTip>
                                     }
                                     else
                                     {
-                                        @if (AlternateTimelineItems.Count == 0 && EntryView.RelevancesState != EditState.locked)
+                                        @if (EntryView.NewsOfEntry.Count == 0 && EntryView.RelevancesState != EditState.locked)
                                         {
                                             <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
                                         }
@@ -308,11 +307,10 @@ else
                                     {
                                         <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"></AlertTip>
                                     }
-
-                                    @if (AlternateTimelineItems.Count > 0)
+                                    
+                                    @if (EntryView.NewsOfEntry.Count > 0)
                                     {
-                                        <Timeline Items="AlternateTimelineItems" IsAlternate="!((IsSmallScreen) || (EntryView.NewsOfEntry.Count < 3))" />
-
+                                       <CnGalWebSite.Shared.Component.Entries.NewVersion.NewsTimelineCard Model="EntryView" IsSmallScreen="IsSmallScreen"/>
                                     }
 
                                 </div>
@@ -499,7 +497,7 @@ else
 
     public SteamInfor steamInfor { get; set; } = new SteamInfor();
     public int TabIndexNum = 0;
-    private readonly List<TimelineItem> AlternateTimelineItems = new List<TimelineItem>();
+
     public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
 
     public PlayedGameInforModel GameInforModel { get; set; } = new PlayedGameInforModel();
@@ -683,8 +681,7 @@ else
                 await GetUserIsFavorited();
                 await GetPlayedGameInfor();
             }
-            //初始化动态时间线
-            InitNewsTimeLine();
+
             isReady = true;
             StateHasChanged();
 
@@ -729,42 +726,8 @@ else
         }
     }
 
-    public Color GetColor(int index)
-    {
-        switch (index)
-        {
-            case 0:
-                return Color.Primary;
-            case 1:
-                return Color.Info;
-            case 2:
-                return Color.Success;
-            case 3:
-                return Color.Warning;
-            default:
-                return Color.Danger;
-        }
-    }
-    public void InitNewsTimeLine()
-    {
-        int next = 0;
-        AlternateTimelineItems.Clear();
-        foreach (var item in EntryView.NewsOfEntry.OrderByDescending(s => s.HappenedTime))
-        {
-            AlternateTimelineItems.Add(new TimelineItem
-            {
-                Color = GetColor((next++) % 4),
-                Component = BootstrapDynamicComponent.CreateComponent<CnGalWebSite.Shared.Component.Entries.TimeLinePart>(new Dictionary<string, object>
-                {
-                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.Title)] = item.Title,
-                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.BriefIntroduction)] = item.BriefIntroduction,
-                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.HappenedTime)] = item.HappenedTime,
-                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.Link)] = item.Link,
-                }),
-                Description = item.HappenedTime.ToString("yyyy-MM-dd")
-            });
-        }
-    }
+
+ 
 
     private void UnEdit()
     {

@@ -268,7 +268,15 @@ namespace CnGalWebSite.APIServer.Application.Entries
             return entryId;
         }
 
-        public void UpdateEntryDataMain(Entry entry, EntryMain examine)
+        public void UpdateEntryDataMain(Entry entry, ExamineMain examine)
+        {
+            ToolHelper.ModifyDataAccordingToEditingRecord(entry, examine.Items);
+
+            //更新最后编辑时间
+            entry.LastEditTime = DateTime.Now.ToCstTime();
+
+        }
+        public void UpdateEntryDataMain(Entry entry, EntryMain_1_0 examine)
         {
             entry.Name = examine.Name;
             entry.BriefIntroduction = examine.BriefIntroduction;
@@ -657,14 +665,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
             switch (examine.Operation)
             {
                 case Operation.EstablishMain:
-                    EntryMain entryMain = null;
+                    ExamineMain examineMain = null;
                     using (TextReader str = new StringReader(examine.Context))
                     {
                         var serializer = new JsonSerializer();
-                        entryMain = (EntryMain)serializer.Deserialize(str, typeof(EntryMain));
+                        examineMain = (ExamineMain)serializer.Deserialize(str, typeof(ExamineMain));
                     }
 
-                    UpdateEntryDataMain(entry, entryMain);
+                    UpdateEntryDataMain(entry, examineMain);
                     break;
                 case Operation.EstablishAddInfor:
                     EntryAddInfor entryAddInfor = null;
@@ -707,7 +715,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     await UpdateEntryDataTagsAsync(entry, entryTags);
                     break;
                 case Operation.EstablishMainPage:
-                    UpdateEntryDataMainPage(entry, examine.Context);
+                    string mainPage = examine.Context;
+                    UpdateEntryDataMainPage(entry, mainPage);
                     break;
                 default:
                     throw new InvalidOperationException("不支持的操作");
@@ -1352,27 +1361,20 @@ namespace CnGalWebSite.APIServer.Application.Entries
         {
             var examines = new List<KeyValuePair<object, Operation>>();
             //第一部分 主要信息
-            //判断是否被修改
-            if (currentEntry.SmallBackgroundPicture != newEntry.SmallBackgroundPicture || currentEntry.Name != newEntry.Name || currentEntry.BriefIntroduction != newEntry.BriefIntroduction
-                || currentEntry.MainPicture != newEntry.MainPicture || currentEntry.Thumbnail != newEntry.Thumbnail || currentEntry.BackgroundPicture != newEntry.BackgroundPicture
-                || currentEntry.Type != newEntry.Type || currentEntry.DisplayName != newEntry.DisplayName || currentEntry.AnotherName != newEntry.AnotherName)
+
+            //添加修改记录
+            //新建审核数据对象
+            var examineMain = new ExamineMain
             {
-                //添加修改记录
-                //新建审核数据对象
-                var entryMain = new EntryMain
-                {
-                    Name = newEntry.Name,
-                    BriefIntroduction = newEntry.BriefIntroduction,
-                    MainPicture = newEntry.MainPicture,
-                    Thumbnail = newEntry.Thumbnail,
-                    BackgroundPicture = newEntry.BackgroundPicture,
-                    Type = newEntry.Type,
-                    DisplayName = newEntry.DisplayName,
-                    SmallBackgroundPicture = newEntry.SmallBackgroundPicture,
-                    AnotherName = newEntry.AnotherName
-                };
-                examines.Add(new KeyValuePair<object, Operation>(entryMain, Operation.EstablishMain));
+                Items = ToolHelper.GetEditingRecordFromContrastData(currentEntry, newEntry)
+            };
+            examineMain.Items.RemoveAll(s => s.Key == "PubulishTime");
+            if (examineMain.Items.Count > 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(examineMain, Operation.EstablishMain));
+
             }
+
 
             //第二部分 附加信息
             var entryAddInfor = new EntryAddInfor();
@@ -1553,7 +1555,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
                     {
                         DisplayName = item.ToEntry.ToString(),
-                        DisplayValue=item.ToEntryNavigation.Name,
+                        DisplayValue = item.ToEntryNavigation.Name,
                         Type = RelevancesType.Entry,
                         IsDelete = false
                     });
@@ -1615,7 +1617,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             foreach (var infor in newEntry.Outlinks)
             {
                 var isSame = false;
-                foreach (var item in entryRelevances.Relevances.Where(s=>s.Type==RelevancesType.Outlink))
+                foreach (var item in entryRelevances.Relevances.Where(s => s.Type == RelevancesType.Outlink))
                 {
                     if (item.DisplayName == infor.Name)
                     {
@@ -1641,7 +1643,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         DisplayName = infor.Name,
                         DisplayValue = infor.BriefIntroduction,
                         Link = infor.Link,
-                        Type= RelevancesType.Outlink,
+                        Type = RelevancesType.Outlink,
                         IsDelete = false
                     });
                 }
@@ -1653,7 +1655,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
 
             //第五部分 主页
-            if (newEntry.MainPage!=currentEntry.MainPage)
+            if (newEntry.MainPage != currentEntry.MainPage)
             {
                 //序列化
                 var resulte = newEntry.MainPage;
@@ -1676,7 +1678,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //添加新建项目
             foreach (var item in newEntry.Tags)
             {
-                var temp = entryTags.Tags.FirstOrDefault(s => s.TagId==item.Id);
+                var temp = entryTags.Tags.FirstOrDefault(s => s.TagId == item.Id);
                 if (temp != null)
                 {
                     entryTags.Tags.Remove(temp);
@@ -1705,6 +1707,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             model.Add(await GetEntryIndexViewModelAsync(currentEntry));
             model.Add(await GetEntryIndexViewModelAsync(newEntry));
+
+
 
             return model;
         }

@@ -21,7 +21,8 @@ namespace CnGalWebSite.APIServer.Application.Articles
 
         Task<PagedResultDto<ArticleInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input);
 
-        void UpdateArticleDataMain(Article article, ArticleMain examine);
+        void UpdateArticleDataMain(Article article, ExamineMain examine);
+        void UpdateArticleDataMain(Article article, ArticleMain_1_0 examine);
 
         Task UpdateArticleDataRelevances(Article article, ArticleRelevances examine);
 
@@ -34,5 +35,9 @@ namespace CnGalWebSite.APIServer.Application.Articles
         Task<NewsModel> GetNewsModelAsync(Article article);
 
         ArticleViewModel GetArticleViewModelAsync(Article article);
+
+        List<KeyValuePair<object, Operation>> ExaminesCompletion(Article currentArticle, Article newArticle);
+
+        List<ArticleViewModel> ConcompareAndGenerateModel(Article currentArticle, Article newArticle);
     }
 }

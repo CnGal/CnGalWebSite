@@ -48,18 +48,7 @@
             }
         </AuthorizeView>
         </p>
-        <div class="mt-4 mb-4">
-            <i class="fa fa-tags fa-fw article-tag-text-color"></i>
-            @foreach (var item in Relevances)
-            {
-                @foreach (var temp in item.Informations)
-                {
-                    <button class="article-tag article-tag-color" @onclick="@(()=>ViewAtOther(temp.Link,temp.DisplayName))">@temp.DisplayName</button>
-                }
-            }
-            <div style="float: right;" class="article-tag-text-color">最后编辑：@LastEditTime.ToString("yyyy-MM-dd")</div>
-        </div>
-
+     
     </div>
 }
 else
@@ -123,18 +112,7 @@ else
                 </div>
 
             </div>
-            <div class="mt-4 mb-4">
-                <i class="fa fa-tags fa-fw article-tag-text-color"></i>
-                @foreach (var item in Relevances)
-                {
-                    @foreach (var temp in item.Informations)
-                    {
-                        <button class="article-tag article-tag-color" @onclick="@(()=>ViewAtOther(temp.Link,temp.DisplayName))">@temp.DisplayName</button>
-                    }
-                }
-                <div style="float: right;" class="article-tag-text-color">最后编辑：@LastEditTime.ToString("yyyy-MM-dd")</div>
-            </div>
-
+           
         </div>
     }
     else if (IsLargeSreeen)
@@ -247,35 +225,19 @@ else
                         <div><hr style="margin: 0px;" /></div>
                     }
                 </AuthorizeView>
-                <li class="list-group li-user-space">
+                <li class="list-group li-user-space"  @onclick="@(()=>OnClick(10))">
                     <div class="li-user-space-left-div">
                         <i class="fa fa-angle-double-right fa-fw fa-lg"></i>
                     </div>
                     <div class="li-user-space-right-div">
-                        <div class="li-user-space-text" style="cursor: default">&nbsp;&nbsp;&nbsp;最后编辑：@LastEditTime.ToString("yyyy-MM-dd")</div>
+                        <div class="li-user-space-text">&nbsp;&nbsp;&nbsp;最后编辑：@LastEditTime.ToString("yyyy-MM-dd")</div>
                         <i class="fa fa-history fa-fw fa-lg li-user-space-icon" style="cursor: default"></i>
 
                     </div>
                 </li>
             </ul>
         </div>
-        @if (Relevances.Count > 0)
-        {
-            <div class=" rounded shadow-sm  p-3 mt-3 bg-opacity">
-                <div style="width: 100%;">
-                    <div>
-                        <i class="fa fa-tags fa-fw article-tag-text-color-large"></i>
-                        @foreach (var item in Relevances)
-                        {
-                            @foreach (var temp in item.Informations)
-                            {
-                                <button class="article-tag article-tag-color-large" @onclick="@(()=>ViewAtOther(temp.Link,temp.DisplayName))">@temp.DisplayName</button>
-                            }
-                        }
-                    </div>
-                </div>
-            </div>
-        }
+      
 
     }
 }

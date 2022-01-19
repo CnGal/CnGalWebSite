@@ -36,7 +36,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         /// <summary>
         /// 最后编辑日期
         /// </summary>
-        public DateTime EditDate { get; set; }
+        public DateTime LastEditTime { get; set; }
         /// <summary>
         /// 主图
         /// </summary>
@@ -112,6 +112,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         /// 相关性列表
         /// </summary>
         public List<RelevancesViewModel> Relevances { get; set; } = new List<RelevancesViewModel>();
+
+        public long LastExamineId { get; set; }
 
     }
 }

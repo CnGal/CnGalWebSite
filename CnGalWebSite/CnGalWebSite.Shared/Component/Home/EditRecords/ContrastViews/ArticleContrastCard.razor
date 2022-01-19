@@ -1,0 +1,15 @@
+﻿<div>
+    <div class="rounded shadow-sm bg-opacity mb-3 pb-4">
+        <CnGalWebSite.Shared.Component.Articles.NewVersion.MainInforCard Model="Model" IsSmallScreen="false" />
+    </div>
+    @if (Model.Relevances.Count > 0)
+    {
+        <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard IsSmallScreen="false" Model="Model" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public ArticleViewModel Model { get; set; } = new ArticleViewModel();
+
+}

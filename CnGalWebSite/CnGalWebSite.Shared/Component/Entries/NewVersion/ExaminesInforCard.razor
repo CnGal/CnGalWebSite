@@ -1,0 +1,56 @@
+﻿<div class="mt-2">
+    <Timeline Items="AlternateTimelineItems" IsAlternate="!((IsSmallScreen) || (Model.Count < 3))" />
+</div>
+
+@code {
+        [Parameter]
+        public List<ExaminedNormalListModel> Model { get; set; }
+
+        [Parameter]
+        public bool IsSmallScreen { get; set; }
+
+    private readonly List<TimelineItem> AlternateTimelineItems = new List<TimelineItem>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        //初始化动态时间线
+        InitNewsTimeLine();
+    }
+    public Color GetColor(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                return Color.Primary;
+            case 1:
+                return Color.Info;
+            case 2:
+                return Color.Success;
+            case 3:
+                return Color.Warning;
+            default:
+                return Color.Danger;
+        }
+    }
+    public void InitNewsTimeLine()
+    {
+        int next = 0;
+        AlternateTimelineItems.Clear();
+
+        foreach (var item in Model)
+        {
+            AlternateTimelineItems.Add(new TimelineItem
+            {
+                Color = GetColor((next++) % 4),
+                Component = BootstrapDynamicComponent.CreateComponent<ExamineInforAloneTip>(new Dictionary<string, object>
+                {
+                    [nameof(ExamineInforAloneTip.Model)] = item,
+                    [nameof(ExamineInforAloneTip.IsRight)] = Model.Count < 3 ? false : (Model.IndexOf(item) % 2 == 1),
+                    [nameof(ExamineInforAloneTip.LastExamineId)] = Model.Max(s => s.Id),
+                }),
+                Description = item.ApplyTime.ToString("yyyy/M/d HH:mm")
+            });
+        }
+    }
+
+}

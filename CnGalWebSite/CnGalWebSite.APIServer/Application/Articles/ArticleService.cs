@@ -302,7 +302,16 @@ namespace CnGalWebSite.APIServer.Application.Articles
             return entryId;
         }
 
-        public void UpdateArticleDataMain(Article article, ArticleMain examine)
+        public void UpdateArticleDataMain(Article article, ExamineMain examine)
+        {
+            ToolHelper.ModifyDataAccordingToEditingRecord(article, examine.Items);
+
+            //更新最后编辑时间
+            article.LastEditTime = DateTime.Now.ToCstTime();
+
+        }
+
+        public void UpdateArticleDataMain(Article article, ArticleMain_1_0 examine)
         {
             article.Name = examine.Name;
             article.DisplayName = examine.DisplayName;
@@ -488,14 +497,14 @@ namespace CnGalWebSite.APIServer.Application.Articles
             switch (examine.Operation)
             {
                 case Operation.EditArticleMain:
-                    ArticleMain articleMain = null;
+                    ExamineMain examineMain = null;
                     using (TextReader str = new StringReader(examine.Context))
                     {
                         var serializer = new JsonSerializer();
-                        articleMain = (ArticleMain)serializer.Deserialize(str, typeof(ArticleMain));
+                        examineMain = (ExamineMain)serializer.Deserialize(str, typeof(ExamineMain));
                     }
 
-                    UpdateArticleDataMain(article, articleMain);
+                    UpdateArticleDataMain(article, examineMain);
                     break;
                 case Operation.EditArticleRelevanes:
                     ArticleRelevances articleRelecances = null;
@@ -520,7 +529,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 Title = article.DisplayName ?? article.Name,
                 BriefIntroduction = article.BriefIntroduction,
                 Link = article.OriginalLink ?? ("/articles/index/" + article.Id),
-                HappenedTime = article.RealNewsTime ?? article.CreateTime,
+                HappenedTime = article.RealNewsTime ?? article.PubishTime,
                 NewsType = article.NewsType ?? "动态",
             };
 
@@ -548,16 +557,16 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 }
                 else
                 {
-                    model.Image = _appHelper.GetImagePath(article.CreateUser.PhotoPath, "user.png");
-                    model.GroupName = article.CreateUser.UserName;
-                    model.UserId = article.CreateUser.Id;
+                    model.Image = _appHelper.GetImagePath(article.CreateUser?.PhotoPath, "user.png");
+                    model.GroupName = article.CreateUser?.UserName;
+                    model.UserId = article.CreateUser?.Id;
                 }
             }
             else
             {
-                model.Image = _appHelper.GetImagePath(article.CreateUser.PhotoPath, "user.png");
-                model.GroupName = article.CreateUser.UserName;
-                model.UserId = article.CreateUser.Id;
+                model.Image = _appHelper.GetImagePath(article.CreateUser?.PhotoPath, "user.png");
+                model.GroupName = article.CreateUser?.UserName;
+                model.UserId = article.CreateUser?.Id;
             }
 
             return model;
@@ -576,9 +585,9 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 OriginalLink = article.OriginalLink,
                 OriginalAuthor = article.OriginalAuthor,
                 CreateTime = article.CreateTime,
-                ThumbsUpCount = article.ThumbsUps.Count,
+                ThumbsUpCount = article.ThumbsUps?.Count??0,
                 ReaderCount = article.ReaderCount,
-                EditDate = article.LastEditTime,
+                LastEditTime = article.LastEditTime,
                 CanComment = article.CanComment ?? true,
                 DisambigId = article.DisambigId ?? 0,
                 DisambigName = article.Disambig?.Name,
@@ -661,6 +670,182 @@ namespace CnGalWebSite.APIServer.Application.Articles
 
             return model;
         }
+
+        public List<KeyValuePair<object, Operation>> ExaminesCompletion(Article currentArticle, Article newArticle)
+        {
+            var examines = new List<KeyValuePair<object, Operation>>();
+            //第一部分 主要信息
+
+            //添加修改记录
+            //新建审核数据对象
+            var examineMain = new ExamineMain
+            {
+                Items = ToolHelper.GetEditingRecordFromContrastData(currentArticle, newArticle)
+
+            };
+            if (examineMain.Items.Count > 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(examineMain, Operation.EditArticleMain));
+
+            }
+
+
+
+            //第二部分 关联信息
+            //创建审核数据模型
+            var articleRelevances = new ArticleRelevances();
+
+            //处理关联词条
+
+            //遍历当前词条数据 打上删除标签
+            foreach (var item in currentArticle.ArticleRelationFromArticleNavigation.Select(s => s.ToArticleNavigation))
+            {
+                articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                {
+                    DisplayName = item.Id.ToString(),
+                    DisplayValue = item.Name,
+                    Type = RelevancesType.Article,
+                    IsDelete = true,
+                });
+            }
+
+            //再遍历视图 对应修改
+
+            //添加新建项目
+            foreach (var item in newArticle.ArticleRelationFromArticleNavigation)
+            {
+                var temp = articleRelevances.Relevances.FirstOrDefault(s => s.Type == RelevancesType.Article && s.DisplayName == item.ToArticle.ToString());
+                if (temp != null)
+                {
+                    articleRelevances.Relevances.Remove(temp);
+                }
+                else
+                {
+                    articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                    {
+                        DisplayName = item.ToArticle.ToString(),
+                        DisplayValue = item.ToArticleNavigation.Name,
+                        Type = RelevancesType.Entry,
+                        IsDelete = false
+                    });
+                }
+            }
+
+            //处理关联文章
+            //遍历当前文章数据 打上删除标签
+            foreach (var item in currentArticle.Entries)
+            {
+                articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                {
+                    DisplayName = item.Id.ToString(),
+                    DisplayValue = item.Name,
+                    Type = RelevancesType.Entry,
+                    IsDelete = true,
+                });
+            }
+
+            //再遍历视图 对应修改
+
+            //添加新建项目
+            foreach (var item in newArticle.Entries)
+            {
+                var temp = articleRelevances.Relevances.FirstOrDefault(s => s.Type == RelevancesType.Entry && s.DisplayName == item.Id.ToString());
+                if (temp != null)
+                {
+                    articleRelevances.Relevances.Remove(temp);
+                }
+                else
+                {
+                    articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                    {
+                        DisplayName = item.Id.ToString(),
+                        DisplayValue = item.Name,
+                        Type = RelevancesType.Entry,
+                        IsDelete = false
+                    });
+                }
+            }
+
+            //处理外部链接
+
+            //遍历当前词条外部链接 打上删除标签
+            foreach (var item in currentArticle.Outlinks)
+            {
+                articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                {
+                    DisplayName = item.Name,
+                    DisplayValue = item.BriefIntroduction,
+                    IsDelete = true,
+                    Type = RelevancesType.Outlink,
+                    Link = item.Link
+                });
+            }
+
+
+            //循环查找外部链接是否相同
+            foreach (var infor in newArticle.Outlinks)
+            {
+                var isSame = false;
+                foreach (var item in articleRelevances.Relevances.Where(s => s.Type == RelevancesType.Outlink))
+                {
+                    if (item.DisplayName == infor.Name)
+                    {
+                        if (item.DisplayValue != infor.BriefIntroduction || item.Link != infor.Link)
+                        {
+                            item.DisplayValue = infor.BriefIntroduction;
+                            item.IsDelete = false;
+                            item.Link = infor.Link;
+                        }
+                        else
+                        {
+                            articleRelevances.Relevances.Remove(item);
+                            isSame = true;
+                        }
+                        break;
+
+                    }
+                }
+                if (isSame == false)
+                {
+                    articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                    {
+                        DisplayName = infor.Name,
+                        DisplayValue = infor.BriefIntroduction,
+                        Link = infor.Link,
+                        Type = RelevancesType.Outlink,
+                        IsDelete = false
+                    });
+                }
+            }
+
+            if (articleRelevances.Relevances.Count != 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(articleRelevances, Operation.EditArticleRelevanes));
+            }
+
+            //第三部分 主页
+            if (newArticle.MainPage != currentArticle.MainPage)
+            {
+                //序列化
+                var resulte = newArticle.MainPage;
+                examines.Add(new KeyValuePair<object, Operation>(resulte, Operation.EditArticleMainPage));
+            }
+            return examines;
+        }
+
+        public List<ArticleViewModel> ConcompareAndGenerateModel(Article currentArticle, Article newArticle)
+        {
+            var model = new List<ArticleViewModel>();
+
+            model.Add( GetArticleViewModelAsync(currentArticle));
+            model.Add( GetArticleViewModelAsync(newArticle));
+
+
+
+            return model;
+        }
+
+
 
     }
 }

@@ -32,7 +32,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="entry">关联词条</param>
         /// <param name="examine">审核数据模型</param>
         /// <returns></returns>
-        Task ExamineEstablishMainAsync(Entry entry, EntryMain examine);
+        Task ExamineEstablishMainAsync(Entry entry, ExamineMain examine);
         /// <summary>
         /// 处理 EstablishAddInfor 审核成功后调用更新数据
         /// </summary>
@@ -105,7 +105,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="user">管理员用户</param>
         /// <param name="note">备注</param>
         /// <returns></returns>
-        Task AddBatchEtryExaminesAsync(Entry model, ApplicationUser user, string note);
+        Task<Entry> AddNewEtryExaminesAsync(Entry model, ApplicationUser user, string note);
 
         /// <summary>
         /// 获取当前用户对该 文章 部分的待审核记录
@@ -121,7 +121,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="article">关联文章</param>
         /// <param name="examine">审核数据模型</param>
         /// <returns></returns>
-        Task ExamineEditArticleMainAsync(Article article, ArticleMain examine);
+        Task ExamineEditArticleMainAsync(Article article, ExamineMain examine);
         /// <summary>
         /// 文章 创建 数据处理完毕后调用该方法 通用
         /// </summary>
@@ -166,7 +166,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="user">用户</param>
         /// <param name="note">备注</param>
         /// <returns></returns>
-        Task AddBatchArticleExaminesAsync(Article model, ApplicationUser user, string note);
+        Task<Article> AddNewArticleExaminesAsync(Article model, ApplicationUser user, string note);
         /// <summary>
         /// 为批量导入的周边建立审核记录
         /// </summary>
@@ -361,7 +361,8 @@ namespace CnGalWebSite.APIServer.ExamineX
         Task MigrationEditEntryTagsExamineRecord();
         Task MigrationEditArticleRelevanceExamineRecord();
         Task MigrationEditEntryRelevanceExamineRecord();
-
+        Task ReplaceEditEntryMainExamineContext();
+        Task ReplaceEditArticleMainExamineContext();
 
         /// <summary>
         /// 处理 PeripheryRelatedPeripheries 审核成功后调用更新数据

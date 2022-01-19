@@ -269,6 +269,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 article.OriginalAuthor = model.Author;
                 article.OriginalLink = model.Link;
                 article.DisplayName = model.Title;
+                article.Name = model.Title;
                 article.BriefIntroduction = model.BriefIntroduction;
                 article.MainPage = model.MainPage;
                 article.MainPicture = model.MainPicture;
@@ -516,6 +517,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var article = await _articleRepository.FirstOrDefaultAsync(s => s.Id == weeklyNews.ArticleId);
 
                 article.DisplayName = model.Title;
+                article.Name = model.Title;
                 article.BriefIntroduction = model.BriefIntroduction;
                 article.MainPage = _newsService.GenerateRealWeeklyNewsMainPage(weeklyNews);
                 article.MainPicture = model.MainPicture;

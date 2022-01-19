@@ -2,7 +2,7 @@
 using System;
 namespace CnGalWebSite.DataModel.ExamineModel
 {
-    public class ArticleMain
+    public class ArticleMain_1_0
     {
         public string Name { get; set; }
         public string DisplayName { get; set; }

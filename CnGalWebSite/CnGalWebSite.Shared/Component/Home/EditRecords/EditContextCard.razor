@@ -7,7 +7,12 @@
             <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-file-text-o"></i>&nbsp;&nbsp;概览</h2>
         </div>
         <div>
-            <div class="markdown-body m-0 p-0" style=" white-space: break-spaces; max-height: 420px; overflow-y: auto;">
+            <style>
+                pre {
+                    overflow: initial !important;
+                }
+            </style>
+            <div class="markdown-body m-0 p-0" style=" white-space: break-spaces; max-height: 420px; overflow: auto;">
                 @((MarkupString)Model.EditOverview)
             </div>
         </div>

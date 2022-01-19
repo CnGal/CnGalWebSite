@@ -1,11 +1,14 @@
 ﻿
 using CnGalWebSite.APIServer.Application.ElasticSearches;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Home;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,17 +28,26 @@ namespace CnGalWebSite.APIServer.Controllers
     {
         private readonly ISearchService _searchService;
         private readonly IRepository<Entry, int> _entryRepository;
+        private readonly IRepository<Article, long> _articleRepository;
+        private readonly IRepository<Examine, long> _examineRepository;
         private readonly IHomeService _homeService;
         private readonly IElasticsearchService _elasticsearchService;
+        private readonly IExamineService _examineService;
+        private readonly IAppHelper _appHelper;
 
-        public HomeAPIController(ISearchService searchService, IElasticsearchService elasticsearchService,
-        IRepository<Entry, int> entryRepository, IHomeService homeService)
+        public HomeAPIController(ISearchService searchService, IElasticsearchService elasticsearchService, IAppHelper appHelper, IRepository<Article, long> articleRepository,
+        IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository)
         {
             _searchService = searchService;
             _entryRepository = entryRepository;
             _homeService = homeService;
             _elasticsearchService = elasticsearchService;
+            _examineService = examineService;
+            _appHelper = appHelper;
+            _examineRepository = examineRepository;
+            _articleRepository = articleRepository;
         }
+
         /// <summary>
         /// 获取即将发售游戏
         /// </summary>
@@ -180,6 +192,117 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<IEnumerable<string>>> GetSearchTipListAsync()
         {
             return await _entryRepository.GetAll().Where(s => s.IsHidden != true).AsNoTracking().Select(s => s.Name).Where(s => string.IsNullOrWhiteSpace(s) == false).ToArrayAsync();
+        }
+
+        /// <summary>
+        /// 获取编辑记录概览
+        /// </summary>
+        /// <param name="id">要对比的编辑记录</param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ExaminesOverviewViewModel>> GetEditRecordsOverview(long id)
+        {
+            var examine = await _examineRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == id && s.IsPassed == true);
+            if (examine == null)
+            {
+                return NotFound("无法找到该审核");
+            }
+
+            var model = new ExaminesOverviewViewModel();
+            if (examine.EntryId != null)
+            {
+                var entry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examine.EntryId);
+                if (entry == null)
+                {
+                    return NotFound("无法找到审核记录对应的词条");
+                }
+
+                model.ObjectId = entry.Id;
+                model.ObjectName = entry.DisplayName;
+                model.ObjectBriefIntroduction = entry.BriefIntroduction;
+                model.Image = (entry.Type == EntryType.Game || entry.Type == EntryType.ProductionGroup) ? _appHelper.GetImagePath(entry.MainPicture, "app.png") : _appHelper.GetImagePath(entry.Thumbnail, "user.png");
+                model.IsThumbnail = (entry.Type == EntryType.Game || entry.Type == EntryType.ProductionGroup) ? false : true;
+                model.Type = ExaminedNormalListModelType.Entry;
+
+                var examines = await _examineRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).Include(s => s.Entry)
+                    .Where(s => s.EntryId == entry.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
+
+                var examinedView = new Models.ExaminedViewModel();
+
+                foreach (var item in examines)
+                {
+                    if (await _examineService.GetExamineView(examinedView, item))
+                    {
+
+                        model.Examines.Add(new EditRecordAloneViewModel
+                        {
+                            ApplyTime = item.ApplyTime,
+                            Comments = item.Comments,
+                            EditOverview = examinedView.EditOverview,
+                            Id = item.Id,
+                            Note = item.Note,
+                            Operation = item.Operation,
+                            PassedAdminName = item.PassedAdminName,
+                            PassedTime = item.PassedTime.Value,
+                            UserId = item.ApplicationUserId,
+                            IsSelected = item.Id == id,
+                            UserName = item.ApplicationUser.UserName
+                        });
+                    }
+
+                }
+
+                return model;
+            }
+            else if(examine.ArticleId!=null)
+            {
+                var article = await _articleRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
+                if (article == null)
+                {
+                    return NotFound("无法找到审核记录对应的文章");
+                }
+
+                model.ObjectId = article.Id;
+                model.ObjectName = article.DisplayName;
+                model.ObjectBriefIntroduction = article.BriefIntroduction;
+                model.Image = _appHelper.GetImagePath(article.MainPicture, "app.png");
+                model.IsThumbnail = false;
+                model.Type = ExaminedNormalListModelType.Article;
+
+                var examines = await _examineRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).Include(s => s.Entry)
+                    .Where(s => s.ArticleId == article.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
+
+                var examinedView = new Models.ExaminedViewModel();
+
+                foreach (var item in examines)
+                {
+                    if (await _examineService.GetExamineView(examinedView, item))
+                    {
+                        model.Examines.Add(new EditRecordAloneViewModel
+                        {
+                            ApplyTime = item.ApplyTime,
+                            Comments = item.Comments,
+                            EditOverview = examinedView.EditOverview,
+                            Id = item.Id,
+                            Note = item.Note,
+                            Operation = item.Operation,
+                            PassedAdminName = item.PassedAdminName,
+                            PassedTime = item.PassedTime.Value,
+                            UserId = item.ApplicationUserId,
+                            IsSelected = item.Id == id,
+                            UserName = item.ApplicationUser.UserName
+                        });
+                    }
+
+                }
+
+                return model;
+            }
+            else
+            {
+                return BadRequest("无效的类型");
+            }
         }
     }
 }

@@ -1,0 +1,71 @@
+﻿<div class="">
+
+    @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
+    {
+        <img class="mb-4" style="width:100%" src="@Model.MainPicture" alt="@Model.Name">
+    }
+    <div class="mb-2 ps-4 pe-4">
+        <h1 class="fw-bold text-center h3">@Model.Name</h1>
+
+        <p class="text-center" style="color: gray;margin-top:20px">
+            <i class="fa fa-calendar fa-fw "></i>
+            <span class="article-infor-text">@Model.CreateTime.ToString("yyyy-MM-dd")</span>&nbsp;&nbsp;&nbsp;
+            <i class="fa fa-eye fa-fw "></i>
+            <span class="article-infor-text">@(Model.ReaderCount + "次阅读")</span>&nbsp;&nbsp;&nbsp;
+            <i class="fa fa-user fa-fw"></i>
+            <TabLink Icon="fa fa-star-o" Url="@("/space/index/" + Model.UserId)" Text="@Model.LastEditUserName" class="a-font-color" style="color:gray;">
+                <span class="article-infor-text"  style="cursor: pointer">@Model.LastEditUserName</span>
+            </TabLink>
+            @if (IsSmallScreen)
+            {
+                <br />
+            }
+            else
+            {
+                <span>&nbsp; &nbsp; &nbsp;</span>
+            }
+            <i class="fa fa-commenting-o fa-fw "></i>
+            <span class="article-infor-text">@(Model.CommentCount + "条评论")&nbsp; &nbsp; &nbsp;</span>
+            <i class="fa fa-thumbs-o-up fa-fw "></i>
+            <span class="article-infor-text">@(Model.ThumbsUpCount + "人点赞")&nbsp; &nbsp; &nbsp;</span>
+
+        </p>
+    </div>
+    <div class=" ps-4 pe-4">
+        <hr />
+        <div class="mt-4">
+                @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false)
+                {
+                    <div class="alert alert-primary  rounded shadow-sm  rounded" role="alert">
+                        作者：
+                        <strong> @Model.OriginalAuthor</strong>
+                        &nbsp; 原文发表在：
+                        <a href="@Model.OriginalLink" class="alert-link" style="word-wrap: break-word;word-break:break-all;" target="_blank">@Model.OriginalLink</a>
+                    </div>
+                }
+
+                @if (Model.MainPageState == EditState.Preview || Model.MainState == EditState.Preview || Model.RelevancesState == EditState.Preview)
+                {
+                    <AlertTip Title="编辑文章" Type="AlertTip.AlertTipType.preview" Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></AlertTip>
+                }
+                <div class="markdown-body">
+                    @((MarkupString)Model.MainPage)
+                </div>
+                <div>
+                    <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Article" Id="Model.Id" />
+                </div>
+            
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public ArticleViewModel Model { get; set; } = new ArticleViewModel();
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+
+}

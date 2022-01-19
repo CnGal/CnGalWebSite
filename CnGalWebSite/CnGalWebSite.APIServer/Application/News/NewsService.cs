@@ -384,7 +384,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
             //走批量导入的流程
             var admin = await _userManager.FindByIdAsync(article.CreateUserId);
-            await _examineService.AddBatchArticleExaminesAsync(article, admin, "自动生成动态");
+            await _examineService.AddNewArticleExaminesAsync(article, admin, "自动生成动态");
 
             //查找文章
             var articleId = await _articleRepository.GetAll().Where(s => s.Name == article.Name).Select(s => s.Id).FirstOrDefaultAsync();
@@ -450,9 +450,6 @@ namespace CnGalWebSite.APIServer.Application.News
                     article.Entries.Add(entry);
                 }
             }
-
-
-
             return article;
         }
 
@@ -464,7 +461,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
             //走批量导入的流程
             var admin = await _userManager.FindByIdAsync(article.CreateUserId);
-            await _examineService.AddBatchArticleExaminesAsync(article, admin, "自动生成周报");
+            await _examineService.AddNewArticleExaminesAsync(article, admin, "自动生成周报");
 
             //查找文章
             var articleId = await _articleRepository.GetAll().Where(s => s.Name == article.Name).Select(s => s.Id).FirstOrDefaultAsync();

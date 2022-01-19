@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -120,7 +121,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
                 .Include(s => s.Entries)
                 .Include(s => s.Outlinks)
-                .Include(s => s.Examines).FirstOrDefaultAsync(x => x.Id == id);
+                .Include(s => s.Examines).ThenInclude(s=>s.ApplicationUser)
+                .FirstOrDefaultAsync(x => x.Id == id);
             if (article == null)
             {
                 return NotFound();
@@ -199,12 +201,13 @@ namespace CnGalWebSite.APIServer.Controllers
             var createUser = article.CreateUser;
             if (createUser == null)
             {
-                createUser = article.Examines.First(s => s.IsPassed == true).ApplicationUser;
+                article.CreateUser= createUser = article.Examines.First(s => s.IsPassed == true).ApplicationUser;
             }
 
 
             model.LastEditUserName = createUser.UserName;
             model.UserId = createUser.Id;
+            model.LastExamineId = article.Examines.Last().Id;
 
             //判断是否有权限编辑
             if (user != null && await _userManager.IsInRoleAsync(user, "Editor") == true)
@@ -418,53 +421,24 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = ex.Message };
                 }
 
+                var newArticle = new Article();
                 //第一步 处理主要信息
 
                 //新建审核数据对象
-                var entryMain = new ArticleMain
-                {
-                    Name = model.Name,
-                    BriefIntroduction = model.BriefIntroduction,
-                    MainPicture = model.MainPicture,
-                    BackgroundPicture = model.BackgroundPicture,
-                    SmallBackgroundPicture = model.SmallBackgroundPicture,
-                    Type = model.Type,
-                    OriginalAuthor = model.OriginalAuthor,
-                    OriginalLink = model.OriginalLink,
-                    PubishTime = model.PubishTime,
-                    RealNewsTime = model.RealNewsTime,
-                    DisplayName = model.DisplayName,
-                    NewsType = model.NewsType,
-                };
-                //序列化
-                var resulte = "";
-                using (TextWriter text = new StringWriter())
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(text, entryMain);
-                    resulte = text.ToString();
-                }
-                //将空文章添加到数据库中 目的是为了获取索引
-                var article = new Article
-                {
-                    Type = model.Type,
-                    CreateUser = user,
-                    CreateTime = DateTime.Now.ToCstTime(),
-                    LastEditTime = DateTime.Now.ToCstTime()
-                };
-                article = await _articleRepository.InsertAsync(article);
-                //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                {
-                    await _examineService.ExamineEditArticleMainAsync(article, entryMain);
-                    await _examineService.UniversalCreateArticleExaminedAsync(article, user, true, resulte, Operation.EditArticleMain, model.Note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, article.Id, Operation.EditArticleMain);
-                }
-                else
-                {
-                    await _examineService.UniversalCreateArticleExaminedAsync(article, user, false, resulte, Operation.EditArticleMain, model.Note);
-                }
 
+                newArticle.Name = model.Name;
+                newArticle.BriefIntroduction = model.BriefIntroduction;
+                newArticle.MainPicture = model.MainPicture;
+                    newArticle.BackgroundPicture = model.BackgroundPicture;
+                newArticle.SmallBackgroundPicture = model.SmallBackgroundPicture;
+                newArticle.Type = model.Type;
+                newArticle.OriginalAuthor = model.OriginalAuthor;
+                newArticle.OriginalLink = model.OriginalLink;
+                newArticle.PubishTime = model.PubishTime;
+                newArticle.RealNewsTime = model.RealNewsTime;
+                newArticle.DisplayName = model.DisplayName;
+                newArticle.NewsType = model.NewsType;
+              
                 //第二步 处理关联词条
 
                 //创建审核数据模型
@@ -484,84 +458,45 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 }
 
+                //第二步 修改文章关联词条
+
+                var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
+                var articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
 
 
-                //处理关联文章
-
-                //添加新建项目
-                foreach (var item in articleIds.Where(s => articleRelevances.Relevances.Where(s => s.Type == RelevancesType.Article).Select(s => s.DisplayName).Contains(s.ToString()) == false))
+                newArticle.Outlinks.Clear();
+                newArticle.Entries = entries;
+                newArticle.ArticleRelationFromArticleNavigation = articles.Select(s => new ArticleRelation
                 {
-                    articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
-                    {
-                        DisplayName = item.ToString(),
-                        Type = RelevancesType.Article,
-                        IsDelete = false
-                    });
+                    ToArticle = s.Id,
+                    ToArticleNavigation = s
+                }).ToList();
 
-                }
-                //处理外部链接
-
-                //循环查找外部链接是否相同
                 foreach (var item in model.others)
                 {
-
-                    articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                    newArticle.Outlinks.Add(new Outlink
                     {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.DisPlayValue,
-                        Type = RelevancesType.Outlink,
+                        Name = item.DisplayName,
+                        BriefIntroduction = item.DisPlayValue,
                         Link = item.Link,
-                        IsDelete = false
                     });
-
                 }
 
-                //判断审核是否为空
-                if (articleRelevances.Relevances.Count != 0)
+                //第三步 修改文章正文
+                newArticle.MainPage = model.Context;
+
+                newArticle.CreateTime = DateTime.Now.ToCstTime();
+                var article = new Article();
+                //获取审核记录
+                try
                 {
-
-                    //序列化JSON
-                    resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, articleRelevances);
-                        resulte = text.ToString();
-                    }
-
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEditArticleRelevancesAsync(article, articleRelevances);
-                        await _examineService.UniversalCreateArticleExaminedAsync(article, user, true, resulte, Operation.EditArticleRelevanes, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, article.Id, Operation.EditArticleRelevanes);
-
-                    }
-                    else
-                    {
-                        await _examineService.UniversalCreateArticleExaminedAsync(article, user, false, resulte, Operation.EditArticleRelevanes, model.Note);
-                    }
+                    article = await _examineService.AddNewArticleExaminesAsync(newArticle, user, model.Note);
                 }
-
-                //第三步 添加正文
-
-                //判断是否为空
-                if (model.Context != null && string.IsNullOrWhiteSpace(model.Context) == false)
+                catch (Exception ex)
                 {
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEditArticleMainPageAsync(article, model.Context);
-                        await _examineService.UniversalCreateArticleExaminedAsync(article, user, true, model.Context, Operation.EditArticleMainPage, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, article.Id, Operation.EditArticleMainPage);
+                    return new Result { Successful = false, Error = ex.Message };
 
-                    }
-                    else
-                    {
-                        await _examineService.UniversalCreateArticleExaminedAsync(article, user, false, model.Context, Operation.EditArticleMainPage, model.Note);
-                    }
                 }
-
                 return new Result { Successful = true, Error = article.Id.ToString() };
             }
             catch
@@ -737,18 +672,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Error = "只有管理员才有权限发布公告", Successful = false };
                 }
 
-                //查找当前文章
-                var article = await _articleRepository.GetAll()
-                    .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
-                    .Include(s => s.Entries)
-                    .Include(s => s.Outlinks)
-                    .FirstOrDefaultAsync(s => s.Id == model.Id);
-                if (article == null)
-                {
-                    return new Result { Error = $"无法找到ID为{model.Id}的文章", Successful = false };
-                }
-                //判断名称是否重复
-                if (model.Name != article.Name && await _articleRepository.FirstOrDefaultAsync(s => s.Name == model.Name && s.Id != model.Id) != null)
+               //判断名称是否重复
+                if ( await _articleRepository.GetAll().AnyAsync(s => s.Name == model.Name && s.Id != model.Id))
                 {
                     return new Result { Error = "该文章的名称与其他文章重复", Successful = false };
                 }
@@ -788,217 +713,109 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = ex.Message };
                 }
 
+                //查找当前文章
+                var currentArticle = await _articleRepository.GetAll()
+                    .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
+                    .Include(s => s.Entries)
+                    .Include(s => s.Outlinks)
+                    .FirstOrDefaultAsync(s => s.Id == model.Id);
+                var newArticle = await _articleRepository.GetAll().AsNoTracking()
+                    .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
+                    .Include(s => s.Entries)
+                    .Include(s => s.Outlinks)
+                    .FirstOrDefaultAsync(s => s.Id == model.Id);
+
+                if (currentArticle == null)
+                {
+                    return new Result { Error = $"无法找到ID为{model.Id}的文章", Successful = false };
+                }
+
+
 
                 //第一步 修改文章主要信息
 
-                //判断是否修改
-                if (article.SmallBackgroundPicture != model.SmallBackgroundPicture || article.DisplayName != model.DisplayName || article.NewsType != model.NewsType ||
-                    article.BriefIntroduction != model.BriefIntroduction || article.MainPicture != model.MainPicture
-                    || article.BackgroundPicture != model.BackgroundPicture || article.RealNewsTime != model.RealNewsTime || article.RealNewsTime != model.RealNewsTime
-                    || article.Type != model.Type || article.OriginalLink != model.OriginalLink || article.OriginalAuthor != model.OriginalAuthor || article.PubishTime.ToString("D") != model.PubishTime.ToString("D"))
-                {
-                    //添加修改记录
-                    //新建审核数据对象
-                    var articleMain = new ArticleMain
-                    {
-                        Name = model.Name,
-                        BriefIntroduction = model.BriefIntroduction,
-                        MainPicture = model.MainPicture,
-                        BackgroundPicture = model.BackgroundPicture,
-                        Type = model.Type,
-                        OriginalAuthor = model.OriginalAuthor,
-                        OriginalLink = model.OriginalLink,
-                        PubishTime = model.PubishTime,
-                        RealNewsTime = model.RealNewsTime,
-                        DisplayName = model.DisplayName,
-                        NewsType = model.NewsType,
-                        SmallBackgroundPicture = model.SmallBackgroundPicture
-                    };
-                    //序列化
-                    var resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, articleMain);
-                        resulte = text.ToString();
-                    }
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEditArticleMainAsync(article, articleMain);
-                        await _examineService.UniversalEditArticleExaminedAsync(article, user, true, resulte, Operation.EditArticleMain, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, article.Id, Operation.EditArticleMain);
+                newArticle.Name = model.Name;
+                newArticle.BriefIntroduction = model.BriefIntroduction;
+                newArticle.MainPicture = model.MainPicture;
+                newArticle.BackgroundPicture = model.BackgroundPicture;
+                newArticle.Type = model.Type;
+                newArticle.OriginalAuthor = model.OriginalAuthor;
+                newArticle.OriginalLink = model.OriginalLink;
+                newArticle.PubishTime = model.PubishTime;
+                newArticle.RealNewsTime = model.RealNewsTime;
+                newArticle.DisplayName = model.DisplayName;
+                newArticle.NewsType = model.NewsType;
+                newArticle.SmallBackgroundPicture = model.SmallBackgroundPicture;
 
-                    }
-                    else
-                    {
-                        await _examineService.UniversalEditArticleExaminedAsync(article, user, false, resulte, Operation.EditArticleMain, model.Note);
-                    }
-                }
 
 
                 //第二步 修改文章关联词条
 
-                //创建审核数据模型
-                var examinedModel = new ArticleRelevances();
+                var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
+                var articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
 
-                //处理关联词条
 
-                //遍历当前词条数据 打上删除标签
-                foreach (var item in article.ArticleRelationFromArticleNavigation.Select(s => s.ToArticleNavigation))
+                newArticle.Outlinks.Clear();
+                newArticle.Entries = entries;
+                newArticle.ArticleRelationFromArticleNavigation = articles.Select(s => new ArticleRelation
                 {
-                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
-                    {
-                        DisplayName = item.Id.ToString(),
-                        DisplayValue = item.Name,
-                        Type = RelevancesType.Article,
-                        IsDelete = true,
-                    });
-                }
+                    ToArticle = s.Id,
+                    ToArticleNavigation = s
+                }).ToList();
 
-                //再遍历视图 对应修改
-
-                //添加新建项目
-                foreach (var item in articleIds.Where(s => examinedModel.Relevances.Where(s => s.Type == RelevancesType.Article).Select(s => s.DisplayName).Contains(s.ToString()) == false))
-                {
-                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
-                    {
-                        DisplayName = item.ToString(),
-                        Type = RelevancesType.Article,
-                        IsDelete = false
-                    });
-
-                }
-                //删除不存在的老项目
-                examinedModel.Relevances.RemoveAll(s => articleIds.Select(s => s.ToString()).Contains(s.DisplayName) && s.IsDelete && s.Type == RelevancesType.Article);
-
-
-                //处理关联文章
-                //遍历当前文章数据 打上删除标签
-                foreach (var item in article.Entries)
-                {
-                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
-                    {
-                        DisplayName = item.Id.ToString(),
-                        DisplayValue = item.Name,
-                        Type = RelevancesType.Entry,
-                        IsDelete = true,
-                    });
-                }
-
-                //再遍历视图 对应修改
-
-                //添加新建项目
-                foreach (var item in entryIds.Where(s => examinedModel.Relevances.Where(s => s.Type == RelevancesType.Entry).Select(s => s.DisplayName).Contains(s.ToString()) == false))
-                {
-                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
-                    {
-                        DisplayName = item.ToString(),
-                        Type = RelevancesType.Entry,
-                        IsDelete = false
-                    });
-
-                }
-                //删除不存在的老项目
-                examinedModel.Relevances.RemoveAll(s => entryIds.Select(s => s.ToString()).Contains(s.DisplayName) && s.IsDelete && s.Type == RelevancesType.Entry);
-                //处理外部链接
-
-
-                //遍历当前词条外部链接 打上删除标签
-                foreach (var item in article.Outlinks)
-                {
-                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
-                    {
-                        DisplayName = item.Name,
-                        DisplayValue = item.BriefIntroduction,
-                        IsDelete = true,
-                        Type = RelevancesType.Outlink,
-                        Link = item.Link
-                    });
-                }
-
-
-                //循环查找外部链接是否相同
                 foreach (var item in model.others)
-                {
-                    var isSame = false;
-                    foreach (var infor in article.Outlinks)
+{
+                    newArticle.Outlinks.Add(new Outlink
                     {
-                        if (item.DisplayName == infor.Name && item.DisPlayValue == infor.BriefIntroduction && item.Link == infor.Link)
-                        {
-                            //如果两次一致 删除上一步中的项目
-                            foreach (var temp in examinedModel.Relevances.Where(s => s.Type == RelevancesType.Outlink))
-                            {
-                                if (temp.DisplayName == infor.Name && temp.DisplayValue == infor.BriefIntroduction && temp.Link == infor.Link)
-                                {
-                                    examinedModel.Relevances.Remove(temp);
-                                    isSame = true;
-                                    break;
-                                }
-                            }
-                            isSame = true;
-                            break;
-                        }
-                    }
-                    if (isSame == false && string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                    {
-                        examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
-                        {
-                            DisplayName = item.DisplayName,
-                            DisplayValue = item.DisPlayValue,
-                            Type = RelevancesType.Outlink,
-                            Link = item.Link,
-                            IsDelete = false
-                        });
-                    }
+                        Name = item.DisplayName,
+                        BriefIntroduction = item.DisPlayValue,
+                        Link = item.Link,
+                    });
                 }
 
+                //第三步 修改文章正文
+                newArticle.MainPage = model.Context;
 
-                //判断审核是否为空
-                if (examinedModel.Relevances.Count != 0)
+                var examines = _articleService.ExaminesCompletion(currentArticle, newArticle);
+
+                examines = examines.OrderBy(s => s.Value).ToList();
+                foreach (var item in examines)
                 {
-                    //序列化JSON
+
                     var resulte = "";
                     using (TextWriter text = new StringWriter())
                     {
                         var serializer = new JsonSerializer();
-                        serializer.Serialize(text, examinedModel);
+                        serializer.Serialize(text, item.Key);
                         resulte = text.ToString();
                     }
-                    //判断是否是管理员
                     if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
-                        await _examineService.ExamineEditArticleRelevancesAsync(article, examinedModel);
-                        await _examineService.UniversalEditArticleExaminedAsync(article, user, true, resulte, Operation.EditArticleRelevanes, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, article.Id, Operation.EditArticleRelevanes);
+                        switch (item.Value)
+                        {
+                            case Operation.EditArticleMain:
+                                await _examineService.ExamineEditArticleMainAsync(currentArticle, item.Key as ExamineMain);
+                                break;
+                            case Operation.EditArticleMainPage:
+                                await _examineService.ExamineEditArticleMainPageAsync(currentArticle, item.Key as string);
+                                break;
+                            case Operation.EditArticleRelevanes:
+                                await _examineService.ExamineEditArticleRelevancesAsync(currentArticle, item.Key as ArticleRelevances);
+                                break;
+                            default:
+                                throw new Exception("不支持的类型");
+                        }
+
+                        await _examineService.UniversalEditArticleExaminedAsync(currentArticle, user, true, resulte, item.Value, model.Note);
+                        await _appHelper.AddUserContributionValueAsync(user.Id, currentArticle.Id, item.Value);
                     }
                     else
                     {
-                        await _examineService.UniversalEditArticleExaminedAsync(article, user, false, resulte, Operation.EditArticleRelevanes, model.Note);
+                        await _examineService.UniversalEditArticleExaminedAsync(currentArticle, user, false, resulte, item.Value, model.Note);
                     }
                 }
 
-                //第三步 修改文章正文
-
-                //判断是否为空
-                if (string.IsNullOrWhiteSpace(model.Context) == false && model.Context != article.MainPage)
-                {
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEditArticleMainPageAsync(article, model.Context);
-                        await _examineService.UniversalEditArticleExaminedAsync(article, user, true, model.Context, Operation.EditArticleMainPage, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, article.Id, Operation.EditArticleMainPage);
-
-                    }
-                    else
-                    {
-                        await _examineService.UniversalEditArticleExaminedAsync(article, user, false, model.Context, Operation.EditArticleMainPage, model.Note);
-                    }
-                }
-
-
-                return new Result { Successful = true, Error = article.Id.ToString() };
+                return new Result { Successful = true, Error = currentArticle.Id.ToString() };
             }
             catch
             {
@@ -1281,5 +1098,58 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             return model;
         }
+
+        /// <summary>
+        /// 获取编辑记录概览
+        /// </summary>
+        /// <param name="contrastId">要对比的编辑记录</param>
+        /// <param name="currentId">当前最新的编辑记录</param>
+        /// <returns></returns>
+        [HttpGet("{contrastId}/{currentId}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ArticleContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
+        {
+            if (contrastId > currentId)
+            {
+                return BadRequest("对比的编辑必须先于当前的编辑");
+            }
+
+            var contrastExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId);
+            var currentExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == currentId);
+
+            if (contrastExamine == null || currentExamine == null || contrastExamine.ArticleId == null || currentExamine.ArticleId == null || contrastExamine.ArticleId != currentExamine.ArticleId)
+            {
+                return NotFound("编辑记录Id不正确");
+            }
+
+            var currentArticle = new Article();
+            var newArticle = new Article();
+
+            //获取审核记录
+            var examines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.IsPassed == true && s.ArticleId == currentExamine.ArticleId).ToListAsync();
+
+            foreach (var item in examines.Where(s => s.Id <= contrastId))
+            {
+                await _articleService.UpdateArticleData(currentArticle, item);
+            }
+
+            foreach (var item in examines.Where(s => s.Id <= currentId))
+            {
+                await _articleService.UpdateArticleData(newArticle, item);
+            }
+
+            var result = _articleService.ConcompareAndGenerateModel(currentArticle, newArticle);
+
+            var model = new ArticleContrastEditRecordViewModel
+            {
+                ContrastId = contrastId,
+                CurrentId = currentId,
+                ContrastModel = result[0],
+                CurrentModel = result[1],
+            };
+
+            return model;
+        }
+
     }
 }

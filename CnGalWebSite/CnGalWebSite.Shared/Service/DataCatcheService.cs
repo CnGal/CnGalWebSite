@@ -4,6 +4,7 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
@@ -98,6 +99,19 @@ namespace CnGalWebSite.Shared.Service
         /// 主页轮播图数据缓存
         /// </summary>
         public IPageModelCatche<List<DataModel.Model.Carousel>> HomePageCarouselsCatche { get; set; }
+        /// <summary>
+        /// 编辑总览页面数据缓存
+        /// </summary>
+        public IPageModelCatche<ExaminesOverviewViewModel> ExaminesOverviewCatche { get; set; }
+        /// <summary>
+        /// 编辑对比页面数据缓存 词条
+        /// </summary>
+        public IPageModelCatche<EntryContrastEditRecordViewModel> EntryContrastEditRecordViewCatche { get; set; }
+        /// <summary>
+        /// 编辑对比页面数据缓存 文章
+        /// </summary>
+        public IPageModelCatche<ArticleContrastEditRecordViewModel> ArticleContrastEditRecordViewCatche { get; set; }
+
 
         /// <summary>
         /// 评论详情
@@ -123,7 +137,9 @@ namespace CnGalWebSite.Shared.Service
 
         public DataCatcheService(HttpClient httpClient, IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche, IPageModelCatche<VoteViewModel> voteIndexPageCatche,
         IPageModelCatche<PeripheryViewModel> peripheryIndexPageCatche, IPageModelCatche<TagIndexViewModel> tagIndexPageCatche, IPageModelCatche<List<HomeNewsAloneViewModel>> homePageNewsCatche,
-        IPageModelCatche<List<DataModel.Model.Carousel>> homePageCarouselsCatche)
+        IPageModelCatche<List<DataModel.Model.Carousel>> homePageCarouselsCatche,IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
+        IPageModelCatche<ArticleContrastEditRecordViewModel> articleContrastEditRecordViewCatche,
+        IPageModelCatche<EntryContrastEditRecordViewModel> entryContrastEditRecordViewCatche)
         {
             _httpClient = httpClient;
             (EntryIndexPageCatche = entryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/entries/GetEntryView/");
@@ -131,6 +147,9 @@ namespace CnGalWebSite.Shared.Service
             (PeripheryIndexPageCatche = peripheryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/peripheries/GetPeripheryView/");
             (VoteIndexPageCatche = voteIndexPageCatche).Init(ToolHelper.WebApiPath + "api/votes/GetVoteView/");
             (TagIndexPageCatche = tagIndexPageCatche).Init(ToolHelper.WebApiPath + "api/tags/gettag/");
+            (ExaminesOverviewCatche = examinesOverviewCatche).Init(ToolHelper.WebApiPath + "api/home/GetEditRecordsOverview/");
+            (EntryContrastEditRecordViewCatche = entryContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/entries/GetContrastEditRecordViews/");
+            (ArticleContrastEditRecordViewCatche = articleContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/articles/GetContrastEditRecordViews/");
             HomePageNewsCatche = homePageNewsCatche;
             HomePageCarouselsCatche = homePageCarouselsCatche;
         }

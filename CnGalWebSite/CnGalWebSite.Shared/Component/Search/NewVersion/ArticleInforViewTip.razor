@@ -9,7 +9,7 @@
                     <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
                     <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
                 </header>
-                <div style="@($" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; ")">
+                <div style="@($" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;    word-break: break-all; ")">
                     @Model.BriefIntroduction
                 </div>
             </div>

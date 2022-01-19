@@ -1,0 +1,160 @@
+﻿
+<div class="row">
+    <div class="col-12 col-xl-6">
+        <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 class="fw-bold m-0 font-color h5"><i class="fa fa-key"></i>&nbsp;&nbsp;对比的版本</h2>
+            </div>
+                    <Select Items="ContrastItems" OnSelectedItemChanged="OnContrastChanged" @bind-Value="ContrastItem" style="width:220px"></Select>
+
+        </div>
+        <CascadingValue Value=this>
+            @ContrastView
+        </CascadingValue>
+    </div>
+    <div class="col-12 col-xl-6">
+        <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 class="fw-bold  m-0 font-color h5"><i class="fa fa-lock"></i>&nbsp;&nbsp;当前的版本</h2>
+            </div>
+            <Select Items="CurrentItems" OnSelectedItemChanged="OnCurrentChanged" @bind-Value="CurrentItem" style="width:220px"></Select>
+
+        </div>
+        <CascadingValue Value=this>
+            @CurrentView
+        </CascadingValue>
+
+    </div>
+</div>
+
+
+
+
+@code {
+    [Parameter]
+    public ExaminesOverviewViewModel Model { get; set; }
+    [Parameter]
+    public RenderFragment ContrastView { get; set; }
+    [Parameter]
+    public RenderFragment CurrentView { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ContrastChanged { get; set; }
+    [Parameter]
+    public EventCallback<string> CurrentChanged { get; set; }
+
+    private List<SelectedItem> ContrastItems { get; set; } = new List<SelectedItem>();
+    private List<SelectedItem> CurrentItems { get; set; } = new List<SelectedItem>();
+    [Parameter]
+    public string ContrastItem { get; set; }
+    [Parameter]
+    public string CurrentItem { get; set; }
+
+    bool isContrastFirst = true;
+    bool isCurrentFirst = true;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await  GenerateList();
+    }
+    public Task GenerateList()
+    {
+        ContrastItems.Clear();
+        CurrentItems.Clear();
+        var isContrast = false;
+        var isCurrent = false;
+        foreach (var item in Model.Examines)
+        {
+            if(isCurrent==false)
+            {
+                ContrastItems.Add(new SelectedItem
+                {
+                    Text = $"『{item.Id.ToString("00000")}』 {item.ApplyTime.ToString("yyyy/M/d HH:mm")}",
+                    Value = item.Id.ToString(),
+                    Active = item.IsSelected
+                });
+                if(item.IsSelected)
+                {
+                    ContrastItem = item.Id.ToString();
+                }
+            }
+            if(item.Id.ToString()==CurrentItem)
+            {
+                isCurrent = true;
+            }
+            if (item.IsSelected)
+            {
+                isContrast = true;
+            }
+            if (isContrast)
+            {
+                CurrentItems.Add(new SelectedItem
+                {
+                    Text = $"『{item.Id.ToString("00000")}』 {item.ApplyTime.ToString("yyyy/M/d HH:mm")}",
+                    Value = item.Id.ToString(),
+                    Active = CurrentItem== item.Id.ToString()
+                });
+                if (CurrentItem == item.Id.ToString())
+                {
+                    CurrentItem = item.Id.ToString();
+                }
+            }
+        }
+        if (CurrentItems.Count == 0)
+        {
+            var item = Model.Examines.Last();
+            CurrentItems.Add(new SelectedItem
+            {
+                Text = $"『{item.Id.ToString("00000")}』 {item.ApplyTime.ToString("yyyy/M/d HH:mm")}",
+                Value = item.Id.ToString(),
+                Active = CurrentItem == item.Id.ToString()
+            });
+            if(CurrentItem == item.Id.ToString())
+            {
+                CurrentItem = item.Id.ToString();
+            }
+        }
+        if(CurrentItems.Any(s=>s.Active)==false)
+        {
+            CurrentItems.Last().Active = true;
+            CurrentItem = CurrentItems.Last().Value;
+        }
+        return Task.CompletedTask;
+    }
+
+    public async Task OnContrastChanged(SelectedItem item)
+    {
+        if(isContrastFirst)
+        {
+            isContrastFirst = false;
+            return;
+        }
+        foreach(var temp in Model.Examines)
+        {
+            if(temp.Id.ToString()==item.Value)
+            {
+                temp.IsSelected = true;
+            }
+            else
+            {
+                temp.IsSelected = false;
+            }
+        }
+
+        await GenerateList();
+        StateHasChanged();
+        await ContrastChanged.InvokeAsync(item.Value);
+    }
+    public async Task OnCurrentChanged(SelectedItem item)
+    {
+        if (isCurrentFirst)
+        {
+            isCurrentFirst = false;
+            return;
+        }
+        await GenerateList();
+        StateHasChanged();
+        await CurrentChanged.InvokeAsync(item.Value);
+    }
+}

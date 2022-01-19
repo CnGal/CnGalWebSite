@@ -558,73 +558,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         /// <summary>
-        /// 获取编辑记录概览
-        /// </summary>
-        /// <param name="id">要对比的编辑记录</param>
-        /// <returns></returns>
-        [AllowAnonymous]
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ExaminesOverviewViewModel>> GetEditRecordsOverview(long id)
-        {
-            var examine = await _examineRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == id && s.IsPassed == true);
-            if(examine == null)
-            {
-                return NotFound("无法找到该审核");
-            }
-
-            var model = new ExaminesOverviewViewModel();
-            if (examine.EntryId != null)
-            {
-                var entry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examine.EntryId);
-                if (entry == null)
-                {
-                    return NotFound("无法找到审核记录对应的词条");
-                }
-
-                model.ObjectId = entry.Id;
-                model.ObjectName = entry.Name;
-                model.ObjectBriefIntroduction = entry.BriefIntroduction;
-                model.Image = (entry.Type == EntryType.Game || entry.Type == EntryType.ProductionGroup) ? _appHelper.GetImagePath(entry.MainPicture, "app.png") : _appHelper.GetImagePath(entry.Thumbnail, "user.png");
-                model.IsThumbnail = (entry.Type == EntryType.Game || entry.Type == EntryType.ProductionGroup) ? false : true;
-                model.Type = ExaminedNormalListModelType.Entry;
-
-                var examines = await _examineRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).Include(s=>s.Entry)
-                    .Where(s => s.EntryId == entry.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
-
-                var examinedView = new Models.ExaminedViewModel();
-
-                foreach (var item in examines)
-                {
-                    if (await _examineService.GetExamineView(examinedView, item))
-                    {
-
-                        model.Examines.Add(new EditRecordAloneViewModel
-                        {
-                            ApplyTime = item.ApplyTime,
-                            Comments = item.Comments,
-                            EditOverview = examinedView.EditOverview,
-                            Id = item.Id,
-                            Note = item.Note,
-                            Operation = item.Operation,
-                            PassedAdminName = item.PassedAdminName,
-                            PassedTime = item.PassedTime.Value,
-                            UserId = item.ApplicationUserId,
-                            IsSelected = item.Id == id,
-                            UserName = item.ApplicationUser.UserName
-                        });
-                    }
-
-                }
-
-                return model;
-            }
-            else
-            {
-                return BadRequest("无效的类型");
-            }
-        }
-
-        /// <summary>
         /// 获取编辑记录详细信息视图
         /// </summary>
         /// <param name="id"></param>
@@ -793,14 +726,14 @@ namespace CnGalWebSite.APIServer.Controllers
                             return NotFound();
                         }
                         //序列化数据
-                        EntryMain entryMain = null;
+                        ExamineMain examineMain = null;
                         using (TextReader str = new StringReader(examine.Context))
                         {
                             var serializer = new JsonSerializer();
-                            entryMain = (EntryMain)serializer.Deserialize(str, typeof(EntryMain));
+                            examineMain = (ExamineMain)serializer.Deserialize(str, typeof(ExamineMain));
                         }
 
-                        await _examineService.ExamineEstablishMainAsync(entry, entryMain);
+                        await _examineService.ExamineEstablishMainAsync(entry, examineMain);
                         break;
                     case Operation.EstablishAddInfor:
                         entry = await _entryRepository.GetAll()
@@ -892,11 +825,11 @@ namespace CnGalWebSite.APIServer.Controllers
                             return NotFound();
                         }
                         //序列化数据
-                        ArticleMain articleMain = null;
+                        ExamineMain articleMain = null;
                         using (TextReader str = new StringReader(examine.Context))
                         {
                             var serializer = new JsonSerializer();
-                            articleMain = (ArticleMain)serializer.Deserialize(str, typeof(ArticleMain));
+                            articleMain = (ExamineMain)serializer.Deserialize(str, typeof(ExamineMain));
                         }
 
                         await _examineService.ExamineEditArticleMainAsync(article, articleMain);
@@ -1564,15 +1497,19 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var examines = await _examineRepository.GetAll().Where(s => s.Operation == Operation.EstablishImages).ToListAsync();
-                foreach (var item in examines)
-                {
-                    item.Context = item.Context.Replace("pic.sliots.top", "pic.cngal.top");
-                    await _examineRepository.UpdateAsync(item);
-                }
+                await _examineRepository.DeleteAsync(s => s.Operation == Operation.EstablishTags && s.Context == "{\"Tags\":[]}");
 
-                await _examineService.MigrationEditEntryRelevanceExamineRecord();
-                await _examineService.MigrationEditArticleRelevanceExamineRecord();
+                //var examines = await _examineRepository.GetAll().Where(s => s.Operation == Operation.EstablishImages).ToListAsync();
+                //foreach (var item in examines)
+                //{
+                //    item.Context = item.Context.Replace("pic.sliots.top", "pic.cngal.top");
+                //    await _examineRepository.UpdateAsync(item);
+                //}
+
+                //await _examineService.MigrationEditEntryRelevanceExamineRecord();
+                //await _examineService.MigrationEditArticleRelevanceExamineRecord();
+                //await _examineService.ReplaceEditEntryMainExamineContext();
+                //await _examineService.ReplaceEditArticleMainExamineContext();
                 //string temp= await _fileService.SaveImageAsync("https://wx4.sinaimg.cn/mw2000/008qAv3ngy1gyem1zkfwqj31cr0s9hbg.jpg", _configuration["NewsAdminId"]);
                 //await _elasticsearchService.DeleteDataOfElasticsearch();
                 //await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);

@@ -31,6 +31,10 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if(Id==0)
+        {
+            return;
+        }
         try
         {
             Model = await Http.GetFromJsonAsync<List<VoteCardViewModel>>(ToolHelper.WebApiPath + "api/votes/GetRelatedVotes/" + (int)Type + "/" + Id);

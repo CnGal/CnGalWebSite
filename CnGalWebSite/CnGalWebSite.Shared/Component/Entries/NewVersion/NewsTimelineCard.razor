@@ -1,0 +1,53 @@
+﻿<Timeline Items="AlternateTimelineItems" IsAlternate="!((IsSmallScreen) || (Model.NewsOfEntry.Count < 3))" />
+
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
+    private readonly List<TimelineItem> AlternateTimelineItems = new List<TimelineItem>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        //初始化动态时间线
+        InitNewsTimeLine();
+    }
+    public Color GetColor(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                return Color.Primary;
+            case 1:
+                return Color.Info;
+            case 2:
+                return Color.Success;
+            case 3:
+                return Color.Warning;
+            default:
+                return Color.Danger;
+        }
+    }
+    public void InitNewsTimeLine()
+    {
+        int next = 0;
+        AlternateTimelineItems.Clear();
+        foreach (var item in Model.NewsOfEntry.OrderByDescending(s => s.HappenedTime))
+        {
+            AlternateTimelineItems.Add(new TimelineItem
+            {
+                Color = GetColor((next++) % 4),
+                Component = BootstrapDynamicComponent.CreateComponent<CnGalWebSite.Shared.Component.Entries.TimeLinePart>(new Dictionary<string, object>
+                {
+                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.Title)] = item.Title,
+                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.BriefIntroduction)] = item.BriefIntroduction,
+                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.HappenedTime)] = item.HappenedTime,
+                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.Link)] = item.Link,
+                }),
+                Description = item.HappenedTime.ToString("yyyy-MM-dd")
+            });
+        }
+    }
+
+}

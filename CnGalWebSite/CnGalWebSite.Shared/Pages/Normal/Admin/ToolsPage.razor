@@ -141,7 +141,7 @@
         //上传
         try
         {
-            await ToastService.Success("正在执行临时脚本", "任务执行需要一定时间，请稍安勿躁");
+            await ToastService.Success("正在执行临时脚本", "任务执行需要一定时间，请稍安勿躁哦");
             var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/admin/TempFunction");
             //判断结果
             if (obj.Successful == false)

@@ -1,0 +1,75 @@
+﻿@inject ToastService ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+
+<div>
+    @if (IsSmallScreen)
+    {
+        <div>
+            <i class="fa fa-tags fa-fw article-tag-text-color"></i>
+            @foreach (var item in Model.Relevances)
+            {
+                @foreach (var temp in item.Informations)
+                {
+                    @if (string.IsNullOrWhiteSpace(temp.Link))
+                    {
+                        <button class="article-tag article-tag-color" @onclick="@(()=>OnClickNull(temp.DisplayName))">@temp.DisplayName</button>
+
+                    }
+                    else
+                    {
+                        <TabLink class="article-tag article-tag-color" Url="@temp.Link" Text="@temp.DisplayName" Icon="fa fa-link">@temp.DisplayName</TabLink>
+
+                    }
+                }
+            }
+            <div style="float: right;" class="article-tag-text-color">最后编辑：@Model.LastEditTime.ToString("yyyy-MM-dd")</div>
+
+        </div>
+    }
+    else
+    {
+        @if (Model.Relevances.Count > 0)
+        {
+            <div class=" rounded shadow-sm  p-3 mt-3 bg-opacity">
+                <div style="display: flex; flex-wrap: wrap; align-items: center;">
+                    <i class="fa fa-tags fa-fw article-tag-text-color-large"></i>
+                    @foreach (var item in Model.Relevances)
+                    {
+                        @foreach (var temp in item.Informations)
+                        {
+                            @if (string.IsNullOrWhiteSpace(temp.Link))
+                            {
+                                <button class="article-tag article-tag-color-large" @onclick="@(()=>OnClickNull(temp.DisplayName))">@temp.DisplayName</button>
+
+                            }
+                            else
+                            {
+                                <TabLink class="article-tag article-tag-color-large" Url="@temp.Link" Text="@temp.DisplayName" Icon="fa fa-link">@temp.DisplayName</TabLink>
+
+                            }
+                        }
+                    }
+                </div>
+            </div>
+
+        }
+
+    }
+</div>
+
+@code {
+    [Parameter]
+    public ArticleViewModel Model { get; set; } = new ArticleViewModel();
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
+
+    public async Task OnClickNull(string text)
+    {
+
+        await ToastService.Error("该词条不存在", "你可以亲自创建“" + text + "”哦~");
+
+
+    }
+}

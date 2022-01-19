@@ -25,6 +25,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TencentCloud.Cme.V20191029.Models;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -234,7 +235,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //建立视图模型
             var model = await _entryService.GetEntryIndexViewModelAsync(entry);
-            model.Examines = await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => s.EntryId == entry.Id && s.IsPassed == true), true);
+            model.Examines = await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => s.EntryId == entry.Id && s.IsPassed == true).OrderByDescending(s=>s.Id), true);
 
             if (user != null)
             {
@@ -500,7 +501,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断是否是管理员
             if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
-                await _examineService.ExamineEstablishMainAsync(currentEntry, examine.Key as EntryMain);
+                await _examineService.ExamineEstablishMainAsync(currentEntry, examine.Key as ExamineMain);
                 await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishMain, model.Note);
                 await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishMain);
             }
@@ -1525,6 +1526,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
             var articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
 
+            newEntry.Outlinks.Clear();
             newEntry.Articles = articles;
             newEntry.EntryRelationFromEntryNavigation = entries.Select(s => new EntryRelation
             {
@@ -1532,10 +1534,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 ToEntryNavigation = s
             }).ToList();
 
-            //循环查找外部链接是否相同
             foreach (var item in model.others)
             {
-
                 newEntry.Outlinks.Add(new Outlink
                 {
                     Name = item.DisplayName,
@@ -1970,62 +1970,16 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 //第六步 建立词条标签
                 newEntry.Tags = tags;
-
-                //获取审核记录
-                var examines = _entryService.ExaminesCompletion(new Entry(), newEntry);
-
-                if (examines.Any(s => s.Value == Operation.EstablishMain) == false)
-                {
-                    return new Result { Successful = false, Error = "无法获取主要信息审核记录，请联系管理员" };
-                }
                 var entry = new Entry();
-
-                entry = await _entryRepository.InsertAsync(entry);
-
-                examines = examines.OrderBy(s => s.Value).ToList();
-                foreach (var item in examines)
+                //获取审核记录
+                try
                 {
+                    entry= await _examineService.AddNewEtryExaminesAsync(newEntry, user, model.Note);
+                }
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
 
-                    var resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, item.Key);
-                        resulte = text.ToString();
-                    }
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        switch (item.Value)
-                        {
-                            case Operation.EstablishMain:
-                                await _examineService.ExamineEstablishMainAsync(entry, item.Key as EntryMain);
-                                break;
-                            case Operation.EstablishAddInfor:
-                                await _examineService.ExamineEstablishAddInforAsync(entry, item.Key as EntryAddInfor);
-                                break;
-                            case Operation.EstablishMainPage:
-                                await _examineService.ExamineEstablishMainPageAsync(entry, item.Key as string);
-                                break;
-                            case Operation.EstablishImages:
-                                await _examineService.ExamineEstablishImagesAsync(entry, item.Key as EntryImages);
-                                break;
-                            case Operation.EstablishRelevances:
-                                await _examineService.ExamineEstablishRelevancesAsync(entry, item.Key as EntryRelevances);
-                                break;
-                            case Operation.EstablishTags:
-                                await _examineService.ExamineEstablishTagsAsync(entry, item.Key as EntryTags);
-                                break;
-                            default:
-                                throw new Exception("不支持的类型");
-                        }
-
-                        await _examineService.UniversalEstablishExaminedAsync(entry, user, true, resulte, item.Value, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, item.Value);
-                    }
-                    else
-                    {
-                        await _examineService.UniversalEditExaminedAsync(entry, user, false, resulte, item.Value, model.Note);
-                    }
                 }
 
                 //创建词条成功
@@ -2294,6 +2248,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <param name="currentId">当前最新的编辑记录</param>
         /// <returns></returns>
         [HttpGet("{contrastId}/{currentId}")]
+        [AllowAnonymous]
         public async Task<ActionResult<EntryContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
             if (contrastId > currentId)
@@ -2315,12 +2270,12 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取审核记录
             var examines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.IsPassed == true && s.EntryId == currentExamine.EntryId).ToListAsync();
 
-            foreach (var item in examines.Where(s => s.Id < contrastId))
+            foreach (var item in examines.Where(s => s.Id <= contrastId))
             {
                 await _entryService.UpdateEntryDataAsync(currentEntry, item);
             }
 
-            foreach (var item in examines.Where(s => s.Id < currentId))
+            foreach (var item in examines.Where(s => s.Id <= currentId))
             {
                 await _entryService.UpdateEntryDataAsync(newEntry, item);
             }

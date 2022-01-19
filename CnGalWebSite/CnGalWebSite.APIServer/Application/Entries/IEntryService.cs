@@ -20,7 +20,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         Task<PagedResultDto<EntryInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input);
 
-        void UpdateEntryDataMain(Entry entry, EntryMain examine);
+        void UpdateEntryDataMain(Entry entry, ExamineMain examine);
+
+        void UpdateEntryDataMain(Entry entry, EntryMain_1_0 examine);
 
         void UpdateEntryDataAddInfor(Entry entry, EntryAddInfor examine);
 

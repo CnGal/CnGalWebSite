@@ -6,7 +6,7 @@
                 <div class="row">
                     @foreach (var item in Model.Roles)
                     {
-                        <div class="col-12 col-xxl-6 mt-3 ">
+                        <div class="col-12 col-lg-6 mt-3 ">
                             <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="@((Model.Roles.IndexOf(item)%11+1).ToString())" IsEdit="Model.IsEdit"/>
                         </div>
                     }
@@ -22,7 +22,7 @@
                 <div class="row">
                     @foreach (var item in Model.StaffGames)
                     {
-                        <div class="col-12 col-xxl-6 mt-3 ">
+                        <div class="@(" mt-3 "+(IsForceSmall?"col-12":"col-12 col-xxl-6"))">
                             <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="@((Model.StaffGames.IndexOf(item)%11+1).ToString())"  IsEdit="Model.IsEdit"/>
                         </div>
                     }
@@ -38,7 +38,7 @@
                 <div class="row">
                     @foreach (var item in Model.EntryRelevances)
                     {
-                        <div class="col-12 col-xxl-6 mt-3 ">
+                        <div class="@(" mt-3 "+(IsForceSmall?"col-12":"col-12 col-xxl-6"))">
                             <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="@((Model.EntryRelevances.IndexOf(item)%11+1).ToString())" IsEdit="Model.IsEdit" />
                         </div>
                     }
@@ -56,9 +56,9 @@
                     @foreach (var item in Model.ArticleRelevances)
                     {
 
-                        <div class="col-12 col-xxl-6 mt-3 ">
+                        <div class="@(" mt-3 "+(IsForceSmall?"col-12":"col-12 col-xxl-6"))">
 
-                            <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item"/>
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item" />
                         </div>
                     }
 
@@ -77,7 +77,7 @@
 
                     @foreach (var item in Model.OtherRelevances)
                     {
-                        <div class="col-12 col-xxl-6  mt-3 ">
+                        <div class="@(" mt-3 "+(IsForceSmall?"col-12":"col-12 col-xxl-6"))">
                             <RelevanceOtherTip Model="item" />
                         </div>
                     }
@@ -91,5 +91,7 @@
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public bool IsForceSmall { get; set; }
 
 }

@@ -2,6 +2,7 @@
 using CnGalWebSite.DataModel.ViewModel.Accounts;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Space;
@@ -56,6 +57,13 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<List<DataModel.Model.Carousel>> HomePageCarouselsCatche { get; set; }
 
         IPageModelCatche<VoteViewModel> VoteIndexPageCatche { get; set; }
+
+        IPageModelCatche<ExaminesOverviewViewModel> ExaminesOverviewCatche { get; set; }
+
+        IPageModelCatche<EntryContrastEditRecordViewModel> EntryContrastEditRecordViewCatche { get; set; }
+
+        IPageModelCatche<ArticleContrastEditRecordViewModel> ArticleContrastEditRecordViewCatche { get; set; }
+
 
         SearchViewModel SearchViewModel { get; set; }
 

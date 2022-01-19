@@ -165,8 +165,8 @@
             switch (Model.operation)
             {
                 case Operation.EstablishMain:
-                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<EntryMain>();
-                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<EntryMain>();
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<EntryMain_1_0>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<EntryMain_1_0>();
                     break;
                 case Operation.EstablishAddInfor:
                     Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<InformationsModel>>();
@@ -189,8 +189,8 @@
                     // Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<EntryMain>();
                     break;
                 case Operation.EditArticleMain:
-                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<ArticleMain>();
-                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<ArticleMain>();
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<ArticleMain_1_0>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<ArticleMain_1_0>();
                     break;
                 case Operation.EditArticleRelevanes:
                     Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<RelevancesViewModel>>();

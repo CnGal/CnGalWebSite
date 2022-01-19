@@ -1,7 +1,7 @@
 ﻿using CnGalWebSite.DataModel.Model;
 namespace CnGalWebSite.DataModel.ExamineModel
 {
-    public class EntryMain
+    public class EntryMain_1_0
     {
         public string Name { get; set; }
 

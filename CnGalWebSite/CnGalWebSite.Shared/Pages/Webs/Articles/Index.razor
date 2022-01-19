@@ -69,76 +69,18 @@ else
                     <AlertTip Title="@Model.DisambigName" Type="AlertTip.AlertTipType.ArticleDisPlayDisambigTip" Url="@("/disambigs/index/" + Model.DisambigId)"></AlertTip>
                 }
 
-                <div class="  rounded shadow-sm  bg-opacity pt-3 mb-4">
-                    <div class="row mt-2 ms-2 me-2" style="padding-right: 0;padding-left: 0;">
+                <div class="rounded shadow-sm bg-opacity mb-4 pb-4">
+                    <CnGalWebSite.Shared.Component.Articles.NewVersion.MainInforCard Model="Model" IsSmallScreen="IsSmallScreen" OnRevoke="OnRevoke" />
+                    @if (IsLargeScreen == false)
+                    {
+                <div class="ps-4 pe-4 ">
+                    <ArticleOperationTip Authority="AsyncModel.Authority" IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" Relevances="Model.Relevances" OnArticleClick="OnArticleClick" LastEditTime="Model.LastEditTime" IsThumbsUp="AsyncModel.IsThumbsUp"
+                                         IsLargeSreeen="IsLargeScreen" IsNormalSreeen="IsNormalScreen" IsSmallSreeen="IsSmallScreen" OnClickUrl="OnClickUrl" IsFavorited="IsUserFavorited"></ArticleOperationTip>
+                    <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard Model="Model" IsSmallScreen="true" />
 
-                        @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
-                        {
-                            <img class="col-12 col-md-12 col-lg-12 mt-1 mb-4" src="@Model.MainPicture" alt="@Model.Name">
-                        }
-                        <div class="col-12 col-md-12 col-lg-12 mt-1 mb-2">
-                            <h1 class="fw-bold text-center mt-4 h3">@Model.Name</h1>
+                </div>
 
-                            <p class="text-center" style="color: gray;margin-top:20px">
-                                <i class="fa fa-calendar fa-fw "></i>
-                                <span class="article-infor-text">@Model.CreateTime.ToString("yyyy-MM-dd")</span>&nbsp;&nbsp;&nbsp;
-                                <i class="fa fa-eye fa-fw "></i>
-                                <span class="article-infor-text">@(Model.ReaderCount + "次阅读")</span>&nbsp;&nbsp;&nbsp;
-                                <i class="fa fa-user fa-fw"></i>
-                                <TabLink Icon="fa fa-star-o" Url="@("/space/index/" + Model.UserId)" Text="@Model.LastEditUserName" class="a-font-color" style="color:gray;">
-                                    <span class="article-infor-text" @onclick="(() => OnUserClick())" style="cursor: pointer">@Model.LastEditUserName</span>
-                                </TabLink>
-                                @if (IsSmallScreen)
-                                {
-                                    <br />
-                                }
-                                else
-                                {
-                                    <span>&nbsp; &nbsp; &nbsp;</span>
-                                }
-                                <i class="fa fa-commenting-o fa-fw "></i>
-                                <span class="article-infor-text">@(Model.CommentCount + "条评论")&nbsp; &nbsp; &nbsp;</span>
-                                <i class="fa fa-thumbs-o-up fa-fw "></i>
-                                <span class="article-infor-text">@(Model.ThumbsUpCount + "人点赞")&nbsp; &nbsp; &nbsp;</span>
-
-                            </p>
-                        </div>
-                        <div class="col-12 col-md-12 col-lg-12">
-                            <hr />
-                            <div class="mb-4 mt-4">
-
-                                @if (isReady == true)
-                                {
-                                    @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false)
-                                    {
-
-                                        <div class="alert alert-primary  rounded shadow-sm  rounded" role="alert">
-                                            作者： <strong> @Model.OriginalAuthor</strong> &nbsp; 原文发表在： <a href="@Model.OriginalLink" class="alert-link" style="word-wrap: break-word;word-break:break-all;" target="_blank">@Model.OriginalLink</a>
-                                        </div>
-                                    }
-
-                                    if (Model.MainPageState == EditState.Preview || Model.MainState == EditState.Preview || Model.RelevancesState == EditState.Preview)
-                                    {
-                                        <AlertTip Title="编辑文章" Type="AlertTip.AlertTipType.preview" Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></AlertTip>
-                                    }
-                                    <div class="markdown-body">
-                                        @((MarkupString)Model.MainPage)
-                                    </div>
-                                    <div>
-                                        <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Article" Id="Model.Id" />
-                                    </div>
-
-                                    @if (IsLargeScreen == false)
-                                    {
-                                        <ArticleOperationTip Authority="AsyncModel.Authority" IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" Relevances="Model.Relevances" OnArticleClick="OnArticleClick" LastEditTime="Model.EditDate" IsThumbsUp="AsyncModel.IsThumbsUp"
-                                                             IsLargeSreeen="IsLargeScreen" IsNormalSreeen="IsNormalScreen" IsSmallSreeen="IsSmallScreen" OnClickUrl="OnClickUrl" IsFavorited="IsUserFavorited"></ArticleOperationTip>
-                                    }
-
-                                }
-                            </div>
-                        </div>
-                    </div>
-
+                    }
                 </div>
                 @if (Model.CanComment)
                 {
@@ -155,18 +97,20 @@ else
 
         @if (IsLargeScreen)
         {
-            <div class="col-xl-3">
-                @if (string.IsNullOrWhiteSpace(Model.UserId) == false)
-                {
-                    <UserInforTip Length="75" UserId="@Model.UserId" OnClickUrl="OnClickUrl"></UserInforTip>
-                }
+    <div class="col-xl-3">
+        @if (string.IsNullOrWhiteSpace(Model.UserId) == false)
+        {
+            <UserInforTip Length="75" UserId="@Model.UserId" OnClickUrl="OnClickUrl"></UserInforTip>
+        }
 
-                @if (IsLargeScreen)
-                {
-                    <ArticleOperationTip OnClickUrl="OnClickUrl" Authority="AsyncModel.Authority" IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" Relevances="Model.Relevances" OnArticleClick="OnArticleClick" LastEditTime="Model.EditDate" IsThumbsUp="AsyncModel.IsThumbsUp"
-                                         IsLargeSreeen="IsLargeScreen" IsNormalSreeen="IsNormalScreen" IsSmallSreeen="IsSmallScreen" IsFavorited="IsUserFavorited"></ArticleOperationTip>
-                }
-            </div>
+        @if (IsLargeScreen)
+        {
+            <ArticleOperationTip OnClickUrl="OnClickUrl" Authority="AsyncModel.Authority" IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" Relevances="Model.Relevances" OnArticleClick="OnArticleClick" LastEditTime="Model.LastEditTime" IsThumbsUp="AsyncModel.IsThumbsUp"
+                                 IsLargeSreeen="IsLargeScreen" IsNormalSreeen="IsNormalScreen" IsSmallSreeen="IsSmallScreen" IsFavorited="IsUserFavorited"></ArticleOperationTip>
+            <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard Model="Model" IsSmallScreen="false" />
+
+        }
+    </div>
         }
     </div>
 }
@@ -593,6 +537,10 @@ else
         else if (index == 8)
         {
             await OnFavoriteClick();
+        }
+        else if (index == 10)
+        {
+            NavigationManager.NavigateTo(Provider, "/home/editrecord?ContrastId=" + Model.LastExamineId + "&CurrentId=" + Model.LastExamineId, "『"+Model.Name+"』历史编辑记录总览", "fa fa-edit");
         }
     }
 

@@ -1,0 +1,75 @@
+﻿<div>
+    <div class=" mb-3 ">
+        <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="Model" IsSmallScreen="true" />
+    </div>
+    @if (Model.SteamId > 0)
+    {
+        <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard IsNormalScreen="true" Model="Model" />
+    }
+    @if (Model.Information.Count > 0)
+    {
+        <div>
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="Model" />
+        </div>
+
+    }
+    @if (Model.Tags.Count > 0)
+    {
+        <div>
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="Model" />
+        </div>
+    }
+    @if (Model.Staffs.Count > 0)
+    {
+        <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="Model" IsLargeScreen="false" />
+    }
+
+    @if (string.IsNullOrWhiteSpace(Model.MainPage) == false)
+    {
+        <div class="mb-3">
+            <TitleCollapseCard Icon="fa-home" Title="主页">
+                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity mt-3">
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="Model" IsLargeScreen="false" />
+                </div>
+            </TitleCollapseCard>
+        </div>
+
+    }
+    @if (Model.Pictures.Count > 0)
+    {
+        <div class="mb-3">
+            <TitleCollapseCard Icon="fa-picture-o" Title="相册">
+                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity mt-3">
+                    <EntryImageListViewTip Model="Model.Pictures"></EntryImageListViewTip>
+                </div>
+            </TitleCollapseCard>
+        </div>
+
+
+    }
+
+    @if (Model.NewsOfEntry.Count > 0)
+    {
+        <div class="mb-3">
+            <TitleCollapseCard Icon="fa-newspaper-o" Title="动态">
+                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity mt-3">
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.NewsTimelineCard Model="Model" IsSmallScreen="true" />
+                </div>
+            </TitleCollapseCard>
+        </div>
+
+    }
+    @if (Model.ArticleRelevances.Count != 0 || Model.EntryRelevances.Count != 0 || Model.OtherRelevances.Count != 0 || Model.StaffGames.Count != 0 || Model.Roles.Count != 0)
+    {
+        <div>
+            <EntryRelevancesNormalListViewTip Model="Model" IsForceSmall="true"></EntryRelevancesNormalListViewTip>
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; } = new EntryIndexViewModel();
+
+}
