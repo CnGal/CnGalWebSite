@@ -9,7 +9,7 @@
 
         <p class="text-center" style="color: gray;margin-top:20px">
             <i class="fa fa-calendar fa-fw "></i>
-            <span class="article-infor-text">@Model.CreateTime.ToString("yyyy-MM-dd")</span>&nbsp;&nbsp;&nbsp;
+            <span class="article-infor-text">@((Model.CreateTime.Year<1900?Model.LastEditTime: Model.CreateTime).ToString("yyyy-MM-dd"))</span>&nbsp;&nbsp;&nbsp;
             <i class="fa fa-eye fa-fw "></i>
             <span class="article-infor-text">@(Model.ReaderCount + "次阅读")</span>&nbsp;&nbsp;&nbsp;
             <i class="fa fa-user fa-fw"></i>

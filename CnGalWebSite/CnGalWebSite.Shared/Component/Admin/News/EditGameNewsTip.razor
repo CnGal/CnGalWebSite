@@ -163,6 +163,7 @@
             if (string.IsNullOrWhiteSpace(Model.WeiboId) == false && long.TryParse(Model.WeiboId, out temp) == false)
             {
                 await ToastService.Error("保存动态数据失败", "微博Id无效");
+                return;
             }
 
 

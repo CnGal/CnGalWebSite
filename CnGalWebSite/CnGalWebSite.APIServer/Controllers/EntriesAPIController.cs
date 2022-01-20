@@ -150,17 +150,18 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var id = -1;
                 id = int.Parse(_id);
-                entry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Disambig)
+                entry = await _entryRepository.GetAll().Include(s => s.Disambig)
                     .Include(s => s.Outlinks)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
+                    .Include(s => s.Articles).ThenInclude(s => s.Entries)
                     .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
                     .AsSplitQuery().FirstOrDefaultAsync(x => x.Id == id);
             }
             catch (Exception)
             {
-                entry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Disambig)
+                entry = await _entryRepository.GetAll().Include(s => s.Disambig)
                     .Include(s => s.Outlinks)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)

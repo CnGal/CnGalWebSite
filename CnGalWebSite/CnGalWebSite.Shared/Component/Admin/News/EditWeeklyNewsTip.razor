@@ -180,6 +180,7 @@
             if (Model.News.Any(s=>s.IsSelected)==false)
             {
                 await ToastService.Error("保存周报数据失败", "至少选中一个动态");
+                return;
             }
             foreach(var item in Model.News)
             {

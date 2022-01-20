@@ -781,14 +781,22 @@ namespace CnGalWebSite.APIServer.Controllers
                 examines = examines.OrderBy(s => s.Value).ToList();
                 foreach (var item in examines)
                 {
-
                     var resulte = "";
-                    using (TextWriter text = new StringWriter())
+
+                    if (item.Value == Operation.EditArticleMainPage)
                     {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, item.Key);
-                        resulte = text.ToString();
+                        resulte = item.Key as string;
                     }
+                    else
+                    {
+                        using (TextWriter text = new StringWriter())
+                        {
+                            var serializer = new JsonSerializer();
+                            serializer.Serialize(text, item.Key);
+                            resulte = text.ToString();
+                        }
+                    }
+                
                     if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         switch (item.Value)

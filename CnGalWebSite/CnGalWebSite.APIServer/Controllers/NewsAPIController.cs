@@ -274,6 +274,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 article.MainPage = model.MainPage;
                 article.MainPicture = model.MainPicture;
                 article.NewsType = model.NewsType;
+                article.PubishTime = model.PublishTime;
+                article.RealNewsTime = model.PublishTime;
 
                 await _articleRepository.UpdateAsync(article);
             }

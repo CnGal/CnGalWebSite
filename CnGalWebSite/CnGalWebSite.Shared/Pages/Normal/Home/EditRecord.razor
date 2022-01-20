@@ -195,21 +195,28 @@ else
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            NavigationManager.LocationChanged += LocationChanged;
+            if (_dataCatcheService.ThemeSetting.UseTabSet == false)
+            {
+                NavigationManager.LocationChanged += LocationChanged;
+            }
             isFirstLoad = false;
         }
 
     }
     public async void LocationChanged(object sender, LocationChangedEventArgs args)
     {
-        try
+        if(NavigationManager.Uri.Contains("/home/editrecord"))
         {
-            await OnRefreshContrastView(ContrastId.ToString(), CurrentId.ToString());
-        }
-        catch
-        {
+            try
+            {
+                await OnRefreshContrastView(ContrastId.ToString(), CurrentId.ToString());
+            }
+            catch
+            {
 
+            }
         }
+
     }
 
     protected override async Task OnInitializedAsync()
@@ -296,7 +303,10 @@ else
 
     public void  Dispose()
     {
-        NavigationManager.LocationChanged -= LocationChanged;
+        if (_dataCatcheService.ThemeSetting.UseTabSet == false)
+        {
+            NavigationManager.LocationChanged -= LocationChanged;
+        }
         GC.SuppressFinalize(this);
     }
     #endregion
