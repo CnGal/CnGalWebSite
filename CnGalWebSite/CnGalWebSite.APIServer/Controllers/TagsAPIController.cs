@@ -374,7 +374,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     await _tagService.UpdateTagDataAsync(tag, examine);
                 }
             }
-            foreach (var item in tag.Entries)
+            foreach (var item in tag.Entries.Where(s=>s.IsHidden==false))
             {
                 model.ChildrenEntries.Add(await _appHelper.GetEntryInforTipViewModel(item));
             }

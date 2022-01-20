@@ -1,23 +1,23 @@
 ﻿<TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.Id)" Text="@Model.Name" class="a-font-color h-100">
 
-    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 h-100">
+    <div class="div-shadow rounded  bg-opacity aticle-home-layout pb-3 h-100" style="display: flex; flex-direction: column; justify-content: space-between;">
         @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
         {
-            <div class="row mb-2">
-                <div class="col-12  pt-3">
+            <div class="">
+                <div class="">
                     <img class="img-fluid" src="@Model.MainImage">
                 </div>
-                <div class="col-12 pt-3">
-                    <header>
+                <div class="p-3">
+                    <header style=" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-all;">
                         <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
                         <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
                     </header>
-                    <div class="article-home-text">
+                    <div style=" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; word-break: break-all; ">
                         @Model.BriefIntroduction
                     </div>
                 </div>
             </div>
-            <div class="pb-3" style="color: gray;">
+            <div class="ps-3 pe-3" style="color: gray;">
                 <i class="fa fa-calendar fa-fw"></i>
                 <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
 
@@ -40,7 +40,7 @@
                             <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
                             <h5 class="fw-bold" style=" margin-bottom: 0px; margin-left: 5px; margin-top: 1px;">@Model.DisplayName</h5>
                         </header>
-                        <div class="article-home-text text-center">
+                        <div class="text-center" style=" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; word-break: break-all; ">
                             @Model.BriefIntroduction
                         </div>
                     </div>

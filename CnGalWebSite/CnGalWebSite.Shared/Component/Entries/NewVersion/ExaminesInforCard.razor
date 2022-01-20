@@ -3,11 +3,11 @@
 </div>
 
 @code {
-        [Parameter]
-        public List<ExaminedNormalListModel> Model { get; set; }
+    [Parameter]
+    public List<ExaminedNormalListModel> Model { get; set; }
 
-        [Parameter]
-        public bool IsSmallScreen { get; set; }
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
 
     private readonly List<TimelineItem> AlternateTimelineItems = new List<TimelineItem>();
 
@@ -45,7 +45,7 @@
                 Component = BootstrapDynamicComponent.CreateComponent<ExamineInforAloneTip>(new Dictionary<string, object>
                 {
                     [nameof(ExamineInforAloneTip.Model)] = item,
-                    [nameof(ExamineInforAloneTip.IsRight)] = Model.Count < 3 ? false : (Model.IndexOf(item) % 2 == 1),
+                    [nameof(ExamineInforAloneTip.IsRight)] = (IsSmallScreen || Model.Count < 3) ? false : (Model.IndexOf(item) % 2 == 1),
                     [nameof(ExamineInforAloneTip.LastExamineId)] = Model.Max(s => s.Id),
                 }),
                 Description = item.ApplyTime.ToString("yyyy/M/d HH:mm")

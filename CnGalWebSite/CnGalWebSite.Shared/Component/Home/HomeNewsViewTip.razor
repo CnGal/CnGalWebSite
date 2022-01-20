@@ -145,7 +145,7 @@
 
         try
         {
-            await JS.InvokeAsync<string>("trackEvent", "动态", "点击", model.Title, "1", "click");
+            await JS.InvokeAsync<string>("trackEvent", "动态", "点击", model.Text, "1", "click");
         }
         catch (Exception exc)
         {

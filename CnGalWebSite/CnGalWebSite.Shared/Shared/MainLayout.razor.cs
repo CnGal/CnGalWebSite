@@ -227,6 +227,7 @@ namespace CnGalWebSite.Shared.Shared
             {
                 new MenuItem() { Text = "主页", Icon = "fa fa-fw fa-home", Url = "/" , Match = NavLinkMatch.All},
                 new MenuItem() { Text = "随机", Icon = "fa fa-fw fa-random", Url = "/home/random" },
+                new MenuItem() { Text = "免费游戏", Icon = "fa fa-fw fa-dollar", Url = "/tags/index/92" },
 
                 new MenuItem() { Text = "文章", Icon = "fa fa-fw fa-newspaper-o", Url = "/articles/home" },
                 new MenuItem() { Text = "词条", Icon = "fa fa-fw fa-codepen", Url="/null", IsCollapsed=false, Items=new List<MenuItem>{

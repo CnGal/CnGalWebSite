@@ -2067,8 +2067,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = "当前词条该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }
             //查找词条
-            var newEntry = await _entryRepository.GetAll().Include(s => s.Tags).FirstOrDefaultAsync(x => x.Id == model.Id);
-            var currentEntry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Tags).FirstOrDefaultAsync(x => x.Id == model.Id);
+            var currentEntry = await _entryRepository.GetAll().Include(s => s.Tags).FirstOrDefaultAsync(x => x.Id == model.Id);
+            var newEntry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Tags).FirstOrDefaultAsync(x => x.Id == model.Id);
             if (newEntry == null)
             {
                 return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };

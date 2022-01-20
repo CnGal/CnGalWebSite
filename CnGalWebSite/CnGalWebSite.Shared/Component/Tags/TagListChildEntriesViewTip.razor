@@ -1,41 +1,37 @@
 ﻿
 <div class="mb-1">
-    <div class="shadow-sm rounded  bg-opacity ps-3 pe-3 mb-3">
-        <div style="display: block;">
-            <h2 class="fw-bold pt-3 pb-3 m-0 font-color h4"><i class="fa fa-codepen"></i>&nbsp;&nbsp;子词条</h2>
-        </div>
-    </div>
-
-    @if (IsEdit == true)
-    {
-        <div class="pb-1">
-            @switch (EditState)
-            {
-                case EditState.locked:
-                    <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                    break;
-                case EditState.Normal:
-                    <AlertTip Title="编辑子词条" Type="@(Model.Count==0?AlertTip.AlertTipType.Blank: AlertTip.AlertTipType.Editable)" Url="@("/tags/EditChildEntries/" + Id)"></AlertTip>
-                    break;
-            }
-        </div>
-    }
-    @if (EditState == EditState.Preview)
-    {
-        <div class="pb-1">
-            <AlertTip Title="编辑子词条" Type="AlertTip.AlertTipType.preview" Url="@("/tags/EditChildEntries/" + Id)" ExamineType="Operation.EditTagChildEntries" OnClickRevoke="OnClickRevoke"></AlertTip>
-        </div>
-    }
-
-    <div class="row">
-        @foreach (var item in Model)
+    <TitleCollapseCard Icon="fa-codepen" Title="子词条">
+        @if (IsEdit == true)
         {
-            <div class="@((IsNormalScreen?"col-12 col-md-6 col-lg-4 col-xxl-3":"col-12")+" mb-3")">
-                <TagChildEntryInforTip Model="item" />
+            <div class="pb-1">
+                @switch (EditState)
+                {
+                    case EditState.locked:
+                        <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                        break;
+                    case EditState.Normal:
+                        <AlertTip Title="编辑子词条" Type="@(Model.Count==0?AlertTip.AlertTipType.Blank: AlertTip.AlertTipType.Editable)" Url="@("/tags/EditChildEntries/" + Id)"></AlertTip>
+                        break;
+                }
+            </div>
+        }
+        @if (EditState == EditState.Preview)
+        {
+            <div class="pb-1">
+                <AlertTip Title="编辑子词条" Type="AlertTip.AlertTipType.preview" Url="@("/tags/EditChildEntries/" + Id)" ExamineType="Operation.EditTagChildEntries" OnClickRevoke="OnClickRevoke"></AlertTip>
             </div>
         }
 
-    </div>
+        <div class="row mt-3">
+            @foreach (var item in Model)
+            {
+                <div class="@((IsNormalScreen?"col-12 col-md-6 col-lg-4 col-xxl-3":"col-12")+" mb-3")">
+                    <TagChildEntryInforTip Model="item" />
+                </div>
+            }
+
+        </div>
+    </TitleCollapseCard>   
 </div>
 
 @code {

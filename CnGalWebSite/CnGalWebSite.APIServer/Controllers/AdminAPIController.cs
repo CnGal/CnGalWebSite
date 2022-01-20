@@ -1497,19 +1497,10 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _examineRepository.DeleteAsync(s => s.Operation == Operation.EstablishTags && s.Context == "{\"Tags\":[]}");
-
-                //var examines = await _examineRepository.GetAll().Where(s => s.Operation == Operation.EstablishImages).ToListAsync();
-                //foreach (var item in examines)
-                //{
-                //    item.Context = item.Context.Replace("pic.sliots.top", "pic.cngal.top");
-                //    await _examineRepository.UpdateAsync(item);
-                //}
-
-                //await _examineService.MigrationEditEntryRelevanceExamineRecord();
-                //await _examineService.MigrationEditArticleRelevanceExamineRecord();
-                //await _examineService.ReplaceEditEntryMainExamineContext();
-                //await _examineService.ReplaceEditArticleMainExamineContext();
+                var freegames =await _steamInforRepository.GetAll().Where(s => s.PriceNow == 0).Include(s => s.Entry).Select(s => s.Entry).ToListAsync();
+                var tag = await _tagRepository.GetAll().Include(s=>s.Entries).FirstOrDefaultAsync(s => s.Name == "免费");
+                tag.Entries = freegames;
+                await _tagRepository.UpdateAsync(tag);
                 //string temp= await _fileService.SaveImageAsync("https://wx4.sinaimg.cn/mw2000/008qAv3ngy1gyem1zkfwqj31cr0s9hbg.jpg", _configuration["NewsAdminId"]);
                 //await _elasticsearchService.DeleteDataOfElasticsearch();
                 //await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
