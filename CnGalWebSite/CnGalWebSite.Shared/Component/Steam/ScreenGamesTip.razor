@@ -1,0 +1,60 @@
+﻿
+<div class="row">
+    <div class="col-12 col-lg-4">
+        <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 class="fw-bold m-0 font-color h5"><i class="fa fa-filter"></i>&nbsp;&nbsp;筛选</h2>
+            </div>
+            <Select TValue="ScreenSteamType" Value="ScreenType" ValueChanged="OnScreenTypeChanged" style="width:105px"></Select>
+        </div>
+
+    </div>
+    <div class="col-12 col-lg-4">
+        <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 class="fw-bold  m-0 font-color h5"><i class="fa fa-sort-amount-desc"></i>&nbsp;&nbsp;主排</h2>
+            </div>
+            <Select TValue="SteamSortType" Value="OrderType" ValueChanged="OnOrderTypeChangedChanged" style="width:105px"></Select>
+        </div>
+
+    </div>
+    <div class="col-12 col-lg-4">
+        <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 class="fw-bold  m-0 font-color h5"><i class="fa fa-sort-amount-desc"></i>&nbsp;&nbsp;次排</h2>
+            </div>
+            <Select TValue="SteamSortType" Value="ThenOrderType" ValueChanged="OnThenOrderTypeChangedChanged" style="width:105px"></Select>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public ScreenSteamType ScreenType { get; set; }
+    [Parameter]
+    public SteamSortType OrderType { get; set; }
+    [Parameter]
+    public SteamSortType ThenOrderType { get; set; }
+
+    [Parameter]
+    public EventCallback< ScreenSteamType> ScreenTypeChanged { get; set; }
+    [Parameter]
+    public EventCallback<SteamSortType>  OrderTypeChanged { get; set; }
+    [Parameter]
+    public EventCallback<SteamSortType>  ThenOrderTypeChanged { get; set; }
+
+    public async Task OnScreenTypeChanged(ScreenSteamType type)
+    {
+        await ScreenTypeChanged.InvokeAsync(type);
+    }
+    public async Task OnOrderTypeChangedChanged(SteamSortType type)
+    {
+        await OrderTypeChanged.InvokeAsync(type);
+    }
+    public async Task OnThenOrderTypeChangedChanged(SteamSortType type)
+    {
+        await ThenOrderTypeChanged.InvokeAsync(type);
+    }
+
+}

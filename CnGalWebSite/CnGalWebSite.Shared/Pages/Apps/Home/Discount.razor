@@ -1,0 +1,174 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject NavigationManager NavigationManager
+
+
+<TitleTip Title="打折中的游戏"></TitleTip>
+
+<CnGalWebSite.Shared.AppComponent.Pages.Home.Steam.HeadBar Title="打折中的游戏" OrderType="OrderType" OrderTypeChanged="OrderTypeChanged" ScreenType="ScreenType"
+                                                           ScreenTypeChanged="ScreenTypeChanged"/>
+<div style="margin-top: 130px; width: 100%; ">
+    <div class="ms-3 me-3">
+        <div>
+            @foreach (var item in Items)
+            {
+                <div class="mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Home.Steam.SteamInforCard Model="item" />
+
+                </div>
+            }
+
+
+        </div>
+        @if (Items.Count == 0)
+        {
+            <CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard Type="无数据"/>
+        }
+    </div>
+</div>
+
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    bool isReady = false;
+
+    public List<SteamInforTipViewModel> Model = new List<SteamInforTipViewModel>();
+    public List<SteamInforTipViewModel> Items = new List<SteamInforTipViewModel>();
+    [Parameter]
+    public ScreenSteamType ScreenType { get; set; }
+    [Parameter]
+    public SteamSortType OrderType { get; set; }
+    [Parameter]
+    public SteamSortType ThenOrderType { get; set; } = SteamSortType.RecommendationRate;
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+
+            Model = await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame");
+            isReady = true;
+            SetItems();
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取Steam折扣游戏列表失败");
+        }
+
+
+    }
+
+    public Task ScreenTypeChanged(ScreenSteamType type)
+    {
+        ScreenType = type;
+        SetItems();
+        return Task.CompletedTask;
+    }
+
+    public Task OrderTypeChanged(SteamSortType type)
+    {
+        OrderType = type;
+        SetItems();
+        return Task.CompletedTask;
+    }
+
+    public Task ThenOrderTypeChanged(SteamSortType type)
+    {
+        ThenOrderType = type;
+        SetItems();
+        return Task.CompletedTask;
+    }
+
+    public void SetItems()
+    {
+        switch (ScreenType)
+        {
+            case ScreenSteamType.All:
+                Items = Model;
+                break;
+            case ScreenSteamType.NewHistoryLow:
+                Items = Model.Where(s => s.CutNow > s.CutLowest && s.CutLowest > 0).ToList();
+                break;
+        };
+
+        switch (OrderType)
+        {
+
+            case SteamSortType.EvaluationCount:
+                switch (ThenOrderType)
+                {
+                    case SteamSortType.EvaluationCount:
+                        Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.EvaluationCount).ToList();
+                        break;
+                    case SteamSortType.RecommendationRate:
+                        Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.RecommendationRate).ToList();
+                        break;
+                    case SteamSortType.PublishTime:
+                        Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.PublishTime).ToList();
+                        break;
+                    case SteamSortType.Discount:
+                        Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.CutNow).ToList();
+                        break;
+                }
+                break;
+            case SteamSortType.RecommendationRate:
+                switch (ThenOrderType)
+                {
+                    case SteamSortType.EvaluationCount:
+                        Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.EvaluationCount).ToList();
+                        break;
+                    case SteamSortType.RecommendationRate:
+                        Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.RecommendationRate).ToList();
+                        break;
+                    case SteamSortType.PublishTime:
+                        Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.PublishTime).ToList();
+                        break;
+                    case SteamSortType.Discount:
+                        Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.CutNow).ToList();
+                        break;
+                }
+                break;
+            case SteamSortType.PublishTime:
+                switch (ThenOrderType)
+                {
+                    case SteamSortType.EvaluationCount:
+                        Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.EvaluationCount).ToList();
+                        break;
+                    case SteamSortType.RecommendationRate:
+                        Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.RecommendationRate).ToList();
+                        break;
+                    case SteamSortType.PublishTime:
+                        Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.PublishTime).ToList();
+                        break;
+                    case SteamSortType.Discount:
+                        Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.CutNow).ToList();
+                        break;
+                }
+                break;
+            case SteamSortType.Discount:
+                switch (ThenOrderType)
+                {
+                    case SteamSortType.EvaluationCount:
+                        Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.EvaluationCount).ToList();
+                        break;
+                    case SteamSortType.RecommendationRate:
+                        Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.RecommendationRate).ToList();
+                        break;
+                    case SteamSortType.PublishTime:
+                        Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.PublishTime).ToList();
+                        break;
+                    case SteamSortType.Discount:
+                        Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.CutNow).ToList();
+                        break;
+                }
+                break;
+        };
+
+    }
+}

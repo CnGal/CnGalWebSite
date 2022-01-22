@@ -2,6 +2,8 @@
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Steam;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -117,6 +119,40 @@ namespace CnGalWebSite.APIServer.Controllers
             await _appHelper.GetAllSteamImageToGame();
             return new Result { Successful = true };
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<SteamInforTipViewModel>>> GetAllDiscountSteamGame()
+        {
+            var games = await _steamInforRepository.GetAll().Include(s=>s.Entry).Where(s => s.CutNow > 0&&s.Entry.IsHidden==false).ToListAsync();
+
+            var model=new List<SteamInforTipViewModel>();
+            foreach(var item in games)
+            {
+                model.Add(new SteamInforTipViewModel
+                {
+                    SteamId = item.SteamId,
+                    EntryId = item.EntryId ?? 0,
+                    EvaluationCount = item.EvaluationCount,
+                    BriefIntroduction = item.Entry.BriefIntroduction,
+                    PriceLowestString = item.PriceLowestString,
+                    PriceNowString = item.PriceNowString,
+                    CutLowest = item.CutLowest,
+                    CutNow = item.CutNow,
+                    Image = _appHelper.GetImagePath(item.Entry.MainPicture, "app.png"),
+                    LowestTime = item.LowestTime,
+                    Name = item.Entry.DisplayName,
+                    OriginalPrice = item.OriginalPrice,
+                    PriceLowest = item.PriceLowest,
+                    PriceNow = item.PriceNow,
+                    PublishTime = item.Entry.PubulishTime,
+                    RecommendationRate = item.RecommendationRate,
+                });
+            }
+
+            return model;
+        }
+        
 
     }
 }

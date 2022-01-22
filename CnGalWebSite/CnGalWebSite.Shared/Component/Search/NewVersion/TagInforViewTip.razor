@@ -4,12 +4,12 @@
             <div class="pt-3">
                 <img style=" width: 250px; "  src="@Model.MainImage">
             </div>
-            <div class="pt-3">
+            <div class="pt-3 ps-3">
                 <header>
                     <div class="article-home-tag">标签</div>
                     <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
                 </header>
-                <div style="@($" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; ")">
+                <div class="text-truncate-3">
                     @Model.BriefIntroduction
                 </div>
               

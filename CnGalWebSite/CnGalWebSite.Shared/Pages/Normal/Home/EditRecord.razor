@@ -173,7 +173,6 @@ else
     [Parameter]
     public long CurrentId { get; set; }
 
-    bool isFirstLoad = true;
     bool isReady = false;
     bool isRefreshing = true;
 
@@ -199,7 +198,6 @@ else
             {
                 NavigationManager.LocationChanged += LocationChanged;
             }
-            isFirstLoad = false;
         }
 
     }

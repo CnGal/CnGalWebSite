@@ -274,6 +274,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
                         CreateTime = nowTime,
                         LastEditTime = nowTime,
                     });
+
                 }
                 //颁发新头衔
                 await _rankUserRepository.InsertAsync(new RankUser
@@ -308,6 +309,18 @@ namespace CnGalWebSite.APIServer.Application.Ranks
                     RankId = rank.Id,
                     Time = nowTime
                 });
+            }
+
+            //去重
+            var ranks = await _rankUserRepository.GetAll().Include(s=>s.Rank).Where(s => s.ApplicationUserId == user.Id).ToListAsync();
+            var ranksCopy = ranks.ToArray();
+            foreach(var rank in ranksCopy)
+            {
+                if (ranks.Count(s => s.Rank.Name == rank.Rank.Name) > 1)
+                {
+                    await _rankUserRepository.DeleteAsync(rank);
+                    ranks.Remove(rank);
+                }
             }
         }
 

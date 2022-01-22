@@ -1,0 +1,14 @@
+﻿@page "/discount"
+
+@inject IDataCacheService _dataCacheService
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Home.Discount />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Home.Discount />
+}
+@code{
+
+}

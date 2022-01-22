@@ -86,36 +86,18 @@ else
                             <Select @bind-Value="Model.Type"></Select>
                         </div>
 
-                        <AuthorizeView Roles="Admin">
-                            <Authorized>
-                                <div class="form-group col-12  col-sm-6">
-                                    <BootstrapInput @bind-Value="Model.Name" />
-                                </div>
-                                <div class="form-group col-12">
-                                    <AlertTip Type="AlertTip.AlertTipType.CreateDisambig"></AlertTip>
-                                </div>
-                                <div class="form-group col-12  col-sm-6">
-                                    <BootstrapInput @bind-Value="Model.DisplayName" />
-                                </div>
-                                <div class="form-group col-12  col-sm-6">
-                                    <BootstrapInput @bind-Value="Model.AnotherName" />
-                                </div>
-                            </Authorized>
-                            <NotAuthorized>
-                                <div class="form-group col-12  col-sm-6">
-                                    <BootstrapInput @bind-Value="Model.Name" IsDisabled="true" />
-                                </div>
-                                <div class="form-group col-12">
-                                    <AlertTip Type="AlertTip.AlertTipType.NoChangeName"></AlertTip>
-                                </div>
-                                <div class="form-group col-12  col-sm-6">
-                                    <BootstrapInput @bind-Value="Model.DisplayName" />
-                                </div>
-                                <div class="form-group col-12  col-sm-6">
-                                    <BootstrapInput @bind-Value="Model.AnotherName" />
-                                </div>
-                            </NotAuthorized>
-                        </AuthorizeView>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Name" />
+                        </div>
+                        <div class="form-group col-12">
+                            <AlertTip Type="AlertTip.AlertTipType.CreateDisambig"></AlertTip>
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.DisplayName" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.AnotherName" />
+                        </div>
 
 
 
@@ -163,7 +145,7 @@ else
             Model = await Http.GetFromJsonAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/editmain/" + Id);
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑词条主要信息失败");
         }
@@ -201,10 +183,10 @@ else
             else
             {
                 await ToastService.Success("保存成功", "保存词条主要信息成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider,"/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
+                NavigationManager.NavigateTo(Provider, "/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存词条主要信息失败");
         }

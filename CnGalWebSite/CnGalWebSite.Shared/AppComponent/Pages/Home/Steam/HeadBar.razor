@@ -1,0 +1,127 @@
+﻿@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+
+<div class="shadow-sm apps-headbar-layout" style=" position: fixed; top: 0;width:100%;z-index:10000;">
+    <div style="display: flex; height: 45px; flex-direction: row; align-items: center;" class="ms-2 me-2">
+        <div style=" display: flex; flex-direction: column; justify-content: center;" class="me-2" @onclick="OnClickBack">
+            <i class="fa fa-home fa-fw " style=" font-size: 17px;"></i>
+        </div>
+        <div style=" width: 100%; font-size: 16px; text-align: center; margin-right: 30px; " class="text-truncate">
+            @Title
+        </div>
+        <div style=" display: flex; flex-direction: column; justify-content: center;" class="me-2" @onclick="@(()=>NavigationManager.NavigateTo("/home/search"))">
+            <i class="fa fa-search fa-fw " style=" font-size: 17px;"></i>
+        </div>
+    </div>
+    <div style="display: flex; flex-direction: row; align-items: center;" class="ms-3 me-3 pt-1 mb-2">
+        <CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine Model="ScreenModel" Styles="display: flex;flex-direction: row; overflow-x: auto;flex-wrap: nowrap;width: fit-content;"></CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine>
+    </div>
+    <div style="display: flex; flex-direction: row; align-items: center;" class="ms-3 me-3 pt-1 mb-2">
+        <CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine Model="SortModel" Styles="display: flex;flex-direction: row; overflow-x: auto;flex-wrap: nowrap;width: fit-content;"></CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public ScreenSteamType ScreenType { get; set; }
+    [Parameter]
+    public SteamSortType OrderType { get; set; }
+
+
+    [Parameter]
+    public EventCallback<ScreenSteamType> ScreenTypeChanged { get; set; }
+    [Parameter]
+    public EventCallback<SteamSortType> OrderTypeChanged { get; set; }
+
+
+    public async void OnClickBack()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    public int DefaultIndex { get; set; }
+    public int SortRandomIndex { get; set; } = new Random().Next();
+    public int ScreenRandomIndex { get; set; } = new Random().Next();
+    private CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel SortModel = new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel { Items = new List<CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel>() };
+    private CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel ScreenModel = new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel { Items = new List<CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel>() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        ScreenModel.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = (int)ScreenType,
+            Index = 0,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnScreenChange(a)),
+            RandomIndex = ScreenRandomIndex,
+            Text = "全部",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+        ScreenModel.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = (int)ScreenType,
+            Index = 1,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnScreenChange(a)),
+            RandomIndex = ScreenRandomIndex,
+            Text = "新史低",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+
+        SortModel.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = (int)OrderType,
+            Index = 0,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnSortChange(a)),
+            RandomIndex = SortRandomIndex,
+            Text = "折扣",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+        SortModel.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = (int)OrderType,
+            Index = 1,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnSortChange(a)),
+            RandomIndex = SortRandomIndex,
+            Text = "发行时间",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+        SortModel.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = (int)OrderType,
+            Index = 2,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnSortChange(a)),
+            RandomIndex = SortRandomIndex,
+            Text = "评测数",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+        SortModel.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = (int)OrderType,
+            Index = 3,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnSortChange(a)),
+            RandomIndex = SortRandomIndex,
+            Text = "好评率",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+    }
+
+    public async Task OnScreenChange(int index)
+    {
+        await ScreenTypeChanged.InvokeAsync((ScreenSteamType)index);
+    }
+
+    public async Task OnSortChange(int index)
+    {
+        await OrderTypeChanged.InvokeAsync((SteamSortType)index);
+    }
+
+}
+

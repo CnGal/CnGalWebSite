@@ -91,7 +91,7 @@
 
     private ListTimedTaskAloneModel searchModel { get; set; } = new ListTimedTaskAloneModel();
 
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    private IEnumerable<int> PageItems => new int[] { 20, 40, 80, 200, 5000 };
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

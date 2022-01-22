@@ -1,0 +1,286 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IJSRuntime JS
+@inject IDataCacheService _dataCacheService
+@implements IAsyncDisposable
+
+    <TitleTip Title="打折中的游戏"></TitleTip>
+
+    <div>
+        @if (isReady == false)
+        {
+            <div class="  rounded shadow-sm  bg-opacity pt-3">
+
+                <div class="row mt-2 ms-2 me-2" style="padding-right: 0;padding-left: 0;">
+                    <div class="col-12 col-md-12 col-lg-5 mt-1 mb-4">
+                        <SkeletonAvatar Round="false" />
+                    </div>
+
+                    <div class="col-12 col-md-12 col-lg-6 mt-1 mb-2">
+                        <SkeletonParagraph />
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3">
+                    <SkeletonParagraph />
+
+                </div>
+            </div>
+
+
+            <div class=" mt-3">
+                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                    <SkeletonParagraph />
+                </div>
+            </div>
+            <div class="mt-3" style="padding-right: 0;padding-left: 0;">
+                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                </div>
+            </div>
+        }
+        else
+        {
+            <div>
+                <CnGalWebSite.Shared.Component.Steam.ScreenGamesTip ScreenType="ScreenType" OrderType="OrderType" ThenOrderType="ThenOrderType"
+                                                                    ScreenTypeChanged="ScreenTypeChanged" OrderTypeChanged="OrderTypeChanged" ThenOrderTypeChanged="ThenOrderTypeChanged" />
+            </div>
+            <div class="row">
+                @foreach (var item in Items)
+                {
+                    <div class="@("mb-3 "+(IsSmallScreen?"col-12 col-md-6":"col-12"))">
+                        <CnGalWebSite.Shared.Component.Steam.SteamInforViewTip Model="item" IsSmallScreen="IsSmallScreen" />
+                    </div>
+                }
+
+
+            </div>
+            @if (Items.Count == 0)
+            {
+                <NotFoundTip IsNeedLayput="true" />
+            }
+        }
+    </div>
+
+    @code {
+        [CascadingParameter]
+        public ErrorHandler ErrorHandler { get; set; }
+        bool isReady = false;
+
+        public List<SteamInforTipViewModel> Model = new List<SteamInforTipViewModel>();
+        public List<SteamInforTipViewModel> Items = new List<SteamInforTipViewModel>();
+        [Parameter]
+        public ScreenSteamType ScreenType { get; set; }
+        [Parameter]
+        public SteamSortType OrderType { get; set; }
+        [Parameter]
+        public SteamSortType ThenOrderType { get; set; } = SteamSortType.RecommendationRate;
+
+        #region 获取屏幕大小
+        public bool IsSmallScreen { get; set; }
+        public bool IsNormalScreen { get; set; }
+        public bool IsLargeScreen { get; set; } = true;
+
+        /// <summary>
+        /// 获得/设置 IJSRuntime 实例
+        /// </summary>
+        [Inject]
+        [System.Diagnostics.CodeAnalysis.NotNull]
+        public IJSRuntime JSRuntime { get; set; }
+
+        private JSInterop<Discount> Interop { get; set; }
+        /// <summary>
+        /// OnAfterRenderAsync 方法
+        /// </summary>
+        /// <param name="firstRender"></param>
+        /// <returns></returns>
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            if (firstRender)
+            {
+                Interop = new JSInterop<Discount>(JSRuntime);
+                await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
+            }
+        }
+
+        /// <summary>
+        /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
+        /// </summary>
+        /// <returns></returns>
+        [JSInvokable]
+        public void SetCollapsed(int width)
+        {
+            if (IsSmallScreen != (width < 1100))
+            {
+                IsSmallScreen = width < 1100;
+
+                StateHasChanged();
+            }
+            if (IsNormalScreen != (width >= 1100 && width < 1630))
+            {
+                IsNormalScreen = width >= 1100 && width < 1630;
+
+                StateHasChanged();
+            }
+            if (IsLargeScreen != (width >= 1630))
+            {
+                IsLargeScreen = width >= 1630;
+                StateHasChanged();
+            }
+        }
+        #endregion
+
+        protected override async Task OnInitializedAsync()
+        {
+
+            try
+            {
+
+                Model = await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame");
+                isReady = true;
+                SetItems();
+                StateHasChanged();
+
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取Steam折扣游戏列表失败");
+            }
+
+
+        }
+
+        public Task ScreenTypeChanged(ScreenSteamType type)
+        {
+            ScreenType = type;
+            SetItems();
+            return Task.CompletedTask;
+        }
+
+        public Task OrderTypeChanged(SteamSortType type)
+        {
+            OrderType = type;
+            SetItems();
+            return Task.CompletedTask;
+        }
+
+        public Task ThenOrderTypeChanged(SteamSortType type)
+        {
+            ThenOrderType = type;
+            SetItems();
+            return Task.CompletedTask;
+        }
+
+        public void SetItems()
+        {
+            switch (ScreenType)
+            {
+                case ScreenSteamType.All:
+                    Items = Model;
+                    break;
+                case ScreenSteamType.NewHistoryLow:
+                    Items = Model.Where(s => s.CutNow > s.CutLowest && s.CutLowest > 0).ToList();
+                    break;
+            };
+
+            switch (OrderType)
+            {
+
+                case SteamSortType.EvaluationCount:
+                    switch (ThenOrderType)
+                    {
+                        case SteamSortType.EvaluationCount:
+                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.EvaluationCount).ToList();
+                            break;
+                        case SteamSortType.RecommendationRate:
+                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.RecommendationRate).ToList();
+                            break;
+                        case SteamSortType.PublishTime:
+                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.PublishTime).ToList();
+                            break;
+                        case SteamSortType.Discount:
+                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.CutNow).ToList();
+                            break;
+                    }
+                    break;
+                case SteamSortType.RecommendationRate:
+                    switch (ThenOrderType)
+                    {
+                        case SteamSortType.EvaluationCount:
+                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.EvaluationCount).ToList();
+                            break;
+                        case SteamSortType.RecommendationRate:
+                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.RecommendationRate).ToList();
+                            break;
+                        case SteamSortType.PublishTime:
+                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.PublishTime).ToList();
+                            break;
+                        case SteamSortType.Discount:
+                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.CutNow).ToList();
+                            break;
+                    }
+                    break;
+                case SteamSortType.PublishTime:
+                    switch (ThenOrderType)
+                    {
+                        case SteamSortType.EvaluationCount:
+                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.EvaluationCount).ToList();
+                            break;
+                        case SteamSortType.RecommendationRate:
+                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.RecommendationRate).ToList();
+                            break;
+                        case SteamSortType.PublishTime:
+                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.PublishTime).ToList();
+                            break;
+                        case SteamSortType.Discount:
+                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.CutNow).ToList();
+                            break;
+                    }
+                    break;
+                case SteamSortType.Discount:
+                    switch (ThenOrderType)
+                    {
+                        case SteamSortType.EvaluationCount:
+                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.EvaluationCount).ToList();
+                            break;
+                        case SteamSortType.RecommendationRate:
+                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.RecommendationRate).ToList();
+                            break;
+                        case SteamSortType.PublishTime:
+                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.PublishTime).ToList();
+                            break;
+                        case SteamSortType.Discount:
+                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.CutNow).ToList();
+                            break;
+                    }
+                    break;
+            };
+
+        }
+
+
+        #region 释放实例
+        private async ValueTask DisposeAsyncCore()
+        {
+            if (Interop != null)
+            {
+                await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
+                Interop.Dispose();
+                Interop = null;
+            }
+        }
+        public async ValueTask DisposeAsync()
+        {
+            await DisposeAsyncCore();
+            GC.SuppressFinalize(this);
+        }
+        #endregion
+    }

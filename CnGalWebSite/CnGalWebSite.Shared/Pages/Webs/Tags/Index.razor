@@ -111,7 +111,7 @@
 
             @if (Model.ChildrenTags.Count != 0 || Model.IsEdit)
             {
-                <div class="">
+                <div class="mb-3">
                     <TagListChildTagsViewTip Model="Model.ChildrenTags" IsNormalScreen="true" EditState="Model.ChildTagsState" IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" />
                 </div>
             }
