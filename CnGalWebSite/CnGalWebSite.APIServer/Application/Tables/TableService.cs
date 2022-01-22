@@ -638,6 +638,8 @@ namespace CnGalWebSite.APIServer.Application.Tables
                         PriceLowest = steamInfor.PriceLowest,
                         CutLowest = steamInfor.CutLowest,
                         LowestTime = steamInfor.LowestTime,
+                        EvaluationCount = steamInfor.EvaluationCount,
+                        RecommendationRate = steamInfor.RecommendationRate,
                     };
                     if (item.Entry != null)
                     {
@@ -670,7 +672,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
 
                 if (item.Name != temp.Name || item.SteamId != temp.SteamId || item.OriginalPrice != temp.OriginalPrice
                     || item.PriceNow != temp.PriceNow || item.CutNow != temp.CutNow || item.PriceLowest != temp.PriceLowest || item.CutLowest != temp.CutLowest
-                    || item.LowestTime != temp.LowestTime)
+                    || item.LowestTime != temp.LowestTime || item.EvaluationCount != temp.EvaluationCount || item.RecommendationRate != temp.RecommendationRate)
                 {
                     item.Name = temp.Name;
                     item.SteamId = temp.SteamId;
@@ -680,6 +682,8 @@ namespace CnGalWebSite.APIServer.Application.Tables
                     item.PriceLowest = temp.PriceLowest;
                     item.CutLowest = temp.CutLowest;
                     item.LowestTime = temp.LowestTime;
+                    item.EvaluationCount = temp.EvaluationCount;
+                    item.RecommendationRate = temp.RecommendationRate;
 
                     await _steamInforTableModelRepository.UpdateAsync(item);
                 }

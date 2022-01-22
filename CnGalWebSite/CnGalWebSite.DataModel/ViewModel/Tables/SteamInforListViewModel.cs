@@ -27,6 +27,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Tables
         public int PriceLowest { get; set; }
         [Display(Name = "历史最高折扣 %")]
         public int CutLowest { get; set; }
+        [Display(Name = "评测数")]
+        public int EvaluationCount { get; set; }
+        [Display(Name = "好评率")]
+        public int RecommendationRate { get; set; }
         [Display(Name = "史低价格出现时间")]
         public DateTime LowestTime { get; set; }
     }

@@ -5,13 +5,13 @@
                 <img  style=" width: 250px; " src="@Model.MainImage">
             </div>
             <div class="ps-3 pt-3">
-                <header style=" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                <header class="text-truncate-2">
                     <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
                     <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
                 </header>
-                <div style="@($" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;    word-break: break-all; ")">
+                <span class="text-truncate-3">
                     @Model.BriefIntroduction
-                </div>
+                </span>
             </div>
         </div>
         <p class="" style="color: gray;">

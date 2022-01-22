@@ -20,6 +20,7 @@
                     </div>
                 }
             }
+
             else if (SteamInfor.PriceNow == 0)
             {
                 <div class="@(IsNormalScreen?"col-12 col-md-6":"col-12")">
@@ -39,7 +40,12 @@
                     <BasicInforAloneTip Icon="fa-calendar-times-o" Text="已下架" />
                 </div>
             }
-
+            @if (SteamInfor.EvaluationCount > 0)
+            {
+                <div class="@(IsNormalScreen?"col-12 col-md-6":"col-12")">
+                    <BasicInforAloneTip Icon="fa-thumbs-o-up" Text="@($"{SteamInfor.RecommendationRate}% 好评（{SteamInfor.EvaluationCount}条评测）")" />
+                </div>            
+            }
             <div class="col-12">
                 <BasicInforAloneTip Icon="fa-home" Text="商店页面：" Url="@("https://store.steampowered.com/app/" + Model.SteamId)" />
             </div>

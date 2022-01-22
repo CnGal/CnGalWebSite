@@ -15,36 +15,37 @@
             font-size: 19px;
         }
 </style>
-<div class=" ps-4 pe-4 pt-3 mb-3 @(IsChild ? "comment-layout-child" : "comment-layout") comment-layout-transition div-shadow rounded bg-opacity" style="cursor:default">
-    <div class="new-row-warp no-margin">
+<div class=" ps-4 pe-4 pt-3 pb-3 mt-3 @(IsChild ? "comment-layout-child" : "comment-layout") comment-layout-transition div-shadow rounded bg-opacity" style="cursor:default">
+    <div>
         <UserRankTextViewTip UserId="@Model.ApplicationUserId" UserName="@Model.UserName" Image="@Model.UserImage" Ranks="@Model.Ranks" Text="@Model.CommentTime.ToString("yyyy年M月d日 H:mm")"></UserRankTextViewTip>
-        <div class="mt-2 col-12 no-padding comment-text-markdown">
+        <div class="mt-2">
             <div class="markdown-body">
                 @((MarkupString)(ReplyTip+Model.Text))
             </div>
         </div>
-        <div class="col-12 no-padding">
+     
             <AuthorizeView>
                 <Authorized>
+                    <div class="mt-2" style=" display: flex; justify-content: flex-end; ">
+                        @if (IsReplying)
+                        {
+                            <button class="comment-reply comment-reply-color mb-3" style="float: right;" @onclick="OnUnReplyClick">取消回复</button>
+                        }
+                        else
+                        {
+                            <button class="comment-reply comment-reply-color" style="float: right;" @onclick="OnReplyClick">回复</button>
+                        }
 
-                    @if (IsReplying)
-                    {
-                        <button class="comment-reply comment-reply-color mb-3" style="float: right;" @onclick="OnUnReplyClick">取消回复</button>
-                    }
-                    else
-                    {
-                        <button class="comment-reply comment-reply-color mb-3" style="float: right;" @onclick="OnReplyClick">回复</button>
-                    }
 
-
-                    @if (CanDeleted)
-                    {
-                        <button class="comment-reply comment-reply-color mb-3" style="float: right;" @onclick="OnDeleteClick">删除</button>
-                    }
+                        @if (CanDeleted)
+                        {
+                            <button class="comment-reply comment-reply-color" style="float: right;" @onclick="OnDeleteClick">删除</button>
+                        }
+                    </div>
                 </Authorized>
             </AuthorizeView>
 
-        </div>
+   
 
         @if (Deepth < MaxDeepth)
         {

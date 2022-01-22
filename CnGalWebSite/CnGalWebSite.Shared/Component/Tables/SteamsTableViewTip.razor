@@ -25,12 +25,13 @@ else
             <TableColumn @bind-Field="@context.EntryId" Filterable="true" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="100" AllowTextWrap="true" Fixed="true" />
             <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
             <TableColumn @bind-Field="@context.SteamId" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.OriginalPrice" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true"  Formatter="PriceFormatter" />
-            <TableColumn @bind-Field="@context.PriceNow" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true"  Formatter="PriceFormatter"/>
-            <TableColumn @bind-Field="@context.CutNow" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true"  Formatter="CutFormatter"/>
-            <TableColumn @bind-Field="@context.PriceLowest" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true"  Formatter="PriceLowestFormatter"/>
-            <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="170" AllowTextWrap="true"   Formatter="CutLowestFormatter"/>
-            <TableColumn @bind-Field="@context.LowestTime" Filterable="true" Sortable="true"  Width="170" AllowTextWrap="true"  Formatter="LowestTimeFormatter"/>
+            <TableColumn @bind-Field="@context.OriginalPrice" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true" Formatter="PriceFormatter" />
+            <TableColumn @bind-Field="@context.PriceNow" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true" Formatter="PriceFormatter" />
+            <TableColumn @bind-Field="@context.CutNow" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true" Formatter="CutFormatter" />
+            <TableColumn @bind-Field="@context.PriceLowest" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true" Formatter="PriceLowestFormatter" />
+            <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="170" AllowTextWrap="true" Formatter="CutLowestFormatter" />
+            <TableColumn @bind-Field="@context.EvaluationCount" Filterable="true" Sortable="true" Width="170" AllowTextWrap="true"/>
+            <TableColumn @bind-Field="@context.RecommendationRate" Filterable="true" Sortable="true" Width="170" AllowTextWrap="true" Formatter="RecommendationRateFormatter" />
         </TableColumns>
         <RowButtonTemplate>
             <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.SteamId))" />
@@ -143,7 +144,17 @@ else
 
         return res;
     }
+    public async Task<string> RecommendationRateFormatter(object cut)
+    {
+        string res = ((int)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)cut).Value).ToString();
+        if (res == "0")
+        {
+            res = "无";
+        }
+     
 
+        return res;
+    }
     public async Task<string> LowestTimeFormatter(object cut)
     {
         DateTime res = (DateTime)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)cut).Value;

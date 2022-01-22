@@ -29,7 +29,7 @@
     <PackageReference Include="AlibabaCloud.SDK.Dysmsapi20170525" Version="2.0.8" />
     <PackageReference Include="AspNetCoreRateLimit" Version="4.0.1" />
     <PackageReference Include="AspNetCoreRateLimit.Redis" Version="1.0.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.39" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.40" />
     <PackageReference Include="htmldiff.net" Version="1.4.0" />
     <PackageReference Include="Markdig" Version="0.26.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
@@ -51,8 +51,8 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.2" />
-    <PackageReference Include="TencentCloudSDK" Version="3.0.431" />
-    <PackageReference Include="Zack.EFCore.Batch.MySQL.Pomelo_NET6" Version="6.0.0" />
+    <PackageReference Include="TencentCloudSDK" Version="3.0.450" />
+    <PackageReference Include="Zack.EFCore.Batch.MySQL.Pomelo_NET6" Version="6.0.10" />
   </ItemGroup>
 
   <ItemGroup>

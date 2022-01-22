@@ -7,13 +7,13 @@
                     <img  style=" width: 250px; " src="@Model.MainImage">
                 </div>
                 <div class="pt-3 ps-3" style=" width: 100%;">
-                    <header style=" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-all;">
+                    <header class="text-truncate-2">
                         <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
                         <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
                     </header>
-                    <div style="@($" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: {((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)?2:3)}; -webkit-box-orient: vertical;     word-break: break-all;")">
+                    <span class="@((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)?"text-truncate-2":"text-truncate-3")">
                         @Model.BriefIntroduction
-                    </div>
+                    </span>
                     @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)
                     {
 
@@ -59,14 +59,14 @@
                 </div>
 
                 <div class="pt-3 ps-3" style=" width: 100%;">
-                    <header style=" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-all;">
+                    <header class="text-truncate-2">
 
                         <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
                         <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
                     </header>
-                    <div style="@($" overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: {((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)?2:3)}; -webkit-box-orient: vertical;     word-break: break-all;")">
+                    <span class="@((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)?"text-truncate-2":"text-truncate-3")">
                         @Model.BriefIntroduction
-                    </div>
+                    </span>
                     @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)
                     {
 
@@ -80,7 +80,7 @@
                                         @foreach (var infor in item.Contents)
                                         {
                                             <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id>0)" IsShowExistTag="@IsEdit"
-                                                           Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" Icon="fa fa-codepen"  IsNotShowTip="@(infor.Id==-1)" />
+                                                                                                            Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" Icon="fa fa-codepen" IsNotShowTip="@(infor.Id==-1)" />
                                         }
                                     </div>
                                 </div>

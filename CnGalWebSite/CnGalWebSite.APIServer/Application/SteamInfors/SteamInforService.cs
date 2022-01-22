@@ -1,9 +1,11 @@
 ﻿using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
+using ReverseMarkdown.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -232,6 +234,22 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 steam.PriceNowString = "¥ " + ((double)steam.PriceNow / 100).ToString("0.00");
             }
 
+            //获取评测
+            if (steam.PriceNow >= 0)
+            {
+                try
+                {
+                    var item = await GetSteamEvaluationAsync(steamId);
+                    steam.EvaluationCount = item.EvaluationCount;
+                    steam.RecommendationRate = item.RecommendationRate;
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+
+
             if (steam.Id == 0)
             {
                 await _steamInforRepository.InsertAsync(steam);
@@ -299,6 +317,39 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             {
                 return false;
             }
+        }
+
+        public async Task<SteamEvaluation> GetSteamEvaluationAsync(int id)
+        {
+            using var client = _clientFactory.CreateClient();
+
+            var content = await client.GetStringAsync("https://store.steampowered.com/app/" + id);
+
+            HtmlDocument document = new HtmlDocument();
+            document.LoadHtml(content);
+
+            var node = document.GetElementbyId("userReviews");
+            var text = "";
+            if (node.ChildNodes.Count > 3)
+            {
+                text = node.ChildNodes[3].ChildNodes[3].ChildNodes[5].InnerText;
+
+            }
+            else
+            {
+                text = node.ChildNodes[1].ChildNodes[3].ChildNodes[5].InnerText;
+
+            }
+
+
+
+            string countStr = ToolHelper.MidStrEx(text, "the ", " ").Replace(",", "");
+            string rateStr = ToolHelper.MidStrEx(text, " ", "% ");
+            return new SteamEvaluation
+            {
+                EvaluationCount = int.Parse(countStr),
+                RecommendationRate = int.Parse(rateStr),
+            };
         }
 
     }

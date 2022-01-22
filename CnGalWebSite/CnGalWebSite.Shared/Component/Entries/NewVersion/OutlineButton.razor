@@ -4,8 +4,7 @@
 
 @if (IsTitile)
 {
-    <div class="@("badge me-2 bg-title bg-title-color-"+ColorNum)"
-         style="margin-top: 0px; margin-bottom: 5px; height: 25px; font-size: small; padding-top: 6px; font-weight: normal; ">
+    <div class="@("outline-button-title badge me-2 bg-title bg-title-color-"+ColorNum)">
         @Text
     </div>
 }
@@ -14,8 +13,7 @@ else
     @if (string.IsNullOrWhiteSpace(Url))
     {
         <div @onclick="OnClickNull"
-             class="@("btn me-2 bg-context-"+ColorNum)"
-             style="transition: all .6s ease; word-break: keep-all; margin-top: 0px; height: 25px; margin-bottom: 5px; font-size: small; padding-top: 2px; font-weight: normal; ">
+             class="@("btn me-2 outline-button-null-url bg-context-"+ColorNum)">
             @Text
         </div>
 
@@ -23,8 +21,7 @@ else
     else
     {
         <TabLink Text="@Text" Url="@Url" Icon="@Icon"
-                 class="@("btn me-2 bg-context-"+ColorNum)"
-                 style="transition: all .6s ease; word-break: keep-all; margin-top: 0px; height: 25px; margin-bottom: 5px; font-size: small; padding-top: 2px; font-weight: normal; ">
+                 class="@("btn me-2 outline-button-normal bg-context-"+ColorNum)">
             <span>@Text</span>
             @if (IsShowExistTag)
             {

@@ -20,6 +20,16 @@ namespace CnGalWebSite.DataModel.Model
         public int PriceLowest { get; set; }
         public string PriceLowestString { get; set; }
         public int CutLowest { get; set; }
+
+        /// <summary>
+        /// 评测数
+        /// </summary>
+        public int EvaluationCount { get; set; }
+        /// <summary>
+        /// 好评率
+        /// </summary>
+        public int RecommendationRate { get; set; }
+
         /// <summary>
         /// 关联的游戏
         /// </summary>
@@ -28,6 +38,18 @@ namespace CnGalWebSite.DataModel.Model
 
         public DateTime LowestTime { get; set; }
         public DateTime UpdateTime { get; set; }
+    }
+
+    public class SteamEvaluation
+    {
+        /// <summary>
+        /// 评测数
+        /// </summary>
+        public int EvaluationCount { get; set; }
+        /// <summary>
+        /// 好评率
+        /// </summary>
+        public int RecommendationRate { get; set; }
     }
 
     public class SteamNowJson

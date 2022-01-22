@@ -1,0 +1,17 @@
+﻿
+@page "/free"
+
+@inject IDataCacheService _dataCacheService
+
+
+@if (_dataCacheService.IsApp == true)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Tags.Index Id="92" DefaultIndex="2" />
+}
+else
+{
+    <CnGalWebSite.Shared.Pages.Webs.Tags.Index Id="92" />
+}
+@code{
+
+}
