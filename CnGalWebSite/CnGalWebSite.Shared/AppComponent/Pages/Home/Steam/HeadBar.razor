@@ -74,40 +74,50 @@
         SortModel.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
         {
             DefaultIndex = (int)OrderType,
-            Index = 0,
+            Index = (int)SteamSortType.Discount,
             OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnSortChange(a)),
             RandomIndex = SortRandomIndex,
-            Text = "折扣",
+            Text = SteamSortType.Discount.GetDisplayName(),
             Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
             ClassNames = $"col-auto pe-2 p-0"
         });
         SortModel.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
         {
             DefaultIndex = (int)OrderType,
-            Index = 1,
+            Index = (int)SteamSortType.Price,
             OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnSortChange(a)),
             RandomIndex = SortRandomIndex,
-            Text = "发行时间",
+            Text = SteamSortType.Price.GetDisplayName(),
             Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
             ClassNames = $"col-auto pe-2 p-0"
         });
         SortModel.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
         {
             DefaultIndex = (int)OrderType,
-            Index = 2,
+            Index = (int)SteamSortType.PublishTime,
             OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnSortChange(a)),
             RandomIndex = SortRandomIndex,
-            Text = "评测数",
+            Text = SteamSortType.PublishTime.GetDisplayName(),
             Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
             ClassNames = $"col-auto pe-2 p-0"
         });
         SortModel.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
         {
             DefaultIndex = (int)OrderType,
-            Index = 3,
+            Index = (int)SteamSortType.EvaluationCount,
             OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnSortChange(a)),
             RandomIndex = SortRandomIndex,
-            Text = "好评率",
+            Text = SteamSortType.EvaluationCount.GetDisplayName(),
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+        SortModel.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = (int)OrderType,
+            Index = (int)SteamSortType.RecommendationRate,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnSortChange(a)),
+            RandomIndex = SortRandomIndex,
+            Text = SteamSortType.RecommendationRate.GetDisplayName(),
             Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
             ClassNames = $"col-auto pe-2 p-0"
         });

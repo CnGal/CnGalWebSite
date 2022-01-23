@@ -54,6 +54,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
     {
         [Display(Name = "折扣")]
         Discount,
+        [Display(Name = "价格")]
+        Price,
         [Display(Name = "发行时间")]
         PublishTime,
         [Display(Name = "评测数")]

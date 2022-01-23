@@ -3939,14 +3939,21 @@ namespace CnGalWebSite.APIServer.ExamineX
             var entry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == newEntry.Id);
             foreach (var item in examines)
             {
-               
                 var resulte = "";
-                using (TextWriter text = new StringWriter())
+                if (item.Value == Operation.EstablishMainPage)
                 {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(text, item.Key);
-                    resulte = text.ToString();
+                    resulte = item.Key as string;
                 }
+                else
+                {
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, item.Key);
+                        resulte = text.ToString();
+                    }
+                }
+
                 await UniversalEditExaminedAsync(entry, admin, true, resulte, item.Value, "补全审核记录");
             }
         }

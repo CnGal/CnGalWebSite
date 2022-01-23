@@ -209,6 +209,9 @@
                         case SteamSortType.Discount:
                             Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.CutNow).ToList();
                             break;
+                        case SteamSortType.Price:
+                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.PriceNow).ToList();
+                            break;
                     }
                     break;
                 case SteamSortType.RecommendationRate:
@@ -226,6 +229,10 @@
                         case SteamSortType.Discount:
                             Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.CutNow).ToList();
                             break;
+                        case SteamSortType.Price:
+                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.PriceNow).ToList();
+                            break;
+
                     }
                     break;
                 case SteamSortType.PublishTime:
@@ -243,6 +250,10 @@
                         case SteamSortType.Discount:
                             Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.CutNow).ToList();
                             break;
+                        case SteamSortType.Price:
+                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.PriceNow).ToList();
+                            break;
+
                     }
                     break;
                 case SteamSortType.Discount:
@@ -260,6 +271,31 @@
                         case SteamSortType.Discount:
                             Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.CutNow).ToList();
                             break;
+                        case SteamSortType.Price:
+                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.PriceNow).ToList();
+                            break;
+
+                    }
+                    break;
+                case SteamSortType.Price:
+                    switch (ThenOrderType)
+                    {
+                        case SteamSortType.EvaluationCount:
+                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.EvaluationCount).ToList();
+                            break;
+                        case SteamSortType.RecommendationRate:
+                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.RecommendationRate).ToList();
+                            break;
+                        case SteamSortType.PublishTime:
+                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.PublishTime).ToList();
+                            break;
+                        case SteamSortType.Discount:
+                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.CutNow).ToList();
+                            break;
+                        case SteamSortType.Price:
+                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.PriceNow).ToList();
+                            break;
+
                     }
                     break;
             };
