@@ -38,7 +38,7 @@
                 var qqUrl = "https://jq.qq.com/?_wv=1027&k=q0DBI011";
                 resolvent = $"检查网络是否正常，按下Ctrl + F5 刷新网页缓存，加群 <a href='{qqUrl}'>{qq}</a> 反馈Bug";
             }
-            ToastService.Show(new ToastOption
+            await ToastService.Show(new ToastOption
             {
                 Title = message,
                 IsAutoHide = true,

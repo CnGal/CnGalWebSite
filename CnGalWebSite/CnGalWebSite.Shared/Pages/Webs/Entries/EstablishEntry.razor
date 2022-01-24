@@ -335,10 +335,8 @@ else
             <h3 class="text-truncate mb-4 fw-bold">编辑主页</h3>
             <hr class="mb-4" />
 
-            @if (isReady == true)
-            {
                 <MarkdownEditorTip @ref="markdownEditorTip" @bind-Context="Model.Context"></MarkdownEditorTip>
-            }
+     
 
 
         </div>
@@ -399,7 +397,7 @@ else
     private List<string> SearchResult = new List<string>();
     string TagString = "";
 
-    private bool isReady = true;
+    private bool isReady = false;
     [NotNull]
     private MarkdownEditorTip? markdownEditorTip;
     [NotNull]
@@ -434,7 +432,7 @@ else
             ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
             //获取所有标签
             TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags");
-
+            isReady = true;
         }
         catch (Exception ex)
         {

@@ -22,16 +22,20 @@
         遇到格式错乱？可以尝试<a @onclick="OnClickTextOnly"
                       class="alert-link">切换编辑器</a>
     </div>
-    @if (isTextOnly)
+    @if (isReady)
     {
-        <EditorMdViewTip Context="@Context" @ref="markdownEditorTip" ContextChanged="ContextValueChanged"></EditorMdViewTip>
-    }
-    else
-    {
+        @if (isTextOnly)
+        {
+            <EditorMdViewTip Context="@Context" @ref="markdownEditorTip" ContextChanged="ContextValueChanged"></EditorMdViewTip>
+        }
+        else
+        {
 
-        <Markdown Height="800" MinHeight="300" Placeholder="这是 Markdown" PreviewStyle="PreviewStyle.Tab"
-                  InitialEditType="InitialEditType.Wysiwyg" Value="@Context" ValueChanged="ContextValueChanged" Language="zh-CN"></Markdown>
+            <Markdown Height="800" MinHeight="300" Placeholder="这是 Markdown" PreviewStyle="PreviewStyle.Tab"
+                      InitialEditType="InitialEditType.Wysiwyg" Value="@Context" ValueChanged="ContextValueChanged" Language="zh-CN"></Markdown>
+        }
     }
+
 </div>
 
 @code {
@@ -41,8 +45,32 @@
     public EventCallback<string> ContextChanged { get; set; }
     [NotNull]
     private EditorMdViewTip? markdownEditorTip;
+    bool isReady = false;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && ToolHelper.IsSSR == false)
+        {
+            isReady = true;
+            //获取主页中原有的图片
+            if (string.IsNullOrWhiteSpace(Context) == false)
+            {
+                var temp = ToolHelper.GetImageLinks(Context);
 
+                images.Clear();
+                foreach (var item in temp)
+                {
+                    images.Add(new ImagesUploadAloneModel
+                    {
+                        ImagePath = item,
+                        Image = item
+                    });
+                }
+                StateHasChanged();
+            }
+            StateHasChanged();
+        }
+    }
 
 
     public async Task<string> GetContext()
@@ -63,30 +91,6 @@
     {
         Context = text;
         await ContextChanged.InvokeAsync(Context);
-    }
-
-
-    protected override Task OnInitializedAsync()
-    {
-        //获取主页中原有的图片
-        if (string.IsNullOrWhiteSpace(Context) == false)
-        {
-            var temp = ToolHelper.GetImageLinks(Context);
-
-            images.Clear();
-            foreach (var item in temp)
-            {
-                images.Add(new ImagesUploadAloneModel
-                {
-                    ImagePath = item,
-                    Image = item
-                });
-            }
-            StateHasChanged();
-        }
-
-
-        return Task.CompletedTask;
     }
 
     public async Task OnClickTextOnly()

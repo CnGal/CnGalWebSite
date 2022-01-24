@@ -298,10 +298,9 @@
         <div class="ps-3 pe-3 pt-2 mb-3">
             <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑正文" />
             <div class="mt-3">
-                @if (isReady == true)
-                {
+
                     <MarkdownEditorTip @ref="markdownEditorTip"  @bind-Context="@Model.Context"></MarkdownEditorTip>
-                }
+           
 
             </div>
 
@@ -353,7 +352,7 @@
     private List<string> SearchResult = new List<string>();
     string TagString = "";
 
-    private bool isReady = true;
+    private bool isReady = false;
     [NotNull]
     private MarkdownEditorTip? markdownEditorTip;
     [NotNull]
@@ -388,7 +387,7 @@
             ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
             //获取所有标签
             TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags");
-
+            isReady = true;
         }
         catch (Exception ex)
         {
