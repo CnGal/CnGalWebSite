@@ -15,6 +15,9 @@ else
     <TitleTip></TitleTip>
 
 }
+<AutoSaveTip TItem="EditAddInforViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
+
+
 <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
 
 <div style=" margin-top: 45px; width: 100%;margin-bottom:65px;">
@@ -231,6 +234,7 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditAddInforViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -261,7 +265,7 @@ else
             }
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑词条附加信息失败");
         }
@@ -335,6 +339,8 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("保存成功", "保存词条附加信息成功，等待审核通过");
                 NavigationManager.NavigateTo("/entries/index/" + Model.Id);
             }
@@ -345,5 +351,15 @@ else
         }
     }
 
+
+    private Task DataLoaded(EditAddInforViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
 
 }

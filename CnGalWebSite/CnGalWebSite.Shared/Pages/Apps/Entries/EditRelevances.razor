@@ -15,6 +15,7 @@ else
     <TitleTip></TitleTip>
 
 }
+<AutoSaveTip TItem="EditRelevancesViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
 
@@ -26,42 +27,42 @@ else
     }
     else
     {
-<div class="ps-3 pe-3 pt-2 mb-3">
-    <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑关联信息" />
-    <div class="mt-3">
-        <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色" />
+        <div class="ps-3 pe-3 pt-2 mb-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑关联信息" />
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色" />
 
-    </div>
+            </div>
 
 
-    @if (Model.Type != EntryType.Game)
-    {
-<div class="mt-3">
-    <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryStaffItems" Model="Model.staffs" Title="STAFF"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+            @if (Model.Type != EntryType.Game)
+            {
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryStaffItems" Model="Model.staffs" Title="STAFF"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
 
-</div>
-    }
-<div class="mt-3">
-    <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@ArticleItems" Model="Model.news" Title="动态"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+                </div>
+            }
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@ArticleItems" Model="Model.news" Title="动态"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
 
-</div>
-    <div class="mt-3">
-        <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@ArticleItems" Model="Model.articles" Title="文章"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@ArticleItems" Model="Model.articles" Title="文章"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
 
-    </div>
-    <div class="mt-3">
-        <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
 
-    </div>
-    <div class="mt-3">
-        <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
 
-    </div>
-    <div class="mt-3">
-        <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListOtherLink Model="Model.others" Title="自定义链接"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListOtherLink>
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListOtherLink Model="Model.others" Title="自定义链接"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListOtherLink>
 
-    </div>
-</div>
+            </div>
+        </div>
     }
 </div>
 
@@ -91,6 +92,7 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditRelevancesViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -133,13 +135,27 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("保存成功", "保存词条关联信息成功，等待审核通过");
                 NavigationManager.NavigateTo("/entries/index/" + Model.Id);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存词条关联信息失败");
         }
     }
+
+
+    private Task DataLoaded(EditRelevancesViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

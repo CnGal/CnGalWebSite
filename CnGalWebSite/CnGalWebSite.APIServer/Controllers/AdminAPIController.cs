@@ -1497,13 +1497,14 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
+                await _examineRepository.DeleteAsync(s => s.Id == 16789);
                 //var freegames =await _steamInforRepository.GetAll().Where(s => s.PriceNow == 0).Include(s => s.Entry).Select(s => s.Entry).ToListAsync();
                 //var tag = await _tagRepository.GetAll().Include(s=>s.Entries).FirstOrDefaultAsync(s => s.Name == "免费");
                 //tag.Entries = freegames;
                 //await _tagRepository.UpdateAsync(tag);
                 //string temp= await _fileService.SaveImageAsync("https://wx4.sinaimg.cn/mw2000/008qAv3ngy1gyem1zkfwqj31cr0s9hbg.jpg", _configuration["NewsAdminId"]);
-                await _elasticsearchService.DeleteDataOfElasticsearch();
-                await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
+                //await _elasticsearchService.DeleteDataOfElasticsearch();
+                //await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
 
                 //await _weeklyNewsRepository.DeleteAsync(s => true);
                 /*var news = await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.State == GameNewsState.Ignore).ToListAsync();

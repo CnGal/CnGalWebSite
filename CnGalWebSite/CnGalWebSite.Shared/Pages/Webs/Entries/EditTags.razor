@@ -16,6 +16,9 @@ else
     <TitleTip></TitleTip>
 
 }
+<AutoSaveTip TItem="EditEntryTagViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
+
+
 <div class="">
     <div class="" style="padding-right: 0; padding-left: 0">
 
@@ -108,6 +111,7 @@ else
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    AutoSaveTip<EditEntryTagViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -138,7 +142,7 @@ else
             }
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑词条标签失败");
         }
@@ -167,15 +171,27 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("保存成功", "保存词条标签成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider,"/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
+                NavigationManager.NavigateTo(Provider, "/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存词条标签失败");
         }
     }
 
+
+    private Task DataLoaded(EditEntryTagViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
 
 }

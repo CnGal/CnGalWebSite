@@ -7,6 +7,7 @@
 
 
 <TitleTip></TitleTip>
+<AutoSaveTip TItem="EditUserDataViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.UserName" />
 
@@ -82,6 +83,7 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditUserDataViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -105,7 +107,7 @@
             }
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑用户资料失败");
         }
@@ -146,6 +148,8 @@
             }
             else
             {
+                autoSave.Clean();
+
                 var userState = await authenticationStateTask;
                 var user = userState.User;
                 SwalOption op = null;
@@ -187,7 +191,7 @@
                 await SwalService.Show(op);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存用户信息失败");
         }
@@ -240,4 +244,16 @@
         Model.SBgImageName = "";
         return true;
     }
+
+
+    private Task DataLoaded(EditUserDataViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

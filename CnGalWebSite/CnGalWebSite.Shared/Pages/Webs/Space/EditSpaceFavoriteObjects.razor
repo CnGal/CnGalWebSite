@@ -5,8 +5,9 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
-<TitleTip></TitleTip>
+<TitleTip Title="管理收藏夹"></TitleTip>
 
+<AutoSaveTip TItem="EditFavoriteFolderViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 @if (isReady == false)
 {
@@ -93,6 +94,7 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditFavoriteFolderViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,7 +104,7 @@ else
             Model = await Http.GetFromJsonAsync<EditFavoriteFolderViewModel>(ToolHelper.WebApiPath + "api/favorites/EditFavoriteFolder/" + Id);
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑收藏夹基本信息失败");
         }
@@ -132,6 +134,8 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("保存收藏夹基本信息成功", "保存收藏夹基本信息成功");
 
                 //获取用户收藏夹相关信息 只需要获取一次
@@ -147,15 +151,15 @@ else
                 }
                 if (string.IsNullOrWhiteSpace(ReturnUrl) == false)
                 {
-                    NavigationManager.NavigateTo(Provider,ToolHelper.Base64DecodeUrl(ReturnUrl), "管理收藏夹", "fa fa-folder-open");
+                    NavigationManager.NavigateTo(Provider, ToolHelper.Base64DecodeUrl(ReturnUrl), "管理收藏夹", "fa fa-folder-open");
                 }
                 else
                 {
-                    NavigationManager.NavigateTo(Provider,"/space/index/" + userId, user.Identity.Name, "fa fa-star-o");
+                    NavigationManager.NavigateTo(Provider, "/space/index/" + userId, user.Identity.Name, "fa fa-star-o");
                 }
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存收藏夹基本信息失败");
         }
@@ -165,7 +169,7 @@ else
     {
         try
         {
-            NavigationManager.NavigateTo(Provider,model.Url, model.Title, model.Icon);
+            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
         }
         catch
         {
@@ -179,4 +183,16 @@ else
         Model.MainImagePath = url;
         return Task.CompletedTask;
     }
+
+
+    private Task DataLoaded(EditFavoriteFolderViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

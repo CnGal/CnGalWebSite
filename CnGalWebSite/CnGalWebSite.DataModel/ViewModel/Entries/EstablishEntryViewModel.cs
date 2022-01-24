@@ -132,7 +132,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         #endregion
 
         #region 主页
-        public string Context { get; set; }
+        public string Context { get; set; } = "";
         #endregion
 
         #region 图片

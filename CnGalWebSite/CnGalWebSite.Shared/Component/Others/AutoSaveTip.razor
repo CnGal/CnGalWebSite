@@ -1,0 +1,112 @@
+﻿@typeparam TItem
+
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService _localStorage
+@inject SwalService SwalService
+@implements IDisposable
+
+@code {
+    [Parameter]
+    public TItem Item { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> DataLoaded { get; set; }
+
+    private System.Threading.Timer mytimer;
+
+    private string _key { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender&&ToolHelper.IsSSR==false)
+        {
+            string key = _key = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
+            string keyTime = key + " - Time";
+            string keyData = key + " - Data";
+            //尝试读取
+            if (await _localStorage.ContainKeyAsync(keyTime) && await _localStorage.ContainKeyAsync(keyData))
+            {
+                //都存在 读取
+                var time = await _localStorage.GetItemAsync<DateTime>(keyTime);
+                if ((DateTime.Now.ToCstTime() - time).TotalDays < 7)
+                {
+                    var data = await _localStorage.GetItemAsync<TItem>(keyData);
+                    //询问用户是否加载历史记录
+                    //确认
+                    var op = new SwalOption()
+                    {
+                        Title = "继续上一次编辑",
+                        Content = "你在 " + time.ToString("yyyy/M/d HH:mm") + " 有一次编辑记录，是否需要在此基础上继续？",
+                        IsConfirm = true,
+                        Category = SwalCategory.Warning,
+                    };
+                    var ret = await SwalService.ShowModal(op);
+                    if (ret)
+                    {
+                        await DataLoaded.InvokeAsync(data);
+                    }
+                }
+            }
+
+
+            //启动定时保存
+            //启动定时器
+            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 10);
+
+        }
+    }
+
+    public async Task Clean()
+    {
+        try
+        {
+            string key = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
+            string keyTime = key + " - Time";
+            string keyData = key + " - Data";
+
+            await _localStorage.RemoveItemAsync(keyTime);
+            await _localStorage.RemoveItemAsync(keyData);
+        }
+        catch
+        {
+
+        }
+
+    }
+
+    private async void Send(object o)
+    {
+        await InvokeAsync(async () =>
+        {
+            try
+            {
+                string key = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
+
+                if (Item != null && _key == key)
+                {
+                    string keyTime = key + " - Time";
+                    string keyData = key + " - Data";
+
+                    await _localStorage.SetItemAsync<DateTime>(keyTime, DateTime.Now.ToCstTime());
+                    await _localStorage.SetItemAsync<TItem>(keyData, Item);
+                }
+
+            }
+            catch
+            {
+
+            }
+        });
+
+    }
+
+    public void Dispose()
+    {
+        if (mytimer != null)
+        {
+            mytimer.Dispose();
+            mytimer = null;
+        }
+        GC.SuppressFinalize(this);
+    }
+}

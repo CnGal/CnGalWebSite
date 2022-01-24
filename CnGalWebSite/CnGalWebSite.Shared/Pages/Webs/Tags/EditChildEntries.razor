@@ -10,8 +10,12 @@
 {
     <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
 }
+else
+{
+    <TitleTip />
+}
 
-<MakeSureInWASMTip></MakeSureInWASMTip>
+<AutoSaveTip TItem="EditTagChildEntriesViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <div class="">
     <div class="" style="padding-right: 0;padding-left: 0;">
@@ -89,6 +93,7 @@
     private ImagesListEditorViewTip ImagesListEditorView;
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    AutoSaveTip<EditTagChildEntriesViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -127,6 +132,8 @@
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("编辑标签子词条成功", "编辑标签子词条成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/tags/index/" + Model.Id, Model.Name, "fa fa-tag");
             }
@@ -136,4 +143,16 @@
             ErrorHandler.ProcessError(ex, "编辑标签子词条失败");
         }
     }
+
+
+    private Task DataLoaded(EditTagChildEntriesViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

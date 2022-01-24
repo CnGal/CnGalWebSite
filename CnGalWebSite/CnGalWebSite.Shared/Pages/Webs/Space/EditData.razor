@@ -7,8 +7,8 @@
 @inject NavigationManager NavigationManager
 
 
-<TitleTip></TitleTip>
-<MakeSureInWASMTip></MakeSureInWASMTip>
+<TitleTip Title="编辑个人资料"></TitleTip>
+<AutoSaveTip TItem="EditUserDataViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <div class="rounded shadow-sm p-4 bg-opacity rounded">
     @if (isReady == false)
@@ -157,12 +157,11 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditUserDataViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-#if DEBUG
-        //Thread.Sleep(10000);
-#endif
+
         try
         {
             //获取词条信息
@@ -184,7 +183,7 @@
             }
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑用户资料失败");
         }
@@ -225,6 +224,8 @@
             }
             else
             {
+                autoSave.Clean();
+
                 var userState = await authenticationStateTask;
                 var user = userState.User;
                 SwalOption op = null;
@@ -259,14 +260,14 @@
                     builder.AddAttribute(5, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async () =>
                     {
                         await op.Close();
-                        NavigationManager.NavigateTo(Provider,"/space/index/" + Model.Id, "个人空间", "fa fa-star-o");
+                        NavigationManager.NavigateTo(Provider, "/space/index/" + Model.Id, "个人空间", "fa fa-star-o");
                     }));
                     builder.CloseComponent();
                 });
                 await SwalService.Show(op);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存用户信息失败");
         }
@@ -318,6 +319,16 @@
     {
         Model.SBgImageName = "";
         return true;
+    }
+
+    private Task DataLoaded(EditUserDataViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
 
 }

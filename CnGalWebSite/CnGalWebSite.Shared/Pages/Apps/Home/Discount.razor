@@ -6,10 +6,10 @@
 @inject NavigationManager NavigationManager
 
 
-<TitleTip Title="打折中的游戏"></TitleTip>
+<TitleTip Title="打折中的游戏" Description="Steam游戏折扣专题页，可以按价格，发行时间，好评率等排序"></TitleTip>
 
 <CnGalWebSite.Shared.AppComponent.Pages.Home.Steam.HeadBar Title="打折中的游戏" OrderType="OrderType" OrderTypeChanged="OrderTypeChanged" ScreenType="ScreenType"
-                                                           ScreenTypeChanged="ScreenTypeChanged"/>
+                                                           ScreenTypeChanged="ScreenTypeChanged" />
 <div style="margin-top: 130px; width: 100%; ">
     <div class="ms-3 me-3">
         <div>
@@ -25,7 +25,7 @@
         </div>
         @if (Items.Count == 0)
         {
-            <CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard Type="无数据"/>
+            <CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard Type="无数据" />
         }
     </div>
 </div>

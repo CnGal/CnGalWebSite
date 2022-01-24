@@ -10,8 +10,7 @@
 {
     <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
 }
-
-<MakeSureInWASMTip></MakeSureInWASMTip>
+<AutoSaveTip TItem="EditPeripheryMainViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <div class="">
     <div class="" style="padding-right: 0;padding-left: 0;">
@@ -166,6 +165,7 @@
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    AutoSaveTip<EditPeripheryMainViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -210,6 +210,8 @@
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("编辑周边主要信息成功", "编辑周边主要信息成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/peripheries/index/" + Model.Id, Model.Name, "fa fa-newspaper-o");
             }
@@ -219,4 +221,16 @@
             ErrorHandler.ProcessError(ex, "编辑周边主要信息失败");
         }
     }
+
+
+    private Task DataLoaded(EditPeripheryMainViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

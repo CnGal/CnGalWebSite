@@ -18,6 +18,7 @@ else
 
 }
 
+<AutoSaveTip TItem="EditPeripheryImagesViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
 
@@ -32,7 +33,7 @@ else
         <div class="ps-3 pe-3 pt-2 mb-3">
             <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑相册" />
             <div class="mt-4">
-                <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListImage Images="Model.Images" @ref="ImagesListEditorView"/>
+                <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListImage Images="Model.Images" @ref="ImagesListEditorView" />
 
             </div>
         </div>
@@ -56,6 +57,7 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditPeripheryImagesViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,6 +91,8 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("编辑周边相册成功", "编辑周边相册成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/peripheries/index/" + Model.Id, Model.Name, "fa fa-newspaper-o");
             }
@@ -98,4 +102,16 @@ else
             ErrorHandler.ProcessError(ex, "编辑周边相册失败");
         }
     }
+
+
+    private Task DataLoaded(EditPeripheryImagesViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

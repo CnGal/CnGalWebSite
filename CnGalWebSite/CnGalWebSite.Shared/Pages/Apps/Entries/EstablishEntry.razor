@@ -11,296 +11,304 @@
 
 <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="创建词条" />
 
-<link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor.Markdown/css/bootstrap.blazor.markdown.min.css" media="none" onload="this.media='all'" />
+<AutoSaveTip TItem="EstablishEntryViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <div style=" margin-top: 45px; width: 100%;margin-bottom:65px;">
-    <ValidateForm Model="@Model" ValidateAllProperties="true" @ref="ComplexForm">
+    @if (isReady == false)
+    {
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+    }
+    else
+    {
+        <ValidateForm Model="@Model" ValidateAllProperties="true" @ref="ComplexForm">
+            <div class="ps-3 pe-3 pt-2 mb-3">
+
+                <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="填写主要信息" />
+
+                <div class="row">
+                    <div class=" col-12 col-md-6  col-lg-3 mt-2">
+                        <ImageCropperButton ImagePath="@MainImagePath" OnUploadedImage="OnCardUploadMain" EntryType_="Model.Type" IsMainImage="true"
+                                            IsMustCropper="true" Text="上传主图"></ImageCropperButton>
+                    </div>
+                    <div class=" col-12 col-md-6  col-lg-3 mt-2">
+                        <ImageCropperButton ImagePath="@ThuImagePath" OnUploadedImage="OnCardUploadThu" Type="ImageAspectType._1_1" Text="上传缩略图"></ImageCropperButton>
+                    </div>
+                    <div class=" col-12 col-md-6  col-lg-3 mt-2">
+                        <ImageCropperButton ImagePath="@BackImagePath" OnUploadedImage="OnCardUploadBack" Type="ImageAspectType.None" Text="上传大背景"></ImageCropperButton>
+                    </div>
+                    <div class=" col-12 col-md-6  col-lg-3 mt-2">
+                        <ImageCropperButton ImagePath="@SmallBackImagePath" OnUploadedImage="OnCardUploadSmall" Type="ImageAspectType.None" Text="上传小背景"></ImageCropperButton>
+                    </div>
+
+                </div>
+
+                <div class="form-group mt-4">
+                    <div class="row">
+                        <div class="form-group col-12  col-sm-6">
+                            <Select @bind-Value="Model.Type"></Select>
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Name" />
+                        </div>
+
+                        <div class="form-group col-12">
+                            <AlertTip Type="AlertTip.AlertTipType.CreateDisambig"></AlertTip>
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.DisplayName" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.AnotherName" />
+                        </div>
+
+                        <div class="form-group col-12">
+                            <BootstrapInput @bind-Value="Model.BriefIntroduction" />
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </ValidateForm>
         <div class="ps-3 pe-3 pt-2 mb-3">
-
-            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="填写主要信息" />
-
-            <div class="row">
-                <div class=" col-12 col-md-6  col-lg-3 mt-2">
-                    <ImageCropperButton ImagePath="@MainImagePath" OnUploadedImage="OnCardUploadMain" EntryType_="Model.Type" IsMainImage="true"
-                                        IsMustCropper="true" Text="上传主图"></ImageCropperButton>
-                </div>
-                <div class=" col-12 col-md-6  col-lg-3 mt-2">
-                    <ImageCropperButton ImagePath="@ThuImagePath" OnUploadedImage="OnCardUploadThu" Type="ImageAspectType._1_1" Text="上传缩略图"></ImageCropperButton>
-                </div>
-                <div class=" col-12 col-md-6  col-lg-3 mt-2">
-                    <ImageCropperButton ImagePath="@BackImagePath" OnUploadedImage="OnCardUploadBack" Type="ImageAspectType.None" Text="上传大背景"></ImageCropperButton>
-                </div>
-                <div class=" col-12 col-md-6  col-lg-3 mt-2">
-                    <ImageCropperButton ImagePath="@SmallBackImagePath" OnUploadedImage="OnCardUploadSmall" Type="ImageAspectType.None" Text="上传小背景"></ImageCropperButton>
-                </div>
-
-            </div>
-
-            <div class="form-group mt-4">
-                <div class="row">
-                    <div class="form-group col-12  col-sm-6">
-                        <Select @bind-Value="Model.Type"></Select>
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.Name" />
-                    </div>
-
-                    <div class="form-group col-12">
-                        <AlertTip Type="AlertTip.AlertTipType.CreateDisambig"></AlertTip>
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.DisplayName" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.AnotherName" />
-                    </div>
-
-                    <div class="form-group col-12">
-                        <BootstrapInput @bind-Value="Model.BriefIntroduction" />
-                    </div>
-                </div>
-            </div>
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="填写基本信息" />
 
 
-        </div>
-    </ValidateForm>
-    <div class="ps-3 pe-3 pt-2 mb-3">
-        <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="填写基本信息" />
-
-
-        @switch (Model.Type)
-        {
-            case EntryType.Game:
-                <div class="row">
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.SteamId" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <DateTimePicker @bind-Value="@Model.IssueTime" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="@Model.IssueTimeString" ShowLabel="true" />
-                    </div>
-
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.Original" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <AutoComplete Items="@EntryGroupItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.ProductionGroup" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.Engine" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.Publisher" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.IssueMethod" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.OfficialWebsite" ShowLabel="true" />
-                    </div>
-
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.QQgroupGame" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12">
-                        <CheckboxList @bind-Value="@GamePlatformsValue" ShowBorder="true" Items="@GamePlatforms" DisplayText="游戏平台" ShowLabel="true"></CheckboxList>
-                    </div>
-                    <div class="col-12 p-3">
-                        <Divider></Divider>
-                    </div>
-                </div>
-
-                <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListStaff Staffs="Model.InforStaffs" @ref="staffEditor"></CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListStaff>
-
-                break;
-            case EntryType.ProductionGroup:
-                <ValidateForm Model="@Model" ValidateAllProperties="true">
-                    <div class="row">
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.QQgroupGroup" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.WeiboId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.BilibiliId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.AcFunId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.ZhihuId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.AfdianId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.PixivId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.TwitterId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.YouTubeId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.FacebookId" />
-                        </div>
-                    </div>
-                </ValidateForm>
-
-                break;
-            case EntryType.Role:
-                <div class="row">
-                    <div class="form-group col-12  col-sm-6">
-                        <AutoComplete Items="@EntryStaffItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.CV" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <Select @bind-Value="Model.Gender" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.FigureData" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.FigureSubjective" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <DateTimePicker @bind-Value="@Model.Birthday" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.Haircolor" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.Pupilcolor" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.ClothesAccessories" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.Character" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.RoleIdentity" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.BloodType" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.RoleHeight" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.RoleTaste" ShowLabel="true" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.RoleAge" ShowLabel="true" />
-                    </div>
-                </div>
-
-                break;
-            case EntryType.Staff:
-                <ValidateForm Model="@Model" ValidateAllProperties="true">
-                    <div class="row">
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.WeiboId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.BilibiliId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.AcFunId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.ZhihuId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.AfdianId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.PixivId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.TwitterId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.YouTubeId" />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.FacebookId" />
-                        </div>
-                    </div>
-                </ValidateForm>
-                break;
-        }
-
-        <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListSocialPlatform Model="Model.SocialPlatforms" Title="相关网站"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListSocialPlatform>
-    </div>
-    <div class="ps-3 pe-3 pt-2 mb-3">
-
-        <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="添加词条标签" />
-
-        <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListTag AutoCompleteItems="@TagItems" Model="Model.Tags"></CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListTag>
-    </div>
-    <div class="ps-3 pe-3 pt-2 mb-3">
-        <CnGalWebSite.Shared.AppComponent.Pages.Tags.Normal.SearchTags />
-    </div>
-    <div class="ps-3 pe-3 pt-2 mb-3">
-        <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑相册" />
-        <div class="mt-4">
-            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListImage Images="Model.Images" @ref="ImagesListEditorView"></CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListImage>
-
-        </div>
-    </div>
-    <div class="ps-3 pe-3 pt-2 mb-3">
-
-        <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="添加关联信息" />
-        <div class="mt-3">
-            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色" />
-
-        </div>
-
-
-        @if (Model.Type != EntryType.Game)
-        {
-            <div class="mt-3">
-                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryStaffItems" Model="Model.ReStaffs" Title="STAFF"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
-
-            </div>
-        }
-        <div class="mt-3">
-            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@ArticleItems" Model="Model.News" Title="动态"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
-
-        </div>
-        <div class="mt-3">
-            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@ArticleItems" Model="Model.articles" Title="文章"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
-
-        </div>
-        <div class="mt-3">
-            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
-
-        </div>
-        <div class="mt-3">
-            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
-
-        </div>
-        <div class="mt-3">
-            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListOtherLink Model="Model.Others" Title="自定义链接"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListOtherLink>
-
-        </div>
-    </div>
-    <div class="ps-3 pe-3 pt-2 mb-3">
-        <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑正文" />
-        <div class="mt-3">
-            @if (isReady == true)
+            @switch (Model.Type)
             {
-                <MarkdownEditorTip @ref="markdownEditorTip"></MarkdownEditorTip>
+                case EntryType.Game:
+                    <div class="row">
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.SteamId" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <DateTimePicker @bind-Value="@Model.IssueTime" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="@Model.IssueTimeString" ShowLabel="true" />
+                        </div>
+
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Original" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <AutoComplete Items="@EntryGroupItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.ProductionGroup" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Engine" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Publisher" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.IssueMethod" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.OfficialWebsite" ShowLabel="true" />
+                        </div>
+
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.QQgroupGame" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12">
+                            <CheckboxList @bind-Value="@GamePlatformsValue" ShowBorder="true" Items="@GamePlatforms" DisplayText="游戏平台" ShowLabel="true"></CheckboxList>
+                        </div>
+                        <div class="col-12 p-3">
+                            <Divider></Divider>
+                        </div>
+                    </div>
+
+                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListStaff Staffs="Model.InforStaffs" @ref="staffEditor"></CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListStaff>
+
+                    break;
+                case EntryType.ProductionGroup:
+                    <ValidateForm Model="@Model" ValidateAllProperties="true">
+                        <div class="row">
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.QQgroupGroup" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.WeiboId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.BilibiliId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.AcFunId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.ZhihuId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.AfdianId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.PixivId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.TwitterId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.YouTubeId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.FacebookId" />
+                            </div>
+                        </div>
+                    </ValidateForm>
+
+                    break;
+                case EntryType.Role:
+                    <div class="row">
+                        <div class="form-group col-12  col-sm-6">
+                            <AutoComplete Items="@EntryStaffItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.CV" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <Select @bind-Value="Model.Gender" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.FigureData" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.FigureSubjective" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <DateTimePicker @bind-Value="@Model.Birthday" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Haircolor" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Pupilcolor" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.ClothesAccessories" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Character" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.RoleIdentity" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.BloodType" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.RoleHeight" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.RoleTaste" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.RoleAge" ShowLabel="true" />
+                        </div>
+                    </div>
+
+                    break;
+                case EntryType.Staff:
+                    <ValidateForm Model="@Model" ValidateAllProperties="true">
+                        <div class="row">
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.WeiboId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.BilibiliId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.AcFunId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.ZhihuId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.AfdianId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.PixivId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.TwitterId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.YouTubeId" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.FacebookId" />
+                            </div>
+                        </div>
+                    </ValidateForm>
+                    break;
             }
 
+            <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListSocialPlatform Model="Model.SocialPlatforms" Title="相关网站"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListSocialPlatform>
+        </div>
+        <div class="ps-3 pe-3 pt-2 mb-3">
+
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="添加词条标签" />
+
+            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListTag AutoCompleteItems="@TagItems" Model="Model.Tags"></CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListTag>
+        </div>
+        <div class="ps-3 pe-3 pt-2 mb-3">
+            <CnGalWebSite.Shared.AppComponent.Pages.Tags.Normal.SearchTags />
+        </div>
+        <div class="ps-3 pe-3 pt-2 mb-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑相册" />
+            <div class="mt-4">
+                <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListImage Images="Model.Images" @ref="ImagesListEditorView"></CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.InputListImage>
+
+            </div>
+        </div>
+        <div class="ps-3 pe-3 pt-2 mb-3">
+
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="添加关联信息" />
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色" />
+
+            </div>
+
+
+            @if (Model.Type != EntryType.Game)
+            {
+                <div class="mt-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryStaffItems" Model="Model.ReStaffs" Title="STAFF"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+
+                </div>
+            }
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@ArticleItems" Model="Model.News" Title="动态"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@ArticleItems" Model="Model.articles" Title="文章"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString>
+
+            </div>
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListOtherLink Model="Model.Others" Title="自定义链接"></CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListOtherLink>
+
+            </div>
+        </div>
+        <div class="ps-3 pe-3 pt-2 mb-3">
+            <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="编辑正文" />
+            <div class="mt-3">
+                @if (isReady == true)
+                {
+                    <MarkdownEditorTip @ref="markdownEditorTip"  @bind-Context="@Model.Context"></MarkdownEditorTip>
+                }
+
+            </div>
+
+
         </div>
 
-
-    </div>
+    }
 </div>
 
 <CnGalWebSite.Shared.AppComponent.Pages.Entries.Edits.EditFooter OnSubmit="OnSubmit" />
@@ -364,6 +372,7 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EstablishEntryViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -463,11 +472,13 @@
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("创建词条成功", "创建词条成功，等待审核通过");
                 NavigationManager.NavigateTo("/entries/index/" + obj.Error);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "创建词条失败");
         }
@@ -519,4 +530,16 @@
         StateHasChanged();
         return Task.CompletedTask;
     }
+
+
+    private Task DataLoaded(EstablishEntryViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

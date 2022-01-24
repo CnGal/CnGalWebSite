@@ -16,6 +16,7 @@ else
 
 }
 
+<AutoSaveTip TItem="EditTagChildEntriesViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
 
@@ -61,6 +62,8 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditTagChildEntriesViewModel> autoSave { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -98,6 +101,8 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("编辑标签子词条成功", "编辑标签子词条成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/tags/index/" + Model.Id, Model.Name, "fa fa-tag");
             }
@@ -107,4 +112,17 @@ else
             ErrorHandler.ProcessError(ex, "编辑标签子词条失败");
         }
     }
+
+
+    private Task DataLoaded(EditTagChildEntriesViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+
 }

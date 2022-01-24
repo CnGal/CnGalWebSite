@@ -17,6 +17,7 @@ else
 
 }
 
+<AutoSaveTip TItem="EditAddInforViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <div class="">
     <div class="" style="padding-right: 0;padding-left: 0;">
@@ -102,7 +103,7 @@ else
                                 <BootstrapInput @bind-Value="Model.QQgroupGame" ShowLabel="true" />
                             </div>
                             <div class="form-group col-12">
-                                <CheckboxList @bind-Value="@GamePlatformsValue" ShowBorder="true" Items="@GamePlatforms" DisplayText="游戏平台" ShowLabel="true" ></CheckboxList>
+                                <CheckboxList @bind-Value="@GamePlatformsValue" ShowBorder="true" Items="@GamePlatforms" DisplayText="游戏平台" ShowLabel="true"></CheckboxList>
                             </div>
                             <div class="col-12 p-3">
                                 <Divider></Divider>
@@ -255,8 +256,8 @@ else
 </div>
 @code {
 
-        [Parameter]
-        public string Id { get; set; }
+    [Parameter]
+    public string Id { get; set; }
     public EditAddInforViewModel Model { get; set; } = new EditAddInforViewModel
     {
         Staffs = new List<StaffModel>(),
@@ -277,6 +278,7 @@ else
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    AutoSaveTip<EditAddInforViewModel> autoSave { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -311,7 +313,7 @@ else
             }
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑词条附加信息失败");
         }
@@ -383,6 +385,8 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("保存成功", "保存词条附加信息成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
             }
@@ -392,5 +396,16 @@ else
             ErrorHandler.ProcessError(ex, "保存词条附加信息失败");
         }
     }
+
+    private Task DataLoaded(EditAddInforViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 
 }

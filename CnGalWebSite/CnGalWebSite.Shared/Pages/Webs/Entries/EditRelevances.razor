@@ -16,6 +16,7 @@ else
     <TitleTip></TitleTip>
 
 }
+<AutoSaveTip TItem="EditRelevancesViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <div class="">
     <div class="" style="padding-right: 0; padding-left: 0">
@@ -126,6 +127,7 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditRelevancesViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -144,7 +146,7 @@ else
             StateHasChanged();
 
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑词条关联信息失败");
         }
@@ -165,13 +167,27 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("保存成功", "保存词条关联信息成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider,"/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
+                NavigationManager.NavigateTo(Provider, "/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存词条关联信息失败");
         }
     }
+
+
+    private Task DataLoaded(EditRelevancesViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

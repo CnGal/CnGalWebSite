@@ -104,7 +104,7 @@ else
         //初始化编辑按钮列表
         EditStates.Add(Operation.EditTagMain, Model.State.MainState);
         EditStates.Add(Operation.EditTagChildTags, Model.State.ChildTagsState);
-        @if(Model.Name != "游戏" && Model.Name != "角色" && Model.Name != "STAFF" && Model.Name != "制作组")
+        @if (Model.Name != "游戏" && Model.Name != "角色" && Model.Name != "STAFF" && Model.Name != "制作组")
         {
             EditStates.Add(Operation.EditTagChildEntries, Model.State.ChildEntriesState);
         }

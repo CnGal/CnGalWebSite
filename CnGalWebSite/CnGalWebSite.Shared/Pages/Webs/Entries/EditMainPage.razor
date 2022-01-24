@@ -17,6 +17,7 @@ else
 
 }
 
+<AutoSaveTip TItem="EditMainPageViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <div class="">
     <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
@@ -67,7 +68,7 @@ else
 
             @if (isReady == true)
             {
-                <MarkdownEditorTip Context="@Model.Context" @ref="markdownEditorTip"></MarkdownEditorTip>
+                <MarkdownEditorTip @bind-Context="@Model.Context" @ref="markdownEditorTip"></MarkdownEditorTip>
 
             }
         </div>
@@ -96,6 +97,7 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditMainPageViewModel> autoSave { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -107,7 +109,7 @@ else
 
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑词条主页失败");
         }
@@ -139,13 +141,26 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("保存成功", "保存词条主页成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider,"/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
+                NavigationManager.NavigateTo(Provider, "/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存词条主页失败");
         }
     }
+
+    private Task DataLoaded(EditMainPageViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

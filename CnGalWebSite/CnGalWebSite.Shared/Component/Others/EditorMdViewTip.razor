@@ -6,6 +6,7 @@
 @inject IAppHelper _appHelper
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
+@implements IDisposable
 
 <div style="height:800px">
     <div id="editor">
@@ -14,6 +15,10 @@
 @code {
     [Parameter]
     public string Context { get; set; }
+    [Parameter]
+    public EventCallback<string> ContextChanged { get; set; }
+
+    private System.Threading.Timer mytimer;
 
     public async Task<string> GetContext()
     {
@@ -41,6 +46,39 @@
             //初始化编辑器
             await JS.InvokeAsync<string>("initEditorMd", Context);
             isLoaded = true;
+            //启动定时器
+            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 10);
+
         }
+    }
+    private async void Send(object o)
+    {
+        await InvokeAsync(async () =>
+        {
+            try
+            {
+                var context = Context;
+                await GetContext();
+
+                if (context != Context)
+                {
+                    await ContextChanged.InvokeAsync(Context);
+                }
+            }
+            catch
+            {
+
+            }
+        });
+
+    }
+    public void Dispose()
+    {
+        if (mytimer != null)
+        {
+            mytimer.Dispose();
+            mytimer = null;
+        }
+        GC.SuppressFinalize(this);
     }
 }

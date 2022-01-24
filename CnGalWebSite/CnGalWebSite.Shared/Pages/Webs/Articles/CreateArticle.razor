@@ -8,147 +8,170 @@
 
 <TitleTip Title="发表文章"></TitleTip>
 
-<MakeSureInWASMTip></MakeSureInWASMTip>
-<link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor.Markdown/css/bootstrap.blazor.markdown.min.css" media="none" onload="this.media='all'" />
+<AutoSaveTip TItem="CreateArticleViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
+@if (isReady == false)
+{
+    <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+        <div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+        </div>
+    </div>
+}
+else
+{
+    <div class="">
 
-<div class="">
-    <div class="" style="padding-right: 0;padding-left: 0;">
-        <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
-        <AlertTip Type="AlertTip.AlertTipType.ArticleStandard"></AlertTip>
-        <ValidateForm Model="@Model" ValidateAllProperties="true" @ref="ComplexForm">
-            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-                <h3 class="text-truncate mb-4 fw-bold">填写主要信息</h3>
-                <hr />
+        <div>
+            <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
+            <AlertTip Type="AlertTip.AlertTipType.ArticleStandard"></AlertTip>
+            <ValidateForm Model="@Model" ValidateAllProperties="true" @ref="ComplexForm">
+                <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+                    <h3 class="text-truncate mb-4 fw-bold">填写主要信息</h3>
+                    <hr />
 
-                <div class="row">
-                    <div class=" col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
-                        <ImageCropperButton ImagePath="@MainImagePath" OnUploadedImage="OnCardUploadMain" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
-                    </div>
-                    <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
-                        <ImageCropperButton ImagePath="@BackImagePath" OnUploadedImage="OnCardUploadBack" Type="ImageAspectType.None" Text="上传大背景图"></ImageCropperButton>
-                    </div>
-                    <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
-                        <ImageCropperButton ImagePath="@SmallBackImagePath" OnUploadedImage="OnCardUploadSmall" Type="ImageAspectType.None" Text="上传小背景图"></ImageCropperButton>
-                    </div>
-                </div>
-
-                <div class="form-group mt-4">
                     <div class="row">
-                        <div class="form-group col-12  col-sm-6">
-                            <Select @bind-Value="Model.Type"></Select>
+                        <div class=" col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
+                            <ImageCropperButton ImagePath="@MainImagePath" OnUploadedImage="OnCardUploadMain" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
                         </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.Name" />
+                        <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
+                            <ImageCropperButton ImagePath="@BackImagePath" OnUploadedImage="OnCardUploadBack" Type="ImageAspectType.None" Text="上传大背景图"></ImageCropperButton>
                         </div>
+                        <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
+                            <ImageCropperButton ImagePath="@SmallBackImagePath" OnUploadedImage="OnCardUploadSmall" Type="ImageAspectType.None" Text="上传小背景图"></ImageCropperButton>
+                        </div>
+                    </div>
 
-                        <div class="form-group col-12  col-sm-6">
-                            <div class="mb-3">
-                                <AlertTip Type="AlertTip.AlertTipType.CreateDisambig"></AlertTip>
+                    <div class="form-group mt-4">
+                        <div class="row">
+                            <div class="form-group col-12  col-sm-6">
+                                <Select @bind-Value="Model.Type"></Select>
                             </div>
-                            <BootstrapInput @bind-Value="Model.DisplayName" />
-                        </div>
-                        <div class="form-group col-12">
-                            <BootstrapInput @bind-Value="Model.BriefIntroduction" />
-                        </div>
-                        <div class="form-group col-12">
-                            <hr />
-                        </div>
-                        <div class="form-group col-12  col-sm-6">
-                            <BootstrapInput @bind-Value="Model.OriginalAuthor" />
-                        </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.Name" />
+                            </div>
 
-                        <div class="form-group col-12  col-sm-6">
-                            <DateTimePicker @bind-Value="@Model.PubishTime" ViewModel="DatePickerViewModel.DateTime" />
-                        </div>
-                        <div class="form-group col-12">
-                            <BootstrapInput @bind-Value="Model.OriginalLink" />
-                        </div>
-                        @if (Model.Type == ArticleType.News)
-                        {
+                            <div class="form-group col-12  col-sm-6">
+                                <div class="mb-3">
+                                    <AlertTip Type="AlertTip.AlertTipType.CreateDisambig"></AlertTip>
+                                </div>
+                                <BootstrapInput @bind-Value="Model.DisplayName" />
+                            </div>
+                            <div class="form-group col-12">
+                                <BootstrapInput @bind-Value="Model.BriefIntroduction" />
+                            </div>
                             <div class="form-group col-12">
                                 <hr />
                             </div>
-                            <div class="col-12">
-                                <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
-                                    请选择该动态发生时的真实时间，我们会据此生成时间轴
-                                </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.OriginalAuthor" />
                             </div>
-                            <div class="form-group col-12 col-sm-6">
-                                <Switch @bind-Value="IsOnlyNeedPublishTime" ShowLabel="true" DisplayText="动态发生时间与发布日期一致" />
-                            </div>
-                            @if (IsOnlyNeedPublishTime)
-                            {
-                                <div class="form-group col-12  col-sm-6">
-                                    <DateTimePicker @bind-Value="@Model.PubishTime" ViewModel="DatePickerViewModel.DateTime" IsDisabled="true"  DisplayText="动态发生时间"/>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="form-group col-12  col-sm-6">
-                                    <DateTimePicker @bind-Value="@Model.RealNewsTime" ViewModel="DatePickerViewModel.DateTime"  />
-                                </div>
-                            }
 
                             <div class="form-group col-12  col-sm-6">
-                                <BootstrapInput @bind-Value="Model.NewsType"></BootstrapInput>
+                                <DateTimePicker @bind-Value="@Model.PubishTime" ViewModel="DatePickerViewModel.DateTime" />
                             </div>
-                        }
+                            <div class="form-group col-12">
+                                <BootstrapInput @bind-Value="Model.OriginalLink" />
+                            </div>
+                            @if (Model.Type == ArticleType.News)
+                            {
+                                <div class="form-group col-12">
+                                    <hr />
+                                </div>
+                                <div class="col-12">
+                                    <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
+                                        请选择该动态发生时的真实时间，我们会据此生成时间轴
+                                    </div>
+                                </div>
+                                <div class="form-group col-12 col-sm-6">
+                                    <Switch @bind-Value="IsOnlyNeedPublishTime" ShowLabel="true" DisplayText="动态发生时间与发布日期一致" />
+                                </div>
+                                @if (IsOnlyNeedPublishTime)
+                                {
+                                    <div class="form-group col-12  col-sm-6">
+                                        <DateTimePicker @bind-Value="@Model.PubishTime" ViewModel="DatePickerViewModel.DateTime" IsDisabled="true" DisplayText="动态发生时间" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="form-group col-12  col-sm-6">
+                                        <DateTimePicker @bind-Value="@Model.RealNewsTime" ViewModel="DatePickerViewModel.DateTime" />
+                                    </div>
+                                }
+
+                                <div class="form-group col-12  col-sm-6">
+                                    <BootstrapInput @bind-Value="Model.NewsType"></BootstrapInput>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+
+                </div>
+            </ValidateForm>
+            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+                <h3 class="text-truncate mb-4 fw-bold">编辑正文</h3>
+                <hr class="mb-4" />
+
+                @if (isReady == true)
+                {
+                    <MarkdownEditorTip @ref="markdownEditorTip" @bind-Context="Model.Context"></MarkdownEditorTip>
+                }
+
+
+            </div>
+            <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
+                我们会根据名称自动关联词条。未填写的词条将会自动忽略，不需要手动删除
+            </div>
+            <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+                <h3 class="text-truncate mb-4 fw-bold">
+                    添加关联词条
+                </h3>
+                <hr />
+                <InputRelevancesListTip AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="出场角色"></InputRelevancesListTip>
+                <hr class="mt-4" />
+                <InputRelevancesListTip AutoCompleteItems="@EntryStaffItems" Model="Model.staffs" Title="STAFF"></InputRelevancesListTip>
+                <hr class="mt-4" />
+                <InputRelevancesListTip AutoCompleteItems="@ArticleItems" Model="Model.articles" Title="文章"></InputRelevancesListTip>
+                <hr class="mt-4" />
+                <InputRelevancesListTip AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></InputRelevancesListTip>
+                <hr class="mt-4" />
+                <InputRelevancesListTip AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组"></InputRelevancesListTip>
+                <hr class="mt-4" />
+                <InputOtherLinkListTip Model="Model.others" Title="自定义链接"></InputOtherLinkListTip>
+            </div>
+
+            <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
+                当你点击“完成”按钮时，将会立即发起审核请求，请在点击前确保内容正确无误
+            </div>
+            <div class="alert alert-success  rounded shadow-sm  rounded" role="alert">
+                你不需要一次性把文章写完，可以在醒目位置备注“延迟审核”，在提交后慢慢修改
+            </div>
+            <ValidateForm Model="@Model" ValidateAllProperties="true">
+
+                <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
+                    <div>
+                        <BootstrapBlazor.Components.Textarea @bind-Value="Model.Note" DisplayText="备注" />
+                        <Button class="mt-3" style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
                     </div>
                 </div>
 
-
-            </div>
-        </ValidateForm>
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-            <h3 class="text-truncate mb-4 fw-bold">编辑正文</h3>
-            <hr class="mb-4" />
-
-            @if (isReady == true)
-            {
-                <MarkdownEditorTip @ref="markdownEditorTip"></MarkdownEditorTip>
-            }
-
-
+            </ValidateForm>
         </div>
-        <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
-            我们会根据名称自动关联词条。未填写的词条将会自动忽略，不需要手动删除
-        </div>
-        <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-            <h3 class="text-truncate mb-4 fw-bold">
-                添加关联词条
-            </h3>
-            <hr />
-            <InputRelevancesListTip AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="出场角色"></InputRelevancesListTip>
-            <hr class="mt-4" />
-            <InputRelevancesListTip AutoCompleteItems="@EntryStaffItems" Model="Model.staffs" Title="STAFF"></InputRelevancesListTip>
-            <hr class="mt-4" />
-            <InputRelevancesListTip AutoCompleteItems="@ArticleItems" Model="Model.articles" Title="文章"></InputRelevancesListTip>
-            <hr class="mt-4" />
-            <InputRelevancesListTip AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></InputRelevancesListTip>
-            <hr class="mt-4" />
-            <InputRelevancesListTip AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组"></InputRelevancesListTip>
-            <hr class="mt-4" />
-            <InputOtherLinkListTip Model="Model.others" Title="自定义链接"></InputOtherLinkListTip>
-        </div>
-
-        <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
-            当你点击“完成”按钮时，将会立即发起审核请求，请在点击前确保内容正确无误
-        </div>
-        <div class="alert alert-success  rounded shadow-sm  rounded" role="alert">
-            你不需要一次性把文章写完，可以在醒目位置备注“延迟审核”，在提交后慢慢修改
-        </div>
-        <ValidateForm Model="@Model" ValidateAllProperties="true">
-
-            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
-                <div>
-                    <BootstrapBlazor.Components.Textarea @bind-Value="Model.Note" DisplayText="备注" />
-                    <Button class="mt-3" style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
-                </div>
-            </div>
-
-        </ValidateForm>
     </div>
-</div>
+
+}
 
 
 @code {
@@ -182,6 +205,7 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<CreateArticleViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -197,7 +221,7 @@
 
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取所有词条文章名称列表失败");
         }
@@ -214,7 +238,7 @@
                 await ToastService.Error("创建文章失败", "请填写所有必填项目");
                 return;
             }
-            if (string.IsNullOrWhiteSpace(Model.Context)&&Model.Type!=ArticleType.News)
+            if (string.IsNullOrWhiteSpace(Model.Context) && Model.Type != ArticleType.News)
             {
                 await ToastService.Error("创建文章失败", "必须输入文章正文");
                 return;
@@ -231,7 +255,7 @@
             {
                 Model.RealNewsTime = Model.RealNewsTime.Value.AddHours(Model.RealNewsTime.Value.Hour < 12 ? (12 - Model.RealNewsTime.Value.Hour) : 0);
             }
-            if(IsOnlyNeedPublishTime)
+            if (IsOnlyNeedPublishTime)
             {
                 Model.RealNewsTime = Model.PubishTime;
             }
@@ -249,11 +273,13 @@
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("创建文章成功", "创建文章成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider,"/articles/index/" + obj.Error, Model.Name, "fa fa-newspaper-o");
+                NavigationManager.NavigateTo(Provider, "/articles/index/" + obj.Error, Model.Name, "fa fa-newspaper-o");
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "创建文章失败");
         }
@@ -279,5 +305,17 @@
         Model.SmallBackgroundPicture = url;
         return Task.CompletedTask;
     }
+
+
+    private Task DataLoaded(CreateArticleViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 
 }

@@ -16,6 +16,7 @@ else
     <TitleTip></TitleTip>
 
 }
+<AutoSaveTip TItem="EditPeripheryRelatedPeripheriesViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
 
@@ -33,7 +34,7 @@ else
             <div class="mt-3">
                 <CnGalWebSite.Shared.AppComponent.Normal.Lists.InputListString AutoCompleteItems="@PeripheryItems" Model="Model.Peripheries" Title="周边" />
             </div>
-          
+
         </div>
     }
 
@@ -57,6 +58,7 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditPeripheryRelatedPeripheriesViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -91,6 +93,8 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("编辑周边关联周边信息成功", "编辑周边关联周边信息成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/peripheries/index/" + Model.Id, Model.Name, "fa fa-newspaper-o");
             }
@@ -100,4 +104,16 @@ else
             ErrorHandler.ProcessError(ex, "编辑周边关联周边信息失败");
         }
     }
+
+
+    private Task DataLoaded(EditPeripheryRelatedPeripheriesViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

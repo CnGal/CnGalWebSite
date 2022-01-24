@@ -11,8 +11,7 @@
     <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
 }
 
-<MakeSureInWASMTip></MakeSureInWASMTip>
-<link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor.Markdown/css/bootstrap.blazor.markdown.min.css" media="none" onload="this.media='all'" />
+<AutoSaveTip TItem="EditArticleViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <div class="">
     <div class="" style="padding-right: 0;padding-left: 0;">
@@ -149,7 +148,7 @@
                                 @if (IsOnlyNeedPublishTime)
                                 {
                                     <div class="form-group col-12  col-sm-6">
-                                        <DateTimePicker @bind-Value="@Model.PubishTime" ViewModel="DatePickerViewModel.DateTime" IsDisabled="true"  DisplayText="动态发生时间"/>
+                                        <DateTimePicker @bind-Value="@Model.PubishTime" ViewModel="DatePickerViewModel.DateTime" IsDisabled="true" DisplayText="动态发生时间" />
                                     </div>
                                 }
                                 else
@@ -174,7 +173,7 @@
 
                 @if (isReady == true)
                 {
-                    <MarkdownEditorTip Context="@Model.Context" @ref="markdownEditorTip"></MarkdownEditorTip>
+                    <MarkdownEditorTip @bind-Context="@Model.Context" @ref="markdownEditorTip"></MarkdownEditorTip>
                 }
 
 
@@ -254,6 +253,7 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditArticleViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -271,7 +271,7 @@
 
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑文章失败");
         }
@@ -305,7 +305,7 @@
             {
                 Model.RealNewsTime = Model.RealNewsTime.Value.AddHours(Model.RealNewsTime.Value.Hour < 12 ? (12 - Model.RealNewsTime.Value.Hour) : 0);
             }
-            if(Model.Type==ArticleType.News&& IsOnlyNeedPublishTime)
+            if (Model.Type == ArticleType.News && IsOnlyNeedPublishTime)
             {
                 Model.RealNewsTime = Model.PubishTime;
             }
@@ -323,8 +323,10 @@
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("编辑文章成功", "编辑文章成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider,"/articles/index/" + obj.Error, Model.Name, "fa fa-newspaper-o");
+                NavigationManager.NavigateTo(Provider, "/articles/index/" + obj.Error, Model.Name, "fa fa-newspaper-o");
             }
         }
         catch (Exception ex)
@@ -352,5 +354,17 @@
         Model.SmallBackgroundPicture = url;
         return Task.CompletedTask;
     }
+
+
+    private Task DataLoaded(EditArticleViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 
 }

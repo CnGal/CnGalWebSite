@@ -5,6 +5,7 @@
 @inject NavigationManager NavigationManager
 
 <TitleTip></TitleTip>
+<AutoSaveTip TItem="EditFavoriteFolderViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
 
@@ -73,6 +74,7 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditFavoriteFolderViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -82,7 +84,7 @@
             Model = await Http.GetFromJsonAsync<EditFavoriteFolderViewModel>(ToolHelper.WebApiPath + "api/favorites/EditFavoriteFolder/" + Id);
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑收藏夹基本信息失败");
         }
@@ -113,6 +115,8 @@
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("保存收藏夹基本信息成功", "保存收藏夹基本信息成功");
 
                 //获取用户收藏夹相关信息 只需要获取一次
@@ -136,7 +140,7 @@
                 }
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存收藏夹基本信息失败");
         }
@@ -160,4 +164,16 @@
         Model.MainImagePath = url;
         return Task.CompletedTask;
     }
+
+
+    private Task DataLoaded(EditFavoriteFolderViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

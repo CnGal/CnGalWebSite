@@ -2,15 +2,18 @@
 @attribute [Authorize]
 
 @inject IDataCacheService _dataCacheService
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Space.EditMainPage Id="@Id"></CnGalWebSite.Shared.Pages.Apps.Space.EditMainPage>
-}
-else
-{
-    <CnGalWebSite.Shared.Pages.Webs.Space.EditMainPage Id="@Id"></CnGalWebSite.Shared.Pages.Webs.Space.EditMainPage>
-}
-@code{
-    [Parameter]
-    public string Id { get; set; }
-}
+
+    <MakeSureInWASMTip></MakeSureInWASMTip>
+
+    @if (_dataCacheService.IsApp == true)
+    {
+        <CnGalWebSite.Shared.Pages.Apps.Space.EditMainPage Id="@Id"></CnGalWebSite.Shared.Pages.Apps.Space.EditMainPage>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.Pages.Webs.Space.EditMainPage Id="@Id"></CnGalWebSite.Shared.Pages.Webs.Space.EditMainPage>
+    }
+    @code{
+        [Parameter]
+        public string Id { get; set; }
+    }

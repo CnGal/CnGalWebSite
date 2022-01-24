@@ -16,6 +16,7 @@ else
 
 }
 
+<AutoSaveTip TItem="EditMainViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
 
@@ -111,6 +112,7 @@ else
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    AutoSaveTip<EditMainViewModel> autoSave { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -160,11 +162,13 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("保存成功", "保存词条主要信息成功，等待审核通过");
                 NavigationManager.NavigateTo("/entries/index/" + Model.Id);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存词条主要信息失败");
         }
@@ -197,5 +201,15 @@ else
     }
 
 
+
+    private Task DataLoaded(EditMainViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
 
 }

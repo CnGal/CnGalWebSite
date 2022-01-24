@@ -17,8 +17,7 @@ else
 
 }
 
-
-<MakeSureInWASMTip></MakeSureInWASMTip>
+<AutoSaveTip TItem="EditImagesViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <div class="">
     <div class="" style="padding-right: 0;padding-left: 0;">
@@ -87,6 +86,7 @@ else
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    AutoSaveTip<EditImagesViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -123,14 +123,26 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("保存成功", "保存词条图片成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider,"/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
+                NavigationManager.NavigateTo(Provider, "/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存词条图片失败");
         }
     }
-  
+
+    private Task DataLoaded(EditImagesViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

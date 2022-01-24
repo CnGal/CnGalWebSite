@@ -3,19 +3,22 @@
 @attribute [Authorize]
 
 @inject IDataCacheService _dataCacheService
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Space.EditSpaceFavoriteObjects Id="@Id" Name="@Name" ReturnUrl="@ReturnUrl"></CnGalWebSite.Shared.Pages.Apps.Space.EditSpaceFavoriteObjects>
-}
-else
-{
-    <CnGalWebSite.Shared.Pages.Webs.Space.EditSpaceFavoriteObjects  Id="@Id" Name="@Name" ReturnUrl="@ReturnUrl"></CnGalWebSite.Shared.Pages.Webs.Space.EditSpaceFavoriteObjects>
-}
-@code{
-    [Parameter]
-    public string Id { get; set; }
-    [Parameter]
-    public string Name { get; set; }
-    [Parameter]
-    public string ReturnUrl { get; set; }
-}
+    <MakeSureInWASMTip></MakeSureInWASMTip>
+
+
+    @if (_dataCacheService.IsApp == true)
+    {
+        <CnGalWebSite.Shared.Pages.Apps.Space.EditSpaceFavoriteObjects Id="@Id" Name="@Name" ReturnUrl="@ReturnUrl"></CnGalWebSite.Shared.Pages.Apps.Space.EditSpaceFavoriteObjects>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.Pages.Webs.Space.EditSpaceFavoriteObjects Id="@Id" Name="@Name" ReturnUrl="@ReturnUrl"></CnGalWebSite.Shared.Pages.Webs.Space.EditSpaceFavoriteObjects>
+    }
+    @code{
+        [Parameter]
+        public string Id { get; set; }
+        [Parameter]
+        public string Name { get; set; }
+        [Parameter]
+        public string ReturnUrl { get; set; }
+    }

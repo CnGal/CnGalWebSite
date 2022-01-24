@@ -16,6 +16,7 @@ else
     <TitleTip></TitleTip>
 
 }
+<AutoSaveTip TItem="EditMainViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave"/>
 
 <div class="">
     <div class="" style="padding-right: 0;padding-left: 0;">
@@ -133,12 +134,9 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-
+    AutoSaveTip<EditMainViewModel> autoSave { get; set; }
     protected override async Task OnInitializedAsync()
     {
-#if DEBUG
-        //Thread.Sleep(10000);
-#endif
         try
         {
             //获取词条信息
@@ -182,6 +180,7 @@ else
             }
             else
             {
+                autoSave.Clean();
                 await ToastService.Success("保存成功", "保存词条主要信息成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/entries/index/" + Model.Id, Model.Name, "fa fa-codepen");
             }
@@ -191,6 +190,17 @@ else
             ErrorHandler.ProcessError(ex, "保存词条主要信息失败");
         }
     }
+
+    private Task DataLoaded(EditMainViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
     private Task OnCardUpload1(string url)
     {
         Model.MainPicturePath = url;

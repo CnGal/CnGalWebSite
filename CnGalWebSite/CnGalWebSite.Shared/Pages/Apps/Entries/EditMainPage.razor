@@ -15,7 +15,7 @@ else
     <TitleTip></TitleTip>
 }
 
-<link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor.Markdown/css/bootstrap.blazor.markdown.min.css" media="none" onload="this.media='all'" />
+<AutoSaveTip TItem="EditMainPageViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
 
 
@@ -32,7 +32,7 @@ else
 
             @if (isReady == true)
             {
-                <MarkdownEditorTip Context="@Model.Context" @ref="markdownEditorTip"></MarkdownEditorTip>
+                <MarkdownEditorTip @bind-Context="@Model.Context" @ref="markdownEditorTip"></MarkdownEditorTip>
 
             }
         </div>
@@ -54,6 +54,7 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditMainPageViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -100,13 +101,27 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("保存成功", "保存词条主页成功，等待审核通过");
                 NavigationManager.NavigateTo("/entries/index/" + Model.Id);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存词条主页失败");
         }
     }
+
+
+    private Task DataLoaded(EditMainPageViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

@@ -7,7 +7,7 @@
 
 <TitleTip></TitleTip>
 
-<link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor.Markdown/css/bootstrap.blazor.markdown.min.css" media="none" onload="this.media='all'" />
+<AutoSaveTip TItem="EditUserMainPageViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar />
 
 <div style=" margin-top: 45px; width: 100%;margin-bottom:65px;">
@@ -30,9 +30,9 @@
 
 
 @code {
-        [Parameter]
-        public string Id { get; set; }
-    public EditUserMainPageViewModel Model { get; set; }
+    [Parameter]
+    public string Id { get; set; }
+    public EditUserMainPageViewModel Model { get; set; } = new EditUserMainPageViewModel();
     bool isReady = false;
 
     [NotNull]
@@ -40,6 +40,7 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditUserMainPageViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,13 +82,27 @@
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("保存成功", "保存用户主页成功，等待审核通过");
                 NavigationManager.NavigateTo("/space/index/" + Model.Id);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存用户主页失败");
         }
     }
+
+
+    private Task DataLoaded(EditUserMainPageViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
 }

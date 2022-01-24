@@ -1658,7 +1658,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             else
             {
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishRelevances, model.Note);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishMainPage, model.Note);
             }
 
             return new Result { Successful = true };

@@ -13,6 +13,7 @@ else
 {
     <TitleTip></TitleTip>
 }
+<AutoSaveTip TItem="EditArticleViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="@Model.Name" />
 
@@ -87,7 +88,7 @@ else
                             @if (IsOnlyNeedPublishTime)
                             {
                                 <div class="form-group col-12  col-sm-6">
-                                    <DateTimePicker @bind-Value="@Model.PubishTime" ViewModel="DatePickerViewModel.DateTime" IsDisabled="true"  DisplayText="动态发生时间"/>
+                                    <DateTimePicker @bind-Value="@Model.PubishTime" ViewModel="DatePickerViewModel.DateTime" IsDisabled="true" DisplayText="动态发生时间" />
                                 </div>
                             }
                             else
@@ -111,7 +112,7 @@ else
             <div class="mt-3">
                 @if (isReady == true)
                 {
-                    <MarkdownEditorTip Context="@Model.Context" @ref="markdownEditorTip"></MarkdownEditorTip>
+                    <MarkdownEditorTip @bind-Context="@Model.Context" @ref="markdownEditorTip"></MarkdownEditorTip>
                 }
 
             </div>
@@ -184,6 +185,7 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AutoSaveTip<EditArticleViewModel> autoSave { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -201,7 +203,7 @@ else
 
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑文章信息失败");
         }
@@ -252,6 +254,8 @@ else
             }
             else
             {
+                autoSave.Clean();
+
                 await ToastService.Success("编辑文章成功", "编辑文章成功，等待审核通过");
                 NavigationManager.NavigateTo("/articles/index/" + obj.Error);
             }
@@ -279,6 +283,16 @@ else
     {
         Model.SmallBackgroundPicturePath = url;
         Model.SmallBackgroundPicture = url;
+        return Task.CompletedTask;
+    }
+
+    private Task DataLoaded(EditArticleViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
         return Task.CompletedTask;
     }
 
