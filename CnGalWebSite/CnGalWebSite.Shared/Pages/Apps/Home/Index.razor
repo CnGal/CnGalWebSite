@@ -20,19 +20,31 @@
                     </div>
                 </div>
                 <div class="@("tab-pane fade" + (defaultIndex == 1 ? " show active " : "") )" id="@("pills" + randomIndex + "-1")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-1-tab")">
+
+                    @if(isReadyTab1)
+            {
                     <div>
                         <CnGalWebSite.Shared.AppComponent.Pages.Entries.Index />
                     </div>
+            }
                 </div>
                 <div class="@("tab-pane fade" + (defaultIndex == 2 ? " show active " : "") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
-                    <div>
-                        <CnGalWebSite.Shared.AppComponent.Pages.Articles.Home />
-                    </div>
+                    @if (isReadyTab2)
+                    {
+                        <div>
+                            <CnGalWebSite.Shared.AppComponent.Pages.Articles.Home />
+                        </div>
+                    }
+
                 </div>
                 <div class="@("tab-pane fade" + (defaultIndex == 3 ? " show active " : "") )" id="@("pills" + randomIndex + "-3")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-3-tab")">
-                    <div>
-                       <CnGalWebSite.Shared.AppComponent.Pages.Home.Others.Index/>
-                    </div>
+                    @if (isReadyTab3)
+                    {
+                        <div>
+                            <CnGalWebSite.Shared.AppComponent.Pages.Home.Others.Index />
+                        </div>
+                    }
+
                 </div>
             </div>
         </div>
@@ -75,6 +87,9 @@
     string userId = "";
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+    bool isReadyTab1 = false;
+    bool isReadyTab2 = false;
+    bool isReadyTab3 = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -128,7 +143,19 @@
 
     public async Task OnTabClick(int index)
     {
-
+        if(index==1)
+        {
+            isReadyTab1 = true;
+        }
+        else if (index == 2)
+        {
+            isReadyTab2 = true;
+        }
+        else if (index == 3)
+        {
+            isReadyTab3 = true;
+        }
+        StateHasChanged();
         TabIndexNum = index;
     }
 }
