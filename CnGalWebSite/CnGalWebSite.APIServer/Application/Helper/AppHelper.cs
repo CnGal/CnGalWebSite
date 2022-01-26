@@ -123,7 +123,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 else
                 {
                     image = "default/" + defaultStr;
-                    return "//app.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
+                    return "https://app.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
                 }
 
             }
@@ -132,10 +132,15 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 //判断是否为绝对路径
                 if (image.Contains("http://") || image.Contains("https://") || image.Contains("//"))
                 {
-                    /*if(image.Contains("pic.cngal.top"))
+                    //if(image.Contains("pic.cngal.top"))
+                    //{
+                    //    return image.Replace(".png", ".md.png").Replace(".jpg", ".md.jpg").Replace(".jpeg", ".md.jpeg").Replace(".gif", ".md.gif");
+                    //}
+
+                    if (image.Contains("http://pic.cngal.top"))
                     {
-                        return image.Replace(".png", ".md.png").Replace(".jpg", ".md.jpg").Replace(".jpeg", ".md.jpeg").Replace(".gif", ".md.gif");
-                    }*/
+                        return image.Replace("http://pic.cngal.top", "https://pic.cngal.top");
+                    }
 
                     return image;
                 }
@@ -143,7 +148,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 {
                     //http://localhost:51313/
                     //121.43.54.210
-                    return "//app.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
+                    return "https://app.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
                 }
             }
         }

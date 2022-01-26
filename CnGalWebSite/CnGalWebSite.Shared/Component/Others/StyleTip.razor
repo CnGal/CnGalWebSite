@@ -24,9 +24,9 @@
 
 @if (isDark)
 {
-    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/vs2015.min.css" media="none" onload="this.media='all'" />
-    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/dark-cover.min.css" />
     <link href="https://cdn.bootcdn.net/ajax/libs/github-markdown-css/5.1.0/github-markdown-dark.min.css" rel="stylesheet" media="none" onload="this.media='all'">
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/vs2015.min.css" media="none" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/dark-cover.min.css" />
     <style>
         [data-bs-toggle="lgbSelect"] .form-select {
             background-color: transparent;
@@ -38,21 +38,20 @@ else
 {
     <!-- <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/editor.md/css/editormd.min.css" media="none" onload="this.media='all'" />
     -->
-
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/github-markdown-css/5.1.0/github-markdown-light.min.css" media="none" onload="this.media='all'" />
-    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/vs.min.css" media="none" onload="this.media='all'" />
-    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/Lighting-mode.min.css" />
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.4.0/styles/atom-one-light.min.css" media="none" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/Lighting-mode.min.css" />
 
     <style>
         #__vconsole .vc-switch {
             margin-right: 20px;
-            box-shadow-sm: 0 0.5rem 1rem rgb(255, 255, 255, 15%) !important;
+            box-shadow: 0 0.5rem 1rem rgb(255, 255, 255, 15%) !important;
         }
     </style>
 
     if (IsOnBgImage)
     {
-        <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/show-background.min.css" />
+        <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/show-background.min.css" />
     }
     else
     {
@@ -72,7 +71,7 @@ else
 }
 @if (IsOnMouse)
 {
-    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/mouse.min.css" />
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/mouse.min.css" />
 
 
 }
@@ -82,7 +81,7 @@ else
     <style>
         .layout.is-page .layout-footer {
             background-color: transparent !important;
-            box-shadow-sm: 0 0.5rem 1rem rgb(0 0 0 / 50%) !important;
+            box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 50%) !important;
         }
     </style>
 
@@ -108,8 +107,8 @@ else
             <div id="web_bg" style="background-image: url(@mimage)" class=" d-none d-sm-block"></div>
         </Authorized>
         <NotAuthorized>
-            <div id="web_bg" style="background-image: url(//app.cngal.org/_content/CnGalWebSite.Shared/images/CnGal5thMin.png) " class=" d-none bg-d-lg-block"></div>
-            <div id="web_bg" style="background-image: url(//app.cngal.org/_content/CnGalWebSite.Shared/images/oppsitebackground.png)" class=" d-none d-sm-block"></div>
+            <div id="web_bg" style="background-image: url(https://app.cngal.org/_content/CnGalWebSite.Shared/images/CnGal5thMin.png) " class=" d-none bg-d-lg-block"></div>
+            <div id="web_bg" style="background-image: url(https://app.cngal.org/_content/CnGalWebSite.Shared/images/oppsitebackground.png)" class=" d-none d-sm-block"></div>
         </NotAuthorized>
     </AuthorizeView>
 }
@@ -129,9 +128,10 @@ else
     .markdown-body {
         background-color: transparent;
     }
-    .markdown-body b, .markdown-body strong {
-        font-weight: bolder;
-    }
+
+        .markdown-body b, .markdown-body strong {
+            font-weight: bolder;
+        }
 </style>
 
 @code {

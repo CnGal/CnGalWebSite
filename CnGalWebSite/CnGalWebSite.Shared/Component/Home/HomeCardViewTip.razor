@@ -2,7 +2,7 @@
 @if (IsSmallScreen)
 {
     <TabLink Icon="@Icon" Url="@Url" Text="@Name" class="a-font-color">
-        <div class="card h-100 "  style="background-color: transparent; border: 0px; cursor: pointer ">
+        <div class="h-100 ">
             <img src="@Image" class="card-img-top" alt="@Name" />
             <div class="card-body" style="padding: 0px; padding: 0px; padding-top: 0.5rem; padding-left: 0.4rem; padding-right: 0.4rem;">
                 <span class="home-card-name-text">@Name</span>
@@ -26,9 +26,9 @@ else
     if (IsRole)
     {
         <TabLink Icon="@Icon" Url="@Url" Text="@Name" class="a-font-color">
-            <div class="card h-100 " style="background-color: transparent; border: 0px; cursor: pointer">
+            <div class=" h-100 ">
                 <img src="@Image" class="card-img-top" alt="@Name" style="border-radius:50%" />
-                <div class="card-body" style="padding: 0px; padding-top: 0.5rem;">
+                <div class="pt-2">
                     <p class="m-0 text-center home-card-name-text" style="font-size:16px">@Name</p>
                         <div class="row" style="color:gray">
                             <div class="col-6">
@@ -48,9 +48,9 @@ else
     else
     {
         <TabLink Icon="@Icon" Url="@Url" Text="@Name" class="a-font-color">
-            <div class="card h-100 " style="background-color: transparent; border: 0px; cursor: pointer">
+            <div class=" h-100 " >
                 <img src="@Image" class="card-img-top" alt="@Name" />
-                <div class="card-body" style="padding: 0px; padding-top: 0.5rem;">
+                <div class="pt-2">
                     <span class="home-card-name-text">@Name</span>
 
                         <div class="row" style="color:gray">

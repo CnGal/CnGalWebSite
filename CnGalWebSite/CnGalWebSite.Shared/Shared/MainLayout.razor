@@ -11,7 +11,7 @@
 
 <StyleTip ColorString="@_dataCacheService.ThemeSetting.Theme" IsDark="_dataCacheService.ThemeSetting.IsDark" @ref="styleTip" IsOnMouse="_dataCacheService.ThemeSetting.IsOnMouse" IsOnBgImage="_dataCacheService.ThemeSetting.IsOnBgImage"></StyleTip>
 
-<link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/pc.min.css">
+<link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/pc.min.css">
 
 <ImagesLargeViewTip></ImagesLargeViewTip>
 
@@ -47,13 +47,13 @@
                         }
                     }
                     @{userName = context.User.Identity.Name;}
-                    <img src="@(image??"//app.cngal.org/_content/CnGalWebSite.Shared/images/user.png")" class="layout-avatar-right" alt="头像" />
+                    <img src="@(image??"https://app.cngal.org/_content/CnGalWebSite.Shared/images/user.png")" class="layout-avatar-right" alt="头像" />
                     <TabLink Text="个人空间" Url="@("/space/index/"+userId)" Icon="fa fa-star-o" class="d-sm-block nav-link" style="color: white; word-wrap: break-word; word-break: break-all; width: max-content;">
                         @context.User.Identity.Name
                     </TabLink>
                 </Authorized>
                 <NotAuthorized>
-                    <img src="//app.cngal.org/_content/CnGalWebSite.Shared/images/user.png" class="layout-avatar-right" alt="头像" />
+                    <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/user.png" class="layout-avatar-right" alt="头像" />
                     <TabLink Text="登入" Url="/account/login" Icon="fa fa-sign-in" class="nav-link" style="color:white">
                         登入
                     </TabLink>
@@ -75,7 +75,7 @@
     </Header>
     <Side>
         <TabLink class="layout-banner" Text="主页" Url="/" Icon="fa fa-home">
-            <img class="layout-logo" src="//app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" alt="logo" />
+            <img class="layout-logo" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" alt="logo" />
             <div class="layout-title">
                 <span>CnGal资料站</span>
             </div>
@@ -84,7 +84,7 @@
         <div class="layout-user">
             <AuthorizeView>
                 <Authorized>
-                    <img class="layout-avatar" src="@(image??"//app.cngal.org/_content/CnGalWebSite.Shared/images/user.png")" alt="头像">
+                    <img class="layout-avatar" src="@(image??"https://app.cngal.org/_content/CnGalWebSite.Shared/images/user.png")" alt="头像">
                     <div class="layout-title">
                         <TabLink Text="个人空间" Url="@("/space/index/"+userId)" Icon="fa fa-star-o" class="nav-link">
                             @context.User.Identity.Name
@@ -93,7 +93,7 @@
                     <div class="layout-user-state"></div>
                 </Authorized>
                 <NotAuthorized>
-                    <img class="layout-avatar" src="_content/CnGalWebSite.Shared/images/user.png" alt="头像">
+                    <img class="layout-avatar" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/user.png" alt="头像">
                     <div class="layout-title">
                         <TabLink Text="登入" Url="/account/login" Icon="fa fa-sign-in" class="nav-link" style="color:white">
                             登入

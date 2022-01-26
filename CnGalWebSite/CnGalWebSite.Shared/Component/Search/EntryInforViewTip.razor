@@ -11,7 +11,7 @@
                         <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
                         <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
                     </header>
-                    <div class="article-home-text">
+                    <div class="article-home-text text-truncate-4">
                         @Model.BriefIntroduction
                     </div>
                     @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)
@@ -65,7 +65,7 @@
                         <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
                         <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
                     </header>
-                    <h6 class="article-home-text "
+                    <h6 class="article-home-text text-truncate-4"
                         title="@Model.BriefIntroduction">
                         @Model.BriefIntroduction
                     </h6>

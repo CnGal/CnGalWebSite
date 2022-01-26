@@ -1,50 +1,45 @@
 ﻿@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
 
 
+<div class="markdown-body" id="@("markdown-" + Id)">
+    @((MarkupString)Text)
+</div>
 
-    <style>
-        .markdown-body img {
-            background-color: transparent;
-        }
-    </style>
+@code {
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public bool IsNeedHighlight { get; set; } = true;
 
+    public int Id = new Random().Next();
 
-    <div class="markdown-body" id="@("markdown-" + Id)">
-
-    </div>
-
-    @code {
-        public string MarkdownText { get; set; }
-        public int Id = new Random().Next();
-
-        [Parameter]
-        public string Text { get; set; }
-
-        #region 渲染MarkDown
-        /// <summary>
-        /// OnAfterRenderAsync 方法
-        /// </summary>
-        /// <param name="firstRender"></param>
-        /// <returns></returns>
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
-            try
+            if (IsNeedHighlight)
             {
-                if (!string.IsNullOrWhiteSpace(Text))
+
+                try
                 {
-                    MarkdownText = await JS.InvokeAsync<string>("marked", Text);
-                    await JS.InvokeAsync<string>("cleanInnerHTML", "markdown-" + Id);
-                    await JS.InvokeAsync<string>("setInnerHTML", "markdown-" + Id, MarkdownText);
+                    await JS.InvokeAsync<string>("highlightAllCode");
+                }
+                catch
+                {
+
                 }
             }
-            catch
-            {
-
-            }
-
-
-
         }
-        #endregion
     }
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (string.IsNullOrWhiteSpace(Text) == false)
+        {
+            var url = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
+            Text = Text.Replace("href=\"#", $"href=\"{url}#");
+        }
+    }
+
+}
