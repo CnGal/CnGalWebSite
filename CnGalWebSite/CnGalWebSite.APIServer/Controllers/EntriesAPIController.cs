@@ -1642,13 +1642,8 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishMainPage);
             //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
+            var resulte = examine.Key as string;
+
             //判断是否是管理员
             if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
