@@ -200,32 +200,32 @@ namespace CnGalWebSite.APIServer.ExamineX
             return dtos;
         }
 
-        public Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListExamineAloneModel searchModel)
+        public async Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListExamineAloneModel searchModel)
         {
-            IEnumerable<Examine> items = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
+            IQueryable<Examine> items = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
             // 处理高级搜索
             if (!string.IsNullOrWhiteSpace(searchModel.EntryId?.ToString()))
             {
-                items = items.Where(item => item.EntryId.ToString()?.Contains(searchModel.EntryId.ToString(), StringComparison.OrdinalIgnoreCase) ?? false);
+                items = items.Where(item => item.EntryId.ToString().Contains(searchModel.EntryId.ToString(), StringComparison.OrdinalIgnoreCase));
             }
 
             if (!string.IsNullOrWhiteSpace(searchModel.ArticleId?.ToString()))
             {
-                items = items.Where(item => item.ArticleId.ToString()?.Contains(searchModel.ArticleId.ToString(), StringComparison.OrdinalIgnoreCase) ?? false);
+                items = items.Where(item => item.ArticleId.ToString().Contains(searchModel.ArticleId.ToString(), StringComparison.OrdinalIgnoreCase) );
             }
 
             if (!string.IsNullOrWhiteSpace(searchModel.TagId?.ToString()))
             {
-                items = items.Where(item => item.TagId.ToString()?.Contains(searchModel.TagId.ToString(), StringComparison.OrdinalIgnoreCase) ?? false);
+                items = items.Where(item => item.TagId.ToString().Contains(searchModel.TagId.ToString(), StringComparison.OrdinalIgnoreCase));
             }
 
             if (!string.IsNullOrWhiteSpace(searchModel.ApplicationUserId?.ToString()))
             {
-                items = items.Where(item => item.ApplicationUserId.ToString()?.Contains(searchModel.ApplicationUserId.ToString(), StringComparison.OrdinalIgnoreCase) ?? false);
+                items = items.Where(item => item.ApplicationUserId.ToString().Contains(searchModel.ApplicationUserId.ToString(), StringComparison.OrdinalIgnoreCase) );
             }
             if (!string.IsNullOrWhiteSpace(searchModel.Comments))
             {
-                items = items.Where(item => item.Comments?.Contains(searchModel.Comments, StringComparison.OrdinalIgnoreCase) ?? false);
+                items = items.Where(item => item.Comments.Contains(searchModel.Comments, StringComparison.OrdinalIgnoreCase));
             }
             if (searchModel.Operation != null)
             {
@@ -237,20 +237,19 @@ namespace CnGalWebSite.APIServer.ExamineX
             // 处理 SearchText 模糊搜索
             if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                items = items.Where(item => (item.EntryId.ToString()?.Contains(options.SearchText) ?? false)
-                             || (item.EntryId.ToString()?.Contains(options.SearchText) ?? false)
-                             || (item.ArticleId.ToString()?.Contains(options.SearchText) ?? false)
-                             || (item.TagId.ToString()?.Contains(options.SearchText) ?? false)
-                             || (item.ApplicationUserId.ToString()?.Contains(options.SearchText) ?? false));
+                items = items.Where(item => (item.EntryId.ToString().Contains(options.SearchText) )
+                             || (item.EntryId.ToString().Contains(options.SearchText))
+                             || (item.ArticleId.ToString().Contains(options.SearchText) )
+                             || (item.TagId.ToString().Contains(options.SearchText) )
+                             || (item.ApplicationUserId.ToString().Contains(options.SearchText)));
             }
 
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
-                // 外部未进行排序，内部自动进行排序处理
-                var invoker = SortLambdaCacheEntry.GetOrAdd(typeof(Examine), key => LambdaExtensions.GetSortLambda<Examine>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+
+                items.Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 
@@ -258,11 +257,11 @@ namespace CnGalWebSite.APIServer.ExamineX
             var total = items.Count();
 
             // 内存分页
-            items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
+            var itemsReal =await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
 
             //复制数据
             var resultItems = new List<ListExamineAloneModel>();
-            foreach (var item in items)
+            foreach (var item in itemsReal)
             {
                 resultItems.Add(new ListExamineAloneModel
                 {
@@ -283,13 +282,13 @@ namespace CnGalWebSite.APIServer.ExamineX
                 });
             }
 
-            return Task.FromResult(new QueryData<ListExamineAloneModel>()
+            return new QueryData<ListExamineAloneModel>()
             {
                 Items = resultItems,
                 TotalCount = total,
                 IsSorted = isSorted,
                 // IsFiltered = isFiltered
-            });
+            };
         }
 
 

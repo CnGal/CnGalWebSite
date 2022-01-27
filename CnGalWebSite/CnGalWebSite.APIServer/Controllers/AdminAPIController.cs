@@ -1497,9 +1497,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var entry = await _entryRepository.GetAll().FirstOrDefaultAsync(s => s.Id == 3433);
-                entry.MainPicture = "https://media.st.dl.pinyuncloud.com/steam/apps/1874810/header.jpg?t=1642910979";
-                await _entryRepository.UpdateAsync(entry);
+                await _examineRepository.DeleteAsync(s => s.Id == 16802);
                 //string temp= await _fileService.SaveImageAsync("https://wx4.sinaimg.cn/mw2000/008qAv3ngy1gyem1zkfwqj31cr0s9hbg.jpg", _configuration["NewsAdminId"]);
                 //await _elasticsearchService.DeleteDataOfElasticsearch();
                 //await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);

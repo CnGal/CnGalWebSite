@@ -42,7 +42,6 @@
                        ShowExtendButtons="true" ExtendButtonColumnWidth="180" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
                        ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true" IsAutoRefresh="@IsAutoRefresh">
                     <TableToolbarTemplate>
-                        <TableToolbarButton TItem="ListExamineAloneModel" Color="Color.Primary" Icon="fa fa-spin fa-spinner fa-fw" Text="切换自动刷新" OnClickCallback="ClickIsAutoRefresh" />
                         <TableToolbarButton TItem="ListExamineAloneModel" Color="Color.Success" Icon="fa fa-paper-plane-o" Text="通过审核" OnClickCallback="OnPassedExamineClick" IsAsync="true" />
                         <TableToolbarButton TItem="ListExamineAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="驳回审核" OnClickCallback="OnUnPassedExamineClick" IsAsync="true" />
                     </TableToolbarTemplate>
@@ -164,9 +163,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-#if DEBUG
-        //Thread.Sleep(10000);
-#endif
         try
         {
             InforModel = await Http.GetFromJsonAsync<ListExaminesInforViewModel>(ToolHelper.WebApiPath + "api/admin/ListExamines");
