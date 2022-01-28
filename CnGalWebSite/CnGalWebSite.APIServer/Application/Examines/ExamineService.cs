@@ -249,7 +249,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
 
-                items.Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+                items=items.Sort(options.SortName, (SortOrder)options.SortOrder);
                 isSorted = true;
             }
 

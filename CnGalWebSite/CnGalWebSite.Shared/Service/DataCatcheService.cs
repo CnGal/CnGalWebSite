@@ -9,6 +9,7 @@ using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Space;
+using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Theme;
 using CnGalWebSite.DataModel.ViewModel.Votes;
@@ -112,7 +113,10 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public IPageModelCatche<ArticleContrastEditRecordViewModel> ArticleContrastEditRecordViewCatche { get; set; }
 
-
+        /// <summary>
+        /// 折扣页面缓存辅助类
+        /// </summary>
+        public DiscountPageHelper DiscountPageCatcheHelper { get; set; } = new DiscountPageHelper();
         /// <summary>
         /// 评论详情
         /// </summary>
