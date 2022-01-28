@@ -1,8 +1,10 @@
 ﻿{
+  "lang": "ch",
+  "id": "CnGal",
   "name": "CnGal资料站",
   "short_name": "CnGal资料站",
-  "description": "CnGal资料站的建站目的是收集,索引国产galgame资料、文章、攻略，为国产galgame同好们提供方便",
-  "start_url": "./",
+  "description": "CnGal资料站的建站目的是收集,索引国产及中文化galgame资料、文章、攻略，为galgame同好们提供方便",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#FFFFFF",
   "theme_color": "#d979a2",

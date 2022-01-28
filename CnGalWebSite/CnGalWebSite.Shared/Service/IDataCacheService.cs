@@ -13,6 +13,7 @@ using CnGalWebSite.DataModel.ViewModel.Votes;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CnGalWebSite.DataModel.ViewModel.Steam;
 
 namespace CnGalWebSite.Shared.Service
 {

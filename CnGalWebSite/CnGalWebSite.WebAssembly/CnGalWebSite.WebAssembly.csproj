@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\css\vs.min.css" Link="wwwroot\css\vs.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\css\vs2015.min.css" Link="wwwroot\css\vs2015.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\CnGalWebSite.Server\wwwroot\styles\bundle-css.css" Link="wwwroot\styles\bundle-css.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -44,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CnGalWebSite.DataModel\CnGalWebSite.DataModel.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Shared\CnGalWebSite.Shared.csproj" />
   </ItemGroup>
 

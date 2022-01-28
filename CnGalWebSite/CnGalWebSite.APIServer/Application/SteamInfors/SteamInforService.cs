@@ -120,7 +120,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
 
 
-            //修正价无法获取价格的游戏状态
+            //修正无法获取价格的游戏状态
             if (steamNowJson.price == 0 && steamLowestJson.price == -1)
             {
                 steamNowJson = new SteamNowJson
@@ -233,6 +233,13 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 steam.CutNow = 0;
                 steam.PriceNowString = "¥ " + ((double)steam.PriceNow / 100).ToString("0.00");
             }
+            if (steamId == 1827680)
+            {
+                steam.PriceNow = 0;
+                steam.CutNow = 0;
+                steam.PriceNowString = "¥ 0.00";
+            }
+
 
             //获取评测
             if (steam.PriceNow >= 0)
