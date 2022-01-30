@@ -1390,7 +1390,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 entryAddInfor.Information.Add(new BasicEntryInformation_ { Modifier = item.Modifier, DisplayName = item.DisplayName, DisplayValue = item.DisplayValue, IsDelete = true, Additional = additional_s });
             }
             //再对比当前
-            foreach (var item in newEntry.Information)
+            foreach (var item in newEntry.Information.ToList().Purge())
             {
                 var isSame = false;
                 foreach (var infor in entryAddInfor.Information)
@@ -1399,7 +1399,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     {
                         isSame = true;
                         //如果两次一致 删除上一步中的项目
-                        foreach (var temp1 in item.Additional)
+                        foreach (var temp1 in item.Additional.ToList().Purge())
                         {
                             var isSameIn = false;
                             foreach (var temp in infor.Additional)
@@ -1543,7 +1543,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //再遍历视图 对应修改
 
             //添加新建项目
-            foreach (var item in newEntry.EntryRelationFromEntryNavigation)
+            foreach (var item in newEntry.EntryRelationFromEntryNavigation.ToList().Purge())
             {
                 var temp = entryRelevances.Relevances.FirstOrDefault(s => s.Type == RelevancesType.Entry && s.DisplayName == item.ToEntry.ToString());
                 if (temp != null)

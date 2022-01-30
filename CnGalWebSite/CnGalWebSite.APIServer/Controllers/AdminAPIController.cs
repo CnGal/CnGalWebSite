@@ -1487,6 +1487,26 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
+        /// <summary>
+        /// 刷新ES缓存
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<Result>> RefreshSearchData()
+        {
+            try
+            {
+                await _elasticsearchService.DeleteDataOfElasticsearch();
+                await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
+
+                return new Result { Successful = true };
+            }
+            catch (Exception ex)
+            {
+                return new Result { Successful = false, Error = ex.Message + "\n" + ex.StackTrace + "\n" + ex.Source };
+            }
+
+        }
 
         /// <summary>
         /// 临时脚本
@@ -1497,7 +1517,9 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _examineRepository.DeleteAsync(s => s.Id == 16802);
+                await _examineRepository.DeleteAsync(s => s.ApplicationUserId == _configuration["ExamineAdminId"]
+                && (s.Operation==Operation.EstablishMainPage || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishRelevances)
+                && (s.ApplyTime.Date.Year == 2022&& s.ApplyTime.Date.Month == 1&& s.ApplyTime.Date.Day >20));
                 //string temp= await _fileService.SaveImageAsync("https://wx4.sinaimg.cn/mw2000/008qAv3ngy1gyem1zkfwqj31cr0s9hbg.jpg", _configuration["NewsAdminId"]);
                 //await _elasticsearchService.DeleteDataOfElasticsearch();
                 //await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);

@@ -34,33 +34,38 @@
             await InvokeAsync(() =>
             {
                 Index++;
-                Index = Index % 2;
+                Index = Index % 3;
 
 
                 Text1 = Index switch
                 {
                     0 => "欢迎加入CnGal玩家交流群：",
                     1 => "CnGal资料站编辑者交流与BUG反馈群：",
+                    2 => "",
                 };
                 Text2 = Index switch
                 {
                     0 => "点击链接加入群聊【CnGal资料站】",
                     1 => "点击链接加入群聊【CnGal-NewType反馈群】",
+                    2 => "点击加入 CnGal QQ频道",
                 };
                 Text3 = Index switch
                 {
                     0 => "https://jq.qq.com/?_wv=1027&k=mG6qNvyg",
                     1 => "https://jq.qq.com/?_wv=1027&k=JzuI1IkF",
+                    2 => "https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&inviteCode=onAQQ&from=246610&biz=ka",
                 };
                 Text4 = Index switch
                 {
                     0 => "128446539",
                     1 => "761794704",
+                    2 => "点击加入 CnGal QQ频道",
                 };
                 Text5 = Index switch
                 {
                     0 => "",
                     1 => "欢迎加入",
+                    2 => "",
                 };
                 StateHasChanged();
             });

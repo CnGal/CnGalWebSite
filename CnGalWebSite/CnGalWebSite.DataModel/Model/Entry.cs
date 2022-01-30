@@ -235,6 +235,8 @@ namespace CnGalWebSite.DataModel.Model
         public ICollection<BasicEntryInformationAdditional> Additional { get; set; }=new List<BasicEntryInformationAdditional>();
     }
 
+
+
     public class BasicEntryInformationAdditional
     {
         public long Id { get; set; }

@@ -514,7 +514,7 @@ else
             }
             else
             {
-                autoSave.Clean();
+                await autoSave.Clean();
 
                 await ToastService.Success("创建词条成功", "创建词条成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/entries/index/" + obj.Error, Model.Name, "fa fa-codepen");

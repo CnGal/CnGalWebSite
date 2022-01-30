@@ -124,11 +124,7 @@ else
                 <h3 class="text-truncate mb-4 fw-bold">编辑正文</h3>
                 <hr class="mb-4" />
 
-                @if (isReady == true)
-                {
                     <MarkdownEditorTip @ref="markdownEditorTip" @bind-Context="Model.Context"></MarkdownEditorTip>
-                }
-
 
             </div>
             <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
@@ -273,7 +269,7 @@ else
             }
             else
             {
-                autoSave.Clean();
+                await autoSave.Clean();
 
                 await ToastService.Success("创建文章成功", "创建文章成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/articles/index/" + obj.Error, Model.Name, "fa fa-newspaper-o");

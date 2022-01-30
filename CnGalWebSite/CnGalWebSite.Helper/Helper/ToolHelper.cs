@@ -898,6 +898,75 @@ namespace CnGalWebSite.DataModel.Helper
 
             return model;
         }
+
+        /// <summary>
+        /// 词条附加信息 列表 清理相同项目
+        /// </summary>
+        /// <param name="informations"></param>
+        /// <returns></returns>
+        public static List<BasicEntryInformation> Purge(this List<BasicEntryInformation> informations)
+        {
+            var list = informations.ToList();
+            foreach(var item in list)
+            {
+                if(informations.Count(s=> item.DisplayName == s.DisplayName && item.DisplayValue == s.DisplayValue && item.Modifier == s.Modifier)>1)
+                {
+                    var temp = informations.FirstOrDefault(s => item.DisplayName == s.DisplayName && s.DisplayValue == s.DisplayValue && item.Modifier == s.Modifier);
+                    if(temp!=null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
+
+        /// <summary>
+        /// 词条 关联词条 列表 清理相同项目
+        /// </summary>
+        /// <param name="informations"></param>
+        /// <returns></returns>
+        public static List<EntryRelation> Purge(this List<EntryRelation> informations)
+        {
+            var list = informations.ToList();
+            foreach (var item in list)
+            {
+                if (informations.Count(s => item.ToEntry == s.ToEntry ) > 1)
+                {
+                    var temp = informations.FirstOrDefault(s => item.ToEntry == s.ToEntry);
+                    if (temp != null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
+
+        /// <summary>
+        /// 词条 附加信息 的 额外信息列表 清理相同项目
+        /// </summary>
+        /// <param name="informations"></param>
+        /// <returns></returns>
+        public static List<BasicEntryInformationAdditional> Purge(this List<BasicEntryInformationAdditional> informations)
+        {
+            var list = informations.ToList();
+            foreach (var item in list)
+            {
+                if (informations.Count(s => item.DisplayName == s.DisplayName) > 1)
+                {
+                    var temp = informations.FirstOrDefault(s => item.DisplayValue == s.DisplayValue);
+                    if (temp != null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
     }
 
     public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions
