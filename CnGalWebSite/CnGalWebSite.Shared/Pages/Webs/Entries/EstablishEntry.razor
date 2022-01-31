@@ -50,17 +50,17 @@ else
 
                     <div class="row">
                         <div class=" col-12 col-md-6  col-lg-3 mt-2">
-                            <ImageCropperButton ImagePath="@MainImagePath" OnUploadedImage="OnCardUploadMain" EntryType_="Model.Type" IsMainImage="true"
+                            <ImageCropperButton @bind-ImagePath="@Model.MainPicture" EntryType_="Model.Type" IsMainImage="true"
                                                 IsMustCropper="true" Text="上传主图"></ImageCropperButton>
                         </div>
                         <div class=" col-12 col-md-6  col-lg-3 mt-2">
-                            <ImageCropperButton ImagePath="@ThuImagePath" OnUploadedImage="OnCardUploadThu" Type="ImageAspectType._1_1" Text="上传缩略图"></ImageCropperButton>
+                            <ImageCropperButton @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图"></ImageCropperButton>
                         </div>
                         <div class=" col-12 col-md-6  col-lg-3 mt-2">
-                            <ImageCropperButton ImagePath="@BackImagePath" OnUploadedImage="OnCardUploadBack" Type="ImageAspectType.None" Text="上传大背景"></ImageCropperButton>
+                            <ImageCropperButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景"></ImageCropperButton>
                         </div>
                         <div class=" col-12 col-md-6  col-lg-3 mt-2">
-                            <ImageCropperButton ImagePath="@SmallBackImagePath" OnUploadedImage="OnCardUploadSmall" Type="ImageAspectType.None" Text="上传小背景"></ImageCropperButton>
+                            <ImageCropperButton @bind-ImagePath="@Model.SmallBackgroundPicture"  Type="ImageAspectType.None" Text="上传小背景"></ImageCropperButton>
                         </div>
 
                     </div>
@@ -364,11 +364,6 @@ else
 
     private EstablishEntryViewModel Model { get; set; } = new EstablishEntryViewModel();
 
-    private string MainImagePath { get; set; } = "_content/CnGalWebSite.Shared/images/default/app.png";
-    private string ThuImagePath { get; set; } = "_content/CnGalWebSite.Shared/images/default/app.png";
-    private string BackImagePath { get; set; } = "_content/CnGalWebSite.Shared/images/default/app.png";
-    private string SmallBackImagePath { get; set; } = "_content/CnGalWebSite.Shared/images/default/app.png";
-
     [Display(Name = "游戏平台")]
     private List<SelectedItem> GamePlatforms { get; set; } = new List<SelectedItem> {
         new SelectedItem{Text=GamePlatformType.Android.ToString(),Value=GamePlatformType.Android.ToString()},
@@ -525,32 +520,6 @@ else
             ErrorHandler.ProcessError(ex, "创建词条失败");
         }
     }
-
-    private Task OnCardUploadMain(string url)
-    {
-        MainImagePath = url;
-        Model.MainPicture = url;
-        return Task.CompletedTask;
-    }
-    private Task OnCardUploadThu(string url)
-    {
-        ThuImagePath = url;
-        Model.Thumbnail = url;
-        return Task.CompletedTask;
-    }
-    private Task OnCardUploadBack(string url)
-    {
-        BackImagePath = url;
-        Model.BackgroundPicture = url;
-        return Task.CompletedTask;
-    }
-    private Task OnCardUploadSmall(string url)
-    {
-        SmallBackImagePath = url;
-        Model.SmallBackgroundPicture = url;
-        return Task.CompletedTask;
-    }
-
 
     public Task OnChangeEntryType()
     {
