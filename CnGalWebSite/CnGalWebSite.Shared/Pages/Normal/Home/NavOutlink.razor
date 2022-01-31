@@ -1,0 +1,15 @@
+﻿@page "/navoutlink"
+
+@inject NavigationManager NavigationManager
+@layout AccountLayout
+
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string Link { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.NavigateTo(Link);
+    }
+}

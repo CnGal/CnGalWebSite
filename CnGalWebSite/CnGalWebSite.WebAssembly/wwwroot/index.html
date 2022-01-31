@@ -20,18 +20,18 @@
     <meta itemprop="name" content="CnGal_中文GalGame资料站"/>
     <meta itemprop="image" content="//app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png"/>
 
-    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//app.cngal.org/_content/BootstrapBlazor/css/bootstrap.blazor.bundle.min.css">
-    <link rel="stylesheet" href="//app.cngal.org/_content/BootstrapBlazor/css/motronic.min.css">
+    <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor/css/bootstrap.blazor.bundle.min.css">
+    <link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor/css/motronic.min.css">
 
 
 
-    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/bundle-css.min.css">
-    <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/css/cover-default.min.css">
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/bundle-css.min.css">
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/cover-default.min.css">
 
-    <link rel="stylesheet" href="css/wasm.css" />
+    <link rel="stylesheet" href="https://app.cngal.org/css/wasm.css" />
 
-    <link rel="stylesheet" href="styles/blazor-loading.css">
+    <link rel="stylesheet" href="https://app.cngal.org/styles/blazor-loading.css">
 
 </head>
 
@@ -192,50 +192,27 @@
         <a class="dismiss"><i class="fa fa-times"></i></a>
     </div>
 
-    <script src="decode.js"></script>
-    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
 
-    <script src="//app.cngal.org/_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js"></script>
+    <script src="https://app.cngal.org/_content/BootstrapBlazor/js/bootstrap.blazor.bundle.min.js"></script>
 
-    <script src="//app.cngal.org/_content/BootstrapBlazor.Markdown/js/bootstrap.blazor.markdown.min.js"></script>
-    <script src="//app.cngal.org/_content/BootstrapBlazor.Chart/js/bootstrap.blazor.chart.bundle.min.js"></script>
-    <script src="//app.cngal.org/_content/BootstrapBlazor.TableExport/js/export.min.js"></script>
-    <script src="//app.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
+    <script src="https://app.cngal.org/_content/BootstrapBlazor.Markdown/js/bootstrap.blazor.markdown.min.js"></script>
+    <script src="https://app.cngal.org/_content/BootstrapBlazor.Chart/js/bootstrap.blazor.chart.bundle.min.js"></script>
+    <script src="https://app.cngal.org/_content/BootstrapBlazor.TableExport/js/export.min.js"></script>
+    <script src="https://app.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
 
-    <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.9.0/vconsole.min.js"></script>
+   <!--  <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/eruda/2.4.1/eruda.min.js"></script>-->
     <!-- <script src="https://cdn.bootcdn.net/ajax/libs/eruda/2.4.1/eruda.min.js"></script>-->
-        <script src="//app.cngal.org/_content/CnGalWebSite.Shared/js/gt.js"></script>
-    <script src="//app.cngal.org/_content/CnGalWebSite.Shared/js/NativeShare.js"></script>
+        <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/gt.js"></script>
+    <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/NativeShare.js"></script>
 
-    <script src="js/common.js"></script>
-    <script src="service-worker-register.js"></script>
+    <script src="https://app.cngal.org/js/common.js"></script>
 
-    <script src="//app.cngal.org/scripts/bundle-js.min.js"></script>
+    <script src="https://app.cngal.org/scripts/bundle-js.min.js"></script>
 
-    <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/editor-md/1.5.0/editormd.min.js"></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/highlight.min.js"></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/editor-md/1.5.0/editormd.min.js"></script>
 
-    <script>
-        Blazor.start({
-            loadBootResource: function (type, name, defaultUri, integrity) {
-                if (type !== 'dotnetjs' && location.hostname !== 'localhost') {
-                    return (async function () {
-                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
-                        if (!response.ok) {
-                            throw new Error(response.statusText);
-                        }
-                        const originalResponseBuffer = await response.arrayBuffer();
-                        const originalResponseArray = new Int8Array(originalResponseBuffer);
-                        const decompressedResponseArray = BrotliDecode(originalResponseArray);
-                        const contentType = type ===
-                            'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
-                        return new Response(decompressedResponseArray,
-                            { headers: { 'content-type': contentType } });
-                    })();
-                }
-            }
-        });
-    </script>
+  
      <script>
         function browserVersion() {
             var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
@@ -319,8 +296,43 @@
         }
 
     </script>
-    <script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1280206141'%3E%3C/span%3E%3Cscript src='https://s9.cnzz.com/z_stat.php%3Fid%3D1280206141%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
+    <script>
+        var cnzz_s_tag = document.createElement('script');
+        cnzz_s_tag.type = 'text/javascript';
+        cnzz_s_tag.async = true;
+        cnzz_s_tag.charset = "utf - 8";
+        cnzz_s_tag.src = "https://w.cnzz.com/c.php?id=1280206141&async=1";
+        var root_s = document.getElementsByTagName('script')[0];
+        root_s.parentNode.insertBefore(cnzz_s_tag, root_s);
+    </script>
     <script async defer data-website-id="5d00ea9a-0bc7-4ea9-bf86-661c5e7cd01e" src="https://umami.cngal.top/umami.js"></script>
+
+
+    <script src="decode.js"></script>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script src="service-worker-register.js"></script>
+
+    <script>
+        Blazor.start({
+            loadBootResource: function (type, name, defaultUri, integrity) {
+                if (type !== 'dotnetjs' && location.hostname !== 'localhost') {
+                    return (async function () {
+                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        const originalResponseBuffer = await response.arrayBuffer();
+                        const originalResponseArray = new Int8Array(originalResponseBuffer);
+                        const decompressedResponseArray = BrotliDecode(originalResponseArray);
+                        const contentType = type ===
+                            'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
+                        return new Response(decompressedResponseArray,
+                            { headers: { 'content-type': contentType } });
+                    })();
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -19,7 +19,41 @@
 
     <base href="~/" />
 
-    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <meta http-equiv="Content-Security-Policy"
+          content="base-uri 'self';
+               block-all-mixed-content;
+               default-src 'self';
+               img-src data: https:;
+               object-src 'none';
+               script-src https://app.cngal.org/
+                          https://lf3-cdn-tos.bytecdntp.com/
+                          https://lf6-cdn-tos.bytecdntp.com/
+                          https://lf9-cdn-tos.bytecdntp.com/
+                          https://lf26-cdn-tos.bytecdntp.com/
+                          https://c.cnzz.com/
+                          https://w.cnzz.com/ 
+                          https://umami.cngal.top/
+                          'unsafe-inline'
+                          'unsafe-eval'
+                          'self';
+               style-src https://app.cngal.org/
+                          https://lf3-cdn-tos.bytecdntp.com/
+                          https://lf6-cdn-tos.bytecdntp.com/
+                          https://lf9-cdn-tos.bytecdntp.com/
+                          https://lf26-cdn-tos.bytecdntp.com/
+                         'self'
+                         'unsafe-inline';
+               font-src https://app.cngal.org/
+                        https://lf3-cdn-tos.bytecdntp.com/
+                        https://lf6-cdn-tos.bytecdntp.com/
+                        https://lf9-cdn-tos.bytecdntp.com/
+                        https://lf26-cdn-tos.bytecdntp.com/
+                        'self';
+               connect-src https://umami.cngal.top/
+                        'self';
+               upgrade-insecure-requests;">
+
+    <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor/css/bootstrap.blazor.bundle.min.css">
     <link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor/css/motronic.min.css">
 
@@ -88,125 +122,16 @@
     <script src="https://app.cngal.org/_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
 
 
-    <script src="https://cdn.bootcdn.net/ajax/libs/eruda/2.4.1/eruda.min.js"></script>
+    <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/eruda/2.4.1/eruda.min.js"></script>
     <!-- <script src="https://cdn.bootcdn.net/ajax/libs/eruda/2.4.1/eruda.min.js"></script>-->
     <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/NativeShare.js"></script>
     <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/gt.js"></script>
 
     <script src="https://app.cngal.org/scripts/bundle-js.min.js"></script>
 
-    <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/editor-md/1.5.0/editormd.min.js"></script>
-    <script>
-        window.setInterval(showalert, 500);
-        var count = 0;
-        function showalert() {
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/highlight.min.js"></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/editor-md/1.5.0/editormd.min.js"></script>
 
-            if ($("#components-reconnect-modal").css("display") != 'none') {
-                count++;
-                if (count > 10) {
-                    $("#components-reconnect-modal-infor").addClass("d-block");
-                }
-            }
-            else {
-                $("#components-reconnect-modal-infor").removeClass("d-block");
-                count = 0;
-            }
-            if (document.querySelector('.components-reconnect-failed')
-                || document.querySelector('.components-reconnect-rejected')) {
-                location.reload();
-            }
-        }
-
-        function onreload() {
-            location.reload();
-        }
-
-    </script>
-    <script>
-        function browserVersion() {
-            var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
-            var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1; //判断是否IE<11浏览器
-            var isIE11 = userAgent.indexOf('Trident') > -1 && userAgent.indexOf("rv:11.0") > -1;
-            var isEdge = userAgent.indexOf("Edge") > -1 && !isIE; //Edge浏览器
-            var isFirefox = userAgent.indexOf("Firefox") > -1; //Firefox浏览器
-            var isOpera = userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1; //Opera浏览器
-            var isChrome = userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Edge") == -1 && userAgent.indexOf("OPR") == -1; //Chrome浏览器
-            var isSafari = userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") == -1 && userAgent.indexOf("Edge") == -1 && userAgent.indexOf("OPR") == -1; //Safari浏览器
-            if (isIE) {
-                return 1;
-            } else if (isIE11) {
-                return 1;
-            } else if (isEdge) {
-                if (userAgent.split('Edge/')[1].split('.')[0] < 16) {
-                    return 1;
-                }
-                else {
-                    return 0;
-                }
-            } else if (isFirefox) {
-                if (userAgent.split('Firefox/')[1].split('.')[0] < 53) {
-                    return 1;
-                }
-                else {
-                    return 0;
-                }
-            } else if (isOpera) {
-                if (userAgent.split('OPR/')[1].split('.')[0] < 44) {
-                    return 1;
-                }
-                else {
-                    return 0;
-                }
-            } else if (isChrome) {
-                if (userAgent.split('Chrome/')[1].split('.')[0] < 56) {
-                    return 1;
-                }
-                else {
-                    return 0;
-                }
-            } else if (isSafari) {
-                if (userAgent.split('Safari/')[1].split('.')[0] < 11) {
-                    return 1;
-                }
-                else {
-                    return 0;
-                }
-            } else {
-                return -1;//不是ie浏览器
-            }
-        }
-
-        browserVersion();
-
-        if (browserVersion() == 1) {
-            window.location.href = "/_content/CnGalWebSite.Shared/pages/NotSupported.html";
-        }
-    </script>
-    <script>
-        function shareLink(icon, link, title, desc) {
-            var nativeShare = new NativeShare();
-
-            // 设置分享文案
-            nativeShare.setShareData({
-                icon: icon,
-                link: link,
-                title: title,
-                desc: desc
-            })
-
-            // 唤起浏览器原生分享组件(如果在微信中不会唤起，此时call方法只会设置文案。类似setShareData)
-            try {
-                nativeShare.call()
-                // 如果是分享到微信则需要 nativeShare.call('wechatFriend')
-                // 类似的命令下面有介绍
-            } catch (err) {
-                // 如果不支持，你可以在这里做降级处理
-            }
-        }
-
-    </script>
-    <script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1280206141'%3E%3C/span%3E%3Cscript src='https://s9.cnzz.com/z_stat.php%3Fid%3D1280206141%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));</script>
     <script async defer data-website-id="5d00ea9a-0bc7-4ea9-bf86-661c5e7cd01e" src="https://umami.cngal.top/umami.js"></script>
 
     <!-- <script src="//app.cngal.org/_framework/blazor.server.5.0.js"></script>-->

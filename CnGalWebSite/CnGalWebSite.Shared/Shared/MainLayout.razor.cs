@@ -247,8 +247,8 @@ namespace CnGalWebSite.Shared.Shared
                 new MenuItem() { Text = "投票", Icon = "fa fa-fw fa-dropbox", Url = "/votes/home" },
                 new MenuItem() { Text = "数据汇总", Icon = "fa fa-fw fa-line-chart", Url = "/tables/index" },
                 new MenuItem() { Text = "编辑指引", Icon = "fa fa-fw fa-map-signs", Url = "/perfections/home" },
-                new MenuItem() { Text = "Steam鉴赏家", Icon = "fa fa-fw fa-steam", Url = "https://store.steampowered.com/curator/11627314/",Target="_blank" },
-                new MenuItem() { Text = "网店", Icon = "fa fa-fw fa-shopping-cart", Url = "https://shop523081230.taobao.com/",Target="_blank"},
+                new MenuItem() { Text = "Steam鉴赏家", Icon = "fa fa-fw fa-steam", Url = "/navoutlink?link=https://store.steampowered.com/curator/11627314/",Target="_blank" },
+                new MenuItem() { Text = "网店", Icon = "fa fa-fw fa-shopping-cart", Url = "/navoutlink?link=https://shop523081230.taobao.com/",Target="_blank"},
                 new MenuItem() { Text = "关于", Icon = "fa fa-fw fa-bolt", Url = "/home/about" },
 
                //new MenuItem() { Text = "测试", Icon = "fa fa-fw fa-bolt", Url = "/_content/CnGalWebSite.Shared/pages/NotSupported.html" },

@@ -38,14 +38,6 @@ namespace CnGalWebSite.Server
 
             services.AddBootstrapBlazor();
 
-            /*services.AddRequestLocalization<IOptions<BootstrapBlazorOptions>>((localizerOption, blazorOption) =>
-            {
-                var supportedCultures = blazorOption.Value.GetSupportedCultures();
-
-                localizerOption.SupportedCultures = supportedCultures;
-                localizerOption.SupportedUICultures = supportedCultures;
-            });*/
-
             services.AddScoped(sp => new HttpClient());
 
 
