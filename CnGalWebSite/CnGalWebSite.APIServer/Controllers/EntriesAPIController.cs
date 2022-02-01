@@ -1292,6 +1292,15 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = "相册中不能添加外部图片：" + item.Url };
                 }
             }
+            //检查是否重复
+            foreach(var item in model.Images)
+            {
+                if(model.Images.Count(s=>s.Url==item.Url)>1)
+                {
+                    return new Result { Error = "图片链接不能重复，重复的链接：" + item.Url, Successful = false };
+
+                }
+            }
             //查找词条
             var currentEntry = await _entryRepository.GetAll().Include(s => s.Pictures).FirstOrDefaultAsync(x => x.Id == model.Id);
             var newEntry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Pictures).FirstOrDefaultAsync(x => x.Id == model.Id);
@@ -1300,8 +1309,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
             }
 
-
             //再遍历视图模型中的图片 对应修改
+            newEntry.Pictures.Clear();
 
             foreach (var item in model.Images)
             {

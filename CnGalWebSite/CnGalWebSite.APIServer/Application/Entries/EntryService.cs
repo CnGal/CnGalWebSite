@@ -1481,7 +1481,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 });
             }
             //再对比当前
-            foreach (var infor in newEntry.Pictures)
+            foreach (var infor in newEntry.Pictures.ToList().Purge())
             {
                 var isSame = false;
                 foreach (var item in entryImages.Images)
@@ -1497,9 +1497,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         else
                         {
                             entryImages.Images.Remove(item);
-                            isSame = true;
-
                         }
+                        isSame = true;
                         break;
 
                     }

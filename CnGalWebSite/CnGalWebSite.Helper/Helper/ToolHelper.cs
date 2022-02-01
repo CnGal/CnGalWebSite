@@ -24,8 +24,8 @@ namespace CnGalWebSite.DataModel.Helper
 
 
         //public const string WebApiPath = "http://localhost:45160/";
-        //public const string WebApiPath = "http://172.17.0.1:2001/";
-        public const string WebApiPath = "https://www.cngal.org/";
+        public const string WebApiPath = "http://172.17.0.1:2001/";
+        //public const string WebApiPath = "https://www.cngal.org/";
 
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";
 
@@ -967,6 +967,31 @@ namespace CnGalWebSite.DataModel.Helper
 
             return informations;
         }
+
+        /// <summary>
+        /// 词条 相册 的 列表 清理相同项目
+        /// </summary>
+        /// <param name="informations"></param>
+        /// <returns></returns>
+        public static List<EntryPicture> Purge(this List<EntryPicture> informations)
+        {
+            var list = informations.ToList();
+            foreach (var item in list)
+            {
+                if (informations.Count(s => item.Url == s.Url) > 1)
+                {
+                    var temp = informations.FirstOrDefault(s => item.Url == s.Url);
+                    if (temp != null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
+
+
     }
 
     public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions

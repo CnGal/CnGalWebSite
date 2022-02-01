@@ -480,7 +480,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 user.LastOnlineTime = DateTime.Now.ToCstTime();
 
-                var result = await _userManager.UpdateAsync(user);
+                await _userManager.UpdateAsync(user);
 
                 //判断是否写入登入信息
                 var tempDateTimeNow = DateTime.Now.ToCstTime();
