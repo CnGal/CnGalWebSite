@@ -23,8 +23,8 @@ namespace CnGalWebSite.DataModel.Helper
         //https://v3.cngal.org/
 
 
-        //public const string WebApiPath = "http://localhost:45160/";
-        public const string WebApiPath = "http://172.17.0.1:2001/";
+        public const string WebApiPath = "http://localhost:45160/";
+        //public const string WebApiPath = "http://172.17.0.1:2001/";
         //public const string WebApiPath = "https://www.cngal.org/";
 
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";

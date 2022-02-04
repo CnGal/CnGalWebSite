@@ -21,7 +21,6 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
-using CnGalWebSite.DataModel.ViewModel.Home;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -35,6 +34,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using TencentCloud.Cme.V20191029.Models;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -736,24 +736,32 @@ namespace CnGalWebSite.APIServer.Controllers
                         await _examineService.ExamineEstablishMainAsync(entry, examineMain);
                         break;
                     case Operation.EstablishAddInfor:
-                        entry = await _entryRepository.GetAll()
-                            .Include(s => s.Information)
-                              .ThenInclude(s => s.Additional)
-                            .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
-                        if (entry == null)
+                        try
                         {
-                            return NotFound();
-                        }
+                            entry = await _entryRepository.GetAll()
+                                                       .Include(s => s.Information)
+                                                         .ThenInclude(s => s.Additional)
+                                                       .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
+                            if (entry == null)
+                            {
+                                return NotFound();
+                            }
 
-                        //读取当前用户等待审核的信息
-                        //序列化数据
-                        EntryAddInfor entryAddInfor = null;
-                        using (TextReader str = new StringReader(examine.Context))
-                        {
-                            var serializer = new JsonSerializer();
-                            entryAddInfor = (EntryAddInfor)serializer.Deserialize(str, typeof(EntryAddInfor));
+                            //读取当前用户等待审核的信息
+                            //序列化数据
+                            EntryAddInfor entryAddInfor = null;
+                            using (TextReader str = new StringReader(examine.Context))
+                            {
+                                var serializer = new JsonSerializer();
+                                entryAddInfor = (EntryAddInfor)serializer.Deserialize(str, typeof(EntryAddInfor));
+                            }
+                            await _examineService.ExamineEstablishAddInforAsync(entry, entryAddInfor);
                         }
-                        await _examineService.ExamineEstablishAddInforAsync(entry, entryAddInfor);
+                        catch (Exception ex)
+                        {
+
+                        }
+                       
                         break;
                     case Operation.EstablishImages:
                         entry = await _entryRepository.GetAll()
@@ -1005,7 +1013,15 @@ namespace CnGalWebSite.APIServer.Controllers
                 examine.PassedTime = DateTime.Now.ToCstTime();
                 examine.IsPassed = true;
                 examine.ContributionValue = model.ContributionValue;
-                examine = await _examineRepository.UpdateAsync(examine);
+                try
+                {
+                    examine = await _examineRepository.UpdateAsync(examine);
+
+                }
+                catch(Exception ex)
+                {
+
+                }
 
                 //更新用户积分
                 await _appHelper.UpdateUserIntegral(user);
@@ -1517,25 +1533,41 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _examineRepository.DeleteAsync(s => s.ApplicationUserId == _configuration["ExamineAdminId"]
-                && (s.Operation==Operation.EstablishMainPage || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishRelevances)
-                && (s.ApplyTime.Date.Year == 2022&& s.ApplyTime.Date.Month == 1&& s.ApplyTime.Date.Day >20));
+
                 //string temp= await _fileService.SaveImageAsync("https://wx4.sinaimg.cn/mw2000/008qAv3ngy1gyem1zkfwqj31cr0s9hbg.jpg", _configuration["NewsAdminId"]);
-                //await _elasticsearchService.DeleteDataOfElasticsearch();
-                //await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
 
-                //await _weeklyNewsRepository.DeleteAsync(s => true);
-                /*var news = await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.State == GameNewsState.Ignore).ToListAsync();
-                foreach (var item in news)
+                var examines = await _examineRepository.GetAll()
+                    .Include(s=>s.Entry).ThenInclude(s=>s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                    .Where(s => s.ApplicationUserId == _configuration["ExamineAdminId"]
+                        && (s.Operation == Operation.EstablishRelevances)
+                        && (s.ApplyTime.Date.Year == 2022 && s.ApplyTime.Date.Month == 2 && s.ApplyTime.Date.Day ==4)).ToListAsync();
+
+                foreach(var item in examines)
                 {
-                    item.Title = "已删除";
-                    item.PublishTime = DateTime.MinValue;
-                    item.RSS.PublishTime = DateTime.MinValue;
-                    await _gameNewsRepository.UpdateAsync(item);
-                }*/
+                    EntryRelevances entryRelevances = null;
+                    using (TextReader str = new StringReader(item.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        entryRelevances = (EntryRelevances)serializer.Deserialize(str, typeof(EntryRelevances));
+                    }
 
-                //await _historyDataService.GenerateZhiHuArticleImportJson();
+                    if(entryRelevances.Relevances.Any(s=>s.DisplayValue==null))
+                    {
+                        foreach(var temp in entryRelevances.Relevances)
+                        {
+                            temp.IsDelete = !temp.IsDelete;
+}
 
+                        await _entryService.UpdateEntryDataRelevances(item.Entry, entryRelevances);
+                        await _entryRepository.UpdateAsync(item.Entry);
+                    }
+                }
+
+
+                foreach(var item in examines)
+                {
+                    await _examineRepository.DeleteAsync(item);
+                }
 
 
                 return new Result { Successful = true };

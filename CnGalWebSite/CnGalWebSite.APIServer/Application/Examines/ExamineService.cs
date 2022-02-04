@@ -2019,7 +2019,13 @@ namespace CnGalWebSite.APIServer.ExamineX
         {
             //更新数据
             _entryService.UpdateEntryDataAddInfor(entry, examine);
-            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            //保存
+            await _entryRepository.UpdateAsync(entry);
+
+            //更新完善度
+            await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
+
+            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
 
             //反向关联
             foreach (var item in examine.Information)
@@ -2030,7 +2036,9 @@ namespace CnGalWebSite.APIServer.ExamineX
                     {
                         if (item.Modifier == "STAFF")
                         {
-                            var temp = await _entryRepository.GetAll().Include(s => s.EntryRelationFromEntryNavigation).FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
+                            var temp = await _entryRepository.GetAll()
+                                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                                .FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
 
                             if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
                             {
@@ -2063,7 +2071,9 @@ namespace CnGalWebSite.APIServer.ExamineX
                     {
                         if (item.Modifier == "基本信息" && item.DisplayName == "声优" && string.IsNullOrWhiteSpace(item.DisplayValue) == false)
                         {
-                            var temp = await _entryRepository.GetAll().Include(s => s.EntryRelationFromEntryNavigation).FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
+                            var temp = await _entryRepository.GetAll()
+                                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                                .FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
 
                             if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
                             {
@@ -2093,11 +2103,6 @@ namespace CnGalWebSite.APIServer.ExamineX
                     }
                 }
             }
-            //保存
-            await _entryRepository.UpdateAsync(entry);
-
-            //更新完善度
-            await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
         }
 
@@ -2119,12 +2124,19 @@ namespace CnGalWebSite.APIServer.ExamineX
             await _entryService.UpdateEntryDataRelevances(entry, examine);
             await _entryRepository.UpdateAsync(entry);
 
-            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            //更新完善度
+            await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
+
+            var admin = new ApplicationUser();
+            admin.Id = _configuration["ExamineAdminId"];
+
             //反向关联 词条
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Entry))
             {
                 //查找关联词条
-                var temp = await _entryRepository.GetAll().Include(s => s.EntryRelationFromEntryNavigation).FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                var temp = await _entryRepository.GetAll()
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                    .FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
                 if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false
                     && (entry.Type == EntryType.Staff && temp.Type == EntryType.Game) == false)
                 {
@@ -2187,9 +2199,6 @@ namespace CnGalWebSite.APIServer.ExamineX
 
             }
 
-            //更新完善度
-            await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
-
         }
 
         public async Task ExamineEstablishTagsAsync(Entry entry, EntryTags examine)
@@ -2230,13 +2239,15 @@ namespace CnGalWebSite.APIServer.ExamineX
             await _articleService.UpdateArticleDataRelevances(article, examine);
             await _articleRepository.UpdateAsync(article);
 
-
-            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
-            //反向关联 词条
+            var admin = new ApplicationUser();
+            admin.Id = _configuration["ExamineAdminId"];
+            //反向关联 文章
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Article))
             {
-                //查找关联词条
-                var temp = await _articleRepository.GetAll().Include(s => s.ArticleRelationFromArticleNavigation).FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                //查找关联文章
+                var temp = await _articleRepository.GetAll()
+                    .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s=>s.ToArticleNavigation)
+                    .FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
                 if (temp != null && temp.ArticleRelationFromArticleNavigation.Any(s => s.ToArticle == article.Id) == false)
                 {
                     //补全审核记录
@@ -2264,7 +2275,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
 
             }
-            //反向关联 文章
+            //反向关联 词条
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Entry))
             {
                 //查找关联词条
