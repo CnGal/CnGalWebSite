@@ -1318,7 +1318,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         relevancesEntry.Add(await _appHelper.GetEntryInforTipViewModel(item));
                     }
                 }
-                else if (entry.Type == EntryType.Staff)
+                else if (item.Type == EntryType.Staff)
                 {
                     if (entry.Type != EntryType.Game)
                     {
