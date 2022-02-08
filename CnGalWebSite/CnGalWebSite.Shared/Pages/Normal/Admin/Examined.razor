@@ -113,8 +113,8 @@
 
 
 @code {
-    [Parameter]
-    public string Id { get; set; }
+        [Parameter]
+        public string Id { get; set; }
     public ExaminedViewModel Model { get; set; } = new ExaminedViewModel();
     private List<TimelineItem> CustomerTimelineItems = new List<TimelineItem>();
     private string Title { get; set; }
@@ -372,13 +372,13 @@
         //上传
         try
         {
-            if (Model.SensitiveWords!=null&&Model.SensitiveWords.Count != 0)
+            if (Model.SensitiveWords != null && Model.SensitiveWords.Count != 0 && isPassed)
             {
                 string temp = "";
                 bool isFrist = true;
-                foreach(var item in Model.SensitiveWords)
+                foreach (var item in Model.SensitiveWords)
                 {
-                    if(isFirst)
+                    if (isFirst)
                     {
                         isFirst = false;
                     }
@@ -392,7 +392,7 @@
                 var op = new SwalOption()
                 {
                     Title = "确认通过审核",
-                    Content = "该审核包含以下敏感词："+temp,
+                    Content = "该审核包含以下敏感词：" + temp,
                     IsConfirm = true,
                     Category = SwalCategory.Error,
                 };
