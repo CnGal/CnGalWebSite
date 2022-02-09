@@ -12,9 +12,12 @@
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
-    <TitleTip Title="@Model.Name"></TitleTip>
+    <TitleTip Title="@Model.Name" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
 }
-
+else
+{
+    <TitleTip/>
+}
 <div>
     @if (isReady == false)
     {

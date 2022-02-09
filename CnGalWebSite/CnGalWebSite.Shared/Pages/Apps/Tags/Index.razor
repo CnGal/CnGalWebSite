@@ -8,7 +8,11 @@
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
-    <TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+    <TitleTip Title="@Model.Name" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+}
+else
+{
+    <TitleTip />
 }
 
 <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.HeadBar Title="@Model.Name" OnEdit="@(() => NavigationManager.NavigateTo("/tags/edit/home/" + Model.Id))" CanEdit="true" ClassName="" />
@@ -31,8 +35,8 @@
                 <CnGalWebSite.Shared.AppComponent.Pages.Tags.HeadCard Model="Model" />
                 <div>
                     <CnGalWebSite.Shared.AppComponent.Pages.Tags.PivotLine IsShowChildTags="@(Model.ChildrenTags.Count!=0)" IsShowChildEntries="@(Model.ChildrenEntries.Count!=0)" @ref="pivotLine"
-                                                                              IsShowDetail="@(Model.Name!="游戏"&&Model.Name!="角色"&&Model.Name!="STAFF"&&Model.Name!="制作组")"
-                                                                                     OnTabClick="OnTabClick" DefaultIndex="defaultIndex" RandomIndex="randomIndex" />
+                                                                           IsShowDetail="@(Model.Name!="游戏"&&Model.Name!="角色"&&Model.Name!="STAFF"&&Model.Name!="制作组")"
+                                                                           OnTabClick="OnTabClick" DefaultIndex="defaultIndex" RandomIndex="randomIndex" />
                     <div class="ms-3 me-3">
                         <div class="mt-3 mb-3" style="padding-right: 0;padding-left: 0;">
                             <div class="tab-content" id="@("pills" + randomIndex + "-tabContent")">
@@ -49,7 +53,7 @@
                                 </div>
                                 <div class="@("tab-pane fade" + (defaultIndex == 2 ? " show active " : "") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
                                     <div class="mt-2">
-                                        <CnGalWebSite.Shared.AppComponent.Pages.Tags.ChildEntryCard Model="Model"  />
+                                        <CnGalWebSite.Shared.AppComponent.Pages.Tags.ChildEntryCard Model="Model" />
                                     </div>
                                 </div>
                             </div>
@@ -179,7 +183,7 @@
             }
 
             //修改默认Tab
-            if(defaultIndex==0 &&(Model.Name == "游戏" || Model.Name == "角色" || Model.Name == "STAFF" || Model.Name == "制作组"))
+            if (defaultIndex == 0 && (Model.Name == "游戏" || Model.Name == "角色" || Model.Name == "STAFF" || Model.Name == "制作组"))
             {
                 defaultIndex = 1;
                 TabIndexNum = 1;

@@ -1322,8 +1322,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 entry.MainPicture = GetImagePath(entry.MainPicture, "app.png", true);
 
             }
-            entry.BriefIntroduction = GetStringAbbreviation(entry.BriefIntroduction, 50);
-
             var model = new EntryInforTipViewModel
             {
                 Id = entry.Id,
