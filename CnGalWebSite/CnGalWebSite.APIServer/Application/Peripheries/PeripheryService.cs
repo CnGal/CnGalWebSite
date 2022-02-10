@@ -6,9 +6,13 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -25,18 +29,20 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
         private readonly IRepository<PeripheryRelation, long> _peripheryRelationRepository;
         private readonly IRepository<PeripheryRelevanceEntry, long> _peripheryRelevanceEntryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
+        private readonly IRepository<Entry, long> _entryRepository;
         private readonly IAppHelper _appHelper;
 
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Periphery>, string, SortOrder, IEnumerable<Periphery>>> SortLambdaCachePeriphery = new();
+        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Periphery>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Periphery>>> SortLambdaCachePeriphery = new();
 
-        public PeripheryService(IAppHelper appHelper, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository,
-            IRepository<PeripheryRelevanceEntry, long> peripheryRelevanceEntryRepository, IRepository<PeripheryRelation, long> peripheryRelationRepository)
+        public PeripheryService(IAppHelper appHelper, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Entry, long> entryRepository,
+        IRepository<PeripheryRelevanceEntry, long> peripheryRelevanceEntryRepository, IRepository<PeripheryRelation, long> peripheryRelationRepository)
         {
             _peripheryRepository = peripheryRepository;
             _appHelper = appHelper;
             _examineRepository = examineRepository;
             _peripheryRelevanceEntryRepository = peripheryRelevanceEntryRepository;
             _peripheryRelationRepository = peripheryRelationRepository;
+            _entryRepository = entryRepository;
         }
 
         public Task<QueryData<ListPeripheryAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPeripheryAloneModel searchModel)
@@ -140,7 +146,16 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             return entryId;
         }
 
-        public void UpdatePeripheryDataMain(Periphery periphery, PeripheryMain examine)
+        public void UpdatePeripheryDataMain(Periphery periphery, ExamineMain examine)
+        {
+            ToolHelper.ModifyDataAccordingToEditingRecord(periphery, examine.Items);
+
+            //更新最后编辑时间
+            periphery.LastEditTime = DateTime.Now.ToCstTime();
+
+        }
+
+        public void UpdatePeripheryDataMain(Periphery periphery, PeripheryMain_1_0 examine)
         {
             periphery.Name = examine.Name;
             periphery.DisplayName = examine.DisplayName;
@@ -205,11 +220,11 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
 
         }
 
-        public void UpdatePeripheryDataRelatedEntries(Periphery periphery, PeripheryRelatedEntries examine)
+        public async Task UpdatePeripheryDataRelatedEntries(Periphery periphery, PeripheryRelatedEntries examine)
         {
             //序列化相关性列表
             //先读取词条信息
-            var relevances = periphery.Entries;
+            var relevances = periphery.RelatedEntries;
 
             foreach (var item in examine.Relevances)
             {
@@ -219,59 +234,31 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                 foreach (var infor in relevances)
                 {
 
-                    if (infor.EntryId == item.EntryId)
+                    if (infor.Id == item.EntryId)
                     {
                         //查看是否为删除操作
                         if (item.IsDelete == true)
                         {
                             relevances.Remove(infor);
-                            isAdd = true;
-                            break;
                         }
-                        else
-                        {
-                            break;
-                        }
+                        isAdd = true;
+                        break;
                     }
                 }
                 if (isAdd == false && item.IsDelete == false)
                 {
                     //没有找到关键词 则新建关键词
-                    var temp = new PeripheryRelevanceEntry
+                    var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == item.EntryId);
+                    if (entry != null)
                     {
-                        EntryId = item.EntryId,
-                    };
-                    relevances.Add(temp);
-                }
-            }
+                        relevances.Add(entry);
+                    }
 
-            if (relevances.Any() == false)
-            {
-                throw new Exception("周边至少需要关联一个词条");
+                }
             }
 
             //更新最后编辑时间
             periphery.LastEditTime = DateTime.Now.ToCstTime();
-        }
-
-        public async Task RealUpdateRelevances(Periphery periphery)
-        {
-            //查找新添加的关联词条
-            var now = periphery.Entries.Select(s => s.EntryId).ToList();
-            var old = await _peripheryRelevanceEntryRepository.GetAll().Where(s => s.PeripheryId == periphery.Id).Select(s => s.EntryId).ToListAsync();
-
-            var removeIds = old.Where(s => now.Contains(s) == false).ToList();
-            await _peripheryRelevanceEntryRepository.DeleteAsync(s => removeIds.Contains(s.EntryId) && s.PeripheryId == periphery.Id);
-
-            var newAddIds = now.Where(s => old.Contains(s) == false).ToList();
-            foreach (var item in newAddIds)
-            {
-                await _peripheryRelevanceEntryRepository.InsertAsync(new PeripheryRelevanceEntry
-                {
-                    EntryId = item,
-                    PeripheryId = periphery.Id,
-                });
-            }
         }
 
         public async Task UpdatePeripheryDataRelatedPeripheriesAsync(Periphery periphery, PeripheryRelatedPeripheries examine)
@@ -373,16 +360,16 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
         }
 
 
-        public async void UpdatePeripheryData(Periphery periphery, Examine examine)
+        public async Task UpdatePeripheryDataAsync(Periphery periphery, Examine examine)
         {
             switch (examine.Operation)
             {
                 case Operation.EditPeripheryMain:
-                    PeripheryMain peripheryMain = null;
+                    ExamineMain peripheryMain = null;
                     using (TextReader str = new StringReader(examine.Context))
                     {
                         var serializer = new JsonSerializer();
-                        peripheryMain = (PeripheryMain)serializer.Deserialize(str, typeof(PeripheryMain));
+                        peripheryMain = (ExamineMain)serializer.Deserialize(str, typeof(ExamineMain));
                     }
 
                     UpdatePeripheryDataMain(periphery, peripheryMain);
@@ -406,7 +393,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                         peripheryRelevances = (PeripheryRelatedEntries)serializer.Deserialize(str, typeof(PeripheryRelatedEntries));
                     }
 
-                    UpdatePeripheryDataRelatedEntries(periphery, peripheryRelevances);
+                    await UpdatePeripheryDataRelatedEntries(periphery, peripheryRelevances);
                     break;
                 case Operation.EditPeripheryRelatedPeripheries:
                     PeripheryRelatedPeripheries peripheryRelatedPeripheries = null;
@@ -425,14 +412,14 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
         {
             var model = new GameOverviewPeripheriesModel();
             //获取周边列表
-            foreach (var item in entry.Peripheries.Where(s => s.Periphery.IsHidden == false))
+            foreach (var item in entry.RelatedPeripheries.Where(s => s.IsHidden == false))
             {
                 model.Peripheries.Add(new PeripheryOverviewModel
                 {
-                    Id = item.PeripheryId ?? 0,
-                    Image = _appHelper.GetImagePath(item.Periphery.MainPicture, "app.png"),
-                    Name = item.Periphery.DisplayName ?? item.Periphery.Name,
-                    CollectedCount = item.Periphery.CollectedCount,
+                    Id = item.Id,
+                    Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                    Name = item.DisplayName ?? item.Name,
+                    CollectedCount = item.CollectedCount,
                 });
             }
 
@@ -616,5 +603,301 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
 
             return model;
         }
+
+
+        public async Task<PeripheryViewModel> GetPeripheryViewModel(Periphery periphery)
+        {
+            //建立视图模型
+            var model = new PeripheryViewModel
+            {
+                Id = periphery.Id,
+                Name = periphery.Name,
+                BriefIntroduction = periphery.BriefIntroduction,
+                MainPicture = _appHelper.GetImagePath(periphery.MainPicture, ""),
+                BackgroundPicture = _appHelper.GetImagePath(periphery.BackgroundPicture, ""),
+                SmallBackgroundPicture = _appHelper.GetImagePath(periphery.SmallBackgroundPicture, ""),
+                Thumbnail = _appHelper.GetImagePath(periphery.Thumbnail, ""),
+                Author = periphery.Author,
+                Material = periphery.Material,
+                CanComment = periphery.CanComment ?? true,
+                ReaderCount = periphery.ReaderCount,
+                CommentCount = periphery.CommentCount,
+                CollectedCount = periphery.CollectedCount,
+                Price = periphery.Price,
+                PageCount = periphery.PageCount,
+                IndividualParts = periphery.IndividualParts,
+                Brand = periphery.Brand,
+                IsAvailableItem = periphery.IsAvailableItem,
+                IsReprint = periphery.IsReprint,
+                Size = periphery.Size,
+                SongCount = periphery.SongCount,
+                Type = periphery.Type,
+                Category = periphery.Category,
+                SaleLink = periphery.SaleLink,
+                IsHidden = periphery.IsHidden,
+            };
+
+            //读取词条信息
+            var pictures = new List<EntryPicture>();
+            foreach (var item in periphery.Pictures)
+            {
+                pictures.Add(new EntryPicture
+                {
+                    Url = item.Url,
+                    Note = item.Note,
+                    Modifier = item.Modifier
+                });
+            }
+
+            //根据分类来重新排列图片
+            var picturesViewModels = new List<PicturesViewModel>
+            {
+                new PicturesViewModel
+                {
+                    Modifier=null,
+                    Pictures=new List<PicturesAloneViewModel>()
+                }
+            };
+
+            foreach (var item in pictures)
+            {
+                var isAdd = false;
+                foreach (var infor in picturesViewModels)
+                {
+                    if (infor.Modifier == item.Modifier)
+                    {
+                        infor.Pictures.Add(new PicturesAloneViewModel
+                        {
+                            Note = item.Note,
+                            Url = _appHelper.GetImagePath(item.Url, "")
+                        });
+                        isAdd = true;
+                        break;
+                    }
+                }
+
+                if (isAdd == false)
+                {
+                    picturesViewModels.Add(new PicturesViewModel
+                    {
+                        Modifier = item.Modifier,
+                        Pictures = new List<PicturesAloneViewModel> {
+                            new PicturesAloneViewModel
+                            {
+                                Note=item.Note,
+                                Url=_appHelper.GetImagePath(item.Url, "")
+                            }
+                        }
+                    });
+                }
+            }
+
+            //如果所有图片都有分组 则删除默认空分组
+            if (picturesViewModels[0].Pictures.Count == 0)
+            {
+                picturesViewModels.RemoveAt(0);
+            }
+
+            //获取所有关联词条
+            var entries = periphery.RelatedEntries;
+
+            foreach (var item in entries)
+            {
+                model.Entries.Add(await _appHelper.GetEntryInforTipViewModel(item));
+            }
+
+            //获取所有关联周边
+            var peripheries = periphery.PeripheryRelationFromPeripheryNavigation.Select(s => s.ToPeripheryNavigation);
+
+            //将当前周边从周边关联里替换 即加载审核预览
+            foreach (var item in peripheries)
+            {
+
+                var temp = item.PeripheryRelationFromPeripheryNavigation.ToList();
+                temp.RemoveAll(s => s.ToPeriphery == model.Id);
+                item.PeripheryRelationFromPeripheryNavigation = temp;
+                item.PeripheryRelationFromPeripheryNavigation.Add(new PeripheryRelation
+                {
+                    ToPeriphery = model.Id,
+                    ToPeripheryNavigation = periphery
+                });
+            }
+            foreach (var item in peripheries)
+            {
+                model.Peripheries.Add(_appHelper.GetPeripheryInforTipViewModel(item));
+            }
+
+            model.Pictures = picturesViewModels;
+
+            return model;
+
+        }
+
+        public List<KeyValuePair<object, Operation>> ExaminesCompletion(Periphery currentPeriphery, Periphery newPeriphery)
+        {
+            var examines = new List<KeyValuePair<object, Operation>>();
+            //第一部分 主要信息
+
+            //添加修改记录
+            //新建审核数据对象
+            var examineMain = new ExamineMain
+            {
+                Items = ToolHelper.GetEditingRecordFromContrastData(currentPeriphery, newPeriphery)
+
+            };
+            if (examineMain.Items.Count > 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(examineMain, Operation.EditPeripheryMain));
+
+            }
+
+            //第二部分 相册
+
+            var peripheryImages = new PeripheryImages();
+            //先把 当前词条中的图片 都 打上删除标签
+            foreach (var item in currentPeriphery.Pictures)
+            {
+                peripheryImages.Images.Add(new EntryImage
+                {
+                    Url = item.Url,
+                    Note = item.Note,
+                    Modifier = item.Modifier,
+                    IsDelete = true
+                });
+            }
+            //再对比当前
+            foreach (var infor in newPeriphery.Pictures.ToList().Purge())
+            {
+                var isSame = false;
+                foreach (var item in peripheryImages.Images)
+                {
+                    if (item.Url == infor.Url)
+                    {
+                        if (item.Note != infor.Note || item.Modifier != infor.Modifier)
+                        {
+                            item.Modifier = infor.Modifier;
+                            item.IsDelete = false;
+                            item.Note = infor.Note;
+                        }
+                        else
+                        {
+                            peripheryImages.Images.Remove(item);
+                        }
+                        isSame = true;
+                        break;
+
+                    }
+                }
+                if (isSame == false)
+                {
+                    peripheryImages.Images.Add(new EntryImage
+                    {
+                        Url = infor.Url,
+                        Modifier = infor.Modifier,
+                        Note = infor.Note,
+                        IsDelete = false
+                    });
+                }
+            }
+
+            if (peripheryImages.Images.Count != 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(peripheryImages, Operation.EditPeripheryImages));
+
+            }
+
+            //第三部分 关联词条
+            var peripheryRelatedEntries = new PeripheryRelatedEntries();
+
+
+            foreach (var item in currentPeriphery.RelatedEntries)
+            {
+                peripheryRelatedEntries.Relevances.Add(new PeripheryRelatedEntryAloneModel
+                {
+                    EntryId = item.Id,
+                    Name = item.Name,
+                    IsDelete = true,
+                });
+            }
+
+            //再遍历视图 对应修改
+
+            //添加新建项目
+            foreach (var item in newPeriphery.RelatedEntries)
+            {
+                var temp = peripheryRelatedEntries.Relevances.FirstOrDefault(s =>  s.EntryId == item.Id);
+                if (temp != null)
+                {
+                    peripheryRelatedEntries.Relevances.Remove(temp);
+                }
+                else
+                {
+                    peripheryRelatedEntries.Relevances.Add(new PeripheryRelatedEntryAloneModel
+                    {
+                        EntryId = item.Id,
+                        Name=item.Name,
+                        IsDelete = false
+                    });
+                }
+            }
+            if (peripheryRelatedEntries.Relevances.Count != 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(peripheryRelatedEntries, Operation.EditPeripheryRelatedEntries));
+            }
+            //第四部分 关联周边
+
+            var peripheryRelatedPeripheries = new PeripheryRelatedPeripheries();
+
+            //遍历当前词条数据 打上删除标签
+            foreach (var item in currentPeriphery.PeripheryRelationFromPeripheryNavigation.Select(s => s.ToPeripheryNavigation))
+            {
+                peripheryRelatedPeripheries.Relevances.Add(new PeripheryRelatedPeripheriesAloneModel
+                {
+                    PeripheryId = item.Id,
+                    Name = item.Name,
+                    IsDelete = true,
+                });
+            }
+
+            //再遍历视图 对应修改
+
+            //添加新建项目
+            foreach (var item in newPeriphery.PeripheryRelationFromPeripheryNavigation.ToList().Purge())
+            {
+                var temp = peripheryRelatedPeripheries.Relevances.FirstOrDefault(s =>  s.PeripheryId == item.ToPeriphery);
+                if (temp != null)
+                {
+                    peripheryRelatedPeripheries.Relevances.Remove(temp);
+                }
+                else
+                {
+                    peripheryRelatedPeripheries.Relevances.Add(new PeripheryRelatedPeripheriesAloneModel
+                    {
+                        PeripheryId = item.ToPeripheryNavigation.Id,
+                        Name = item.ToPeripheryNavigation.Name,
+                        IsDelete = false
+                    });
+                }
+            }
+            if (peripheryRelatedPeripheries.Relevances.Count != 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(peripheryRelatedPeripheries, Operation.EditPeripheryRelatedPeripheries));
+            }
+
+            return examines;
+        }
+
+        public async Task<List<PeripheryViewModel>> ConcompareAndGenerateModel(Periphery currentPeriphery, Periphery newPeriphery)
+        {
+            var model = new List<PeripheryViewModel>();
+
+            model.Add(await GetPeripheryViewModel(currentPeriphery));
+            model.Add(await GetPeripheryViewModel(newPeriphery));
+
+
+
+            return model;
+        }
+
     }
 }

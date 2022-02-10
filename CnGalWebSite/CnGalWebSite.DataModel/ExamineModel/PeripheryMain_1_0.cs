@@ -1,7 +1,7 @@
 ﻿using CnGalWebSite.DataModel.Model;
 namespace CnGalWebSite.DataModel.ExamineModel
 {
-    public class PeripheryMain
+    public class PeripheryMain_1_0
     {
         public string Name { get; set; }
         public string DisplayName { get; set; }

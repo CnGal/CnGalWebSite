@@ -28,6 +28,12 @@
         <div class="col-12 col-md-6">
             <i class="fa fa-fw  fa-tag font-color "></i>&nbsp;&nbsp;@Model.Type.GetDisplayName()
         </div>
+        @if (string.IsNullOrWhiteSpace(Model.Category) == false)
+        {
+            <div class="col-12 col-md-6">
+                <i class="fa  fa-fw font-color fa-hashtag"></i>&nbsp;&nbsp;@Model.Category
+            </div>
+        }
         @if (string.IsNullOrWhiteSpace(Model.Size) == false)
         {
             <div class="col-12 col-md-6">
@@ -64,10 +70,20 @@
                 <i class="fa font-color fa-fw fa-money"></i>&nbsp;&nbsp;价格：@Model.Price
             </div>
         }
+        @if (Model.IsReprint)
+        {
+            <div class="col-12 col-md-6">
+                <i class="fa font-color fa-fw fa-check-square-o"></i>&nbsp;&nbsp;已再版
+            </div>
+        }
+        else
+        {
+            <div class="col-12 col-md-6">
+                <i class="fa font-color fa-fw fa-minus-square-o"></i>&nbsp;&nbsp;未再版
+            </div>
 
-        <div class="col-12 col-md-6">
-            <i class="fa font-color fa-fw fa-minus-square-o"></i>&nbsp;&nbsp;@(Model.IsReprint?"已再版":"未再版")
-        </div>
+        }
+
         @if (Model.IsAvailableItem)
         {
             <div class="col-12 col-md-6">

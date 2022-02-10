@@ -12,17 +12,17 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
     {
         Task<QueryData<ListPeripheryAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPeripheryAloneModel searchModel);
 
-        void UpdatePeripheryDataMain(Periphery periphery, PeripheryMain examine);
+        void UpdatePeripheryDataMain(Periphery periphery, PeripheryMain_1_0 examine);
+
+        void UpdatePeripheryDataMain(Periphery periphery, ExamineMain examine);
 
         void UpdatePeripheryDataImages(Periphery periphery, PeripheryImages examine);
 
-        void UpdatePeripheryData(Periphery periphery, Examine examine);
+        Task UpdatePeripheryDataAsync(Periphery periphery, Examine examine);
 
-        void UpdatePeripheryDataRelatedEntries(Periphery periphery, PeripheryRelatedEntries examine);
+        Task UpdatePeripheryDataRelatedEntries(Periphery periphery, PeripheryRelatedEntries examine);
 
         Task UpdatePeripheryDataRelatedPeripheriesAsync(Periphery periphery, PeripheryRelatedPeripheries examine);
-
-        Task RealUpdateRelevances(Periphery periphery);
 
         GameOverviewPeripheriesModel GetGameOverViewPeripheriesModel(ApplicationUser user, Entry entry, List<long> ownedPeripheries, bool showUserPhoto);
 
@@ -31,5 +31,11 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
         Task<PeripheryEditState> GetPeripheryEditState(ApplicationUser user, long peripheryId);
 
         Task<List<long>> GetPeripheryIdsFromNames(List<string> names);
+
+        Task<PeripheryViewModel> GetPeripheryViewModel(Periphery periphery);
+
+        List<KeyValuePair<object, Operation>> ExaminesCompletion(Periphery currentPeriphery, Periphery newPeriphery);
+
+        Task<List<PeripheryViewModel>> ConcompareAndGenerateModel(Periphery currentPeriphery, Periphery newPeriphery);
     }
 }

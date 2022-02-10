@@ -105,7 +105,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="user">管理员用户</param>
         /// <param name="note">备注</param>
         /// <returns></returns>
-        Task<Entry> AddNewEtryExaminesAsync(Entry model, ApplicationUser user, string note);
+        Task<Entry> AddNewEntryExaminesAsync(Entry model, ApplicationUser user, string note);
 
         /// <summary>
         /// 获取当前用户对该 文章 部分的待审核记录
@@ -174,8 +174,15 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="user">用户</param>
         /// <param name="note">备注</param>
         /// <returns></returns>
-        Task<string> AddBatchPeeripheryExaminesAsync(ImportPeripheryModel model, ApplicationUser user, string note);
-
+        Task<Periphery> AddNewPeripheryExaminesAsync(Periphery model, ApplicationUser user, string note);
+        /// <summary>
+        /// 为批量导入的标签建立审核记录
+        /// </summary>
+        /// <param name="model">标签</param>
+        /// <param name="user">用户</param>
+        /// <param name="note">备注</param>
+        /// <returns></returns>
+        Task<Tag> AddNewTagExaminesAsync(Tag model, ApplicationUser user, string note);
         /// <summary>
         /// 获取当前用户 标签 等待审核
         /// </summary>
@@ -277,7 +284,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="periphery">关联周边</param>
         /// <param name="examine">审核数据模型</param>
         /// <returns></returns>
-        Task ExamineEditPeripheryMainAsync(Periphery periphery, PeripheryMain examine);
+        Task ExamineEditPeripheryMainAsync(Periphery periphery, ExamineMain examine);
         /// <summary>
         /// 处理 PeripheryImages 审核成功后调用更新数据
         /// </summary>
@@ -328,7 +335,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="tag">标签</param>
         /// <param name="examine">审核数据模型</param>
         /// <returns></returns>
-        Task ExamineEditTagMainAsync(Tag tag, TagMain examine);
+        Task ExamineEditTagMainAsync(Tag tag, ExamineMain examine);
         /// <summary>
         /// 处理 TagChildTags 审核成功后调用更新数据
         /// </summary>
@@ -363,7 +370,9 @@ namespace CnGalWebSite.APIServer.ExamineX
         Task MigrationEditEntryRelevanceExamineRecord();
         Task ReplaceEditEntryMainExamineContext();
         Task ReplaceEditArticleMainExamineContext();
-
+        Task ReplaceEditPeripheryMainExamineContext();
+        Task ReplacePeripheryRelatedEntries();
+        Task ReplaceEditTagMainExamineContext();
         /// <summary>
         /// 处理 PeripheryRelatedPeripheries 审核成功后调用更新数据
         /// </summary>

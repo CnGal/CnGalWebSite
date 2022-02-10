@@ -1,0 +1,21 @@
+﻿<div class="  rounded shadow-sm  bg-opacity mb-3">
+    <PeripheryMainInforTip Model="Model" IsSmallScreen="true" />
+</div>
+<div class="rounded shadow-sm bg-opacity mb-3">
+    <PeripheryBasicInforTip Model="Model" />
+</div>
+@if (Model.Pictures.Count != 0)
+{
+    <div class="mb-3">
+        <PeripheryImagesViewTip Model="Model.Pictures" EditState="Model.ImagesState" IsEdit="Model.IsEdit"  Id="Model.Id" />
+    </div>
+}
+<div class="">
+    <PeripheryListRelevancesViewTip Entries="Model.Entries" Peripheries="Model.Peripheries" RelatedEntriesState="Model.RelatedEntriesState" RelatedPeripheriesState="Model.RelatedPeripheriesState"
+                                     Id="Model.Id" Type="Model.Type" />
+</div>
+@code {
+    [Parameter]
+    public PeripheryViewModel Model { get; set; } = new PeripheryViewModel();
+
+}

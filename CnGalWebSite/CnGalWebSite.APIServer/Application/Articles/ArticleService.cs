@@ -9,6 +9,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
+using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Markdig;
 using Microsoft.EntityFrameworkCore;
@@ -26,17 +27,19 @@ namespace CnGalWebSite.APIServer.Application.Articles
     public class ArticleService : IArticleService
     {
         private readonly IRepository<Article, long> _articleRepository;
+        private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IAppHelper _appHelper;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Article>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Article>>> SortLambdaCacheArticle = new();
 
 
-        public ArticleService(IAppHelper appHelper, IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository)
+        public ArticleService(IAppHelper appHelper, IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository)
         {
             _articleRepository = articleRepository;
             _appHelper = appHelper;
             _entryRepository = entryRepository;
+            _examineRepository = examineRepository;
         }
 
         public async Task<PagedResultDto<Article>> GetPaginatedResult(GetArticleInput input)
@@ -845,6 +848,88 @@ namespace CnGalWebSite.APIServer.Application.Articles
             return model;
         }
 
+        public async Task<ArticleEditState> GetArticleEditState(ApplicationUser user, long id)
+        {
+            var model = new ArticleEditState();
+            //获取该词条的各部分编辑状态
+            //读取审核信息
+            List<Examine> examineQuery = null;
+            if (user != null)
+            {
+                examineQuery = await _examineRepository.GetAll().AsNoTracking()
+                               .Where(s => s.PeripheryId == id && s.ApplicationUserId == user.Id && s.IsPassed == null
+                               && (s.Operation == Operation.EditArticleMain || s.Operation == Operation.EditArticleMainPage || s.Operation == Operation.EditArticleRelevanes ))
+                               .Select(s => new Examine
+                               {
+                                   Operation = s.Operation
+                               })
+                               .ToListAsync();
+            }
+
+            if (user != null)
+            {
+                if (examineQuery.Any(s => s.Operation == Operation.EditArticleMain))
+                {
+                    model.MainState = EditState.Preview;
+                }
+                if (examineQuery.Any(s => s.Operation == Operation.EditArticleMainPage))
+                {
+                    model.MainPageState = EditState.Preview;
+                }
+                if (examineQuery.Any(s => s.Operation == Operation.EditArticleRelevanes))
+                {
+                    model.RelevancesState = EditState.Preview;
+                }
+
+            }
+            //获取各部分状态
+            var examiningList = new List<Operation>();
+            if (user != null)
+            {
+                examiningList = await _examineRepository.GetAll().Where(s => s.PeripheryId == id && s.ApplicationUserId != user.Id && s.IsPassed == null).Select(s => s.Operation).ToListAsync();
+
+            }
+            if (user != null)
+            {
+                if (model.MainState != EditState.Preview)
+                {
+                    if (examiningList.Any(s => s == Operation.EditArticleMain))
+                    {
+                        model.MainState = EditState.locked;
+                    }
+                    else
+                    {
+                        model.MainState = EditState.Normal;
+                    }
+                }
+                if (model.MainPageState != EditState.Preview)
+                {
+
+                    if (examiningList.Any(s => s == Operation.EditArticleMainPage))
+                    {
+                        model.MainPageState = EditState.locked;
+                    }
+                    else
+                    {
+                        model.MainPageState = EditState.Normal;
+                    }
+                }
+                if (model.RelevancesState != EditState.Preview)
+                {
+                    if (examiningList.Any(s => s == Operation.EditArticleRelevanes))
+                    {
+                        model.RelevancesState = EditState.locked;
+                    }
+                    else
+                    {
+                        model.RelevancesState = EditState.Normal;
+                    }
+                }
+             
+            }
+
+            return model;
+        }
 
 
     }

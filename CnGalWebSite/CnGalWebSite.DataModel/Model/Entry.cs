@@ -113,6 +113,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 周边列表
         /// </summary>
+        [Obsolete("关联周边已迁移，请访问RelatedPeripheries")]
         public ICollection<PeripheryRelevanceEntry> Peripheries { get; set; }=new List<PeripheryRelevanceEntry>();
 
         /// <summary>
@@ -131,6 +132,10 @@ namespace CnGalWebSite.DataModel.Model
         /// 关联文章
         /// </summary>
         public ICollection<Article> Articles { get; set; } = new List<Article>();
+        /// <summary>
+        /// 关联周边
+        /// </summary>
+        public virtual ICollection<Periphery> RelatedPeripheries { get; set; } = new List<Periphery>();
         /// <summary>
         /// 关联外部链接
         /// </summary>

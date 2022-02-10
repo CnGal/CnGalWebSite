@@ -11,6 +11,7 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -1158,6 +1159,34 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
         }
+
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<EditArticleInforBindModel>> GetArticleEditInforBindModelAsync(long id)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            var periphery = await _articleRepository.FirstOrDefaultAsync(s => s.Id == id);
+            if (periphery == null)
+            {
+                return NotFound("无法找到该文章");
+            }
+            var model = new EditArticleInforBindModel
+            {
+                Id = id,
+                Name = periphery.Name
+            };
+
+            //获取编辑记录
+            model.Examines = await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => s.ArticleId == id && s.IsPassed == true), true);
+            model.Examines = model.Examines.OrderByDescending(s => s.ApplyTime).ToList();
+            //获取编辑状态
+            model.State = await _articleService.GetArticleEditState(user, id);
+
+            return model;
+        }
+
 
     }
 }

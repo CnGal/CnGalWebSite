@@ -66,6 +66,9 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<ArticleContrastEditRecordViewModel> ArticleContrastEditRecordViewCatche { get; set; }
 
+        IPageModelCatche<PeripheryContrastEditRecordViewModel> PeripheryContrastEditRecordViewCatche { get; set; }
+
+        IPageModelCatche<TagContrastEditRecordViewModel> TagContrastEditRecordViewCatche { get; set; }
 
         SearchViewModel SearchViewModel { get; set; }
 

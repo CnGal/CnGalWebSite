@@ -112,6 +112,14 @@ namespace CnGalWebSite.Shared.Service
         /// 编辑对比页面数据缓存 文章
         /// </summary>
         public IPageModelCatche<ArticleContrastEditRecordViewModel> ArticleContrastEditRecordViewCatche { get; set; }
+        /// <summary>
+        /// 编辑对比页面数据缓存 周边
+        /// </summary>
+        public IPageModelCatche<PeripheryContrastEditRecordViewModel> PeripheryContrastEditRecordViewCatche { get; set; }
+        /// <summary>
+        /// 编辑对比页面数据缓存 标签
+        /// </summary>
+        public IPageModelCatche<TagContrastEditRecordViewModel> TagContrastEditRecordViewCatche { get; set; }
 
         /// <summary>
         /// 折扣页面缓存辅助类
@@ -143,6 +151,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<PeripheryViewModel> peripheryIndexPageCatche, IPageModelCatche<TagIndexViewModel> tagIndexPageCatche, IPageModelCatche<List<HomeNewsAloneViewModel>> homePageNewsCatche,
         IPageModelCatche<List<DataModel.Model.Carousel>> homePageCarouselsCatche,IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
         IPageModelCatche<ArticleContrastEditRecordViewModel> articleContrastEditRecordViewCatche,
+        IPageModelCatche<PeripheryContrastEditRecordViewModel> peripheryContrastEditRecordViewCatche,
+        IPageModelCatche<TagContrastEditRecordViewModel> tagContrastEditRecordViewCatche,
         IPageModelCatche<EntryContrastEditRecordViewModel> entryContrastEditRecordViewCatche)
         {
             _httpClient = httpClient;
@@ -151,9 +161,11 @@ namespace CnGalWebSite.Shared.Service
             (PeripheryIndexPageCatche = peripheryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/peripheries/GetPeripheryView/");
             (VoteIndexPageCatche = voteIndexPageCatche).Init(ToolHelper.WebApiPath + "api/votes/GetVoteView/");
             (TagIndexPageCatche = tagIndexPageCatche).Init(ToolHelper.WebApiPath + "api/tags/gettag/");
-            (ExaminesOverviewCatche = examinesOverviewCatche).Init(ToolHelper.WebApiPath + "api/home/GetEditRecordsOverview/");
+            (ExaminesOverviewCatche = examinesOverviewCatche).Init(ToolHelper.WebApiPath + "api/examines/GetExaminesOverview/");
             (EntryContrastEditRecordViewCatche = entryContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/entries/GetContrastEditRecordViews/");
             (ArticleContrastEditRecordViewCatche = articleContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/articles/GetContrastEditRecordViews/");
+            (PeripheryContrastEditRecordViewCatche = peripheryContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/peripheries/GetContrastEditRecordViews/");
+            (TagContrastEditRecordViewCatche = tagContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/tags/GetContrastEditRecordViews/");
             HomePageNewsCatche = homePageNewsCatche;
             HomePageCarouselsCatche = homePageCarouselsCatche;
         }

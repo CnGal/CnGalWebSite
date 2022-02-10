@@ -1,6 +1,6 @@
 ﻿namespace CnGalWebSite.DataModel.ExamineModel
 {
-    public class TagMain
+    public class TagMain_1_0
     {
         public int ParentTagId { get; set; }
 

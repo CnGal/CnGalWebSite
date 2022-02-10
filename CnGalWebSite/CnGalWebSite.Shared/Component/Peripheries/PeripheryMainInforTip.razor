@@ -1,0 +1,28 @@
+﻿@if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
+{
+    <img class="w-100" src="@Model.MainPicture" alt="@Model.Name">
+}
+<div class="p-3">
+    <h1 class="fw-bold text-center h3">@Model.Name</h1>
+
+    <p class="text-center" style="color: gray;">
+        <i class="fa fa-eye fa-fw "></i>
+        <span class="article-infor-text">@(Model.ReaderCount + "次阅读")</span>&nbsp;&nbsp;&nbsp;
+        <i class="fa fa-commenting-o fa-fw "></i>
+        <span class="article-infor-text">@(Model.CommentCount + "条评论")&nbsp; &nbsp; &nbsp;</span>
+        <i class="fa fa-shopping-basket fa-fw "></i>
+        <span class="article-infor-text">@(Model.CollectedCount + "人拥有")&nbsp; &nbsp; &nbsp;</span>
+    </p>
+    <hr />
+    <div class="markdown-body">
+        @((MarkupString)Model.BriefIntroduction)
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PeripheryViewModel Model { get; set; }
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
+
+}

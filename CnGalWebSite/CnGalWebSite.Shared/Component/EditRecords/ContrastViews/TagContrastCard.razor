@@ -1,0 +1,23 @@
+﻿
+
+<TagHeadNavTip TagList="Model.Taglevels" />
+<TagMainInforCard Model="Model" IsSmallScreen="true"/>
+
+@if (Model.ChildrenTags.Count != 0 )
+{
+    <div class="mb-3">
+        <TagListChildTagsViewTip Model="Model.ChildrenTags"  EditState="Model.ChildTagsState" Id="Model.Id" />
+    </div>
+}
+@if (Model.ChildrenEntries.Count != 0 )
+{
+    <div class="">
+        <TagListChildEntriesViewTip Model="Model.ChildrenEntries"  EditState="Model.ChildEntriesState" Id="Model.Id" />
+    </div>
+}
+
+@code {
+    [Parameter]
+    public TagIndexViewModel Model { get; set; } = new TagIndexViewModel();
+
+}

@@ -13,7 +13,9 @@ namespace CnGalWebSite.APIServer.Application.Tags
 
         Task UpdateTagDataAsync(Tag tag, Examine examine);
 
-        Task UpdateTagDataMainAsync(Tag tag, TagMain examine);
+        Task UpdateTagDataMainAsync(Tag tag, TagMain_1_0 examine);
+
+        Task UpdateTagDataMainAsync(Tag tag, ExamineMain examine);
 
         Task UpdateTagDataChildTagsAsync(Tag tag, TagChildTags examine);
 
@@ -24,5 +26,13 @@ namespace CnGalWebSite.APIServer.Application.Tags
         Task<List<KeyValuePair<string, int>>> GetTagLevelListAsync(Tag tag);
 
         Task<TagEditState> GetTagEditState(ApplicationUser user, long tagId);
+
+        Task<TagIndexViewModel> GetTagViewModel(Tag tag);
+
+        List<KeyValuePair<object, Operation>> ExaminesCompletion(Tag currentTag, Tag newTag);
+
+        Task<List<int>> GetTagIdsFromNames(List<string> names);
+
+        Task<List<TagIndexViewModel>> ConcompareAndGenerateModel(Tag currentTag, Tag newTag);
     }
 }

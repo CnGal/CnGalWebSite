@@ -73,14 +73,14 @@ else
                     <CnGalWebSite.Shared.Component.Articles.NewVersion.MainInforCard Model="Model" IsSmallScreen="IsSmallScreen" OnRevoke="OnRevoke" />
                     @if (IsLargeScreen == false)
                     {
-                <div class="ps-4 pe-4 ">
-                    <ArticleOperationTip Authority="AsyncModel.Authority" IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" Relevances="Model.Relevances" OnArticleClick="OnArticleClick" LastEditTime="Model.LastEditTime" IsThumbsUp="AsyncModel.IsThumbsUp"
-                                         IsLargeSreeen="IsLargeScreen" IsNormalSreeen="IsNormalScreen" IsSmallSreeen="IsSmallScreen" OnClickUrl="OnClickUrl" IsFavorited="IsUserFavorited"></ArticleOperationTip>
-                    <div class="pt-4">
-                        <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard Model="Model" IsSmallScreen="true" />
-                    </div>
+                        <div class="ps-4 pe-4 ">
+                            <ArticleOperationTip Authority="AsyncModel.Authority" IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" Relevances="Model.Relevances" OnArticleClick="OnArticleClick" LastEditTime="Model.LastEditTime" IsThumbsUp="AsyncModel.IsThumbsUp"
+                                                 IsLargeSreeen="IsLargeScreen" IsNormalSreeen="IsNormalScreen" IsSmallSreeen="IsSmallScreen" OnClickUrl="OnClickUrl" IsFavorited="IsUserFavorited"></ArticleOperationTip>
+                            <div class="pt-4">
+                                <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard Model="Model" IsSmallScreen="true" />
+                            </div>
 
-                </div>
+                        </div>
 
                     }
                 </div>
@@ -99,20 +99,20 @@ else
 
         @if (IsLargeScreen)
         {
-    <div class="col-xl-3">
-        @if (string.IsNullOrWhiteSpace(Model.UserId) == false)
-        {
-            <UserInforTip Length="75" UserId="@Model.UserId" OnClickUrl="OnClickUrl"></UserInforTip>
-        }
+            <div class="col-xl-3">
+                @if (string.IsNullOrWhiteSpace(Model.UserId) == false)
+                {
+                    <UserInforTip Length="75" UserId="@Model.UserId" OnClickUrl="OnClickUrl"></UserInforTip>
+                }
 
-        @if (IsLargeScreen)
-        {
-            <ArticleOperationTip OnClickUrl="OnClickUrl" Authority="AsyncModel.Authority" IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" Relevances="Model.Relevances" OnArticleClick="OnArticleClick" LastEditTime="Model.LastEditTime" IsThumbsUp="AsyncModel.IsThumbsUp"
-                                 IsLargeSreeen="IsLargeScreen" IsNormalSreeen="IsNormalScreen" IsSmallSreeen="IsSmallScreen" IsFavorited="IsUserFavorited"></ArticleOperationTip>
-            <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard Model="Model" IsSmallScreen="false" />
+                @if (IsLargeScreen)
+                {
+                    <ArticleOperationTip OnClickUrl="OnClickUrl" Authority="AsyncModel.Authority" IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" Relevances="Model.Relevances" OnArticleClick="OnArticleClick" LastEditTime="Model.LastEditTime" IsThumbsUp="AsyncModel.IsThumbsUp"
+                                         IsLargeSreeen="IsLargeScreen" IsNormalSreeen="IsNormalScreen" IsSmallSreeen="IsSmallScreen" IsFavorited="IsUserFavorited"></ArticleOperationTip>
+                    <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard Model="Model" IsSmallScreen="false" />
 
-        }
-    </div>
+                }
+            </div>
         }
     </div>
 }
@@ -542,7 +542,19 @@ else
         }
         else if (index == 10)
         {
-            NavigationManager.NavigateTo(Provider, "/home/editrecord?ContrastId=" + Model.LastExamineId + "&CurrentId=" + Model.LastExamineId, "『"+Model.Name+"』历史编辑记录总览", "fa fa-edit");
+            var option = new DialogOption()
+            {
+                Title = "历史编辑记录"
+            };
+            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EditRecordListViewTip>(new Dictionary<string, object>
+            {
+                [nameof(EditRecordListViewTip.Id)] = Model.Id,
+                [nameof(EditRecordListViewTip.IsSmallScreen)] = IsSmallScreen,
+                [nameof(EditRecordListViewTip.Type)] = ExaminedNormalListModelType.Article,
+                [nameof(EditRecordListViewTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
+
+            }).Render();
+            await DialogService.Show(option);
         }
     }
 

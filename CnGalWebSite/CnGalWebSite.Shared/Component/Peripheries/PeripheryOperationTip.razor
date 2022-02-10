@@ -5,51 +5,55 @@
         <Authorized>
             @if (IsCollected)
             {
-                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  Icon="fa fa-check" Text="我已拥有" OnClick="@(() => OnClick(5))" />
+                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" Icon="fa fa-check" Text="我已拥有" OnClick="@(() => OnClick(5))" />
 
             }
             else
             {
-                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  IsOutline="true" Icon="fa fa-shopping-basket" Text="拥有" OnClick="@(() => OnClick(6))" />
+                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-shopping-basket" Text="拥有" OnClick="@(() => OnClick(6))" />
 
             }
             @if (IsFavorited)
             {
-                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  IsOutline="true"  Icon="fa fa-star" Text="取消收藏" OnClick="@(() => OnClick(7))" />
+                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-star" Text="取消收藏" OnClick="@(() => OnClick(7))" />
 
             }
             else
             {
-                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"   IsOutline="true" Icon="fa fa-star-o" Text="收藏" OnClick="@(() => OnClick(8))" />
+                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-star-o" Text="收藏" OnClick="@(() => OnClick(8))" />
 
             }
+            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa  fa-history" Text="历史" OnClick="@(() => OnClick(11))" />
+
             @if (IsEdit)
             {
-                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  IsOutline="true"  Icon="fa fa-sign-out" Text="退出编辑" OnClick="@(() => OnClick(9))" />
+                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-sign-out" Text="退出编辑" OnClick="@(() => OnClick(9))" />
 
             }
             else
             {
-                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  IsOutline="true"  Icon="fa  fa-pencil" Text="编辑" OnClick="@(() => OnClick(2))" />
+                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa  fa-pencil" Text="编辑" OnClick="@(() => OnClick(2))" />
 
             }
 
 
         </Authorized>
         <NotAuthorized>
-            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  IsOutline="true"  Icon="fa fa-sign-in " Text="登入后记录收集进度" OnClick="@(() => OnClick(10))" />
+            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa  fa-history" Text="历史" OnClick="@(() => OnClick(11))" />
+
+            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-sign-in " Text="登入后记录收集进度" OnClick="@(() => OnClick(10))" />
 
         </NotAuthorized>
     </AuthorizeView>
     <AuthorizeView Roles="Admin">
         @if (IsHidden)
         {
-            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall"  IsOutline="true" Icon="fa fa-map-signs" Text="取消隐藏" OnClick="@(() => OnClick(3))" />
+            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-map-signs" Text="取消隐藏" OnClick="@(() => OnClick(3))" />
 
         }
         else
         {
-            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true"  Icon="fa fa-unlink fa-check" Text="隐藏" OnClick="@(() => OnClick(4))" />
+            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-unlink fa-check" Text="隐藏" OnClick="@(() => OnClick(4))" />
 
         }
 

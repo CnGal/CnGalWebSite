@@ -8,6 +8,8 @@
 
     [Parameter]
     public bool IsSmallScreen { get; set; }
+    [Parameter]
+    public EventCallback OnNavClick { get; set; }
 
     private readonly List<TimelineItem> AlternateTimelineItems = new List<TimelineItem>();
 
@@ -16,6 +18,7 @@
         //初始化动态时间线
         InitNewsTimeLine();
     }
+
     public Color GetColor(int index)
     {
         switch (index)
@@ -32,6 +35,7 @@
                 return Color.Danger;
         }
     }
+
     public void InitNewsTimeLine()
     {
         int next = 0;
@@ -45,6 +49,7 @@
                 Component = BootstrapDynamicComponent.CreateComponent<ExamineInforAloneTip>(new Dictionary<string, object>
                 {
                     [nameof(ExamineInforAloneTip.Model)] = item,
+                    [nameof(ExamineInforAloneTip.OnNavClick)] = OnNavClick,
                     [nameof(ExamineInforAloneTip.IsRight)] = (IsSmallScreen || Model.Count < 3) ? false : (Model.IndexOf(item) % 2 == 1),
                     [nameof(ExamineInforAloneTip.LastExamineId)] = Model.Max(s => s.Id),
                 }),
@@ -52,5 +57,4 @@
             });
         }
     }
-
 }

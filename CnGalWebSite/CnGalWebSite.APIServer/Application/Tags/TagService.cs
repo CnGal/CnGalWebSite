@@ -1,8 +1,10 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -20,13 +22,16 @@ namespace CnGalWebSite.APIServer.Application.Tags
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
+        private readonly IAppHelper _appHelper;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Tag>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Tag>>> SortLambdaCacheApplicationUser = new();
-        public TagService(IRepository<Tag, int> tagRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository)
+        public TagService(IRepository<Tag, int> tagRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository,
+            IAppHelper appHelper)
         {
             _tagRepository = tagRepository;
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
+            _appHelper = appHelper;
         }
 
         public Task<BootstrapBlazor.Components.QueryData<ListTagAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListTagAloneModel searchModel)
@@ -82,6 +87,30 @@ namespace CnGalWebSite.APIServer.Application.Tags
                 // IsFiltered = isFiltered
             });
         }
+
+        public async Task<List<int>> GetTagIdsFromNames(List<string> names)
+        {
+            //判断关联是否存在
+            var entryId = new List<int>();
+
+            foreach (var item in names)
+            {
+                var infor = await _tagRepository.GetAll().AsNoTracking().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
+                if (infor <= 0)
+                {
+                    throw new Exception("标签 " + item + " 不存在");
+                }
+                else
+                {
+                    entryId.Add(infor);
+                }
+            }
+            //删除重复数据
+            entryId = entryId.Distinct().ToList();
+
+            return entryId;
+        }
+
 
         public async Task UpdateTagDataOldAsync(Tag tag, TagEdit examine)
         {
@@ -165,7 +194,34 @@ namespace CnGalWebSite.APIServer.Application.Tags
             tag.LastEditTime = DateTime.Now.ToCstTime();
         }
 
-        public async Task UpdateTagDataMainAsync(Tag tag, TagMain examine)
+        public async Task UpdateTagDataMainAsync(Tag tag, ExamineMain examine)
+        {
+            ToolHelper.ModifyDataAccordingToEditingRecord(tag, examine.Items);
+            //更新父标签
+
+            if (examine.Items.Any(s => s.Key == "ParentTagId"))
+            {
+                int parentTagId = 0;
+                if (int.TryParse(examine.Items.FirstOrDefault(s => s.Key == "ParentTagId")?.Value, out parentTagId))
+                {
+                    //查找Tag
+                    var tagNew = await _tagRepository.FirstOrDefaultAsync(s => s.Id == parentTagId);
+                    if (tagNew != null)
+                    {
+                        tag.ParentCodeNavigation = tagNew;
+                    }
+                }
+            }
+            else
+            {
+                tag.ParentCodeNavigation = null;
+            }
+            //更新最后编辑时间
+            tag.LastEditTime = DateTime.Now.ToCstTime();
+
+        }
+
+        public async Task UpdateTagDataMainAsync(Tag tag, TagMain_1_0 examine)
         {
             tag.Name = examine.Name;
             tag.BriefIntroduction = examine.BriefIntroduction;
@@ -293,11 +349,11 @@ namespace CnGalWebSite.APIServer.Application.Tags
                     await UpdateTagDataOldAsync(tag, articleMain);
                     break;
                 case Operation.EditTagMain:
-                    TagMain tagMain = null;
+                    ExamineMain tagMain = null;
                     using (TextReader str = new StringReader(examine.Context))
                     {
                         var serializer = new JsonSerializer();
-                        tagMain = (TagMain)serializer.Deserialize(str, typeof(TagMain));
+                        tagMain = (ExamineMain)serializer.Deserialize(str, typeof(ExamineMain));
                     }
 
                     await UpdateTagDataMainAsync(tag, tagMain);
@@ -436,6 +492,158 @@ namespace CnGalWebSite.APIServer.Application.Tags
                 }
 
             }
+
+            return model;
+        }
+
+
+        public async Task<TagIndexViewModel> GetTagViewModel(Tag tag)
+        {
+            var model = new TagIndexViewModel
+            {
+                Id = tag.Id,
+                Name = tag.Name,
+                BriefIntroduction = tag.BriefIntroduction,
+                MainPicture = _appHelper.GetImagePath(tag.MainPicture, "app.png"),
+                BackgroundPicture = _appHelper.GetImagePath(tag.BackgroundPicture, ""),
+                SmallBackgroundPicture = _appHelper.GetImagePath(tag.SmallBackgroundPicture, ""),
+                Thumbnail = _appHelper.GetImagePath(tag.Thumbnail, ""),
+                ReaderCount = tag.ReaderCount,
+                ParentTag = tag.ParentCodeNavigation == null ? null : _appHelper.GetTagInforTipViewModel(tag.ParentCodeNavigation),
+                Taglevels = await GetTagLevelListAsync(tag),
+                IsHidden= tag.IsHidden,
+            };
+
+          
+
+            foreach (var item in tag.InverseParentCodeNavigation)
+            {
+                model.ChildrenTags.Add(_appHelper.GetTagInforTipViewModel(item));
+            }
+
+          
+            foreach (var item in tag.Entries.Where(s => s.IsHidden == false))
+            {
+                model.ChildrenEntries.Add(await _appHelper.GetEntryInforTipViewModel(item));
+            }
+
+            return model;
+
+        }
+
+        public List<KeyValuePair<object, Operation>> ExaminesCompletion(Tag currentTag, Tag newTag)
+        {
+            var examines = new List<KeyValuePair<object, Operation>>();
+            //第一部分 主要信息
+
+            var examineMain = new ExamineMain
+            {
+                Items = ToolHelper.GetEditingRecordFromContrastData(currentTag, newTag)
+            };
+            if (currentTag.ParentCodeNavigation?.Id != newTag.ParentCodeNavigation?.Id)
+            {
+                examineMain.Items.Add(new ExamineMainAlone
+                {
+                    Key = "ParentTagId",
+                    Value = newTag.ParentCodeNavigation?.Id.ToString()
+                });
+            }
+
+            if (examineMain.Items.Count > 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(examineMain, Operation.EditTagMain));
+
+            }
+
+            //第二部分 子标签
+            var tagChildTags = new TagChildTags();
+
+            foreach (var item in currentTag.InverseParentCodeNavigation)
+            {
+                tagChildTags.ChildTags.Add(new TagChildTagAloneModel
+                {
+                    TagId = item.Id,
+                    Name = item.Name,
+                    IsDelete = true,
+                });
+            }
+
+            //再遍历视图 对应修改
+
+            //添加新建项目
+            foreach (var item in newTag.InverseParentCodeNavigation)
+            {
+                var temp = tagChildTags.ChildTags.FirstOrDefault(s => s.TagId == item.Id);
+                if (temp != null)
+                {
+                    tagChildTags.ChildTags.Remove(temp);
+                }
+                else
+                {
+                    tagChildTags.ChildTags.Add(new TagChildTagAloneModel
+                    {
+                        TagId = item.Id,
+                        Name=item.Name,
+                        IsDelete = false
+                    });
+                }
+            }
+            if (tagChildTags.ChildTags.Count != 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(tagChildTags, Operation.EditTagChildTags));
+            }
+
+            //第三部分 子词条
+            var tagChildEntries = new TagChildEntries();
+
+
+            foreach (var item in currentTag.Entries)
+            {
+                tagChildEntries.ChildEntries.Add(new TagChildEntryAloneModel
+                {
+                    EntryId = item.Id,
+                    Name = item.Name,
+                    IsDelete = true,
+                });
+            }
+
+            //再遍历视图 对应修改
+
+            //添加新建项目
+            foreach (var item in newTag.Entries)
+            {
+                var temp = tagChildEntries.ChildEntries.FirstOrDefault(s => s.EntryId == item.Id);
+                if (temp != null)
+                {
+                    tagChildEntries.ChildEntries.Remove(temp);
+                }
+                else
+                {
+                    tagChildEntries.ChildEntries.Add(new TagChildEntryAloneModel
+                    {
+                        EntryId = item.Id,
+                        Name = item.Name,
+                        IsDelete = false
+                    });
+                }
+            }
+            if (tagChildEntries.ChildEntries.Count != 0)
+            {
+                examines.Add(new KeyValuePair<object, Operation>(tagChildEntries, Operation.EditTagChildEntries));
+            }
+
+
+            return examines;
+        }
+
+        public async Task<List<TagIndexViewModel>> ConcompareAndGenerateModel(Tag currentTag, Tag newTag)
+        {
+            var model = new List<TagIndexViewModel>();
+
+            model.Add(await GetTagViewModel(currentTag));
+            model.Add(await GetTagViewModel(newTag));
+
+
 
             return model;
         }

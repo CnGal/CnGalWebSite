@@ -10,6 +10,8 @@ namespace CnGalWebSite.DataModel.ExamineModel
     {
         public bool IsDelete { get; set; }
 
+        public string Name { get; set; }
+
         public int EntryId { get; set; }
     }
 }

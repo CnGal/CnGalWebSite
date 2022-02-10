@@ -203,7 +203,7 @@ namespace CnGalWebSite.Shared.Shared
             Menus = GetIconSideMenuItemsAsync(user);
 
             //启动定时器
-            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 60 );
+            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 60 * 10);
         }
 
         private void GetUserInfor(ClaimsPrincipal user)

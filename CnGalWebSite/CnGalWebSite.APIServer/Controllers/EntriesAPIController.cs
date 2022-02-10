@@ -1686,7 +1686,25 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Error = "该词条的名称与其他词条重复", Successful = false };
                 }
 
-                //预处理 建立词条关联信息
+                //预处理
+                //检查图片链接 是否包含外链
+                foreach (var item in model.Images)
+                {
+                    if (item.Url.Contains("image.cngal.org") == false && item.Url.Contains("pic.cngal.top") == false)
+                    {
+                        return new Result { Successful = false, Error = "相册中不能添加外部图片：" + item.Url };
+                    }
+                }
+                //检查是否重复
+                foreach (var item in model.Images)
+                {
+                    if (model.Images.Count(s => s.Url == item.Url) > 1)
+                    {
+                        return new Result { Error = "图片链接不能重复，重复的链接：" + item.Url, Successful = false };
+
+                    }
+                }
+
                 //判断关联是否存在
                 var tags = new List<Tag>();
 
@@ -1979,7 +1997,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 //获取审核记录
                 try
                 {
-                    entry= await _examineService.AddNewEtryExaminesAsync(newEntry, user, model.Note);
+                    entry = await _examineService.AddNewEntryExaminesAsync(newEntry, user, model.Note);
                 }
                 catch (Exception ex)
                 {

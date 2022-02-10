@@ -67,69 +67,33 @@ else
                 }
 
                 <div class="  rounded shadow-sm  bg-opacity mb-3">
+                    <PeripheryMainInforTip Model="Model" IsSmallScreen="IsSmallScreen"/>
                     <div>
-
-                        @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
-                        {
-                            <img class="w-100" src="@Model.MainPicture" alt="@Model.Name">
-                        }
-                        <div class="mt-4 ms-3 me-3">
-                            <h1 class="fw-bold text-center h3">@Model.Name</h1>
-
-                            <p class="text-center" style="color: gray;margin-top:20px">
-                                <i class="fa fa-eye fa-fw "></i>
-                                <span class="article-infor-text">@(Model.ReaderCount + "次阅读")</span>&nbsp;&nbsp;&nbsp;
-                                @if (IsSmallScreen)
-                                {
-                                    <br />
-                                }
-                                else
-                                {
-                                    <span>&nbsp; &nbsp; &nbsp;</span>
-                                }
-                                <i class="fa fa-commenting-o fa-fw "></i>
-                                <span class="article-infor-text">@(Model.CommentCount + "条评论")&nbsp; &nbsp; &nbsp;</span>
-                                <i class="fa fa-shopping-basket fa-fw "></i>
-                                <span class="article-infor-text">@(Model.CollectedCount + "人拥有")&nbsp; &nbsp; &nbsp;</span>
-
-                            </p>
-                            <hr />
-                            <div class="markdown-body">
-                                @((MarkupString)Model.BriefIntroduction)
-                            </div>
-                            <div class="pb-4">
-                                <div>
-                                    <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Periphery" Id="Model.Id" />
-                                </div>
-
-                                <div class="mt-4">
-                                    <PeripheryOperationTip IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" OnArticleClick="OnArticleClick" CollectedCount="Model.CollectedCount" IsCollected="Model.IsCollected"
-                                                           IsFavorited="IsUserFavorited"></PeripheryOperationTip>
-
-                                </div>
-                            </div>
-
-                        </div>
+                        <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Periphery" Id="Model.Id" />
                     </div>
-
+                    <div class="mt-4 pb-4">
+                        <PeripheryOperationTip IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" OnArticleClick="OnArticleClick" CollectedCount="Model.CollectedCount" IsCollected="Model.IsCollected"
+                                               IsFavorited="IsUserFavorited"></PeripheryOperationTip>
+                    </div>
 
                 </div>
-                @if (IsLargeScreen == false)
-                {
-                    <div class="rounded shadow-sm bg-opacity mb-3">
-                        <PeripheryBasicInforTip Model="Model" OnRevoke="OnRevoke" />
-                    </div>
-                }
+                <div class="rounded shadow-sm bg-opacity mb-3">
+                    <PeripheryBasicInforTip Model="Model" OnRevoke="OnRevoke" />
+                </div>
+
                 @if (Model.Pictures.Count != 0 || Model.IsEdit)
                 {
                     <div class="mb-3">
                         <PeripheryImagesViewTip Model="Model.Pictures" EditState="Model.ImagesState" IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" />
                     </div>
                 }
+                @if (IsLargeScreen == false)
+                {
+                    <div class="">
+                        <PeripheryListOverviewsTip Model="Model.PeripheryOverviewModels" @ref="peripheryOverViewTip" />
+                    </div>
+                }
 
-                <div class="">
-                    <PeripheryListOverviewsTip Model="Model.PeripheryOverviewModels" @ref="peripheryOverViewTip" />
-                </div>
 
                 @if (Model.CanComment)
                 {
@@ -147,14 +111,13 @@ else
         @if (IsLargeScreen)
         {
             <div class="col-xl-6">
-                <div class="rounded shadow-sm bg-opacity mb-3">
-                    <PeripheryBasicInforTip Model="Model"  OnRevoke="OnRevoke" />
-                </div>
                 <div class="">
                     <PeripheryListRelevancesViewTip Entries="Model.Entries" Peripheries="Model.Peripheries" RelatedEntriesState="Model.RelatedEntriesState" RelatedPeripheriesState="Model.RelatedPeripheriesState"
                                                     IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" Type="Model.Type" />
                 </div>
-               
+                <div class="">
+                    <PeripheryListOverviewsTip Model="Model.PeripheryOverviewModels" @ref="peripheryOverViewTip" />
+                </div>
             </div>
         }
     </div>
@@ -542,6 +505,21 @@ else
         else if (index == 10)
         {
             NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        }
+        else if (index == 11)
+        {
+            var option = new DialogOption()
+            {
+                Title = "历史编辑记录"
+            };
+            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EditRecordListViewTip>(new Dictionary<string, object>
+            {
+                [nameof(EditRecordListViewTip.Id)] = Model.Id,
+                [nameof(EditRecordListViewTip.IsSmallScreen)] = IsSmallScreen,
+                [nameof(EditRecordListViewTip.Type)] = ExaminedNormalListModelType.Periphery,
+                [nameof(EditRecordListViewTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
+            }).Render();
+            await DialogService.Show(option);
         }
     }
 

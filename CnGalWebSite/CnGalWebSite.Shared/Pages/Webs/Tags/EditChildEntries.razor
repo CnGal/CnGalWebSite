@@ -132,7 +132,7 @@ else
             }
             else
             {
-                autoSave.Clean();
+                await autoSave.Clean();
 
                 await ToastService.Success("编辑标签子词条成功", "编辑标签子词条成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/tags/index/" + Model.Id, Model.Name, "fa fa-tag");

@@ -2,8 +2,8 @@
     <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 h-100">
         @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
         {
-            <div class="mb-2" style="display:flex;">
-                <div class="pt-3">
+            <div class="" style="display:flex;">
+                <div class="pt-3 pb-3">
                     <img  style=" width: 250px; " src="@Model.MainImage">
                 </div>
                 <div class="pt-3 ps-3" style=" width: 100%;">
@@ -38,18 +38,6 @@
                     }
                 </div>
             </div>
-
-            <p class="" style="color: gray;">
-                <i class="fa fa-calendar fa-fw"></i>
-                <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
-
-                <i class="fa fa-commenting-o fa-fw"></i>
-                <span class="article-home-infor-text">@(Model.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
-
-                <i class="fa fa-eye fa-fw"></i>
-                <span class="article-home-infor-text">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
-            </p>
-            <div style="height: 1px;"></div>
         }
         else
         {

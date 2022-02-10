@@ -792,14 +792,14 @@ namespace CnGalWebSite.APIServer.ExamineX
                 var htmlDiff = new HtmlDiff.HtmlDiff(mainpage_examine ?? "", mainpage ?? "");
                 model.EditOverview = htmlDiff.Build().Replace("\r\n", "<br>");
                 model.BeforeText = _appHelper.MarkdownToHtml(examine.Context);
-                model.AfterText = _appHelper.MarkdownToHtml(entry.MainPage);
+                model.AfterText = _appHelper.MarkdownToHtml(mainpage_examine);
             }
             else
             {
                 //序列化数据
                 var htmlDiff = new HtmlDiff.HtmlDiff(mainpage ?? "", mainpage_examine ?? "");
                 model.EditOverview = htmlDiff.Build().Replace("\r\n", "<br>");
-                model.BeforeText = _appHelper.MarkdownToHtml(entry.MainPage);
+                model.BeforeText = _appHelper.MarkdownToHtml(mainpage);
                 model.AfterText = _appHelper.MarkdownToHtml(examine.Context);
             }
             return true;
@@ -1144,9 +1144,9 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
-        private TagMain InitExamineViewTagMain(Tag tag)
+        private TagMain_1_0 InitExamineViewTagMain(Tag tag)
         {
-            var model = new TagMain
+            var model = new TagMain_1_0
             {
                 Name = tag.Name,
                 BriefIntroduction = tag.BriefIntroduction,
@@ -1177,28 +1177,17 @@ namespace CnGalWebSite.APIServer.ExamineX
             //序列化数据
             var entryMain = InitExamineViewTagMain(tag);
 
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+
             //判断是否是等待审核状态
             if (examine.IsPassed != null)
             {
-                var htmlDiff = new HtmlDiff.HtmlDiff(entryMain.Name ?? "", entryMainBefore.Name ?? "");
-                model.EditOverview = "<h5>唯一名称</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
-
-                htmlDiff = new HtmlDiff.HtmlDiff(entryMain.BriefIntroduction ?? "", entryMainBefore.BriefIntroduction ?? "");
-                model.EditOverview += "<h5>简介</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
-
-
                 model.BeforeModel = entryMain;
                 model.AfterModel = entryMainBefore;
             }
             else
             {
-                var htmlDiff = new HtmlDiff.HtmlDiff(entryMainBefore.Name ?? "", entryMain.Name ?? "");
-                model.EditOverview = "<h5>唯一名称</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
-
-                htmlDiff = new HtmlDiff.HtmlDiff(entryMainBefore.BriefIntroduction ?? "", entryMain.BriefIntroduction ?? "");
-                model.EditOverview += "<h5>简介</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
-
-
                 model.AfterModel = entryMain;
                 model.BeforeModel = entryMainBefore;
             }
@@ -1685,9 +1674,9 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         #region 周边
 
-        private PeripheryMain InitExamineViewPeripheryMain(Periphery periphery)
+        private PeripheryMain_1_0 InitExamineViewPeripheryMain(Periphery periphery)
         {
-            var model = new PeripheryMain
+            var model = new PeripheryMain_1_0
             {
                 Name = periphery.Name,
                 DisplayName = periphery.DisplayName,
@@ -1725,45 +1714,23 @@ namespace CnGalWebSite.APIServer.ExamineX
             var entryMainBefore = InitExamineViewPeripheryMain(periphery);
 
             //添加修改记录 
-            _peripheryService.UpdatePeripheryData(periphery, examine);
+            await _peripheryService.UpdatePeripheryDataAsync(periphery, examine);
 
             //序列化数据
             var entryMain = InitExamineViewPeripheryMain(periphery);
 
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+
+
             //判断是否是等待审核状态
             if (examine.IsPassed != null)
             {
-                var htmlDiff = new HtmlDiff.HtmlDiff(entryMain.Name ?? "", entryMainBefore.Name ?? "");
-                model.EditOverview = "<h5>唯一名称</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
-
-                htmlDiff = new HtmlDiff.HtmlDiff(entryMain.DisplayName ?? "", entryMainBefore.DisplayName ?? "");
-                model.EditOverview += "<h5>显示名称</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
-
-                htmlDiff = new HtmlDiff.HtmlDiff(entryMain.BriefIntroduction ?? "", entryMainBefore.BriefIntroduction ?? "");
-                model.EditOverview += "<h5>简介</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
-
-                htmlDiff = new HtmlDiff.HtmlDiff(entryMain.Material ?? "", entryMainBefore.Material ?? "");
-                model.EditOverview += "<h5>材质</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
-
-
                 model.BeforeModel = entryMain;
                 model.AfterModel = entryMainBefore;
             }
             else
             {
-                var htmlDiff = new HtmlDiff.HtmlDiff(entryMainBefore.Name ?? "", entryMain.Name ?? "");
-                model.EditOverview = "<h5>唯一名称</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
-
-                htmlDiff = new HtmlDiff.HtmlDiff(entryMainBefore.DisplayName ?? "", entryMain.DisplayName ?? "");
-                model.EditOverview += "<h5>显示名称</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
-
-                htmlDiff = new HtmlDiff.HtmlDiff(entryMainBefore.BriefIntroduction ?? "", entryMain.BriefIntroduction ?? "");
-                model.EditOverview += "<h5>简介</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
-
-                htmlDiff = new HtmlDiff.HtmlDiff(entryMainBefore.Material ?? "", entryMain.Material ?? "");
-                model.EditOverview += "<h5>材质</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
-
-
                 model.AfterModel = entryMain;
                 model.BeforeModel = entryMainBefore;
             }
@@ -1801,7 +1768,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             var pictures = InitExamineViewPeripheryImages(periphery);
 
             //添加修改记录 
-            _peripheryService.UpdatePeripheryData(periphery, examine);
+            await _peripheryService.UpdatePeripheryDataAsync(periphery, examine);
 
             var pictures_examine = InitExamineViewPeripheryImages(periphery);
 
@@ -1822,18 +1789,16 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
-        private async Task<List<RelevancesViewModel>> InitExamineViewPeripheryRelatedEntries(Periphery periphery)
+        private List<RelevancesViewModel> InitExamineViewPeripheryRelatedEntries(Periphery periphery)
         {
             var relevances = new List<RelevancesViewModel>();
-            var ids = periphery.Entries.Select(s => s.EntryId).ToList();
-            var entries = await _entryRepository.GetAll().Where(s => ids.Contains(s.Id))
-                .Select(s => new
+            var entries = periphery.RelatedEntries.Select(s => new
                 {
                     s.Id,
                     s.Name,
                     s.BriefIntroduction
                 })
-                .ToListAsync();
+                .ToList();
             foreach (var item in entries)
             {
                 var isAdd = false;
@@ -1878,7 +1843,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         public async Task<bool> GetEditPeripheryRelatedEntriesExamineView(Models.ExaminedViewModel model, Examine examine)
         {
             model.Type = "周边";
-            var periphery = await _peripheryRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
+            var periphery = await _peripheryRepository.GetAll().Include(s => s.RelatedEntries).FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
             if (periphery == null)
             {
                 return false;
@@ -1888,12 +1853,12 @@ namespace CnGalWebSite.APIServer.ExamineX
 
             //序列化相关性列表
             //先读取词条信息
-            var relevances = await InitExamineViewPeripheryRelatedEntries(periphery);
+            var relevances =  InitExamineViewPeripheryRelatedEntries(periphery);
 
             //添加修改记录 
-            _peripheryService.UpdatePeripheryData(periphery, examine);
+            await _peripheryService.UpdatePeripheryDataAsync(periphery, examine);
 
-            var relevances_examine = await InitExamineViewPeripheryRelatedEntries(periphery);
+            var relevances_examine =  InitExamineViewPeripheryRelatedEntries(periphery);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -1912,7 +1877,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
-        private static List<RelevancesViewModel> InitExamineViewPeripheryRelatedPeripheries(Periphery periphery)
+        private List<RelevancesViewModel> InitExamineViewPeripheryRelatedPeripheries(Periphery periphery)
         {
             var relevances = new List<RelevancesViewModel>();
             var peripheries = periphery.PeripheryRelationFromPeripheryNavigation.Select(s => s.ToPeripheryNavigation);
@@ -1941,7 +1906,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     //没有找到关键词 则新建关键词
                     var temp = new RelevancesViewModel
                     {
-                        Modifier = "词条",
+                        Modifier = "周边",
                         Informations = new List<RelevancesKeyValueModel>()
                     };
                     temp.Informations.Add(new RelevancesKeyValueModel
@@ -1973,7 +1938,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             var relevances = InitExamineViewPeripheryRelatedPeripheries(periphery);
 
             //添加修改记录 
-            _peripheryService.UpdatePeripheryData(periphery, examine);
+           await  _peripheryService.UpdatePeripheryDataAsync(periphery, examine);
 
             var relevances_examine = InitExamineViewPeripheryRelatedPeripheries(periphery);
 
@@ -2325,11 +2290,9 @@ namespace CnGalWebSite.APIServer.ExamineX
             await _tagService.UpdateTagDataOldAsync(tag, examine);
 
             await _tagRepository.UpdateAsync(tag);
-
-            _tagRepository.Clear();
         }
 
-        public async Task ExamineEditTagMainAsync(Tag tag, TagMain examine)
+        public async Task ExamineEditTagMainAsync(Tag tag, ExamineMain examine)
         {
             await _tagService.UpdateTagDataMainAsync(tag, examine);
 
@@ -2388,13 +2351,12 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         #region 周边
 
-        public async Task ExamineEditPeripheryMainAsync(Periphery periphery, PeripheryMain examine)
+        public async Task ExamineEditPeripheryMainAsync(Periphery periphery, ExamineMain examine)
         {
             //更新数据
             _peripheryService.UpdatePeripheryDataMain(periphery, examine);
             //保存
             await _peripheryRepository.UpdateAsync(periphery);
-            _peripheryRepository.Clear();
         }
 
         public async Task ExamineEditPeripheryImagesAsync(Periphery periphery, PeripheryImages examine)
@@ -2403,17 +2365,14 @@ namespace CnGalWebSite.APIServer.ExamineX
             _peripheryService.UpdatePeripheryDataImages(periphery, examine);
             //保存
             await _peripheryRepository.UpdateAsync(periphery);
-            _peripheryRepository.Clear();
         }
 
         public async Task ExamineEditPeripheryRelatedEntriesAsync(Periphery periphery, PeripheryRelatedEntries examine)
         {
             //更新数据
-            _peripheryService.UpdatePeripheryDataRelatedEntries(periphery, examine);
-            _peripheryRepository.Clear();
-            _entryRepository.Clear();
+            await _peripheryService.UpdatePeripheryDataRelatedEntries(periphery, examine);
             //保存
-            await _peripheryService.RealUpdateRelevances(periphery);
+            await _peripheryRepository.UpdateAsync(periphery);
 
         }
 
@@ -2988,7 +2947,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         #region 创建新模型数据
 
-        public async Task<Entry> AddNewEtryExaminesAsync(Entry model, ApplicationUser user, string note)
+        public async Task<Entry> AddNewEntryExaminesAsync(Entry model, ApplicationUser user, string note)
         {
             var examines = _entryService.ExaminesCompletion(new Entry(), model);
 
@@ -3120,209 +3079,120 @@ namespace CnGalWebSite.APIServer.ExamineX
             return article;
         }
 
-        public async Task<string> AddBatchPeeripheryExaminesAsync(ImportPeripheryModel model, ApplicationUser user, string note)
+        public async Task<Periphery> AddNewPeripheryExaminesAsync(Periphery model, ApplicationUser user, string note)
         {
-            //检查周边是否重名
-            if (await _peripheryRepository.GetAll().AnyAsync(s => s.Name == model.Name))
+            var examines = _peripheryService.ExaminesCompletion(new Periphery(), model);
+
+            if (examines.Any(s => s.Value == Operation.EditPeripheryMain) == false)
             {
-                return "该周边的名称与其他周边重复";
+                throw new Exception("无法获取主要信息审核记录，请联系管理员");
             }
-            //预处理 建立词条关联信息
-            //判断关联是否存在
-            var entryId = new List<int>();
-
-            var entryNames = new List<string>();
-            entryNames.AddRange(model.Entries.Where(s => string.IsNullOrWhiteSpace(s) == false));
-            //确保至少有一个关联词条
-            if (entryNames.Any() == false)
-            {
-                return "至少需要关联一个词条";
-            }
-
-            foreach (var item in entryNames)
-            {
-                var infor = await _entryRepository.GetAll().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
-                if (infor <= 0)
-                {
-                    return "词条 " + item + " 不存在";
-                }
-                else
-                {
-                    entryId.Add(infor);
-                }
-            }
-            //删除重复数据
-            entryId = entryId.Distinct().ToList();
-
-            //预处理 建立周边关联信息
-            //判断关联是否存在
-            var peripheryIds = new List<long>();
-
-            var peripheryNames = new List<string>();
-            peripheryNames.AddRange(model.Peripheries.Where(s => string.IsNullOrWhiteSpace(s) == false));
-
-
-            foreach (var item in peripheryNames)
-            {
-                var infor = await _peripheryRepository.GetAll().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
-                if (infor <= 0)
-                {
-                    return "周边 " + item + " 不存在";
-                }
-                else
-                {
-                    peripheryIds.Add(infor);
-                }
-            }
-            //删除重复数据
-            peripheryIds = peripheryIds.Distinct().ToList();
-
-            //第一步 处理主要信息
-
-            //新建审核数据对象
-            var peripheryMain = new PeripheryMain
-            {
-                Name = model.Name,
-                BriefIntroduction = model.BriefIntroduction,
-                MainPicture = model.MainPicture,
-                BackgroundPicture = model.BackgroundPicture,
-                SmallBackgroundPicture = model.SmallBackgroundPicture,
-                Thumbnail = model.Thumbnail,
-                Author = model.Author,
-                Material = model.Material,
-                Brand = model.Brand,
-                IndividualParts = model.IndividualParts,
-                IsAvailableItem = model.IsAvailableItem,
-                PageCount = model.PageCount,
-                Price = model.Price,
-                IsReprint = model.IsReprint,
-                Size = model.Size,
-                SongCount = model.SongCount,
-                Type = model.Type,
-                Category = model.Category,
-                SaleLink = model.SaleLink,
-                DisplayName = model.DisplayName,
-            };
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, peripheryMain);
-                resulte = text.ToString();
-            }
-            //将空文章添加到数据库中 目的是为了获取索引
             var periphery = new Periphery();
 
             periphery = await _peripheryRepository.InsertAsync(periphery);
 
-            await ExamineEditPeripheryMainAsync(periphery, peripheryMain);
-            await UniversalCreatePeripheryExaminedAsync(periphery, user, true, resulte, Operation.EditPeripheryMain, note);
-
-
-            //第二步 建立词条图片
-
-            //创建审核数据模型
-            periphery.Pictures = new List<EntryPicture>();
-
-            var peripheryImages = new PeripheryImages
+            examines = examines.OrderBy(s => s.Value).ToList();
+            foreach (var item in examines)
             {
-                Images = new List<EntryImage>()
-            };
-            if (model.Pictures != null)
-            {
-                foreach (var item in model.Pictures)
-                {
-                    if (item != "app.png")
+
+                var resulte = "";
+                    using (TextWriter text = new StringWriter())
                     {
-                        //复制到审核的列表中
-                        peripheryImages.Images.Add(new EntryImage
-                        {
-                            Url = item,
-                            IsDelete = false
-                        });
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, item.Key);
+                        resulte = text.ToString();
                     }
-                }
-            }
+                
 
-            //判断审核是否为空
-            if (peripheryImages.Images.Count != 0)
-            {
-                //序列化JSON
-                resulte = "";
-                using (TextWriter text = new StringWriter())
+                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                 {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(text, peripheryImages);
-                    resulte = text.ToString();
-                }
-
-                await ExamineEditPeripheryImagesAsync(periphery, peripheryImages);
-                await UniversalEditPeripheryExaminedAsync(periphery, user, true, resulte, Operation.EditPeripheryImages, note);
-            }
-
-            //第五步 建立周边关联周边信息
-            //判断审核是否为空
-            if (model.Peripheries.Count != 0)
-            {   //创建审核数据模型
-                var peripheryRelatedPeripheries = new PeripheryRelatedPeripheries();
-
-                foreach (var item in peripheryIds)
-                {
-                    peripheryRelatedPeripheries.Relevances.Add(new PeripheryRelatedPeripheriesAloneModel
+                    switch (item.Value)
                     {
-                        IsDelete = false,
-                        PeripheryId = item
+                        case Operation.EditPeripheryMain:
+                            await ExamineEditPeripheryMainAsync(periphery, item.Key as ExamineMain);
+                            break;
+                        case Operation.EditPeripheryImages:
+                            await ExamineEditPeripheryImagesAsync(periphery, item.Key as PeripheryImages);
+                            break;
+                        case Operation.EditPeripheryRelatedEntries:
+                            await ExamineEditPeripheryRelatedEntriesAsync(periphery, item.Key as PeripheryRelatedEntries);
+                            break;
+                        case Operation.EditPeripheryRelatedPeripheries:
+                            await ExamineEditPeripheryRelatedPeripheriesAsync(periphery, item.Key as PeripheryRelatedPeripheries);
+                            break;
 
-                    });
+                        default:
+                            throw new Exception("不支持的类型");
+                    }
+
+                    await UniversalCreatePeripheryExaminedAsync(periphery, user, true, resulte, item.Value, note);
+                    await _appHelper.AddUserContributionValueAsync(user.Id, periphery.Id, item.Value);
                 }
-                //序列化JSON
-                resulte = "";
-                using (TextWriter text = new StringWriter())
+                else
                 {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(text, peripheryRelatedPeripheries);
-                    resulte = text.ToString();
+                    await UniversalCreatePeripheryExaminedAsync(periphery, user, false, resulte, item.Value, note);
                 }
-                await ExamineEditPeripheryRelatedPeripheriesAsync(periphery, peripheryRelatedPeripheries);
-                await UniversalEditPeripheryExaminedAsync(periphery, user, true, resulte, Operation.EditPeripheryRelatedPeripheries, note);
-
             }
 
-            //第四步 建立周边关联词条信息
-            //判断审核是否为空
-            if (entryId.Count != 0)
-            {
-                //创建审核数据模型
-                var examinedModel = new PeripheryRelatedEntries();
-
-                foreach (var item in entryId)
-                {
-                    examinedModel.Relevances.Add(new PeripheryRelatedEntryAloneModel
-                    {
-                        IsDelete = false,
-                        EntryId = item
-
-                    });
-                }
-                periphery.Entries = new List<PeripheryRelevanceEntry>();
-                //序列化JSON
-                resulte = "";
-                using (TextWriter text = new StringWriter())
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(text, examinedModel);
-                    resulte = text.ToString();
-                }
-                //判断是否是管理员
-                await ExamineEditPeripheryRelatedEntriesAsync(periphery, examinedModel);
-                await UniversalEditPeripheryExaminedAsync(periphery, user, true, resulte, Operation.EditPeripheryRelatedEntries, note);
-            }
-
-
-
-            return null;
+            return periphery;
         }
+
+        public async Task<Tag> AddNewTagExaminesAsync(Tag model, ApplicationUser user, string note)
+        {
+            var examines = _tagService.ExaminesCompletion(new Tag(), model);
+
+            if (examines.Any(s => s.Value == Operation.EditPeripheryMain) == false)
+            {
+                throw new Exception("无法获取主要信息审核记录，请联系管理员");
+            }
+            var tag = new Tag();
+
+            tag = await _tagRepository.InsertAsync(tag);
+
+            examines = examines.OrderBy(s => s.Value).ToList();
+            foreach (var item in examines)
+            {
+
+                var resulte = "";
+                using (TextWriter text = new StringWriter())
+                {
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(text, item.Key);
+                    resulte = text.ToString();
+                }
+
+
+                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
+                {
+                    switch (item.Value)
+                    {
+                        case Operation.EditTagMain:
+                            await ExamineEditTagMainAsync(tag, item.Key as ExamineMain);
+                            break;
+                        case Operation.EditTagChildEntries:
+                            await ExamineEditTagChildEntriesAsync(tag, item.Key as TagChildEntries);
+                            break;
+                        case Operation.EditTagChildTags:
+                            await ExamineEditTagChildTagsAsync(tag, item.Key as TagChildTags);
+                            break;
+
+                        default:
+                            throw new Exception("不支持的类型");
+                    }
+
+                    await UniversalCreateTagExaminedAsync(tag, user, true, resulte, item.Value, note);
+                    await _appHelper.AddUserContributionValueAsync(user.Id, tag.Id, item.Value);
+                }
+                else
+                {
+                    await UniversalCreateTagExaminedAsync(tag, user, false, resulte, item.Value, note);
+                }
+            }
+
+            return tag;
+        }
+
+
         #endregion
 
         #region 获取用户待审核记录
@@ -3376,6 +3246,209 @@ namespace CnGalWebSite.APIServer.ExamineX
             await ReplaceEditEntryRelevancesExamineContext();
         }
 
+        /// <summary>
+        /// 迁移标签审核数据 主要信息部分
+        /// </summary>
+        /// <returns></returns>
+        public async Task ReplaceEditTagMainExamineContext()
+        {
+            TagMain_1_0 oldExamineModel = null;
+            ExamineMain newExamineModel = null;
+            //获取要替换的所有审核记录ID
+            var ids = await _examineRepository.GetAll().AsNoTracking().Where(s => s.Operation == Operation.EditTagMain && s.Version == ExamineVersion.V1_0).Select(s => s.Id).ToListAsync();
+
+            //遍历列表 依次替换
+            foreach (var id in ids)
+            {
+                var examine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == id);
+                if (examine != null)
+                {
+                    var newTag = new Tag();
+
+                    //获取该词条之前的每次编辑主页的审核
+                    var beforeexamine = await _examineRepository.GetAll()
+                        .Where(s => s.IsPassed == true && s.Id < examine.Id && s.TagId == examine.TagId && s.Operation == Operation.EditTagMain).ToListAsync();
+                    //若没有则与新模型对比
+                    if (beforeexamine.Count == 0)
+                    {
+                        using (TextReader str = new StringReader(examine.Context))
+                        {
+                            var serializer = new JsonSerializer();
+                            oldExamineModel = (TagMain_1_0)serializer.Deserialize(str, typeof(TagMain_1_0));
+                        }
+                        await _tagService.UpdateTagDataMainAsync(newTag, oldExamineModel);
+                        newExamineModel = new ExamineMain
+                        {
+                            Items = ToolHelper.GetEditingRecordFromContrastData(new Tag(), newTag)
+                        };
+                    }
+                    else
+                    {
+                        //将之前的审核记录叠加进新模型后对比
+                        var currentTag = new Tag();
+                        foreach (var item in beforeexamine)
+                        {
+                            using (TextReader str = new StringReader(item.Context))
+                            {
+                                var serializer = new JsonSerializer();
+                                oldExamineModel = (TagMain_1_0)serializer.Deserialize(str, typeof(TagMain_1_0));
+                            }
+                            await _tagService.UpdateTagDataMainAsync(currentTag, oldExamineModel);
+                        }
+
+                        using (TextReader str = new StringReader(examine.Context))
+                        {
+                            var serializer = new JsonSerializer();
+                            oldExamineModel = (TagMain_1_0)serializer.Deserialize(str, typeof(TagMain_1_0));
+                        }
+                        await _tagService.UpdateTagDataMainAsync(newTag, oldExamineModel);
+
+                        newExamineModel = new ExamineMain
+                        {
+                            Items = ToolHelper.GetEditingRecordFromContrastData(new Tag(), newTag)
+                        };
+                    }
+
+                    //序列化新数据模型
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, newExamineModel);
+                        resulte = text.ToString();
+                    }
+
+                    //保存
+                    if (newExamineModel.Items.Count == 0)
+                    {
+                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移词条主要信息编辑记录";
+                    }
+                    examine.Version = ExamineVersion.V1_1;
+                    examine.Context = resulte;
+                    await _examineRepository.UpdateAsync(examine);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 迁移周边审核数据 主要信息部分
+        /// </summary>
+        /// <returns></returns>
+        public async Task ReplaceEditPeripheryMainExamineContext()
+        {
+            PeripheryMain_1_0 oldExamineModel = null;
+            ExamineMain newExamineModel = null;
+            //获取要替换的所有审核记录ID
+            var ids = await _examineRepository.GetAll().AsNoTracking().Where(s => s.Operation == Operation.EditPeripheryMain && s.Version == ExamineVersion.V1_0).Select(s => s.Id).ToListAsync();
+
+            //遍历列表 依次替换
+            foreach (var id in ids)
+            {
+                var examine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == id);
+                if (examine != null)
+                {
+                    var newPeriphery = new Periphery();
+
+                    //获取该词条之前的每次编辑主页的审核
+                    var beforeexamine = await _examineRepository.GetAll()
+                        .Where(s => s.IsPassed == true && s.Id < examine.Id && s.PeripheryId == examine.PeripheryId && s.Operation == Operation.EditPeripheryMain).ToListAsync();
+                    //若没有则与新模型对比
+                    if (beforeexamine.Count == 0)
+                    {
+                        using (TextReader str = new StringReader(examine.Context))
+                        {
+                            var serializer = new JsonSerializer();
+                            oldExamineModel = (PeripheryMain_1_0)serializer.Deserialize(str, typeof(PeripheryMain_1_0));
+                        }
+                        _peripheryService.UpdatePeripheryDataMain(newPeriphery, oldExamineModel);
+                        newExamineModel = new ExamineMain
+                        {
+                            Items = ToolHelper.GetEditingRecordFromContrastData(new Periphery(), newPeriphery)
+                        };
+                    }
+                    else
+                    {
+                        //将之前的审核记录叠加进新模型后对比
+                        var currentPeriphery = new Periphery();
+                        foreach (var item in beforeexamine)
+                        {
+                            using (TextReader str = new StringReader(item.Context))
+                            {
+                                var serializer = new JsonSerializer();
+                                oldExamineModel = (PeripheryMain_1_0)serializer.Deserialize(str, typeof(PeripheryMain_1_0));
+                            }
+                            _peripheryService.UpdatePeripheryDataMain(currentPeriphery, oldExamineModel);
+                        }
+
+                        using (TextReader str = new StringReader(examine.Context))
+                        {
+                            var serializer = new JsonSerializer();
+                            oldExamineModel = (PeripheryMain_1_0)serializer.Deserialize(str, typeof(PeripheryMain_1_0));
+                        }
+                        _peripheryService.UpdatePeripheryDataMain(newPeriphery, oldExamineModel);
+
+                        newExamineModel = new ExamineMain
+                        {
+                            Items = ToolHelper.GetEditingRecordFromContrastData(new Periphery(), newPeriphery)
+                        };
+                    }
+
+                    //序列化新数据模型
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, newExamineModel);
+                        resulte = text.ToString();
+                    }
+
+                    //保存
+                    if (newExamineModel.Items.Count == 0)
+                    {
+                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移词条主要信息编辑记录";
+                    }
+                    examine.Version = ExamineVersion.V1_1;
+                    examine.Context = resulte;
+                    await _examineRepository.UpdateAsync(examine);
+                }
+            }
+        }
+        /// <summary>
+        /// 迁移周边关联词条数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task ReplacePeripheryRelatedEntries()
+        {
+            var peripheries = await _peripheryRepository.GetAll()
+                 .Include(s => s.Entries).ThenInclude(s => s.Entry)
+                 .Where(s => s.Entries.Any())
+                 .ToListAsync();
+
+            foreach (var item in peripheries)
+            {
+                item.RelatedEntries = item.Entries.Select(s => s.Entry).ToList();
+                item.Entries.Clear();
+                await _peripheryRepository.UpdateAsync(item);
+            }
+        }
+        /// <summary>
+        /// 迁移词条关联周边数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task ReplaceEntryRelatedPeripheries()
+        {
+            var entries = await _entryRepository.GetAll()
+                 .Include(s => s.Peripheries).ThenInclude(s => s.Periphery)
+                 .Where(s => s.Peripheries.Any())
+                 .ToListAsync();
+
+            foreach (var item in entries)
+            {
+                item.RelatedPeripheries = item.Peripheries.Select(s => s.Periphery).ToList();
+                item.Peripheries.Clear();
+                await _entryRepository.UpdateAsync(item);
+            }
+        }
         /// <summary>
         /// 迁移文章审核数据 主要信息部分
         /// </summary>
@@ -3918,7 +3991,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         public async Task ExaminesCompletion()
         {
             //补全词条
-            var entryIds = await _entryRepository.GetAll().Where(s=>string.IsNullOrWhiteSpace(s.Name)==false).Select(s => s.Id).ToListAsync();
+            var entryIds = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
             foreach (var entryId in entryIds)
             {
                 var entry = await _entryRepository.GetAll().AsNoTracking()
@@ -3932,6 +4005,52 @@ namespace CnGalWebSite.APIServer.ExamineX
                 var examineModel = await GenerateModelFromExamines(entry);
                 //应用审核记录
                 await ExaminesCompletionEntry(entry, examineModel as Entry);
+
+            }
+            //补全文章
+            var articleIds = await _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
+            foreach (var articleId in articleIds)
+            {
+                var article = await _articleRepository.GetAll().AsNoTracking()
+                 .Include(s => s.Outlinks)
+                 .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
+                 .Include(s => s.Entries)
+                 .FirstOrDefaultAsync(s => s.Id == articleId);
+                //获取通过审核记录叠加的旧模型
+                var examineModel = await GenerateModelFromExamines(article);
+                //应用审核记录
+                await ExaminesCompletionArticle(article, examineModel as Article);
+
+            }
+            //补全标签
+            var tagIds = await _tagRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
+            foreach (var tagId in tagIds)
+            {
+                var tag = await _tagRepository.GetAll().AsNoTracking()
+                 .Include(s => s.Entries)
+                 .Include(s => s.ParentCodeNavigation)
+                 .Include(s => s.InverseParentCodeNavigation)
+                 .FirstOrDefaultAsync(s => s.Id == tagId);
+                //获取通过审核记录叠加的旧模型
+                var examineModel = await GenerateModelFromExamines(tag);
+                //应用审核记录
+                await ExaminesCompletionTag(tag, examineModel as Tag);
+
+            }
+
+            //补全周边
+            var peripheryIds = await _peripheryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
+            foreach (var peripheryId in peripheryIds)
+            {
+                var periphery = await _peripheryRepository.GetAll().AsNoTracking()
+                 .Include(s => s.RelatedEntries)
+                 .Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s=>s.ToPeripheryNavigation)
+                 .Include(s => s.Pictures)
+                 .FirstOrDefaultAsync(s => s.Id == peripheryId);
+                //获取通过审核记录叠加的旧模型
+                var examineModel = await GenerateModelFromExamines(periphery);
+                //应用审核记录
+                await ExaminesCompletionTag(periphery, examineModel as Periphery);
 
             }
         }
@@ -3968,31 +4087,90 @@ namespace CnGalWebSite.APIServer.ExamineX
             }
         }
 
-        public async Task<object> GenerateModelFromExamines(long examineId)
+        private async Task ExaminesCompletionArticle(Article newArticle, Article currentArticle)
         {
-            var examine = await _examineRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examineId);
-            if(examine==null)
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+
+            //将当前模型和新模型对比 获取差异审核 并补全
+            var examines = _articleService.ExaminesCompletion(currentArticle, newArticle);
+            if (examines.Count == 0)
             {
-                throw new Exception("该审核记录不存在");
+                return;
             }
-            if (examine.EntryId!=0)
+            var article = await _articleRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == newArticle.Id);
+            foreach (var item in examines)
             {
-                var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.EntryId == examine.EntryId&&s.IsPassed==true).OrderBy(s => s.Id).ToListAsync();
-                if (exammines.Any())
+                var resulte = "";
+                if (item.Value == Operation.EditArticleMainPage)
                 {
-                    return await GenerateModelFromExamines(exammines);
+                    resulte = item.Key as string;
                 }
                 else
                 {
-                    throw new Exception("未找到该词条");
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, item.Key);
+                        resulte = text.ToString();
+                    }
                 }
 
-            }
-            else
-            {
-                throw new Exception("不支持的类型");
+                await UniversalEditArticleExaminedAsync(article, admin, true, resulte, item.Value, "补全审核记录");
             }
         }
+
+        private async Task ExaminesCompletionTag(Tag newTag, Tag currentTag)
+        {
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+
+            //将当前模型和新模型对比 获取差异审核 并补全
+            var examines = _tagService.ExaminesCompletion(currentTag, newTag);
+            if (examines.Count == 0)
+            {
+                return;
+            }
+            var tag = await _tagRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == newTag.Id);
+            foreach (var item in examines)
+            {
+                var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, item.Key);
+                        resulte = text.ToString();
+                    }
+                
+
+                await UniversalEditTagExaminedAsync(tag, admin, true, resulte, item.Value, "补全审核记录");
+            }
+        }
+
+        private async Task ExaminesCompletionTag(Periphery newPeriphery, Periphery currentPeriphery)
+        {
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+
+            //将当前模型和新模型对比 获取差异审核 并补全
+            var examines = _peripheryService.ExaminesCompletion(currentPeriphery, newPeriphery);
+            if (examines.Count == 0)
+            {
+                return;
+            }
+            var periphery = await _peripheryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == newPeriphery.Id);
+            foreach (var item in examines)
+            {
+                var resulte = "";
+                using (TextWriter text = new StringWriter())
+                {
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(text, item.Key);
+                    resulte = text.ToString();
+                }
+
+
+                await UniversalEditPeripheryExaminedAsync(periphery, admin, true, resulte, item.Value, "补全审核记录");
+            }
+        }
+
 
         public async Task<object> GenerateModelFromExamines(object model)
         {
@@ -4010,6 +4188,51 @@ namespace CnGalWebSite.APIServer.ExamineX
                 }
 
             }
+            else if (model is Article)
+            {
+                var article = model as Article;
+                var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.ArticleId == article.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
+                if (exammines.Any())
+                {
+                    return await GenerateModelFromExamines(exammines);
+                }
+                else
+                {
+                    throw new Exception("未找到该文章");
+                }
+
+            }
+            else if (model is Tag)
+            {
+                var tag = model as Tag;
+                var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.TagId == tag.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
+                if (exammines.Any())
+                {
+                    return await GenerateModelFromExamines(exammines);
+                }
+                else
+                {
+                    return new Tag
+                    {
+                        Id= tag.Id
+                    };
+                }
+
+            }
+            else if (model is Periphery)
+            {
+                var periphery = model as Periphery;
+                var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.PeripheryId == periphery.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
+                if (exammines.Any())
+                {
+                    return await GenerateModelFromExamines(exammines);
+                }
+                else
+                {
+                    throw new Exception("未找到该周边");
+                }
+
+            }
             else
             {
                 throw new Exception("不支持的类型");
@@ -4018,7 +4241,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         public async Task<object> GenerateModelFromExamines(List<Examine> examines)
         {
-            if (examines.FirstOrDefault().EntryId != 0)
+            if (examines.FirstOrDefault().EntryId != null)
             {
                 var entry = new Entry();
                 foreach (var item in examines)
@@ -4026,6 +4249,33 @@ namespace CnGalWebSite.APIServer.ExamineX
                     await _entryService.UpdateEntryDataAsync(entry, item);
                 }
                 return entry;
+            }
+            else if (examines.FirstOrDefault().ArticleId != null)
+            {
+                var article = new Article();
+                foreach (var item in examines)
+                {
+                    await _articleService.UpdateArticleData(article, item);
+                }
+                return article;
+            }
+            else if (examines.FirstOrDefault().TagId != null)
+            {
+                var tag = new Tag();
+                foreach (var item in examines)
+                {
+                    await _tagService.UpdateTagDataAsync(tag, item);
+                }
+                return tag;
+            }
+            else if (examines.FirstOrDefault().PeripheryId != null)
+            {
+                var periphery = new Periphery();
+                foreach (var item in examines)
+                {
+                    await _peripheryService.UpdatePeripheryDataAsync(periphery, item);
+                }
+                return periphery;
             }
             else
             {

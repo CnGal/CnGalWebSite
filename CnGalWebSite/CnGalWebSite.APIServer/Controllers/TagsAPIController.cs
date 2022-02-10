@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Entries;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Tags;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
@@ -7,6 +8,7 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -33,10 +35,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IAppHelper _appHelper;
         private readonly ITagService _tagService;
+        private readonly IEntryService _entryService;
         private readonly IExamineService _examineService;
 
         public TagsAPIController(UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<Tag, int> tagRepository, ITagService tagService,
-            IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<Examine, long> examineRepository)
+            IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<Examine, long> examineRepository, IEntryService entryService)
         {
             _userManager = userManager;
             _tagRepository = tagRepository;
@@ -45,6 +48,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _entryRepository = entryRepository;
             _examineService = examineService;
             _examineRepository = examineRepository;
+            _entryService = entryService;
         }
 
 
@@ -88,163 +92,67 @@ namespace CnGalWebSite.APIServer.Controllers
                 var tagNames = new List<string>();
                 tagNames.AddRange(model.Tags.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
 
-                foreach (var item in tagNames)
+                try
                 {
-                    var infor = await _tagRepository.GetAll().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
-                    if (infor <= 0)
-                    {
-                        return new Result { Successful = false, Error = "标签 " + item + " 不存在" };
-                    }
-                    else
-                    {
-                        tagIds.Add(infor);
-                    }
+                    tagIds = await _tagService.GetTagIdsFromNames(tagNames);
                 }
-                //删除重复数据
-                tagIds = tagIds.Distinct().ToList();
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
+                }
+                //获取标签
+                var tags = await _tagRepository.GetAll().Where(s => tagIds.Contains(s.Id)).ToListAsync();
 
-
-                //预处理 建立子词条关联信息
                 //判断关联是否存在
                 var entryIds = new List<int>();
 
                 var entryNames = new List<string>();
                 entryNames.AddRange(model.Entries.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-
-                foreach (var item in entryNames)
+                try
                 {
-                    var infor = await _entryRepository.GetAll().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
-                    if (infor <= 0)
-                    {
-                        return new Result { Successful = false, Error = "词条 " + item + " 不存在" };
-                    }
-                    else
-                    {
-                        entryIds.Add(infor);
-                    }
+                    entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
                 }
-                //删除重复数据
-                entryIds = entryIds.Distinct().ToList();
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
+                }
+                //获取词条
+                var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
 
+
+                var newTag = new Tag();
                 //第一步 处理主要信息
 
-                //新建审核数据对象
-                var tagMain = new TagMain
-                {
-                    Name = model.Name,
-                    BriefIntroduction = model.BriefIntroduction,
-                    MainPicture = model.MainPicture,
-                    BackgroundPicture = model.BackgroundPicture,
-                    SmallBackgroundPicture = model.SmallBackgroundPicture,
-                    Thumbnail = model.Thumbnail,
-                    ParentTagId = parentTag?.Id ?? 0
-                };
-                //序列化
-                var resulte = "";
-                using (TextWriter text = new StringWriter())
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(text, tagMain);
-                    resulte = text.ToString();
-                }
-                //将空标签添加到数据库中 目的是为了获取索引
-                var tag = new Tag();
 
-                tag = await _tagRepository.InsertAsync(tag);
-                //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                {
-                    await _examineService.ExamineEditTagMainAsync(tag, tagMain);
-                    await _examineService.UniversalCreateTagExaminedAsync(tag, user, true, resulte, Operation.EditTagMain, model.Note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, tag.Id, Operation.EditTagMain);
-                }
-                else
-                {
-                    await _examineService.UniversalCreateTagExaminedAsync(tag, user, false, resulte, Operation.EditTagMain, model.Note);
-                }
+                newTag.ParentCodeNavigation = parentTag;
+
+                newTag.Name = model.Name;
+                newTag.BriefIntroduction = model.BriefIntroduction;
+                newTag.MainPicture = model.MainPicture;
+                newTag.BackgroundPicture = model.BackgroundPicture;
+                newTag.SmallBackgroundPicture = model.SmallBackgroundPicture;
+                newTag.Thumbnail = model.Thumbnail;
 
                 //第二步 处理子标签
-                //创建审核数据模型
-                var examinedModel = new TagChildTags();
 
-
-                //添加新建项目
-                foreach (var item in tagIds)
-                {
-                    examinedModel.ChildTags.Add(new TagChildTagAloneModel
-                    {
-                        TagId = item,
-                        IsDelete = false
-                    });
-
-                }
-
-                //判断审核是否为空
-                if (examinedModel.ChildTags.Count != 0)
-                {
-
-                    //序列化JSON
-                    resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, examinedModel);
-                        resulte = text.ToString();
-                    }
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEditTagChildTagsAsync(tag, examinedModel);
-                        await _examineService.UniversalCreateTagExaminedAsync(tag, user, true, resulte, Operation.EditTagChildTags, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, tag.Id, Operation.EditTagChildTags);
-                    }
-                    else
-                    {
-                        await _examineService.UniversalCreateTagExaminedAsync(tag, user, false, resulte, Operation.EditTagChildTags, model.Note);
-                    }
-                }
-
+                newTag.InverseParentCodeNavigation = tags;
 
                 //第三步 处理子词条 
-                //创建审核数据模型
-                var tagChildEntries = new TagChildEntries();
+
+                newTag.Entries = entries;
 
 
-                //添加新建项目
-                foreach (var item in entryIds)
+                var tag = new Tag();
+                //获取审核记录
+                try
                 {
-                    tagChildEntries.ChildEntries.Add(new TagChildEntryAloneModel
-                    {
-                        EntryId = item,
-                        IsDelete = false
-                    });
+                    tag = await _examineService.AddNewTagExaminesAsync(newTag, user, model.Note);
+                }
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
 
                 }
-
-                //判断审核是否为空
-                if (tagChildEntries.ChildEntries.Count != 0)
-                {
-                    resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, tagChildEntries);
-                        resulte = text.ToString();
-                    }
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEditTagChildEntriesAsync(tag, tagChildEntries);
-                        await _examineService.UniversalCreateTagExaminedAsync(tag, user, true, resulte, Operation.EditTagChildEntries, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, tag.Id, Operation.EditTagChildEntries);
-                    }
-                    else
-                    {
-                        await _examineService.UniversalCreateTagExaminedAsync(tag, user, false, resulte, Operation.EditTagChildEntries, model.Note);
-                    }
-                }
-
-                //序列化JSON
 
 
                 return new Result { Successful = true, Error = tag.Id.ToString() };
@@ -288,6 +196,16 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return NotFound();
             }
+            //判断当前是否隐藏
+            if (tag.IsHidden == true)
+            {
+                if (user == null || await _userManager.IsInRoleAsync(user, "Admin") != true)
+                {
+                    return NotFound();
+                }
+             
+            }
+          
             //读取审核信息
             List<Examine> examineQuery = null;
             if (user != null)
@@ -310,34 +228,21 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     await _tagService.UpdateTagDataAsync(tag, examine);
                 }
-            }
-            var model = new TagIndexViewModel
-            {
-                Id = tag.Id,
-                Name = tag.Name,
-                BriefIntroduction = tag.BriefIntroduction,
-                MainPicture = _appHelper.GetImagePath(tag.MainPicture, "app.png"),
-                BackgroundPicture = _appHelper.GetImagePath(tag.BackgroundPicture, ""),
-                SmallBackgroundPicture = _appHelper.GetImagePath(tag.SmallBackgroundPicture, ""),
-                Thumbnail = _appHelper.GetImagePath(tag.Thumbnail, ""),
-                ReaderCount = tag.ReaderCount,
-                ParentTag = tag.ParentCodeNavigation == null ? null : _appHelper.GetTagInforTipViewModel(tag.ParentCodeNavigation),
-                Taglevels = await _tagService.GetTagLevelListAsync(tag)
-            };
-
-            //判断当前是否隐藏
-            if (tag.IsHidden == true)
-            {
-                if (user == null || await _userManager.IsInRoleAsync(user, "Admin") != true)
+                examine = await _examineService.GetUserTagActiveExamineAsync(tag.Id, user.Id, Operation.EditTagChildTags);
+                if (examine != null)
                 {
-                    return NotFound();
+                    await _tagService.UpdateTagDataAsync(tag, examine);
                 }
-                model.IsHidden = true;
+                examine = await _examineService.GetUserTagActiveExamineAsync(tag.Id, user.Id, Operation.EditTagChildEntries);
+                if (examine != null)
+                {
+                    await _tagService.UpdateTagDataAsync(tag, examine);
+                }
             }
-            else
-            {
-                model.IsHidden = false;
-            }
+
+            var model =await _tagService.GetTagViewModel(tag);
+
+           
             if (user != null)
             {
                 var examine = examineQuery.Find(s => s.Operation == Operation.EditTagMain);
@@ -345,41 +250,17 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     model.MainState = EditState.Preview;
                 }
-            }
-
-            //序列化标签子标签
-            //获取用户审核记录
-            if (user != null)
-            {
-                var examine = await _examineService.GetUserTagActiveExamineAsync(tag.Id, user.Id, Operation.EditTagChildTags);
+                examine = await _examineService.GetUserTagActiveExamineAsync(tag.Id, user.Id, Operation.EditTagChildTags);
                 if (examine != null)
                 {
                     model.ChildTagsState = EditState.Preview;
-                    await _tagService.UpdateTagDataAsync(tag, examine);
                 }
-            }
-            foreach (var item in tag.InverseParentCodeNavigation)
-            {
-                model.ChildrenTags.Add(_appHelper.GetTagInforTipViewModel(item));
-            }
-
-            //序列化标签子词条
-            //获取用户审核记录
-            if (user != null)
-            {
-                var examine = await _examineService.GetUserTagActiveExamineAsync(tag.Id, user.Id, Operation.EditTagChildEntries);
+                examine = await _examineService.GetUserTagActiveExamineAsync(tag.Id, user.Id, Operation.EditTagChildEntries);
                 if (examine != null)
                 {
                     model.ChildEntriesState = EditState.Preview;
-                    await _tagService.UpdateTagDataAsync(tag, examine);
                 }
             }
-            foreach (var item in tag.Entries.Where(s=>s.IsHidden==false))
-            {
-                model.ChildrenEntries.Add(await _appHelper.GetEntryInforTipViewModel(item));
-            }
-
-
 
             var examiningList = new List<Operation>();
             if (user != null)
@@ -549,15 +430,9 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
 
-            //查找当前周边
-            var tag = await _tagRepository.GetAll().Include(s => s.ParentCodeNavigation).FirstOrDefaultAsync(s => s.Id == model.Id);
-            if (tag == null)
-            {
-                return new Result { Error = $"无法找到ID为{tag.Id}的标签", Successful = false };
-            }
             //判断父标签是否存在
             Tag parentTag = null;
-            if (tag.Name != "游戏" && tag.Name != "角色" && tag.Name != "制作组" && tag.Name != "STAFF")
+            if (model.Name != "游戏" && model.Name != "角色" && model.Name != "制作组" && model.Name != "STAFF")
             {
                 if (string.IsNullOrWhiteSpace(model.ParentTagName))
                 {
@@ -573,43 +448,51 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
             }
 
-            //判断是否被修改
-            if (model.SmallBackgroundPicture != tag.SmallBackgroundPicture || model.Name != tag.Name || model.BriefIntroduction != tag.BriefIntroduction
-                || model.MainPicture != tag.MainPicture || model.Thumbnail != tag.Thumbnail || model.BackgroundPicture != tag.BackgroundPicture
-                 || tag.ParentCodeNavigation?.Name != parentTag?.Name)
+            //查找当前标签
+            var currentTag = await _tagRepository.GetAll().Include(s => s.ParentCodeNavigation).FirstOrDefaultAsync(s => s.Id == model.Id);
+            var newTag = await _tagRepository.GetAll().AsNoTracking().Include(s => s.ParentCodeNavigation).FirstOrDefaultAsync(s => s.Id == model.Id);
+            if (currentTag == null)
             {
-                //添加修改记录
-                //新建审核数据对象
-                var tagMain = new TagMain
-                {
-                    Name = model.Name,
-                    BriefIntroduction = model.BriefIntroduction,
-                    MainPicture = model.MainPicture,
-                    BackgroundPicture = model.BackgroundPicture,
-                    SmallBackgroundPicture = model.SmallBackgroundPicture,
-                    Thumbnail = model.Thumbnail,
-                    ParentTagId = parentTag?.Id ?? 0
-                };
-                //序列化
-                var resulte = "";
-                using (TextWriter text = new StringWriter())
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(text, tagMain);
-                    resulte = text.ToString();
-                }
-                //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                {
-                    await _examineService.ExamineEditTagMainAsync(tag, tagMain);
-                    await _examineService.UniversalEditTagExaminedAsync(tag, user, true, resulte, Operation.EditTagMain, model.Note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, tag.Id, Operation.EditPeripheryMain);
-                }
-                else
-                {
-                    await _examineService.UniversalEditTagExaminedAsync(tag, user, false, resulte, Operation.EditTagMain, model.Note);
-                }
+                return new Result { Error = $"无法找到ID为{model.Id}的标签", Successful = false };
             }
+
+            newTag.ParentCodeNavigation = parentTag;
+
+            newTag.Name = model.Name;
+            newTag.BriefIntroduction = model.BriefIntroduction;
+            newTag.MainPicture = model.MainPicture;
+            newTag.BackgroundPicture = model.BackgroundPicture;
+            newTag.SmallBackgroundPicture = model.SmallBackgroundPicture;
+            newTag.Thumbnail = model.Thumbnail;
+
+
+            var examines = _tagService.ExaminesCompletion(currentTag, newTag);
+
+            if (examines.Any(s => s.Value == Operation.EditTagMain) == false)
+            {
+                return new Result { Successful = true };
+            }
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EditTagMain);
+            //序列化
+            var resulte = "";
+            using (TextWriter text = new StringWriter())
+            {
+                var serializer = new JsonSerializer();
+                serializer.Serialize(text, examine.Key);
+                resulte = text.ToString();
+            }
+            //判断是否是管理员
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
+            {
+                await _examineService.ExamineEditTagMainAsync(currentTag, examine.Key as ExamineMain);
+                await _examineService.UniversalEditTagExaminedAsync(currentTag, user, true, resulte, Operation.EditTagMain, model.Note);
+                await _appHelper.AddUserContributionValueAsync(user.Id, currentTag.Id, Operation.EditTagMain);
+            }
+            else
+            {
+                await _examineService.UniversalEditTagExaminedAsync(currentTag, user, false, resulte, Operation.EditTagMain, model.Note);
+            }
+
 
             return new Result { Successful = true };
 
@@ -675,15 +558,6 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Error = "当前标签该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }
-
-
-            //查找当前周边
-            var tag = await _tagRepository.GetAll().Include(s => s.InverseParentCodeNavigation).FirstOrDefaultAsync(s => s.Id == model.Id);
-            if (tag == null)
-            {
-                return new Result { Error = $"无法找到ID为{tag.Id}的标签", Successful = false };
-            }
-
             //预处理 建立词条关联信息
             //判断关联是否存在
             var tagIds = new List<int>();
@@ -691,74 +565,55 @@ namespace CnGalWebSite.APIServer.Controllers
             var tagNames = new List<string>();
             tagNames.AddRange(model.Tags.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
 
-            foreach (var item in tagNames)
+            try
             {
-                var infor = await _tagRepository.GetAll().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
-                if (infor <= 0)
-                {
-                    return new Result { Successful = false, Error = "标签 " + item + " 不存在" };
-                }
-                else
-                {
-                    tagIds.Add(infor);
-                }
+                tagIds = await _tagService.GetTagIdsFromNames(tagNames);
             }
-            //删除重复数据
-            tagIds = tagIds.Distinct().ToList();
-
-            //创建审核数据模型
-            var examinedModel = new TagChildTags();
-
-            //遍历当前词条数据 打上删除标签
-            foreach (var item in tag.InverseParentCodeNavigation)
+            catch (Exception ex)
             {
-                examinedModel.ChildTags.Add(new TagChildTagAloneModel
-                {
-                    TagId = item.Id,
-                    IsDelete = true,
-                });
+                return new Result { Successful = false, Error = ex.Message };
+            }
+            //获取标签
+            var tags = await _tagRepository.GetAll().Where(s => tagIds.Contains(s.Id)).ToListAsync();
+
+            //查找当前周边
+            var currentTag = await _tagRepository.GetAll().Include(s => s.InverseParentCodeNavigation).FirstOrDefaultAsync(s => s.Id == model.Id);
+            var newTag = await _tagRepository.GetAll().AsNoTracking().Include(s => s.InverseParentCodeNavigation).FirstOrDefaultAsync(s => s.Id == model.Id);
+            if (currentTag == null)
+            {
+                return new Result { Error = $"无法找到ID为{model.Id}的标签", Successful = false };
             }
 
-            //再遍历视图 对应修改
+            newTag.InverseParentCodeNavigation = tags;
 
-            //添加新建项目
-            foreach (var item in tagIds.Where(s => examinedModel.ChildTags.Select(s => s.TagId).Contains(s) == false))
-            {
-                examinedModel.ChildTags.Add(new TagChildTagAloneModel
-                {
-                    TagId = item,
-                    IsDelete = false
-                });
+            var examines = _tagService.ExaminesCompletion(currentTag, newTag);
 
-            }
-            //删除不存在的老项目
-            examinedModel.ChildTags.RemoveAll(s => tagIds.Contains(s.TagId) && s.IsDelete);
-
-            //判断审核是否为空
-            if (examinedModel.ChildTags.Count == 0)
+            if (examines.Any(s => s.Value == Operation.EditTagChildTags) == false)
             {
                 return new Result { Successful = true };
             }
-
-            //序列化JSON
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EditTagChildTags);
+            //序列化
             var resulte = "";
             using (TextWriter text = new StringWriter())
             {
                 var serializer = new JsonSerializer();
-                serializer.Serialize(text, examinedModel);
+                serializer.Serialize(text, examine.Key);
                 resulte = text.ToString();
             }
             //判断是否是管理员
             if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
-                await _examineService.ExamineEditTagChildTagsAsync(tag, examinedModel);
-                await _examineService.UniversalEditTagExaminedAsync(tag, user, true, resulte, Operation.EditTagChildTags, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, tag.Id, Operation.EditTagChildTags);
+                await _examineService.ExamineEditTagChildTagsAsync(currentTag, examine.Key as TagChildTags);
+                await _examineService.UniversalEditTagExaminedAsync(currentTag, user, true, resulte, Operation.EditTagChildTags, model.Note);
+                await _appHelper.AddUserContributionValueAsync(user.Id, currentTag.Id, Operation.EditTagChildTags);
             }
             else
             {
-                await _examineService.UniversalEditTagExaminedAsync(tag, user, false, resulte, Operation.EditTagChildTags, model.Note);
+                await _examineService.UniversalEditTagExaminedAsync(currentTag, user, false, resulte, Operation.EditTagChildTags, model.Note);
             }
+
+
             return new Result { Successful = true };
 
         }
@@ -823,15 +678,6 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Error = "当前标签该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
             }
-
-
-            //查找当前周边
-            var tag = await _tagRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id == model.Id);
-            if (tag == null)
-            {
-                return new Result { Error = $"无法找到ID为{tag.Id}的标签", Successful = false };
-            }
-
             //预处理 建立词条关联信息
             //判断关联是否存在
             var entryIds = new List<int>();
@@ -839,74 +685,54 @@ namespace CnGalWebSite.APIServer.Controllers
             var entryNames = new List<string>();
             entryNames.AddRange(model.Entries.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
 
-            foreach (var item in entryNames)
+            try
             {
-                var infor = await _entryRepository.GetAll().Where(s => s.Name == item).Select(s => s.Id).FirstOrDefaultAsync();
-                if (infor <= 0)
-                {
-                    return new Result { Successful = false, Error = "词条 " + item + " 不存在" };
-                }
-                else
-                {
-                    entryIds.Add(infor);
-                }
+                entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
             }
-            //删除重复数据
-            entryIds = entryIds.Distinct().ToList();
-
-            //创建审核数据模型
-            var examinedModel = new TagChildEntries();
-
-            //遍历当前词条数据 打上删除标签
-            foreach (var item in tag.Entries)
+            catch (Exception ex)
             {
-                examinedModel.ChildEntries.Add(new TagChildEntryAloneModel
-                {
-                    EntryId = item.Id,
-                    IsDelete = true,
-                });
+                return new Result { Successful = false, Error = ex.Message };
+            }
+            //获取词条
+            var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
+
+            //查找当前标签
+            var currentTag = await _tagRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id == model.Id);
+            var newTag = await _tagRepository.GetAll().AsNoTracking().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id == model.Id);
+            if (currentTag == null)
+            {
+                return new Result { Error = $"无法找到ID为{model.Id}的标签", Successful = false };
             }
 
-            //再遍历视图 对应修改
+            newTag.Entries = entries;
 
-            //添加新建项目
-            foreach (var item in entryIds.Where(s => examinedModel.ChildEntries.Select(s => s.EntryId).Contains(s) == false))
-            {
-                examinedModel.ChildEntries.Add(new TagChildEntryAloneModel
-                {
-                    EntryId = item,
-                    IsDelete = false
-                });
+            var examines = _tagService.ExaminesCompletion(currentTag, newTag);
 
-            }
-            //删除不存在的老项目
-            examinedModel.ChildEntries.RemoveAll(s => entryIds.Contains(s.EntryId) && s.IsDelete);
-
-            //判断审核是否为空
-            if (examinedModel.ChildEntries.Count == 0)
+            if (examines.Any(s => s.Value == Operation.EditTagChildEntries) == false)
             {
                 return new Result { Successful = true };
             }
-
-            //序列化JSON
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EditTagChildEntries);
+            //序列化
             var resulte = "";
             using (TextWriter text = new StringWriter())
             {
                 var serializer = new JsonSerializer();
-                serializer.Serialize(text, examinedModel);
+                serializer.Serialize(text, examine.Key);
                 resulte = text.ToString();
             }
             //判断是否是管理员
             if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
-                await _examineService.ExamineEditTagChildEntriesAsync(tag, examinedModel);
-                await _examineService.UniversalEditTagExaminedAsync(tag, user, true, resulte, Operation.EditTagChildEntries, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, tag.Id, Operation.EditTagChildEntries);
+                await _examineService.ExamineEditTagChildEntriesAsync(currentTag, examine.Key as TagChildEntries);
+                await _examineService.UniversalEditTagExaminedAsync(currentTag, user, true, resulte, Operation.EditTagChildEntries, model.Note);
+                await _appHelper.AddUserContributionValueAsync(user.Id, currentTag.Id, Operation.EditTagChildEntries);
             }
             else
             {
-                await _examineService.UniversalEditTagExaminedAsync(tag, user, false, resulte, Operation.EditTagChildEntries, model.Note);
+                await _examineService.UniversalEditTagExaminedAsync(currentTag, user, false, resulte, Operation.EditTagChildEntries, model.Note);
             }
+
             return new Result { Successful = true };
 
         }
@@ -994,5 +820,58 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
         }
+
+        /// <summary>
+        /// 获取编辑记录概览
+        /// </summary>
+        /// <param name="contrastId">要对比的编辑记录</param>
+        /// <param name="currentId">当前最新的编辑记录</param>
+        /// <returns></returns>
+        [HttpGet("{contrastId}/{currentId}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<TagContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
+        {
+            if (contrastId > currentId)
+            {
+                return BadRequest("对比的编辑必须先于当前的编辑");
+            }
+
+            var contrastExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId);
+            var currentExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == currentId);
+
+            if (contrastExamine == null || currentExamine == null || contrastExamine.TagId == null || currentExamine.TagId == null || contrastExamine.TagId != currentExamine.TagId)
+            {
+                return NotFound("编辑记录Id不正确");
+            }
+
+            var currentTag = new Tag();
+            var newTag = new Tag();
+
+            //获取审核记录
+            var examines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.IsPassed == true && s.TagId == currentExamine.TagId).ToListAsync();
+
+            foreach (var item in examines.Where(s => s.Id <= contrastId))
+            {
+                await _tagService.UpdateTagDataAsync(currentTag, item);
+            }
+
+            foreach (var item in examines.Where(s => s.Id <= currentId))
+            {
+                await _tagService.UpdateTagDataAsync(newTag, item);
+            }
+
+            var result = await _tagService.ConcompareAndGenerateModel(currentTag, newTag);
+
+            var model = new TagContrastEditRecordViewModel
+            {
+                ContrastId = contrastId,
+                CurrentId = currentId,
+                ContrastModel = result[0],
+                CurrentModel = result[1],
+            };
+
+            return model;
+        }
+
     }
 }

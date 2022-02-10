@@ -22,8 +22,8 @@
 
 @if (isReady)
 {
-    <CnGalWebSite.Shared.Component.Home.EditRecords.OverviewCard Model="ExaminesOverview" @ref="overviewCard" />
-    <CnGalWebSite.Shared.Component.Home.EditRecords.ContrastViews.ContrastOverview Model="ExaminesOverview" ContrastItem="@ContrastId.ToString()" CurrentItem="@CurrentId.ToString()"
+    <OverviewCard Model="ExaminesOverview" @ref="overviewCard" />
+    <ContrastOverview Model="ExaminesOverview" ContrastItem="@ContrastId.ToString()" CurrentItem="@CurrentId.ToString()"
                                                                                    ContrastChanged="ContrastChanged" CurrentChanged="CurrentChanged">
         <ContrastView>
             @if (isRefreshing)
@@ -69,12 +69,20 @@
             {
                 @if (ExaminesOverview.Type == ExaminedNormalListModelType.Entry)
                 {
-                    <CnGalWebSite.Shared.Component.Home.EditRecords.ContrastViews.EntryContrastCard Model="EntryContrast.ContrastModel" />
+                    <EntryContrastCard Model="EntryContrast.ContrastModel" />
                 }
                 else if (ExaminesOverview.Type == ExaminedNormalListModelType.Article)
-                    {
-                    <CnGalWebSite.Shared.Component.Home.EditRecords.ContrastViews.ArticleContrastCard Model="ArticleContrast.ContrastModel"/>
-                    }
+                {
+                    <ArticleContrastCard Model="ArticleContrast.ContrastModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Periphery)
+                {
+                    <PeripheryContrastCard Model="PeripheryContrast.ContrastModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Tag)
+                {
+                    <TagContrastCard Model="TagContrast.ContrastModel" />
+                }
             }
 
         </ContrastView>
@@ -122,17 +130,25 @@
             {
                 @if (ExaminesOverview.Type == ExaminedNormalListModelType.Entry)
                 {
-                    <CnGalWebSite.Shared.Component.Home.EditRecords.ContrastViews.EntryContrastCard Model="EntryContrast.CurrentModel" />
+                    <EntryContrastCard Model="EntryContrast.CurrentModel" />
                 }
                 else if (ExaminesOverview.Type == ExaminedNormalListModelType.Article)
                 {
-                    <CnGalWebSite.Shared.Component.Home.EditRecords.ContrastViews.ArticleContrastCard Model="ArticleContrast.CurrentModel" />
+                    <ArticleContrastCard Model="ArticleContrast.CurrentModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Periphery)
+                {
+                    <PeripheryContrastCard Model="PeripheryContrast.CurrentModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Tag)
+                {
+                    <TagContrastCard Model="TagContrast.CurrentModel" />
                 }
             }
 
 
         </CurrentView>
-    </CnGalWebSite.Shared.Component.Home.EditRecords.ContrastViews.ContrastOverview>
+    </ContrastOverview>
 }
 else
 {
@@ -182,8 +198,10 @@ else
     public ExaminesOverviewViewModel ExaminesOverview { get; set; } = new ExaminesOverviewViewModel();
     public EntryContrastEditRecordViewModel EntryContrast { get; set; } = new EntryContrastEditRecordViewModel();
     public ArticleContrastEditRecordViewModel ArticleContrast { get; set; } = new ArticleContrastEditRecordViewModel();
+    public PeripheryContrastEditRecordViewModel PeripheryContrast { get; set; } = new PeripheryContrastEditRecordViewModel();
+    public TagContrastEditRecordViewModel TagContrast { get; set; } = new TagContrastEditRecordViewModel();
 
-    CnGalWebSite.Shared.Component.Home.EditRecords.OverviewCard overviewCard;
+    OverviewCard overviewCard;
 
     async Task OnReLoad()
     {
@@ -240,11 +258,11 @@ else
             int index = ExaminesOverview.Examines.FindIndex(s => s.IsSelected);
             if (index == ExaminesOverview.Examines.Count - 1)
             {
-                overviewCard.SelecteChanged(ExaminesOverview.Examines[index]);
+                await overviewCard.SelecteChanged(ExaminesOverview.Examines[index]);
             }
             else
             {
-                overviewCard.SelecteChanged(ExaminesOverview.Examines[index + 1]);
+                await overviewCard.SelecteChanged(ExaminesOverview.Examines[index + 1]);
             }
         }
         if (_dataCatcheService.ThemeSetting.UseTabSet == false)
@@ -288,6 +306,18 @@ else
                 ArticleContrast = await _dataCatcheService.ArticleContrastEditRecordViewCatche.GetCatche(conId + "/" + curId, true);
                 ContrastId = ArticleContrast.ContrastId;
                 CurrentId = ArticleContrast.CurrentId;
+            }
+            else if (ExaminesOverview.Type == ExaminedNormalListModelType.Periphery)
+            {
+                PeripheryContrast = await _dataCatcheService.PeripheryContrastEditRecordViewCatche.GetCatche(conId + "/" + curId, true);
+                ContrastId = PeripheryContrast.ContrastId;
+                CurrentId = PeripheryContrast.CurrentId;
+            }
+            else if (ExaminesOverview.Type == ExaminedNormalListModelType.Tag)
+            {
+                TagContrast = await _dataCatcheService.TagContrastEditRecordViewCatche.GetCatche(conId + "/" + curId, true);
+                ContrastId = TagContrast.ContrastId;
+                CurrentId = TagContrast.CurrentId;
             }
             isRefreshing = false;
             StateHasChanged();

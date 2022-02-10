@@ -132,7 +132,7 @@
 
             //获取审核信息
             //Model = await Http.GetFromJsonAsync<ExaminedViewModel>(Program.WebApiPath + "api/admin/examined/" + Id);
-            var result = await Http.GetAsync(ToolHelper.WebApiPath + "api/admin/examined/" + Id);
+            var result = await Http.GetAsync(ToolHelper.WebApiPath + "api/examines/GetExamineView/" + Id);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
 
             //将json数据转为对象
@@ -217,8 +217,8 @@
                     Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<UserMain>();
                     break;
                 case Operation.EditPeripheryMain:
-                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<PeripheryMain>();
-                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<PeripheryMain>();
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<PeripheryMain_1_0>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<PeripheryMain_1_0>();
                     break;
                 case Operation.EditPeripheryRelatedEntries:
                     Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<RelevancesViewModel>>();
@@ -229,8 +229,8 @@
                     Model.afterModel = ((Newtonsoft.Json.Linq.JArray)temp.afterModel).ToObject<List<EntryPicture>>();
                     break;
                 case Operation.EditTagMain:
-                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<TagMain>();
-                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<TagMain>();
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<TagMain_1_0>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<TagMain_1_0>();
                     break;
                 case Operation.EditTagChildTags:
                     Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<RelevancesViewModel>>();
@@ -402,7 +402,7 @@
                     return;
                 }
             }
-            var result = await Http.PostAsJsonAsync<ExaminedViewModel>(ToolHelper.WebApiPath + "api/admin/examined", new ExaminedViewModel
+            var result = await Http.PostAsJsonAsync<ExaminedViewModel>(ToolHelper.WebApiPath + "api/examines/proc", new ExaminedViewModel
             {
                 id = Model.id,
                 isPassed = isPassed,

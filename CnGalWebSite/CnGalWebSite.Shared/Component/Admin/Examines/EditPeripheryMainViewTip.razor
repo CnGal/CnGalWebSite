@@ -13,10 +13,12 @@
     <ExaminesPartViewInforTip DispalyName="材质" DispalyValue="@Model.Material"></ExaminesPartViewInforTip>
 
     <ExaminesPartViewInforTip DispalyName="类型" DispalyValue="@Model.Type.GetDisplayName()"></ExaminesPartViewInforTip>
+    <ExaminesPartViewInforTip DispalyName="类型" DispalyValue="@Model.Category"></ExaminesPartViewInforTip>
     <ExaminesPartViewInforTip DispalyName="尺寸" DispalyValue="@Model.Size"></ExaminesPartViewInforTip>
     <ExaminesPartViewInforTip DispalyName="品牌" DispalyValue="@Model.Brand"></ExaminesPartViewInforTip>
     <ExaminesPartViewInforTip DispalyName="单独部件数量" DispalyValue="@Model.IndividualParts"></ExaminesPartViewInforTip>
     <ExaminesPartViewInforTip DispalyName="价格" DispalyValue="@Model.Price"></ExaminesPartViewInforTip>
+    <ExaminesPartViewInforTip DispalyName="贩售链接" DispalyValue="@Model.SaleLink"></ExaminesPartViewInforTip>
     <ExaminesPartViewInforTip DispalyName="是否再版" DispalyValue="@Model.IsReprint.ToString()"></ExaminesPartViewInforTip>
     <ExaminesPartViewInforTip DispalyName="是否为可用物品" DispalyValue="@Model.IsAvailableItem.ToString()"></ExaminesPartViewInforTip>
     @if (Model.Type == PeripheryType.SetorAlbumEtc)
@@ -32,4 +34,4 @@
 
 </div>
 @code { [Parameter]
-            public PeripheryMain Model { get; set; } = new PeripheryMain(); }
+            public PeripheryMain_1_0 Model { get; set; } = new PeripheryMain_1_0(); }

@@ -4,6 +4,7 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -23,9 +24,9 @@ namespace CnGalWebSite.DataModel.Helper
         //https://v3.cngal.org/
 
 
-        //public const string WebApiPath = "http://localhost:45160/";
+        public const string WebApiPath = "http://localhost:45160/";
         //public const string WebApiPath = "http://172.17.0.1:2001/";
-        public const string WebApiPath = "https://www.cngal.org/";
+        //public const string WebApiPath = "https://www.cngal.org/";
 
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";
 
@@ -824,6 +825,14 @@ namespace CnGalWebSite.DataModel.Helper
                     {
                         pt.SetValue(data, item.Value, null);
                     }
+                    else if (pt.PropertyType == typeof(bool))
+                    {
+                        pt.SetValue(data, item.Value != null ? bool.Parse(item.Value) : false, null);
+                    }
+                    else if (pt.PropertyType == typeof(int))
+                    {
+                        pt.SetValue(data, item.Value != null ? int.Parse(item.Value) : 0, null);
+                    }
                 }
             }
         }
@@ -835,10 +844,18 @@ namespace CnGalWebSite.DataModel.Helper
             Type t = currentItem.GetType();
             var pts = t.GetProperties();
             foreach (var item in pts.Where(s => s.PropertyType == typeof(string) || s.PropertyType == typeof(DateTime) || s.PropertyType == typeof(DateTime?)
-            || s.PropertyType == typeof(EntryType) || s.PropertyType == typeof(ArticleType)))
+            || s.PropertyType == typeof(EntryType) || s.PropertyType == typeof(ArticleType) || s.PropertyType == typeof(bool) || s.PropertyType == typeof(int)))
             {
                 //特殊字段跳过
-                if(item.Name=="MainPage"|| item.Name == "CreateTime" || item.Name == "LastEditTime")
+                if(item.Name=="MainPage"|| item.Name == "CreateTime" || item.Name == "LastEditTime" || item.Name == "CreateUserId")
+                {
+                    continue;
+                }
+                if (item.PropertyType == typeof(bool) && item.Name != "IsReprint" && item.Name != "IsAvailableItem")
+                {
+                    continue;
+                }
+                if (item.PropertyType == typeof(int) && item.Name != "PageCount" && item.Name != "SongCount")
                 {
                     continue;
                 }
@@ -893,6 +910,22 @@ namespace CnGalWebSite.DataModel.Helper
                             Value = newValue?.ToString() ?? ""
                         });
                     }
+                    else if (item.PropertyType == typeof(bool))
+                    {
+                        model.Add(new ExamineMainAlone
+                        {
+                            Key = item.Name,
+                            Value = newValue.ToString()
+});
+}
+                    else if (item.PropertyType == typeof(int))
+                    {
+                        model.Add(new ExamineMainAlone
+                        {
+                            Key = item.Name,
+                            Value = newValue.ToString()
+                        });
+                    }
                 }
             }
 
@@ -932,9 +965,31 @@ namespace CnGalWebSite.DataModel.Helper
             var list = informations.ToList();
             foreach (var item in list)
             {
-                if (informations.Count(s => item.ToEntry == s.ToEntry ) > 1)
+                if (informations.Count(s => item.ToEntry == s.ToEntry) > 1)
                 {
                     var temp = informations.FirstOrDefault(s => item.ToEntry == s.ToEntry);
+                    if (temp != null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
+        /// <summary>
+        /// 周报 关联周报 列表 清理相同项目
+        /// </summary>
+        /// <param name="informations"></param>
+        /// <returns></returns>
+        public static List<PeripheryRelation> Purge(this List<PeripheryRelation> informations)
+        {
+            var list = informations.ToList();
+            foreach (var item in list)
+            {
+                if (informations.Count(s => item.ToPeriphery == s.ToPeriphery) > 1)
+                {
+                    var temp = informations.FirstOrDefault(s => item.ToPeriphery == s.ToPeriphery);
                     if (temp != null)
                     {
                         informations.Remove(temp);

@@ -1,0 +1,85 @@
+﻿@inject ToastService ToastService
+
+@inject HttpClient Http
+<style>
+    .modal-footer {
+        display: none;
+    }
+</style>
+
+<div>
+    @if (isReady)
+    {
+        <CnGalWebSite.Shared.Component.Entries.NewVersion.ExaminesInforCard IsSmallScreen="IsSmallScreen" Model="Model" OnNavClick="OnNavClick"/>
+    }
+    else
+    {
+        <div style="min-height:200px;">
+            <h3 class="mb-3 text-center">正在加载</h3>
+            <div class="d-flex" style="justify-content: center;">
+                <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
+            </div>
+        </div>
+
+    }
+</div>
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    [Parameter]
+    public ExaminedNormalListModelType Type { get; set; }
+
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
+
+    [Parameter]
+    public EventCallback OnClickClose { get; set; }
+
+    public List<ExaminedNormalListModel> Model { get; set; } = new List<ExaminedNormalListModel>();
+    private readonly List<TimelineItem> AlternateTimelineItems = new List<TimelineItem>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public string Text { get; set; }
+    private IEnumerable<long> Value1 { get; set; }
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (Type == ExaminedNormalListModelType.Article)
+            {
+                var model = await Http.GetFromJsonAsync<EditArticleInforBindModel>(ToolHelper.WebApiPath + "api/articles/GetArticleEditInforBindModel/" + Id);
+                Model = model.Examines;
+            }
+            else if (Type == ExaminedNormalListModelType.Periphery)
+            {
+                var model = await Http.GetFromJsonAsync<EditPeripheryInforBindModel>(ToolHelper.WebApiPath + "api/peripheries/GetPeripheryEditInforBindModel/" + Id);
+                Model = model.Examines;
+            }
+            else if (Type == ExaminedNormalListModelType.Tag)
+            {
+                var model = await Http.GetFromJsonAsync<EditTagInforBindModel>(ToolHelper.WebApiPath + "api/tags/GetTagEditInforBindModel/" + Id);
+                Model = model.Examines;
+            }
+
+
+
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取历史编辑记录列表失败");
+        }
+    }
+
+    public async Task OnNavClick()
+    {
+       await OnClickClose.InvokeAsync();
+    }
+}

@@ -3,6 +3,7 @@ using System;
 using CnGalWebSite.APIServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CnGalWebSite.APIServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220210055853_ChangePeripheryRelatedEntry")]
+    partial class ChangePeripheryRelatedEntry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,7 +33,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("EntriesId");
 
-                    b.ToTable("ArticleEntry", (string)null);
+                    b.ToTable("ArticleEntry");
                 });
 
             modelBuilder.Entity("ArticleVote", b =>
@@ -46,7 +48,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("VotesId");
 
-                    b.ToTable("ArticleVote", (string)null);
+                    b.ToTable("ArticleVote");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ApplicationUser", b =>
@@ -296,7 +298,7 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Articles", (string)null);
+                    b.ToTable("Articles");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ArticleRelation", b =>
@@ -318,7 +320,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("ToArticle");
 
-                    b.ToTable("ArticleRelations", (string)null);
+                    b.ToTable("ArticleRelations");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ArticleRelevance", b =>
@@ -346,7 +348,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("ArticleId");
 
-                    b.ToTable("ArticleRelevance", (string)null);
+                    b.ToTable("ArticleRelevance");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.BackUpArchive", b =>
@@ -378,7 +380,7 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("EntryId")
                         .IsUnique();
 
-                    b.ToTable("BackUpArchives", (string)null);
+                    b.ToTable("BackUpArchives");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.BackUpArchiveDetail", b =>
@@ -403,7 +405,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("BackUpArchiveId");
 
-                    b.ToTable("BackUpArchiveDetails", (string)null);
+                    b.ToTable("BackUpArchiveDetails");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.BasicEntryInformation", b =>
@@ -428,7 +430,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("EntryId");
 
-                    b.ToTable("BasicEntryInformation", (string)null);
+                    b.ToTable("BasicEntryInformation");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.BasicEntryInformationAdditional", b =>
@@ -450,7 +452,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("BasicEntryInformationId");
 
-                    b.ToTable("BasicEntryInformationAdditional", (string)null);
+                    b.ToTable("BasicEntryInformationAdditional");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Carousel", b =>
@@ -470,7 +472,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Carousels", (string)null);
+                    b.ToTable("Carousels");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Comment", b =>
@@ -532,7 +534,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("VoteId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Disambig", b =>
@@ -564,7 +566,7 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Disambigs", (string)null);
+                    b.ToTable("Disambigs");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Entry", b =>
@@ -646,7 +648,7 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Entries", (string)null);
+                    b.ToTable("Entries");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.EntryPicture", b =>
@@ -676,7 +678,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("PeripheryId");
 
-                    b.ToTable("EntryPicture", (string)null);
+                    b.ToTable("EntryPicture");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.EntryRelation", b =>
@@ -698,7 +700,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("ToEntry");
 
-                    b.ToTable("EntryRelations", (string)null);
+                    b.ToTable("EntryRelations");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.EntryRelevance", b =>
@@ -726,7 +728,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("EntryId");
 
-                    b.ToTable("EntryRelevance", (string)null);
+                    b.ToTable("EntryRelevance");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ErrorCount", b =>
@@ -746,7 +748,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ErrorCounts", (string)null);
+                    b.ToTable("ErrorCounts");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Examine", b =>
@@ -826,7 +828,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("Examines", (string)null);
+                    b.ToTable("Examines");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.FavoriteFolder", b =>
@@ -860,7 +862,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("FavoriteFolders", (string)null);
+                    b.ToTable("FavoriteFolders");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.FavoriteObject", b =>
@@ -897,7 +899,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("PeripheryId");
 
-                    b.ToTable("FavoriteObjects", (string)null);
+                    b.ToTable("FavoriteObjects");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.FriendLink", b =>
@@ -920,7 +922,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FriendLinks", (string)null);
+                    b.ToTable("FriendLinks");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.GameNews", b =>
@@ -980,7 +982,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("WeeklyNewsId");
 
-                    b.ToTable("GameNewses", (string)null);
+                    b.ToTable("GameNewses");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.GameNewsRelatedEntry", b =>
@@ -999,7 +1001,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("GameNewsId");
 
-                    b.ToTable("GameNewsRelatedEntry", (string)null);
+                    b.ToTable("GameNewsRelatedEntry");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.HistoryUser", b =>
@@ -1028,7 +1030,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("HistoryUsers", (string)null);
+                    b.ToTable("HistoryUsers");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Loginkey", b =>
@@ -1051,7 +1053,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Loginkeys", (string)null);
+                    b.ToTable("Loginkeys");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Message", b =>
@@ -1097,7 +1099,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Messages", (string)null);
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.OriginalRSS", b =>
@@ -1126,7 +1128,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OriginalRSS", (string)null);
+                    b.ToTable("OriginalRSS");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Outlink", b =>
@@ -1156,7 +1158,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("EntryId");
 
-                    b.ToTable("Outlink", (string)null);
+                    b.ToTable("Outlink");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Perfection", b =>
@@ -1179,7 +1181,7 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("EntryId")
                         .IsUnique();
 
-                    b.ToTable("Perfections", (string)null);
+                    b.ToTable("Perfections");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.PerfectionCheck", b =>
@@ -1213,7 +1215,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("PerfectionId");
 
-                    b.ToTable("PerfectionChecks", (string)null);
+                    b.ToTable("PerfectionChecks");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.PerfectionOverview", b =>
@@ -1248,7 +1250,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PerfectionOverviews", (string)null);
+                    b.ToTable("PerfectionOverviews");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Periphery", b =>
@@ -1343,7 +1345,7 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Peripheries", (string)null);
+                    b.ToTable("Peripheries");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.PeripheryRelation", b =>
@@ -1365,7 +1367,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("ToPeriphery");
 
-                    b.ToTable("PeripheryRelations", (string)null);
+                    b.ToTable("PeripheryRelations");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.PeripheryRelevanceEntry", b =>
@@ -1386,7 +1388,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("PeripheryId");
 
-                    b.ToTable("PeripheryRelevanceEntries", (string)null);
+                    b.ToTable("PeripheryRelevanceEntries");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.PeripheryRelevanceUser", b =>
@@ -1410,7 +1412,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("PeripheryId");
 
-                    b.ToTable("PeripheryRelevanceUsers", (string)null);
+                    b.ToTable("PeripheryRelevanceUsers");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.PlayedGame", b =>
@@ -1458,7 +1460,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("EntryId");
 
-                    b.ToTable("PlayedGames", (string)null);
+                    b.ToTable("PlayedGames");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Rank", b =>
@@ -1496,7 +1498,7 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Ranks", (string)null);
+                    b.ToTable("Ranks");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.RankUser", b =>
@@ -1523,7 +1525,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("RankId");
 
-                    b.ToTable("RankUsers", (string)null);
+                    b.ToTable("RankUsers");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.SendCount", b =>
@@ -1546,7 +1548,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SendCounts", (string)null);
+                    b.ToTable("SendCounts");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.SignInDay", b =>
@@ -1565,7 +1567,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("SignInDay", (string)null);
+                    b.ToTable("SignInDay");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.SteamInfor", b =>
@@ -1623,7 +1625,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("EntryId");
 
-                    b.ToTable("SteamInfors", (string)null);
+                    b.ToTable("SteamInfors");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Tag", b =>
@@ -1672,7 +1674,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("ParentCodeNavigationId");
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
 
                     b.HasData(
                         new
@@ -1738,7 +1740,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("ThirdPartyLoginInfors", (string)null);
+                    b.ToTable("ThirdPartyLoginInfors");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ThumbsUp", b =>
@@ -1762,7 +1764,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("ArticleId");
 
-                    b.ToTable("ThumbsUps", (string)null);
+                    b.ToTable("ThumbsUps");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.TimedTask", b =>
@@ -1803,7 +1805,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TimedTasks", (string)null);
+                    b.ToTable("TimedTasks");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserOnlineInfor", b =>
@@ -1822,7 +1824,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("UserOnlineInfors", (string)null);
+                    b.ToTable("UserOnlineInfors");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserSpaceCommentManager", b =>
@@ -1839,7 +1841,7 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("UserSpaceCommentManagers", (string)null);
+                    b.ToTable("UserSpaceCommentManagers");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Vote", b =>
@@ -1917,7 +1919,7 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Votes", (string)null);
+                    b.ToTable("Votes");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.VoteOption", b =>
@@ -1954,7 +1956,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("VoteId");
 
-                    b.ToTable("VoteOptions", (string)null);
+                    b.ToTable("VoteOptions");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.VoteUser", b =>
@@ -1981,7 +1983,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("VoteId");
 
-                    b.ToTable("VoteUsers", (string)null);
+                    b.ToTable("VoteUsers");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.WeeklyNews", b =>
@@ -2022,7 +2024,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("ArticleId");
 
-                    b.ToTable("WeeklyNewses", (string)null);
+                    b.ToTable("WeeklyNewses");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.WeiboUserInfor", b =>
@@ -2047,7 +2049,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("EntryId");
 
-                    b.ToTable("WeiboUserInfors", (string)null);
+                    b.ToTable("WeiboUserInfors");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Models.FileManager", b =>
@@ -2070,7 +2072,7 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("FileManagers", (string)null);
+                    b.ToTable("FileManagers");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Models.TokenCustom", b =>
@@ -2093,7 +2095,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TokenCustoms", (string)null);
+                    b.ToTable("TokenCustoms");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Models.UserFile", b =>
@@ -2124,7 +2126,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("FileManagerId");
 
-                    b.ToTable("UserFiles", (string)null);
+                    b.ToTable("UserFiles");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.ViewModel.Tables.BasicInforTableModel", b =>
@@ -2177,7 +2179,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BasicInforTableModels", (string)null);
+                    b.ToTable("BasicInforTableModels");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.ViewModel.Tables.GroupInforTableModel", b =>
@@ -2200,7 +2202,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GroupInforTableModels", (string)null);
+                    b.ToTable("GroupInforTableModels");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.ViewModel.Tables.MakerInforTableModel", b =>
@@ -2238,7 +2240,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MakerInforTableModels", (string)null);
+                    b.ToTable("MakerInforTableModels");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.ViewModel.Tables.RoleInforTableModel", b =>
@@ -2303,7 +2305,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RoleInforTableModels", (string)null);
+                    b.ToTable("RoleInforTableModels");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.ViewModel.Tables.StaffInforTableModel", b =>
@@ -2338,7 +2340,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StaffInforTableModels", (string)null);
+                    b.ToTable("StaffInforTableModels");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel", b =>
@@ -2382,7 +2384,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SteamInforTableModels", (string)null);
+                    b.ToTable("SteamInforTableModels");
                 });
 
             modelBuilder.Entity("EntryPeriphery", b =>
@@ -2397,7 +2399,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("RelatedPeripheriesId");
 
-                    b.ToTable("EntryPeriphery", (string)null);
+                    b.ToTable("EntryPeriphery");
                 });
 
             modelBuilder.Entity("EntryTag", b =>
@@ -2412,7 +2414,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("TagsId");
 
-                    b.ToTable("EntryTag", (string)null);
+                    b.ToTable("EntryTag");
                 });
 
             modelBuilder.Entity("EntryVote", b =>
@@ -2427,7 +2429,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("VotesId");
 
-                    b.ToTable("EntryVote", (string)null);
+                    b.ToTable("EntryVote");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -2622,7 +2624,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("VotesId");
 
-                    b.ToTable("PeripheryVote", (string)null);
+                    b.ToTable("PeripheryVote");
                 });
 
             modelBuilder.Entity("VoteOptionVoteUser", b =>
@@ -2637,7 +2639,7 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.HasIndex("VoteUsersId");
 
-                    b.ToTable("VoteOptionVoteUser", (string)null);
+                    b.ToTable("VoteOptionVoteUser");
                 });
 
             modelBuilder.Entity("ArticleEntry", b =>

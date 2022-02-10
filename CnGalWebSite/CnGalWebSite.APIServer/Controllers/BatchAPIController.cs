@@ -144,7 +144,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //导入数据
             try
             {
-                await _examineService.AddNewEtryExaminesAsync(model, user, "批量导入历史数据");
+                await _examineService.AddNewEntryExaminesAsync(model, user, "批量导入历史数据");
             }
             catch (Exception exc)
             {
@@ -155,7 +155,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Result>> ImportPeripheryDataAsync(ImportPeripheryModel model)
+        public async Task<ActionResult<Result>> ImportPeripheryDataAsync(Periphery model)
         {
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
@@ -176,22 +176,14 @@ namespace CnGalWebSite.APIServer.Controllers
             //导入数据
             try
             {
-                var result = await _examineService.AddBatchPeeripheryExaminesAsync(model, user, "批量导入历史数据");
-                if (result == null)
-                {
-                    return new Result { Successful = true };
-                }
-                else
-                {
-                    return new Result { Successful = false, Error = result };
-                }
+                await _examineService.AddNewPeripheryExaminesAsync(model, user, "批量导入历史数据");
             }
             catch (Exception exc)
             {
                 return new Result { Successful = false, Error = "为周边创建审核记录时发生异常『" + exc.Message + "』" };
             }
 
-
+            return new Result { Successful = true };
         }
 
         [HttpPost]
