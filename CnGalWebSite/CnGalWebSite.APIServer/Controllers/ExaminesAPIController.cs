@@ -585,7 +585,9 @@ namespace CnGalWebSite.APIServer.Controllers
                         await _examineService.ExamineEditPeripheryImagesAsync(periphery, peripheryImages);
                         break;
                     case Operation.EditPeripheryRelatedEntries:
-                        periphery = await _peripheryRepository.GetAll().AsNoTracking().Include(s => s.RelatedEntries).FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
+                        periphery = await _peripheryRepository.GetAll()
+                            .Include(s => s.RelatedEntries)
+                            .FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
                         if (periphery == null)
                         {
                             return NotFound();
@@ -599,6 +601,24 @@ namespace CnGalWebSite.APIServer.Controllers
                         }
 
                         await _examineService.ExamineEditPeripheryRelatedEntriesAsync(periphery, peripheryRelevances);
+                        break;
+                    case Operation.EditPeripheryRelatedPeripheries:
+                        periphery = await _peripheryRepository.GetAll()
+                            .Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s=>s.ToPeripheryNavigation)
+                            .FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
+                        if (periphery == null)
+                        {
+                            return NotFound();
+                        }
+                        //序列化数据
+                        PeripheryRelatedPeripheries peripheryRelatedPeripheries = null;
+                        using (TextReader str = new StringReader(examine.Context))
+                        {
+                            var serializer = new JsonSerializer();
+                            peripheryRelatedPeripheries = (PeripheryRelatedPeripheries)serializer.Deserialize(str, typeof(PeripheryRelatedPeripheries));
+                        }
+
+                        await _examineService.ExamineEditPeripheryRelatedPeripheriesAsync(periphery, peripheryRelatedPeripheries);
                         break;
                 }
 

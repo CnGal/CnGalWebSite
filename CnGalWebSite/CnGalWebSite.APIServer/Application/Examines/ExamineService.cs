@@ -249,7 +249,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
 
-                items=items.Sort(options.SortName, (SortOrder)options.SortOrder);
+                items = items.OrderBy(s=>s.Id).Sort(options.SortName, (SortOrder)options.SortOrder);
                 isSorted = true;
             }
 
@@ -3247,6 +3247,58 @@ namespace CnGalWebSite.APIServer.ExamineX
         }
 
         /// <summary>
+        /// 迁移标签审核数据 EditTag模型部分
+        /// </summary>
+        /// <returns></returns>
+        public async Task ReplaceEditTag_1_0_ExamineContext()
+        {
+            TagEdit oldExamineModel = null;
+           
+            //获取要替换的所有审核记录ID
+            var ids = await _examineRepository.GetAll().AsNoTracking().Where(s => s.Operation == Operation.EditTag && s.Version == ExamineVersion.V1_0).Select(s => s.Id).ToListAsync();
+
+            //遍历列表 依次替换
+            foreach (var id in ids)
+            {
+                var examine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == id);
+                if (examine != null)
+                {
+
+                    ExamineMain newExamineModel = new ExamineMain();
+                    using (TextReader str = new StringReader(examine.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        oldExamineModel = (TagEdit)serializer.Deserialize(str, typeof(TagEdit));
+                    }
+                    newExamineModel.Items.Add(new ExamineMainAlone
+                    {
+                        Key = "Name",
+                        Value = oldExamineModel.Name
+                    });
+                    examine.Operation = Operation.EditTagMain;
+                    //序列化新数据模型
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, newExamineModel);
+                        resulte = text.ToString();
+                    }
+
+                    //保存
+                    if (newExamineModel.Items.Count == 0)
+                    {
+                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移标签旧综合编辑记录";
+                    }
+                    examine.Version = ExamineVersion.V1_1;
+                    examine.Context = resulte;
+                    await _examineRepository.UpdateAsync(examine);
+                }
+            }
+        }
+
+
+        /// <summary>
         /// 迁移标签审核数据 主要信息部分
         /// </summary>
         /// <returns></returns>
@@ -3321,7 +3373,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     //保存
                     if (newExamineModel.Items.Count == 0)
                     {
-                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移词条主要信息编辑记录";
+                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移标签主要信息编辑记录";
                     }
                     examine.Version = ExamineVersion.V1_1;
                     examine.Context = resulte;
@@ -3405,7 +3457,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     //保存
                     if (newExamineModel.Items.Count == 0)
                     {
-                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移词条主要信息编辑记录";
+                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移周边主要信息编辑记录";
                     }
                     examine.Version = ExamineVersion.V1_1;
                     examine.Context = resulte;
@@ -3524,7 +3576,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     //保存
                     if (newExamineModel.Items.Count == 0)
                     {
-                        examine.Note += ("\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移词条主要信息编辑记录");
+                        examine.Note += ("\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移文章主要信息编辑记录");
                     }
                     examine.Version = ExamineVersion.V1_1;
                     examine.Context = resulte;

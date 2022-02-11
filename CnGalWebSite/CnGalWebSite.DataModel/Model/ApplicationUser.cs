@@ -40,10 +40,12 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 附加积分
         /// </summary>
+        [Obsolete("此项已不计入积分统计，请在积分列表中添加")]
         public int Integral { get; set; } = 0;
         /// <summary>
         /// 附加贡献值
         /// </summary>
+        [Obsolete("此项已不计入积分统计，请在积分列表中添加")]
         public int ContributionValue { get; set; } = 0;
         /// <summary>
         /// 显示积分 = 附加 + 计算
@@ -88,6 +90,19 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public UserSpaceCommentManager UserSpaceCommentManager { get; set; }
 
+        /// <summary>
+        /// 用户地址 用于接收奖品
+        /// </summary>
+        public UserAddress UserAddress { get; set; }
+        public long? UserAddressId { get; set; }
+
+        public virtual ICollection<LotteryUser> Lotteries { get; set; }
+
+        /// <summary>
+        /// 积分 贡献值 列表
+        /// </summary>
+        public virtual ICollection<UserIntegral> Integrals { get; set; }
+
         public ICollection<SignInDay> SignInDays { get; set; }
 
         public ICollection<Examine> Examines { get; set; }
@@ -105,9 +120,30 @@ namespace CnGalWebSite.DataModel.Model
         public ICollection<RankUser> UserRanks { get; set; }
 
         public ICollection<PeripheryRelevanceUser> UserOwnedPeripheries { get; set; }
-
-
     }
+
+    public class UserIntegral
+    {
+        public long Id { get; set; }
+
+        public int Count { get; set; }
+
+        public string Note { get; set; }
+
+        public UserIntegralType Type  { get; set; }
+
+        public ApplicationUser ApplicationUser { get; set; }
+        public string ApplicationUserId { get; set; }
+    }
+
+    public enum UserIntegralType
+    {
+        [Display(Name ="积分")]
+        Integral,
+        [Display(Name = "贡献值")]
+        ContributionValue,
+    }
+
     public class SignInDay
     {
         public long Id { get; set; }
@@ -119,4 +155,19 @@ namespace CnGalWebSite.DataModel.Model
         public ApplicationUser ApplicationUser { get; set; }
 
     }
+
+    public class UserAddress
+    {
+        public long Id { set; get; }
+
+        public string ApplicationUserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
+
+        public string RealName { get; set; }
+
+        public string PhoneNumber { get; set; }
+
+        public string Address { get; set; }
+    }
+
 }

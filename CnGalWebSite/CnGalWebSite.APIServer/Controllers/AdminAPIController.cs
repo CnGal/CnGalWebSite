@@ -804,7 +804,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 await _examineService.ReplaceEditPeripheryMainExamineContext();
                 await _examineService.ReplacePeripheryRelatedEntries();
-                await _examineRepository.DeleteAsync(s => s.Operation == Operation.EditTag);
+                await _examineService.ReplaceEditTag_1_0_ExamineContext();
                 await _examineService.ReplaceEditTagMainExamineContext();
                 return new Result { Successful = true };
             }

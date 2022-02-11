@@ -58,6 +58,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         private readonly IRepository<SendCount, long> _sendCountRepository;
         private readonly IRepository<Loginkey, long> _loginkeyRepository;
         private readonly IRepository<Vote, long> _voteRepository;
+        private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly IEmailService _EmailService;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
@@ -68,7 +69,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             IRepository<Comment, long> commentRepository, IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<SteamInfor, int> steamInforRepository, IRepository<Loginkey, long> loginkeyRepository,
         IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository, IEmailService EmailService, IRepository<TokenCustom, int> tokenCustomRepository,
             IRepository<Article, long> aricleRepository, SignInManager<ApplicationUser> signInManager, IRepository<Entry, int> entryRepository, IRepository<SendCount, long> sendCountRepository,
-        IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository)
+        IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<Lottery, long> lotteryRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -97,6 +98,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             _loginkeyRepository = loginkeyRepository;
             _peripheryRepository = peripheryRepository;
             _voteRepository = voteRepository;
+            _lotteryRepository = lotteryRepository;
         }
 
         public async Task<bool> IsEntryLockedAsync(int entryId, string userId, Operation operation)
@@ -830,6 +832,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             Entry entry = null;
             Periphery periphery = null;
             Vote vote = null;
+            Lottery lottery = null;
             UserSpaceCommentManager userSpace = null;
             Comment replyComment = null;
             ApplicationUser userTemp = null;
@@ -865,6 +868,13 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 case CommentType.CommentVote:
                     vote = await _voteRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
                     if (vote == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentLottery:
+                    lottery = await _lotteryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
+                    if (lottery == null)
                     {
                         return;
                     }
@@ -916,6 +926,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
                     break;
                 case CommentType.CommentVote:
                     comment.VoteId = tempId;
+                    break;
+                case CommentType.CommentLottery:
+                    comment.LotteryId = tempId;
                     break;
                 case CommentType.CommentUser:
                     comment.UserSpaceCommentManager = userSpace;
@@ -1022,6 +1035,10 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 case CommentType.CommentVote:
                     tempCount = await _commentRepository.CountAsync(s => s.VoteId == tempId);
                     await _voteRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    break;
+                case CommentType.CommentLottery:
+                    tempCount = await _commentRepository.CountAsync(s => s.VoteId == tempId);
+                    await _lotteryRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
                     break;
             }
         }

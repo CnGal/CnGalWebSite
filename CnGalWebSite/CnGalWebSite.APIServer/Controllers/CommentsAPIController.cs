@@ -36,11 +36,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<Vote, long> _voteRepository;
+        private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly ICommentService _commentService;
         private readonly IAppHelper _appHelper;
 
         public CommentsAPIController(UserManager<ApplicationUser> userManager, IRepository<ApplicationUser, string> userRepository, ICommentService commentService,
-            IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository,
+            IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository,
         IRepository<Entry, int> entryRepository)
         {
@@ -53,6 +54,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _userRepository = userRepository;
             _peripheryRepository = peripheryRepository;
             _voteRepository = voteRepository;
+            _lotteryRepository = lotteryRepository;
         }
 
         [AllowAnonymous]
@@ -130,6 +132,18 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                 }
             }
+            else if (commentType == CommentType.CommentLottery)
+            {
+                var lottery = await _lotteryRepository.FirstOrDefaultAsync(s => s.Id == int.Parse(id));
+                if (lottery != null)
+                {
+                    //判断是否被关闭
+                    if (lottery.CanComment == false)
+                    {
+                        return new PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>() };
+                    }
+                }
+            }
 
             var input = new GetCommentInput
             {
@@ -150,6 +164,7 @@ namespace CnGalWebSite.APIServer.Controllers
             Entry entry = null;
             Periphery periphery = null;
             Vote vote = null;
+            Lottery lottery = null;
             UserSpaceCommentManager userSpace = null;
             Comment replyComment = null;
             ApplicationUser userTemp = null;
@@ -203,6 +218,17 @@ namespace CnGalWebSite.APIServer.Controllers
                     if (vote.CanComment == false)
                     {
                         return new Result { Successful = false, Error = "该投票不允许评论" };
+                    }
+                    break;
+                case CommentType.CommentLottery:
+                    lottery = await _lotteryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
+                    if (lottery == null)
+                    {
+                        return new Result { Successful = false, Error = "无法找到该抽奖，Id" + model.ObjectId };
+                    }
+                    if (lottery.CanComment == false)
+                    {
+                        return new Result { Successful = false, Error = "该抽奖不允许评论" };
                     }
                     break;
                 case CommentType.CommentUser:

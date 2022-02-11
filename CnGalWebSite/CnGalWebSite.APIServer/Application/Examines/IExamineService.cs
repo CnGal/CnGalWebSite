@@ -373,6 +373,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         Task ReplaceEditPeripheryMainExamineContext();
         Task ReplacePeripheryRelatedEntries();
         Task ReplaceEditTagMainExamineContext();
+        Task ReplaceEditTag_1_0_ExamineContext();
         /// <summary>
         /// 处理 PeripheryRelatedPeripheries 审核成功后调用更新数据
         /// </summary>

@@ -65,6 +65,10 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<VoteUser> VoteUsers { get; set; }
         public DbSet<EntryRelation> EntryRelations { get; set; }
         public DbSet<ArticleRelation> ArticleRelations { get; set; }
+        public DbSet<UserIntegral> UserIntegrals { get; set; }
+        public DbSet<Lottery> Lotteries { get; set; }
+        public DbSet<LotteryUser> LotteryUsers { get; set; }
+        public DbSet<LotteryAward> LotteryAwards { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -94,6 +98,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<Rank>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Periphery>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Vote>().HasIndex(g => g.Name).IsUnique();
+            modelBuilder.Entity<Lottery>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Disambig>().HasIndex(g => g.Name).IsUnique();
 
             //设定默认值
