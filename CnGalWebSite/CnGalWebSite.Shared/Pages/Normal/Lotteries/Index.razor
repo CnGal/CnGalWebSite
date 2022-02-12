@@ -1,4 +1,7 @@
-﻿@inject HttpClient Http
+﻿@page "/lotteries/index/{Id}"
+
+
+@inject HttpClient Http
 @inject ExamineService _examineService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
@@ -31,15 +34,14 @@ else
 
 @if (isNotFound == true)
 {
-    int temp = 0;
-    <NotFoundVote IsNeedLayput="true"></NotFoundVote>
+    <NotFoundLottery IsNeedLayput="true"></NotFoundLottery>
 }
 else
 {
-    <div class="row">
+    <div class="container">
         @if (isReady == false)
         {
-            <div class="col-12">
+            <div>
                 <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
                     <SkeletonParagraph />
                     <hr class="m-2" />
@@ -58,44 +60,25 @@ else
         }
         else
         {
-            <div class="col-12 @(IsLargeScreen ? " col-xl-6" : "")">
+            <div class="">
 
                 @if (Model.IsHidden == true)
                 {
                     <div class="alert alert-info  rounded shadow-sm  rounded" role="alert">
-                        当前投票处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+                        当前抽奖处于隐藏状态，如果你看到了这个提示，请立即联系管理员
                     </div>
 
                 }
 
                 <div class="rounded shadow-sm  bg-opacity mb-4 pb-3">
-                    <div>
-                        <CnGalWebSite.Shared.Component.Votes.MainPage.MainInforCard Model="Model" />
-
-                    </div>
-                    <AuthorizeView Roles="Admin">
-                        <Authorized>
-                            <div class="ms-3 me-3 mt-3">
-                                <CnGalWebSite.Shared.Component.Votes.MainPage.ExtraButtonCard Model="Model" StateChanged="HiddenStateChanged" />
-                            </div>
-                        </Authorized>
-                    </AuthorizeView>
-                    <div class="ms-3 me-3 mt-3">
-                        <CnGalWebSite.Shared.Component.Votes.MainPage.OptionsInforCard Model="Model" IsShowResult="Model.ShowResult" />
-                    </div>
-                    @if (Model.ShowResult == false || Model.IsAllowModification)
-                    {
-                        <div class="ms-3 me-3 mt-3">
-                            <CnGalWebSite.Shared.Component.Votes.MainPage.VoteButtonCard Model="Model" OnVoted="OnVoted" OnReVoted="OnReVoted" />
-                        </div>
-                    }
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
                 </div>
 
 
                 @if (Model.CanComment)
                 {
                     <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="false" IsSmallScreen="IsSmallScreen" CurrentUserRank="@CurrentUserRank" RelyCallBack="OnRely" IsAdmin="@IsAdmin" CanDeleted="IsAdmin" DeletedCallBack="OnDeleted"></CommentListView>
-                    <ReplyCommentTip CurrentUserRank="@CurrentUserRank" IsChild="false" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentVote" RelyCallBack="OnRely" IsAdmin="IsAdmin"></ReplyCommentTip>
+                    <ReplyCommentTip CurrentUserRank="@CurrentUserRank" IsChild="false" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" RelyCallBack="OnRely" IsAdmin="IsAdmin"></ReplyCommentTip>
 
                 }
                 else
@@ -104,20 +87,7 @@ else
                 }
 
             </div>
-            @if (IsLargeScreen)
-            {
-    <div class="col-xl-6">
-        @if (Model.Users.Count != 0)
-        {
-            <CnGalWebSite.Shared.Component.Votes.MainPage.ListUserInforCard Model="Model" />
-        }
-        @if (Model.Entries.Count != 0 || Model.Artciles.Count != 0 || Model.Peripheries.Count != 0)
-        {
-            <CnGalWebSite.Shared.Component.Votes.MainPage.RelevanceInforCard Model="Model" />
-        }
 
-    </div>
-            }
         }
 
 
@@ -149,7 +119,7 @@ else
     bool isReady = false;
     bool isNotFound = false;
 
-    public VoteViewModel Model { get; set; } = new VoteViewModel();
+    public LotteryViewModel Model { get; set; } = new LotteryViewModel();
 
     public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
 
@@ -196,12 +166,12 @@ else
         }
 
         //记录数据
-        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name)==false)
+        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name) == false)
         {
             LastLookName = Model.Name;
             try
             {
-                await JS.InvokeAsync<string>("trackEvent", "投票", "浏览", Model.Name, "1", "look");
+                await JS.InvokeAsync<string>("trackEvent", "抽奖", "浏览", Model.Name, "1", "look");
             }
             catch (Exception exc)
             {
@@ -254,7 +224,7 @@ else
 
 
             //获取周边信息
-            Model = await _dataCatcheService.VoteIndexPageCatche.GetCatche(Id);
+            Model = await _dataCatcheService.LotteryIndexPageCatche.GetCatche(Id);
             //判断投票名称是否为空 为空则跳转到主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {
@@ -291,17 +261,6 @@ else
 
     }
 
-    public async Task OnVoted()
-    {
-        Model = await _dataCatcheService.VoteIndexPageCatche.GetCatche(Id, false);
-        StateHasChanged();
-    }
-    public async Task OnReVoted()
-    {
-        Model.ShowResult = false;
-        StateHasChanged();
-    }
-
     public Task HiddenStateChanged()
     {
         Model.IsHidden = !Model.IsHidden;
@@ -314,7 +273,7 @@ else
     {
         try
         {
-            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)CommentType.CommentVote + "/" + Id + "/" + pageIndex + "/8");
+            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)CommentType.CommentLottery + "/" + Id + "/" + pageIndex + "/8");
             StateHasChanged();
         }
         catch (Exception ex)

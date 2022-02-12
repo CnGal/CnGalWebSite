@@ -614,7 +614,7 @@ else
     {
 
         //记录数据
-        if (EntryView.Name != LastLookName && EntryView.Name != "CnGal_中文GalGame资料站")
+        if (EntryView.Name != LastLookName &&string.IsNullOrWhiteSpace(EntryView.Name)==false)
         {
             LastLookName = EntryView.Name;
 

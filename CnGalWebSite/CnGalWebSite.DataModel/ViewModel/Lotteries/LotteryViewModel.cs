@@ -91,22 +91,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         /// </summary>
         public long Count { get; set; }
 
-        public UserLotteryState State { get; set; }
 
         public List<LotteryAwardViewModel> Awards { get; set; } = new List<LotteryAwardViewModel>();
     }
 
-    public enum UserLotteryState
-    {
-        [Display(Name = "未参与")]
-        NotInvolved,
-        [Display(Name ="等待开奖")]
-        WaitingDraw,
-        [Display(Name = "未中奖")]
-        NotWin,
-        [Display(Name = "中奖")]
-        Win
-    }
 
     public class LotteryAwardViewModel
     {

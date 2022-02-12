@@ -61,6 +61,9 @@ namespace CnGalWebSite.APIServer.Application.Comments
                 case CommentType.CommentVote:
                     query = query.Where(s => s.Type == type && s.VoteId == tempId);
                     break;
+                case CommentType.CommentLottery:
+                    query = query.Where(s => s.Type == type && s.LotteryId == tempId);
+                    break;
                 case CommentType.CommentUser:
                     //
                     var userSpace = await _userSpaceCommentManagerRepository.FirstOrDefaultAsync(s => s.ApplicationUserId == Id);
@@ -184,6 +187,9 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     break;
                 case CommentType.CommentVote:
                     items = items.Where(s => s.VoteId == tempId);
+                    break;
+                case CommentType.CommentLottery:
+                    items = items.Where(s => s.LotteryId == tempId);
                     break;
                 case CommentType.CommentUser:
                     var space = await _userSpaceCommentManagerRepository.FirstOrDefaultAsync(s => s.ApplicationUserId == objectId);

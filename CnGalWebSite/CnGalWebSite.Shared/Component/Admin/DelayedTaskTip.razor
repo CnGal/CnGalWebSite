@@ -1,0 +1,59 @@
+﻿@inject ILocalStorageService _localStorage
+@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+@inject ToastService ToastService
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            //读取数据
+            var taskList = await _localStorage.GetItemAsync<List<DelayedTask>>("DelayedTasks");
+            if (taskList != null)
+            {
+                _dataCacheService.DelayedTaskList = taskList;
+            }
+            //确保网络连通
+            if (await Http.GetFromJsonAsync<List<HomeNewsAloneViewModel>>(ToolHelper.WebApiPath + "api/home/GetHomeNewsView") == null)
+            {
+                return;
+            }
+
+            foreach(var item in _dataCacheService.DelayedTaskList)
+            {
+                try
+                {
+                    string tipStr = $"执行任务成功，当前队列[{_dataCacheService.DelayedTaskList.IndexOf(item) + 1}/{_dataCacheService.DelayedTaskList.Count}]";
+                    if (item.Type == DelayedTaskType.DrawLottery)
+                    {
+                        var model = JsonSerializer.Deserialize<ManualLotteryModel>(item.Context, ToolHelper.options);
+                        var result = await Http.PostAsJsonAsync<ManualLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/DrawLottery", model);
+                        string jsonContent = result.Content.ReadAsStringAsync().Result;
+                        Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                        //判断结果
+                        if (obj.Successful == false)
+                        {
+
+                            await ToastService.Error(tipStr,"抽奖失败，"+ obj.Error);
+                        }
+                        else
+                        {
+                            await ToastService.Success(tipStr, "抽奖成功");
+                        }
+                    }
+
+                }
+                catch
+                {
+
+                }
+
+            }
+
+            await _localStorage.RemoveItemAsync("DelayedTasks");
+        }
+    }
+}

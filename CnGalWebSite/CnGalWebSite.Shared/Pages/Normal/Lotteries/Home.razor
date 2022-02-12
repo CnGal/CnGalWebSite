@@ -1,0 +1,70 @@
+﻿@page "/lotteries/home"
+
+@inject HttpClient Http
+@inject IRoleService _roleService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+
+<TitleTip Title="抽奖板块" Description="这里是正在测试中的抽奖板块，如果有什么好的设计方案欢迎加群761794704反馈"></TitleTip>
+
+<div class="">
+    <div class="row">
+        <div class="col-12  col-md-6  col-xl-4  pb-3">
+            <CnGalWebSite.Shared.Component.Votes.HomeTitleCard Title="抽奖板块" OnToolClick="OnCreateLottery" Icon="fa-dropbox"
+                                                               BriefIntroduction="这里是正在测试中的抽奖板块，如果有什么好的设计方案欢迎加群761794704反馈">
+            </CnGalWebSite.Shared.Component.Votes.HomeTitleCard>
+        </div>
+        @if (isReady)
+        {
+            @foreach (var item in Model)
+            {
+                <div class="col-12  col-md-6  col-xl-4 pb-3">
+
+                    <CnGalWebSite.Shared.Component.Lotteries.LotteryCardView Model="item" />
+                </div>
+            }
+
+        }
+        else
+        {
+            <div class="col-12  col-md-6 col-xl-4 pb-3">
+                <CnGalWebSite.Shared.Component.Votes.HomeLoadingCard />
+            </div>
+        }
+
+
+    </div>
+
+</div>
+
+@code {
+
+
+    private List<LotteryCardViewModel> Model = new List<LotteryCardViewModel>();
+
+    bool isReady = false;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            Model = await Http.GetFromJsonAsync<List<LotteryCardViewModel>>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryCards");
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取抽奖主页信息列表失败");
+        }
+    }
+
+    private Task OnCreateLottery()
+    {
+        NavigationManager.NavigateTo(Provider, "/lotteries/createlottery", "创建抽奖", "fa fa-gift");
+        return Task.CompletedTask;
+    }
+}

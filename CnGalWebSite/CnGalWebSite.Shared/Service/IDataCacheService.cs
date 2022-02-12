@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CnGalWebSite.DataModel.ViewModel.Steam;
+using CnGalWebSite.DataModel.ViewModel.Lotteries;
+using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
 
 namespace CnGalWebSite.Shared.Service
 {
@@ -46,6 +48,8 @@ namespace CnGalWebSite.Shared.Service
 
         ThemeModel ThemeSetting { get; set; }
 
+        List<DelayedTask> DelayedTaskList { get; set; }
+
         IPageModelCatche<EntryIndexViewModel> EntryIndexPageCatche { get; set; }
 
         IPageModelCatche<PeripheryViewModel> PeripheryIndexPageCatche { get; set; }
@@ -69,6 +73,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<PeripheryContrastEditRecordViewModel> PeripheryContrastEditRecordViewCatche { get; set; }
 
         IPageModelCatche<TagContrastEditRecordViewModel> TagContrastEditRecordViewCatche { get; set; }
+
+        IPageModelCatche<LotteryViewModel> LotteryIndexPageCatche { get; set; }
 
         SearchViewModel SearchViewModel { get; set; }
 

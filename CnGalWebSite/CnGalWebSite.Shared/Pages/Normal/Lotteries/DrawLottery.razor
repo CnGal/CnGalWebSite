@@ -1,0 +1,179 @@
+﻿@page "/lotteries/drawlottery/{Id}"
+@attribute [Authorize(Roles = "Admin")]
+
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<div class="container">
+    @if (isReady)
+    {
+    <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4" style="display: flex; flex-direction: column;">
+        @if (CurrentAward == null)
+        {
+            <p>抽奖结束</p>
+        }
+        else
+        {
+            <p>当前奖品：@CurrentAward.Name</p>
+            if (LastWinningUser != null)
+            {
+                <p>上一位中奖用户：@LastWinningUser.Name</p>
+
+            }
+
+            @if (NextAward != null)
+            {
+                <p>下个奖品：@NextAward.Name</p>
+            }
+            <Button IsAsync="true" Color="Color.Dark" Text="抽奖" OnClick="OnDrawLottery" />
+
+        }
+    </div>
+
+    }
+    else
+    {
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+            <div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    public DrawLotteryDataModel Model = new DrawLotteryDataModel();
+
+    public LotteryAwardDataModel CurrentAward;
+    public LotteryUserDataModel LastWinningUser;
+
+    public LotteryAwardDataModel NextAward;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<DrawLotteryDataModel>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryData/" + Id);
+            GetAward();
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取抽奖数据失败");
+        }
+    }
+
+    public async Task OnDrawLottery()
+    {
+        if (Model.NotWinningUsers.Count == 0)
+        {
+            await ToastService.Error("抽奖失败", "没有未被抽取到的用户");
+            return;
+        }
+
+        var index = new Random().Next(0, Model.NotWinningUsers.Count - 1);
+        LastWinningUser = Model.NotWinningUsers[index];
+        Model.NotWinningUsers.Remove(LastWinningUser);
+
+        CurrentAward.WinningUsers.Add(LastWinningUser);
+
+        var model = new ManualLotteryModel
+        {
+            LotteryAwardId = CurrentAward.Id,
+            LotteryId = Model.Id,
+            UserId = LastWinningUser.Id
+        };
+
+        try
+        {
+            var result = await Http.PostAsJsonAsync<ManualLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/DrawLottery", model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("抽奖失败", obj.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            //var resulte = "";
+            //using (TextWriter text = new StringWriter())
+            //{
+            //    var serializer = new Newtonsoft.Json.JsonSerializer();
+            //    serializer.Serialize(text, model);
+            //    resulte = text.ToString();
+            //}
+
+            //_dataCacheService.DelayedTaskList.Add(new DelayedTask
+            //{
+            //    Context = resulte,
+            //    CreateTime = DateTime.Now.ToCstTime(),
+            //    Type = DelayedTaskType.DrawLottery
+            //});
+
+            //await _localStorage.SetItemAsync("DelayedTasks", _dataCacheService.DelayedTaskList);
+        }
+
+        GetAward();
+    }
+
+    public void GetAward()
+    {
+        var awards = Model.Awards.Where(s => s.TotalCount > s.WinningUsers.Count).OrderByDescending(s => s.Priority).ToList();
+
+
+        if (awards.Count == 0)
+        {
+            CurrentAward = NextAward = null;
+            return;
+        }
+        CurrentAward = awards[0];
+        if (CurrentAward.TotalCount - CurrentAward.WinningUsers.Count > 1)
+        {
+            NextAward = CurrentAward;
+        }
+        else
+        {
+            if (awards.Count > 1)
+            {
+                NextAward = awards[1];
+            }
+            else
+            {
+                NextAward = null;
+                return;
+            }
+
+        }
+
+    }
+
+}

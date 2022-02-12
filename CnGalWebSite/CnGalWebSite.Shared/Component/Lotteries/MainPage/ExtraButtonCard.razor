@@ -1,0 +1,76 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+
+<div style="display:flex;">
+    @if (Model.EndTime < DateTime.Now.ToCstTime())
+    {
+        <Button Icon="fa fa-bomb" Text="抽奖" Color="Color.Primary" IsAsync="true" OnClick="OnDraw" Size="Size.ExtraSmall" style=" width: 80px;" class="me-3" />
+
+    }
+    else
+    {
+        <Button Icon="fa fa-bomb" Text="抽奖" Color="Color.Primary" IsDisabled="true" Size="Size.ExtraSmall" style=" width: 80px;" class="me-3" />
+
+    }
+    <Button Icon="fa fa-pencil" Text="编辑" Color="Color.Success" IsAsync="true" OnClick="OnEdit" Size="Size.ExtraSmall" style=" width: 80px;" class="me-3" />
+    @if (Model.IsHidden)
+    {
+        <Button Icon="fa fa-map-signs" Text="显示" Color="Color.Info" IsAsync="true" OnClickWithoutRender="@(()=>OnClickLottery(false))" Size="Size.ExtraSmall" style=" width: 80px;" />
+
+    }
+    else
+    {
+        <Button Icon="fa fa-unlink" Text="隐藏" Color="Color.Danger" IsAsync="true" OnClickWithoutRender="@(()=>OnClickLottery(true))" Size="Size.ExtraSmall" style=" width: 80px;" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public LotteryViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback StateChanged { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task OnClickLottery(bool isHidden)
+    {
+        string text = isHidden ? "隐藏" : "显示";
+
+        try
+        {
+            var result = await Http.PostAsJsonAsync<HiddenLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/HiddenLottery", new HiddenLotteryModel { Ids = new long[] { Model.Id }, IsHidden = true });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(text + "抽奖失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success(text + "抽奖成功", text + "抽奖成功");
+                await StateChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, text + "抽奖失败");
+        }
+    }
+
+    public Task OnEdit()
+    {
+        NavigationManager.NavigateTo(Provider, "/lotteries/editlottery/" + Model.Id, "编辑抽奖","fa fa-gift");
+        return Task.CompletedTask;
+    }
+    public Task OnDraw()
+    {
+        NavigationManager.NavigateTo(Provider, "/lotteries/drawlottery/" + Model.Id, "正在抽奖", "fa fa-gift");
+        return Task.CompletedTask;
+    }
+}

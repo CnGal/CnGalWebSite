@@ -341,6 +341,28 @@ namespace CnGalWebSite.DataModel.Helper
             return null;
         }
 
+        public static List<string> GetTextListFromString(string text)
+        {
+            var result = new List<string>();
+
+            text = text.Replace("，", ",").Replace("、", ",").Replace("：", ":").Replace("\r\n", "\n");
+            var Subcategory = string.Empty;
+            //按行分割
+            var lines = text.Split('\n');
+
+            foreach (var item in lines)
+            {
+                if (string.IsNullOrWhiteSpace(item))
+                {
+                    continue;
+                }
+                result.Add(item);
+
+            }
+
+            return result;
+        }
+
         public static List<StaffModel> GetStaffsFromString(string text)
         {
             var result = new List<StaffModel>();

@@ -1,0 +1,40 @@
+﻿<div class="">
+
+    @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
+    {
+        <img src="@Model.MainPicture" alt="@Model.Name" style="width:100%">
+    }
+<div class="ps-3 pe-3 ">
+    <div class="pt-4">
+        <h1 class="fw-bold text-center h3">@Model.Name</h1>
+    </div>
+    <div class=" mt-4">
+        <div class="markdown-body">
+            @((MarkupString)Model.MainPage)
+        </div>
+    </div>
+    <div class="mt-4">
+        <BasicInforCard Model="Model" />
+    </div>
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <div class="mt-3">
+                <ExtraButtonCard Model="Model" StateChanged="StateChanged" />
+            </div>
+        </Authorized>
+    </AuthorizeView>
+    <div class="mt-4">
+        <OptionInforCard ViewModel="Model" />
+    </div>
+</div>
+    
+
+</div>
+
+@code {
+    [Parameter]
+    public LotteryViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback StateChanged { get; set; }
+
+}

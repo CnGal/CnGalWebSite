@@ -53,7 +53,7 @@
                 var userName = user.User.Identity.Name;
                 foreach (var item in user.User.Claims)
                 {
-               if (item.Type == "userid")
+                    if (item.Type == "userid")
                     {
                         userId = item.Value;
                     }
@@ -81,7 +81,8 @@
             {
 
             }
-
+            //启动定时器
+            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 60 * 10);
         }
 
 
@@ -104,8 +105,7 @@
         _dataCacheService.IsOnThirdPartyLogin = true;
         _dataCacheService.ThirdPartyLoginTempModel = null;
 
-        //启动定时器
-        mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 60 * 10);
+
         //刷新用户状态
         //await RefreshUserInfor();
     }

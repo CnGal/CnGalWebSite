@@ -1,0 +1,63 @@
+﻿@inject ToastService ToastService
+
+@inject HttpClient Http
+<style>
+    .modal-footer {
+        display: none;
+    }
+</style>
+
+<div>
+    @if (isReady)
+    {
+        @if (Model.Type == LotteryAwardType.ActivationCode)
+        {
+            <p>激活码：@Model.Context</p>
+
+        }
+        else if (Model.Type == LotteryAwardType.RealThing)
+        {
+            <p>单号：@Model.Context</p>
+
+        }
+    }
+    else
+    {
+        <div style="min-height:200px;">
+            <h3 class="mb-3 text-center">正在加载</h3>
+            <div class="d-flex" style="justify-content: center;">
+                <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
+            </div>
+        </div>
+
+    }
+</div>
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    public PrizeViewModel Model { get; set; } = new PrizeViewModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public string Text { get; set; }
+    private IEnumerable<long> Value1 { get; set; }
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<PrizeViewModel>(ToolHelper.WebApiPath + "api/lotteries/GetUserPrize/" + Id);
+
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取用户奖品失败");
+        }
+    }
+}

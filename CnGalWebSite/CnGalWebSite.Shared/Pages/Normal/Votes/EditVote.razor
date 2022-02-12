@@ -14,20 +14,22 @@
 {
     <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
 }
-
-<link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor.Markdown/css/bootstrap.blazor.markdown.min.css" media="none" onload="this.media='all'" />
+else
+{
+    <TitleTip />
+}
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
 
 <div class="">
-    <div class="" style="padding-right: 0;padding-left: 0;">
+    <div>
         <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
         <AlertTip Type="AlertTip.AlertTipType.PeripheryStandard"></AlertTip>
         @if (isReady == false)
         {
             <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
                 <h3 class="text-truncate mb-4 fw-bold">编辑附加信息</h3>
-                <h5 class=" mb-4 fw-bold">当前词条：（Id:）</h5>
+                <h5 class=" mb-4 fw-bold">当前投票：（Id:）</h5>
                 <hr>
 
                 <div>
@@ -287,7 +289,7 @@
             else
             {
                 await ToastService.Success("编辑投票成功", "编辑投票成功");
-                NavigationManager.NavigateTo(Provider, "/votes/index/" + Model.Id, Model.DisplayName,"fa fa-dropbox");
+                NavigationManager.NavigateTo(Provider, "/votes/index/" + Model.Id, Model.DisplayName, "fa fa-dropbox");
             }
         }
         catch (Exception ex)

@@ -69,6 +69,8 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<Lottery> Lotteries { get; set; }
         public DbSet<LotteryUser> LotteryUsers { get; set; }
         public DbSet<LotteryAward> LotteryAwards { get; set; }
+        public DbSet<LotteryPrize> LotteryPrizes { get; set; }
+        public DbSet<UserAddress> UserAddresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -105,6 +107,9 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<Article>().Property(b => b.CanComment).HasDefaultValue(true);
             modelBuilder.Entity<ApplicationUser>().Property(b => b.CanComment).HasDefaultValue(true);
             modelBuilder.Entity<Entry>().Property(b => b.CanComment).HasDefaultValue(true);
+            modelBuilder.Entity<Periphery>().Property(b => b.CanComment).HasDefaultValue(true);
+            modelBuilder.Entity<Vote>().Property(b => b.CanComment).HasDefaultValue(true);
+            modelBuilder.Entity<Lottery>().Property(b => b.CanComment).HasDefaultValue(true);
 
             //设置周边自身多对多关系
             modelBuilder.Entity<PeripheryRelation>(entity =>

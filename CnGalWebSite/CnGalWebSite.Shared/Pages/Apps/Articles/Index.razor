@@ -154,7 +154,7 @@ else
     {
 
         //记录数据
-        if (Model.Name != LastLookName && Model.Name != "CnGal_中文GalGame资料站")
+        if (Model.Name != LastLookName && string.IsNullOrWhiteSpace(Model.Name) == false)
         {
             LastLookName = Model.Name;
             try

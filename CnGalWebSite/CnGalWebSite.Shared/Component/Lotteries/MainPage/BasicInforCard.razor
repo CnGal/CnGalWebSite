@@ -1,0 +1,56 @@
+﻿<div style="color:gray;">
+    @if (DateTime.Now.ToCstTime() < Model.BeginTime)
+    {
+        <div>
+            <i class="fa fa-clock-o fa-fw text-primary"></i>
+            <span>未开始</span>
+        </div>
+    }
+    else if (DateTime.Now.ToCstTime() > Model.EndTime)
+    {
+        <div >
+            <i class="fa fa-check-circle fa-fw text-success"></i>
+            <span>已结束</span>
+        </div>
+    }
+    else
+    {
+        <div>
+            <i class="fa fa-check-circle-o fa-fw text-success"></i>
+            <span>正在进行</span>
+        </div>
+    }
+    <div>
+        <i class="fa fa-users fa-fw"></i>
+        <span>@("参与人数："+Model.Count)</span>
+    </div>
+    @if (Model.Type == LotteryType.Automatic)
+    {
+        <div >
+            <i class="fa fa-calendar-check-o fa-fw"></i>
+            <span>@("开奖时间："+ Model.LotteryTime.ToString("yyyy.M.d HH:mm"))</span>
+        </div>
+    }
+    <div >
+        <i class="fa fa-calendar fa-fw "></i>
+        <span>@(Model.BeginTime.ToString("yyyy.M.d HH:mm")+" - "+ Model.EndTime.ToString("yyyy.M.d HH:mm"))</span>
+    </div>
+
+</div>
+<div>
+    <p class="h5 fw-bold mt-3">
+        <i class="fa fa-gift fa-fw "></i>
+        <span>奖品列表</span>
+    </p>
+    @foreach (var item in Model.Awards)
+    {
+        <div class="mt-2 p-2" style="border: 1px solid rgba(0,0,0,.125); border-radius: 5px; ">
+            <i class="fa fa-bookmark-o fa-fw "></i>
+            <span>@(item.Name+" "+item.Count + "件")</span>
+        </div>
+    }
+</div>
+@code {
+    [Parameter]
+    public LotteryViewModel Model { get; set; }
+}

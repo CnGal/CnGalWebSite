@@ -21,7 +21,6 @@ else
     @if (isReady == false)
     {
         <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
-
     }
     else
     {
@@ -149,7 +148,7 @@ else
     {
 
         //记录数据
-        if (Model.Name != LastLookName && string.IsNullOrWhiteSpace(Model.Name))
+        if (Model.Name != LastLookName && string.IsNullOrWhiteSpace(Model.Name)==false)
         {
             LastLookName = Model.Name;
             try

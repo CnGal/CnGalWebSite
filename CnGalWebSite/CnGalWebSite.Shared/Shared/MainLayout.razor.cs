@@ -80,7 +80,8 @@ namespace CnGalWebSite.Shared.Shared
                 }
 
 
-
+                //启动定时器
+                mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 60 * 10);
 
                 //加载调试工具
                 if (_dataCacheService.ThemeSetting.IsDebug)
@@ -202,8 +203,7 @@ namespace CnGalWebSite.Shared.Shared
             //获取菜单
             Menus = GetIconSideMenuItemsAsync(user);
 
-            //启动定时器
-            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 60 * 10);
+            
         }
 
         private void GetUserInfor(ClaimsPrincipal user)
@@ -245,6 +245,7 @@ namespace CnGalWebSite.Shared.Shared
                     new MenuItem() { Text = "制作组", Icon = "fa fa-fw fa-object-group", Url = "/tags/index/4"}
                 } },
                 new MenuItem() { Text = "投票", Icon = "fa fa-fw fa-dropbox", Url = "/votes/home" },
+                new MenuItem() { Text = "抽奖", Icon = "fa fa-fw fa-gift", Url = "/lotteries/home" },
                 new MenuItem() { Text = "数据汇总", Icon = "fa fa-fw fa-line-chart", Url = "/tables/index" },
                 new MenuItem() { Text = "编辑指引", Icon = "fa fa-fw fa-map-signs", Url = "/perfections/home" },
                 new MenuItem() { Text = "Steam鉴赏家", Icon = "fa fa-fw fa-steam", Url = "/navoutlink?link=https://store.steampowered.com/curator/11627314/",Target="_blank" },

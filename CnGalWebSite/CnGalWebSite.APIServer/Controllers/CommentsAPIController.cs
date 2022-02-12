@@ -134,7 +134,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             else if (commentType == CommentType.CommentLottery)
             {
-                var lottery = await _lotteryRepository.FirstOrDefaultAsync(s => s.Id == int.Parse(id));
+                var lottery = await _lotteryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(id));
                 if (lottery != null)
                 {
                     //判断是否被关闭

@@ -92,9 +92,9 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public bool? CanComment { get; set; } = true;
 
-        public virtual ICollection<LotteryUser> Users { get; set; }
+        public virtual ICollection<LotteryUser> Users { get; set; }=new List<LotteryUser>();
 
-        public virtual ICollection<LotteryAward> Awards { get; set; }
+        public virtual ICollection<LotteryAward> Awards { get; set; } = new List<LotteryAward>();
 
 
     }
@@ -113,6 +113,8 @@ namespace CnGalWebSite.DataModel.Model
 
         public DateTime ParticipationTime { get; set; }
 
+        public int Number { get; set; }
+
         public ApplicationUser ApplicationUser { get; set; }
         public string ApplicationUserId { get; set; }
 
@@ -120,7 +122,6 @@ namespace CnGalWebSite.DataModel.Model
         public long? LotteryId { get; set; }
 
         public LotteryPrize LotteryPrize { get; set; }
-        public long? LotteryPrizeId { get; set; }
 
         public LotteryAward LotteryAward { get; set; }
         public long? LotteryAwardId { get; set; }

@@ -1,0 +1,240 @@
+﻿@page "/lotteries/createlottery"
+@attribute [Authorize(Roles = "Admin")]
+
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+<TitleTip Title="创建抽奖"></TitleTip>
+
+<MakeSureInWASMTip></MakeSureInWASMTip>
+
+<div>
+    <div>
+        @if (isReady == false)
+        {
+            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+                <h3 class="text-truncate mb-4 fw-bold">编辑附加信息</h3>
+                <h5 class=" mb-4 fw-bold">当前词条：（Id:）</h5>
+                <hr>
+
+                <div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                </div>
+            </div>
+        }
+        else
+        {
+            <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
+            <AlertTip Type="AlertTip.AlertTipType.PeripheryStandard"></AlertTip>
+            <ValidateForm Model="@Model" ValidateAllProperties="true" @ref="ComplexForm">
+                <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 mb-4">
+                    <h3 class="text-truncate mb-4 fw-bold">填写主要信息</h3>
+                    <hr />
+
+                    <div class="row">
+                        <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
+                            <ImageCropperButton @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
+                        </div>
+                        <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
+                            <ImageCropperButton @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图"></ImageCropperButton>
+                        </div>
+                        <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
+                            <ImageCropperButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图"></ImageCropperButton>
+                        </div>
+                        <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
+                            <ImageCropperButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图"></ImageCropperButton>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <div class="row">
+
+                            <div class="form-group col-12  col-sm-6">
+                                <Select @bind-Value="Model.Type" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.Name" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.DisplayName" />
+                            </div>
+                            <div class="form-group col-12">
+                                <Textarea @bind-Value="Model.BriefIntroduction" rows="3" />
+                            </div>
+                            <div class="form-group col-12 col-sm-6">
+                                <DateTimePicker @bind-Value="@Model.BeginTime" ViewModel="DatePickerViewModel.DateTime" />
+                            </div>
+                            <div class="form-group col-12 col-sm-6">
+                                <DateTimePicker @bind-Value="@Model.EndTime" ViewModel="DatePickerViewModel.DateTime" />
+                            </div>
+                            @if (Model.Type == LotteryType.Automatic)
+                            {
+                                <div class="form-group col-12 col-sm-6">
+                                    <Switch @bind-Value="IsLotteryTimeSameWithEndTime" ShowLabel="true" DisplayText="抽奖时间与结束时间一致" />
+                                </div>
+                                @if (IsLotteryTimeSameWithEndTime)
+                                {
+                                    <div class="form-group col-12 col-sm-6">
+                                        <DateTimePicker @bind-Value="@Model.EndTime" IsDisabled="true" ViewModel="DatePickerViewModel.DateTime" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="form-group col-12 col-sm-6">
+                                        <DateTimePicker @bind-Value="@Model.LotteryTime" ViewModel="DatePickerViewModel.DateTime" />
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+
+
+                </div>
+            </ValidateForm>
+            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+                <h3 class="text-truncate mb-4 fw-bold">编辑正文</h3>
+                <hr class="mb-4" />
+
+
+                <MarkdownEditorTip @bind-Context="@Model.MainPage"></MarkdownEditorTip>
+
+
+
+            </div>
+
+            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+                <h3 class="text-truncate mb-4 fw-bold">填写奖项</h3>
+                <hr />
+                <h5 class="fw-bold mb-4">奖项列表</h5>
+                <CnGalWebSite.Shared.Component.Lotteries.EditPage.EditAwardListCard Awards="Model.Awards" />
+
+            </div>
+
+            <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
+                当你点击“完成”按钮时，将会立即发起审核请求，请在点击前确保内容正确无误
+            </div>
+
+            <ValidateForm Model="@Model" ValidateAllProperties="true">
+
+                <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
+                    <div>
+                        <BootstrapBlazor.Components.Textarea @bind-Value="Model.Note" DisplayText="备注" />
+                        <Button class="mt-3" style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
+                    </div>
+                </div>
+
+            </ValidateForm>
+        }
+
+    </div>
+</div>
+
+
+@code {
+    private EditLotteryModel Model { get; set; } = new EditLotteryModel();
+
+    [NotNull]
+    private ValidateForm? ComplexForm { get; set; }
+
+    private bool IsLotteryTimeSameWithEndTime { get; set; } = true;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            //处理数据
+            if (string.IsNullOrWhiteSpace(Model.Name) || string.IsNullOrWhiteSpace(Model.DisplayName))
+            {
+                await ToastService.Error("创建抽奖失败", "请填写所有必填项目");
+                return;
+            }
+
+            if (Model.BeginTime > Model.EndTime)
+            {
+                await ToastService.Error("创建抽奖失败", "开始时间必须早于结束时间");
+                return;
+            }
+            if(IsLotteryTimeSameWithEndTime)
+            {
+                Model.LotteryTime = Model.EndTime;
+            }
+            if(Model.LotteryTime<Model.EndTime)
+            {
+                await ToastService.Error("创建抽奖失败", "结束时间必须早于抽奖时间");
+                return;
+            }
+
+            if (Model.Awards.Count==0)
+            {
+                await ToastService.Error("创建抽奖失败", "至少需要一个奖项");
+                return;
+            }
+            foreach(var item in Model.Awards)
+            {
+                if(item.Prizes.Count==0)
+                {
+                    await ToastService.Error("创建抽奖失败", "每个奖项至少需要一个奖品");
+                    return;
+                }
+                if(item.Type== LotteryAwardType.ActivationCode&& item.Count != item.Prizes.Count)
+                {
+                    await ToastService.Error("创建抽奖失败", "激活码类别的奖品的数量需要对应实际录入奖品数量");
+                    return;
+                }
+            }
+
+
+            var result = await Http.PostAsJsonAsync<EditLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/CreateLottery", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+
+                await ToastService.Error("创建抽奖失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("创建抽奖成功", "创建抽奖成功");
+                NavigationManager.NavigateTo(Provider, "/lotteries/index/" + obj.Error, Model.Name, "fa fa-dropbox");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "创建抽奖失败");
+        }
+    }
+}

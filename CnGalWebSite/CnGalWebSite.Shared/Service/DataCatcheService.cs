@@ -4,8 +4,10 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
+using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
+using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Space;
@@ -70,6 +72,10 @@ namespace CnGalWebSite.Shared.Service
         /// 主题设置
         /// </summary>
         public ThemeModel ThemeSetting { get; set; } = new ThemeModel();
+        /// <summary>
+        /// 延迟任务列表
+        /// </summary>
+        public List<DelayedTask> DelayedTaskList { get; set; } = new List<DelayedTask>();
 
         /// <summary>
         /// 词条主页数据缓存
@@ -87,6 +93,10 @@ namespace CnGalWebSite.Shared.Service
         /// 投票主页数据缓存
         /// </summary>
         public IPageModelCatche<VoteViewModel> VoteIndexPageCatche { get; set; }
+        /// <summary>
+        /// 抽奖主页数据缓存
+        /// </summary>
+        public IPageModelCatche<LotteryViewModel> LotteryIndexPageCatche { get; set; }
 
         /// <summary>
         /// 标签主页数据缓存
@@ -150,6 +160,7 @@ namespace CnGalWebSite.Shared.Service
         public DataCatcheService(HttpClient httpClient, IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche, IPageModelCatche<VoteViewModel> voteIndexPageCatche,
         IPageModelCatche<PeripheryViewModel> peripheryIndexPageCatche, IPageModelCatche<TagIndexViewModel> tagIndexPageCatche, IPageModelCatche<List<HomeNewsAloneViewModel>> homePageNewsCatche,
         IPageModelCatche<List<DataModel.Model.Carousel>> homePageCarouselsCatche,IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
+        IPageModelCatche<LotteryViewModel> lotteryIndexPageCatche,
         IPageModelCatche<ArticleContrastEditRecordViewModel> articleContrastEditRecordViewCatche,
         IPageModelCatche<PeripheryContrastEditRecordViewModel> peripheryContrastEditRecordViewCatche,
         IPageModelCatche<TagContrastEditRecordViewModel> tagContrastEditRecordViewCatche,
@@ -160,6 +171,7 @@ namespace CnGalWebSite.Shared.Service
             (ArticleIndexPageCatche = articleIndexPageCatche).Init(ToolHelper.WebApiPath + "api/articles/GetArticleView/");
             (PeripheryIndexPageCatche = peripheryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/peripheries/GetPeripheryView/");
             (VoteIndexPageCatche = voteIndexPageCatche).Init(ToolHelper.WebApiPath + "api/votes/GetVoteView/");
+            (LotteryIndexPageCatche = lotteryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/lotteries/GetLotteryView/");
             (TagIndexPageCatche = tagIndexPageCatche).Init(ToolHelper.WebApiPath + "api/tags/gettag/");
             (ExaminesOverviewCatche = examinesOverviewCatche).Init(ToolHelper.WebApiPath + "api/examines/GetExaminesOverview/");
             (EntryContrastEditRecordViewCatche = entryContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/entries/GetContrastEditRecordViews/");

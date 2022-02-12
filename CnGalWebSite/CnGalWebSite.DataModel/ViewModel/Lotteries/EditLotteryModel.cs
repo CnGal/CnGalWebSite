@@ -48,6 +48,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         public DateTime LotteryTime { get; set; }
 
         public List<EditLotteryAwardModel> Awards { get; set; }=new List<EditLotteryAwardModel>();
+
+        [Display(Name = "备注")]
+        public string Note { get; set; }
     }
 
     public class EditLotteryAwardModel
@@ -61,6 +64,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         public int Count { get; set; }
 
         [Display(Name = "名称")]
+        [Required(ErrorMessage = "请填写名称")]
         public string Name { get; set; }
 
         [Display(Name = "类型")]
@@ -69,13 +73,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         [Display(Name = "附加积分")]
         public int Integral { get; set; }
 
-        public virtual ICollection<LotteryPrize> Prizes { get; set; } = new List<LotteryPrize>();
+        public  List<EditLotteryPrizeModel> Prizes { get; set; } = new List<EditLotteryPrizeModel>();
     }
 
     public class EditLotteryPrizeModel
     {
         public long Id { get; set; }
 
+        [Required(ErrorMessage = "请填写奖品")]
         [Display(Name = "奖品")]
         public string Context { get; set; }
     }

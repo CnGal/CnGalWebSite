@@ -204,7 +204,7 @@
 
             if (Model.BeginTime > Model.EndTime)
             {
-                await ToastService.Error("编辑投票失败", "开始时间必须早于结束时间");
+                await ToastService.Error("创建投票失败", "开始时间必须早于结束时间");
                 return;
 
             }
@@ -246,7 +246,7 @@
             }
             else
             {
-                await ToastService.Success("创建投票成功", "创建投票成功，等待审核通过");
+                await ToastService.Success("创建投票成功", "创建投票成功");
                 NavigationManager.NavigateTo(Provider, "/votes/index/" + obj.Error, Model.Name, "fa fa-dropbox");
             }
         }

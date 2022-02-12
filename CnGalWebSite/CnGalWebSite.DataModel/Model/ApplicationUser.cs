@@ -94,7 +94,6 @@ namespace CnGalWebSite.DataModel.Model
         /// 用户地址 用于接收奖品
         /// </summary>
         public UserAddress UserAddress { get; set; }
-        public long? UserAddressId { get; set; }
 
         public virtual ICollection<LotteryUser> Lotteries { get; set; }
 

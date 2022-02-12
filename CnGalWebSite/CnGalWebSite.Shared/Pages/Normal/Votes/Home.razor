@@ -7,11 +7,11 @@
 @inject NavigationManager NavigationManager
 
 
-<TitleTip Title="投票"></TitleTip>
+<TitleTip Title="投票板块" Description="这里是正在测试中的投票板块，如果有什么好的设计方案欢迎加群761794704反馈"></TitleTip>
 
 <div class="">
     <div class="row">
-        <div class="col-12  col-md-6  col-xl-4 col-xxl-3  pb-3">
+        <div class="col-12  col-md-6  col-xl-4 pb-3">
             <CnGalWebSite.Shared.Component.Votes.HomeTitleCard Title="投票板块" OnToolClick="OnCreateVote" Icon="fa-dropbox"
                                                                BriefIntroduction="这里是正在测试中的投票板块，如果有什么好的设计方案欢迎加群761794704反馈">
             </CnGalWebSite.Shared.Component.Votes.HomeTitleCard>
@@ -20,7 +20,7 @@
         {
             @foreach (var item in Model)
             {
-                <div class="col-12  col-md-6  col-xl-4 col-xxl-3  pb-3">
+                <div class="col-12  col-md-6  col-xl-4 pb-3">
 
                     <CnGalWebSite.Shared.Component.Votes.VoteCardViewTip Model="item" />
                 </div>
@@ -29,7 +29,7 @@
         }
         else
         {
-            <div class="col-12  col-md-6 col-xl-4 col-xxl-3  pb-3">
+            <div class="col-12  col-md-6 col-xl-4 pb-3">
                 <CnGalWebSite.Shared.Component.Votes.HomeLoadingCard />
             </div>
         }
@@ -64,7 +64,7 @@
 
     private Task OnCreateVote()
     {
-        NavigationManager.NavigateTo(Provider, "/votes/createvote","创建投票");
+        NavigationManager.NavigateTo(Provider, "/votes/createvote", "创建投票");
         return Task.CompletedTask;
     }
 }

@@ -200,7 +200,7 @@ else
         }
 
         //记录数据
-        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name))
+        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name)==false)
         {
             LastLookName = Model.Name;
             try

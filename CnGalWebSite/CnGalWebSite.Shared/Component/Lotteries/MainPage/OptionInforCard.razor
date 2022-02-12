@@ -1,0 +1,160 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+<div>
+    @if (isReady)
+    {
+        @if (StateModel == null)
+        {
+            @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
+            {
+                <Button IsDisabled="true" Color="Color.Dark" Text="未参与" />
+            }
+            else
+            {
+                <Button Color="Color.Dark" Text="登入后参与抽奖"  OnClick="OnLogin" />
+            }
+        }
+        else
+        {
+            @if (StateModel.State == UserLotteryState.NotInvolved)
+            {
+                @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
+                {
+                    <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="未参与" />
+                }
+                else
+                {
+                    <Button Color="Color.Dark" Text="参与抽奖" IsAsync="true" OnClick="OnParticipateInLottery" />
+                }
+            }
+            else if (StateModel.State == UserLotteryState.NotWin)
+            {
+                <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="未中奖" />
+
+            }
+            else if (StateModel.State == UserLotteryState.WaitingDraw)
+            {
+                <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="等待开奖" />
+            }
+            else if (StateModel.State == UserLotteryState.Win && StateModel.Award != null)
+            {
+                @if (StateModel.Award.Type == LotteryAwardType.ActivationCode)
+                {
+                    <Button Color="Color.Dark" Text="恭喜中奖，查看激活码" OnClick="OnLookPrize" />
+                }
+                else if (StateModel.Award.Type == LotteryAwardType.Integral)
+                {
+                    <Button Color="Color.Dark" Text="恭喜中奖，已发放积分" />
+                }
+            }
+            else if (StateModel.State == UserLotteryState.WaitAddress)
+            {
+                <Button Color="Color.Dark"  Text="恭喜中奖，填写收货地址" />
+
+            }
+            else if (StateModel.State == UserLotteryState.WaitShipments)
+            {
+                <Button Color="Color.Dark" Text="恭喜中奖，等待发货" />
+
+            }
+            else if (StateModel.State == UserLotteryState.Shipped)
+            {
+                <Button Color="Color.Dark" Text="恭喜中奖，查看单号" OnClick="OnLookPrize"/>
+            }
+            @if (StateModel.Award != null)
+            {
+                <p>
+                    @("已中奖："+StateModel.Award.Name)
+                </p>
+            }
+        }
+
+    }
+    else
+    {
+        <Button Color="Color.Dark" Icon="fa-spinner fa-spin" />
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public LotteryViewModel ViewModel { get; set; }
+
+    public UserLotteryStateModel StateModel { get; set; }
+
+    bool isReady = false;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+        isReady = true;
+    }
+
+    public async Task Refresh()
+    {
+        var user = await authenticationStateTask;
+        if(user.User.Identity.IsAuthenticated)
+        {
+            try
+            {
+                StateModel = await Http.GetFromJsonAsync<UserLotteryStateModel>(ToolHelper.WebApiPath + "api/lotteries/GetUserLotteryState/" + ViewModel.Id);
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取用户抽奖状态失败");
+            }
+        }
+
+    }
+
+    public async Task OnParticipateInLottery()
+    {
+        try
+        {
+            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/lotteries/ParticipateInLottery/" + ViewModel.Id);
+            if(result.Successful)
+            {
+                await ToastService.Success("参与抽奖成功", "参与抽奖成功");
+                await Refresh();
+            }
+            else
+            {
+                await ToastService.Error("参与抽奖失败", result.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "参与抽奖失败");
+        }
+    }
+
+    public Task OnLogin()
+    {
+        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        return Task.CompletedTask;
+    }
+
+    public async Task OnLookPrize()
+    {
+        var option = new DialogOption()
+        {
+            Title = "查看奖品",
+            Size= Size.Medium
+        };
+        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<PrizePage.LookPrizeTip>(new Dictionary<string, object>
+        {
+            [nameof(PrizePage.LookPrizeTip.Id)] = ViewModel.Id,
+        }).Render();
+        await DialogService.Show(option);
+    }
+}
