@@ -16,24 +16,44 @@
 
 <div>
     <TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.GameId)" Text="@Model.GameName" class="a-font-color" OnClick="@(()=>OnClickClose.InvokeAsync())">
-        <div style="display:flex;">
 
-            <div>
-                <img style="height:100px;" src="@Model.GameImage" alt="@Model.GameName">
+        @if (IsSmallScreen)
+        {
+            <div style=" display: flex; flex-direction: column;">
+                <div>
+                    <img style="width:100%;" src="@Model.GameImage" alt="@Model.GameName">
+                </div>
+                <div class="pt-2">
+                    <h1 class="fw-bold h4">@Model.GameName</h1>
+                    <span class="text-truncate-3">
+                        @Model.GameBriefIntroduction
+                    </span>
+                </div>
             </div>
-            <div class="ps-3">
-                <h1 class="fw-bold h4">@Model.GameName</h1>
-                <span class="text-truncate-3">
-                    @Model.GameBriefIntroduction
-                </span>
+
+        }
+        else
+        {
+            <div style="display:flex;">
+                <div>
+                    <img style="height:100px;" src="@Model.GameImage" alt="@Model.GameName">
+                </div>
+                <div class="ps-3">
+                    <h1 class="fw-bold h4">@Model.GameName</h1>
+                    <span class="text-truncate-3">
+                        @Model.GameBriefIntroduction
+                    </span>
+                </div>
             </div>
-        </div>
+        }
+
+
     </TabLink>
     <div class="mt-3 mb-2">
         <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-tags"></i>&nbsp;&nbsp;标签</h2>
     </div>
     <div>
-        <GameRecordTagCard Model="Model" IsDark="true"/>
+        <GameRecordTagCard Model="Model" IsDark="true" />
     </div>
     <div class="mt-3 mb-2">
         <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-paint-brush"></i>&nbsp;&nbsp;感想</h2>
@@ -66,6 +86,8 @@
     public GameRecordViewModel Model { get; set; }
     [Parameter]
     public EventCallback OnClickClose { get; set; }
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

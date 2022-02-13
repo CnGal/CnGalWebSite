@@ -34,6 +34,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         WaitShipments,
         [Display(Name = "已发货")]
         Shipped,
+        [Display(Name = "未满足参与条件")]
+        NoCondition,
     }
 
 }

@@ -1,8 +1,8 @@
 ﻿<div class="row">
     @foreach (var item in Model)
     {
-        <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mt-3">
-            <GameRecordViewCard Model="item" OnChanged="OnChanged"/>
+        <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mt-3">
+            <GameRecordViewCard Model="item" OnChanged="OnChanged" IsSmallScreen="IsSmallScreen"/>
 
         </div>
     }
@@ -11,6 +11,8 @@
 @code {
     [Parameter]
     public List<GameRecordViewModel> Model { get; set; }
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
 
     public Task OnChanged()
     {

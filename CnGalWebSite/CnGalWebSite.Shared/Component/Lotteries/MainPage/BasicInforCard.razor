@@ -8,7 +8,7 @@
     }
     else if (DateTime.Now.ToCstTime() > Model.EndTime)
     {
-        <div >
+        <div>
             <i class="fa fa-check-circle fa-fw text-success"></i>
             <span>已结束</span>
         </div>
@@ -24,14 +24,21 @@
         <i class="fa fa-users fa-fw"></i>
         <span>@("参与人数："+Model.Count)</span>
     </div>
+    @if (Model.ConditionType == LotteryConditionType.GameRecord)
+    {
+        <div>
+            <i class="fa fa-filter fa-fw"></i>
+            <span>@("参与条件：至少有一条游玩记录")</span>
+        </div>
+    }
     @if (Model.Type == LotteryType.Automatic)
     {
-        <div >
+        <div>
             <i class="fa fa-calendar-check-o fa-fw"></i>
             <span>@("开奖时间："+ Model.LotteryTime.ToString("yyyy.M.d HH:mm"))</span>
         </div>
     }
-    <div >
+    <div>
         <i class="fa fa-calendar fa-fw "></i>
         <span>@(Model.BeginTime.ToString("yyyy.M.d HH:mm")+" - "+ Model.EndTime.ToString("yyyy.M.d HH:mm"))</span>
     </div>

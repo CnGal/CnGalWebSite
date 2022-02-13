@@ -70,6 +70,9 @@
                                 <Select @bind-Value="Model.Type" />
                             </div>
                             <div class="form-group col-12  col-sm-6">
+                                <Select @bind-Value="Model.ConditionType" />
+                            </div>
+                            <div class="form-group col-12  col-sm-6">
                                 <BootstrapInput @bind-Value="Model.Name" />
                             </div>
                             <div class="form-group col-12  col-sm-6">
@@ -87,12 +90,12 @@
                             @if (Model.Type == LotteryType.Automatic)
                             {
                                 <div class="form-group col-12 col-sm-6">
-                                    <Switch @bind-Value="IsLotteryTimeSameWithEndTime" ShowLabel="true" DisplayText="抽奖时间与结束时间一致"/>
+                                    <Switch @bind-Value="IsLotteryTimeSameWithEndTime" ShowLabel="true" DisplayText="抽奖时间与结束时间一致" />
                                 </div>
                                 @if (IsLotteryTimeSameWithEndTime)
                                 {
                                     <div class="form-group col-12 col-sm-6">
-                                        <DateTimePicker @bind-Value="@Model.EndTime" IsDisabled="true" ViewModel="DatePickerViewModel.DateTime"   DisplayText="抽奖时间"/>
+                                        <DateTimePicker @bind-Value="@Model.EndTime" IsDisabled="true" ViewModel="DatePickerViewModel.DateTime" DisplayText="抽奖时间" />
                                     </div>
                                 }
                                 else

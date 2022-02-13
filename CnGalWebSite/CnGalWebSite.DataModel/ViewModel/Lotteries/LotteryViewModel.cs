@@ -93,6 +93,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
 
         public bool IsEnd { get; set; }
 
+        public LotteryConditionType ConditionType { get; set; }
 
         public List<LotteryAwardViewModel> Awards { get; set; } = new List<LotteryAwardViewModel>();
     }

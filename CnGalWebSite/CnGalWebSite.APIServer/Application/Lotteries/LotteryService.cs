@@ -219,8 +219,8 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             {
                 if(item.Count>item.WinningUsers.Count)
                 {
-                    var index=new Random().Next(0, item.WinningUsers.Count);
-                    var winnningUser=NotWinnningUser[index];
+                    var index = new Random().Next(0, NotWinnningUser.Count);
+                    var winnningUser =NotWinnningUser[index];
 
                     item.WinningUsers.Add(winnningUser);
                     NotWinnningUser.Remove(winnningUser);

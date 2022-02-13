@@ -26,6 +26,10 @@
     public GameRecordViewModel Model { get; set; }
     [Parameter]
     public EventCallback OnChanged { get; set; }
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
+
+
     public async Task OnClick()
     {
         var option = new DialogOption()
@@ -37,6 +41,7 @@
         option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<GameRecordViewTip>(new Dictionary<string, object>
         {
             [nameof(GameRecordViewTip.Model)] = Model,
+            [nameof(GameRecordViewTip.IsSmallScreen)] = IsSmallScreen,
             [nameof(GameRecordViewTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
 
         }).Render();

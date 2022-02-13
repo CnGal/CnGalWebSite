@@ -95,6 +95,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<LotteryUser, long> _lotteryUserRepository;
         private readonly IRepository<LotteryAward, long> _lotteryAwardRepository;
         private readonly IRepository<LotteryPrize, long> _lotteryPrizeRepository;
+        private readonly IRepository<PlayedGame, long> _playedGameRepository;
 
         public LotteryAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
             IRepository<Vote, long> voteRepository, IRepository<VoteOption, long> voteOptionRepository, IRepository<VoteUser, long> voteUserRepository,
@@ -107,7 +108,7 @@ namespace CnGalWebSite.APIServer.Controllers
       IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
       IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
          IRepository<WeeklyNews, long> weeklyNewsRepository, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository,
-         IRepository<LotteryPrize, long> lotteryPrizeRepository, ILotteryService lotteryService)
+         IRepository<LotteryPrize, long> lotteryPrizeRepository, ILotteryService lotteryService, IRepository<PlayedGame, long> playedGameRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -158,6 +159,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _lotteryAwardRepository = lotteryAwardRepository;
             _lotteryPrizeRepository = lotteryPrizeRepository;
             _lotteryService= lotteryService;
+            _playedGameRepository = playedGameRepository;
         }
 
 
@@ -233,10 +235,15 @@ namespace CnGalWebSite.APIServer.Controllers
                 ReaderCount = lottery.ReaderCount,
                 Thumbnail = lottery.Thumbnail,
                 Type = lottery.Type,
-                IsEnd = lottery.IsEnd
+                IsEnd = lottery.IsEnd,
+                ConditionType = lottery.ConditionType,
             };
+            //初始化主页Html代码
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
+            model.MainPage = Markdown.ToHtml(model.MainPage ?? "", pipeline);
 
-            foreach(var item in lottery.Awards)
+
+            foreach (var item in lottery.Awards)
             {
                 model.Awards.Add(new LotteryAwardViewModel
                 {
@@ -286,7 +293,29 @@ namespace CnGalWebSite.APIServer.Controllers
                
                 if (award == null)
                 {
-                    model.State = UserLotteryState.NotInvolved;
+                    if (lottery.EndTime < DateTime.Now.ToCstTime())
+                    {
+                        model.State = UserLotteryState.NotInvolved;
+                    }
+                    else
+                    {
+                        if (lottery.ConditionType == LotteryConditionType.GameRecord)
+                        {
+                            if(await _playedGameRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id))
+                            {
+                                model.State = UserLotteryState.NotInvolved;
+                            }
+                            else
+                            {
+                                model.State = UserLotteryState.NoCondition;
+                            }
+                        }
+                        else
+                        {
+                            model.State = UserLotteryState.NotInvolved;
+
+                        }
+                    }
                 }
                 else
                 {
@@ -361,6 +390,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var lotteries = await _lotteryRepository.GetAll().AsNoTracking()
                 .Include(s=>s.Users)
+                .Where(s=>s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false)
                 .ToListAsync();
 
             var model = new List<LotteryCardViewModel>();
@@ -423,6 +453,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 MainPage = model.MainPage,
                 MainPicture = model.MainPicture,
                 Thumbnail = model.Thumbnail,
+                ConditionType=model.ConditionType,
             };
 
             foreach(var item in model.Awards)
@@ -481,7 +512,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 MainPicture = lottery.MainPicture,
                 Name = lottery.Name,
                 Thumbnail = lottery.Thumbnail,
-                Type = lottery.Type
+                Type = lottery.Type,
+                ConditionType = lottery.ConditionType,
             };
 
             foreach (var item in lottery.Awards)
@@ -558,7 +590,7 @@ namespace CnGalWebSite.APIServer.Controllers
             lottery.MainPage = model.MainPage;
             lottery.MainPicture = model.MainPicture;
             lottery.Thumbnail = model.Thumbnail;
-
+            lottery.ConditionType = model.ConditionType;
 
             //记录现有的Ids
             var awardIds = model.Awards.Select(s => s.Id).ToList();
@@ -648,9 +680,16 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Successful = false, Error = "未找到该抽奖或抽奖已结束" };
             }
-
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            if(lottery.ConditionType== LotteryConditionType.GameRecord)
+            {
+                if(await _playedGameRepository.GetAll().AnyAsync(s=>s.ApplicationUserId==user.Id)==false)
+                {
+                    return new Result { Successful = false, Error = "参加该抽奖需要至少有一条游玩记录" };
+                }
+            }
 
             if (lottery.Users.Any(s=>s.ApplicationUserId==user.Id))
             {

@@ -1,0 +1,123 @@
+﻿@page "/space/myplayedgame"
+@attribute [Authorize]
+
+
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService ToastService
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+@inject IJSRuntime JS
+@inject DialogService DialogService
+@inject IDataCacheService _dataCatcheService
+
+@if (string.IsNullOrWhiteSpace(_dataCatcheService.UserInfor.UserName) == false)
+{
+    <TitleTip Title="@(_dataCatcheService.UserInfor.UserName + " - CnGal 中文galgame资料站")" Description="@_dataCatcheService.UserInfor.PersonalSignature" Image="@_dataCatcheService.UserInfor.PhotoPath"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+}
+
+<CnGalWebSite.Shared.AppComponent.Pages.Users.MyPlayedGame.HeadBar Title="@ViewModel.Name" SteamId="@ViewModel.SteamId" IsShadow="true" OnEditSteam="OnEditSteam" OnRefresh="OnRefresh" />
+<div style="margin-top: 45px; width: 100%;">
+    @if (isReady)
+    {
+        if (Model.Count == 0)
+        {
+            <div class="mt-3">
+                <CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard />
+            </div>
+        }
+        else
+        {
+            <div class="ms-3 me-3 mb-3">
+                <CnGalWebSite.Shared.Component.PlayedGames.ListGameRecordCard Model="Model" IsSmallScreen="true" />
+            </div>
+        }
+    }
+    else
+    {
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+    }
+
+</div>
+
+@code{
+
+    public PersonalSpaceViewModel ViewModel { get; set; } = new PersonalSpaceViewModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    public List<GameRecordViewModel> Model = new List<GameRecordViewModel>();
+
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var userState = await authenticationStateTask;
+            var user = userState.User;
+            var userId = "";
+            foreach (var item in user.Claims)
+            {
+
+                if (item.Type == "userid")
+                {
+                    userId = item.Value;
+                }
+            }
+
+            ViewModel = await Http.GetFromJsonAsync<PersonalSpaceViewModel>(ToolHelper.WebApiPath + "api/space/getuserview/" + userId);
+            Model = await Http.GetFromJsonAsync<List<GameRecordViewModel>>(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameInfor");
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取用户游玩记录列表失败");
+        }
+    }
+
+    public async Task OnEditSteam()
+    {
+        var option = new DialogOption()
+        {
+            Title = "绑定Steam账号"
+        };
+        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<CnGalWebSite.Shared.Component.PlayedGames.EditUserSteamInforTip>(new Dictionary<string, object>
+        {
+            [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditUserSteamInforTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
+            [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditUserSteamInforTip.OnChanged)] = EventCallback.Factory.Create<string>(this, async (s) => { ViewModel.SteamId = s; await OnRefresh(); }),
+
+        }).Render();
+        await DialogService.Show(option);
+    }
+
+    public async Task OnRefresh()
+    {
+        try
+        {
+            var model = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/playedgame/RefreshPlayedGameSteamInfor");
+            if (model.Successful)
+            {
+                await OnInitializedAsync();
+                await ToastService.Success("刷新成功", "刷新成功");
+                StateHasChanged();
+            }
+            else
+            {
+                await ToastService.Error("刷新失败", "刷新失败");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "刷新用户Steam信息失败");
+        }
+    }
+
+}

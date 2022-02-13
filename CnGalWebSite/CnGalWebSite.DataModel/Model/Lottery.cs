@@ -96,6 +96,11 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public bool? CanComment { get; set; } = true;
 
+        /// <summary>
+        /// 参加抽奖的前置条件
+        /// </summary>
+        public LotteryConditionType ConditionType { get; set; }
+
         public virtual ICollection<LotteryUser> Users { get; set; }=new List<LotteryUser>();
 
         public virtual ICollection<LotteryAward> Awards { get; set; } = new List<LotteryAward>();
@@ -109,6 +114,14 @@ namespace CnGalWebSite.DataModel.Model
         Manual,
         [Display(Name = "自动")]
         Automatic,
+    }
+
+    public enum LotteryConditionType
+    {
+        [Display(Name ="无")]
+        None,
+        [Display(Name = "至少有一条游玩记录")]
+        GameRecord,
     }
 
     public class LotteryUser

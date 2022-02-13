@@ -1,5 +1,7 @@
 ﻿@page "/space/myfavorite"
 
+@attribute [Authorize]
+
 @inject HttpClient Http
 @inject ExamineService _examineService
 @inject ToastService ToastService

@@ -111,6 +111,12 @@
             },
             new AppComponent.Normal.Links.IconTextModel
             {
+                Icon="fa-file-text-o",
+                Text="游玩记录",
+                Url=isOnline?"/space/myplayedgame":"/account/apps/login"
+            },
+            new AppComponent.Normal.Links.IconTextModel
+            {
                 Icon="fa-map-o",
                 Text="创作中心",
                 Url=isOnline?("/home/creativecenter/"+userId):"/account/apps/login"

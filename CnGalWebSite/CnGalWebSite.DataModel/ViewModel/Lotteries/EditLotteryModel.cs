@@ -39,10 +39,13 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
 
         [Display(Name = "类型")]
         public LotteryType Type { get; set; }
+        [Display(Name = "参加抽奖的条件")]
+        public LotteryConditionType ConditionType { get; set; }
+
 
         [Display(Name = "开始时间")]
         public DateTime BeginTime { get; set; }
-        [Display(Name = "截至时间")]
+        [Display(Name = "截止时间")]
         public DateTime EndTime { get; set; }
         [Display(Name = "抽奖时间")]
         public DateTime LotteryTime { get; set; }
