@@ -90,7 +90,8 @@ else
                 @if (IsLargeScreen == false)
                 {
                     <div class="">
-                        <PeripheryListOverviewsTip Model="Model.PeripheryOverviewModels" @ref="peripheryOverViewTip" />
+                        <PeripheryListOverviewsTip Model="Model.PeripheryOverviewModels" @ref="peripheryOverViewTip" RelatedEntriesState="Model.RelatedEntriesState" RelatedPeripheriesState="Model.RelatedPeripheriesState"
+                                                    IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" Type="Model.Type" />
                     </div>
                 }
 

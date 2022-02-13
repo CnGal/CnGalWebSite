@@ -59,6 +59,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         private readonly IRepository<Loginkey, long> _loginkeyRepository;
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
+        private readonly IRepository<UserIntegral, long> _userIntegralRepository;
         private readonly IEmailService _EmailService;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
@@ -69,7 +70,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
             IRepository<Comment, long> commentRepository, IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<SteamInfor, int> steamInforRepository, IRepository<Loginkey, long> loginkeyRepository,
         IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository, IEmailService EmailService, IRepository<TokenCustom, int> tokenCustomRepository,
             IRepository<Article, long> aricleRepository, SignInManager<ApplicationUser> signInManager, IRepository<Entry, int> entryRepository, IRepository<SendCount, long> sendCountRepository,
-        IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<Lottery, long> lotteryRepository)
+        IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<Lottery, long> lotteryRepository,
+        IRepository<UserIntegral, long> userIntegralRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -99,6 +101,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             _peripheryRepository = peripheryRepository;
             _voteRepository = voteRepository;
             _lotteryRepository = lotteryRepository;
+            _userIntegralRepository= userIntegralRepository;
         }
 
         public async Task<bool> IsEntryLockedAsync(int entryId, string userId, Operation operation)
@@ -1622,16 +1625,20 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 //签到
                 var integral_3 = await _signInDayRepository.CountAsync(s => s.ApplicationUserId == user.Id) * signInDaysIntegral;
 
+                var integral_4 = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.Integral).Select(s => s.Count).SumAsync();
 
-                user.DisplayIntegral = user.Integral + integral_1 + integral_2 + integral_3;
+                user.DisplayIntegral = integral_1 + integral_2 + integral_3+ integral_4;
 
 
                 //计算贡献值
-                user.DisplayContributionValue = user.ContributionValue + await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).SumAsync(s => s.ContributionValue);
+
+                var contributionValue_1 = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.ContributionValue).Select(s => s.Count).SumAsync();
+
+                user.DisplayContributionValue = contributionValue_1 + await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).SumAsync(s => s.ContributionValue);
 
                 await _userManager.UpdateAsync(user);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
             }

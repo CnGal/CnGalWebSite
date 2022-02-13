@@ -1,0 +1,28 @@
+﻿@if (Model.IsInSteam)
+{
+    <Button IsOutline="false" class="me-2" style="border-radius:5px;" Color="@(IsDark?Color.Dark:Color.Info)" Text="@((Model.PlayDuration/60.0).ToString("0.0")+" 小时")" Icon="fa fa-steam" Size="Size.ExtraSmall" />
+}
+
+@if (Model.Type == PlayedGameType.WantToPlay)
+{
+    <Button IsOutline="false" style="border-radius: 5px;"  Color="@(IsDark?Color.Dark:Color.Warning)" Text="想玩" Icon="fa  fa-car" Size="Size.ExtraSmall" />
+}
+else if (Model.Type == PlayedGameType.Playing)
+{
+    <Button IsOutline="false" style="border-radius: 5px;" Color="@(IsDark?Color.Dark:Color.Primary)" Text="正在玩" Icon="fa  fa-dashboard" Size="Size.ExtraSmall" />
+}
+else if (Model.Type == PlayedGameType.Played)
+{
+    <Button IsOutline="false" style="border-radius: 5px;" Color="@(IsDark?Color.Dark:Color.Success)" Text="已玩" Icon="fa  fa-gamepad" Size="Size.ExtraSmall" />
+}
+else if (Model.Type == PlayedGameType.Uninterested)
+{
+    <Button IsOutline="false" style="border-radius: 5px;" Color="@(IsDark?Color.Dark:Color.Danger)" Text="不感兴趣" Icon="fa  fa-thumbs-o-down" Size="Size.ExtraSmall" />
+}
+
+@code {
+    [Parameter]
+    public GameRecordViewModel Model { get; set; }
+    [Parameter]
+    public bool IsDark { get; set; }
+}

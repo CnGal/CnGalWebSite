@@ -2,7 +2,7 @@
 
 namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
 {
-    public class GameRecordModel
+    public class GameRecordViewModel
     {
         /// <summary>
         /// 类型
@@ -32,7 +32,10 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
         /// <summary>
         /// 游戏简介
         /// </summary>
-        public string BriefIntroduction { get; set; }
-
+        public string GameBriefIntroduction { get; set; }
+        /// <summary>
+        /// 游戏简介
+        /// </summary>
+        public string PlayImpressions { get; set; }
     }
 }

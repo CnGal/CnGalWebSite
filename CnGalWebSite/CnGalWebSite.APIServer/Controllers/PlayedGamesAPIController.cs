@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.PlayedGames;
+using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Model;
@@ -23,18 +24,62 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IAppHelper _appHelper;
+        private readonly ISteamInforService _steamInforService;
         private readonly IPlayedGameService _playedGameService;
 
-        public PlayedGamesAPIController(IPlayedGameService playedGameService, IRepository<PlayedGame, long> playedGameRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository)
+        public PlayedGamesAPIController(IPlayedGameService playedGameService, ISteamInforService steamInforService,
+        IRepository<PlayedGame, long> playedGameRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
             _playedGameRepository = playedGameRepository;
             _playedGameService = playedGameService;
+            _steamInforService = steamInforService;
         }
+        /// <summary>
+        /// 编辑游玩记录
+        /// </summary>
+        /// <param name="id">游戏Id</param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EditGameRecordModel>> EditGameRecordAsync(int id)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
+            var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Type == EntryType.Game && s.Id == id);
+            if (entry == null)
+            {
+                return NotFound("不存在Id：" + id + " 的游戏");
+            }
+
+            //查找是否已经添加
+            var game = await _playedGameRepository.GetAll().FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.EntryId == id);
+            if (game == null)
+            {
+
+                return new EditGameRecordModel
+                {
+                    GameId = id
+                };
+            }
+            else
+            {
+                return new EditGameRecordModel
+                {
+                    GameId = id,
+                    Type = game.Type,
+                    PlayImpressions=game.PlayImpressions,
+                };
+            }
+        }
+        /// <summary>
+        /// 编辑游玩记录
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<Result>> AddGameToPlayedList(AddGameToPlayedModel model)
+        public async Task<ActionResult<Result>> EditGameRecordAsync(EditGameRecordModel model)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -52,47 +97,43 @@ namespace CnGalWebSite.APIServer.Controllers
                 await _playedGameRepository.InsertAsync(new PlayedGame
                 {
                     ApplicationUserId = user.Id,
+                    Type=model.Type,
+                    PlayImpressions=model.PlayImpressions,
                     EntryId = model.GameId
                 });
-
-                //刷新缓存
-                //var tempCount = await _playedGameRepository.CountAsync(s => s.EntryId == model.GameId);
-                //await _entryRepository.GetRangeUpdateTable().Where(s => s.Id == model.GameId).Set(s => s.PlayedCount, b => tempCount).ExecuteAsync();
 
                 return new Result { Successful = true };
             }
             else
             {
                 game.Type = model.Type;
+                game.PlayImpressions = model.PlayImpressions;
+
                 await _playedGameRepository.UpdateAsync(game);
                 return new Result { Successful = true };
             }
         }
+        /// <summary>
+        /// 删除游戏记录
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<Result>> DeleteGameFromPlayedList(DeleteGameFromPlayedModel model)
+        public async Task<ActionResult<Result>> DeleteGameFromPlayedList(DeleteGameRecordModel model)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            var entry = await _playedGameRepository.FirstOrDefaultAsync(s => s.Id == model.Id && s.ApplicationUserId == user.Id);
-
-            if (entry == null)
-            {
-                return new Result { Successful = false, Error = "不存在Id：" + model.Id + " 的游戏" };
-            }
-
-            await _playedGameRepository.DeleteAsync(entry);
+            await _playedGameRepository.DeleteAsync(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.Id));
 
             return new Result { Successful = true };
         }
 
-        [AllowAnonymous]
-        [HttpPost]
-        public async Task<PagedResultDto<EntryInforTipViewModel>> GetUserPlayedGameListAsync(PagedSortedAndFilterInput input)
-        {
-            return await _playedGameService.GetPaginatedResult(input);
-        }
-
+        /// <summary>
+        /// 获取当前用户的某个游戏记录
+        /// </summary>
+        /// <param name="id">游戏词条Id</param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<PlayedGameInforModel>> GetPlayedGameInforAsync(int id)
         {
@@ -121,38 +162,14 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Result>> ScoreGameAsync(ScoreGameModel model)
-        {
-            //获取当前用户ID
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Type == EntryType.Game && s.Id == model.GameId);
-            if (entry == null)
-            {
-                return new Result { Successful = false, Error = "不存在Id：" + model.GameId + "的游戏" };
-            }
-
-            //查找是否已经添加
-            var gameScore = await _playedGameRepository.FirstOrDefaultAsync(s => s.EntryId == model.GameId && s.ApplicationUserId == user.Id);
-            if (gameScore == null)
-            {
-                return new Result { Successful = false, Error = "必须添加已玩列表后才能评分" };
-            }
-
-            gameScore.CVSocre = model.CVSocre;
-            gameScore.ShowSocre = model.ShowSocre;
-            gameScore.ScriptSocre = model.ScriptSocre;
-            gameScore.PaintSocre = model.PaintSocre;
-            gameScore.SystemSocre = model.SystemSocre;
-
-            await _playedGameRepository.UpdateAsync(gameScore);
-
-            return new Result { Successful = true };
-        }
-
+        /// <summary>
+        ///
+        /// 获取当前用户的游戏记录
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<GameRecordModel>>> GetPlayedGameInforAsync()
+        public async Task<ActionResult<List<GameRecordViewModel>>> GetPlayedGameInforAsync()
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -160,23 +177,35 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取词条
             var games = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.Entry).Where(s => s.ApplicationUserId == user.Id).ToListAsync();
 
-            var model = new List<GameRecordModel>();
+            var model = new List<GameRecordViewModel>();
 
-            foreach (var item in games)
+            foreach (var item in games.OrderByDescending(s=>s.PlayDuration))
             {
-                model.Add(new GameRecordModel
+                model.Add(new GameRecordViewModel
                 {
-                    BriefIntroduction = item.Entry.BriefIntroduction,
+                    GameBriefIntroduction = item.Entry.BriefIntroduction,
                     IsInSteam = item.IsInSteam,
                     GameId = item.EntryId ?? 0,
                     GameImage = _appHelper.GetImagePath(item.Entry.MainPicture, "app.png"),
                     GameName = item.Entry.Name,
                     PlayDuration = item.PlayDuration,
                     Type = item.Type,
+                    PlayImpressions=item.PlayImpressions,
                 });
             }
 
             return model;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<Result>> RefreshPlayedGameSteamInfor()
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            await _steamInforService.UpdateUserSteam(user);
+
+            return new Result { Successful = true };
         }
 
     }

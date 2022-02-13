@@ -1,0 +1,112 @@
+﻿@inject ToastService ToastService
+@inject DialogService DialogService
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IServiceProvider Provider
+
+<style>
+    .modal-footer {
+        display: none;
+    }
+
+    .modal-title {
+        font-weight: bolder;
+    }
+</style>
+
+<div>
+    <TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.GameId)" Text="@Model.GameName" class="a-font-color" OnClick="@(()=>OnClickClose.InvokeAsync())">
+        <div style="display:flex;">
+
+            <div>
+                <img style="height:100px;" src="@Model.GameImage" alt="@Model.GameName">
+            </div>
+            <div class="ps-3">
+                <h1 class="fw-bold h4">@Model.GameName</h1>
+                <span class="text-truncate-3">
+                    @Model.GameBriefIntroduction
+                </span>
+            </div>
+        </div>
+    </TabLink>
+    <div class="mt-3 mb-2">
+        <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-tags"></i>&nbsp;&nbsp;标签</h2>
+    </div>
+    <div>
+        <GameRecordTagCard Model="Model" IsDark="true"/>
+    </div>
+    <div class="mt-3 mb-2">
+        <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-paint-brush"></i>&nbsp;&nbsp;感想</h2>
+    </div>
+
+    @if (string.IsNullOrWhiteSpace(Model.PlayImpressions) == false)
+    {
+
+        <span>
+            @Model.PlayImpressions
+        </span>
+
+    }
+    else
+    {
+        <span>无</span>
+    }
+</div>
+<div class="mt-4" style="display: flex; justify-content: space-between;">
+    <Button Color="Color.Danger" Icon="fa fa-close" OnClick="OnDelete" IsAsync="true" Text="删除"></Button>
+
+
+    <Button Color="Color.Success" Icon="fa fa-pencil" OnClick="OnEdit" IsAsync="true" Text="编辑"></Button>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public GameRecordViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnClickClose { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task OnEdit()
+    {
+        var option = new DialogOption()
+        {
+            Title = "编辑游玩记录"
+        };
+        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EditGameRecordTip>(new Dictionary<string, object>
+        {
+            [nameof(EditGameRecordTip.Id)] = Model.GameId,
+            [nameof(EditGameRecordTip.ViewModel)] = Model,
+            [nameof(EditGameRecordTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => { StateHasChanged(); await option.Dialog.Close(); }),
+
+        }).Render();
+        await DialogService.Show(option);
+    }
+
+    public async Task OnDelete()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<DeleteGameRecordModel>(ToolHelper.WebApiPath + "api/playedgame/DeleteGameFromPlayedList", new DeleteGameRecordModel { Ids = new long[] { Model.GameId } });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("删除游玩记录失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("删除游玩记录成功", "删除游玩记录成功");
+                await OnClickClose.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "删除游玩记录失败");
+        }
+    }
+}

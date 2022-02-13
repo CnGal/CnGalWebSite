@@ -7,6 +7,7 @@ using CnGalWebSite.APIServer.Application.Favorites;
 using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.HistoryData;
+using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.Messages;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Perfections;
@@ -80,12 +81,14 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRankService _rankService;
         private readonly IPeripheryService _peripheryService;
         private readonly IVoteService _voteService;
+        private readonly ILotteryService _lotteryService;
         private readonly IElasticsearchBaseService<Entry> _entryElasticsearchBaseService;
         private readonly IElasticsearchBaseService<Article> _articleElasticsearchBaseService;
         private readonly IElasticsearchService _elasticsearchService;
         private readonly INewsService _newsService;
         private readonly IRepository<GameNews, long> _gameNewsRepository;
         private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
+        private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly IHistoryDataService _historyDataService;
         private readonly IConfiguration _configuration;
 
@@ -99,8 +102,8 @@ namespace CnGalWebSite.APIServer.Controllers
         IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
-        IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository,
-        IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration)
+        IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService,
+        IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -147,6 +150,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _voteRepository = voteRepository;
             _configuration = configuration;
             _steamInforRepository = steamInforRepository;
+            _lotteryRepository = lotteryRepository;
+            _lotteryService = lotteryService;
         }
 
         /// <summary>
@@ -542,8 +547,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var model = new ListVotesInforViewModel
             {
-                All = await _rankRepository.LongCountAsync(),
-                Hiddens = await _rankRepository.LongCountAsync(s => s.IsHidden == true)
+                All = await _voteRepository.LongCountAsync(),
+                Hiddens = await _voteRepository.LongCountAsync(s => s.IsHidden == true)
             };
 
             return model;
@@ -557,7 +562,27 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-     
+        [HttpGet]
+        public async Task<ActionResult<ListLotteriesInforViewModel>> ListLotteriesAsync()
+        {
+            var model = new ListLotteriesInforViewModel
+            {
+                All = await _lotteryRepository.LongCountAsync(),
+                Hiddens = await _lotteryRepository.LongCountAsync(s => s.IsHidden == true)
+            };
+
+            return model;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListLotteryAloneModel>>> GetLotteryListAsync(LotteriesPagesInfor input)
+        {
+            var dtos = await _lotteryService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
+        }
+
+
 
         /// <summary>
         /// 管理主页 包括友情链接 轮播图

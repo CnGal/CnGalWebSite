@@ -2,6 +2,26 @@
 <div>
     <TitleCollapseCard Icon="fa-shopping-basket" Title="周边合集">
         <div class="mt-3">
+            @if (IsEdit == true)
+            {
+                <div>
+                    @switch (RelatedEntriesState)
+                    {
+                        case EditState.locked:
+                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
+                            break;
+                        case EditState.Normal:
+                            <AlertTip Title="编辑关联词条信息" Type="@(Model.Count==0?AlertTip.AlertTipType.Blank: AlertTip.AlertTipType.Editable)" Url="@("/peripheries/EditRelatedEntries/" + Id)"></AlertTip>
+                            break;
+                    }
+                </div>
+            }
+            @if (RelatedEntriesState == EditState.Preview)
+            {
+                <div>
+                    <AlertTip Title="编辑关联词条信息" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditRelatedEntries/" + Id)" ExamineType="Operation.EditPeripheryRelatedEntries" OnClickRevoke="OnClickRevoke"></AlertTip>
+                </div>
+            }
             @foreach (var item in Model)
             {
                 <div class=" rounded shadow-sm  bg-opacity mb-3 ps-3 pt-3 pb-1 pe-3">
@@ -17,7 +37,18 @@
 @code {
     [Parameter]
     public List<GameOverviewPeripheriesModel> Model { get; set; } = new List<GameOverviewPeripheriesModel>();
-
+    [Parameter]
+    public bool IsEdit { get; set; }
+    [Parameter]
+    public EditState RelatedEntriesState { get; set; }
+    [Parameter]
+    public EditState RelatedPeripheriesState { get; set; }
+    [Parameter]
+    public EventCallback<Operation> OnClickRevoke { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public PeripheryType Type { get; set; }
     public Task CollectionChanged(bool collected, long id)
     {
         foreach (var item in Model)

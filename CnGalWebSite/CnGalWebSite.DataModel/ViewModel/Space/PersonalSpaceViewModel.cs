@@ -74,5 +74,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 
         public bool IsShowFavorites { get; set; }
 
+        public string SteamId { get; set; }
+
     }
 }

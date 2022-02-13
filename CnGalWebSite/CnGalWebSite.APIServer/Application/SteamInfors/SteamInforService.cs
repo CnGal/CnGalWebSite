@@ -273,57 +273,67 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         {
             //获取最新列表
             //获取信息
+            var steamGames = new UserSteamResponseJson();
             try
             {
                 using var client = _clientFactory.CreateClient();
                 var jsonContent = await client.GetStringAsync("http://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + user.SteamId);
                 var obj = JObject.Parse(jsonContent);
-                var steamGames = obj["response"].ToObject<UserSteamResponseJson>();
-                if (steamGames == null || steamGames.games == null)
-                {
-                    return false;
-                }
-                var appids = steamGames.games.Select(s => s.appid);
+                steamGames = obj["response"].ToObject<UserSteamResponseJson>();
+            }
+            catch (Exception ex)
+            {
 
-                //查找
-                var steams = await _steamInforRepository.GetAll().Where(s => appids.Contains(s.SteamId)).ToListAsync();
-                var userGames = await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).ToListAsync();
+            }
+            //查找
+            var userGames = await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).ToListAsync();
 
+            if (steamGames == null || steamGames.games == null)
+            {
+                //取消在库中的标记
                 //遍历列表更新已玩游戏信息
                 foreach (var item in userGames)
                 {
-                    var steamTemp = steams.FirstOrDefault(s => s.EntryId == item.EntryId);
-                    if (steamTemp != null)
-                    {
-                        item.IsInSteam = true;
-                        item.PlayDuration = steamGames.games.FirstOrDefault(s => s.appid == steamTemp.SteamId)?.playtime_forever ?? 0;
-                    }
-                    else
-                    {
-                        item.IsInSteam = false;
-                    }
+                    item.IsInSteam = false;
+                    await _playedGameRepository.UpdateAsync(item);
                 }
-
-                //添加新游戏
-                foreach (var item in steams.Where(s => userGames.Select(s => s.EntryId).Contains(s.EntryId) == false))
-                {
-                    await _playedGameRepository.InsertAsync(new PlayedGame
-                    {
-                        IsInSteam = true,
-                        PlayDuration = steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0,
-                        EntryId = item.EntryId,
-                        Type = ((steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0) > 0) ? PlayedGameType.Played : PlayedGameType.WantToPlay,
-                        ApplicationUserId = user.Id,
-                    });
-                }
-
-                return true;
-
-            }
-            catch
-            {
                 return false;
             }
+            var appids = steamGames.games.Select(s => s.appid);
+            var steams = await _steamInforRepository.GetAll().Where(s => appids.Contains(s.SteamId)).ToListAsync();
+
+            //遍历列表更新已玩游戏信息
+            foreach (var item in userGames)
+            {
+                var steamTemp = steams.FirstOrDefault(s => s.EntryId == item.EntryId);
+                if (steamTemp != null)
+                {
+                    item.IsInSteam = true;
+                    item.PlayDuration = steamGames.games.FirstOrDefault(s => s.appid == steamTemp.SteamId)?.playtime_forever ?? 0;
+                }
+                else
+                {
+                    item.IsInSteam = false;
+                }
+                await _playedGameRepository.UpdateAsync(item);
+            }
+
+            //添加新游戏
+            foreach (var item in steams.Where(s => userGames.Select(s => s.EntryId).Contains(s.EntryId) == false))
+            {
+                await _playedGameRepository.InsertAsync(new PlayedGame
+                {
+                    IsInSteam = true,
+                    PlayDuration = steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0,
+                    EntryId = item.EntryId,
+                    Type = ((steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0) > 0) ? PlayedGameType.Played : PlayedGameType.WantToPlay,
+                    ApplicationUserId = user.Id,
+                });
+            }
+
+            return true;
+
+
         }
 
         public async Task<SteamEvaluation> GetSteamEvaluationAsync(int id)

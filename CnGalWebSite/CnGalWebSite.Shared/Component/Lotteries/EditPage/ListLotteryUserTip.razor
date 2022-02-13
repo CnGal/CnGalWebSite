@@ -1,0 +1,63 @@
+﻿@inject HttpClient Http
+@inject IRoleService _roleService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<div>
+      
+            <Table TItem="ListLotteryUserAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelArticle" ShowSearch="true" @ref="TableRows"
+                   ShowExtendButtons="true" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+                   ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+                <TableColumns>
+                    <TableColumn @bind-Field="@context.Number" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
+                    <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" AllowTextWrap="true" Width="200" />
+                    <TableColumn @bind-Field="@context.Id" Searchable="true" AllowTextWrap="true" Width="400" />
+                </TableColumns>
+            </Table>
+</div>
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    [NotNull]
+    private Table<ListLotteryUserAloneModel>? TableRows { get; set; }
+    private List<ListLotteryUserAloneModel> SelectedRows { get; set; } = new();
+
+
+    public ListLotteryUsersInforViewModel InforModel { get; set; } = new ListLotteryUsersInforViewModel();
+    public ListLotteryUsersViewModel ListModel { get; set; } = new ListLotteryUsersViewModel { LotteryUsers = new List<ListLotteryUserAloneModel>() };
+
+    private ListLotteryUserAloneModel SearchModelArticle { get; set; } = new ListLotteryUserAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private async Task<QueryData<ListLotteryUserAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+
+            var result = await Http.PostAsJsonAsync<LotteryUsersPagesInfor>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryUserList", new LotteryUsersPagesInfor { LotteryId = Id, SearchModel = SearchModelArticle, Options = (QueryPageOptionsHelper)options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListLotteryUserAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取参加抽奖的用户列表");
+            return new QueryData<ListLotteryUserAloneModel>();
+        }
+    }
+}

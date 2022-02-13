@@ -1,0 +1,46 @@
+﻿@inject DialogService DialogService
+
+<div class="h-100" @onclick="OnClick">
+
+    <div class="div-shadow rounded  bg-opacity aticle-home-layout h-100" style="display: flex; flex-direction: column; justify-content: space-between;">
+
+        <div class="">
+            <div class="">
+                <img class="img-fluid" src="@Model.GameImage" alt="@Model.GameName">
+            </div>
+            <div class="p-2">
+                <header class="text-truncate-1 h6 mb-2">
+                    <span>@Model.GameName</span>
+                </header>
+                <div>
+                    <GameRecordTagCard Model="Model" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public GameRecordViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+    public async Task OnClick()
+    {
+        var option = new DialogOption()
+        {
+            Title = "游玩记录",
+            OnCloseAsync=async ()=> await OnChanged.InvokeAsync()
+        };
+
+        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<GameRecordViewTip>(new Dictionary<string, object>
+        {
+            [nameof(GameRecordViewTip.Model)] = Model,
+            [nameof(GameRecordViewTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
+
+        }).Render();
+        await DialogService.Show(option);
+    }
+
+}

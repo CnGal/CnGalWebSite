@@ -181,7 +181,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "a0af53bf-f39c-4c71-b523-2aa01923a5d7",
+                            ConcurrencyStamp = "d64d0d9b-44a3-48fc-bbed-56d77b27e6cf",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
@@ -1091,6 +1091,9 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<bool>("IsEnd")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<bool>("IsHidden")
                         .HasColumnType("tinyint(1)");
 
@@ -1605,6 +1608,9 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.Property<long>("PlayDuration")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("PlayImpressions")
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("ScoreTime")
                         .HasColumnType("datetime(6)");
@@ -2681,28 +2687,28 @@ namespace CnGalWebSite.APIServer.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            ConcurrencyStamp = "5b7b8353-fc99-454e-b396-85232839408e",
+                            ConcurrencyStamp = "b280ddb6-3687-40e0-9daf-a7d6baa7eab8",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e576",
-                            ConcurrencyStamp = "07679eee-63de-421e-9c67-c32016fa0002",
+                            ConcurrencyStamp = "31475618-3a52-48d4-8556-9c9f3cf8f396",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e577",
-                            ConcurrencyStamp = "cdddfec6-751a-41af-a2c3-5dc173802060",
+                            ConcurrencyStamp = "4ccab7b3-9794-4872-9b47-06aeb32f960a",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e578",
-                            ConcurrencyStamp = "fd0661a4-c2c8-4e2f-a52a-4a74d80849b4",
+                            ConcurrencyStamp = "53b94293-0eb3-4486-b354-7584644d9e9e",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         });

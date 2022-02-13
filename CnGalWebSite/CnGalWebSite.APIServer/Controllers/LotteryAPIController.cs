@@ -6,6 +6,7 @@ using CnGalWebSite.APIServer.Application.ErrorCounts;
 using CnGalWebSite.APIServer.Application.Favorites;
 using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.Messages;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Perfections;
@@ -18,6 +19,7 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using Markdig;
@@ -82,6 +84,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IElasticsearchBaseService<Article> _articleElasticsearchBaseService;
         private readonly IElasticsearchService _elasticsearchService;
         private readonly INewsService _newsService;
+        private readonly ILotteryService _lotteryService;
         private readonly IRepository<GameNews, long> _gameNewsRepository;
         private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
         private readonly IRepository<WeiboUserInfor, long> _weiboUserInforRepository;
@@ -104,7 +107,7 @@ namespace CnGalWebSite.APIServer.Controllers
       IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
       IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
          IRepository<WeeklyNews, long> weeklyNewsRepository, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository,
-         IRepository<LotteryPrize, long> lotteryPrizeRepository)
+         IRepository<LotteryPrize, long> lotteryPrizeRepository, ILotteryService lotteryService)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -154,6 +157,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _lotteryUserRepository = lotteryUserRepository;
             _lotteryAwardRepository = lotteryAwardRepository;
             _lotteryPrizeRepository = lotteryPrizeRepository;
+            _lotteryService= lotteryService;
         }
 
 
@@ -228,7 +232,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 Name = lottery.Name,
                 ReaderCount = lottery.ReaderCount,
                 Thumbnail = lottery.Thumbnail,
-                Type = lottery.Type
+                Type = lottery.Type,
+                IsEnd = lottery.IsEnd
             };
 
             foreach(var item in lottery.Awards)
@@ -243,6 +248,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     Type = item.Type,
                 });
             }
+
+            //增加阅读人数
+            await _lotteryRepository.GetRangeUpdateTable().Where(s => s.Id == id).Set(s => s.ReaderCount, b => b.ReaderCount + 1).ExecuteAsync();
 
             return model;
 
@@ -272,15 +280,17 @@ namespace CnGalWebSite.APIServer.Controllers
             else
             {
                 var award = await _lotteryUserRepository.GetAll().AsNoTracking()
-                    .Include(s=>s.LotteryAward)
-                    .Include(s=>s.LotteryPrize)
-                    .FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id);
+                    .Include(s => s.LotteryAward)
+                    .Include(s => s.LotteryPrize)
+                    .FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.LotteryId == id);
+               
                 if (award == null)
                 {
                     model.State = UserLotteryState.NotInvolved;
                 }
                 else
                 {
+                    model.Number= award.Number;
                     if (lottery.EndTime > DateTime.Now.ToCstTime())
                     {
                         model.State = UserLotteryState.WaitingDraw;
@@ -289,7 +299,15 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         if (award.LotteryAward == null)
                         {
-                            model.State = UserLotteryState.NotWin;
+                            if (lottery.IsEnd)
+                            {
+                                model.State = UserLotteryState.NotWin;
+                            }
+                            else
+                            {
+                                model.State = UserLotteryState.WaitingDraw;
+                            }
+
                         }
                         else
                         {
@@ -368,7 +386,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> CreateLottery(EditLotteryModel model)
         {
-            if (await _voteRepository.GetAll().AnyAsync(s => s.Name == model.Name))
+            if (await _lotteryRepository.GetAll().AnyAsync(s => s.Name == model.Name))
             {
                 return new Result { Successful = false, Error = "已存在该名称的抽奖" };
             }
@@ -674,23 +692,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var award = await _lotteryAwardRepository.GetAll().AsNoTracking()
                 .Include(s => s.WinningUsers)
-                .Include(s => s.Prizes)
                 .FirstOrDefaultAsync(s => s.Id == model.LotteryAwardId && s.LotteryId == model.LotteryId && s.Count > s.WinningUsers.Count);
             if (award == null)
             {
                 return new Result { Successful = false, Error = "当前奖项人数已满，或未找到该奖项，请核对抽奖Id" };
             }
 
-
-            userAward.LotteryAwardId = model.LotteryAwardId;
-            if(award.Type== LotteryAwardType.ActivationCode)
-            {
-                var prize = await _lotteryPrizeRepository.FirstOrDefaultAsync(s => s.LotteryAwardId == model.LotteryAwardId && s.LotteryUserId == null);
-                prize.LotteryUserId = userAward.Id;
-                await _lotteryPrizeRepository.UpdateAsync(prize);
-            }
-
-            await _lotteryUserRepository.UpdateAsync(userAward);
+            await _lotteryService.SendPrizeToWinningUser(userAward, award);
 
             return new Result { Successful = true };
         }
@@ -700,6 +708,14 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<Result>> HiddenLotteryAsync(HiddenLotteryModel model)
         {
             await _lotteryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            return new Result { Successful = true };
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [HttpPost]
+        public async Task<ActionResult<Result>> EndLotteryAsync(EndLotteryModel model)
+        {
+            await _lotteryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsEnd, b => model.IsEnd).ExecuteAsync();
             return new Result { Successful = true };
         }
 
@@ -741,5 +757,15 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
         }
+
+
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListLotteryUserAloneModel>>> GetLotteryUserListAsync(LotteryUsersPagesInfor input)
+        {
+            var dtos = await _lotteryService.GetPaginatedResult(input.Options, input.SearchModel, input.LotteryId);
+
+            return dtos;
+        }
+
     }
 }

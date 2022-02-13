@@ -9,7 +9,9 @@
 <div>
 
     <Virtualize ItemsProvider="@LoadEntries" @ref="virtualize">
-        <EntryInforViewTip Model="context" ColorNum="main"></EntryInforViewTip>
+        <div class="mb-3">
+            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="context" ColorNum="main" />
+        </div>
     </Virtualize>
 </div>
 

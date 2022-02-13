@@ -3,19 +3,15 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
-<div class=" rounded shadow-sm  bg-opacity rounded ps-3 pe-3 pt-3 pb-3 mb-2" style="display: flex; flex-direction: row; justify-content: space-between;">
-    <h5 class="fw-bold font-color" style="margin-bottom:auto;margin-top:auto;"><i class="fa fa-folder-open"></i>&nbsp;&nbsp;@Title</h5>
+<div class=" rounded shadow-sm  bg-opacity rounded ps-3 pe-3 pt-2 pb-2 mb-2" style="display: flex; flex-direction: row; justify-content: space-between;">
+    <h5 class="fw-bold font-color" ><i class="fa fa-folder-open"></i>&nbsp;&nbsp;@Title</h5>
     <div class="float: right">
         @if (IsCurrentUser)
         {
-            <Button @onclick="OnManage" class="btn-sm me-2" Color="Color.Dark" IsOutline="true" Size="Size.Small" Icon="fa fa-pencil-square">
-                &nbsp;管理
-            </Button>
+            <Button @onclick="OnManage" class=" me-2" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-pencil-square" Text="管理"/>
 
         }
-        <Button @onclick="OnReturn" class="btn-sm" Color="Color.Dark" IsOutline="true" Size="Size.Small" Icon="fa fa-rotate-left">
-            &nbsp;返回
-        </Button>
+        <Button @onclick="OnReturn" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-rotate-left" Text="返回"/>
     </div>
    
 
@@ -29,19 +25,22 @@
 <div>
 
     <Virtualize ItemsProvider="@LoadArticles" @ref="virtualize">
-        @if (context.entry != null)
-        {
-            <EntryInforViewTip Model="context.entry" ColorNum="main"></EntryInforViewTip>
+        <div class="mb-3">
+            @if (context.entry != null)
+            {
+                <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="context.entry" ColorNum="main" />
 
-        }
-        else if (context.article != null)
-        {
-            <ArticleInforViewTip Model="context.article"></ArticleInforViewTip>
-        }
-        else if (context.periphery != null)
-        {
-            <PeripheryInforViewTip Model="context.periphery"></PeripheryInforViewTip>
-        }
+            }
+            else if (context.article != null)
+            {
+                <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="context.article" />
+            }
+            else if (context.periphery != null)
+            {
+                <CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip Model="context.periphery" />
+            }
+        </div>
+     
     </Virtualize>
 </div>
 

@@ -19,6 +19,10 @@
          {
              <EntryTabAloneTip Icon="fa-folder-open" Index="10" OnTabClick="OnClick" Text="收藏" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
          }
+         @if (IsCurrentUser)
+         {
+             <EntryTabAloneTip Icon="fa-file-text-o" Index="9" OnTabClick="OnClick" Text="游玩记录" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
+         }
          <EntryTabAloneTip Icon="fa-shopping-basket" Index="11" OnTabClick="OnClick" Text="周边" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
 
          <EntryTabAloneTip Icon=" fa-pencil" Index="4" OnTabClick="OnClick" Text="编辑记录" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
@@ -46,9 +50,13 @@ else
                 <SpaceTabAloneTip Icon="fa-envelope-o" Index="5" OnTabClick="OnClick" Text="消息" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
             }
             <SpaceTabAloneTip Icon="fa-book" Index="7" OnTabClick="OnClick" Text="文章" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
-            @if (IsCurrentUser || IsShowFavorites)
+            @if (IsCurrentUser )
             {
                 <SpaceTabAloneTip Icon="fa-folder-open" Index="10" OnTabClick="OnClick" Text="收藏" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
+            }
+            @if (IsCurrentUser || IsShowFavorites)
+            {
+                <SpaceTabAloneTip Icon="fa-file-text-o" Index="9" OnTabClick="OnClick" Text="游玩记录" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
             }
             <SpaceTabAloneTip Icon="fa-shopping-basket" Index="11" OnTabClick="OnClick" Text="周边" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
             <SpaceTabAloneTip Icon="fa-pencil" Index="4" OnTabClick="OnClick" Text="编辑记录" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>

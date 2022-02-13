@@ -1,0 +1,167 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService ToastService
+@inject NavigationManager NavigationManager
+@inject IAppHelper _appHelper
+@inject IJSRuntime JS
+@inject DialogService DialogService
+@inject IDataCacheService _dataCatcheService
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+}
+
+<CnGalWebSite.Shared.AppComponent.Pages.Lotteries.HeadBar Title="@Model.DisplayName" IsShadow="true" />
+<div style="margin-top: 45px; width: 100%;margin-bottom:65px; " @onclick="@(() => lotteryFooter.UnRelyComment())">
+    @if (isReady)
+    {
+        if (isNotFound)
+        {
+            <CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard EntryName="@Id" Type="未找到抽奖" />
+        }
+        else
+        {
+            <div class="">
+                <div>
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" />
+
+                </div>
+          
+                <div class="ms-3 me-3 mt-4">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Comments.ListComment ObjectId="@Model.Id" Type="CommentType.CommentLottery" CanDeleted="CanEdit" OnRelying="@((a)=>lotteryFooter.RelyComment(a.UserName,a.CommentId))" @ref="comments" />
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
+    }
+</div>
+@if (isNotFound == false && isReady == true)
+{
+    <CnGalWebSite.Shared.AppComponent.Pages.Lotteries.LotteryFooter @ref="lotteryFooter" Image="@Model.MainPicture" RelyCallBack="RefreshComment"
+                                                             LotteryId="@Model.Id" ArticleName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private int defaultIndex { get; set; } = 0;
+    [Parameter]
+    public string DefaultIndex
+    {
+        get
+        {
+            return defaultIndex.ToString();
+        }
+        set
+        {
+            try
+            {
+                defaultIndex = int.Parse(value);
+            }
+            catch
+            {
+                defaultIndex = 0;
+            }
+        }
+    }
+
+    bool isReady = false;
+    bool isNotFound = false;
+    bool isFirstLoad = true;
+    public CnGalWebSite.Shared.AppComponent.Pages.Lotteries.LotteryFooter lotteryFooter;
+    public CnGalWebSite.Shared.AppComponent.Normal.Comments.ListComment comments;
+
+    public bool CanEdit { get; set; }
+    public LotteryViewModel Model { get; set; } = new LotteryViewModel();
+
+    public UserInforViewModel UserInfor { get; set; } = new UserInforViewModel { Ranks = new List<RankViewModel>() };
+    string LastLookName = "";
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+
+            isFirstLoad = false;
+        }
+
+        //记录数据
+        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name) == false)
+        {
+            LastLookName = Model.Name;
+            try
+            {
+                await JS.InvokeAsync<string>("trackEvent", "抽奖", "浏览", Model.Name, "1", "look");
+            }
+            catch (Exception exc)
+            {
+
+            }
+        }
+    }
+    public async Task RefreshComment()
+    {
+        if (comments != null)
+        {
+            await comments.Refresh();
+
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var user = await authenticationStateTask;
+            CanEdit = user.User.IsInRole("Editor");
+
+            isReady = false;
+            isNotFound = true;
+
+            Model = await _dataCatcheService.LotteryIndexPageCatche.GetCatche(Id, true);
+
+            //判断如果名称为空则返回主页
+            if (string.IsNullOrWhiteSpace(Model.Name))
+            {
+                NavigationManager.NavigateTo("/home");
+            }
+
+            isReady = true;
+            isNotFound = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取抽奖失败");
+            isReady = true;
+            isNotFound = true;
+            StateHasChanged();
+        }
+
+    }
+
+    public Task HiddenStateChanged()
+    {
+        Model.IsHidden = !Model.IsHidden;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+}

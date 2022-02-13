@@ -91,6 +91,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         /// </summary>
         public long Count { get; set; }
 
+        public bool IsEnd { get; set; }
+
 
         public List<LotteryAwardViewModel> Awards { get; set; } = new List<LotteryAwardViewModel>();
     }

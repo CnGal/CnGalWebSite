@@ -9,7 +9,10 @@
 <div>
     
     <Virtualize  ItemsProvider="@LoadArticles" @ref="virtualize">
-        <ArticleInforViewTip Model="context"></ArticleInforViewTip>
+        <div class="mb-3">
+            <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="context" />
+
+        </div>
     </Virtualize>
 </div>
    

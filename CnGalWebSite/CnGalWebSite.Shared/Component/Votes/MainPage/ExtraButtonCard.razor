@@ -33,7 +33,7 @@
 
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenVoteModel>(ToolHelper.WebApiPath + "api/votes/HiddenVote", new HiddenVoteModel { Ids = new long[] { Model.Id }, IsHidden = true });
+            var result = await Http.PostAsJsonAsync<HiddenVoteModel>(ToolHelper.WebApiPath + "api/votes/HiddenVote", new HiddenVoteModel { Ids = new long[] { Model.Id }, IsHidden = isHidden });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果

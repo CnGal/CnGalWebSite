@@ -85,7 +85,11 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 是否隐藏
         /// </summary>
-        public bool IsHidden { get; set; } = false;
+        public bool IsHidden { get; set; }
+        /// <summary>
+        /// 是否抽奖完成
+        /// </summary>
+        public bool IsEnd { get; set; }
 
         /// <summary>
         /// 是否可以评论

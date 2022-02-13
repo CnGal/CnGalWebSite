@@ -25,6 +25,7 @@ namespace CnGalWebSite.APIServer.Application.Users
     public class UserService : IUserService
     {
         private readonly IRepository<ApplicationUser, string> _userRepository;
+        private readonly IRepository<UserIntegral, string> _userIntegralRepository;
         private readonly IRepository<ThirdPartyLoginInfor, long> _thirdPartyLoginInforRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IConfiguration _configuration;
@@ -32,13 +33,14 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<ApplicationUser>, string, SortOrder, IEnumerable<ApplicationUser>>> SortLambdaCacheApplicationUser = new();
         public UserService(IRepository<ApplicationUser, string> userRepository, IConfiguration configuration, IHttpClientFactory clientFactory, IRepository<ThirdPartyLoginInfor, long> thirdPartyLoginInforRepository,
-            IRepository<Examine, long> examineRepository)
+            IRepository<Examine, long> examineRepository, IRepository<UserIntegral, string> userIntegralRepository)
         {
             _userRepository = userRepository;
             _configuration = configuration;
             _clientFactory = clientFactory;
             _thirdPartyLoginInforRepository = thirdPartyLoginInforRepository;
             _examineRepository = examineRepository;
+            _userIntegralRepository = userIntegralRepository;
         }
 
         public async Task<PagedResultDto<ApplicationUser>> GetPaginatedResult(GetUserInput input)
@@ -703,6 +705,17 @@ namespace CnGalWebSite.APIServer.Application.Users
 
 
             return model;
+        }
+
+        public async Task AddUserIntegral(AddUserIntegralModel model)
+        {
+            await _userIntegralRepository.InsertAsync(new UserIntegral
+            {
+                ApplicationUserId = model.UserId,
+                Count = model.Count,
+                Note = model.Note,
+                Type = model.Type,
+            });
         }
 
     }

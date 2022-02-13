@@ -89,7 +89,11 @@ else
         set
         {
             id = value;
-            OnInitializedAsync();
+            @if(isFirst==false)
+            {
+                OnInitializedAsync();
+            }
+       
 
         }
     }
@@ -100,6 +104,7 @@ else
 
     public TagIndexViewModel Model { get; set; } = new TagIndexViewModel();
     string LastLookName = "";
+    bool isFirst = true;
 
     #region 获取屏幕大小
 
@@ -128,6 +133,10 @@ else
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            isFirst = false;
+        }
         try
         {
             await JS.InvokeAsync<string>("highlightAllCode");

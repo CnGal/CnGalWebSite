@@ -1,7 +1,7 @@
 ﻿namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
 {
-    public class DeleteGameFromPlayedModel
+    public class DeleteGameRecordModel
     {
-        public long Id { get; set; }
+        public long[] Ids { get; set; }= new long[0];
     }
 }

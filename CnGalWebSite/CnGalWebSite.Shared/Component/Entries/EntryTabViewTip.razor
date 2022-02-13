@@ -27,29 +27,10 @@
                 {
                     <EntryTabAloneTip Icon="fa-star-o" Index="18" OnTabClick="OnClick" Text="收藏" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
                 }
-                @if (PlayedInfor != null)
-                {
-                    @if (PlayedInfor.Type == null)
-                    {
-                        <EntryTabAloneTip Icon="fa-compass" Index="21" OnTabClick="OnClick" Text="" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
-                    }
-                    else if (PlayedInfor.Type == PlayedGameType.WantToPlay)
-                    {
-                        <EntryTabAloneTip Icon="fa-sign-out" Index="7" OnTabClick="OnClick" Text="退出编辑" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
-                    }
-                    else if (PlayedInfor.Type == PlayedGameType.Playing)
-                    {
 
-                    }
-                    else if (PlayedInfor.Type == PlayedGameType.Played)
-                    {
+                <EntryTabAloneTip Icon="fa-file-text-o" Index="21" OnTabClick="OnClick" Text="记录" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
 
-                    }
-                    else if (PlayedInfor.Type == PlayedGameType.Uninterested)
-                    {
-
-                    }
-                }
+            
                 @if (IsEdit)
                 {
                     <EntryTabAloneTip Icon="fa-sign-out" Index="7" OnTabClick="OnClick" Text="退出编辑" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
@@ -103,9 +84,6 @@
 
     [Parameter]
     public EntryType Type { get; set; } = EntryType.Game;
-
-    [Parameter]
-    public PlayedGameInforModel PlayedInfor { get; set; }
 
 
     public void OnClick(int index)

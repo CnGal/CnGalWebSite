@@ -1,0 +1,100 @@
+﻿@inject ToastService ToastService
+@inject DialogService DialogService
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IServiceProvider Provider
+
+<style>
+    .modal-footer {
+        display: none;
+    }
+
+    .modal-title {
+        font-weight: bolder;
+    }
+</style>
+
+<div>
+    @if (isReady)
+    {
+        <div>
+            <BootstrapInput @bind-Value="Model.SteamId" DisplayText="SteamId" ShowLabel="true" />
+
+        </div>
+
+    }
+    else
+    {
+        <div style="min-height:200px;">
+            <h3 class="mb-3 text-center">正在加载</h3>
+            <div class="d-flex" style="justify-content: center;">
+                <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
+            </div>
+        </div>
+    }
+
+</div>
+
+<div class="mt-3" style="display: flex; justify-content: space-between;">
+    <Button Color="Color.Primary" Icon="fa fa-close" class="me-1" OnClick="OnClickClose" IsAsync="true" Text="取消"></Button>
+
+
+    <Button Color="Color.Success" Icon="fa fa-save" class="me-1" OnClick="OnSubmit" IsAsync="true" Text="保存"></Button>
+</div>
+
+
+@code {
+    [Parameter]
+    public EventCallback OnClickClose { get; set; }
+    [Parameter]
+    public EventCallback<string> OnChanged { get; set; }
+
+    public EditUserDataViewModel Model = new EditUserDataViewModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool isReady = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<EditUserDataViewModel>(ToolHelper.WebApiPath + "api/space/EditUserData");
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑用户信息失败");
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditUserDataViewModel>(ToolHelper.WebApiPath + "api/space/EditUserData", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+
+                await ToastService.Error("编辑用户Steam信息失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("编辑用户Steam信息成功", "编辑用户Steam信息成功");
+                await OnClickClose.InvokeAsync();
+                await OnChanged.InvokeAsync(Model.SteamId);
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "编辑用户Steam信息失败");
+        }
+    }
+
+
+}

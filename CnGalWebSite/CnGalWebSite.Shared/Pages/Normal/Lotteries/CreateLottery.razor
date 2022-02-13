@@ -87,12 +87,12 @@
                             @if (Model.Type == LotteryType.Automatic)
                             {
                                 <div class="form-group col-12 col-sm-6">
-                                    <Switch @bind-Value="IsLotteryTimeSameWithEndTime" ShowLabel="true" DisplayText="抽奖时间与结束时间一致" />
+                                    <Switch @bind-Value="IsLotteryTimeSameWithEndTime" ShowLabel="true" DisplayText="抽奖时间与结束时间一致"/>
                                 </div>
                                 @if (IsLotteryTimeSameWithEndTime)
                                 {
                                     <div class="form-group col-12 col-sm-6">
-                                        <DateTimePicker @bind-Value="@Model.EndTime" IsDisabled="true" ViewModel="DatePickerViewModel.DateTime" />
+                                        <DateTimePicker @bind-Value="@Model.EndTime" IsDisabled="true" ViewModel="DatePickerViewModel.DateTime"   DisplayText="抽奖时间"/>
                                     </div>
                                 }
                                 else
@@ -204,11 +204,6 @@
             }
             foreach(var item in Model.Awards)
             {
-                if(item.Prizes.Count==0)
-                {
-                    await ToastService.Error("创建抽奖失败", "每个奖项至少需要一个奖品");
-                    return;
-                }
                 if(item.Type== LotteryAwardType.ActivationCode&& item.Count != item.Prizes.Count)
                 {
                     await ToastService.Error("创建抽奖失败", "激活码类别的奖品的数量需要对应实际录入奖品数量");

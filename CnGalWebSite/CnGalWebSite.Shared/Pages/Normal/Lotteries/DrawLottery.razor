@@ -16,6 +16,14 @@
     <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4" style="display: flex; flex-direction: column;">
         @if (CurrentAward == null)
         {
+            if (LastWinningUser != null)
+            {
+                <p>上一位中奖用户：@LastWinningUser.Name</p>
+            }
+            @if (LastAward != null)
+            {
+                <p>上一个奖品：@LastAward.Name</p>
+            }
             <p>抽奖结束</p>
         }
         else
@@ -29,7 +37,7 @@
 
             @if (NextAward != null)
             {
-                <p>下个奖品：@NextAward.Name</p>
+                <p>下一个奖品：@NextAward.Name</p>
             }
             <Button IsAsync="true" Color="Color.Dark" Text="抽奖" OnClick="OnDrawLottery" />
 
@@ -67,7 +75,9 @@
     public DrawLotteryDataModel Model = new DrawLotteryDataModel();
 
     public LotteryAwardDataModel CurrentAward;
+
     public LotteryUserDataModel LastWinningUser;
+    public LotteryAwardDataModel LastAward;
 
     public LotteryAwardDataModel NextAward;
 
@@ -81,7 +91,7 @@
         try
         {
             Model = await Http.GetFromJsonAsync<DrawLotteryDataModel>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryData/" + Id);
-            GetAward();
+            await GetAward();
             isReady = true;
         }
         catch (Exception ex)
@@ -142,17 +152,25 @@
             //await _localStorage.SetItemAsync("DelayedTasks", _dataCacheService.DelayedTaskList);
         }
 
-        GetAward();
+        await GetAward();
     }
 
-    public void GetAward()
+    public async Task GetAward()
     {
+        if (CurrentAward != null)
+        {
+            LastAward = CurrentAward;
+        }
+
         var awards = Model.Awards.Where(s => s.TotalCount > s.WinningUsers.Count).OrderByDescending(s => s.Priority).ToList();
 
 
         if (awards.Count == 0)
         {
+
             CurrentAward = NextAward = null;
+            //抽奖结束
+            await EndLottery();
             return;
         }
         CurrentAward = awards[0];
@@ -176,4 +194,22 @@
 
     }
 
+    public async Task EndLottery()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EndLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/EndLottery", new EndLotteryModel { Ids = new long[] { Model.Id }, IsEnd = true });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("结束抽奖失败", obj.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex,  "结束抽奖失败");
+        }
+    }
 }

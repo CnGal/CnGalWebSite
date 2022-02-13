@@ -34,5 +34,7 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         Task<UserEditInforBindModel> GetUserEditInforBindModel(ApplicationUser user);
 
+        Task AddUserIntegral(AddUserIntegralModel model);
+
     }
 }

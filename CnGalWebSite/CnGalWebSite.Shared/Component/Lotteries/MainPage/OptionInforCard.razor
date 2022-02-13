@@ -4,7 +4,15 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
-<div>
+<style>
+    .lottery-button button {
+        height: 250px;
+        width: 250px;
+        border-radius: 50%;
+        font-size: x-large !important;
+    }
+</style>
+<div class="lottery-button" style=" display: flex; flex-direction: column; align-items: center; ">
     @if (isReady)
     {
         @if (StateModel == null)
@@ -38,36 +46,66 @@
             }
             else if (StateModel.State == UserLotteryState.WaitingDraw)
             {
-                <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="等待开奖" />
+                <Button IsDisabled="true" Color="Color.Dark" IsAsync="true">
+                    <div style="display: flex; flex-direction: column;">
+                        <span>等待开奖</span>
+                        <span>你的号码：@StateModel.Number</span>
+                    </div>
+                </Button>
             }
             else if (StateModel.State == UserLotteryState.Win && StateModel.Award != null)
             {
                 @if (StateModel.Award.Type == LotteryAwardType.ActivationCode)
                 {
-                    <Button Color="Color.Dark" Text="恭喜中奖，查看激活码" OnClick="OnLookPrize" />
+<Button Color="Color.Dark" OnClick="OnLookPrize">
+    <div style="display: flex; flex-direction: column;">
+        <span>恭喜中奖</span>
+        <span>查看激活码</span>
+    </div>
+</Button>
                 }
                 else if (StateModel.Award.Type == LotteryAwardType.Integral)
                 {
-                    <Button Color="Color.Dark" Text="恭喜中奖，已发放积分" />
+<Button Color="Color.Dark">
+    <div style="display: flex; flex-direction: column;">
+        <span>恭喜中奖</span>
+        <span>已发放积分</span>
+    </div>
+</Button>
                 }
             }
             else if (StateModel.State == UserLotteryState.WaitAddress)
             {
-                <Button Color="Color.Dark"  Text="恭喜中奖，填写收货地址" />
+<Button Color="Color.Dark"  OnClick="EditUserAddress">
+    <div style="display: flex; flex-direction: column;">
+        <span>恭喜中奖</span>
+        <span>填写收货地址</span>
+    </div>
+</Button>
 
             }
             else if (StateModel.State == UserLotteryState.WaitShipments)
             {
-                <Button Color="Color.Dark" Text="恭喜中奖，等待发货" />
+<Button Color="Color.Dark" OnClick="EditUserAddress">
+    <div style="display: flex; flex-direction: column;">
+        <span>恭喜中奖</span>
+        <span>等待发货</span>
+    </div>
+</Button>
 
             }
             else if (StateModel.State == UserLotteryState.Shipped)
             {
-                <Button Color="Color.Dark" Text="恭喜中奖，查看单号" OnClick="OnLookPrize"/>
+<Button Color="Color.Dark" OnClick="OnLookPrize">
+    <div style="display: flex; flex-direction: column;">
+        <span>恭喜中奖</span>
+        <span>查看单号</span>
+    </div>
+</Button>
             }
             @if (StateModel.Award != null)
             {
-                <p>
+                <p class="h5 fw-bold mt-3 font-color">
                     @("已中奖："+StateModel.Award.Name)
                 </p>
             }
@@ -156,5 +194,66 @@
             [nameof(PrizePage.LookPrizeTip.Id)] = ViewModel.Id,
         }).Render();
         await DialogService.Show(option);
+    }
+
+    public async Task EditUserAddress()
+    {
+        var model = new EditUserAddressModel();
+        try
+        {
+            model = await Http.GetFromJsonAsync<EditUserAddressModel>(ToolHelper.WebApiPath + "api/space/EditUserAddress");
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑用户地址信息失败");
+        }
+
+        var items = Utility.GenerateEditorItems<EditUserAddressModel>();
+        var editItem = items.First(i => i.GetFieldName() == nameof(EditUserAddressModel.Address));
+        editItem.Rows = 3;
+
+        var option = new EditDialogOption<EditUserAddressModel>()
+        {
+            Title = "编辑收货地址",
+            Model = model,
+            Items = items,
+
+            OnCloseAsync = () =>
+            {
+                //Trace.Log("关闭按钮被点击");
+                return Task.CompletedTask;
+            },
+            OnEditAsync = async context =>
+            {
+                // Trace.Log("保存按钮被点击");
+                var item = (EditUserAddressModel)context.Model;
+
+                try
+                {
+                    var result = await Http.PostAsJsonAsync<EditUserAddressModel>(ToolHelper.WebApiPath + "api/space/EditUserAddress", item);
+                    string jsonContent = result.Content.ReadAsStringAsync().Result;
+                    Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                    //判断结果
+                    if (obj.Successful == false)
+                    {
+                        await ToastService.Error("编辑收货地址失败", obj.Error);
+                        return false;
+                    }
+                    else
+                    {
+                        await ToastService.Success( "编辑收货地址成功",  "编辑收货地址成功");
+                        await Refresh();
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorHandler.ProcessError(ex, "编辑收货地址失败");
+                    return false;
+                }
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
     }
 }

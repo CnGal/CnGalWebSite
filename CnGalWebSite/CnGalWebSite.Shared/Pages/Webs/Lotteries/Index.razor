@@ -1,0 +1,324 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+@inject IDataCacheService _dataCatcheService
+
+@inject DialogService DialogService
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+}
+
+@if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+{
+    <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class=" d-none  bg-d-lg-block bgimage-ison"></div>
+}
+@if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) == false)
+{
+    <div id="web_bg" style="background-image: url(@Model.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
+}
+
+
+
+@if (isNotFound == true)
+{
+    <NotFoundLottery IsNeedLayput="true"></NotFoundLottery>
+}
+else
+{
+    <div class="container">
+        @if (isReady == false)
+        {
+            <div>
+                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                    <SkeletonParagraph />
+                    <hr class="m-2" />
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="">
+
+                @if (Model.IsHidden == true)
+                {
+                    <div class="alert alert-info  rounded shadow-sm  rounded" role="alert">
+                        当前抽奖处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+                    </div>
+
+                }
+
+                <div class="rounded shadow-sm  bg-opacity mb-4 pb-3">
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
+                </div>
+
+
+                @if (Model.CanComment)
+                {
+                    <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="false" IsSmallScreen="IsSmallScreen" CurrentUserRank="@CurrentUserRank" RelyCallBack="OnRely" IsAdmin="@IsAdmin" CanDeleted="IsAdmin" DeletedCallBack="OnDeleted"></CommentListView>
+                    <ReplyCommentTip CurrentUserRank="@CurrentUserRank" IsChild="false" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" RelyCallBack="OnRely" IsAdmin="IsAdmin"></ReplyCommentTip>
+
+                }
+                else
+                {
+                    <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
+                }
+
+            </div>
+
+        }
+
+
+
+    </div>
+}
+
+
+@code {
+    private string id = "";
+    [Parameter]
+    public string Id
+    {
+        get { return id; }
+        set
+        {
+            id = value;
+            if (isFrist == false)
+            {
+                OnInitializedAsync();
+
+            }
+        }
+    }
+    public string MainPageHtml { get; set; }
+    public int currentPage { get; set; } = 1;
+    public string NoticeCard { get; set; } = "";
+    public string CurrentUserRank { get; set; }
+    bool isReady = false;
+    bool isNotFound = false;
+
+    public LotteryViewModel Model { get; set; } = new LotteryViewModel();
+
+    public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
+
+
+    #region 获取屏幕大小
+
+    /// <summary>
+    /// 获得/设置 IJSRuntime 实例
+    /// </summary>
+    [Inject]
+    [System.Diagnostics.CodeAnalysis.NotNull]
+    public IJSRuntime? JSRuntime { get; set; }
+
+
+
+    public bool IsSmallScreen { get; set; }
+    public bool IsNormalScreen { get; set; }
+    public bool IsLargeScreen { get; set; }
+    public bool IsAdmin { get; set; } = false;
+    string LastLookName = "";
+    bool isFrist = true;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private JSInterop<Index>? Interop { get; set; }
+    /// <summary>
+    /// OnAfterRenderAsync 方法
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        try
+        {
+            await JS.InvokeAsync<string>("highlightAllCode");
+        }
+        catch
+        {
+
+        }
+
+        //记录数据
+        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name) == false)
+        {
+            LastLookName = Model.Name;
+            try
+            {
+                await JS.InvokeAsync<string>("trackEvent", "抽奖", "浏览", Model.Name, "1", "look");
+            }
+            catch (Exception exc)
+            {
+
+            }
+        }
+        if (firstRender)
+        {
+            Interop = new JSInterop<Index>(JSRuntime);
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
+
+            isFrist = false;
+
+
+        }
+
+    }
+
+    /// <summary>
+    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
+    /// </summary>
+    /// <returns></returns>
+    [JSInvokable]
+    public void SetCollapsed(int width)
+    {
+        if (IsSmallScreen != (width < 850))
+        {
+            IsSmallScreen = width < 850;
+            StateHasChanged();
+        }
+        if (IsNormalScreen != (width >= 850 && width < 1500))
+        {
+            IsNormalScreen = width >= 850 && width < 1500;
+            StateHasChanged();
+        }
+        if (IsLargeScreen != (width >= 1500))
+        {
+            IsLargeScreen = width >= 1500;
+            StateHasChanged();
+        }
+    }
+    #endregion
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isReady = false;
+            isNotFound = false;
+
+
+            //获取周边信息
+            Model = await _dataCatcheService.LotteryIndexPageCatche.GetCatche(Id);
+            //判断投票名称是否为空 为空则跳转到主页
+            if (string.IsNullOrWhiteSpace(Model.Name))
+            {
+                NavigationManager.NavigateTo(Provider, "/votes/home", "主页", "fa fa-home");
+            }
+
+            isReady = true;
+            StateHasChanged();
+            var user = await authenticationStateTask;
+            if (user.User.Identity.IsAuthenticated)
+            {
+                IsAdmin = user.User.IsInRole("Editor");
+            }
+            else
+            {
+                _dataCatcheService.VoteIndexPageCatche.Clean(Id);
+            }
+
+            try
+            {
+                await OnCommentPageClick(1);
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取投票评论列表失败");
+            }
+        }
+        catch (Exception exc)
+        {
+            isReady = true;
+            isNotFound = true;
+            StateHasChanged();
+        }
+
+    }
+
+    public Task HiddenStateChanged()
+    {
+        Model.IsHidden = !Model.IsHidden;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+
+    private async Task OnCommentPageClick(int pageIndex)
+    {
+        try
+        {
+            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)CommentType.CommentLottery + "/" + Id + "/" + pageIndex + "/8");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取评论列表失败");
+        }
+    }
+
+    private async Task OnRely()
+    {
+        Model.CommentCount++;
+        await OnCommentPageClick(ListComments.CurrentPage);
+    }
+    private async Task OnDeleted()
+    {
+        await OnCommentPageClick(ListComments.CurrentPage);
+    }
+
+    public async void OnClickUrl(NavigateModel model)
+    {
+        try
+        {
+            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
+        }
+        catch
+        {
+            await ToastService.Error("导航失败", "请尝试刷新页面");
+        }
+    }
+
+
+
+
+    #region 释放实例
+    private async ValueTask DisposeAsyncCore()
+    {
+        if (Interop != null)
+        {
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
+            Interop.Dispose();
+            Interop = null;
+        }
+    }
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore();
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+
+}

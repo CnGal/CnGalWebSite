@@ -1,6 +1,7 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.BackUpArchives;
 using CnGalWebSite.APIServer.Application.ElasticSearches;
+using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.SteamInfors;
@@ -29,11 +30,12 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         private readonly IElasticsearchService _elasticsearchService;
         private readonly INewsService _newsService;
         private readonly IExamineService _examineService;
+        private readonly ILotteryService _lotteryService;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<TimedTask>, string, SortOrder, IEnumerable<TimedTask>>> SortLambdaCacheApplicationUser = new();
 
         public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, ISteamInforService steamInforService, IBackUpArchiveService backUpArchiveService, ITableService tableService,
-            IPerfectionService perfectionService, IElasticsearchService elasticsearchService, INewsService newsService, IExamineService examineService)
+            IPerfectionService perfectionService, IElasticsearchService elasticsearchService, INewsService newsService, IExamineService examineService, ILotteryService lotteryService)
         {
             _timedTaskRepository = timedTaskRepository;
             _steamInforService = steamInforService;
@@ -43,6 +45,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             _elasticsearchService = elasticsearchService;
             _newsService = newsService;
             _examineService = examineService;
+            _lotteryService = lotteryService;
         }
 
         public Task<QueryData<ListTimedTaskAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListTimedTaskAloneModel searchModel)
@@ -193,6 +196,9 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         break;
                     case TimedTaskType.ExaminesCompletion:
                         await _examineService.ExaminesCompletion();
+                        break;
+                    case TimedTaskType.DrawLottery:
+                        await _lotteryService.DrawAllLottery();
                         break;
                 }
                 //记录执行时间

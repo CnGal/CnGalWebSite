@@ -49,7 +49,8 @@ namespace CnGalWebSite.APIServer.Controllers
 
         public SpaceAPIController(IRepository<Message, int> messageRepository, IMessageService messageService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository,
         UserManager<ApplicationUser> userManager, IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService,
-        IRepository<Examine, long> examineRepository, IExamineService examineService, IRankService rankService, IRepository<FavoriteObject, long> favoriteObjectRepository)
+        IRepository<Examine, long> examineRepository, IExamineService examineService, IRankService rankService, IRepository<FavoriteObject, long> favoriteObjectRepository,
+        ISteamInforService steamInforService)
         {
             _examineRepository = examineRepository;
             _examineService = examineService;
@@ -63,6 +64,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _userService = userService;
             _rankService = rankService;
             _favoriteObjectRepository = favoriteObjectRepository;
+            _steamInforService = steamInforService;
         }
         /// <summary>
         /// 通过Id获取用户的真实数据 
@@ -220,6 +222,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 TotalFilesSpace = userEditInfor.TotalFilesSpace,
                 TotalExamine = userEditInfor.EditCount,
                 LastEditTime = userEditInfor.LastEditTime,
+                SteamId = user.SteamId,
             };
 
             //提前将MarkDown语法转为Html
@@ -700,6 +703,67 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<ActionResult<EditUserAddressModel>> EditUserAddress()
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
+            user =await _userRepository.GetAll().AsNoTracking()
+                .Include(s=>s.UserAddress)
+                .FirstOrDefaultAsync(s=>s.Id == user.Id);
+
+            if(user.UserAddress==null)
+            {
+                return new EditUserAddressModel();
+            }
+
+
+            var model = new EditUserAddressModel
+            {
+                Address = user.UserAddress.Address,
+                PhoneNumber = user.UserAddress.PhoneNumber,
+                RealName = user.UserAddress.RealName
+            };
+
+            return model;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Result>> EditUserAddress(EditUserAddressModel model)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            _userRepository.Clear();
+            user = await _userRepository.GetAll().AsNoTracking()
+                .Include(s => s.UserAddress)
+                .FirstOrDefaultAsync(s => s.Id == user.Id);
+            if(user.UserAddress == null)
+            {
+                user.UserAddress = new UserAddress();
+            }
+            user.UserAddress.Address = model.Address;
+            user.UserAddress.RealName = model.RealName;
+            user.UserAddress.PhoneNumber = model.PhoneNumber;
+
+            await _userRepository.UpdateAsync(user);
+
+            return new Result { Successful = true };
+        }
+
+
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        public async Task<ActionResult<Result>> AddUserIntegralAsync(AddUserIntegralModel model)
+        {
+            if(await _userRepository.GetAll().AnyAsync(s=>s.Id==model.UserId)==false)
+            {
+                return new Result { Successful=false ,Error="未找到该用户"};
+            }
+
+            await _userService.AddUserIntegral(model);
+
+            return new Result { Successful = true };
+        }
     }
 }

@@ -2867,7 +2867,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
                 //根据文章Id查找前置审核
                 long? examineId = null;
-                if (operation != Operation.DisambigMain)
+                if (operation != Operation.EditPeripheryMain)
                 {
                     var examine_1 = await GetUserPeripheryActiveExamineAsync(periphery.Id, user.Id, Operation.EditPeripheryMain);
                     if (examine_1 == null)
@@ -3141,7 +3141,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         {
             var examines = _tagService.ExaminesCompletion(new Tag(), model);
 
-            if (examines.Any(s => s.Value == Operation.EditPeripheryMain) == false)
+            if (examines.Any(s => s.Value == Operation.EditTagMain) == false)
             {
                 throw new Exception("无法获取主要信息审核记录，请联系管理员");
             }

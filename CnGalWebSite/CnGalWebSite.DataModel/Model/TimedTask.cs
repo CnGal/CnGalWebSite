@@ -67,7 +67,9 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "更新微博用户信息缓存")]
         UpdateWeiboUserInfor,
         [Display(Name = "补全审核记录")]
-        ExaminesCompletion
+        ExaminesCompletion,
+        [Display(Name = "自动抽奖")]
+        DrawLottery
     }
     public enum TimedTaskExecuteType
     {

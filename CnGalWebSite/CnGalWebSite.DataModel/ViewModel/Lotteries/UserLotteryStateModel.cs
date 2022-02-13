@@ -10,6 +10,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
     {
         public UserLotteryState State { get; set; }
 
+        public int Number { get; set; }
+
         public LotteryAwardViewModel Award { get; set; }
 
     }

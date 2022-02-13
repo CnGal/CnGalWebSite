@@ -727,7 +727,7 @@ else
     }
 
 
- 
+
 
     private void UnEdit()
     {
@@ -828,7 +828,17 @@ else
         }
         else if(index==21)
         {
+            var option = new DialogOption()
+            {
+                Title = "编辑游玩记录"
+            };
+            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip>(new Dictionary<string, object>
+            {
+                [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip.Id)] = EntryView.Id,
+                [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
 
+            }).Render();
+            await DialogService.Show(option);
         }
         else
         {
@@ -838,7 +848,7 @@ else
 
     public async Task GetPlayedGameInfor()
     {
-        
+
         try
         {
             GameInforModel = await Http.GetFromJsonAsync<PlayedGameInforModel>(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameInfor/" + EntryView.Id);

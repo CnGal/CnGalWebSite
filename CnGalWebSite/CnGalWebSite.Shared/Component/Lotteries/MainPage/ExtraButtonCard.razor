@@ -6,16 +6,20 @@
 
 
 <div style="display:flex;">
-    @if (Model.EndTime < DateTime.Now.ToCstTime())
+    @if (Model.Type == LotteryType.Manual&&Model.IsEnd==false)
     {
-        <Button Icon="fa fa-bomb" Text="抽奖" Color="Color.Primary" IsAsync="true" OnClick="OnDraw" Size="Size.ExtraSmall" style=" width: 80px;" class="me-3" />
+        @if (Model.EndTime < DateTime.Now.ToCstTime())
+        {
+            <Button Icon="fa fa-bomb" Text="抽奖" Color="Color.Primary" IsAsync="true" OnClick="OnDraw" Size="Size.ExtraSmall" style=" width: 80px;" class="me-3" />
 
-    }
-    else
-    {
-        <Button Icon="fa fa-bomb" Text="抽奖" Color="Color.Primary" IsDisabled="true" Size="Size.ExtraSmall" style=" width: 80px;" class="me-3" />
+        }
+        else
+        {
+            <Button Icon="fa fa-bomb" Text="抽奖" Color="Color.Primary" IsDisabled="true" Size="Size.ExtraSmall" style=" width: 80px;" class="me-3" />
 
+        }
     }
+
     <Button Icon="fa fa-pencil" Text="编辑" Color="Color.Success" IsAsync="true" OnClick="OnEdit" Size="Size.ExtraSmall" style=" width: 80px;" class="me-3" />
     @if (Model.IsHidden)
     {
@@ -43,7 +47,7 @@
 
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/HiddenLottery", new HiddenLotteryModel { Ids = new long[] { Model.Id }, IsHidden = true });
+            var result = await Http.PostAsJsonAsync<HiddenLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/HiddenLottery", new HiddenLotteryModel { Ids = new long[] { Model.Id }, IsHidden = isHidden });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果

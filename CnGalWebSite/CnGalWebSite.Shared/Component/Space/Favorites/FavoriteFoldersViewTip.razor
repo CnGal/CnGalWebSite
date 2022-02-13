@@ -10,13 +10,11 @@
 }
 else
 {
-<div class=" rounded shadow-sm  bg-opacity rounded ps-3 pe-3 pt-3 pb-3 mb-2" style="display: flex; flex-direction: row; justify-content: space-between;">
-    <h5 class="fw-bold font-color" style="margin-bottom:auto;margin-top:auto;"><i class="fa fa-folder-open"></i>&nbsp;&nbsp;收藏夹</h5>
+<div class=" rounded shadow-sm  bg-opacity rounded ps-3 pe-3 pt-2 pb-2 mb-2" style="display: flex; flex-direction: row; justify-content: space-between;">
+    <h5 class="fw-bold font-color"><i class="fa fa-folder-open"></i>&nbsp;&nbsp;收藏夹</h5>
     @if (IsCurrentUser)
     {
-        <Button @onclick="OnManage" class="btn-sm" Color="Color.Dark" IsOutline="true" Size="Size.Small" Icon="fa fa-pencil-square" style="float: right">
-            &nbsp;管理
-        </Button>
+        <Button @onclick="OnManage" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-pencil-square" Text="管理"/>
     }
 
 </div>

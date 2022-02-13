@@ -199,9 +199,8 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     }
                     items = items.Where(s => s.UserSpaceCommentManagerId == space.Id);
                     break;
-                default:
-                    throw new ArgumentException("未知评论类型");
             }
+
             // 处理高级搜索
             if (!string.IsNullOrWhiteSpace(searchModel.Text))
             {

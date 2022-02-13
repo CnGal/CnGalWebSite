@@ -347,7 +347,11 @@
                         <ArticleHomeListView Input="PublishArticleInput"></ArticleHomeListView>
                     </div>
                     <div class="@("tab-pane fade"+(defaultIndex==9?" show active ":"") )" id="@("pills"+randomIndex+"-9")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-9-tab")">
-                        <UserPlayedGameListView Input="PlayedGameInput" OnClickUrl="OnClickUrl"></UserPlayedGameListView>
+                        @if (Model.IsCurrentUser)
+                        {
+                            <UserPlayedGameListView SteamId="@Model.SteamId"></UserPlayedGameListView>
+                        }
+
                     </div>
                     <div class="@("tab-pane fade"+(defaultIndex==10 ?"show active ":"") )" id="@("pills"+randomIndex+"-10")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-10-tab")">
                         @if (Model.IsCurrentUser || Model.IsShowFavorites)
