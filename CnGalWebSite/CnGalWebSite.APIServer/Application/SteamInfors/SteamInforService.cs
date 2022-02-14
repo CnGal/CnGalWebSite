@@ -332,7 +332,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     IsInSteam = true,
                     PlayDuration = steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0,
                     EntryId = item.EntryId,
-                    Type = ((steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0) > 0) ? PlayedGameType.Played : PlayedGameType.WantToPlay,
+                    Type = ((steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0) > 0) ? PlayedGameType.Played : PlayedGameType.UnPlayed,
                     ApplicationUserId = user.Id,
                 });
             }

@@ -827,10 +827,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _examineService.ReplaceEditPeripheryMainExamineContext();
-                await _examineService.ReplacePeripheryRelatedEntries();
-                await _examineService.ReplaceEditTag_1_0_ExamineContext();
-                await _examineService.ReplaceEditTagMainExamineContext();
+
                 return new Result { Successful = true };
             }
             catch (Exception ex)

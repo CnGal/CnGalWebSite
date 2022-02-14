@@ -26,14 +26,16 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<SteamInfor, int> _steamInforRepository;
         private readonly IAppHelper _appHelper;
         private readonly ISteamInforService _steamInforService;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
 
         public SteamAPIController(IRepository<SteamInfor, int> steamInforRepository, ISteamInforService steamInforService,
-        IAppHelper appHelper, IRepository<Entry, int> entryRepository)
+        IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<ApplicationUser, string> userRepository)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
             _steamInforRepository = steamInforRepository;
             _steamInforService = steamInforService;
+            _userRepository = userRepository;
         }
 
         [AllowAnonymous]
@@ -164,16 +166,19 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            if (user.IsShowGameRecord == false && id != user.Id)
+            var objectUser = await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
+
+            if (objectUser.IsShowGameRecord == false && id != user.Id)
             {
-                return NotFound("该用户的Steam信息未公开");
+                return NotFound("该用户的游玩记录未公开");
             }
-            if(string.IsNullOrWhiteSpace(user.SteamId))
+
+            if (string.IsNullOrWhiteSpace(objectUser.SteamId))
             {
                 return new List<SteamUserInfor>();
             }
 
-            var steamids = user.SteamId.Replace("，", ",").Replace("、", ",").Split(',');
+            var steamids = objectUser.SteamId.Replace("，", ",").Replace("、", ",").Split(',');
 
             var model =await _steamInforService.GetSteamUserInfors(steamids.ToList());
 

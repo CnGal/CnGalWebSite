@@ -372,7 +372,8 @@
                 @if (IsNormalScreen && isReady)
                 {
                     <div class="col-3">
-                        <SpaceTabViewTip OnTabClick="OnTabClick" IsCurrentUser="Model.IsCurrentUser" RandomIndex="randomIndex" DefaultIndex="defaultIndex"></SpaceTabViewTip>
+                        <SpaceTabViewTip OnTabClick="OnTabClick" IsCurrentUser="Model.IsCurrentUser" IsShowGameRecord="Model.IsShowGameRecord"  IsShowFavorites="Model.IsShowFavorites" 
+                                         RandomIndex="randomIndex" DefaultIndex="defaultIndex"></SpaceTabViewTip>
                     </div>
                 }
             </div>
@@ -387,7 +388,8 @@
             <UserInforTip Length="75" UserId="@Id" @ref="userInforTip" OnClickUrl="OnClickUrl"></UserInforTip>
             @if (isReady)
             {
-                <SpaceTabViewTip OnTabClick="OnTabClick" IsCurrentUser="Model.IsCurrentUser" RandomIndex="randomIndex" IsShowFavorites="Model.IsShowFavorites" DefaultIndex="defaultIndex"></SpaceTabViewTip>
+                <SpaceTabViewTip OnTabClick="OnTabClick" IsCurrentUser="Model.IsCurrentUser" RandomIndex="randomIndex" IsShowGameRecord="Model.IsShowGameRecord"
+                                 IsShowFavorites="Model.IsShowFavorites" DefaultIndex="defaultIndex"></SpaceTabViewTip>
             }
         </div>
     }

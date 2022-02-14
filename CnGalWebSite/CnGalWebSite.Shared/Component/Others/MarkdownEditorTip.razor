@@ -19,21 +19,10 @@
     <ImagesUploadViewTip images="images" OnUploadedImage="OnUploadImage"></ImagesUploadViewTip>
     <div class="alert alert-success  rounded shadow-sm  rounded mb-4" role="alert" style="margin:0px">
         不了解Markdown？可以在这<a href="http://www.markdown.cn/" target="_blank" class="alert-link">查看语法说明</a>
-        遇到格式错乱？可以尝试<a @onclick="OnClickTextOnly"
-                      class="alert-link">切换编辑器</a>
     </div>
     @if (isReady)
     {
-        @if (isTextOnly)
-        {
             <EditorMdViewTip Context="@Context" @ref="markdownEditorTip" ContextChanged="ContextValueChanged"></EditorMdViewTip>
-        }
-        else
-        {
-
-            <Markdown Height="800" MinHeight="300" Placeholder="这是 Markdown" PreviewStyle="PreviewStyle.Tab"
-                      InitialEditType="InitialEditType.Wysiwyg" Value="@Context" ValueChanged="ContextValueChanged" Language="zh-CN"></Markdown>
-        }
     }
 
 </div>

@@ -959,7 +959,7 @@ namespace CnGalWebSite.DataModel.Helper
                         model.Add(new ExamineMainAlone
                         {
                             Key = item.Name,
-                            Value = newValue?.ToString() ?? ""
+                            Value = (string)newValue
                         });
                     }
                     else if (item.PropertyType == typeof(bool))

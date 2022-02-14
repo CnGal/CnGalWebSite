@@ -50,7 +50,7 @@ else
                 <SpaceTabAloneTip Icon="fa-envelope-o" Index="5" OnTabClick="OnClick" Text="消息" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
             }
             <SpaceTabAloneTip Icon="fa-book" Index="7" OnTabClick="OnClick" Text="文章" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
-            @if (IsCurrentUser )
+            @if (IsCurrentUser || IsShowGameRecord)
             {
                 <SpaceTabAloneTip Icon="fa-folder-open" Index="10" OnTabClick="OnClick" Text="收藏" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></SpaceTabAloneTip>
             }

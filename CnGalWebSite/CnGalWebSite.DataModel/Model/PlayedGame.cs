@@ -61,6 +61,8 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "已玩")]
         Played,
         [Display(Name = "不感兴趣")]
-        Uninterested
+        Uninterested,
+        [Display(Name = "未玩")]
+        UnPlayed
     }
 }

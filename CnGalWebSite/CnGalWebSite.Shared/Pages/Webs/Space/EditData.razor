@@ -241,7 +241,7 @@
             }
             else
             {
-                autoSave.Clean();
+                await autoSave.Clean();
 
                 var userState = await authenticationStateTask;
                 var user = userState.User;
