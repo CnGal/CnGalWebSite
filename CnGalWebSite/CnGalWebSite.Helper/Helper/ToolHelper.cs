@@ -340,6 +340,11 @@ namespace CnGalWebSite.DataModel.Helper
             }
             return null;
         }
+        /// <summary>
+        /// 批量导入抽奖奖项
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
 
         public static List<string> GetTextListFromString(string text)
         {
@@ -363,11 +368,16 @@ namespace CnGalWebSite.DataModel.Helper
             return result;
         }
 
+        /// <summary>
+        /// 批量导入Staff信息
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static List<StaffModel> GetStaffsFromString(string text)
         {
             var result = new List<StaffModel>();
 
-            text = text.Replace("，", ",").Replace("、", ",").Replace("：", ":").Replace("\r\n", "\n");
+            text = text.Replace("，", ",").Replace("、", ",").Replace("：", ":").Replace("（","(").Replace("）",")").Replace("\r\n", "\n");
             var Subcategory = string.Empty;
             //按行分割
             var lines = text.Split('\n');
@@ -380,7 +390,8 @@ namespace CnGalWebSite.DataModel.Helper
                 }
                 //按冒号分割
                 var pairs = item.Split(":");
-                string? Position;
+                string Position;
+                string PositionGeneral;
                 if (pairs.Length == 0)
                 {
                     continue;
@@ -393,6 +404,15 @@ namespace CnGalWebSite.DataModel.Helper
                 else if (pairs.Length == 2)
                 {
                     Position = pairs[0];
+                    PositionGeneral = MidStrEx(Position, "(", ")");
+                    if(string.IsNullOrWhiteSpace(PositionGeneral))
+                    {
+                        PositionGeneral = null;
+                    }
+                    else
+                    {
+                    Position= Position.Replace($"({PositionGeneral})", "");
+                    }
                 }
                 else
                 {
@@ -406,20 +426,29 @@ namespace CnGalWebSite.DataModel.Helper
                     {
                         continue;
                     }
+                    var roleName = MidStrEx(infor, "(", ")");
                     //创建staff
+                    var type= GetGeneralType(PositionGeneral ?? Position);
                     result.Add(new StaffModel
                     {
-                        NicknameOfficial = infor,
+                        NicknameOfficial = infor.Replace($"({roleName})", ""),
                         PositionOfficial = Position,
                         Subcategory = Subcategory,
-                        PositionGeneral = GetGeneralType(Position)
-                    });
+                        Role = type == PositionGeneralType.CV ? roleName : null,
+                        SubordinateOrganization = type == PositionGeneralType.CV ?  null :roleName,
+                        PositionGeneral = type
+                    }) ;
                 }
 
             }
 
             return result;
         }
+        /// <summary>
+        /// 批量导入投票选项
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static List<EditVoteOptionModel> GetOptionsFromString(string text)
         {
             var result = new List<EditVoteOptionModel>();
@@ -466,6 +495,7 @@ namespace CnGalWebSite.DataModel.Helper
 
             return result;
         }
+
         public static PositionGeneralType GetGeneralType(string text)
         {
             foreach (var item in Enum.GetValues(typeof(PositionGeneralType)))

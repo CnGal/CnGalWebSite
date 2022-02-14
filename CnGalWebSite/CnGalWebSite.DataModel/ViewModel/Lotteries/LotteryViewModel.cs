@@ -1,4 +1,6 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
+using CnGalWebSite.DataModel.ViewModel.Votes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -115,5 +117,25 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         /// 附加积分 全类型生效
         /// </summary>
         public int Integral { get; set; }
+
+        /// <summary>
+        /// 参加的用户
+        /// </summary>
+        public List<LotteryUserViewModel> Users { get; set; } = new List<LotteryUserViewModel>();
+
+    }
+    public class LotteryUserViewModel
+    {
+        public string UserId { get; set; }
+
+        public string UserName { get; set; }
+
+        public DateTime VotedTime { get; set; }
+
+        public string Image { get; set; }
+
+        public string PersonalSignature { get; set; }
+
+        public List<RankViewModel> Ranks { get; set; }
     }
 }

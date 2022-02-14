@@ -41,7 +41,8 @@
                 @if (IsSmallScreen && isReady)
                 {
                     <div class="col-12 mb-3">
-                        <SpaceTabViewTip OnTabClick="OnTabClick" IsSmallSreeen="true" IsCurrentUser="Model.IsCurrentUser" RandomIndex="randomIndex" IsShowFavorites="Model.IsShowFavorites" DefaultIndex="defaultIndex"></SpaceTabViewTip>
+                        <SpaceTabViewTip OnTabClick="OnTabClick" IsSmallSreeen="true" IsCurrentUser="Model.IsCurrentUser" IsShowGameRecord="Model.IsShowGameRecord"
+                                         RandomIndex="randomIndex" IsShowFavorites="Model.IsShowFavorites" DefaultIndex="defaultIndex"></SpaceTabViewTip>
                     </div>
                 }
                 <div class="@(IsSmallScreen?"col-12":"") @(IsNormalScreen?"col-9":"") @(IsLargeScreen?"col-12":"") mb-2">
@@ -347,9 +348,9 @@
                         <ArticleHomeListView Input="PublishArticleInput"></ArticleHomeListView>
                     </div>
                     <div class="@("tab-pane fade"+(defaultIndex==9?" show active ":"") )" id="@("pills"+randomIndex+"-9")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-9-tab")">
-                        @if (Model.IsCurrentUser)
+                        @if (Model.IsCurrentUser||Model.IsShowGameRecord)
                         {
-                            <UserPlayedGameListView SteamId="@Model.SteamId"></UserPlayedGameListView>
+                            <UserPlayedGameListView SteamId="@Model.SteamId" UserId="@Model.Id"></UserPlayedGameListView>
                         }
 
                     </div>

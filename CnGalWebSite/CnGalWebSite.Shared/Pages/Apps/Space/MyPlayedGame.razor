@@ -20,21 +20,26 @@ else
     <TitleTip></TitleTip>
 }
 
-<CnGalWebSite.Shared.AppComponent.Pages.Users.MyPlayedGame.HeadBar Title="@ViewModel.Name" SteamId="@ViewModel.SteamId" IsShadow="true" OnEditSteam="OnEditSteam" OnRefresh="OnRefresh" />
+<CnGalWebSite.Shared.AppComponent.Pages.Users.MyPlayedGame.HeadBar Title="游玩记录" SteamId="@ViewModel.SteamId" IsShadow="true" OnEditSteam="OnEditSteam" OnRefresh="OnRefresh" />
 <div style="margin-top: 45px; width: 100%;">
     @if (isReady)
     {
-        if (Model.Count == 0)
+
+        if (GameRecords.Count == 0)
         {
+
             <div class="mt-3">
                 <CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard />
             </div>
         }
         else
         {
-            <div class="ms-3 me-3 mb-3">
-                <CnGalWebSite.Shared.Component.PlayedGames.ListGameRecordCard Model="Model" IsSmallScreen="true" />
-            </div>
+
+<div class="ms-3 me-3 mb-3">
+    <CnGalWebSite.Shared.Component.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" IsSmallScreen="true" />
+
+    <CnGalWebSite.Shared.Component.PlayedGames.ListGameRecordCard Model="GameRecords" IsSmallScreen="true" />
+</div>
         }
     }
     else
@@ -53,7 +58,9 @@ else
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    public List<GameRecordViewModel> Model = new List<GameRecordViewModel>();
+
+    public List<GameRecordViewModel> GameRecords = new List<GameRecordViewModel>();
+    public List<SteamUserInfor> SteamUserInfors = new List<SteamUserInfor>();
 
     bool isReady = false;
 
@@ -74,7 +81,8 @@ else
             }
 
             ViewModel = await Http.GetFromJsonAsync<PersonalSpaceViewModel>(ToolHelper.WebApiPath + "api/space/getuserview/" + userId);
-            Model = await Http.GetFromJsonAsync<List<GameRecordViewModel>>(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameInfor");
+            GameRecords = await Http.GetFromJsonAsync<List<GameRecordViewModel>>(ToolHelper.WebApiPath + "api/playedgame/GetUserGameRecords/" + userId);
+            SteamUserInfors = await Http.GetFromJsonAsync<List<SteamUserInfor>>(ToolHelper.WebApiPath + "api/steam/GetUserSteamInfor/" + userId);
             isReady = true;
         }
         catch (Exception ex)

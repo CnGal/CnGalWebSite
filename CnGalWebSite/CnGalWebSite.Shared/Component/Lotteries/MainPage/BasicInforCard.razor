@@ -51,10 +51,24 @@
     </p>
     @foreach (var item in Model.Awards)
     {
-        <div class="mt-2 p-2" style="border: 1px solid rgba(0,0,0,.125); border-radius: 5px; ">
-            <i class="fa fa-bookmark-o fa-fw "></i>
-            <span>@(item.Name+" "+item.Count + "件")</span>
+<div class="mt-2 p-2" style="border: 1px solid rgba(0,0,0,.125); border-radius: 5px; ">
+    <div style=" font-size: medium; ">
+        <i class="fa fa-bookmark-o fa-fw "></i>
+        <span>@(item.Name+" "+item.Count + "件")</span>
+
+    </div>
+    <div class="row">
+        @foreach (var temp in item.Users)
+        {
+            
+        <div class="col-12 col-lg-6 mt-2">
+            <UserInforCard  Model="temp" />
+
         </div>
+        }
+    </div>
+  
+</div>
     }
 </div>
 @code {

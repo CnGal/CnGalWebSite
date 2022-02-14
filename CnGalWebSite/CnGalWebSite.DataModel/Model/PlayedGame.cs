@@ -35,7 +35,10 @@ namespace CnGalWebSite.DataModel.Model
         /// 是否在Steam库中
         /// </summary>
         public bool IsInSteam { get; set; }
-
+        /// <summary>
+        /// 是否隐藏
+        /// </summary>
+        public bool IsHidden { get; set; }
         /// <summary>
         /// 游玩感想
         /// </summary>

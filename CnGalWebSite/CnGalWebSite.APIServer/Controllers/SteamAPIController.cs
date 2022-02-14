@@ -35,6 +35,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _steamInforRepository = steamInforRepository;
             _steamInforService = steamInforService;
         }
+
         [AllowAnonymous]
         [HttpGet("{steamId}/{entryId}")]
         public async Task<ActionResult<SteamInfor>> GetSteamInforAsync(int steamId, int entryId)
@@ -59,6 +60,9 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return steamInfor;
         }
+
+
+
         /// <summary>
         /// 使所有词条的steamId同步到数据库
         /// </summary>
@@ -152,7 +156,30 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
         }
-        
+
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<List<SteamUserInfor>>> GetUserSteamInforAsync(string id)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            if (user.IsShowGameRecord == false && id != user.Id)
+            {
+                return NotFound("该用户的Steam信息未公开");
+            }
+            if(string.IsNullOrWhiteSpace(user.SteamId))
+            {
+                return new List<SteamUserInfor>();
+            }
+
+            var steamids = user.SteamId.Replace("，", ",").Replace("、", ",").Split(',');
+
+            var model =await _steamInforService.GetSteamUserInfors(steamids.ToList());
+
+            return model;
+
+        }
 
     }
 }

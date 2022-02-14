@@ -670,7 +670,6 @@ namespace CnGalWebSite.APIServer.Controllers
             vote.BackgroundPicture = model.BackgroundPicture;
             vote.EndTime = model.EndTime;
             vote.LastEditTime = DateTime.Now.ToCstTime();
-            vote.CreateTime = DateTime.Now.ToCstTime();
             vote.BeginTime = model.BeginTime;
             vote.BriefIntroduction = model.BriefIntroduction;
             vote.MainPage = model.MainPage;

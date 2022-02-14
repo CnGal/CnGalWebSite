@@ -13,7 +13,6 @@ using CnGalWebSite.DataModel.ViewModel.Votes;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
 
@@ -21,7 +20,6 @@ namespace CnGalWebSite.Shared.Service
 {
     public interface IDataCacheService
     {
-
         bool? IsApp { get; set; }
 
         EventCallback RefreshApp { get; set; }

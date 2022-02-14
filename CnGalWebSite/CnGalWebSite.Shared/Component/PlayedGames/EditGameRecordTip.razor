@@ -17,14 +17,17 @@
 <div>
     @if (isReady)
     {
+    <div>
         <div>
-            <div>
-                <RadioList @bind-Value="Model.Type" Color="@Color.Primary" DisplayText="状态" ShowLabel="true"></RadioList>
-            </div>
-            <div class="mt-3">
-                <Textarea @bind-Value="Model.PlayImpressions" rows="5" DisplayText="感想" ShowLabel="true"/>
-            </div>
+            <RadioList @bind-Value="Model.Type" Color="@Color.Primary" DisplayText="状态" ShowLabel="true"></RadioList>
         </div>
+        <div class="mt-3">
+            <Textarea @bind-Value="Model.PlayImpressions" rows="5" DisplayText="感想" ShowLabel="true" />
+        </div>
+        <div class="mt-3">
+            <Checkbox @bind-Value="Model.IsHidden" DisplayText="折叠" ShowAfterLabel="true"></Checkbox>
+        </div>
+    </div>
 
     }
     else
@@ -95,6 +98,7 @@
                 {
                     ViewModel.Type = Model.Type;
                     ViewModel.PlayImpressions = Model.PlayImpressions;
+                    ViewModel.IsHidden = Model.IsHidden;
                 }
 
                 await OnClickClose.InvokeAsync();

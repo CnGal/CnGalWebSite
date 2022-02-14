@@ -18,18 +18,21 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
     {
         private readonly IRepository<SteamInfor, long> _steamInforRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
-        private readonly IRepository<PlayedGame, string> _playedGameRepository;
+        private readonly IRepository<PlayedGame, long> _playedGameRepository;
+        private readonly IRepository<SteamUserInfor, long> _steamUserInforRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
 
-        public SteamInforService(IRepository<SteamInfor, long> steamInforRepository, IRepository<ApplicationUser, string> userRepository, IConfiguration configuration, IRepository<PlayedGame, string> playedGameRepository,
-             IHttpClientFactory clientFactory)
+        public SteamInforService(IRepository<SteamInfor, long> steamInforRepository, IRepository<ApplicationUser, string> userRepository,
+            IConfiguration configuration, IRepository<PlayedGame, long> playedGameRepository, IRepository<SteamUserInfor, long> steamUserInforRepository,
+        IHttpClientFactory clientFactory)
         {
             _steamInforRepository = steamInforRepository;
             _userRepository = userRepository;
             _configuration = configuration;
             _playedGameRepository = playedGameRepository;
             _clientFactory = clientFactory;
+            _steamUserInforRepository = steamUserInforRepository;
         }
 
         public async Task UpdateAllGameSteamInfor()
@@ -45,11 +48,11 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
         public async Task UpdateAllUserSteamInfor()
         {
-            var users = await _userRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.SteamId) == false).ToListAsync();
+            var steamIds = await _steamUserInforRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.SteamId) == false).Select(s=>s.SteamId).ToListAsync();
 
-            foreach (var item in users)
+            foreach (var item in steamIds)
             {
-                await UpdateUserSteam(item);
+                await UpdateSteamUserInfor(item);
             }
         }
 
@@ -271,35 +274,37 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
         public async Task<bool> UpdateUserSteam(ApplicationUser user)
         {
+            var steamIds = new string[0];
+            if (string.IsNullOrWhiteSpace(user.SteamId)==false)
+            {
+                steamIds = user.SteamId.Replace("，", ",").Replace( "、", ",").Split(',');
+            }
             //获取最新列表
             //获取信息
             var steamGames = new UserSteamResponseJson();
-            try
-            {
-                using var client = _clientFactory.CreateClient();
-                var jsonContent = await client.GetStringAsync("http://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + user.SteamId);
-                var obj = JObject.Parse(jsonContent);
-                steamGames = obj["response"].ToObject<UserSteamResponseJson>();
-            }
-            catch (Exception ex)
-            {
 
+            var isError = false;
+            foreach (var item in steamIds)
+            {
+                try
+                {
+                    using var client = _clientFactory.CreateClient();
+                    var jsonContent = await client.GetStringAsync("https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + item);
+                    var obj = JObject.Parse(jsonContent);
+                    var temp = obj["response"].ToObject<UserSteamResponseJson>();
+                    steamGames.games.AddRange(temp.games);
+                    steamGames.game_count += temp.game_count;
+                }
+                catch (Exception ex)
+                {
+                    isError = true;
+                }
             }
+
+
             //查找
             var userGames = await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).ToListAsync();
-
-            if (steamGames == null || steamGames.games == null)
-            {
-                //取消在库中的标记
-                //遍历列表更新已玩游戏信息
-                foreach (var item in userGames)
-                {
-                    item.IsInSteam = false;
-                    await _playedGameRepository.UpdateAsync(item);
-                }
-                return false;
-            }
-            var appids = steamGames.games.Select(s => s.appid);
+            var appids = steamGames.games.Select(s => s.appid).Distinct();
             var steams = await _steamInforRepository.GetAll().Where(s => appids.Contains(s.SteamId)).ToListAsync();
 
             //遍历列表更新已玩游戏信息
@@ -315,6 +320,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 {
                     item.IsInSteam = false;
                 }
+
                 await _playedGameRepository.UpdateAsync(item);
             }
 
@@ -331,7 +337,16 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 });
             }
 
-            return true;
+
+            if (isError)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+
 
 
         }
@@ -367,6 +382,67 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 EvaluationCount = int.Parse(countStr),
                 RecommendationRate = int.Parse(rateStr),
             };
+        }
+
+        public async Task<SteamUserInfor> UpdateSteamUserInfor(string SteamId)
+        {
+            var steamUser=new SteamUserInforJson();
+            try
+            {
+                using var client = _clientFactory.CreateClient();
+                var jsonContent = await client.GetStringAsync("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=" + _configuration["SteamAPIToken"] + "&steamids=" + SteamId);
+                var obj = JObject.Parse(jsonContent);
+                steamUser = obj.ToObject<SteamUserInforJson>();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            if(steamUser.response.players.Count==0)
+            {
+                return null;
+            }
+
+            var player = steamUser.response.players[0];
+            var user=await _steamUserInforRepository.FirstOrDefaultAsync(s=>s.SteamId == SteamId);
+            if(user==null)
+            {
+                user = new SteamUserInfor();
+            }
+
+            user.SteamId = SteamId;
+            user.Name = player.personaname;
+            user.Image = player.avatarfull.Replace("steamcdn-a.akamaihd.net", "cdn.cloudflare.steamstatic.com");
+
+            if(user.Id==0)
+            {
+                await _steamUserInforRepository.InsertAsync(user);
+            }
+            else
+            {
+                await _steamUserInforRepository.UpdateAsync(user);
+            }
+            return user;
+        }
+
+        public async Task<List<SteamUserInfor>> GetSteamUserInfors(List<string> steamids)
+        {
+            var model=await _steamUserInforRepository.GetAllListAsync(s=>steamids.Contains(s.SteamId));
+
+            foreach(var item in steamids)
+            {
+                //不存在则获取
+                if(model.Any(s=>s.SteamId==item)==false)
+                {
+                    var temp =await UpdateSteamUserInfor(item);
+                    if(temp!=null)
+                    {
+                        model.Add(temp);
+                    }
+                }
+            }
+
+            return model;
         }
 
     }

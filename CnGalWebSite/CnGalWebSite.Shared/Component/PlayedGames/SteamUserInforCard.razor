@@ -1,0 +1,113 @@
+﻿@if (SteamUserInfors.Count == 1&&IsSmallScreen==false)
+{
+    var item = SteamUserInfors[0];
+    <a href="@("https://steamcommunity.com/profiles/"+item.SteamId)" rel="noreferrer" class="a-font-color" target="_blank">
+        <div class="div-shadow rounded bg-opacity h-100 p-2 mt-3" style="display:flex;">
+            <img style=" height: 50px; " src="@item.Image" alt="@item.Name" />
+            <div class="ms-3" style=" display: flex; flex-direction: column; justify-content: space-between; ">
+                <p class="m-0 fw-bold h5  font-color">
+                    @item.Name
+                </p>
+                <p class="m-0" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+                    <span>
+                        <i class="fa fa-history fa-fw font-color"></i>
+                        <span>@("总时长："+(GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" 小时")&nbsp;&nbsp;&nbsp;</span>
+                    </span>
+                    <span>
+                        <i class="fa fa-codepen fa-fw font-color"></i>
+                        <span>@("总计："+GameRecords.Count)&nbsp;&nbsp;&nbsp;</span>
+
+                    </span>
+                    <span>
+                        <i class="fa fa-car fa-fw font-color"></i>
+                        <span>@("想玩："+GameRecords.Count(s=>s.Type== PlayedGameType.WantToPlay))&nbsp;&nbsp;&nbsp;</span>
+
+                    </span>
+                    <span>
+                        <i class="fa fa-dashboard fa-fw font-color"></i>
+                        <span>@("正在玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Playing))&nbsp;&nbsp;&nbsp;</span>
+
+                    </span>
+                    <span>
+                        <i class="fa fa-gamepad fa-fw font-color"></i>
+                        <span>@("已玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Played))&nbsp;&nbsp;&nbsp;</span>
+
+                    </span>
+                    <span>
+                        <i class="fa fa-thumbs-o-down fa-fw font-color"></i>
+                        <span>@("不感兴趣："+GameRecords.Count(s=>s.Type== PlayedGameType.Uninterested))&nbsp;&nbsp;&nbsp;</span>
+
+                    </span>
+                </p>
+            </div>
+        </div>
+    </a>
+
+}
+else
+{
+    <div class="row">
+        @foreach (var item in SteamUserInfors)
+        {
+            <div class="col-12 col-md-6 col-xxl-4 h-100">
+                <a href="@("https://steamcommunity.com/profiles/"+item.SteamId)" rel="noreferrer" class="a-font-color" target="_blank">
+                    <div class="div-shadow rounded bg-opacity p-2 mt-3" style="display: flex; align-items: center;">
+                        <img style=" height: 50px; " src="@item.Image" alt="@item.Name" />
+                        <div class="ms-3" style=" display: flex; align-items: center; ">
+                            <span class="h5 fw-bold font-color m-0">
+                                @item.Name
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+
+        }
+    </div>
+
+
+    <div class="shadow-sm rounded bg-opacity h-100 p-2 mt-3" style="display:flex;">
+        <p class="m-0" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+            <span>
+                <i class="fa fa-history fa-fw font-color"></i>
+                <span>@("总时长："+(GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" 小时")&nbsp;&nbsp;&nbsp;</span>
+            </span>
+            <span>
+                <i class="fa fa-codepen fa-fw font-color"></i>
+                <span>@("总计："+GameRecords.Count)&nbsp;&nbsp;&nbsp;</span>
+
+            </span>
+            <span>
+                <i class="fa fa-car fa-fw font-color"></i>
+                <span>@("想玩："+GameRecords.Count(s=>s.Type== PlayedGameType.WantToPlay))&nbsp;&nbsp;&nbsp;</span>
+
+            </span>
+            <span>
+                <i class="fa fa-dashboard fa-fw font-color"></i>
+                <span>@("正在玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Playing))&nbsp;&nbsp;&nbsp;</span>
+
+            </span>
+            <span>
+                <i class="fa fa-gamepad fa-fw font-color"></i>
+                <span>@("已玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Played))&nbsp;&nbsp;&nbsp;</span>
+
+            </span>
+            <span>
+                <i class="fa fa-thumbs-o-down fa-fw font-color"></i>
+                <span>@("不感兴趣："+GameRecords.Count(s=>s.Type== PlayedGameType.Uninterested))&nbsp;&nbsp;&nbsp;</span>
+
+            </span>
+        </p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<GameRecordViewModel> GameRecords { get; set; }
+    [Parameter]
+    public List<SteamUserInfor> SteamUserInfors { get; set; }
+    [Parameter]
+    public bool IsSmallScreen { get; set; }
+
+}

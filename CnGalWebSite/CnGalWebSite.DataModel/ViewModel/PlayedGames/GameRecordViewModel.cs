@@ -37,5 +37,7 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
         /// 游戏简介
         /// </summary>
         public string PlayImpressions { get; set; }
+
+        public bool IsHidden { get; set; }
     }
 }

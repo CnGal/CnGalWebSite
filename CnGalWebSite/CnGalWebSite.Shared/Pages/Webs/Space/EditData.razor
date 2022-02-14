@@ -127,6 +127,9 @@
                 <div class="form-group col-12 col-sm-6">
                     <Switch @bind-Value="Model.CanComment" />
                 </div>
+                <div class="form-group col-12 col-sm-6">
+                    <Switch @bind-Value="Model.IsShowGameRecord" />
+                </div>
 
                 <div class="form-group col-12">
                     <BootstrapInput @bind-Value="Model.PersonalSignature" />
@@ -214,6 +217,20 @@
                     IsShow = RanksName.Any(s => s == item.Text)
                 });
             }
+            if(string.IsNullOrWhiteSpace(Model.SteamId)==false)
+            {
+                System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex("^(-?[0-9]*[.]*[0-9]{0,3})$");
+                var steamIds = Model.SteamId.Replace("，", ",").Replace("、", ",").Split(',');
+                foreach (var item in steamIds)
+                {
+                    if (regex.IsMatch(Model.SteamId) == false)
+                    {
+                        await ToastService.Error("编辑用户Steam信息失败", "SteamId需为64位纯数字");
+                        return;
+                    }
+                }
+            }
+
             var result = await Http.PostAsJsonAsync<EditUserDataViewModel>(ToolHelper.WebApiPath + "api/space/edituserdata", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);

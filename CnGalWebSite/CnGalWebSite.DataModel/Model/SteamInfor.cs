@@ -40,6 +40,32 @@ namespace CnGalWebSite.DataModel.Model
         public DateTime UpdateTime { get; set; }
     }
 
+    public class SteamUserInfor
+    {
+        public long Id { get; set; }
+
+        public string SteamId { get; set; }
+
+        public string Image { get; set; }
+
+        public string Name { get; set; }
+    }
+
+    public class SteamUserInforJson
+    {
+        public SteamUserInforResponseJson response { get; set; } = new SteamUserInforResponseJson();
+    }
+    public class SteamUserInforResponseJson
+    {
+        public List<SteamUserInforplayersJson> players { get; set; } = new List<SteamUserInforplayersJson>();
+    }
+    public class SteamUserInforplayersJson
+    {
+        public string steamid { get; set; }
+        public string personaname { get; set; }
+        public string profileurl { get; set; }
+        public string avatarfull { get; set; }
+    }
     public class SteamEvaluation
     {
         /// <summary>
@@ -69,7 +95,7 @@ namespace CnGalWebSite.DataModel.Model
     public class UserSteamResponseJson
     {
         public int game_count { get; set; }
-        public List<UserSteamGameJson> games { get; set; }
+        public List<UserSteamGameJson> games { get; set; } = new List<UserSteamGameJson>();
     }
 
     public class UserSteamGameJson

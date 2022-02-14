@@ -1051,8 +1051,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.Entries)
                 .Include(s => s.CreateUser)
                 .Where(s => s.Type == ArticleType.News && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false && (s.RealNewsTime != null ? (s.RealNewsTime.Value.Date.AddDays(days) > nowTime.Date) : (s.PubishTime.Date.AddDays(days) > nowTime.Date)))
-                .OrderByDescending(s => s.RealNewsTime)
-                .ThenByDescending(s => s.PubishTime)
+                .OrderByDescending(s => s.PubishTime)
+                .ThenByDescending(s => s.RealNewsTime)
                 .ToListAsync();
 
             //查找关联制作组

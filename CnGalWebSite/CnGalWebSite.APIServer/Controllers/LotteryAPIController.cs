@@ -203,7 +203,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<LotteryViewModel>> GetLotteryViewAsync(long id)
         {
             var lottery = await _lotteryRepository.GetAll().AsNoTracking()
-                .Include(s => s.Awards)
+                .Include(s => s.Awards).ThenInclude(s=>s.WinningUsers).ThenInclude(s=>s.ApplicationUser)
                 .Include(s => s.Users)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
@@ -228,7 +228,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 EndTime = lottery.EndTime,
                 IsHidden = lottery.IsHidden,
                 LastEditTime = lottery.LastEditTime,
-                LotteryTime = lottery.LastEditTime,
+                LotteryTime = lottery.LotteryTime,
                 MainPage = lottery.MainPage,
                 MainPicture = lottery.MainPicture,
                 Name = lottery.Name,
@@ -245,7 +245,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             foreach (var item in lottery.Awards)
             {
-                model.Awards.Add(new LotteryAwardViewModel
+                var temp = new LotteryAwardViewModel
                 {
                     Count = item.Count,
                     Id = item.Id,
@@ -253,7 +253,21 @@ namespace CnGalWebSite.APIServer.Controllers
                     Name = item.Name,
                     Priority = item.Priority,
                     Type = item.Type,
-                });
+                };
+
+                foreach(var infor in item.WinningUsers.Select(s=>s.ApplicationUser))
+                {
+                    temp.Users.Add(new LotteryUserViewModel
+                    {
+                        PersonalSignature = infor.PersonalSignature,
+                        Image = _appHelper.GetImagePath(infor.PhotoPath, "user.png"),
+                        Ranks = await _rankService.GetUserRanks(infor),
+                        UserId = infor.Id,
+                        UserName = infor.UserName
+                    });
+                }
+
+                model.Awards.Add(temp);
             }
 
             //增加阅读人数
@@ -507,7 +521,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 BriefIntroduction = lottery.BriefIntroduction,
                 SmallBackgroundPicture = lottery.SmallBackgroundPicture,
                 EndTime = lottery.EndTime,
-                LotteryTime = lottery.LastEditTime,
+                LotteryTime = lottery.LotteryTime,
                 MainPage = lottery.MainPage,
                 MainPicture = lottery.MainPicture,
                 Name = lottery.Name,
@@ -584,7 +598,6 @@ namespace CnGalWebSite.APIServer.Controllers
             lottery.BeginTime = model.BeginTime;
             lottery.BriefIntroduction = model.BriefIntroduction;
             lottery.DisplayName = model.DisplayName;
-            lottery.CreateTime = DateTime.Now.ToCstTime();
             lottery.LotteryTime = model.LotteryTime;
             lottery.Type = model.Type;
             lottery.MainPage = model.MainPage;
@@ -662,7 +675,6 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
             }
 
-            lottery.LastEditTime = DateTime.Now;
             await _lotteryRepository.UpdateAsync(lottery);
 
             return new Result { Successful = true };

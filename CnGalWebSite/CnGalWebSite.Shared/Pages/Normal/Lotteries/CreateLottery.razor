@@ -89,21 +89,11 @@
                             </div>
                             @if (Model.Type == LotteryType.Automatic)
                             {
-                                <div class="form-group col-12 col-sm-6">
-                                    <Switch @bind-Value="IsLotteryTimeSameWithEndTime" ShowLabel="true" DisplayText="抽奖时间与结束时间一致" />
-                                </div>
-                                @if (IsLotteryTimeSameWithEndTime)
-                                {
-                                    <div class="form-group col-12 col-sm-6">
-                                        <DateTimePicker @bind-Value="@Model.EndTime" IsDisabled="true" ViewModel="DatePickerViewModel.DateTime" DisplayText="抽奖时间" />
-                                    </div>
-                                }
-                                else
-                                {
+
                                     <div class="form-group col-12 col-sm-6">
                                         <DateTimePicker @bind-Value="@Model.LotteryTime" ViewModel="DatePickerViewModel.DateTime" />
                                     </div>
-                                }
+                                
                             }
                         </div>
                     </div>
@@ -156,7 +146,6 @@
     [NotNull]
     private ValidateForm? ComplexForm { get; set; }
 
-    private bool IsLotteryTimeSameWithEndTime { get; set; } = true;
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
@@ -190,10 +179,7 @@
                 await ToastService.Error("创建抽奖失败", "开始时间必须早于结束时间");
                 return;
             }
-            if(IsLotteryTimeSameWithEndTime)
-            {
-                Model.LotteryTime = Model.EndTime;
-            }
+
             if(Model.LotteryTime<Model.EndTime)
             {
                 await ToastService.Error("创建抽奖失败", "结束时间必须早于抽奖时间");

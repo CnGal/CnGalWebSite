@@ -19,7 +19,7 @@
          {
              <EntryTabAloneTip Icon="fa-folder-open" Index="10" OnTabClick="OnClick" Text="收藏" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
          }
-         @if (IsCurrentUser)
+         @if (IsCurrentUser || IsShowGameRecord)
          {
              <EntryTabAloneTip Icon="fa-file-text-o" Index="9" OnTabClick="OnClick" Text="游玩记录" RandomIndex="RandomIndex" DefaultIndex="DefaultIndex"></EntryTabAloneTip>
          }
@@ -74,12 +74,13 @@ else
     public EventCallback<int> OnTabClick { get; set; }
 
     [Parameter]
-    public bool IsSmallSreeen { get; set; } = false;
-
+    public bool IsSmallSreeen { get; set; }
     [Parameter]
-    public bool IsCurrentUser { get; set; } = false;
+    public bool IsCurrentUser { get; set; }
     [Parameter]
-    public bool IsShowFavorites { get; set; } = false;
+    public bool IsShowFavorites { get; set; } 
+    [Parameter]
+    public bool IsShowGameRecord { get; set; }
     [Parameter]
     public int DefaultIndex { get; set; }
 

@@ -41,8 +41,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         public bool CanComment { get; set; }
         [Display(Name = "是否公开收藏夹")]
         public bool IsShowFavorites { get; set; }
+        [Display(Name = "是否公开游玩记录")]
+        public bool IsShowGameRecord { get; set; }
 
-        [Display(Name = "SteamId")]
+        [Display(Name = "SteamID64（64位的数字Id，可用逗号分隔多个Id）")]
         public string SteamId { get; set; }
 
         public string MicrosoftAccountName { get; set; }

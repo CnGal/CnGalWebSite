@@ -26,5 +26,6 @@
         /// 用户背景图 小屏幕
         /// </summary>
         public string SBgImage { get; set; }
+
     }
 }

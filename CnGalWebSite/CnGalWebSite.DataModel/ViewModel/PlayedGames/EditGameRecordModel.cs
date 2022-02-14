@@ -8,6 +8,8 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
 
         public int GameId { get; set; }
 
+        public bool IsHidden { get; set; }
+
         [Display(Name ="类型")]
         public PlayedGameType Type { get; set; }
 

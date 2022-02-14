@@ -69,6 +69,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     GameId = id,
                     Type = game.Type,
+                    IsHidden = game.IsHidden,
                     PlayImpressions=game.PlayImpressions,
                 };
             }
@@ -99,7 +100,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     ApplicationUserId = user.Id,
                     Type=model.Type,
                     PlayImpressions=model.PlayImpressions,
-                    EntryId = model.GameId
+                    EntryId = model.GameId,
+                    IsHidden=model.IsHidden,
                 });
 
                 return new Result { Successful = true };
@@ -107,6 +109,7 @@ namespace CnGalWebSite.APIServer.Controllers
             else
             {
                 game.Type = model.Type;
+                game.IsHidden = model.IsHidden;
                 game.PlayImpressions = model.PlayImpressions;
 
                 await _playedGameRepository.UpdateAsync(game);
@@ -119,13 +122,12 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<Result>> DeleteGameFromPlayedList(DeleteGameRecordModel model)
+        public async Task<ActionResult<Result>> HiddenGameRecord(HiddenGameRecordModel model)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            await _playedGameRepository.DeleteAsync(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.Id));
-
+            await _playedGameRepository.GetRangeUpdateTable().Where(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.EntryId)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
             return new Result { Successful = true };
         }
 
@@ -168,14 +170,20 @@ namespace CnGalWebSite.APIServer.Controllers
         /// 获取当前用户的游戏记录
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<List<GameRecordViewModel>>> GetPlayedGameInforAsync()
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<List<GameRecordViewModel>>> GetUserGameRecordsAsync(string id)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
+            if(user.IsShowGameRecord==false&&id!=user.Id)
+            {
+                return NotFound("该用户的游玩记录未公开");
+            }
+
             //获取词条
-            var games = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.Entry).Where(s => s.ApplicationUserId == user.Id).ToListAsync();
+            var games = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.Entry).Where(s => s.ApplicationUserId == id).ToListAsync();
 
             var model = new List<GameRecordViewModel>();
 
@@ -191,6 +199,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     PlayDuration = item.PlayDuration,
                     Type = item.Type,
                     PlayImpressions=item.PlayImpressions,
+                    IsHidden = item.IsHidden,
                 });
             }
 
@@ -203,7 +212,10 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            await _steamInforService.UpdateUserSteam(user);
+            if(await _steamInforService.UpdateUserSteam(user)==false)
+            {
+                return new Result { Successful = false, Error = "无法获取Steam信息" };
+            }
 
             return new Result { Successful = true };
         }

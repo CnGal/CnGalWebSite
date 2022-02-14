@@ -876,7 +876,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     PostTime = DateTime.Now.ToCstTime(),
                     Image = "default/logo.png",
                     Rank = "系统",
-                    Text = "你的评论『\n" + _appHelper.GetStringAbbreviation(comment.Text, 20) + "\n』被管理员『" + userAdmin.UserName + "』" + ((examine.IsPassed ?? false) ? "通过，感谢你为CnGal资料站做出的贡献" : "驳回") + (string.IsNullOrWhiteSpace(examine.Comments) ? "" : "，批注『" + examine.Comments + "』"),
+                    Text = "你的评论被管理员『" + userAdmin.UserName + "』" + ((examine.IsPassed ?? false) ? "通过，感谢你为CnGal资料站做出的贡献" : "驳回") + (string.IsNullOrWhiteSpace(examine.Comments) ? "" : "，批注『" + examine.Comments + "』"),
                     Link = "",
                     LinkTitle = "",
                     Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,

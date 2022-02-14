@@ -43,13 +43,13 @@
                         <TableColumn @bind-Field="@context.Type" Searchable="true" Sortable="true" Width="80" />
                         <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" AllowTextWrap="true" Width="200" />
                         <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" AllowTextWrap="true" Width="400" />
-                        <TableColumn @bind-Field="@context.BeginTime" Sortable="true" Width="120" FormatString="yyyy-MM-dd" />
-                        <TableColumn @bind-Field="@context.EndTime" Sortable="true" Width="120" FormatString="yyyy-MM-dd" />
-                        <TableColumn @bind-Field="@context.LotteryTime" Sortable="true" Width="120" FormatString="yyyy-MM-dd" />
+                        <TableColumn @bind-Field="@context.BeginTime" Sortable="true" Width="160" FormatString="yyyy-MM-dd HH:mm" />
+                        <TableColumn @bind-Field="@context.EndTime" Sortable="true" Width="160" FormatString="yyyy-MM-dd HH:mm" />
+                        <TableColumn @bind-Field="@context.LotteryTime" Sortable="true" Width="160" FormatString="yyyy-MM-dd HH:mm" />
                         <TableColumn @bind-Field="@context.ReaderCount" Sortable="true" Width="80" />
                         <TableColumn @bind-Field="@context.CommentCount" Sortable="true" Width="80" />
 
-                        <TableColumn @bind-Field="@context.LastEditTime" Sortable="true" Width="120" FormatString="yyyy-MM-dd" />
+                        <TableColumn @bind-Field="@context.LastEditTime" Sortable="true" Width="160" FormatString="yyyy-MM-dd HH:mm" />
 
                         <TableColumn @bind-Field="@context.Priority" Sortable="true" Width="120" />
                         <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />

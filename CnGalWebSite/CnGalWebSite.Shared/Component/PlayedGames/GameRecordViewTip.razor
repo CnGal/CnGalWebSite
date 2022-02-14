@@ -55,7 +55,7 @@
     <div>
         <GameRecordTagCard Model="Model" IsDark="true" />
     </div>
-    <div class="mt-3 mb-2">
+    <div class="mt-1 mb-2">
         <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-paint-brush"></i>&nbsp;&nbsp;感想</h2>
     </div>
 
@@ -73,8 +73,16 @@
     }
 </div>
 <div class="mt-4" style="display: flex; justify-content: space-between;">
-    <Button Color="Color.Danger" Icon="fa fa-close" OnClick="OnDelete" IsAsync="true" Text="删除"></Button>
+    @if (Model.IsHidden)
+    {
+        <Button Color="Color.Warning" Icon="fa fa-map-signs" OnClick="OnHidden" IsAsync="true" Text="显示"></Button>
 
+    }
+    else
+    {
+        <Button Color="Color.Primary" Icon="fa fa-unlink" OnClick="OnHidden" IsAsync="true" Text="隐藏"></Button>
+
+    }
 
     <Button Color="Color.Success" Icon="fa fa-pencil" OnClick="OnEdit" IsAsync="true" Text="编辑"></Button>
 </div>
@@ -108,27 +116,28 @@
         await DialogService.Show(option);
     }
 
-    public async Task OnDelete()
+    public async Task OnHidden()
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<DeleteGameRecordModel>(ToolHelper.WebApiPath + "api/playedgame/DeleteGameFromPlayedList", new DeleteGameRecordModel { Ids = new long[] { Model.GameId } });
+            var result = await Http.PostAsJsonAsync<HiddenGameRecordModel>(ToolHelper.WebApiPath + "api/playedgame/HiddenGameRecord", new HiddenGameRecordModel { IsHidden= !Model.IsHidden, Ids = new int?[] { Model.GameId } });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {
-                await ToastService.Error("删除游玩记录失败", obj.Error);
+                await ToastService.Error("修改游玩记录显示状态失败", obj.Error);
             }
             else
             {
-                await ToastService.Success("删除游玩记录成功", "删除游玩记录成功");
+                Model.IsHidden = !Model.IsHidden;
+                await ToastService.Success("修改游玩记录显示状态成功", "修改游玩记录显示状态成功");
                 await OnClickClose.InvokeAsync();
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "删除游玩记录失败");
+            ErrorHandler.ProcessError(ex, "修改游玩记录显示状态失败");
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.SteamInfors
@@ -30,5 +31,9 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         /// <param name="user">已经更新SteamId的用户</param>
         /// <returns></returns>
         Task<bool> UpdateUserSteam(ApplicationUser user);
+
+        Task<SteamUserInfor> UpdateSteamUserInfor(string SteamId);
+
+        Task<List<SteamUserInfor>> GetSteamUserInfors(List<string> steamids);
     }
 }

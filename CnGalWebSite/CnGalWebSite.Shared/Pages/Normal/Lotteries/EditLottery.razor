@@ -98,21 +98,12 @@ else
                             </div>
                             @if (Model.Type == LotteryType.Automatic)
                             {
-                                <div class="form-group col-12 col-sm-6">
-                                    <Switch @bind-Value="IsLotteryTimeSameWithEndTime" ShowLabel="true" DisplayText="抽奖时间与结束时间一致" />
-                                </div>
-                                @if (IsLotteryTimeSameWithEndTime)
-                                {
-                                    <div class="form-group col-12 col-sm-6">
-                                        <DateTimePicker @bind-Value="@Model.EndTime" IsDisabled="true" ViewModel="DatePickerViewModel.DateTime" DisplayText="抽奖时间" />
-                                    </div>
-                                }
-                                else
-                                {
+
+                               
                                     <div class="form-group col-12 col-sm-6">
                                         <DateTimePicker @bind-Value="@Model.LotteryTime" ViewModel="DatePickerViewModel.DateTime" />
                                     </div>
-                                }
+                                
                             }
                         </div>
                     </div>
@@ -175,7 +166,6 @@ else
     [NotNull]
     private ValidateForm? ComplexForm { get; set; }
 
-    private bool IsLotteryTimeSameWithEndTime { get; set; } = true;
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
@@ -211,10 +201,7 @@ else
                 await ToastService.Error("编辑抽奖失败", "开始时间必须早于结束时间");
                 return;
             }
-            if (IsLotteryTimeSameWithEndTime)
-            {
-                Model.LotteryTime = Model.EndTime;
-            }
+
             if (Model.LotteryTime < Model.EndTime)
             {
                 await ToastService.Error("编辑抽奖失败", "结束时间必须早于抽奖时间");
@@ -235,7 +222,6 @@ else
                 }
 
             }
-
 
             var result = await Http.PostAsJsonAsync<EditLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/EditLottery", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;

@@ -223,6 +223,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 TotalExamine = userEditInfor.EditCount,
                 LastEditTime = userEditInfor.LastEditTime,
                 SteamId = user.SteamId,
+                IsShowGameRecord=user.IsShowGameRecord
             };
 
             //提前将MarkDown语法转为Html
@@ -479,6 +480,7 @@ namespace CnGalWebSite.APIServer.Controllers
             model.SteamId = user.SteamId;
             model.Id = user.Id;
             model.IsShowFavorites = user.IsShowFavotites;
+            model.IsShowGameRecord = user.IsShowGameRecord;
             model.GithubAccountName = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.GitHub)?.Name;
             model.MicrosoftAccountName = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.Microsoft)?.Name;
             model.GiteeAccountName = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.Gitee)?.Name;
@@ -514,10 +516,13 @@ namespace CnGalWebSite.APIServer.Controllers
                 if (string.IsNullOrWhiteSpace(model.SteamId) == false)
                 {
                     //更新游戏信息
-                    await _steamInforService.UpdateUserSteam(user);
+                    if(await _steamInforService.UpdateUserSteam(user)==false)
+                    {
+                        return new Result { Successful = false, Error = "无法获取Steam信息，请检查SteamId是否正确；也可能是服务器网络波动，不填写该项以保存其他修改的内容" };
+                    }
                 }
             }
-
+            user.IsShowGameRecord = model.IsShowGameRecord;
             //user.IsShowFavotites = model.IsShowFavorites;
             //更新头衔是否显示
             await _rankService.UpdateUserRanksIsHidden(user, model.Ranks);

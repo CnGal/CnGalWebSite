@@ -75,6 +75,10 @@ namespace CnGalWebSite.DataModel.Model
         /// 是否公开收藏夹
         /// </summary>
         public bool IsShowFavotites { get; set; }
+        /// <summary>
+        /// 是否公开游玩记录
+        /// </summary>
+        public bool IsShowGameRecord { get; set; }
 
         /// <summary>
         /// 是否通过身份验证
