@@ -23,11 +23,12 @@ namespace CnGalWebSite.APIServer.Controllers
     {
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IAppHelper _appHelper;
         private readonly ISteamInforService _steamInforService;
         private readonly IPlayedGameService _playedGameService;
 
-        public PlayedGamesAPIController(IPlayedGameService playedGameService, ISteamInforService steamInforService,
+        public PlayedGamesAPIController(IPlayedGameService playedGameService, ISteamInforService steamInforService, IRepository<ApplicationUser, string> userRepository,
         IRepository<PlayedGame, long> playedGameRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository)
         {
             _entryRepository = entryRepository;
@@ -35,6 +36,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _playedGameRepository = playedGameRepository;
             _playedGameService = playedGameService;
             _steamInforService = steamInforService;
+            _userRepository = userRepository;
         }
         /// <summary>
         /// 编辑游玩记录
@@ -177,7 +179,9 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            if(user.IsShowGameRecord==false&&id!=user.Id)
+            var objectUser = await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
+
+            if (objectUser.IsShowGameRecord == false && id != user.Id)
             {
                 return NotFound("该用户的游玩记录未公开");
             }
