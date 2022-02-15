@@ -350,7 +350,7 @@
                     <div class="@("tab-pane fade"+(defaultIndex==9?" show active ":"") )" id="@("pills"+randomIndex+"-9")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-9-tab")">
                         @if (Model.IsCurrentUser||Model.IsShowGameRecord)
                         {
-                            <UserPlayedGameListView SteamId="@Model.SteamId" UserId="@Model.Id"></UserPlayedGameListView>
+                            <UserPlayedGameListView SteamId="@Model.SteamId" UserId="@Model.Id" IsCurrentUser="Model.IsCurrentUser"></UserPlayedGameListView>
                         }
 
                     </div>

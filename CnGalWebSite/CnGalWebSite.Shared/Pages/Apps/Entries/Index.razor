@@ -15,10 +15,15 @@ else
 {
     <TitleTip></TitleTip>
 }
+@if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+{
+    <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
+}
+
 
 
 <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.HeadBar Title="@Model.Name"
-                                                                  OnEdit="@(() => NavigationManager.NavigateTo("/entries/edit/home/" + Model.Id))" />
+                                                               OnEdit="@(() => NavigationManager.NavigateTo("/entries/edit/home/" + Model.Id))" />
 <div style="margin-top: 45px; width: 100%;margin-bottom:65px; " @onclick="@(() => entryFooter.UnRelyComment())">
     @if (isReady)
     {
@@ -56,10 +61,10 @@ else
         <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
     }
 </div>
-@if (isNotFound == false&&isReady==true)
+@if (isNotFound == false && isReady == true)
 {
     <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.EntryFooter @ref="entryFooter" Image="@Model.MainPicture" RelyCallBack="RefreshComment"
-                                                                          EntryId="@Model.Id" EntryName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
+                                                                       EntryId="@Model.Id" EntryName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
 }
 
 @code {
@@ -137,7 +142,7 @@ else
 
     public async Task RefreshComment()
     {
-        if(comments!=null)
+        if (comments != null)
         {
             await comments.Refresh();
 
@@ -184,7 +189,7 @@ else
             isNotFound = false;
             StateHasChanged();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             isNotFound = true;
             isReady = true;

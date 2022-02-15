@@ -15,6 +15,11 @@ else
 {
     <TitleTip></TitleTip>
 }
+
+@if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+{
+    <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
+}
 <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.HeadBar Title="@Model.Name" OnEdit="@(() => NavigationManager.NavigateTo("/peripheries/edit/home/" + Model.Id))" CanEdit="true" ClassName="" />
 
 <div style="margin-top: 45px; width: 100%;margin-bottom:65px; " @onclick="@(() => peripheryFooter.UnRelyComment())">
@@ -157,7 +162,7 @@ else
     {
 
         //记录数据
-        if (Model.Name != LastLookName && string.IsNullOrWhiteSpace(Model.Name)==false)
+        if (Model.Name != LastLookName && string.IsNullOrWhiteSpace(Model.Name) == false)
         {
             LastLookName = Model.Name;
             try

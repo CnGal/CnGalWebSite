@@ -1656,9 +1656,17 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //第五部分 主页
             if (newEntry.MainPage != currentEntry.MainPage)
             {
+                if(string.IsNullOrWhiteSpace(newEntry.MainPage)&&string.IsNullOrWhiteSpace(currentEntry.MainPage))
+                {
+                    
+                }
+                else
+                {
                 //序列化
                 var resulte = newEntry.MainPage;
                 examines.Add(new KeyValuePair<object, Operation>(resulte, Operation.EstablishMainPage));
+
+                }
             }
 
             //第六部分 标签

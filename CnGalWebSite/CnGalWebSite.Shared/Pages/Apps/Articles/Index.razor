@@ -15,8 +15,11 @@ else
 {
     <TitleTip></TitleTip>
 }
-
-<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.HeadBar OnEdit="@(() => NavigationManager.NavigateTo("/articles/editarticle/" + Model.Id))" CanEdit="CanEdit"  ClassName="" />
+@if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+{
+    <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
+}
+<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.HeadBar OnEdit="@(() => NavigationManager.NavigateTo("/articles/editarticle/" + Model.Id))" CanEdit="CanEdit" ClassName="" />
 
 <div style="margin-top: 45px; width: 100%;margin-bottom:65px; " @onclick="@(() => articleFooter.UnRelyComment())">
     @if (isReady)
@@ -28,20 +31,20 @@ else
         else
         {
             <div class="ms-3 me-3 pt-2">
-                <CnGalWebSite.Shared.AppComponent.Pages.Articles.HeadCard Model="Model" UserInfor="UserInfor"/>
+                <CnGalWebSite.Shared.AppComponent.Pages.Articles.HeadCard Model="Model" UserInfor="UserInfor" />
                 <div class="mt-4">
                     @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false)
                     {
-                    <div class="mb-2">
-                        原文链接：<a href="@Model.OriginalLink" class="alert-link" style="word-wrap: break-word;word-break:break-all;" target="_blank">@Model.OriginalLink</a>
-                        <br/>
-                        原文作者：@Model.OriginalAuthor
-                    </div>
-                    <hr/>
+                        <div class="mb-2">
+                            原文链接：<a href="@Model.OriginalLink" class="alert-link" style="word-wrap: break-word;word-break:break-all;" target="_blank">@Model.OriginalLink</a>
+                            <br />
+                            原文作者：@Model.OriginalAuthor
+                        </div>
+                        <hr />
                     }
 
                     <CnGalWebSite.Shared.AppComponent.Normal.Texts.MarkdownView Text="@Model.MainPage" />
-                    <CnGalWebSite.Shared.AppComponent.Pages.Articles.ListTagCard Relevances="Model.Relevances"/>
+                    <CnGalWebSite.Shared.AppComponent.Pages.Articles.ListTagCard Relevances="Model.Relevances" />
                 </div>
                 <div class=" mt-4">
                     <CnGalWebSite.Shared.AppComponent.Normal.Comments.ListComment ObjectId="@Model.Id" Type="CommentType.CommentArticle" CanDeleted="CanEdit" OnRelying="@((a)=>articleFooter.RelyComment(a.UserName,a.CommentId))" @ref="comments" />
@@ -54,10 +57,10 @@ else
         <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip />
     }
 </div>
-@if (isNotFound == false&&isReady==true)
+@if (isNotFound == false && isReady == true)
 {
-    <CnGalWebSite.Shared.AppComponent.Pages.Articles.ArticleFooter @ref="articleFooter" Image="@Model.MainPicture" RelyCallBack="RefreshComment" 
-                                                                          ArticleId="@Model.Id" ArticleName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
+    <CnGalWebSite.Shared.AppComponent.Pages.Articles.ArticleFooter @ref="articleFooter" Image="@Model.MainPicture" RelyCallBack="RefreshComment"
+                                                                   ArticleId="@Model.Id" ArticleName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
 }
 
 @code {
@@ -200,7 +203,7 @@ else
             isNotFound = false;
             StateHasChanged();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取文章失败");
             isReady = true;

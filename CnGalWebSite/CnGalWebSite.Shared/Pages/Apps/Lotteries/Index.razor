@@ -15,7 +15,10 @@ else
 {
     <TitleTip></TitleTip>
 }
-
+@if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+{
+    <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
+}
 <CnGalWebSite.Shared.AppComponent.Pages.Lotteries.HeadBar Title="@Model.DisplayName" IsShadow="true" />
 <div style="margin-top: 45px; width: 100%;margin-bottom:65px; " @onclick="@(() => lotteryFooter.UnRelyComment())">
     @if (isReady)
@@ -31,7 +34,7 @@ else
                     <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" />
 
                 </div>
-          
+
                 <div class="ms-3 me-3 mt-4">
                     <CnGalWebSite.Shared.AppComponent.Normal.Comments.ListComment ObjectId="@Model.Id" Type="CommentType.CommentLottery" CanDeleted="CanEdit" OnRelying="@((a)=>lotteryFooter.RelyComment(a.UserName,a.CommentId))" @ref="comments" />
                 </div>
@@ -46,7 +49,7 @@ else
 @if (isNotFound == false && isReady == true)
 {
     <CnGalWebSite.Shared.AppComponent.Pages.Lotteries.LotteryFooter @ref="lotteryFooter" Image="@Model.MainPicture" RelyCallBack="RefreshComment"
-                                                             LotteryId="@Model.Id" ArticleName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
+                                                                    LotteryId="@Model.Id" ArticleName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
 }
 
 @code {

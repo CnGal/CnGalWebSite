@@ -15,8 +15,11 @@ else
 {
     <TitleTip></TitleTip>
 }
-
-<CnGalWebSite.Shared.AppComponent.Pages.Votes.HeadBar Title="@Model.DisplayName" IsShadow="true"/>
+@if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+{
+    <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
+}
+<CnGalWebSite.Shared.AppComponent.Pages.Votes.HeadBar Title="@Model.DisplayName" IsShadow="true" />
 <div style="margin-top: 45px; width: 100%;margin-bottom:65px; " @onclick="@(() => voteFooter.UnRelyComment())">
     @if (isReady)
     {
@@ -55,7 +58,7 @@ else
 @if (isNotFound == false && isReady == true)
 {
     <CnGalWebSite.Shared.AppComponent.Pages.Votes.VoteFooter @ref="voteFooter" Image="@Model.MainPicture" RelyCallBack="RefreshComment"
-                                                                   VoteId="@Model.Id" ArticleName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
+                                                             VoteId="@Model.Id" ArticleName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
 }
 
 @code {
@@ -148,7 +151,7 @@ else
     {
 
         //记录数据
-        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name)==false)
+        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name) == false)
         {
             LastLookName = Model.Name;
             try
@@ -172,16 +175,16 @@ else
             isReady = false;
             isNotFound = true;
 
-            Model = await _dataCatcheService.VoteIndexPageCatche.GetCatche(Id,true);
+            Model = await _dataCatcheService.VoteIndexPageCatche.GetCatche(Id, true);
 
             //判断如果名称为空则返回主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {
                 NavigationManager.NavigateTo("/home");
             }
-            if(user.User.Identity.IsAuthenticated==false)
+            if (user.User.Identity.IsAuthenticated == false)
             {
-                 _dataCatcheService.VoteIndexPageCatche.Clean(Id);
+                _dataCatcheService.VoteIndexPageCatche.Clean(Id);
             }
             isReady = true;
             isNotFound = false;
