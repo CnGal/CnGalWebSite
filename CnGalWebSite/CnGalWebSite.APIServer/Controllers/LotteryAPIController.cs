@@ -195,6 +195,18 @@ namespace CnGalWebSite.APIServer.Controllers
                 });
                 model.NotWinningUsers.RemoveAll(s => item.WinningUsers.Select(s => s.ApplicationUserId).Contains(s.Id));
             }
+
+            var users = model.NotWinningUsers;
+
+            foreach (var temp in users)
+            {
+                var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == temp.Id);
+                if (await _userManager.IsInRoleAsync(user, "Admin"))
+                {
+                    model.NotWinningUsers.Remove(temp);
+                }
+            }
+
             return model;
         }
 

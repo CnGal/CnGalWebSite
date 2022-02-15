@@ -91,7 +91,9 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly IHistoryDataService _historyDataService;
         private readonly IConfiguration _configuration;
-
+        private readonly IRepository<LotteryUser, long> _lotteryUserRepository;
+        private readonly IRepository<LotteryAward, long> _lotteryAwardRepository;
+        private readonly IRepository<LotteryPrize, long> _lotteryPrizeRepository;
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
@@ -103,7 +105,9 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService,
-        IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository)
+        IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository,
+        IRepository<LotteryAward, long> lotteryAwardRepository,
+         IRepository<LotteryPrize, long> lotteryPrizeRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -152,6 +156,9 @@ namespace CnGalWebSite.APIServer.Controllers
             _steamInforRepository = steamInforRepository;
             _lotteryRepository = lotteryRepository;
             _lotteryService = lotteryService;
+            _lotteryUserRepository = lotteryUserRepository;
+            _lotteryAwardRepository = lotteryAwardRepository;
+            _lotteryPrizeRepository = lotteryPrizeRepository;
         }
 
         /// <summary>
@@ -827,7 +834,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-
+                await _lotteryService.ClearLottery(1);
                 return new Result { Successful = true };
             }
             catch (Exception ex)

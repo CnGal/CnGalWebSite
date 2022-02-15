@@ -15,5 +15,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
         Task<QueryData<ListLotteryUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListLotteryUserAloneModel searchModel, long lotteryId); 
 
         Task DrawAllLottery();
+
+        Task ClearLottery(long id);
     }
 }

@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using TencentCloud.Ame.V20190916.Models;
 
 
 namespace CnGalWebSite.APIServer.Application.Lotteries
@@ -35,8 +36,11 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IAppHelper _appHelper;
         private readonly IUserService _userService;
+        private readonly UserManager<ApplicationUser> _userManager;
+
         public LotteryService(IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository,
-            IRepository<LotteryPrize, long> lotteryPrizeRepository, IAppHelper appHelper, IUserService userService, IRepository<ApplicationUser, string> userRepository)
+            IRepository<LotteryPrize, long> lotteryPrizeRepository, IAppHelper appHelper, IUserService userService, IRepository<ApplicationUser, string> userRepository,
+              UserManager<ApplicationUser> userManager)
         {
             _lotteryRepository = lotteryRepository;
             _lotteryUserRepository = lotteryUserRepository;
@@ -45,6 +49,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             _appHelper = appHelper;
             _userService = userService;
             _userRepository = userRepository;
+            _userManager = userManager;
         }
         public Task<QueryData<ListLotteryAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListLotteryAloneModel searchModel)
         {
@@ -201,63 +206,96 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             }
         }
 
-        private async Task DrawLottery(Lottery lottery)
+        private async Task<bool> DrawLottery(Lottery lottery)
         {
-            var NotWinnningUser = lottery.Users.ToList();
+            var NotWinnningUser = lottery.Users.Where(s=>s.IsHidden==false).ToList();
 
-            foreach(var item in lottery.Awards)
+            foreach (var item in lottery.Awards)
             {
                 NotWinnningUser.RemoveAll(s => item.WinningUsers.Select(s => s.ApplicationUserId).ToList().Contains(s.ApplicationUserId));
             }
 
-            if(NotWinnningUser.Count<0)
+            foreach (var item in lottery.Awards)
             {
-                return;
-            }
+                if (NotWinnningUser.Count == 0)
+                {
+                    return false;
+                }
 
-            foreach(var item in lottery.Awards)
-            {
-                if(item.Count>item.WinningUsers.Count)
+                if (item.Count > item.WinningUsers.Count)
                 {
                     var index = new Random().Next(0, NotWinnningUser.Count);
-                    var winnningUser =NotWinnningUser[index];
+                    var winnningUser = NotWinnningUser[index];
 
                     item.WinningUsers.Add(winnningUser);
                     NotWinnningUser.Remove(winnningUser);
 
-                   await SendPrizeToWinningUser(winnningUser, item);
+                    await SendPrizeToWinningUser(winnningUser, item);
                 }
             }
+
+            return true;
         }
 
         public async Task DrawAllLottery()
         {
+
             DateTime time = DateTime.Now.ToCstTime();
             var ids = await _lotteryRepository.GetAll().AsNoTracking()
-                .Where(s => s.IsEnd == false && s.Type == LotteryType.Automatic&&s.LotteryTime< time).Select(s=>s.Id)
+                .Where(s => s.IsEnd == false && s.Type == LotteryType.Automatic && s.LotteryTime < time).Select(s => s.Id)
                 .ToListAsync();
 
-            foreach(var item in ids)
+            foreach (var item in ids)
             {
                 var lottery = await _lotteryRepository.GetAll()
                     .Include(s => s.Awards).ThenInclude(s => s.WinningUsers)
                     .Include(s => s.Users)
                     .FirstOrDefaultAsync(s => s.Id == item);
 
-               await DrawLottery(lottery);
-            }
+                var users = lottery.Users.ToList();
 
-            _lotteryRepository.Clear();
+                foreach (var temp in lottery.Users)
+                {
+                    var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == temp.ApplicationUserId);
+                    if (await _userManager.IsInRoleAsync(user, "Admin"))
+                    {
+                        temp.IsHidden = true;
+                    }
+                }
 
-            foreach (var item in ids)
-            {
-                var lottery = await _lotteryRepository.GetAll()
-                    .FirstOrDefaultAsync(s => s.Id == item);
-                lottery.IsEnd = true;
-                await _lotteryRepository.UpdateAsync(lottery);
+                bool result = await DrawLottery(lottery);
+
+                _lotteryRepository.Clear();
+
+                if (result)
+                {
+                    lottery = await _lotteryRepository.GetAll().FirstOrDefaultAsync(s => s.Id == item);
+                    lottery.IsEnd = true;
+                    await _lotteryRepository.UpdateAsync(lottery);
+                }
             }
         }
 
+        public async Task ClearLottery(long id)
+        {
+            var lottery = await _lotteryRepository.GetAll()
+                    .Include(s => s.Awards).ThenInclude(s => s.WinningUsers)
+                    .Include(s => s.Awards).ThenInclude(s => s.Prizes).ThenInclude(s=>s.LotteryUser)
+                    .FirstOrDefaultAsync(s => s.Id == id);
 
+            foreach(var item in lottery.Awards)
+            {
+                item.WinningUsers.Clear();
+                foreach(var temp in item.Prizes)
+                {
+                    temp.LotteryUser = null;
+                    temp.LotteryUserId = null;
+                }
+            }
+
+            lottery.IsEnd = false;
+
+            await _lotteryRepository.UpdateAsync(lottery);
+        }
     }
 }

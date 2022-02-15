@@ -132,6 +132,8 @@ namespace CnGalWebSite.DataModel.Model
 
         public int Number { get; set; }
 
+        public bool IsHidden { get; set; }
+
         public ApplicationUser ApplicationUser { get; set; }
         public string ApplicationUserId { get; set; }
 

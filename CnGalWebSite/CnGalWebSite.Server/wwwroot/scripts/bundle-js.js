@@ -315,6 +315,7 @@ function initEditorMd(markdownstring) {
             htmlDecode: true,
             width: "100%",
             height: "100%",
+            autoFocus: false,
            // tocm: true, // Using [TOCM]
            // tex: true, // 开启科学公式TeX语言支持，默认关闭
            // flowChart: true, // 开启流程图支持，默认关闭
