@@ -6,15 +6,19 @@
 <div>
     <div class=" rounded shadow-sm  bg-opacity rounded ps-3 pe-3 pt-2 pb-2" style="display: flex; flex-direction: row; justify-content: space-between;">
         <h5 class="fw-bold font-color m-0"><i class="fa fa-file-text-o"></i>&nbsp;&nbsp;游玩记录</h5>
-        <div>
-            @if (string.IsNullOrWhiteSpace(SteamId))
+        @if(IsCurrentUser)
             {
-                <Button OnClick="OnEditSteam" class="me-2" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-link" Text="绑定Steam账号" />
+    <div>
+        @if (string.IsNullOrWhiteSpace(SteamId))
+        {
+            <Button OnClick="OnEditSteam" class="me-2" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-link" Text="绑定Steam账号" />
+        }
+
+
+        <Button OnClick="OnRefresh" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" IsAsync="true" Icon="fa fa-rotate-left" Text="刷新" />
+    </div>
             }
-
-
-            <Button OnClick="OnRefresh" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" IsAsync="true" Icon="fa fa-rotate-left" Text="刷新" />
-        </div>
+        
     </div>
     @if (isReady)
     {
@@ -27,7 +31,7 @@
         }
         else
         {
-            <CnGalWebSite.Shared.Component.PlayedGames.ListGameRecordCard Model="GameRecords" />
+            <CnGalWebSite.Shared.Component.PlayedGames.ListGameRecordCard Model="GameRecords" IsCurrentUser="IsCurrentUser" />
         }
     }
     else
@@ -50,6 +54,8 @@
 
     public List<GameRecordViewModel> GameRecords = new List<GameRecordViewModel>();
     public List<SteamUserInfor> SteamUserInfors = new List<SteamUserInfor>();
+    [Parameter]
+    public bool IsCurrentUser { get; set; }
 
     bool isReady = false;
 

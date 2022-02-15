@@ -674,7 +674,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 Author = authorString,
                 MainPage = GetMicroblogMainPage(originalRSS.Description, authorString),
                 Link = originalRSS.Link,
-                MainPicture = await GetMicroblogMainImage(originalRSS.Description),
+                MainPicture = await GetMicroblogMainImage(GetMicroblogMainPage(originalRSS.Description, authorString)),
                 PublishTime = originalRSS.PublishTime,
                 State = GameNewsState.Edit
             };
@@ -866,7 +866,7 @@ namespace CnGalWebSite.APIServer.Application.News
         public async Task<string> GetMicroblogMainImage(string description)
         {
             var links = ToolHelper.GetImageLinks(description);
-            return links.Any() ? await _fileService.SaveImageAsync(links[0], _configuration["NewsAdminId"], 460, 215) : "";
+            return links.Any() ? await _fileService.SaveImageAsync(links.Last(), _configuration["NewsAdminId"], 460, 215) : "";
         }
 
 

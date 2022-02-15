@@ -119,7 +119,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
         }
         /// <summary>
-        /// 删除游戏记录
+        /// 折叠游戏记录
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -202,7 +202,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     GameName = item.Entry.Name,
                     PlayDuration = item.PlayDuration,
                     Type = item.Type,
-                    PlayImpressions=item.PlayImpressions,
+                    PlayImpressions = objectUser.Id == user.Id ? item.PlayImpressions : "",
                     IsHidden = item.IsHidden,
                 });
             }

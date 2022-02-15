@@ -47,7 +47,7 @@
             await JS.InvokeAsync<string>("initEditorMd", Context);
             isLoaded = true;
             //启动定时器
-            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 10);
+            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 1);
 
         }
     }
