@@ -19,7 +19,8 @@ else
 {
     <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
 }
-<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.HeadBar OnEdit="@(() => NavigationManager.NavigateTo("/articles/editarticle/" + Model.Id))" CanEdit="CanEdit" ClassName="" />
+<CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.HeadBar Title="@Model.Name"
+                                                               OnEdit="@(() => NavigationManager.NavigateTo("/articles/editarticle/" + Model.Id))" CanEdit="CanEdit" ClassName="" />
 
 <div style="margin-top: 45px; width: 100%;margin-bottom:65px; " @onclick="@(() => articleFooter.UnRelyComment())">
     @if (isReady)

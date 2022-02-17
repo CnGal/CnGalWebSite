@@ -410,21 +410,7 @@ body {
 .editormd .CodeMirror-scroll {
     background-color: white;
 }
-.tab-color {
-    color: white;
-    background-color: transparent;
-    transition: all .6s ease;
-}
 
-    .tab-color.active {
-        background-color: white !important;
-        color: #2f2f2f !important;
-    }
-
-    .tab-color:hover {
-        background-color: white !important;
-        color: #2f2f2f !important;
-    }
 .bg-title-color-main {
     color: white;
     background-color: gray;
@@ -440,15 +426,15 @@ body {
     transition: all .6s ease;
 }
 
-    .tab-color.active {
-        background-color: gray !important;
-        color: white !important;
-    }
+.tab-color.active {
+    background-color: gray !important;
+    color: white !important;
+}
 
-    .tab-color:hover {
-        background-color: gray !important;
-        color: white !important;
-    }
+.tab-color:hover {
+    background-color: gray !important;
+    color: white !important;
+}
 
 .steam-infor-price {
     width: 50px;

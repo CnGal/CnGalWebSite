@@ -63,17 +63,14 @@
 
     public async Task<string> GetContext()
     {
-        if (isTextOnly)
-        {
+        
             Context = await markdownEditorTip.GetContext();
             await ContextChanged.InvokeAsync(Context);
-        }
+        
         return Context;
     }
 
     public List<ImagesUploadAloneModel> images = new List<ImagesUploadAloneModel>();
-
-    bool isTextOnly = false;
 
     public async Task ContextValueChanged(string text)
     {
@@ -81,30 +78,17 @@
         await ContextChanged.InvokeAsync(Context);
     }
 
-    public async Task OnClickTextOnly()
-    {
-        if (isTextOnly)
-        {
-            Context = await markdownEditorTip.GetContext();
-        }
-        isTextOnly = !isTextOnly;
-        await ContextChanged.InvokeAsync(Context);
-        StateHasChanged();
-    }
-
     public async Task OnUploadImage(string url)
     {
-        if (isTextOnly)
-        {
+
             Context = await markdownEditorTip.GetContext();
-        }
+        
         //更新字符串
         string temp = ("\n![image](" + url + ")\n");
         Context += temp;
-        if (isTextOnly)
-        {
+
             await markdownEditorTip.AddContext(temp);
-        }
+        
         await ContextChanged.InvokeAsync(Context);
         StateHasChanged();
     }
