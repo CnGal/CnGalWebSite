@@ -300,11 +300,12 @@
                 return;
             }
             //调整时间
-            Model.PubishTime = Model.PubishTime.AddHours(Model.PubishTime.Hour < 12 ? (12 - Model.PubishTime.Hour) : 0);
-            if (Model.RealNewsTime != null)
-            {
-                Model.RealNewsTime = Model.RealNewsTime.Value.AddHours(Model.RealNewsTime.Value.Hour < 12 ? (12 - Model.RealNewsTime.Value.Hour) : 0);
-            }
+            //Model.PubishTime = Model.PubishTime.AddHours(Model.PubishTime.Hour < 12 ? (12 - Model.PubishTime.Hour) : 0);
+            //if (Model.RealNewsTime != null)
+            //{
+            //    Model.RealNewsTime = Model.RealNewsTime.Value.AddHours(Model.RealNewsTime.Value.Hour < 12 ? (12 - Model.RealNewsTime.Value.Hour) : 0);
+            //}
+
             if (Model.Type == ArticleType.News && IsOnlyNeedPublishTime)
             {
                 Model.RealNewsTime = Model.PubishTime;
