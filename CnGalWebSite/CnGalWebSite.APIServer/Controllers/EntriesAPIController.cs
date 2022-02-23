@@ -10,7 +10,6 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
-using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +24,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TencentCloud.Cme.V20191029.Models;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -236,7 +234,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //建立视图模型
             var model = await _entryService.GetEntryIndexViewModelAsync(entry);
-            model.Examines = await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => s.EntryId == entry.Id && s.IsPassed == true).OrderByDescending(s=>s.Id), true);
+            model.Examines = await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => s.EntryId == entry.Id && s.IsPassed == true).OrderByDescending(s => s.Id), true);
 
             if (user != null)
             {
@@ -486,11 +484,11 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
 
-            if(examines.Any(s => s.Value == Operation.EstablishMain)==false)
+            if (examines.Any(s => s.Value == Operation.EstablishMain) == false)
             {
                 return new Result { Successful = true };
             }
-            var examine=examines.FirstOrDefault(s => s.Value == Operation.EstablishMain);
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishMain);
             //序列化
             var resulte = "";
             using (TextWriter text = new StringWriter())
@@ -1293,9 +1291,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
             }
             //检查是否重复
-            foreach(var item in model.Images)
+            foreach (var item in model.Images)
             {
-                if(model.Images.Count(s=>s.Url==item.Url)>1)
+                if (model.Images.Count(s => s.Url == item.Url) > 1)
                 {
                     return new Result { Error = "图片链接不能重复，重复的链接：" + item.Url, Successful = false };
 
@@ -1762,19 +1760,21 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = ex.Message };
                 }
 
-                var newEntry = new Entry();
+                var newEntry = new Entry
+                {
 
-                //第一步 建立词条主要信息
+                    //第一步 建立词条主要信息
 
-                newEntry.Name = model.Name;
-                newEntry.BriefIntroduction = model.BriefIntroduction;
-                newEntry.MainPicture = model.MainPicture;
-                newEntry.Thumbnail = model.Thumbnail;
-                newEntry.BackgroundPicture = model.BackgroundPicture;
-                newEntry.Type = model.Type;
-                newEntry.DisplayName = model.DisplayName;
-                newEntry.SmallBackgroundPicture = model.SmallBackgroundPicture;
-                newEntry.AnotherName = model.AnotherName;
+                    Name = model.Name,
+                    BriefIntroduction = model.BriefIntroduction,
+                    MainPicture = model.MainPicture,
+                    Thumbnail = model.Thumbnail,
+                    BackgroundPicture = model.BackgroundPicture,
+                    Type = model.Type,
+                    DisplayName = model.DisplayName,
+                    SmallBackgroundPicture = model.SmallBackgroundPicture,
+                    AnotherName = model.AnotherName
+                };
 
                 //第二步 建立词条附加信息
                 //根据类别进行序列化操作
@@ -2008,7 +2008,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 //创建词条成功
                 return new Result { Successful = true, Error = entry.Id.ToString() };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new Result { Error = "创建词条的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
             }
@@ -2107,7 +2107,7 @@ namespace CnGalWebSite.APIServer.Controllers
             foreach (var item in tagNames)
             {
                 var infor = await _tagRepository.GetAll().Where(s => s.Name == item).FirstOrDefaultAsync();
-                if (infor==null)
+                if (infor == null)
                 {
                     return new Result { Successful = false, Error = "标签 " + item + " 不存在" };
                 }
@@ -2282,7 +2282,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var contrastExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId);
             var currentExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == currentId);
 
-            if(contrastExamine == null||currentExamine==null||contrastExamine.EntryId==null||currentExamine.EntryId==null||contrastExamine.EntryId!=currentExamine.EntryId)
+            if (contrastExamine == null || currentExamine == null || contrastExamine.EntryId == null || currentExamine.EntryId == null || contrastExamine.EntryId != currentExamine.EntryId)
             {
                 return NotFound("编辑记录Id不正确");
             }

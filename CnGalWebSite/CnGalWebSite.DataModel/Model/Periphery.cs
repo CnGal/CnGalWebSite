@@ -136,24 +136,24 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 审核记录 也是编辑记录
         /// </summary>
-        public ICollection<Examine> Examines { get; set; } =new List<Examine>();
+        public ICollection<Examine> Examines { get; set; } = new List<Examine>();
         /// <summary>
         /// 拥有该周边的用户
         /// </summary>
-        public ICollection<PeripheryRelevanceUser> Users { get; set; }=new List<PeripheryRelevanceUser>();
+        public ICollection<PeripheryRelevanceUser> Users { get; set; } = new List<PeripheryRelevanceUser>();
         /// <summary>
         /// 关联词条
         /// </summary>
         [Obsolete("关联词条已迁移，请访问RelatedEntries")]
-        public ICollection<PeripheryRelevanceEntry> Entries { get; set; }=new List<PeripheryRelevanceEntry>();
+        public ICollection<PeripheryRelevanceEntry> Entries { get; set; } = new List<PeripheryRelevanceEntry>();
         /// <summary>
         /// 关联词条
         /// </summary>
-        public virtual ICollection<Entry> RelatedEntries { get; set; }= new List<Entry>();
+        public virtual ICollection<Entry> RelatedEntries { get; set; } = new List<Entry>();
         /// <summary>
         /// 图片列表
         /// </summary>
-        public ICollection<EntryPicture> Pictures { get; set; }=new List<EntryPicture>();
+        public ICollection<EntryPicture> Pictures { get; set; } = new List<EntryPicture>();
         /// <summary>
         /// 关联周边列表
         /// </summary>

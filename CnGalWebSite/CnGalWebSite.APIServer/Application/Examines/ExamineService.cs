@@ -12,7 +12,6 @@ using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
-using CnGalWebSite.DataModel.ImportModel;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -29,7 +28,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using TencentCloud.Cme.V20191029.Models;
 using Markdown = Markdig.Markdown;
 using Tag = CnGalWebSite.DataModel.Model.Tag;
 
@@ -202,7 +200,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         public async Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListExamineAloneModel searchModel)
         {
-            IQueryable<Examine> items = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
+            var items = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
             // 处理高级搜索
             if (!string.IsNullOrWhiteSpace(searchModel.EntryId?.ToString()))
             {
@@ -211,7 +209,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
             if (!string.IsNullOrWhiteSpace(searchModel.ArticleId?.ToString()))
             {
-                items = items.Where(item => item.ArticleId.ToString().Contains(searchModel.ArticleId.ToString(), StringComparison.OrdinalIgnoreCase) );
+                items = items.Where(item => item.ArticleId.ToString().Contains(searchModel.ArticleId.ToString(), StringComparison.OrdinalIgnoreCase));
             }
 
             if (!string.IsNullOrWhiteSpace(searchModel.TagId?.ToString()))
@@ -221,7 +219,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
             if (!string.IsNullOrWhiteSpace(searchModel.ApplicationUserId?.ToString()))
             {
-                items = items.Where(item => item.ApplicationUserId.ToString().Contains(searchModel.ApplicationUserId.ToString(), StringComparison.OrdinalIgnoreCase) );
+                items = items.Where(item => item.ApplicationUserId.ToString().Contains(searchModel.ApplicationUserId.ToString(), StringComparison.OrdinalIgnoreCase));
             }
             if (!string.IsNullOrWhiteSpace(searchModel.Comments))
             {
@@ -237,10 +235,10 @@ namespace CnGalWebSite.APIServer.ExamineX
             // 处理 SearchText 模糊搜索
             if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                items = items.Where(item => (item.EntryId.ToString().Contains(options.SearchText) )
+                items = items.Where(item => (item.EntryId.ToString().Contains(options.SearchText))
                              || (item.EntryId.ToString().Contains(options.SearchText))
-                             || (item.ArticleId.ToString().Contains(options.SearchText) )
-                             || (item.TagId.ToString().Contains(options.SearchText) )
+                             || (item.ArticleId.ToString().Contains(options.SearchText))
+                             || (item.TagId.ToString().Contains(options.SearchText))
                              || (item.ApplicationUserId.ToString().Contains(options.SearchText)));
             }
 
@@ -249,7 +247,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
 
-                items = items.OrderBy(s=>s.Id).Sort(options.SortName, (SortOrder)options.SortOrder);
+                items = items.OrderBy(s => s.Id).Sort(options.SortName, (SortOrder)options.SortOrder);
                 isSorted = true;
             }
 
@@ -257,7 +255,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             var total = items.Count();
 
             // 内存分页
-            var itemsReal =await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
+            var itemsReal = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
 
             //复制数据
             var resultItems = new List<ListExamineAloneModel>();
@@ -1793,11 +1791,11 @@ namespace CnGalWebSite.APIServer.ExamineX
         {
             var relevances = new List<RelevancesViewModel>();
             var entries = periphery.RelatedEntries.Select(s => new
-                {
-                    s.Id,
-                    s.Name,
-                    s.BriefIntroduction
-                })
+            {
+                s.Id,
+                s.Name,
+                s.BriefIntroduction
+            })
                 .ToList();
             foreach (var item in entries)
             {
@@ -1853,12 +1851,12 @@ namespace CnGalWebSite.APIServer.ExamineX
 
             //序列化相关性列表
             //先读取词条信息
-            var relevances =  InitExamineViewPeripheryRelatedEntries(periphery);
+            var relevances = InitExamineViewPeripheryRelatedEntries(periphery);
 
             //添加修改记录 
             await _peripheryService.UpdatePeripheryDataAsync(periphery, examine);
 
-            var relevances_examine =  InitExamineViewPeripheryRelatedEntries(periphery);
+            var relevances_examine = InitExamineViewPeripheryRelatedEntries(periphery);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -1938,7 +1936,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             var relevances = InitExamineViewPeripheryRelatedPeripheries(periphery);
 
             //添加修改记录 
-           await  _peripheryService.UpdatePeripheryDataAsync(periphery, examine);
+            await _peripheryService.UpdatePeripheryDataAsync(periphery, examine);
 
             var relevances_examine = InitExamineViewPeripheryRelatedPeripheries(periphery);
 
@@ -2002,7 +2000,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         if (item.Modifier == "STAFF")
                         {
                             var temp = await _entryRepository.GetAll()
-                                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                                 .FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
 
                             if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
@@ -2092,15 +2090,17 @@ namespace CnGalWebSite.APIServer.ExamineX
             //更新完善度
             await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
-            var admin = new ApplicationUser();
-            admin.Id = _configuration["ExamineAdminId"];
+            var admin = new ApplicationUser
+            {
+                Id = _configuration["ExamineAdminId"]
+            };
 
             //反向关联 词条
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Entry))
             {
                 //查找关联词条
                 var temp = await _entryRepository.GetAll()
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
                 if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false
                     && (entry.Type == EntryType.Staff && temp.Type == EntryType.Game) == false)
@@ -2204,14 +2204,16 @@ namespace CnGalWebSite.APIServer.ExamineX
             await _articleService.UpdateArticleDataRelevances(article, examine);
             await _articleRepository.UpdateAsync(article);
 
-            var admin = new ApplicationUser();
-            admin.Id = _configuration["ExamineAdminId"];
+            var admin = new ApplicationUser
+            {
+                Id = _configuration["ExamineAdminId"]
+            };
             //反向关联 文章
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Article))
             {
                 //查找关联文章
                 var temp = await _articleRepository.GetAll()
-                    .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s=>s.ToArticleNavigation)
+                    .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
                     .FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
                 if (temp != null && temp.ArticleRelationFromArticleNavigation.Any(s => s.ToArticle == article.Id) == false)
                 {
@@ -2977,7 +2979,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         resulte = text.ToString();
                     }
                 }
-             
+
                 if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                 {
                     switch (item.Value)
@@ -3037,7 +3039,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                 var resulte = "";
                 if (item.Value == Operation.EditArticleMainPage)
                 {
-                    resulte = item.Key as string ;
+                    resulte = item.Key as string;
                 }
                 else
                 {
@@ -3048,7 +3050,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         resulte = text.ToString();
                     }
                 }
-               
+
                 if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                 {
                     switch (item.Value)
@@ -3062,7 +3064,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         case Operation.EditArticleRelevanes:
                             await ExamineEditArticleRelevancesAsync(article, item.Key as ArticleRelevances);
                             break;
-                      
+
                         default:
                             throw new Exception("不支持的类型");
                     }
@@ -3096,13 +3098,13 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
 
                 var resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, item.Key);
-                        resulte = text.ToString();
-                    }
-                
+                using (TextWriter text = new StringWriter())
+                {
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(text, item.Key);
+                    resulte = text.ToString();
+                }
+
 
                 if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                 {
@@ -3253,7 +3255,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         public async Task ReplaceEditTag_1_0_ExamineContext()
         {
             TagEdit oldExamineModel = null;
-           
+
             //获取要替换的所有审核记录ID
             var ids = await _examineRepository.GetAll().AsNoTracking().Where(s => s.Operation == Operation.EditTag && s.Version == ExamineVersion.V1_0).Select(s => s.Id).ToListAsync();
 
@@ -3264,7 +3266,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                 if (examine != null)
                 {
 
-                    ExamineMain newExamineModel = new ExamineMain();
+                    var newExamineModel = new ExamineMain();
                     using (TextReader str = new StringReader(examine.Context))
                     {
                         var serializer = new JsonSerializer();
@@ -3607,7 +3609,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
                     //获取该词条之前的每次编辑主页的审核
                     var beforeexamine = await _examineRepository.GetAll()
-                        .Where(s =>s.IsPassed==true&& s.Id<examine.Id&& s.EntryId == examine.EntryId && s.Operation == Operation.EstablishMain).ToListAsync();
+                        .Where(s => s.IsPassed == true && s.Id < examine.Id && s.EntryId == examine.EntryId && s.Operation == Operation.EstablishMain).ToListAsync();
                     //若没有则与新模型对比
                     if (beforeexamine.Count == 0)
                     {
@@ -3637,7 +3639,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                             }
                             _entryService.UpdateEntryDataMain(currentEntry, oldExamineModel);
                         }
-                        
+
                         using (TextReader str = new StringReader(examine.Context))
                         {
                             var serializer = new JsonSerializer();
@@ -3890,7 +3892,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
                                 DisplayName = item.DisplayName,
                                 DisplayValue = item.DisplayValue,
-                                Link=item.Link,
+                                Link = item.Link,
                                 IsDelete = item.IsDelete,
                                 Type = RelevancesType.Outlink
                             });
@@ -4096,7 +4098,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
                 var periphery = await _peripheryRepository.GetAll().AsNoTracking()
                  .Include(s => s.RelatedEntries)
-                 .Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s=>s.ToPeripheryNavigation)
+                 .Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation)
                  .Include(s => s.Pictures)
                  .FirstOrDefaultAsync(s => s.Id == peripheryId);
                 //获取通过审核记录叠加的旧模型
@@ -4185,13 +4187,13 @@ namespace CnGalWebSite.APIServer.ExamineX
             foreach (var item in examines)
             {
                 var resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, item.Key);
-                        resulte = text.ToString();
-                    }
-                
+                using (TextWriter text = new StringWriter())
+                {
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(text, item.Key);
+                    resulte = text.ToString();
+                }
+
 
                 await UniversalEditTagExaminedAsync(tag, admin, true, resulte, item.Value, "补全审核记录");
             }
@@ -4266,7 +4268,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                 {
                     return new Tag
                     {
-                        Id= tag.Id
+                        Id = tag.Id
                     };
                 }
 
@@ -4333,7 +4335,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
                 throw new Exception("不支持的类型");
             }
-          
+
         }
 
         #endregion

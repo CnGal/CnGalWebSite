@@ -35,7 +35,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using TencentCloud.Cme.V20191029.Models;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -352,7 +351,7 @@ namespace CnGalWebSite.APIServer.Controllers
                             }
                             await _examineService.ExamineEstablishAddInforAsync(entry, entryAddInfor);
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
 
                         }
@@ -604,7 +603,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         break;
                     case Operation.EditPeripheryRelatedPeripheries:
                         periphery = await _peripheryRepository.GetAll()
-                            .Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s=>s.ToPeripheryNavigation)
+                            .Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation)
                             .FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
                         if (periphery == null)
                         {
@@ -633,7 +632,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     examine = await _examineRepository.UpdateAsync(examine);
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                 }
@@ -937,10 +936,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.IsThumbnail = (entry.Type == EntryType.Game || entry.Type == EntryType.ProductionGroup) ? false : true;
                 model.Type = ExaminedNormalListModelType.Entry;
 
-                 examines = await _examineRepository.GetAll().AsNoTracking()
-                    .Include(s => s.ApplicationUser)
-                    .Include(s=>s.Entry)
-                    .Where(s => s.EntryId == entry.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();    
+                examines = await _examineRepository.GetAll().AsNoTracking()
+                   .Include(s => s.ApplicationUser)
+                   .Include(s => s.Entry)
+                   .Where(s => s.EntryId == entry.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
             }
             else if (examine.ArticleId != null)
             {
@@ -959,7 +958,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 examines = await _examineRepository.GetAll().AsNoTracking()
                     .Include(s => s.ApplicationUser)
-                    .Include(s=>s.Article)
+                    .Include(s => s.Article)
                     .Where(s => s.ArticleId == article.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
             }
             else if (examine.PeripheryId != null)
@@ -978,10 +977,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.IsThumbnail = false;
                 model.Type = ExaminedNormalListModelType.Periphery;
 
-                 examines = await _examineRepository.GetAll().AsNoTracking()
-                    .Include(s => s.ApplicationUser)
-                    .Include(s=>s.Periphery)
-                    .Where(s => s.PeripheryId == periphery.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
+                examines = await _examineRepository.GetAll().AsNoTracking()
+                   .Include(s => s.ApplicationUser)
+                   .Include(s => s.Periphery)
+                   .Where(s => s.PeripheryId == periphery.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
             }
             else if (examine.TagId != null)
             {
@@ -1001,7 +1000,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 examines = await _examineRepository.GetAll().AsNoTracking()
                     .Include(s => s.ApplicationUser)
-                    .Include(s=>s.Tag)
+                    .Include(s => s.Tag)
                     .Where(s => s.TagId == tag.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
             }
             else

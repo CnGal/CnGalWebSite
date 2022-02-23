@@ -7,7 +7,6 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
-using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,7 +15,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -105,7 +103,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 examine = examineQuery.Find(s => s.Operation == Operation.EditPeripheryMain);
                 if (examine != null)
                 {
-                   await _peripheryService.UpdatePeripheryDataAsync(periphery, examine);
+                    await _peripheryService.UpdatePeripheryDataAsync(periphery, examine);
                 }
                 examine = examineQuery.Find(s => s.Operation == Operation.EditPeripheryImages);
                 if (examine != null)
@@ -134,7 +132,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
 
-           
+
 
             if (user != null)
             {
@@ -326,29 +324,31 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
 
-                var newPeriphery = new Periphery();
+                var newPeriphery = new Periphery
+                {
 
-                //第一步 处理主要信息
-                newPeriphery.Name = model.Name;
-                newPeriphery.DisplayName = model.DisplayName;
-                newPeriphery.BriefIntroduction = model.BriefIntroduction;
-                newPeriphery.MainPicture = model.MainPicture;
-                newPeriphery.BackgroundPicture = model.BackgroundPicture;
-                newPeriphery.SmallBackgroundPicture = model.SmallBackgroundPicture;
-                newPeriphery.Thumbnail = model.Thumbnail;
-                newPeriphery.Author = model.Author;
-                newPeriphery.Material = model.Material;
-                newPeriphery.Brand = model.Brand;
-                newPeriphery.IndividualParts = model.IndividualParts;
-                newPeriphery.IsAvailableItem = model.IsAvailableItem;
-                newPeriphery.IsReprint = model.IsReprint;
-                newPeriphery.PageCount = model.PageCount;
-                newPeriphery.Price = model.Price;
-                newPeriphery.Size = model.Size;
-                newPeriphery.SongCount = model.SongCount;
-                newPeriphery.Type = model.Type;
-                newPeriphery.Category = model.Category;
-                newPeriphery.SaleLink = model.SaleLink;
+                    //第一步 处理主要信息
+                    Name = model.Name,
+                    DisplayName = model.DisplayName,
+                    BriefIntroduction = model.BriefIntroduction,
+                    MainPicture = model.MainPicture,
+                    BackgroundPicture = model.BackgroundPicture,
+                    SmallBackgroundPicture = model.SmallBackgroundPicture,
+                    Thumbnail = model.Thumbnail,
+                    Author = model.Author,
+                    Material = model.Material,
+                    Brand = model.Brand,
+                    IndividualParts = model.IndividualParts,
+                    IsAvailableItem = model.IsAvailableItem,
+                    IsReprint = model.IsReprint,
+                    PageCount = model.PageCount,
+                    Price = model.Price,
+                    Size = model.Size,
+                    SongCount = model.SongCount,
+                    Type = model.Type,
+                    Category = model.Category,
+                    SaleLink = model.SaleLink
+                };
 
                 //第二步 建立词条图片
                 foreach (var item in model.Images)
@@ -711,10 +711,10 @@ namespace CnGalWebSite.APIServer.Controllers
             var games = new List<RelevancesModel>();
 
             var entries = periphery.RelatedEntries.Select(s => new
-                {
-                    s.Name,
-                    s.Type
-                })
+            {
+                s.Name,
+                s.Type
+            })
                 .ToList();
 
             foreach (var item in entries)
@@ -928,7 +928,7 @@ namespace CnGalWebSite.APIServer.Controllers
             if (currentPeriphery == null)
             {
                 return new Result { Error = $"无法找到ID为{model.Id}的周边", Successful = false };
-}
+            }
 
             newPeriphery.PeripheryRelationFromPeripheryNavigation = peripheries.Select(s => new PeripheryRelation
             {
@@ -1207,7 +1207,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 await _peripheryService.UpdatePeripheryDataAsync(newPeriphery, item);
             }
 
-            var result =await _peripheryService.ConcompareAndGenerateModel(currentPeriphery, newPeriphery);
+            var result = await _peripheryService.ConcompareAndGenerateModel(currentPeriphery, newPeriphery);
 
             var model = new PeripheryContrastEditRecordViewModel
             {

@@ -5,7 +5,6 @@ using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
-using ReverseMarkdown.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +47,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
         public async Task UpdateAllUserSteamInfor()
         {
-            var steamIds = await _steamUserInforRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.SteamId) == false).Select(s=>s.SteamId).ToListAsync();
+            var steamIds = await _steamUserInforRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.SteamId) == false).Select(s => s.SteamId).ToListAsync();
 
             foreach (var item in steamIds)
             {
@@ -253,7 +252,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     steam.EvaluationCount = item.EvaluationCount;
                     steam.RecommendationRate = item.RecommendationRate;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                 }
@@ -275,9 +274,9 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         public async Task<bool> UpdateUserSteam(ApplicationUser user)
         {
             var steamIds = new string[0];
-            if (string.IsNullOrWhiteSpace(user.SteamId)==false)
+            if (string.IsNullOrWhiteSpace(user.SteamId) == false)
             {
-                steamIds = user.SteamId.Replace("，", ",").Replace( "、", ",").Split(',');
+                steamIds = user.SteamId.Replace("，", ",").Replace("、", ",").Split(',');
             }
             //获取最新列表
             //获取信息
@@ -295,7 +294,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     steamGames.games.AddRange(temp.games);
                     steamGames.game_count += temp.game_count;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     isError = true;
                 }
@@ -357,7 +356,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
             var content = await client.GetStringAsync("https://store.steampowered.com/app/" + id);
 
-            HtmlDocument document = new HtmlDocument();
+            var document = new HtmlDocument();
             document.LoadHtml(content);
 
             var node = document.GetElementbyId("userReviews");
@@ -375,8 +374,8 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
 
 
-            string countStr = ToolHelper.MidStrEx(text, "the ", " ").Replace(",", "");
-            string rateStr = ToolHelper.MidStrEx(text, " ", "% ");
+            var countStr = ToolHelper.MidStrEx(text, "the ", " ").Replace(",", "");
+            var rateStr = ToolHelper.MidStrEx(text, " ", "% ");
             return new SteamEvaluation
             {
                 EvaluationCount = int.Parse(countStr),
@@ -386,7 +385,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
         public async Task<SteamUserInfor> UpdateSteamUserInfor(string SteamId)
         {
-            var steamUser=new SteamUserInforJson();
+            var steamUser = new SteamUserInforJson();
             try
             {
                 using var client = _clientFactory.CreateClient();
@@ -394,18 +393,18 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 var obj = JObject.Parse(jsonContent);
                 steamUser = obj.ToObject<SteamUserInforJson>();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
-            if(steamUser.response.players.Count==0)
+            if (steamUser.response.players.Count == 0)
             {
                 return null;
             }
 
             var player = steamUser.response.players[0];
-            var user=await _steamUserInforRepository.FirstOrDefaultAsync(s=>s.SteamId == SteamId);
-            if(user==null)
+            var user = await _steamUserInforRepository.FirstOrDefaultAsync(s => s.SteamId == SteamId);
+            if (user == null)
             {
                 user = new SteamUserInfor();
             }
@@ -414,7 +413,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             user.Name = player.personaname;
             user.Image = player.avatarfull.Replace("steamcdn-a.akamaihd.net", "cdn.cloudflare.steamstatic.com");
 
-            if(user.Id==0)
+            if (user.Id == 0)
             {
                 await _steamUserInforRepository.InsertAsync(user);
             }
@@ -427,15 +426,15 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
         public async Task<List<SteamUserInfor>> GetSteamUserInfors(List<string> steamids)
         {
-            var model=await _steamUserInforRepository.GetAllListAsync(s=>steamids.Contains(s.SteamId));
+            var model = await _steamUserInforRepository.GetAllListAsync(s => steamids.Contains(s.SteamId));
 
-            foreach(var item in steamids)
+            foreach (var item in steamids)
             {
                 //不存在则获取
-                if(model.Any(s=>s.SteamId==item)==false)
+                if (model.Any(s => s.SteamId == item) == false)
                 {
-                    var temp =await UpdateSteamUserInfor(item);
-                    if(temp!=null)
+                    var temp = await UpdateSteamUserInfor(item);
+                    if (temp != null)
                     {
                         model.Add(temp);
                     }

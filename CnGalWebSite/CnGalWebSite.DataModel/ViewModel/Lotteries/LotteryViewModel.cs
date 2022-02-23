@@ -1,10 +1,7 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
-using CnGalWebSite.DataModel.ViewModel.Votes;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.Lotteries
 {

@@ -10,7 +10,7 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
 
         public bool IsHidden { get; set; }
 
-        [Display(Name ="类型")]
+        [Display(Name = "类型")]
         public PlayedGameType Type { get; set; }
 
         [Display(Name = "感想")]

@@ -2,10 +2,8 @@
 using CnGalWebSite.APIServer.Application.PlayedGames;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
-using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -72,7 +70,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     GameId = id,
                     Type = game.Type,
                     IsHidden = game.IsHidden,
-                    PlayImpressions=game.PlayImpressions,
+                    PlayImpressions = game.PlayImpressions,
                 };
             }
         }
@@ -100,10 +98,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 await _playedGameRepository.InsertAsync(new PlayedGame
                 {
                     ApplicationUserId = user.Id,
-                    Type=model.Type,
-                    PlayImpressions=model.PlayImpressions,
+                    Type = model.Type,
+                    PlayImpressions = model.PlayImpressions,
                     EntryId = model.GameId,
-                    IsHidden=model.IsHidden,
+                    IsHidden = model.IsHidden,
                 });
 
                 return new Result { Successful = true };
@@ -191,7 +189,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var model = new List<GameRecordViewModel>();
 
-            foreach (var item in games.OrderByDescending(s=>s.PlayDuration))
+            foreach (var item in games.OrderByDescending(s => s.PlayDuration))
             {
                 model.Add(new GameRecordViewModel
                 {
@@ -216,7 +214,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            if(await _steamInforService.UpdateUserSteam(user)==false)
+            if (await _steamInforService.UpdateUserSteam(user) == false)
             {
                 return new Result { Successful = false, Error = "无法获取Steam信息" };
             }

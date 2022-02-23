@@ -2,7 +2,6 @@
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -130,10 +129,10 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<SteamInforTipViewModel>>> GetAllDiscountSteamGame()
         {
-            var games = await _steamInforRepository.GetAll().Include(s=>s.Entry).Where(s => s.CutNow > 0&&s.Entry.IsHidden==false).ToListAsync();
+            var games = await _steamInforRepository.GetAll().Include(s => s.Entry).Where(s => s.CutNow > 0 && s.Entry.IsHidden == false).ToListAsync();
 
-            var model=new List<SteamInforTipViewModel>();
-            foreach(var item in games)
+            var model = new List<SteamInforTipViewModel>();
+            foreach (var item in games)
             {
                 model.Add(new SteamInforTipViewModel
                 {
@@ -180,7 +179,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var steamids = objectUser.SteamId.Replace("，", ",").Replace("、", ",").Split(',');
 
-            var model =await _steamInforService.GetSteamUserInfors(steamids.ToList());
+            var model = await _steamInforService.GetSteamUserInfors(steamids.ToList());
 
             return model;
 

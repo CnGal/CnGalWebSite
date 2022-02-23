@@ -159,7 +159,7 @@ namespace CnGalWebSite.Shared.Service
 
         public DataCatcheService(HttpClient httpClient, IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche, IPageModelCatche<VoteViewModel> voteIndexPageCatche,
         IPageModelCatche<PeripheryViewModel> peripheryIndexPageCatche, IPageModelCatche<TagIndexViewModel> tagIndexPageCatche, IPageModelCatche<List<HomeNewsAloneViewModel>> homePageNewsCatche,
-        IPageModelCatche<List<DataModel.Model.Carousel>> homePageCarouselsCatche,IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
+        IPageModelCatche<List<DataModel.Model.Carousel>> homePageCarouselsCatche, IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
         IPageModelCatche<LotteryViewModel> lotteryIndexPageCatche,
         IPageModelCatche<ArticleContrastEditRecordViewModel> articleContrastEditRecordViewCatche,
         IPageModelCatche<PeripheryContrastEditRecordViewModel> peripheryContrastEditRecordViewCatche,

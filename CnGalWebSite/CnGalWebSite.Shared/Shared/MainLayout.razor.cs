@@ -203,7 +203,7 @@ namespace CnGalWebSite.Shared.Shared
             //获取菜单
             Menus = GetIconSideMenuItemsAsync(user);
 
-            
+
         }
 
         private void GetUserInfor(ClaimsPrincipal user)

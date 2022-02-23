@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CnGalWebSite.DataModel.ViewModel.Articles
+﻿namespace CnGalWebSite.DataModel.ViewModel.Articles
 {
     public class ArticleContrastEditRecordViewModel
     {

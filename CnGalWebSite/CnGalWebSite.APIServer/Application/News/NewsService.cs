@@ -421,7 +421,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 BriefIntroduction = gameNews.BriefIntroduction,
                 MainPicture = gameNews.MainPicture,
                 Type = gameNews.Type,
-                NewsType = gameNews.NewsType??"动态",
+                NewsType = gameNews.NewsType ?? "动态",
                 CreateUserId = _configuration["NewsAdminId"],
                 PubishTime = gameNews.PublishTime,
                 RealNewsTime = gameNews.PublishTime,

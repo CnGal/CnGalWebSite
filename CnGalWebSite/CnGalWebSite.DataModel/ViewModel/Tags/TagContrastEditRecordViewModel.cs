@@ -1,9 +1,4 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Peripheries;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CnGalWebSite.DataModel.ViewModel.Tags
+﻿namespace CnGalWebSite.DataModel.ViewModel.Tags
 {
     public class TagContrastEditRecordViewModel
     {

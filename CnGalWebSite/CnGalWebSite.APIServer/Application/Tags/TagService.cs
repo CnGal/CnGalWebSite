@@ -4,7 +4,6 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
-using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -201,8 +200,7 @@ namespace CnGalWebSite.APIServer.Application.Tags
 
             if (examine.Items.Any(s => s.Key == "ParentTagId"))
             {
-                int parentTagId = 0;
-                if (int.TryParse(examine.Items.FirstOrDefault(s => s.Key == "ParentTagId")?.Value, out parentTagId))
+                if (int.TryParse(examine.Items.FirstOrDefault(s => s.Key == "ParentTagId")?.Value, out var parentTagId))
                 {
                     //查找Tag
                     var tagNew = await _tagRepository.FirstOrDefaultAsync(s => s.Id == parentTagId);
@@ -511,17 +509,17 @@ namespace CnGalWebSite.APIServer.Application.Tags
                 ReaderCount = tag.ReaderCount,
                 ParentTag = tag.ParentCodeNavigation == null ? null : _appHelper.GetTagInforTipViewModel(tag.ParentCodeNavigation),
                 Taglevels = await GetTagLevelListAsync(tag),
-                IsHidden= tag.IsHidden,
+                IsHidden = tag.IsHidden,
             };
 
-          
+
 
             foreach (var item in tag.InverseParentCodeNavigation)
             {
                 model.ChildrenTags.Add(_appHelper.GetTagInforTipViewModel(item));
             }
 
-          
+
             foreach (var item in tag.Entries.Where(s => s.IsHidden == false))
             {
                 model.ChildrenEntries.Add(await _appHelper.GetEntryInforTipViewModel(item));
@@ -583,7 +581,7 @@ namespace CnGalWebSite.APIServer.Application.Tags
                     tagChildTags.ChildTags.Add(new TagChildTagAloneModel
                     {
                         TagId = item.Id,
-                        Name=item.Name,
+                        Name = item.Name,
                         IsDelete = false
                     });
                 }
@@ -638,10 +636,11 @@ namespace CnGalWebSite.APIServer.Application.Tags
 
         public async Task<List<TagIndexViewModel>> ConcompareAndGenerateModel(Tag currentTag, Tag newTag)
         {
-            var model = new List<TagIndexViewModel>();
-
-            model.Add(await GetTagViewModel(currentTag));
-            model.Add(await GetTagViewModel(newTag));
+            var model = new List<TagIndexViewModel>
+            {
+                await GetTagViewModel(currentTag),
+                await GetTagViewModel(newTag)
+            };
 
 
 

@@ -133,7 +133,7 @@ namespace CnGalWebSite.DataModel.Model
 
         public string Note { get; set; }
 
-        public UserIntegralType Type  { get; set; }
+        public UserIntegralType Type { get; set; }
 
         public ApplicationUser ApplicationUser { get; set; }
         public string ApplicationUserId { get; set; }
@@ -141,7 +141,7 @@ namespace CnGalWebSite.DataModel.Model
 
     public enum UserIntegralType
     {
-        [Display(Name ="积分")]
+        [Display(Name = "积分")]
         Integral,
         [Display(Name = "贡献值")]
         ContributionValue,

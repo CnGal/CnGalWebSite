@@ -2,8 +2,10 @@
 using CnGalWebSite.DataModel.ViewModel.Accounts;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
+using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
+using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
@@ -13,8 +15,6 @@ using CnGalWebSite.DataModel.ViewModel.Votes;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CnGalWebSite.DataModel.ViewModel.Lotteries;
-using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
 
 namespace CnGalWebSite.Shared.Service
 {

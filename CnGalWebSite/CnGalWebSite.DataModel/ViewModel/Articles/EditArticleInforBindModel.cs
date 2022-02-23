@@ -1,8 +1,5 @@
 ﻿using CnGalWebSite.DataModel.ViewModel.Admin;
-using CnGalWebSite.DataModel.ViewModel.Tags;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.Articles
 {

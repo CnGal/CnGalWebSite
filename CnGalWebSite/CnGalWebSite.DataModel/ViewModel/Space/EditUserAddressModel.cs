@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CnGalWebSite.DataModel.ViewModel.Space
 {
     public class EditUserAddressModel
     {
-        [Display(Name ="真实姓名")]
+        [Display(Name = "真实姓名")]
         public string RealName { get; set; }
 
         [Display(Name = "手机号码")]

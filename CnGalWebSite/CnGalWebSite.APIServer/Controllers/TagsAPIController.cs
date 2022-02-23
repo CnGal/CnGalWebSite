@@ -8,7 +8,6 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
-using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -120,26 +119,28 @@ namespace CnGalWebSite.APIServer.Controllers
                 var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
 
 
-                var newTag = new Tag();
-                //第一步 处理主要信息
+                var newTag = new Tag
+                {
+                    //第一步 处理主要信息
 
 
-                newTag.ParentCodeNavigation = parentTag;
+                    ParentCodeNavigation = parentTag,
 
-                newTag.Name = model.Name;
-                newTag.BriefIntroduction = model.BriefIntroduction;
-                newTag.MainPicture = model.MainPicture;
-                newTag.BackgroundPicture = model.BackgroundPicture;
-                newTag.SmallBackgroundPicture = model.SmallBackgroundPicture;
-                newTag.Thumbnail = model.Thumbnail;
+                    Name = model.Name,
+                    BriefIntroduction = model.BriefIntroduction,
+                    MainPicture = model.MainPicture,
+                    BackgroundPicture = model.BackgroundPicture,
+                    SmallBackgroundPicture = model.SmallBackgroundPicture,
+                    Thumbnail = model.Thumbnail,
 
-                //第二步 处理子标签
+                    //第二步 处理子标签
 
-                newTag.InverseParentCodeNavigation = tags;
+                    InverseParentCodeNavigation = tags,
 
-                //第三步 处理子词条 
+                    //第三步 处理子词条 
 
-                newTag.Entries = entries;
+                    Entries = entries
+                };
 
 
                 var tag = new Tag();
@@ -203,9 +204,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     return NotFound();
                 }
-             
+
             }
-          
+
             //读取审核信息
             List<Examine> examineQuery = null;
             if (user != null)
@@ -240,9 +241,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
             }
 
-            var model =await _tagService.GetTagViewModel(tag);
+            var model = await _tagService.GetTagViewModel(tag);
 
-           
+
             if (user != null)
             {
                 var examine = examineQuery.Find(s => s.Operation == Operation.EditTagMain);

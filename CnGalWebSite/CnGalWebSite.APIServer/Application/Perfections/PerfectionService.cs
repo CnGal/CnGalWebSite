@@ -157,7 +157,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
             var model = new List<PerfectionInforTipViewModel>();
             var length = await _perfectionCheckRepository.GetAll().AsNoTracking()
                 .Include(s => s.Perfection).ThenInclude(s => s.Entry)
-                .Where(s => s.Perfection.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Perfection.Entry.Name)==false)
+                .Where(s => s.Perfection.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Perfection.Entry.Name) == false)
                 .Where
                 (s =>
                     (
@@ -201,7 +201,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
                 groups = await _perfectionCheckRepository.GetAll().AsNoTracking()
                     .Include(s => s.Perfection).ThenInclude(s => s.Entry)
-                    .Where(s => s.Perfection.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Perfection.Entry.Name)==false)
+                    .Where(s => s.Perfection.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Perfection.Entry.Name) == false)
                     .Where
                     (s =>
                         (
@@ -310,7 +310,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
         public async Task UpdateAllEntryPerfectionsAsync()
         {
-            var entries = await _entryRepository.GetAll().Where(s => s.Type == EntryType.Game&&s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false).Select(s => s.Id).ToListAsync();
+            var entries = await _entryRepository.GetAll().Where(s => s.Type == EntryType.Game && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
             foreach (var item in entries)
             {
                 await UpdateEntryPerfectionResultAsync(item);
@@ -1029,7 +1029,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 //计算每个词条完善度总分超过全站的百分比
                 var grades = await _perfectionRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entry)
-                .Where(s => s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name)==false)
+                .Where(s => s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false)
                 .Select(s => new { s.Id, s.Grade }).ToListAsync();
                 var count = grades.Count;
                 foreach (var item in grades)
@@ -1041,8 +1041,8 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
                 //计算每个已完成的明细检查 全站的已完成百分比
                 var checkCounts = await _perfectionCheckRepository.GetAll().AsNoTracking()
-                    .Include(s => s.Perfection).ThenInclude(s=>s.Entry)
-                    .Where(s => s.Perfection.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Perfection.Entry.Name)==false)
+                    .Include(s => s.Perfection).ThenInclude(s => s.Entry)
+                    .Where(s => s.Perfection.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Perfection.Entry.Name) == false)
                     .Where(s => s.DefectType == PerfectionDefectType.None)
                     .Select(s => new { s.CheckType })
                     .GroupBy(s => s.CheckType)
@@ -1067,8 +1067,8 @@ namespace CnGalWebSite.APIServer.Application.Perfections
         public async Task<PerfectionLevelOverviewModel> GetPerfectionLevelOverview()
         {
             var grades = await _perfectionRepository.GetAll().AsNoTracking()
-                .Include(s=>s.Entry)
-                .Where(s=>s.Entry.IsHidden==false&&string.IsNullOrWhiteSpace( s.Entry.Name)==false)
+                .Include(s => s.Entry)
+                .Where(s => s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false)
                 .OrderBy(s => s.Grade).Select(s => s.Grade).ToListAsync();
 
             var model = new PerfectionLevelOverviewModel();

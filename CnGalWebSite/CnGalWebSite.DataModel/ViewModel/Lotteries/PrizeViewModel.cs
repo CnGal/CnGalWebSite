@@ -1,7 +1,4 @@
 ﻿using CnGalWebSite.DataModel.Model;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.Lotteries
 {

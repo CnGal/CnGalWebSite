@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.DelayedTasks
 {
-    public  class DelayedTask
+    public class DelayedTask
     {
-       public DelayedTaskType Type { get; set; }
+        public DelayedTaskType Type { get; set; }
 
         public DateTime CreateTime { get; set; }
 

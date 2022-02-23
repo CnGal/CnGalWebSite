@@ -4,7 +4,6 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -377,7 +376,7 @@ namespace CnGalWebSite.DataModel.Helper
         {
             var result = new List<StaffModel>();
 
-            text = text.Replace("，", ",").Replace("、", ",").Replace("：", ":").Replace("（","(").Replace("）",")").Replace("\r\n", "\n");
+            text = text.Replace("，", ",").Replace("、", ",").Replace("：", ":").Replace("（", "(").Replace("）", ")").Replace("\r\n", "\n");
             var Subcategory = string.Empty;
             //按行分割
             var lines = text.Split('\n');
@@ -405,13 +404,13 @@ namespace CnGalWebSite.DataModel.Helper
                 {
                     Position = pairs[0];
                     PositionGeneral = MidStrEx(Position, "(", ")");
-                    if(string.IsNullOrWhiteSpace(PositionGeneral))
+                    if (string.IsNullOrWhiteSpace(PositionGeneral))
                     {
                         PositionGeneral = null;
                     }
                     else
                     {
-                    Position= Position.Replace($"({PositionGeneral})", "");
+                        Position = Position.Replace($"({PositionGeneral})", "");
                     }
                 }
                 else
@@ -428,16 +427,16 @@ namespace CnGalWebSite.DataModel.Helper
                     }
                     var roleName = MidStrEx(infor, "(", ")");
                     //创建staff
-                    var type= GetGeneralType(PositionGeneral ?? Position);
+                    var type = GetGeneralType(PositionGeneral ?? Position);
                     result.Add(new StaffModel
                     {
                         NicknameOfficial = infor.Replace($"({roleName})", ""),
                         PositionOfficial = Position,
                         Subcategory = Subcategory,
                         Role = type == PositionGeneralType.CV ? roleName : null,
-                        SubordinateOrganization = type == PositionGeneralType.CV ?  null :roleName,
+                        SubordinateOrganization = type == PositionGeneralType.CV ? null : roleName,
                         PositionGeneral = type
-                    }) ;
+                    });
                 }
 
             }
@@ -849,9 +848,9 @@ namespace CnGalWebSite.DataModel.Helper
             return temp1 == temp2;
         }
 
-        public static void ModifyDataAccordingToEditingRecord<TResult>(TResult data, List<ExamineMainAlone> examines) where TResult:class
+        public static void ModifyDataAccordingToEditingRecord<TResult>(TResult data, List<ExamineMainAlone> examines) where TResult : class
         {
-            Type t=data.GetType();
+            var t = data.GetType();
             foreach (var item in examines)
             {
                 var pt = t.GetProperty(item.Key);
@@ -893,13 +892,13 @@ namespace CnGalWebSite.DataModel.Helper
         {
             var model = new List<ExamineMainAlone>();
 
-            Type t = currentItem.GetType();
+            var t = currentItem.GetType();
             var pts = t.GetProperties();
             foreach (var item in pts.Where(s => s.PropertyType == typeof(string) || s.PropertyType == typeof(DateTime) || s.PropertyType == typeof(DateTime?)
             || s.PropertyType == typeof(EntryType) || s.PropertyType == typeof(ArticleType) || s.PropertyType == typeof(bool) || s.PropertyType == typeof(int)))
             {
                 //特殊字段跳过
-                if(item.Name=="MainPage"|| item.Name == "CreateTime" || item.Name == "LastEditTime" || item.Name == "CreateUserId")
+                if (item.Name == "MainPage" || item.Name == "CreateTime" || item.Name == "LastEditTime" || item.Name == "CreateUserId")
                 {
                     continue;
                 }
@@ -919,7 +918,7 @@ namespace CnGalWebSite.DataModel.Helper
                 {
                     continue;
                 }
-               
+
                 if (currentValue == null || newValue == null || currentValue.ToString() != newValue.ToString())
                 {
                     if (item.PropertyType == typeof(DateTime))
@@ -938,7 +937,7 @@ namespace CnGalWebSite.DataModel.Helper
                             Value = ((DateTime?)newValue)?.ToBinary().ToString()
                         });
                     }
-                    else if (item.PropertyType == typeof(ArticleType)|| item.PropertyType == typeof(EntryType))
+                    else if (item.PropertyType == typeof(ArticleType) || item.PropertyType == typeof(EntryType))
                     {
                         model.Add(new ExamineMainAlone
                         {
@@ -968,8 +967,8 @@ namespace CnGalWebSite.DataModel.Helper
                         {
                             Key = item.Name,
                             Value = newValue.ToString()
-});
-}
+                        });
+                    }
                     else if (item.PropertyType == typeof(int))
                     {
                         model.Add(new ExamineMainAlone
@@ -992,12 +991,12 @@ namespace CnGalWebSite.DataModel.Helper
         public static List<BasicEntryInformation> Purge(this List<BasicEntryInformation> informations)
         {
             var list = informations.ToList();
-            foreach(var item in list)
+            foreach (var item in list)
             {
-                if(informations.Count(s=> item.DisplayName == s.DisplayName && item.DisplayValue == s.DisplayValue && item.Modifier == s.Modifier)>1)
+                if (informations.Count(s => item.DisplayName == s.DisplayName && item.DisplayValue == s.DisplayValue && item.Modifier == s.Modifier) > 1)
                 {
                     var temp = informations.FirstOrDefault(s => item.DisplayName == s.DisplayName && s.DisplayValue == s.DisplayValue && item.Modifier == s.Modifier);
-                    if(temp!=null)
+                    if (temp != null)
                     {
                         informations.Remove(temp);
                     }

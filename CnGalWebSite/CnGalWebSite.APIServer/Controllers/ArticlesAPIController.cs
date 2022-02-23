@@ -11,7 +11,6 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
-using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -19,7 +18,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -122,7 +120,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
                 .Include(s => s.Entries)
                 .Include(s => s.Outlinks)
-                .Include(s => s.Examines).ThenInclude(s=>s.ApplicationUser)
+                .Include(s => s.Examines).ThenInclude(s => s.ApplicationUser)
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (article == null)
             {
@@ -202,7 +200,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var createUser = article.CreateUser;
             if (createUser == null)
             {
-                article.CreateUser= createUser = article.Examines.First(s => s.IsPassed == true).ApplicationUser;
+                article.CreateUser = createUser = article.Examines.First(s => s.IsPassed == true).ApplicationUser;
             }
 
 
@@ -422,24 +420,26 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = ex.Message };
                 }
 
-                var newArticle = new Article();
-                //第一步 处理主要信息
+                var newArticle = new Article
+                {
+                    //第一步 处理主要信息
 
-                //新建审核数据对象
+                    //新建审核数据对象
 
-                newArticle.Name = model.Name;
-                newArticle.BriefIntroduction = model.BriefIntroduction;
-                newArticle.MainPicture = model.MainPicture;
-                    newArticle.BackgroundPicture = model.BackgroundPicture;
-                newArticle.SmallBackgroundPicture = model.SmallBackgroundPicture;
-                newArticle.Type = model.Type;
-                newArticle.OriginalAuthor = model.OriginalAuthor;
-                newArticle.OriginalLink = model.OriginalLink;
-                newArticle.PubishTime = model.PubishTime;
-                newArticle.RealNewsTime = model.RealNewsTime;
-                newArticle.DisplayName = model.DisplayName;
-                newArticle.NewsType = model.NewsType;
-              
+                    Name = model.Name,
+                    BriefIntroduction = model.BriefIntroduction,
+                    MainPicture = model.MainPicture,
+                    BackgroundPicture = model.BackgroundPicture,
+                    SmallBackgroundPicture = model.SmallBackgroundPicture,
+                    Type = model.Type,
+                    OriginalAuthor = model.OriginalAuthor,
+                    OriginalLink = model.OriginalLink,
+                    PubishTime = model.PubishTime,
+                    RealNewsTime = model.RealNewsTime,
+                    DisplayName = model.DisplayName,
+                    NewsType = model.NewsType
+                };
+
                 //第二步 处理关联词条
 
                 //创建审核数据模型
@@ -673,8 +673,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Error = "只有管理员才有权限发布公告", Successful = false };
                 }
 
-               //判断名称是否重复
-                if ( await _articleRepository.GetAll().AnyAsync(s => s.Name == model.Name && s.Id != model.Id))
+                //判断名称是否重复
+                if (await _articleRepository.GetAll().AnyAsync(s => s.Name == model.Name && s.Id != model.Id))
                 {
                     return new Result { Error = "该文章的名称与其他文章重复", Successful = false };
                 }
@@ -765,7 +765,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }).ToList();
 
                 foreach (var item in model.others)
-{
+                {
                     newArticle.Outlinks.Add(new Outlink
                     {
                         Name = item.DisplayName,
@@ -797,7 +797,7 @@ namespace CnGalWebSite.APIServer.Controllers
                             resulte = text.ToString();
                         }
                     }
-                
+
                     if (await _userManager.IsInRoleAsync(user, "Editor") == true)
                     {
                         switch (item.Value)

@@ -9,7 +9,6 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
-using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Markdig;
 using Microsoft.EntityFrameworkCore;
@@ -588,7 +587,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 OriginalLink = article.OriginalLink,
                 OriginalAuthor = article.OriginalAuthor,
                 CreateTime = article.CreateTime,
-                ThumbsUpCount = article.ThumbsUps?.Count??0,
+                ThumbsUpCount = article.ThumbsUps?.Count ?? 0,
                 ReaderCount = article.ReaderCount,
                 LastEditTime = article.LastEditTime,
                 CanComment = article.CanComment ?? true,
@@ -838,10 +837,11 @@ namespace CnGalWebSite.APIServer.Application.Articles
 
         public List<ArticleViewModel> ConcompareAndGenerateModel(Article currentArticle, Article newArticle)
         {
-            var model = new List<ArticleViewModel>();
-
-            model.Add( GetArticleViewModelAsync(currentArticle));
-            model.Add( GetArticleViewModelAsync(newArticle));
+            var model = new List<ArticleViewModel>
+            {
+                GetArticleViewModelAsync(currentArticle),
+                GetArticleViewModelAsync(newArticle)
+            };
 
 
 
@@ -858,7 +858,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             {
                 examineQuery = await _examineRepository.GetAll().AsNoTracking()
                                .Where(s => s.PeripheryId == id && s.ApplicationUserId == user.Id && s.IsPassed == null
-                               && (s.Operation == Operation.EditArticleMain || s.Operation == Operation.EditArticleMainPage || s.Operation == Operation.EditArticleRelevanes ))
+                               && (s.Operation == Operation.EditArticleMain || s.Operation == Operation.EditArticleMainPage || s.Operation == Operation.EditArticleRelevanes))
                                .Select(s => new Examine
                                {
                                    Operation = s.Operation
@@ -925,7 +925,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                         model.RelevancesState = EditState.Normal;
                     }
                 }
-             
+
             }
 
             return model;

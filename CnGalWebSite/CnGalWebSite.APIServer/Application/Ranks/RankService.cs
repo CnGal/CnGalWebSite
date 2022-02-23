@@ -312,9 +312,9 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             }
 
             //去重
-            var ranks = await _rankUserRepository.GetAll().Include(s=>s.Rank).Where(s => s.ApplicationUserId == user.Id).ToListAsync();
+            var ranks = await _rankUserRepository.GetAll().Include(s => s.Rank).Where(s => s.ApplicationUserId == user.Id).ToListAsync();
             var ranksCopy = ranks.ToArray();
-            foreach(var rank in ranksCopy)
+            foreach (var rank in ranksCopy)
             {
                 if (ranks.Count(s => s.Rank.Name == rank.Rank.Name) > 1)
                 {

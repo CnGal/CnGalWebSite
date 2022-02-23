@@ -1,9 +1,4 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Articles;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CnGalWebSite.DataModel.ViewModel.Peripheries
+﻿namespace CnGalWebSite.DataModel.ViewModel.Peripheries
 {
     public class PeripheryContrastEditRecordViewModel
     {

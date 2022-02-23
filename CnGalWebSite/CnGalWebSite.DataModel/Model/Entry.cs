@@ -109,12 +109,12 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 相关性列表
         /// </summary>
-        public ICollection<EntryRelevance> Relevances { get; set; }=new List<EntryRelevance>();
+        public ICollection<EntryRelevance> Relevances { get; set; } = new List<EntryRelevance>();
         /// <summary>
         /// 周边列表
         /// </summary>
         [Obsolete("关联周边已迁移，请访问RelatedPeripheries")]
-        public ICollection<PeripheryRelevanceEntry> Peripheries { get; set; }=new List<PeripheryRelevanceEntry>();
+        public ICollection<PeripheryRelevanceEntry> Peripheries { get; set; } = new List<PeripheryRelevanceEntry>();
 
         /// <summary>
         /// 图片列表
@@ -123,7 +123,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 审核记录 也是编辑记录
         /// </summary>
-        public ICollection<Examine> Examines { get; set; }=new List<Examine>();
+        public ICollection<Examine> Examines { get; set; } = new List<Examine>();
         /// <summary>
         /// 标签
         /// </summary>
@@ -144,7 +144,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 评分列表 也是已玩用户列表
         /// </summary>
-        public ICollection<PlayedGame> PlayedGames { get; set; }=new HashSet<PlayedGame>();
+        public ICollection<PlayedGame> PlayedGames { get; set; } = new HashSet<PlayedGame>();
 
         public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
 
@@ -237,7 +237,7 @@ namespace CnGalWebSite.DataModel.Model
 
         public string DisplayValue { get; set; }
 
-        public ICollection<BasicEntryInformationAdditional> Additional { get; set; }=new List<BasicEntryInformationAdditional>();
+        public ICollection<BasicEntryInformationAdditional> Additional { get; set; } = new List<BasicEntryInformationAdditional>();
     }
 
 

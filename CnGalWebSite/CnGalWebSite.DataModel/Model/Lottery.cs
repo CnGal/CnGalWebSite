@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace CnGalWebSite.DataModel.Model
 {
@@ -45,7 +44,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 优先级
         /// </summary>
-        public int Priority { get; set; } 
+        public int Priority { get; set; }
 
         /// <summary>
         /// 创建时间
@@ -101,7 +100,7 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public LotteryConditionType ConditionType { get; set; }
 
-        public virtual ICollection<LotteryUser> Users { get; set; }=new List<LotteryUser>();
+        public virtual ICollection<LotteryUser> Users { get; set; } = new List<LotteryUser>();
 
         public virtual ICollection<LotteryAward> Awards { get; set; } = new List<LotteryAward>();
 
@@ -110,7 +109,7 @@ namespace CnGalWebSite.DataModel.Model
 
     public enum LotteryType
     {
-        [Display(Name ="手动")]
+        [Display(Name = "手动")]
         Manual,
         [Display(Name = "自动")]
         Automatic,
@@ -118,7 +117,7 @@ namespace CnGalWebSite.DataModel.Model
 
     public enum LotteryConditionType
     {
-        [Display(Name ="无")]
+        [Display(Name = "无")]
         None,
         [Display(Name = "至少有一条游玩记录")]
         GameRecord,
@@ -175,7 +174,7 @@ namespace CnGalWebSite.DataModel.Model
 
     public enum LotteryAwardType
     {
-        [Display(Name ="激活码")]
+        [Display(Name = "激活码")]
         ActivationCode,
         [Display(Name = "实物")]
         RealThing,

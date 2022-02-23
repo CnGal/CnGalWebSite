@@ -6,13 +6,9 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
-using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Nest;
 using Newtonsoft.Json;
-using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -825,7 +821,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             //添加新建项目
             foreach (var item in newPeriphery.RelatedEntries)
             {
-                var temp = peripheryRelatedEntries.Relevances.FirstOrDefault(s =>  s.EntryId == item.Id);
+                var temp = peripheryRelatedEntries.Relevances.FirstOrDefault(s => s.EntryId == item.Id);
                 if (temp != null)
                 {
                     peripheryRelatedEntries.Relevances.Remove(temp);
@@ -835,7 +831,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                     peripheryRelatedEntries.Relevances.Add(new PeripheryRelatedEntryAloneModel
                     {
                         EntryId = item.Id,
-                        Name=item.Name,
+                        Name = item.Name,
                         IsDelete = false
                     });
                 }
@@ -864,7 +860,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             //添加新建项目
             foreach (var item in newPeriphery.PeripheryRelationFromPeripheryNavigation.ToList().Purge())
             {
-                var temp = peripheryRelatedPeripheries.Relevances.FirstOrDefault(s =>  s.PeripheryId == item.ToPeriphery);
+                var temp = peripheryRelatedPeripheries.Relevances.FirstOrDefault(s => s.PeripheryId == item.ToPeriphery);
                 if (temp != null)
                 {
                     peripheryRelatedPeripheries.Relevances.Remove(temp);
@@ -889,10 +885,11 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
 
         public async Task<List<PeripheryViewModel>> ConcompareAndGenerateModel(Periphery currentPeriphery, Periphery newPeriphery)
         {
-            var model = new List<PeripheryViewModel>();
-
-            model.Add(await GetPeripheryViewModel(currentPeriphery));
-            model.Add(await GetPeripheryViewModel(newPeriphery));
+            var model = new List<PeripheryViewModel>
+            {
+                await GetPeripheryViewModel(currentPeriphery),
+                await GetPeripheryViewModel(newPeriphery)
+            };
 
 
 

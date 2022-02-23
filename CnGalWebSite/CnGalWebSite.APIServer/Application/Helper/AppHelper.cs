@@ -101,7 +101,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             _peripheryRepository = peripheryRepository;
             _voteRepository = voteRepository;
             _lotteryRepository = lotteryRepository;
-            _userIntegralRepository= userIntegralRepository;
+            _userIntegralRepository = userIntegralRepository;
         }
 
         public async Task<bool> IsEntryLockedAsync(int entryId, string userId, Operation operation)
@@ -1627,7 +1627,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
                 var integral_4 = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.Integral).Select(s => s.Count).SumAsync();
 
-                user.DisplayIntegral = integral_1 + integral_2 + integral_3+ integral_4;
+                user.DisplayIntegral = integral_1 + integral_2 + integral_3 + integral_4;
 
 
                 //计算贡献值
@@ -1638,7 +1638,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
                 await _userManager.UpdateAsync(user);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -1865,7 +1865,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         {
             //读取关键词列表
             var words = new List<string>();
-            var path = Path.Combine(_webHostEnvironment.WebRootPath, "SensitiveWords", "1.txt");
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, "BackUp", "SensitiveWords", "1.txt");
 
             using var fs1 = new FileStream(path, FileMode.Open, FileAccess.Read);
             using var sr1 = new StreamReader(fs1);
@@ -1874,7 +1874,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 words.Add(await sr1.ReadLineAsync());
             }
 
-            path = Path.Combine(_webHostEnvironment.WebRootPath, "SensitiveWords", "2.txt");
+            path = Path.Combine(_webHostEnvironment.WebRootPath, "BackUp", "SensitiveWords", "2.txt");
 
             using var fs2 = new FileStream(path, FileMode.Open, FileAccess.Read);
             using var sr2 = new StreamReader(fs2);
@@ -1883,7 +1883,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 words.Add(await sr2.ReadLineAsync());
             }
 
-            path = Path.Combine(_webHostEnvironment.WebRootPath, "SensitiveWords", "3.txt");
+            path = Path.Combine(_webHostEnvironment.WebRootPath, "BackUp", "SensitiveWords", "3.txt");
 
             using var fs3 = new FileStream(path, FileMode.Open, FileAccess.Read);
             using var sr3 = new StreamReader(fs3);

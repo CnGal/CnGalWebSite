@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.Steam
 {
@@ -13,10 +11,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
         private ScreenSteamType screenType;
         public ScreenSteamType ScreenType
         {
-            get
-            {
-                return screenType;
-            }
+            get => screenType;
             set
             {
                 screenType = value;
@@ -26,10 +21,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
         private SteamSortType orderType;
         public SteamSortType OrderType
         {
-            get
-            {
-                return orderType;
-            }
+            get => orderType;
             set
             {
                 orderType = value;
@@ -40,16 +32,13 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
         public SteamSortType thenOrderType;
         public SteamSortType ThenOrderType
         {
-            get
-            {
-                return thenOrderType;
-            }
+            get => thenOrderType;
             set
             {
                 thenOrderType = value;
                 SetItems();
             }
-        } 
+        }
 
         public bool IsInit => Model.Count > 0;
 
@@ -60,7 +49,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
 
         public void Init(List<SteamInforTipViewModel> model)
         {
-            Model= model;
+            Model = model;
             SetItems();
         }
 

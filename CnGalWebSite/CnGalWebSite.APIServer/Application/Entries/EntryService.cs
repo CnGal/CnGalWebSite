@@ -3,7 +3,6 @@ using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
@@ -13,7 +12,6 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -22,7 +20,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using TencentCloud.Cme.V20191029.Models;
 
 namespace CnGalWebSite.APIServer.Application.Entries
 {
@@ -306,7 +303,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         entry.Information.Remove(entryInformation);
                         continue;
                     }
-                    if(item.Additional==null)
+                    if (item.Additional == null)
                     {
                         continue;
                     }
@@ -582,7 +579,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         if (item.IsDelete == true)
                         {
                             relevances.Remove(infor);
-                           
+
                         }
                         isAdd = true;
                         break;
@@ -715,7 +712,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     await UpdateEntryDataTagsAsync(entry, entryTags);
                     break;
                 case Operation.EstablishMainPage:
-                    string mainPage = examine.Context;
+                    var mainPage = examine.Context;
                     UpdateEntryDataMainPage(entry, mainPage);
                     break;
                 default:
@@ -1656,15 +1653,15 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //第五部分 主页
             if (newEntry.MainPage != currentEntry.MainPage)
             {
-                if(string.IsNullOrWhiteSpace(newEntry.MainPage)&&string.IsNullOrWhiteSpace(currentEntry.MainPage))
+                if (string.IsNullOrWhiteSpace(newEntry.MainPage) && string.IsNullOrWhiteSpace(currentEntry.MainPage))
                 {
-                    
+
                 }
                 else
                 {
-                //序列化
-                var resulte = newEntry.MainPage;
-                examines.Add(new KeyValuePair<object, Operation>(resulte, Operation.EstablishMainPage));
+                    //序列化
+                    var resulte = newEntry.MainPage;
+                    examines.Add(new KeyValuePair<object, Operation>(resulte, Operation.EstablishMainPage));
 
                 }
             }
@@ -1708,12 +1705,13 @@ namespace CnGalWebSite.APIServer.Application.Entries
             return examines;
         }
 
-        public async Task<List<EntryIndexViewModel>> ConcompareAndGenerateModel(Entry currentEntry,Entry newEntry)
+        public async Task<List<EntryIndexViewModel>> ConcompareAndGenerateModel(Entry currentEntry, Entry newEntry)
         {
-            var model=new List<EntryIndexViewModel>();
-
-            model.Add(await GetEntryIndexViewModelAsync(currentEntry));
-            model.Add(await GetEntryIndexViewModelAsync(newEntry));
+            var model = new List<EntryIndexViewModel>
+            {
+                await GetEntryIndexViewModelAsync(currentEntry),
+                await GetEntryIndexViewModelAsync(newEntry)
+            };
 
 
 

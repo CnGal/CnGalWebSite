@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Xml.Linq;
 
 namespace CnGalWebSite.DataModel.ViewModel.Lotteries
 {
@@ -50,7 +48,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         [Display(Name = "抽奖时间")]
         public DateTime LotteryTime { get; set; }
 
-        public List<EditLotteryAwardModel> Awards { get; set; }=new List<EditLotteryAwardModel>();
+        public List<EditLotteryAwardModel> Awards { get; set; } = new List<EditLotteryAwardModel>();
 
         [Display(Name = "备注")]
         public string Note { get; set; }
@@ -76,7 +74,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         [Display(Name = "附加积分")]
         public int Integral { get; set; }
 
-        public  List<EditLotteryPrizeModel> Prizes { get; set; } = new List<EditLotteryPrizeModel>();
+        public List<EditLotteryPrizeModel> Prizes { get; set; } = new List<EditLotteryPrizeModel>();
     }
 
     public class EditLotteryPrizeModel

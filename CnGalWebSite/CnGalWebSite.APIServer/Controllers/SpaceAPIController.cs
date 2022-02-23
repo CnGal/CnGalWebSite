@@ -223,7 +223,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 TotalExamine = userEditInfor.EditCount,
                 LastEditTime = userEditInfor.LastEditTime,
                 SteamId = user.SteamId,
-                IsShowGameRecord=user.IsShowGameRecord
+                IsShowGameRecord = user.IsShowGameRecord
             };
 
             //提前将MarkDown语法转为Html
@@ -516,7 +516,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 if (string.IsNullOrWhiteSpace(model.SteamId) == false)
                 {
                     //更新游戏信息
-                    if(await _steamInforService.UpdateUserSteam(user)==false)
+                    if (await _steamInforService.UpdateUserSteam(user) == false)
                     {
                         return new Result { Successful = false, Error = "无法获取Steam信息，请检查SteamId是否正确；也可能是服务器网络波动，不填写该项以保存其他修改的内容" };
                     }
@@ -714,11 +714,11 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            user =await _userRepository.GetAll().AsNoTracking()
-                .Include(s=>s.UserAddress)
-                .FirstOrDefaultAsync(s=>s.Id == user.Id);
+            user = await _userRepository.GetAll().AsNoTracking()
+                .Include(s => s.UserAddress)
+                .FirstOrDefaultAsync(s => s.Id == user.Id);
 
-            if(user.UserAddress==null)
+            if (user.UserAddress == null)
             {
                 return new EditUserAddressModel();
             }
@@ -743,7 +743,7 @@ namespace CnGalWebSite.APIServer.Controllers
             user = await _userRepository.GetAll().AsNoTracking()
                 .Include(s => s.UserAddress)
                 .FirstOrDefaultAsync(s => s.Id == user.Id);
-            if(user.UserAddress == null)
+            if (user.UserAddress == null)
             {
                 user.UserAddress = new UserAddress();
             }
@@ -761,9 +761,9 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> AddUserIntegralAsync(AddUserIntegralModel model)
         {
-            if(await _userRepository.GetAll().AnyAsync(s=>s.Id==model.UserId)==false)
+            if (await _userRepository.GetAll().AnyAsync(s => s.Id == model.UserId) == false)
             {
-                return new Result { Successful=false ,Error="未找到该用户"};
+                return new Result { Successful = false, Error = "未找到该用户" };
             }
 
             await _userService.AddUserIntegral(model);

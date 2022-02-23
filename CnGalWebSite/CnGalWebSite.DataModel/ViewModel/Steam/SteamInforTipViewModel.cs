@@ -1,8 +1,5 @@
-﻿using CnGalWebSite.DataModel.Model;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.Steam
 {
@@ -44,7 +41,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
 
     public enum ScreenSteamType
     {
-        [Display(Name ="全部")]
+        [Display(Name = "全部")]
         All,
         [Display(Name = "新史低")]
         NewHistoryLow

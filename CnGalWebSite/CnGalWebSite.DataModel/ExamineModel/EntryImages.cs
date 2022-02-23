@@ -3,7 +3,7 @@ namespace CnGalWebSite.DataModel.ExamineModel
 {
     public class EntryImages
     {
-        public List<EntryImage> Images { get; set; }=new List<EntryImage>();
+        public List<EntryImage> Images { get; set; } = new List<EntryImage>();
     }
 
     public class EntryImage

@@ -3,7 +3,7 @@ namespace CnGalWebSite.DataModel.ExamineModel
 {
     public class EntryAddInfor
     {
-        public List<BasicEntryInformation_> Information { get; set; }=new List<BasicEntryInformation_> { };
+        public List<BasicEntryInformation_> Information { get; set; } = new List<BasicEntryInformation_> { };
     }
     public class BasicEntryInformation_
     {

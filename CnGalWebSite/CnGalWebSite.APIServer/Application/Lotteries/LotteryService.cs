@@ -2,32 +2,22 @@
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
-using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
-using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Nest;
-using Newtonsoft.Json;
-using StackExchange.Redis;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using TencentCloud.Ame.V20190916.Models;
 
 
 namespace CnGalWebSite.APIServer.Application.Lotteries
 {
-    public class LotteryService:ILotteryService
+    public class LotteryService : ILotteryService
     {
         private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly IRepository<LotteryUser, long> _lotteryUserRepository;
@@ -53,11 +43,11 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
         }
         public Task<QueryData<ListLotteryAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListLotteryAloneModel searchModel)
         {
-            IQueryable<Lottery> items = _lotteryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).AsNoTracking();
+            var items = _lotteryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).AsNoTracking();
             // 处理高级搜索
             if (!string.IsNullOrWhiteSpace(searchModel.Name))
             {
-                items = items.Where(item => item.Name.Contains(searchModel.Name, StringComparison.OrdinalIgnoreCase) );
+                items = items.Where(item => item.Name.Contains(searchModel.Name, StringComparison.OrdinalIgnoreCase));
             }
             if (!string.IsNullOrWhiteSpace(searchModel.BriefIntroduction))
             {
@@ -120,9 +110,9 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             });
         }
 
-        public Task<QueryData<ListLotteryUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListLotteryUserAloneModel searchModel,long lotteryId)
+        public Task<QueryData<ListLotteryUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListLotteryUserAloneModel searchModel, long lotteryId)
         {
-            IQueryable<LotteryUser> items = _lotteryUserRepository.GetAll()
+            var items = _lotteryUserRepository.GetAll()
                 .Include(s => s.ApplicationUser)
                 .Where(s => s.LotteryId == lotteryId).AsNoTracking();
 
@@ -167,8 +157,8 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                 resultItems.Add(new ListLotteryUserAloneModel
                 {
                     Id = item.ApplicationUser.Id,
-                    Name=item.ApplicationUser.UserName,
-                    Number=item.Number,
+                    Name = item.ApplicationUser.UserName,
+                    Number = item.Number,
                 });
             }
 
@@ -181,7 +171,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             });
         }
 
-        public async Task SendPrizeToWinningUser(LotteryUser user,LotteryAward award)
+        public async Task SendPrizeToWinningUser(LotteryUser user, LotteryAward award)
         {
             user.LotteryAwardId = award.Id;
             if (award.Type == LotteryAwardType.ActivationCode)
@@ -208,7 +198,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
 
         private async Task<bool> DrawLottery(Lottery lottery)
         {
-            var NotWinnningUser = lottery.Users.Where(s=>s.IsHidden==false).ToList();
+            var NotWinnningUser = lottery.Users.Where(s => s.IsHidden == false).ToList();
 
             foreach (var item in lottery.Awards)
             {
@@ -240,7 +230,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
         public async Task DrawAllLottery()
         {
 
-            DateTime time = DateTime.Now.ToCstTime();
+            var time = DateTime.Now.ToCstTime();
             var ids = await _lotteryRepository.GetAll().AsNoTracking()
                 .Where(s => s.IsEnd == false && s.Type == LotteryType.Automatic && s.LotteryTime < time).Select(s => s.Id)
                 .ToListAsync();
@@ -263,7 +253,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                     }
                 }
 
-                bool result = await DrawLottery(lottery);
+                var result = await DrawLottery(lottery);
 
                 _lotteryRepository.Clear();
 
@@ -280,13 +270,13 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
         {
             var lottery = await _lotteryRepository.GetAll()
                     .Include(s => s.Awards).ThenInclude(s => s.WinningUsers)
-                    .Include(s => s.Awards).ThenInclude(s => s.Prizes).ThenInclude(s=>s.LotteryUser)
+                    .Include(s => s.Awards).ThenInclude(s => s.Prizes).ThenInclude(s => s.LotteryUser)
                     .FirstOrDefaultAsync(s => s.Id == id);
 
-            foreach(var item in lottery.Awards)
+            foreach (var item in lottery.Awards)
             {
                 item.WinningUsers.Clear();
-                foreach(var temp in item.Prizes)
+                foreach (var temp in item.Prizes)
                 {
                     temp.LotteryUser = null;
                     temp.LotteryUserId = null;
