@@ -1,4 +1,6 @@
-﻿
+﻿@inject IDataCacheService _dataCacheService
+@inject ILocalStorageService _localStorage
+
 @inject IJSRuntime JS
 
 
@@ -22,7 +24,7 @@
 
 </style>
 
-@if (isDark)
+@if (_dataCacheService.ThemeSetting.IsDark)
 {
     <link href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/github-markdown-dark.css" rel="stylesheet" media="none" onload="this.media='all'">
     <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/vs2015.min.css" media="none" onload="this.media='all'" />
@@ -33,6 +35,14 @@
             color: white;
         }
     </style>
+    @if(_dataCacheService.IsApp)
+    {
+        <style>
+            .bg-opacity {
+            background-color: transparent;
+            }
+        </style>
+    }
 }
 else
 {
@@ -49,7 +59,7 @@ else
         }
     </style>
 
-    if (IsOnBgImage)
+    if (_dataCacheService.ThemeSetting.IsOnBgImage)
     {
         <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/show-background.min.css" />
     }
@@ -69,14 +79,14 @@ else
         </style>
     }
 }
-@if (IsOnMouse)
+@if (_dataCacheService.ThemeSetting.IsOnMouse)
 {
     <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/mouse.min.css" />
 
 
 }
 
-@if (IsOnBgImage && isDark == false)
+@if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
 {
     <style>
         .layout.is-page .layout-footer {
@@ -127,115 +137,124 @@ else
     public string colorActive = "#CC578C";
     public string colorString = "color3";
 
-    [Parameter]
-    public string ColorString
-    {
-        set
-        {
-            colorString = value;
-
-            if (IsDark == true)
-            {
-                return;
-            }
-            switch (value)
-            {
-                case "color1":
-                    colorMain = "#5E9CFB";
-                    colorHover = "#5B8BEE";
-                    colorActive = "#5284ED";
-                    break;
-                case "color2":
-                    colorMain = "#28B559";
-                    colorHover = "#1F8B45";
-                    colorActive = "#1E8650";
-                    break;
-                case "color3":
-                    colorMain = "#D979A2";
-                    colorHover = "#C6447E";
-                    colorActive = "#CC578C";
-                    break;
-                case "color4":
-                    colorMain = "#EC8904";
-                    colorHover = "#B46803";
-                    colorActive = "#CE7804";
-                    break;
-                case "color5":
-                    colorMain = "#17a2b8";
-                    colorHover = "#1ab394";
-                    colorActive = "#367fa9";
-                    break;
-                case "color6":
-                    colorMain = "#9D91CA";
-                    colorHover = "#7E5B95";
-                    colorActive = "#9D72BA";
-                    break;
-
-            }
-        }
-    }
-    private bool isDark;
-    [Parameter]
-    public bool IsDark
-    {
-        get
-        {
-            return isDark;
-        }
-        set
-        {
-            isDark = value;
-            if (value == true)
-            {
-                colorMain = "#1F1F1F";
-                colorHover = "#262626";
-                colorActive = "#1F1F1F";
-            }
-            else
-            {
-                ColorString = colorString;
-            }
-        }
-    }
-
-    [Parameter]
-    public bool IsOnMouse { get; set; }
-    [Parameter]
-    public bool IsOnBgImage { get; set; }
-
-
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
-        {
-            if (IsOnMouse)
-            {
-                try
-                {
-                    await JS.InvokeAsync<string>("InitMouse");
-                }
-                catch
-                {
-
-                }
-            }
-        }
-    }
-    public async void Refresh()
-    {
-        if (IsOnMouse)
         {
             try
             {
-                await JS.InvokeAsync<string>("InitMouse");
+                //读取本地主题配置
+                await LoadTheme();
+                //保存本地主题配置 更新数据结构
+                await SaveTheme();
             }
             catch
             {
 
             }
+
+            if (_dataCacheService.ThemeSetting.IsOnMouse)
+            {
+                await InitMouse();
+            }
         }
+    }
+
+    /// <summary>
+    /// 读取本地主题配置 并刷新
+    /// </summary>
+    /// <returns></returns>
+    public async Task LoadTheme()
+    {
+
+        var theme = await _localStorage.GetItemAsync<ThemeModel>("theme");
+        if (theme == null)
+        {
+            return;
+        }
+        _dataCacheService.ThemeSetting = theme;
+        ProcColor();
+        StateHasChanged();
+    }
+
+    public void ProcColor()
+    {
+        switch (_dataCacheService.ThemeSetting.Theme)
+        {
+            case "color1":
+                colorMain = "#5E9CFB";
+                colorHover = "#5B8BEE";
+                colorActive = "#5284ED";
+                break;
+            case "color2":
+                colorMain = "#28B559";
+                colorHover = "#1F8B45";
+                colorActive = "#1E8650";
+                break;
+            case "color3":
+                colorMain = "#D979A2";
+                colorHover = "#C6447E";
+                colorActive = "#CC578C";
+                break;
+            case "color4":
+                colorMain = "#EC8904";
+                colorHover = "#B46803";
+                colorActive = "#CE7804";
+                break;
+            case "color5":
+                colorMain = "#17a2b8";
+                colorHover = "#1ab394";
+                colorActive = "#367fa9";
+                break;
+            case "color6":
+                colorMain = "#9D91CA";
+                colorHover = "#7E5B95";
+                colorActive = "#9D72BA";
+                break;
+
+        }
+
+        if (_dataCacheService.ThemeSetting.IsDark)
+        {
+            colorMain = "#1F1F1F";
+            colorHover = "#262626";
+            colorActive = "#1F1F1F";
+        }
+
+    }
+
+    /// <summary>
+    /// 保存本地主题配置
+    /// </summary>
+    /// <returns></returns>
+    public async Task SaveTheme()
+    {
+        await _localStorage.SetItemAsync("theme", _dataCacheService.ThemeSetting);
+    }
+
+    public async Task InitMouse()
+    {
+        try
+        {
+            await JS.InvokeAsync<string>("InitMouse");
+        }
+        catch
+        {
+
+        }
+    }
+
+    /// <summary>
+    /// 刷新
+    /// </summary>
+    public async void Refresh()
+    {
+        if (_dataCacheService.ThemeSetting.IsOnMouse)
+        {
+            await InitMouse();
+        }
+        ProcColor();
         StateHasChanged();
     }
 }

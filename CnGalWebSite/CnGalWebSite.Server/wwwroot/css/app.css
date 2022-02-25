@@ -974,3 +974,15 @@
     padding-top: 2px;
     font-weight: normal;
 }
+/*页脚*/
+.load-footer a:hover {
+    color: var(--hover-color);
+}
+
+.load-footer a {
+    color: gray;
+}
+
+.pointer{
+    cursor:pointer;
+}

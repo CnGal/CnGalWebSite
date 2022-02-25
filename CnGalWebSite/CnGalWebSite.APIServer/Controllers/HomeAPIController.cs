@@ -133,7 +133,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<Carousel>>> GetHomeCarouselsViewAsync()
+        public async Task<ActionResult<List<CarouselViewModel>>> GetHomeCarouselsViewAsync()
         {
             return await _homeService.GetHomeCarouselsViewAsync();
 
@@ -153,7 +153,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 FriendLinks = await _homeService.GetHomeFriendLinksViewAsync(),
                 Notices = await _homeService.GetHomeNoticesViewAsync(),
                 Articles = await _homeService.GetHomeArticlesViewAsync(),
-                Carousels = await _homeService.GetHomeCarouselsViewAsync()
+                //Carousels = await _homeService.GetHomeCarouselsViewAsync()
             };
 
             return model;

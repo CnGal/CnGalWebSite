@@ -254,3 +254,16 @@ input.te-image-file-input {
     background: #000 !important;
     opacity: .2 !important;
 }
+/*Markdown编辑器*/
+.markdown-body img {
+    background-color: transparent;
+}
+
+.markdown-body {
+    background-color: transparent;
+}
+
+.markdown-body b, .markdown-body strong {
+    font-weight: bolder;
+}
+

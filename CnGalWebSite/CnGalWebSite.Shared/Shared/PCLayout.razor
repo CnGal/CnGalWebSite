@@ -1,0 +1,125 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject IServiceProvider Provider
+
+@inject IDataCacheService _dataCacheService
+<section class="layout has-footer" style=" height: calc(100vh);">
+    <header class="layout-header  shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-light bg-opacity" style="border-bottom: 1px solid #dee2e6 !important;">
+            <div class="container-xxl">
+                <a class="navbar-brand" href="/">
+                    <div style="display: flex; align-items: center;">
+                        <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" style="height:35px;width:35px;">
+                        <div style="font-size:24px;" class="ms-2">
+                            CnGal资料站
+                        </div>
+                    </div>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarScroll">
+                    <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/articles/home">文章</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/entries/home/游戏">游戏</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/entries/home/角色">角色</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/entries/home/STAFF">STAFF</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/entries/home/制作组">制作组</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/home/search/周边">周边</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                标签
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+                                <li><a class="dropdown-item" href="/tags/index/1">游戏</a></li>
+                                <li><a class="dropdown-item" href="/tags/index/2">角色</a></li>
+                                <li><a class="dropdown-item" href="/tags/index/3">STAFF</a></li>
+                                <li><a class="dropdown-item" href="/tags/index/4">制作组</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/home/random">随机</a>
+                        </li>
+                    </ul>
+                    <form class="d-flex">
+                        <BootstrapInput @bind-Value="SearchString" placeholder="可以搜索哦~" class="me-2" />
+                        <Button Color="Color.Dark" IsOutline="true" Icon="fa fa-search" style="display: flex; align-items: center; margin-top: 1px; margin-bottom: 1px;" OnClick="OnSearch"></Button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main class="layout-main">
+        <div  class="container-xxl mt-4 mb-4">
+
+          
+                    @Body
+      
+        </div>
+    </main>
+
+    <footer class="layout-footer shadow bg-opacity">
+        <div class="container-xxl load-footer">
+            <div style="display: flex; justify-content: space-between;" class="mt-2">
+                <div style="display: flex; flex-direction: column;">
+                    <div>
+                        <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/footer_logo.png" style="height:50px;">
+                    </div>
+                    <div>
+                        愿每一个CnGal创作者的作品都能不被忘记
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <a style="width: 44px; height: 44px; border-radius: 50%;" href="https://jq.qq.com/?_wv=1027&k=mG6qNvyg" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="47px" height="47px" viewBox="0 0 1024 1024" version="1.1"><path fill="var(--main-color)" d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m210.5 612.4c-11.5 1.4-44.9-52.7-44.9-52.7 0 31.3-16.2 72.2-51.1 101.8 16.9 5.2 54.9 19.2 45.9 34.4-7.3 12.3-125.6 7.9-159.8 4-34.2 3.8-152.5 8.3-159.8-4-9.1-15.2 28.9-29.2 45.8-34.4-35-29.5-51.1-70.4-51.1-101.8 0 0-33.4 54.1-44.9 52.7-5.4-0.7-12.4-29.6 9.4-99.7 10.3-33 22-60.5 40.2-105.8-3.1-116.9 45.3-215 160.4-215 113.9 0 163.3 96.1 160.4 215 18.1 45.2 29.9 72.8 40.2 105.8 21.7 70.1 14.6 99.1 9.3 99.7z" /></svg>
+                    </a>
+                    <a style="width: 40px; height: 40px; border-radius: 50%; " class="ms-4" href="https://weibo.com/cngalorg" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="40px" height="40px" viewBox="0 0 1024 1024" version="1.1"><path fill="var(--main-color)" d="M512 0C229.243259 0 0 229.224296 0 512s229.243259 512 512 512 512-229.224296 512-512S794.756741 0 512 0zM460.8 778.24c-175.312593 0-317.44-91.685926-317.44-204.781037 0-113.095111 212.859259-291.688296 294.286222-291.688296 34.133333 0 101.148444 25.448296 54.272 106.078815-3.280593 5.632 105.718519-46.895407 165.300148-12.344889 59.600593 34.550519 0 90.055111 0 96.218074 0 6.162963 119.656296 6.162963 119.656296 101.717333C776.874667 686.554074 636.112593 778.24 460.8 778.24zM710.276741 359.461926c-19.740444-23.438222-55.030519-17.957926-55.030519-17.957926-10.334815 0.094815-18.375111-7.111111-19.797333-16.839111-0.132741 0.986074-0.568889 1.896296-0.568889 2.901333l0-5.707852c0 1.005037 0.436148 1.85837 0.568889 2.806519 1.422222-9.993481 9.53837-18.792296 19.740444-20.138667 0 0 42.723556-11.681185 79.739259 21.636741 37.015704 33.317926 21.864296 88.405333 21.864296 88.405333-1.592889 11.207111-12.553481 20.15763-23.931259 20.15763L730.832593 434.725926c-11.396741 0-18.033778-8.779852-14.904889-19.607704C715.927704 415.099259 729.998222 382.900148 710.276741 359.461926zM850.62163 430.26963c-1.422222 15.587556-15.018667 28.273778-30.511407 30.01837 1.137778 0.132741 2.23763 0.341333 3.432296 0.341333l-6.97837 0c1.194667 0 2.37037-0.208593 3.546074-0.341333-15.018667-1.744593-25.125926-14.449778-22.945185-30.056296 0 0 16.70637-64.606815-23.988148-123.031704-40.713481-58.424889-128.208593-48.336593-128.208593-48.336593-15.54963-0.018963-28.596148-11.45363-30.245926-26.718815-0.113778 1.080889-0.32237 2.123852-0.32237 3.223704l0-6.409481c0 1.099852 0.208593 2.123852 0.32237 3.185778 1.649778-15.265185 14.506667-27.439407 30.340741-27.553185 0 0 91.098074-9.197037 158.947556 54.954667C871.860148 323.678815 850.62163 430.26963 850.62163 430.26963zM450.56 573.44m-20.48 0a1.08 1.08 0 1 0 40.96 0 1.08 1.08 0 1 0-40.96 0ZM403.303951 640.642444a1.62 2.159 0 1 0-25.964544-55.683072 1.62 2.159 0 1 0 25.964544 55.683072ZM432.033185 451.830519c-111.995259 15.739259-194.484148 87.514074-184.263111 160.331852 10.221037 72.817778 109.321481 119.087407 221.335704 103.329185 112.014222-15.739259 194.503111-87.514074 184.282074-160.331852C643.147852 482.360889 544.047407 436.091259 432.033185 451.830519zM448.398222 695.675259c-66.635852 12.951704-129.384296-21.560889-140.174222-77.065481-10.789926-55.523556 34.474667-111.009185 101.091556-123.960889 66.635852-12.970667 129.384296 21.541926 140.174222 77.065481C560.260741 627.218963 515.015111 682.723556 448.398222 695.675259z" /></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <a href="/home/about" class="me-2">关于我们</a>
+                <a href="/articles/index/225" class="me-2">隐私协议</a>
+                <a href="/perfections/home" class="me-2">编辑指引</a>
+            </div>
+            <div class="mt-4" style=" display: flex; justify-content: center; align-items: center; flex-wrap: wrap; ">
+                <a class="me-1" style=" display: flex; align-items: center; " rel="noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="知识共享许可协议" style="border-width:0" src="//app.cngal.org/_content/CnGalWebSite.Shared/images/CC4.png"></a>
+                本站内容采用&nbsp;<a rel="noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议</a>&nbsp;进行许可
+            </div>
+            <div class="mt-2 pb-3 text-center">
+                Copyright
+                &copy; 2022 - CnGal资料站
+                - <a class="ml-4" target="_blank" href="http://beian.miit.gov.cn" one-link-mark="yes">
+                    粤ICP备15055899号
+                </a>
+            </div>
+        </div>
+    </footer>
+</section>
+@code {
+    public string SearchString { get; set; } = "";
+
+    protected async override Task OnInitializedAsync()
+    {
+
+    }
+
+    public void OnSearch()
+    {
+        NavigationManager.NavigateTo("/home/search/全部/" + SearchString);
+    }
+}

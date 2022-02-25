@@ -4,8 +4,6 @@
 @inject IServiceProvider Provider
 @inject IJSRuntime JS
 
-@implements IAsyncDisposable
-
 
 <div class=" rounded shadow-sm  bg-opacity ps-4 pe-4 pt-3 h-100" style=" display: flex;flex-direction: column;">
     <div style="display: block;">
@@ -16,9 +14,9 @@
     </div>
     <div class="row h-100">
 
-        @foreach(var item in Items.Take(ItemNum))
+        @foreach(var item in Items.Take(6))
         {
-            <div class="@(IsNormalScreen?" mb-3 col-6":"mb-3 col-12")" style="cursor:pointer;">
+            <div class="mb-3 col-12 col-lg-6 pointer">
                 <HomeNewsAloneTip Model="item" OnClickNews="OnClickNews" OnClickUser="OnClickUser"></HomeNewsAloneTip>
             </div>
         }
@@ -26,11 +24,6 @@
 
 </div>
 @code {
-    public int ItemNum { get; set; } = 3;
-    public bool IsSmallScreen { get; set; } = true;
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; }
-    public bool IsXLargeScreen { get; set; }
 
     public List<HomeNewsAloneViewModel> Items { get; set; } = new List<HomeNewsAloneViewModel>();
 
@@ -56,84 +49,6 @@
 
     }
 
-    #region 获取屏幕大小
-
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime JSRuntime { get; set; }
-
-    private JSInterop<HomeNewsViewTip> Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            Interop = new JSInterop<HomeNewsViewTip>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
-        }
-    }
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 768))
-        {
-            IsSmallScreen = width < 768;
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 768 && width < 1630))
-        {
-            IsNormalScreen = width >= 768 && width < 1630;
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 1630 && width < 2070))
-        {
-            IsLargeScreen = width >= 1630 && width < 2070;
-            StateHasChanged();
-        }
-        if (IsXLargeScreen != (width >= 2070))
-        {
-            IsXLargeScreen = width >= 2070;
-            StateHasChanged();
-        }
-
-        int temp = 3;
-        if (IsSmallScreen)
-        {
-            temp = 3;
-        }
-        else if (IsNormalScreen)
-        {
-            temp = 6;
-        }
-        else if (IsLargeScreen)
-        {
-            temp = 2;
-        }
-        else
-        {
-            temp = 3;
-        }
-
-        if (temp != ItemNum)
-        {
-            ItemNum = temp;
-            StateHasChanged();
-        }
-    }
-    #endregion
     #region 新建标签页
     public async void OpenNewPage(string url)
     {
@@ -178,20 +93,5 @@
 
     }
 
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
-    {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-    }
-    #endregion
+  
 }

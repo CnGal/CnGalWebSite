@@ -1,0 +1,31 @@
+﻿@inject IDataCacheService _dataCacheService
+@using Microsoft.Extensions.Logging
+
+<ErrorHandler @ref="errorHandler">
+    <ErrorLogger ShowToast="false" OnErrorHandleAsync="OnErrorHandleAsync">
+        <CnGalWebSite.Shared.MasaComponent.Shared.StyleTip />
+        <CascadingValue Value=this>
+            @ChildContent
+        </CascadingValue>
+    </ErrorLogger>
+</ErrorHandler>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    ErrorHandler errorHandler;
+    public Task OnErrorHandleAsync(ILogger logger, Exception ex)
+    {
+        if (ex is OutOfMemoryException)
+        {
+            throw ex;
+        }
+        else
+        {
+            errorHandler.ProcessError(ex, "发生未经捕获的异常", "代码里有Bug");
+            return Task.CompletedTask;
+        }
+    }
+
+}

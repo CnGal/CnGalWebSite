@@ -1,12 +1,12 @@
 ﻿@page "/home/random"
 
 
-<TitleTip></TitleTip>
+<TitleTip Title="随机" Description="随机的词条与文章"></TitleTip>
 
 
-<div class="">
-    <div class="" style="padding-right: 0; padding-left: 0">
-        <EntryRandomListCardTip APIUrl="api/articles/GetRandomArticleListView" Title="文章" TitleIcon="fa fa-newspaper-o"  Type="articles" />
+<div>
+
+        <EntryRandomListCardTip APIUrl="api/articles/GetRandomArticleListView" Title="文章" TitleIcon="fa fa-newspaper-o"  Type="articles" IsFrist="true" />
 
         <EntryRandomListCardTip APIUrl="api/entries/GetRandomEntryListView/0" Title="游戏" TitleIcon="fa fa-gamepad"  />
 
@@ -16,7 +16,7 @@
 
         <EntryRandomListCardTip APIUrl="api/entries/GetRandomEntryListView/3" Title="STAFF" TitleIcon="fa fa-star" IsRole="true" />
 
-    </div>
+
 </div>
 
 @code {

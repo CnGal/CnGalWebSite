@@ -253,12 +253,19 @@ namespace CnGalWebSite.APIServer.Application.Home
 
         }
 
-        public async Task<List<Carousel>> GetHomeCarouselsViewAsync()
+        public async Task<List<CarouselViewModel>> GetHomeCarouselsViewAsync()
         {
-            var model = await _carouselRepository.GetAll().AsNoTracking().OrderByDescending(s => s.Priority).ToListAsync();
-            foreach (var item in model)
+            var carouses = await _carouselRepository.GetAll().AsNoTracking().OrderByDescending(s => s.Priority).ToListAsync();
+
+            var model = new List<CarouselViewModel>();
+            foreach (var item in carouses)
             {
-                item.Image = _appHelper.GetImagePath(item.Image, "");
+                model.Add(new CarouselViewModel
+                {
+                    Image = _appHelper.GetImagePath(item.Image, ""),
+                    Link = item.Link,
+                    Priority = item.Priority,
+                });
             }
 
             return model;

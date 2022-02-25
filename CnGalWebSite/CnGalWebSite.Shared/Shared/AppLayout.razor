@@ -1,0 +1,16 @@
+﻿@inherits LayoutComponentBase
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IDataCacheService _dataCacheService
+@inject IJSRuntime JS
+@inject IAuthService _authService
+
+<div class="" style="@(_dataCacheService.ThemeSetting.IsDark?"":"display: flex; min-height: calc(100vh); background-color: rgba(255,255,255,.7);")">
+    <CascadingValue Value="this" IsFixed="true">
+        @Body
+    </CascadingValue>
+</div>
+
+@code {
+
+}

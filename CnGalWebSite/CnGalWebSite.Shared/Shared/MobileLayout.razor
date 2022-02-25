@@ -11,11 +11,11 @@
 <ImagesLargeViewTip></ImagesLargeViewTip>
 @if (_dataCacheService.ThemeSetting.IsDark == false)
 {
-<style>
-    .bg-opacity {
-        background-color: transparent;
-    }
-</style>
+    <style>
+        .bg-opacity {
+            background-color: transparent;
+        }
+    </style>
 }
 
 <div class="" style="@(_dataCacheService.ThemeSetting.IsDark?"":"display: flex; min-height: calc(100vh); background-color: rgba(255,255,255,.7);")">

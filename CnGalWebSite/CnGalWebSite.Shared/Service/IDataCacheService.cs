@@ -20,7 +20,9 @@ namespace CnGalWebSite.Shared.Service
 {
     public interface IDataCacheService
     {
-        bool? IsApp { get; set; }
+        bool IsApp { get; set; }
+
+        bool IsMasa { get; set; }
 
         EventCallback RefreshApp { get; set; }
 
