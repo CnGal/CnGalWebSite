@@ -21,7 +21,6 @@
     .layout.is-page.@colorString .layout-drawer:hover {
         background-color: var(--hover-color);
     }
-
 </style>
 
 @if (_dataCacheService.ThemeSetting.IsDark)
@@ -56,6 +55,9 @@ else
         #__vconsole .vc-switch {
             margin-right: 20px;
             box-shadow: 0 0.5rem 1rem rgb(255, 255, 255, 15%) !important;
+        }
+        .m-application a {
+            color: var(--main-color);
         }
     </style>
 
@@ -132,8 +134,8 @@ else
 }
 
 @code {
-    public string colorMain = "#D979A2";
-    public string colorHover = "#C6447E";
+    public string colorMain = "#f48fb1";
+    public string colorHover = "#D979A2";
     public string colorActive = "#CC578C";
     public string colorString = "color3";
 
@@ -193,8 +195,8 @@ else
                 colorActive = "#1E8650";
                 break;
             case "color3":
-                colorMain = "#D979A2";
-                colorHover = "#C6447E";
+                colorMain = "#f48fb1";
+                colorHover = "#D979A2";
                 colorActive = "#CC578C";
                 break;
             case "color4":

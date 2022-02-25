@@ -809,12 +809,12 @@
 }
 
 .a-font-color {
-    color: var(--bs-body-color);
+    color: var(--bs-body-color) !important;
 }
 
-    .a-font-color:hover {
-        color: var(--bs-body-color);
-    }
+.a-font-color:hover {
+    color: var(--bs-body-color) !important;
+}
 .home-card-name-text {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -976,15 +976,15 @@
 }
 /*页脚*/
 .load-footer a:hover {
-    color: var(--hover-color);
+    color: var(--hover-color)!important;
 }
 
 .load-footer a {
-    color: gray;
+    color: gray!important;
 }
 
 .pointer{
-    cursor:pointer;
+    cursor:pointer!important;
 }
 
 .ContributionCalendar-day {
