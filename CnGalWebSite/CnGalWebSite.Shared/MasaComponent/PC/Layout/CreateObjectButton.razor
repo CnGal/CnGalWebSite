@@ -1,9 +1,11 @@
 ﻿<AuthorizeView>
     <Authorized>
-        <CnGalWebSite.Shared.MasaComponent.Shared.MasaButton Icon="mdi-plus" Class="mr-6" Tooltip="创建" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.MasaButton Icon="mdi-plus" Class="@Class" Tooltip="创建" />
     </Authorized>
 </AuthorizeView>
 
 @code {
+    [Parameter]
+    public string Class { get; set; }
 
 }
