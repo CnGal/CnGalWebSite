@@ -16,7 +16,7 @@
                         c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     }
                     <MButton Icon Color="pink lighten-3" Class="@Class" @attributes="@attrs">
-                        <img style="width:50px;border-radius:50%;" src="@_dataCacheService.UserInfor.PhotoPath" alt="@_dataCacheService.UserInfor.UserName" />
+                        <img style="width:35px;border-radius:50%;" src="@_dataCacheService.UserInfor.PhotoPath" alt="@_dataCacheService.UserInfor.UserName" />
                     </MButton>
                 </ActivatorContent>
                 <ChildContent>
@@ -26,36 +26,9 @@
         </ActivatorContent>
 
         <ChildContent>
-            <MList Dense Width="300">
-                <MSubheader>REPORTS</MSubheader>
-                <MListItemGroup @bind-Value="_selectedItem"
-                                Color="primary">
-                    <MListItem>
-                        <MListItemIcon>
-                            <MIcon>mdi-clock</MIcon>
-                        </MListItemIcon>
-                        <MListItemContent>
-                            <MListItemTitle>Real-Time</MListItemTitle>
-                        </MListItemContent>
-                    </MListItem>
-                    <MListItem>
-                        <MListItemIcon>
-                            <MIcon>mdi-account</MIcon>
-                        </MListItemIcon>
-                        <MListItemContent>
-                            <MListItemTitle>Audience</MListItemTitle>
-                        </MListItemContent>
-                    </MListItem>
-                    <MListItem>
-                        <MListItemIcon>
-                            <MIcon>mdi-flag</MIcon>
-                        </MListItemIcon>
-                        <MListItemContent>
-                            <MListItemTitle>Conversions</MListItemTitle>
-                        </MListItemContent>
-                    </MListItem>
-                </MListItemGroup>
-            </MList>
+          <div style="width:300px;">
+              <UserInforCard Model="@_dataCacheService.UserInfor"/>
+          </div>
         </ChildContent>
     </MMenu>
 }
@@ -67,7 +40,7 @@
 
     [Parameter]
     public string Class { get; set; }
-    private StringNumber _selectedItem = 1;
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

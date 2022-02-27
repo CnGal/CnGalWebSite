@@ -79,8 +79,10 @@ namespace CnGalWebSite.APIServer.Controllers
             var user_ = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
             var user = await _userRepository.GetAll().AsNoTracking().Where(s => s.Id == id)
+                .Include(s=>s.SignInDays)
                 .Select(s => new ApplicationUser
                 {
+                    SignInDays = s.SignInDays,
                     Id = s.Id,
                     BackgroundImage = s.BackgroundImage,
                     PhotoPath = s.PhotoPath,
@@ -111,6 +113,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     await _userService.UpdateUserData(user, examine1);
                 }
             }
+
             var model = new UserInforViewModel
             {
                 Id = user.Id,
@@ -124,7 +127,30 @@ namespace CnGalWebSite.APIServer.Controllers
                 ArticleCount = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id),
                 FavoriteCount = await _favoriteObjectRepository.GetAll().Include(s => s.FavoriteFolder).CountAsync(s => s.FavoriteFolder.ApplicationUserId == user.Id)
             };
-
+            //计算连续签到天数和今天是否签到
+            model.IsSignIn = false;
+            model.SignInDays = 0;
+            if (user.SignInDays != null)
+            {
+                if (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().Date))
+                {
+                    model.IsSignIn = true;
+                    while (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().AddDays(-model.SignInDays).Date))
+                    {
+                        model.SignInDays++;
+                    }
+                }
+                else
+                {
+                    if (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().Date.AddDays(-1)))
+                    {
+                        while (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().AddDays(-model.SignInDays - 1).Date))
+                        {
+                            model.SignInDays++;
+                        }
+                    }
+                }
+            }
             return model;
 
         }

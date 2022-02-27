@@ -1,13 +1,20 @@
-﻿<AuthorizeView>
+﻿@inject NavigationManager NavigationManager
+
+<AuthorizeView>
     <Authorized>
         <CreateObjectButton Class="mr-6"/>
         <UserButton Class="me-4"/>
     </Authorized>
     <NotAuthorized>
-        <CnGalWebSite.Shared.MasaComponent.Shared.MasaButton Icon="mdi-login" Class="mr-6" Tooltip="登入"/>
+        <CnGalWebSite.Shared.MasaComponent.Shared.MasaButton Icon="mdi-login" Class="mr-6" Tooltip="登入" OnClick="OnClickLogin"/>
         <CnGalWebSite.Shared.MasaComponent.Shared.MasaButton Icon="mdi-cog" Class="me-4" Tooltip="设置" />
     </NotAuthorized>
 </AuthorizeView>
 @code {
+    private async void OnClickLogin()
+    {
 
+        NavigationManager.NavigateTo("/account/login");
+
+    }
 }

@@ -1,0 +1,52 @@
+﻿@inject NavigationManager NavigationManager
+
+<div class="bg-white d-flex p-3" style="flex-direction: column; align-items: center; ">
+    <div class="d-flex" style="align-items: center; flex-direction: column; ">
+        <img src="@Model.PhotoPath" alt="@Model.UserName" style="width:60px;border-radius:50%;" />
+        <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
+            <span class="h6 fw-bold">@Model.UserName</span>
+            <span>
+                <i class="fa fa-diamond fa-fw"></i>
+                <span>积分：@Model.Integral</span>
+                <i class="fa fa-magic fa-fw ms-3"></i>
+                <span>Lv @ToolHelper.GetUserLevel(Model.Integral)</span>
+            </span>
+        </div>
+    </div>
+    <MDivider Class="w-100"></MDivider>
+    <div >
+        <SignInButton Model="Model" />
+        <MButton Text Class="w-100" Color="pink lighten-3" OnClick="OnClickUserSpace">
+            <MIcon Left>mdi-star</MIcon>
+            个人空间
+        </MButton>
+        <MButton Text Class="w-100" Color="pink lighten-3">
+            <MIcon Left>mdi-cog</MIcon>
+            主题设置
+        </MButton>
+        <MButton Text Class="w-100" Color="pink lighten-3" OnClick="OnClickLogout">
+            <MIcon Left>mdi-logout</MIcon>
+            退出登入
+        </MButton>
+
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public UserInforViewModel Model { get; set; } = new UserInforViewModel();
+
+    private async void OnClickUserSpace()
+    {
+
+        NavigationManager.NavigateTo("/space/index/" + Model.Id);
+
+    }
+    private async void OnClickLogout()
+    {
+
+        NavigationManager.NavigateTo("/account/logout");
+
+    }
+}
