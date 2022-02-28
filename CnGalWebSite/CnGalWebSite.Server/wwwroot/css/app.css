@@ -986,3 +986,11 @@
 .pointer{
     cursor:pointer!important;
 }
+
+.login-h1-text{  
+    font-family: Roboto !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+    font-size: 1.5rem !important;
+    line-height: 2.25rem !important;
+}

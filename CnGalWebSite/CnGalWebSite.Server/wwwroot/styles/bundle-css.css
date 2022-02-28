@@ -987,6 +987,14 @@
     cursor:pointer!important;
 }
 
+.login-h1-text{  
+    font-family: Roboto !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+    font-size: 1.5rem !important;
+    line-height: 2.25rem !important;
+}
+
 .ContributionCalendar-day {
     margin: 0.15rem;
     height: 0.7rem;

@@ -11,127 +11,128 @@
 @inject IDataCacheService _dataCacheService
 
 <TitleTip Title="绑定手机"></TitleTip>
-<CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight/>
-
-
-<div class=" p-3">
-    @if (isReady == false)
-    {
-        <h1 class="h4 mb-4 text-center">请输入要绑定的手机号码</h1>
-        <div  class="form-group col-12  mb-0">
-
-            <div class="row">
-                <div class="form-group col-12  col-sm-12">
-                    <BootstrapInput @bind-Value="Model.Phone" DisplayText="手机号码" ShowLabel="true"/>
-                </div>
-                <div class="form-group col-12">
-                    <Button Color="Color.Dark"  IsAsync="true" style="width:100%" OnClick="GetPhone">确定</Button>
-                </div>
-
-            </div>
-        </div>
-    }
-    else
-    {
-        <h1 class="h4 mb-3 text-center">验证手机号码</h1>
-        <p class="mb-4">我们已经向<strong>@(Model.Phone)</strong>发送了一封验证短信，请在下方填写其中的验证码。</p>
-        <div   class="form-group col-12 mt-4  mb-0">
-
-            <div class="row">
-                <div class="form-group col-12">
-                    <div id="captcha-box"></div>
-                </div>
-                <div class="form-group col">
-                    <BootstrapInput @bind-Value="AfterModel.NumToken" ShowLabel="true"/>
-                </div>
-
-                <div class="form-group col-auto" style=" display: flex; align-items: flex-end;">
-                    <PostVerificationCodeTip Email="@Model.Phone" LoginKey="@_dataCacheService.LoginKey" SmsType="DataModel.Models.SMSType.Register"></PostVerificationCodeTip>
-                </div>
-                <div class="form-group col-12">
-                    <Button Color="Color.Dark"  IsAsync="true" style="width:100%" OnClick="ConfirmNumToken">验证</Button>
-                </div>
-
-            </div>
-        </div>
-    }
-
-</div>
-
-@code {
-    [Parameter]
-    public string returnURL { get; set; }
-
-    private AddPhoneNumberModel Model = new AddPhoneNumberModel();
-
-    private ConfirmAddPhoneNumberModel AfterModel = new ConfirmAddPhoneNumberModel();
-    bool IsConfirmed = false;
-    bool isReady = false;
-
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
-
-
-    private async Task GetPhone()
-    {
-        if (string.IsNullOrWhiteSpace(Model.Phone))
+<CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+    <div class=" p-3">
+        @if (isReady == false)
         {
-            await ToastService.Error("请输入手机号码", "请输入手机号码");
-            return;
+            <h1 class=" login-h1-text mb-4 text-center">请输入要绑定的手机号码</h1>
+            <div class="form-group col-12  mb-0">
+
+                <div class="row">
+                    <div class="form-group col-12  col-sm-12">
+                        <BootstrapInput @bind-Value="Model.Phone" DisplayText="手机号码" ShowLabel="true" />
+                    </div>
+                    <div class="form-group col-12">
+                        <Button Color="Color.Dark" IsAsync="true" style="width:100%" OnClick="GetPhone">确定</Button>
+                    </div>
+
+                </div>
+            </div>
         }
-        try
+        else
         {
-            Model.LoginToken = _dataCacheService.LoginKey;
+            <h1 class=" login-h1-text mb-3 text-center">验证手机号码</h1>
+            <p class="mb-4">我们已经向<strong>@(Model.Phone)</strong>发送了一封验证短信，请在下方填写其中的验证码。</p>
+            <div class="form-group col-12 mt-4  mb-0">
 
-            var result = await Http.PostAsJsonAsync<AddPhoneNumberModel>(ToolHelper.WebApiPath + "api/account/AddPhoneNumber", Model);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-            //判断结果
-            if (obj.Successful == false)
+                <div class="row">
+                    <div class="form-group col-12">
+                        <div id="captcha-box"></div>
+                    </div>
+                    <div class="form-group col">
+                        <BootstrapInput @bind-Value="AfterModel.NumToken" ShowLabel="true" />
+                    </div>
+
+                    <div class="form-group col-auto" style=" display: flex; align-items: flex-end;">
+                        <PostVerificationCodeTip Email="@Model.Phone" LoginKey="@_dataCacheService.LoginKey" SmsType="DataModel.Models.SMSType.Register"></PostVerificationCodeTip>
+                    </div>
+                    <div class="form-group col-12">
+                        <Button Color="Color.Dark" IsAsync="true" style="width:100%" OnClick="ConfirmNumToken">验证</Button>
+                    </div>
+
+                </div>
+            </div>
+        }
+
+    </div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+
+   
+
+    @code {
+        [Parameter]
+        public string returnURL { get; set; }
+
+        private AddPhoneNumberModel Model = new AddPhoneNumberModel();
+
+        private ConfirmAddPhoneNumberModel AfterModel = new ConfirmAddPhoneNumberModel();
+        bool IsConfirmed = false;
+        bool isReady = false;
+
+        [CascadingParameter]
+        public ErrorHandler ErrorHandler { get; set; }
+
+
+        private async Task GetPhone()
+        {
+            if (string.IsNullOrWhiteSpace(Model.Phone))
             {
-                await ToastService.Error("获取验证码失败", obj.Error);
+                await ToastService.Error("请输入手机号码", "请输入手机号码");
                 return;
             }
-            else
+            try
             {
-                isReady = true;
-                StateHasChanged();
+                Model.LoginToken = _dataCacheService.LoginKey;
+
+                var result = await Http.PostAsJsonAsync<AddPhoneNumberModel>(ToolHelper.WebApiPath + "api/account/AddPhoneNumber", Model);
+                string jsonContent = result.Content.ReadAsStringAsync().Result;
+                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                //判断结果
+                if (obj.Successful == false)
+                {
+                    await ToastService.Error("获取验证码失败", obj.Error);
+                    return;
+                }
+                else
+                {
+                    isReady = true;
+                    StateHasChanged();
+                }
             }
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取手机验证码失败","手机号无效");
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取手机验证码失败", "手机号无效");
+            }
+
         }
 
+
+        private async Task ConfirmNumToken()
+        {
+            try
+            {
+                AfterModel.LoginToken = Model.LoginToken;
+                AfterModel.Phone = Model.Phone;
+
+                var result = await Http.PostAsJsonAsync<ConfirmAddPhoneNumberModel>(ToolHelper.WebApiPath + "api/account/ConfirmAddPhoneNumber", AfterModel);
+                string jsonContent = result.Content.ReadAsStringAsync().Result;
+                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                //判断结果
+                if (obj.Successful == false)
+                {
+                    await ToastService.Error("绑定手机号码失败", obj.Error);
+                    return;
+                }
+                else
+                {
+                    await ToastService.Success("绑定手机号码成功", "绑定手机号码成功，正在跳转");
+
+                    NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(returnURL) ? "/" : ToolHelper.Base64DecodeUrl(returnURL));
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "绑定手机号码失败");
+            }
+        }
     }
-
-
-    private async Task ConfirmNumToken()
-    {
-        try
-        {
-            AfterModel.LoginToken = Model.LoginToken;
-            AfterModel.Phone = Model.Phone;
-
-            var result = await Http.PostAsJsonAsync<ConfirmAddPhoneNumberModel>(ToolHelper.WebApiPath + "api/account/ConfirmAddPhoneNumber", AfterModel);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("绑定手机号码失败", obj.Error);
-                return;
-            }
-            else
-            {
-                await ToastService.Success("绑定手机号码成功", "绑定手机号码成功，正在跳转");
-
-                NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(returnURL) ? "/" : ToolHelper.Base64DecodeUrl(returnURL));
-            }
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "绑定手机号码失败");
-        }
-    }
-}

@@ -14,52 +14,61 @@
 @inject IAppHelper? _appHelper
 
 <TitleTip Title="登入"></TitleTip>
-<CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
 
-@if (isReady)
-{
-    @if (isOnRedirecting)
+<CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+    @if (isReady)
     {
-        <AccountWaitingTip Title="正在重定向" Subtitle="我们正在重定向到第三方登入页面，若长时间无响应，请尝试刷新页面"></AccountWaitingTip>
-    }
-    else
-    {
-        <div class=" p-3">
-            <h1 class="mb-4 text-center h4">欢迎，请登入</h1>
-            <div  class="form-group col-12 mt-4  mb-0">
-                <div class="row">
+        @if (isOnRedirecting)
+        {
+            <AccountWaitingTip Title="正在重定向" Subtitle="我们正在重定向到第三方登入页面，若长时间无响应，请尝试刷新页面"></AccountWaitingTip>
+        }
+        else
+        {
+            <div class=" p-3">
+                <h1 class="mb-4 text-center login-h1-text">欢迎来到CnGal资料站</h1>
 
-                    <div class="form-group col-12  col-sm-12">
-                        <BootstrapInput @bind-Value="Model.UserName" PlaceHolder="推荐使用邮箱登入" ShowLabel="true"/>
-                    </div>
-                    <div class="form-group col-12">
-                        <BootstrapInput @bind-Value="Model.Password" PlaceHolder="请输入密码" type="password"  ShowLabel="true"/>
-                    </div>
-                    <div class="form-group col-12">
-                        <a style="float:right" href="/account/forgetpassword">忘记密码</a>
+                <div>
+                    <div>
+                        <MTextField  Label="用户名或邮箱" Color="pink lighten-3"
+                                    @bind-Value="Model.UserName"></MTextField>
 
-                        <div style="display:flex">
-                            <Checkbox @bind-Value="Model.RememberMe" ShowAfterLabel="true" ShowLabel="false"></Checkbox>&nbsp;记住我
-                        </div>
                     </div>
-                    <div class="form-group col-12">
+                    <div>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPasswordInput Label="密码"
+                                                                                               @bind-Value="Model.Password" />
+
+                    </div>
+
+                    <div class="mb-8" style="display: flex; justify-content: space-between; align-items: flex-end;">
+
+                        <MCheckbox @bind-Value="Model.RememberMe"
+                                   Label="记住我" Class="m-0"
+                                   HideDetails="true"
+                                   Color="pink lighten-3"></MCheckbox>
+                        <a href="/account/forgetpassword">忘记密码？</a>
+
+                    </div>
+                    <div>
                         <div id="captcha-box"></div>
                     </div>
-                    <div class="form-group col-6">
-                        <Button Color="Color.Dark" IsOutline="true" style="width:100%" @onclick="@(()=>OnRegister())">注册</Button>
+
+                    <div class="mb-4">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入" IsAsync="true" OnClick="HandleLogin" Class="w-100" Rounded Depressed />
                     </div>
-                    <div class="form-group col-6">
-                        <Button Color="Color.Dark" IsAsync="true" style="width:100%" OnClick="HandleLogin">登录</Button>
-                    </div>
+
+                    <span class="mb-4 d-flex" style="justify-content: center; ">
+                        还没有账号？ <a style="float:right" href="/account/register">立即注册</a>
+                    </span>
                     @if (_dataCacheService.IsOnThirdPartyLogin)
                     {
                         <ThirdPartyLoginButtonListView ReturnUrl="@ReturnUrl" OnRedirecting="OnRedirecting"></ThirdPartyLoginButtonListView>
                     }
                 </div>
             </div>
-        </div>
+        }
     }
-}
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
 
 @code {
     [Parameter]
@@ -174,7 +183,7 @@
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ErrorHandler.ProcessError(ex, "尝试跳转客户端模式失败");
             }

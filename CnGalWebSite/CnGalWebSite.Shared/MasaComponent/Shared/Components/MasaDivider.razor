@@ -1,0 +1,24 @@
+﻿@if (string.IsNullOrWhiteSpace(Text))
+{
+    <MDivider />
+}
+else
+{
+    <div class="row">
+        <div class="col">
+            <MDivider />
+
+        </div>
+        <div class="col-auto d-flex" style=" align-items: center;color:gray;">
+            <span>@Text</span>
+        </div>
+        <div class="col">
+            <MDivider />
+
+        </div>
+    </div>
+}
+@code {
+    [Parameter]
+    public string Text { get; set; }
+}

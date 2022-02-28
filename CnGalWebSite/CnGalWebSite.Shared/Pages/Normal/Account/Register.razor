@@ -11,39 +11,44 @@
 
 
 <TitleTip Title="注册"></TitleTip>
-<CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
+<CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
 
-
-
-<div class="p-3">
-    <h1 class="h4 mb-4 text-center">注册新用户</h1>
-    <div  class="form-group col-12 mt-4  mb-0">
-
-        <div class="row">
-            <div class="form-group col-12  col-sm-12">
-                <BootstrapInput @bind-Value="Model.Email" type="email" ShowLabel="true"/>
+    <div class="p-3">
+        <h1 class="login-h1-text mb-4 text-center">欢迎来到CnGal资料站</h1>
+        <div>
+            <div>
+                <MTextField @bind-Value="Model.Email"
+                            Color="pink lighten-3"
+                            Label="电子邮件"></MTextField>
             </div>
-            <div class="form-group col-12  col-sm-12">
-                <BootstrapInput @bind-Value="Model.Name" ShowLabel="true"/>
+            <div>
+                <MTextField Dense Label="用户名" Color="pink lighten-3"
+                            @bind-Value="Model.Name"></MTextField>
             </div>
-            <div class="form-group col-12">
-                <BootstrapInput @bind-Value="Model.Password" type="password" ShowLabel="true"/>
+            <div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPasswordInput Placeholder="请输入密码" Label="密码"
+                                                                                       @bind-Value="Model.Password" />
             </div>
-            <div class="form-group col-12">
-                <BootstrapInput @bind-Value="Model.ConfirmPassword" type="password" ShowLabel="true"/>
+            <div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPasswordInput Placeholder="请输入密码" Label="确认密码"
+                                                                                       @bind-Value="Model.ConfirmPassword" />
             </div>
-            <div class="form-group col-12">
+            <div class="mb-4">
                 <a href="/articles/index/225">CnGal资料站隐私协议</a>
             </div>
-            <div class="form-group col-6">
-                <Button Color="Color.Dark"  IsOutline="true" style="width:100%" @onclick="@(()=>OnLogin())">登录</Button>
+            <div class="mb-4">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="注册" IsAsync="true" OnClick="HandleRegistration" Class="w-100" Rounded Depressed />
             </div>
-            <div class="form-group col-6">
-                <Button Color="Color.Dark"  IsAsync="true" style="width:100%" OnClick="HandleRegistration">注册</Button>
-            </div>
+
+            <span class=" d-flex" style="justify-content: center; ">
+                已经有账号了？ <a style="float:right" href="/account/login">立即登入</a>
+            </span>
         </div>
     </div>
-</div>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+
+
 
 @code {
     [Parameter]
@@ -129,11 +134,11 @@
             if (result.Successful)
             {
                 _dataCacheService.UserName = Model.Name;
-                NavigationManager.NavigateTo(Provider,"/account/ConfirmEmailRegister/" + ReturnUrl, "验证邮箱", "fa-at");
+                NavigationManager.NavigateTo(Provider, "/account/ConfirmEmailRegister/" + ReturnUrl, "验证邮箱", "fa-at");
             }
             else
             {
-                await ToastService.Error("注册失败","参数错误 "+ result.Error);
+                await ToastService.Error("注册失败", "参数错误 " + result.Error);
                 isSuccess = false;
             }
         }
@@ -156,7 +161,7 @@
     {
         try
         {
-            NavigationManager.NavigateTo(Provider,"/account/login/" + ReturnUrl, "登入", "fa fa-sign-in");
+            NavigationManager.NavigateTo(Provider, "/account/login/" + ReturnUrl, "登入", "fa fa-sign-in");
         }
         catch
         {

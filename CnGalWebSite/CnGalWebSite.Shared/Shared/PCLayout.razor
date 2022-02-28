@@ -8,21 +8,20 @@
     <MAppBar App Color="white">
         <MToolbarTitle>
             <div style="width:300px;" class="ms-4">
-                <CnGalWebSite.Shared.MasaComponent.Shared.LogoTip />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip />
             </div>
         </MToolbarTitle>
         <MTabs Color="pink lighten-3">
-            <MTab>首页</MTab>
-            <MTab>随机</MTab>
-            <MTab>词条</MTab>
-            <MTab>文章</MTab>
+            <MTab OnClick="OnNavHomeClick">首页</MTab>
+            <MTab OnClick="OnNavEntryClick">词条</MTab>
+            <MTab OnClick="OnNavArticleClick">文章</MTab>
             <MTab>广场</MTab>
         </MTabs>
         <MSpacer></MSpacer>
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.MasaButton Icon="mdi-magnify" Class="mr-6" Tooltip="搜索" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="mdi-magnify" Class="mr-6" Tooltip="搜索" />
 
-        <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton/>
+        <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
     </MAppBar>
 
     <MMain>
@@ -30,15 +29,31 @@
             <div class="mt-3">
                 @Body
             </div>
-           
+
         </MContainer>
     </MMain>
 
     <MFooter App Padless Absolute Color="white">
-        <CnGalWebSite.Shared.MasaComponent.Shared.MainFooterTip />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.MainFooterTip />
     </MFooter>
 </MApp>
 
 @code {
+    public Task OnNavHomeClick()
+    {
+        NavigationManager.NavigateTo("/");
+        return Task.CompletedTask;
+    }
 
+    public Task OnNavEntryClick()
+    {
+        NavigationManager.NavigateTo("/entries/home");
+        return Task.CompletedTask;
+    }
+
+    public Task OnNavArticleClick()
+    {
+        NavigationManager.NavigateTo("/articles/home");
+        return Task.CompletedTask;
+    }
 }

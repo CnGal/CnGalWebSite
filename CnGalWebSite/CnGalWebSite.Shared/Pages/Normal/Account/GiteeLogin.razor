@@ -4,14 +4,16 @@
 
 
 <TitleTip></TitleTip>
-<CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
+<CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+    @if (_dataCacheService.IsApp == false)
+    {
+        <ThirdPartyLoginTip Code="@Code" ReturnUrl="@State" Type="type"></ThirdPartyLoginTip>
+
+    }
+</CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
 
 
-@if (_dataCacheService.IsApp == false)
-{
-    <ThirdPartyLoginTip Code="@Code" ReturnUrl="@State" Type="type"></ThirdPartyLoginTip>
 
-}
 
 
 @code {

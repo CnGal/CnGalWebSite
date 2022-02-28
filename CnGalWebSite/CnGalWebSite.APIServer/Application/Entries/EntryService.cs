@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using CnGalWebSite.Helper.Extensions;
 
 namespace CnGalWebSite.APIServer.Application.Entries
 {

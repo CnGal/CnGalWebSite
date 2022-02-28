@@ -47,7 +47,7 @@
     <PackageReference Include="BootstrapBlazor.Markdown" Version="6.0.0" />
     <PackageReference Include="BootstrapBlazor.TableExport" Version="6.0.0" />
     <PackageReference Include="Chronos.Blazor.Cropper" Version="1.2.0" />
-    <PackageReference Include="Masa.Blazor" Version="0.2.10649" />
+    <PackageReference Include="Masa.Blazor" Version="0.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.2" />
   </ItemGroup>
 
