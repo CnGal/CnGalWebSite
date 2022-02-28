@@ -2,9 +2,9 @@
 
 <div class="bg-white d-flex p-3" style="flex-direction: column; align-items: center; ">
     <div class="d-flex" style="align-items: center; flex-direction: column; ">
-        <img src="@Model.PhotoPath" alt="@Model.UserName" style="width:60px;border-radius:50%;" />
+        <img src="@Model.PhotoPath" alt="@Model.Name" style="width:60px;border-radius:50%;" />
         <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
-            <span class="h6 fw-bold">@Model.UserName</span>
+            <span class="h6 fw-bold">@Model.Name</span>
             <span>
                 <i class="fa fa-diamond fa-fw"></i>
                 <span>积分：@Model.Integral</span>
@@ -36,17 +36,21 @@
 @code {
     [Parameter]
     public UserInforViewModel Model { get; set; } = new UserInforViewModel();
+    [Parameter]
+    public EventCallback OnClosed { get; set; }
 
-    private async void OnClickUserSpace()
+    private async Task OnClickUserSpace()
     {
 
         NavigationManager.NavigateTo("/space/index/" + Model.Id);
+        await OnClosed.InvokeAsync();
 
     }
-    private async void OnClickLogout()
+    private async Task OnClickLogout()
     {
 
         NavigationManager.NavigateTo("/account/logout");
+        await OnClosed.InvokeAsync();
 
     }
 }

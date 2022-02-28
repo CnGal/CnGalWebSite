@@ -1,11 +1,11 @@
 ﻿@implements IAsyncDisposable
 
 <div class="mb-2">
-    <img src="@Model.BackgroundImage" alt="@Model.UserName" class="w-100" />
+    <img src="@Model.BackgroundImage" alt="@Model.Name" class="w-100" />
     <div class="ms-3 me-3" style="display: flex; flex-direction: column; align-items: center; @("margin-top:-"+(ScreenLength/2).ToString()+"px")">
-        <img src="@Model.PhotoPath" alt="@Model.UserName" style="@("width:"+ScreenLength+"px;height:"+ScreenLength+"px;") border-radius:50%" />
+        <img src="@Model.PhotoPath" alt="@Model.Name" style="@("width:"+ScreenLength+"px;height:"+ScreenLength+"px;") border-radius:50%" />
 
-        <div class="text-center mt-3" style="font-size:17px">@Model.UserName</div>
+        <div class="text-center mt-3" style="font-size:17px">@Model.Name</div>
         <div  class="text-center mt-2" style="color:gray;">@Model.PersonalSignature</div>
     </div>
 </div>

@@ -1,4 +1,6 @@
 ﻿using BootstrapBlazor.Components;
+using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Users.Dtos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
@@ -7,6 +9,9 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Space;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -28,12 +33,17 @@ namespace CnGalWebSite.APIServer.Application.Users
         private readonly IRepository<UserIntegral, string> _userIntegralRepository;
         private readonly IRepository<ThirdPartyLoginInfor, long> _thirdPartyLoginInforRepository;
         private readonly IRepository<Examine, long> _examineRepository;
+        private readonly IRepository<Article, long> _articleRepository;
+        private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly IAppHelper _appHelper;
+        private readonly IRankService _rankService;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<ApplicationUser>, string, SortOrder, IEnumerable<ApplicationUser>>> SortLambdaCacheApplicationUser = new();
+
         public UserService(IRepository<ApplicationUser, string> userRepository, IConfiguration configuration, IHttpClientFactory clientFactory, IRepository<ThirdPartyLoginInfor, long> thirdPartyLoginInforRepository,
-            IRepository<Examine, long> examineRepository, IRepository<UserIntegral, string> userIntegralRepository)
+            IRepository<Examine, long> examineRepository, IRepository<UserIntegral, string> userIntegralRepository, IAppHelper appHelper, IRankService rankService, IRepository<Article, long> articleRepository, IRepository<FavoriteObject, long> favoriteObjectRepository)
         {
             _userRepository = userRepository;
             _configuration = configuration;
@@ -41,6 +51,10 @@ namespace CnGalWebSite.APIServer.Application.Users
             _thirdPartyLoginInforRepository = thirdPartyLoginInforRepository;
             _examineRepository = examineRepository;
             _userIntegralRepository = userIntegralRepository;
+            _appHelper = appHelper;
+            _rankService = rankService;
+            _articleRepository = articleRepository;
+            _favoriteObjectRepository = favoriteObjectRepository;
         }
 
         public async Task<PagedResultDto<ApplicationUser>> GetPaginatedResult(GetUserInput input)
@@ -647,11 +661,6 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         }
 
-        public int GetUserLevel(ApplicationUser user)
-        {
-            return ToolHelper.GetUserLevel(user.DisplayIntegral);
-        }
-
         public async Task<UserEditInforBindModel> GetUserEditInforBindModel(ApplicationUser user)
         {
             var model = new UserEditInforBindModel
@@ -716,6 +725,49 @@ namespace CnGalWebSite.APIServer.Application.Users
                 Note = model.Note,
                 Type = model.Type,
             });
+        }
+
+        public async Task<UserInforViewModel> GetUserInforViewModel(ApplicationUser user)
+        {
+            var model = new UserInforViewModel
+            {
+                Id = user.Id,
+                PersonalSignature = user.PersonalSignature,
+                Name = user.UserName,
+                PhotoPath = _appHelper.GetImagePath(user.PhotoPath, "user.png"),
+                BackgroundImage = _appHelper.GetImagePath(user.BackgroundImage, "userbackground.jpg"),
+                Ranks = await _rankService.GetUserRanks(user),
+                Integral = user.DisplayIntegral,
+                EditCount = await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true),
+                ArticleCount = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id),
+                FavoriteCount = await _favoriteObjectRepository.GetAll().Include(s => s.FavoriteFolder).CountAsync(s => s.FavoriteFolder.ApplicationUserId == user.Id)
+            };
+            //计算连续签到天数和今天是否签到
+            model.IsSignIn = false;
+            model.SignInDays = 0;
+            if (user.SignInDays != null)
+            {
+                if (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().Date))
+                {
+                    model.IsSignIn = true;
+                    while (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().AddDays(-model.SignInDays).Date))
+                    {
+                        model.SignInDays++;
+                    }
+                }
+                else
+                {
+                    if (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().Date.AddDays(-1)))
+                    {
+                        while (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().AddDays(-model.SignInDays - 1).Date))
+                        {
+                            model.SignInDays++;
+                        }
+                    }
+                }
+            }
+            return model;
+
         }
 
     }

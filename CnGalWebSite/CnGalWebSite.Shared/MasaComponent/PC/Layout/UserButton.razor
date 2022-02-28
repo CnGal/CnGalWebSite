@@ -6,7 +6,7 @@
 
 @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor.PhotoPath) == false)
 {
-    <MMenu OffsetY CloseOnContentClick="false">
+    <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
         <ActivatorContent Context="m">
             <MTooltip Bottom>
                 <ActivatorContent Context="c">
@@ -16,31 +16,33 @@
                         c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     }
                     <MButton Icon Color="pink lighten-3" Class="@Class" @attributes="@attrs">
-                        <img style="width:35px;border-radius:50%;" src="@_dataCacheService.UserInfor.PhotoPath" alt="@_dataCacheService.UserInfor.UserName" />
+                        <img style="width:35px;border-radius:50%;" src="@_dataCacheService.UserInfor.PhotoPath" alt="@_dataCacheService.UserInfor.Name" />
                     </MButton>
                 </ActivatorContent>
                 <ChildContent>
-                    <span>@_dataCacheService.UserInfor.UserName</span>
+                    <span>@_dataCacheService.UserInfor.Name</span>
                 </ChildContent>
             </MTooltip>
         </ActivatorContent>
 
         <ChildContent>
           <div style="width:300px;">
-              <UserInforCard Model="@_dataCacheService.UserInfor"/>
+              <UserInforCard Model="@_dataCacheService.UserInfor" OnClosed="OnClosed"/>
           </div>
         </ChildContent>
     </MMenu>
 }
 @code {
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
 
     [Parameter]
     public string Class { get; set; }
 
+    private bool menu { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -86,5 +88,12 @@
                 await ToastService.Error("获取用户信息失败", "未知错误，请在确保网络正常后联系开发人员");
             }
         }
+    }
+
+    public Task OnClosed()
+    {
+        menu = false;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
 }

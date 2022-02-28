@@ -112,47 +112,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     await _userService.UpdateUserData(user, examine1);
                 }
-            }
-
-            var model = new UserInforViewModel
-            {
-                Id = user.Id,
-                PersonalSignature = user.PersonalSignature,
-                UserName = user.UserName,
-                PhotoPath = _appHelper.GetImagePath(user.PhotoPath, "user.png"),
-                BackgroundImage = _appHelper.GetImagePath(user.BackgroundImage, "userbackground.jpg"),
-                Ranks = await _rankService.GetUserRanks(user),
-                Integral = user.DisplayIntegral,
-                EditCount = await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true),
-                ArticleCount = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id),
-                FavoriteCount = await _favoriteObjectRepository.GetAll().Include(s => s.FavoriteFolder).CountAsync(s => s.FavoriteFolder.ApplicationUserId == user.Id)
-            };
-            //计算连续签到天数和今天是否签到
-            model.IsSignIn = false;
-            model.SignInDays = 0;
-            if (user.SignInDays != null)
-            {
-                if (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().Date))
-                {
-                    model.IsSignIn = true;
-                    while (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().AddDays(-model.SignInDays).Date))
-                    {
-                        model.SignInDays++;
-                    }
-                }
-                else
-                {
-                    if (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().Date.AddDays(-1)))
-                    {
-                        while (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().AddDays(-model.SignInDays - 1).Date))
-                        {
-                            model.SignInDays++;
-                        }
-                    }
-                }
-            }
-            return model;
-
+            }   
+            return await _userService.GetUserInforViewModel(user);
         }
 
         [AllowAnonymous]
@@ -222,19 +183,13 @@ namespace CnGalWebSite.APIServer.Controllers
             var model = new PersonalSpaceViewModel
             {
                 EditCountList = userEditInfor.EditCountList,
-                Name = user.UserName,
                 Email = user.Email,
-                PersonalSignature = user.PersonalSignature,
                 MainPageContext = user.MainPageContext,
                 Id = user.Id,
                 IsCurrentUser = isCurrentUser,
-                Integral = user.DisplayIntegral,
-                Level = _userService.GetUserLevel(user),
                 ContributionValue = user.DisplayContributionValue,
-                PhotoPath = _appHelper.GetImagePath(user.PhotoPath, "user.png"),
                 SBgImage = _appHelper.GetImagePath(user.SBgImage, ""),
                 MBgImage = _appHelper.GetImagePath(user.MBgImage, ""),
-                BackgroundImagePath = _appHelper.GetImagePath(user.BackgroundImage, "userbackground.jpg"),
                 OnlineTime = ((double)user.OnlineTime / 60 / 60),
                 LastOnlineTime = user.LastOnlineTime,
                 CanComment = user.CanComment ?? true,
@@ -249,8 +204,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 TotalExamine = userEditInfor.EditCount,
                 LastEditTime = userEditInfor.LastEditTime,
                 SteamId = user.SteamId,
-                IsShowGameRecord = user.IsShowGameRecord
-            };
+                IsShowGameRecord = user.IsShowGameRecord,
+                BasicInfor = await _userService.GetUserInforViewModel(user),
+                SignInDaysList = user.SignInDays.Select(s => new KeyValuePair<DateTime, int>(s.Time.Date, 1)).ToList(),
+
+        };
 
             //提前将MarkDown语法转为Html
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
@@ -260,44 +218,21 @@ namespace CnGalWebSite.APIServer.Controllers
             model.EditEntryNum = examines.Count(s => (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishMainPage));
             model.CreateArticleNum = _articleRepository.Count(s => s.CreateUserId == user.Id);
 
-
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
             {
                 model.Role = "Admin";
             }
             else
             {
-                model.Role = "User";
-            }
-
-            //计算连续签到天数和今天是否签到
-            model.IsSignIn = false;
-            model.SignInDays = 0;
-            if (user.SignInDays != null)
-            {
-
-
-                model.SignInDaysList = user.SignInDays.Select(s => new KeyValuePair<DateTime, int>(s.Time.Date, 1)).ToList();
-                if (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().Date))
+                if (await _userManager.IsInRoleAsync(user, "Editor"))
                 {
-                    model.IsSignIn = true;
-                    while (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().AddDays(-model.SignInDays).Date))
-                    {
-                        model.SignInDays++;
-                    }
+                    model.Role = "Editor";
                 }
                 else
                 {
-                    if (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().Date.AddDays(-1)))
-                    {
-                        while (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().AddDays(-model.SignInDays - 1).Date))
-                        {
-                            model.SignInDays++;
-                        }
-                    }
+                    model.Role = "User";
                 }
             }
-
 
             return model;
         }

@@ -1,0 +1,48 @@
+﻿@inject HttpClient Http
+@inject ToastService ToastService
+
+<CalendarHeatmapTip BeforeTreatmentDate="Model.SignInDaysList" ShowTip="false"></CalendarHeatmapTip>
+<div class="mt-4 mb-1" style="display: flex; justify-content: center;">
+    @if (Model.BasicInfor.IsSignIn == false)
+    {
+        <Button ButtonType="ButtonType.Button" Color="Color.Success" Icon="fa fa-calendar-plus-o"
+                IsOutline="true" OnClick="SignIn" IsAsync="true">
+
+            &nbsp; &nbsp;今天还没有签到哦~点我签到    &nbsp; &nbsp;
+        </Button>
+    }
+    else
+    {
+        <Button ButtonType="ButtonType.Button" Color="Color.Success" Icon="fa fa-calendar-check-o"
+                IsOutline="false" IsDisabled="true">
+            @(" 连续签到"+Model.BasicInfor.SignInDays+"天~ ")
+        </Button>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public PersonalSpaceViewModel Model { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private async Task SignIn()
+    {
+        try
+        {
+            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/signIn");
+            if (result.Successful == true)
+            {
+                Model.BasicInfor.IsSignIn = true;
+                Model.BasicInfor.SignInDays++;
+                StateHasChanged();
+                await ToastService.Success("签到成功", "已获得5积分");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "签到失败");
+        }
+    }
+}
