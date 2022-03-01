@@ -227,7 +227,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
         {
             var nowTime = DateTime.Now.ToCstTime();
             //用户等级头衔
-            var level = ToolHelper.GetUserLevel(user.Integral);
+            var level = ToolHelper.GetUserLevel(user.DisplayIntegral);
             //获取用户目前的等级头衔
             var levelRank = await _rankUserRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Rank.Name.Contains("Lv ")).Select(s => s.Rank.Name).FirstOrDefaultAsync();
             //比较是否过时

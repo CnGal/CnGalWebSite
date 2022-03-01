@@ -39,16 +39,16 @@
     else
     {
         <div class="row">
-            <div class=" col-12 col-md-6  col-lg-3 mt-2">
+            <div class=" col-12 col-md-6  col-lg-3 mb-2">
                 <ImageCropperButton ImagePath="@Model.PhotoPath" OnUploadedImage="OnCardUpload1" Type="ImageAspectType._1_1" Text="上传头像"></ImageCropperButton>
             </div>
-            <div class=" col-12 col-md-6  col-lg-3 mt-2">
+            <div class=" col-12 col-md-6  col-lg-3 mb-2">
                 <ImageCropperButton ImagePath="@Model.BackgroundPath" OnUploadedImage="OnCardUpload2" Type="ImageAspectType._4_1A2" Text="上传空间主图"></ImageCropperButton>
             </div>
-            <div class=" col-12 col-md-6  col-lg-3 mt-2">
+            <div class=" col-12 col-md-6  col-lg-3 mb-2">
                 <ImageCropperButton ImagePath="@Model.MBgImagePath" OnUploadedImage="OnCardUpload3" Type="ImageAspectType.None" Text="上传大背景"></ImageCropperButton>
             </div>
-            <div class=" col-12 col-md-6  col-lg-3 mt-2">
+            <div class=" col-12 col-md-6  col-lg-3 mb-2">
                 <ImageCropperButton ImagePath="@Model.SBgImagePath" OnUploadedImage="OnCardUpload4" Type="ImageAspectType.None" Text="上传小背景"></ImageCropperButton>
             </div>
         </div>
@@ -110,7 +110,7 @@
 
         <hr />
         <h5 class="fw-bold mb-3">基本信息</h5>
-        <ValidateForm Model="@Model" OnValidSubmit="OnSubmit" ValidateAllProperties="true" class="form-group">
+        <ValidateForm Model="@Model" OnValidSubmit="OnSubmit" ValidateAllProperties="true">
 
             <div class="row">
 

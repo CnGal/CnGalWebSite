@@ -117,12 +117,10 @@
                     </td>
 
                 </tr>
-
-
             }
         </tbody>
     </table>
-    <Pagination PageItems="@(pagedResultDto.MaxResultCount )" PageItemsSource="@PageItems" TotalCount="@pagedResultDto.TotalCount" OnPageClick="@OnPageClick" OnPageItemsChanged="@OnPageItemsChanged"></Pagination>
+    <Pagination PageItems="@pagedResultDto.MaxResultCount" PageItemsSource="@PageItems" TotalCount="@pagedResultDto.TotalCount" OnPageClick="@OnPageClick" OnPageItemsChanged="@OnPageItemsChanged"></Pagination>
 </div>
 
 
@@ -134,7 +132,7 @@
     public string Id { get; set; }
 
     public PagedResultDto<ExaminedNormalListModel> pagedResultDto = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<ExaminedNormalListModel> { Data = new List<ExaminedNormalListModel>(), CurrentPage = 1, TotalCount = 0 };
-    private IEnumerable<int> PageItems => new int[] { 3, 10, 20, 40 };
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40 };
 
     protected override async Task OnInitializedAsync()
     {
@@ -146,14 +144,16 @@
     {
         try
         {
-            //获取用户编辑记录
-            pagedResultDto.Data = (await Http.GetFromJsonAsync<IEnumerable<ExaminedNormalListModel>>(ToolHelper.WebApiPath + "api/space/getusereditrecord/" + Id + "/" + pageIndex + "/" + pageItems)).ToList();
-            pagedResultDto.CurrentPage = pageIndex;
-            pagedResultDto.MaxResultCount = pageItems;
-            if (pagedResultDto.Data == null)
+            var result = await Http.PostAsJsonAsync<GetExamineInput>(ToolHelper.WebApiPath + "api/space/GetUserEditRecord", new GetExamineInput
             {
-                pagedResultDto.Data = new List<ExaminedNormalListModel>();
-            }
+                UserId=Id,
+                Sorting="Id desc",
+                MaxResultCount=pageItems,
+                CurrentPage=pageIndex
+            });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            pagedResultDto = JsonSerializer.Deserialize<PagedResultDto<ExaminedNormalListModel>>(jsonContent, ToolHelper.options);
+
             StateHasChanged();
         }
         catch (Exception ex)
@@ -165,13 +165,16 @@
     {
         try
         {
-            //获取用户编辑记录
-            pagedResultDto.Data = (await Http.GetFromJsonAsync<IEnumerable<ExaminedNormalListModel>>(ToolHelper.WebApiPath + "api/space/getusereditrecord/" + Id + "/1/" + pageItems)).ToList();
-            pagedResultDto.MaxResultCount = pageItems;
-            if (pagedResultDto.Data == null)
+            var result = await Http.PostAsJsonAsync<GetExamineInput>(ToolHelper.WebApiPath + "api/space/GetUserEditRecord", new GetExamineInput
             {
-                pagedResultDto.Data = new List<ExaminedNormalListModel>();
-            }
+                UserId = Id,
+                Sorting = "Id desc",
+                MaxResultCount = pageItems,
+                CurrentPage = pagedResultDto.CurrentPage
+            });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            pagedResultDto = JsonSerializer.Deserialize<PagedResultDto<ExaminedNormalListModel>>(jsonContent, ToolHelper.options);
+
             StateHasChanged();
         }
         catch (Exception ex)

@@ -1,0 +1,65 @@
+﻿<div class="rounded shadow-sm  bg-opacity rounded p-3">
+    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <h2 class="fw-bold font-color h5" style="margin-bottom:auto;margin-top:auto;">
+        <i class="@(Icon+" font-color")"></i> &nbsp;&nbsp;@Title
+        </h2>
+        <div>
+            @ButtonContent
+            @if (Collapable)
+            {
+                @if (IsCollapsed)
+                {
+                    <Button style=" width: 75px;" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-chevron-right" Text="折叠" OnClick="@(()=>OnCollapseChanged(false))" />
+
+                }
+                else
+                {
+                    <Button style=" width: 75px;" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-chevron-down" Text="展开" OnClick="@(()=>OnCollapseChanged(true))" />
+
+                }
+            }
+        </div>
+    </div>
+    @if (Outline == false)
+    {
+        <div class="mt-3" style="@(IsCollapsed?"display:none;":"display:block;")">
+            @ChildContent
+        </div>
+    }
+</div>
+@if (Outline)
+{
+    <div class="mt-3" style="@(IsCollapsed?"display:none;":"display:block;")">
+        @ChildContent
+    </div>
+}
+
+
+
+@code {
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public RenderFragment ButtonContent { get; set; }
+    [Parameter]
+    public bool Collapable { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
+
+    [Parameter]
+    public bool IsCollapsed { get; set; }
+    [Parameter]
+    public EventCallback<bool> IsCollapsedChanged { get; set; }
+
+    private async Task OnCollapseChanged(bool state)
+    {
+        IsCollapsed = state;
+        await IsCollapsedChanged.InvokeAsync(state);
+        StateHasChanged();
+    }
+}

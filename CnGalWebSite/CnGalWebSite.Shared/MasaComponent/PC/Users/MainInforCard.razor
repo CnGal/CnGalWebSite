@@ -1,14 +1,21 @@
-﻿<div class=" rounded shadow-sm  bg-opacity pb-1 mb-3">
-    <div class="row">
-        <img src="@Model.BackgroundImage" class="col-12">
+﻿<div class=" rounded shadow-sm  bg-opacity mb-3">
+    <div>
+        <img src="@Model.BackgroundImage"  alt="@Model.Name" class="w-100">
         <div style="display: flex; margin-top: -40px; justify-content: center;">
             <img src="@Model.PhotoPath" style="width:80px; border-radius: 50%;" alt="@Model.Name">
-
         </div>
-
     </div>
-    <h4 class="text-center mt-2 fw-bold">@Model.Name</h4>
-    <p class="text-center ms-2 me-2">@Model.PersonalSignature</p>
+    <div class="p-3" style=" display: flex; flex-direction: column; align-items: center;">
+        <h1 class="h5 text-center fw-bold" style=" word-break: break-all;">@Model.Name</h1>
+        <div style="display: flex; font-size: smaller;">
+            @foreach (var item in Model.Ranks)
+            {
+                <RankAloneViewTip Model="item"></RankAloneViewTip>
+            }
+        </div>
+       
+        <span class="text-center mt-2">@Model.PersonalSignature</span>
+    </div>
 </div>
 
 

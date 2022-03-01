@@ -3,7 +3,7 @@
 {
     @if (string.IsNullOrWhiteSpace(Tooltip))
     {
-        <MButton Icon Color="@Color" Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" >
+        <MButton Icon="!Fab" Fab="Fab" Dark Small="Fab" Color="@Color" Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" >
             <MIcon>@Icon</MIcon>
         </MButton>
 
@@ -12,7 +12,7 @@
     {
         <MTooltip Bottom>
             <ActivatorContent>
-                <MButton Icon Color="@Color" Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled">
+                <MButton Icon="!Fab" Dark  Small="Fab" Fab="Fab" Color="@Color" Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled">
                     <MIcon>@Icon</MIcon>
                 </MButton>
             </ActivatorContent>
@@ -64,6 +64,8 @@ else
     public string Class { get; set; }
     [Parameter]
     public bool IsAsync { get; set; }
+    [Parameter]
+    public bool Fab { get; set; }
     [Parameter]
     public string Text { get; set; }
     [Parameter]
