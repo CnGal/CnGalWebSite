@@ -84,16 +84,8 @@ else
 
                     }
                 </div>
-                @if (Model.CanComment)
-                {
-                    <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="false" IsSmallScreen="IsSmallScreen" CurrentUserRank="@CurrentUserRank" RelyCallBack="OnRely" IsAdmin="@IsAdmin" CanDeleted="CanDeleted" DeletedCallBack="OnDeleted"></CommentListView>
-                    <ReplyCommentTip CurrentUserRank="@CurrentUserRank" IsChild="false" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentArticle" RelyCallBack="OnRely" IsAdmin="IsAdmin"></ReplyCommentTip>
+                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" IsShowNotFound="true" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentArticle" />
 
-                }
-                else
-                {
-                    <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
-                }
             }
         </div>
 
@@ -308,15 +300,6 @@ else
 
                 //判断文章是否被收藏
                 await GetUserIsFavorited();
-            }
-
-            try
-            {
-                await OnCommentPageClick(1);
-            }
-            catch (Exception ex)
-            {
-                ErrorHandler.ProcessError(ex, "获取文章评论列表失败");
             }
         }
         catch (Exception exc)
@@ -556,29 +539,6 @@ else
             }).Render();
             await DialogService.Show(option);
         }
-    }
-
-    private async Task OnCommentPageClick(int pageIndex)
-    {
-        try
-        {
-            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)CommentType.CommentArticle + "/" + Id + "/" + pageIndex + "/8");
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取评论列表失败");
-        }
-    }
-
-    private async Task OnRely()
-    {
-        Model.CommentCount++;
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
-    private async Task OnDeleted()
-    {
-        await OnCommentPageClick(ListComments.CurrentPage);
     }
 
     public async void OnClickUrl(NavigateModel model)

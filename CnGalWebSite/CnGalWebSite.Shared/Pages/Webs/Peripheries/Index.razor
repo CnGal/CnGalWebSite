@@ -67,7 +67,7 @@ else
                 }
 
                 <div class="  rounded shadow-sm  bg-opacity mb-3">
-                    <PeripheryMainInforTip Model="Model" IsSmallScreen="IsSmallScreen"/>
+                    <PeripheryMainInforTip Model="Model" IsSmallScreen="IsSmallScreen" />
                     <div>
                         <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Periphery" Id="Model.Id" />
                     </div>
@@ -91,21 +91,12 @@ else
                 {
                     <div class="">
                         <PeripheryListOverviewsTip Model="Model.PeripheryOverviewModels" @ref="peripheryOverViewTip" RelatedEntriesState="Model.RelatedEntriesState" RelatedPeripheriesState="Model.RelatedPeripheriesState"
-                                                    IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" Type="Model.Type" />
+                                                   IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" Type="Model.Type" />
                     </div>
                 }
 
+                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" IsShowNotFound="true" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentPeriphery" />
 
-                @if (Model.CanComment)
-                {
-                    <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="false" IsSmallScreen="IsSmallScreen" CurrentUserRank="@CurrentUserRank" RelyCallBack="OnRely" IsAdmin="@IsAdmin" CanDeleted="IsAdmin" DeletedCallBack="OnDeleted"></CommentListView>
-                    <ReplyCommentTip CurrentUserRank="@CurrentUserRank" IsChild="false" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentPeriphery" RelyCallBack="OnRely" IsAdmin="IsAdmin"></ReplyCommentTip>
-
-                }
-                else
-                {
-                    <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
-                }
             }
         </div>
 
@@ -291,14 +282,7 @@ else
                 await GetUserIsFavorited();
             }
 
-            try
-            {
-                await OnCommentPageClick(1);
-            }
-            catch (Exception ex)
-            {
-                ErrorHandler.ProcessError(ex, "获取周边评论列表失败");
-            }
+         
         }
         catch (Exception exc)
         {
@@ -524,29 +508,7 @@ else
         }
     }
 
-    private async Task OnCommentPageClick(int pageIndex)
-    {
-        try
-        {
-            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)CommentType.CommentPeriphery + "/" + Id + "/" + pageIndex + "/8");
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取评论列表失败");
-        }
-    }
-
-    private async Task OnRely()
-    {
-        Model.CommentCount++;
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
-    private async Task OnDeleted()
-    {
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
-
+  
     public async void OnClickUrl(NavigateModel model)
     {
         try

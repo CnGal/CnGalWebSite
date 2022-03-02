@@ -1,0 +1,20 @@
+﻿<MAlert Text
+        Dense
+        Type="Type"
+        Color="@Color"
+        Icon="@Icon"
+        Border="Borders.Left">
+    @ChildContent
+</MAlert>
+
+@code {
+    [Parameter]
+    public AlertTypes Type { get; set; }
+    [Parameter]
+    public string Icon { get; set; }
+    [Parameter]
+    public string Color { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}
+

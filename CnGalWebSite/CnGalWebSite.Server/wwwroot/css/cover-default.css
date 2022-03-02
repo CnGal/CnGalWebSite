@@ -284,3 +284,6 @@ input.te-image-file-input {
 .theme--light.m-application code {
      background-color: transparent;
 }
+.modal-open{
+    padding-right: 0;
+}

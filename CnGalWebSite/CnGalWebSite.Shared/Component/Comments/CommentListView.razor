@@ -11,10 +11,10 @@
         @for (int i = 0; i < Comments.Data.Count; i++)
         {
             int temp = i;
-            <CommentPartTip Model="Comments.Data[temp]" IsChild="false" CurrentUserRank="@CurrentUserRank" RelyCallBack="OnRely" IsSmallScreen="IsSmallScreen"
-                            IsAdmin="IsAdmin" DeletedCallBack="OnDelete" CanDeleted="CanDeleted"></CommentPartTip>
+            <CommentPartTip Model="Comments.Data[temp]" IsChild="false" RelyCallBack="OnRely"
+                            DeletedCallBack="OnDelete" CanDeleted="CanDeleted"></CommentPartTip>
         }
-        <PageDtoTip CurrentPage="Comments.CurrentPage" ShowBtnCount="1" TotalPages="Comments.TotalPages" IsSmallScreen="IsSmallScreen" OnPageChanged="OnPage"></PageDtoTip>
+        <MPagination Value="Comments.CurrentPage" Class="my-4" Length="Comments.TotalPages" ValueChanged="OnPage" Color="pink lighten-3"  TotalVisible="7"></MPagination>
     }
 
 </div>
@@ -32,21 +32,12 @@
     public EventCallback<int> OnPageChanged { get; set; }
 
     [Parameter]
-    public string CurrentUserRank { get; set; }
-    [Parameter]
-    public bool IsAdmin { get; set; }
-    [Parameter]
     public bool CanDeleted { get; set; }
     [Parameter]
     public EventCallback RelyCallBack { get; set; }
 
     [Parameter]
     public EventCallback DeletedCallBack { get; set; }
-    [Parameter]
-    /// <summary>
-    /// 是否小屏幕
-    /// </summary>
-    public bool IsSmallScreen { get; set; }
 
     [Parameter]
     /// <summary>

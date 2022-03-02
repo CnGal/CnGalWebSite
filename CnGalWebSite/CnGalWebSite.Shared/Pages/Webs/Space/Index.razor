@@ -31,17 +31,17 @@ else
     {
 
         <div class="row">
-            <div class="col-12 col-lg-3">
+            <div class="col-12 col-lg-4">
                 <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Model="Model.BasicInfor" />
                 <CnGalWebSite.Shared.MasaComponent.PC.Users.BasicInforCard Model="Model" />
             </div>
-            <div class="col-12 col-lg-9">
+            <div class="col-12 col-lg-8">
 
 
                 <div>
 
-                    <div class="rounded  shadow-sm bg-opacity mb-3">
-                        <MTabs @bind-Value="TabIndex" IconsAndText Class="rounded"
+                    <div class="rounded  shadow-sm bg-opacity mb-4">
+                        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" 
                                Color="pink lighten-3">
 
                             <MTab Value="1">
@@ -77,6 +77,7 @@ else
                     <div>
                         <MTabsItems @bind-Value="TabIndex">                         
                             <MTabItem Value="1">
+                            
                                    <div class="mb-4">
                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="个人介绍" Icon="fa fa-fw  fa-home">
                                            <ChildContent>
@@ -84,46 +85,40 @@ else
                                            </ChildContent>
                                            <ButtonContent>
                                                @if(Model.IsCurrentUser)
-                        {
+                                                {
                                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab  Icon="mdi-pencil " Tooltip="编辑个人介绍" OnClick="EditMainPage" />
 
-                        }
+                                                }
                                            </ButtonContent>
                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                                   
                                 </div>
-                                  <div class="mb-4">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="签到概览" Icon="fa fa-fw  fa-calendar-check-o">
+                                    <div class="row">
+                                    <div class="col-12 col-lg-6 mb-4">
+                                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="签到概览" Icon="fa fa-fw  fa-calendar-check-o" Class="h-100">
                                                   <CnGalWebSite.Shared.MasaComponent.PC.Users.SignInDaysCard Model="Model" />
 
                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-                                  
-                                </div>
-                                 <div class="mb-4">
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="fa fa-fw  fa-pencil">
+                                    </div>
+                                      <div class="col-12 col-lg-6 mb-4">
+                                             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="fa fa-fw  fa-pencil" Class="h-100">
                                                  <CnGalWebSite.Shared.MasaComponent.PC.Users.EditOverviewCard Model="Model"/>
-
                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-                                 
+                                    </div>
+                                     
                                 </div>
-                                @if (Model.CanComment)
-                                {
-                                    @if (Model.IsCurrentUser)
-                                    {
-                                        <AlertTip Title="管理空间留言" Type="AlertTip.AlertTipType.SpaceComment" Url="@("/space/editspacecomments/" + Model.Id)"></AlertTip>
-                                    }
-                                    <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="true" RelyCallBack="OnRely" IsAdmin="IsAdmin" CanDeleted="CanDeleted" DeletedCallBack="OnDeleted"></CommentListView>
-                                    <ReplyCommentTip IsChild="false" ObjectId="@Model.Id" Type="CommentType.CommentUser" RelyCallBack="OnRely" IsAdmin="IsAdmin"></ReplyCommentTip>
-                                }
-                                else
-                                {
-                                    <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
-                                }
+                                <div class="rounded  rounded shadow-sm  p-3 pb-0 bg-opacity mb-4">
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.DataOverviewCard Model="Model"/>
+                                </div>
+                                <div>
+                                      <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+                                          <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id" Type="CommentType.CommentUser"/>
+                                       </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                </div>
+                             
                             </MTabItem>
                             <MTabItem Value="2">
-                                  <div class="rounded  rounded shadow-sm  p-4 bg-opacity">
                                     <CnGalWebSite.Shared.MasaComponent.PC.Users.ExaminesCard Id="@Model.Id" />
-                                </div>
                             </MTabItem>
                               @if(Model.BasicInfor.ArticleCount!=0)
                                     {
@@ -146,7 +141,7 @@ else
                           
                                   @if (Model.IsCurrentUser || Model.IsShowFavorites)
                                 {    <MTabItem Value="5">
-                                    <FavoriteFoldersViewTip UserId="@Model.Id" OnClickUrl="OnClickUrl" @ref="FavoritesTip" IsCurrentUser="Model.IsCurrentUser"></FavoriteFoldersViewTip>
+                                    <FavoriteFoldersViewTip UserId="@Model.Id" OnClickUrl="OnClickUrl"  IsCurrentUser="Model.IsCurrentUser"></FavoriteFoldersViewTip>
                                   </MTabItem>
                                   }
                          
@@ -224,20 +219,7 @@ else
     bool isFirstLoad = true;
     bool isNotFound = false;
 
-    [NotNull]
-    private Chart? PieChart { get; set; }
-    [NotNull]
-    private Chart? PieChartFile { get; set; }
-    [NotNull]
-    private FavoriteFoldersViewTip? FavoritesTip { get; set; }
-    private IEnumerable<string> ExamineState { get; set; } = new List<string>() { "未通过", "已通过", "待审核" };
-
-
-    private static Random Randomer { get; set; } = new Random();
     public PersonalSpaceViewModel Model { get; set; } = new PersonalSpaceViewModel();
-    public PagedResultDto<CnGalWebSite.DataModel.Model.Message> ListMessages = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CnGalWebSite.DataModel.Model.Message> { Data = new List<CnGalWebSite.DataModel.Model.Message>(), CurrentPage = 1, TotalCount = 0 };
-    public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
-
 
 
     public PagedSortedAndFilterInput PublishArticleInput { get; set; } = new PagedSortedAndFilterInput();
@@ -319,64 +301,6 @@ else
     }
 
 
-    private Task<ChartDataSource> OnPieInit()
-    {
-        var ds = new ChartDataSource();
-
-        ds.Options.Title = "审核概览";
-
-        ds.Labels = ExamineState;
-        List<object> temp = new List<object>();
-
-        temp.Add(Model.UnpassedExamineCount);
-        temp.Add(Model.PassedExamineCount);
-        temp.Add(Model.PassingExamineCount);
-
-        ds.Data.Add(new ChartDataset()
-        {
-            Label = "审核状态",
-            Data = temp
-        });
-        return Task.FromResult(ds);
-    }
-
-    private Task<ChartDataSource> OnPieInitFile()
-    {
-        var ds = new ChartDataSource();
-
-
-        ds.Options.Title = "文件空间概览";
-
-        double tempUsed = ((double)Model.UsedFilesSpace / 1024 / 1024);
-        double tempUnUsed = ((double)(Model.TotalFilesSpace - Model.UsedFilesSpace) / 1024 / 1024);
-        List<string> FileSpace = new List<string>();
-        string tempStr = "已使用 " + tempUsed.ToString("0.0") + "MB";
-        FileSpace.Add(tempStr);
-        tempStr = "未使用 " + tempUnUsed.ToString(".0") + "MB";
-        FileSpace.Add(tempStr);
-
-        ds.Labels = FileSpace;
-
-        List<object> temp = new List<object>();
-
-        temp.Add(tempUsed);
-        temp.Add(tempUnUsed);
-
-
-
-        ds.Data.Add(new ChartDataset()
-        {
-            Label = "文件储存状态",
-            Data = temp
-        });
-        return Task.FromResult(ds);
-    }
-    //private Logger? Trace { get; set; }
-
-
-
-
-
     private async Task EditMainPage()
     {
         try
@@ -389,27 +313,6 @@ else
         }
     }
 
-    private async Task OnCommentPageClick(int pageIndex)
-    {
-        try
-        {
-            //获取用户编辑记录
-            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)CommentType.CommentUser + "/" + Model.Id + "/" + pageIndex + "/8");
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取评论列表失败");
-        }
-    }
-    private async Task OnRely()
-    {
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
-    private async Task OnDeleted()
-    {
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
     public async void OnClickUrl(NavigateModel model)
     {
         try

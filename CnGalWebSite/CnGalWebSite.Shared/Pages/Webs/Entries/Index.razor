@@ -319,18 +319,9 @@ else
                         <div class="@("tab-pane fade"+(defaultIndex==12?" show active ":"") )" id="@("pills" + randomIndex + "-12")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-12-tab")">
                             <div>
                                 <AuthorizeView Roles="Admin">
-                                    <AlertTip Title="管理词条评论" Type="AlertTip.AlertTipType.EntryComment" Url="@("/entries/editentrycomments/" + @EntryView.Id)"></AlertTip>
+                                    <AlertTip Title="管理词条评论" Type="AlertTip.AlertTipType.EntryComment" Url="@("/entries/editentrycomments/" + EntryView.Id)"></AlertTip>
                                 </AuthorizeView>
-                                @if (EntryView.CanComment)
-                                {
-                                    <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="true" IsSmallScreen="IsSmallScreen" RelyCallBack="OnRely" IsAdmin="IsAdmin" CanDeleted="CanDeleted" DeletedCallBack="OnDeleted"></CommentListView>
-                                    <ReplyCommentTip IsChild="false" ObjectId="@Id.ToString()" Type="CommentType.CommentEntries" RelyCallBack="OnRely" IsAdmin="IsAdmin"></ReplyCommentTip>
-                                }
-                                else
-                                {
-                                    <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
-                                }
-
+                               <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" IsShowNotFound="true" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries"/>
                             </div>
                         </div>
 
@@ -666,15 +657,7 @@ else
                 CanDeleted = true;
             }
 
-            //获取评论
-            try
-            {
-                await OnCommentPageClick(1);
-            }
-            catch
-            {
-                await ToastService.Error("获取词条评论列表失败", "请在确保网络正常后联系开发人员");
-            }
+          
             //获取是否被收藏
             if (user.Identity.IsAuthenticated)
             {
@@ -858,28 +841,6 @@ else
         {
             ErrorHandler.ProcessError(ex, "获取用户对该游戏记录信息失败");
         }
-    }
-
-
-    private async Task OnCommentPageClick(int pageIndex)
-    {
-        try
-        {
-            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)CommentType.CommentEntries + "/" + EntryView.Id + "/" + pageIndex + "/8");
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取评论列表失败");
-        }
-    }
-    private async Task OnRely()
-    {
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
-    private async Task OnDeleted()
-    {
-        await OnCommentPageClick(ListComments.CurrentPage);
     }
 
 

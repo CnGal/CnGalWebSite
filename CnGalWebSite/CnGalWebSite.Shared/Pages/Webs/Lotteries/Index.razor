@@ -57,33 +57,24 @@ else
         }
         else
         {
-            <div class="">
+    <div class="">
 
-                @if (Model.IsHidden == true)
-                {
-                    <div class="alert alert-info  rounded shadow-sm  rounded" role="alert">
-                        当前抽奖处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-                    </div>
-
-                }
-
-                <div class="rounded shadow-sm  bg-opacity mb-4 pb-3">
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
-                </div>
-
-
-                @if (Model.CanComment)
-                {
-                    <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="false" IsSmallScreen="IsSmallScreen" CurrentUserRank="@CurrentUserRank" RelyCallBack="OnRely" IsAdmin="@IsAdmin" CanDeleted="IsAdmin" DeletedCallBack="OnDeleted"></CommentListView>
-                    <ReplyCommentTip CurrentUserRank="@CurrentUserRank" IsChild="false" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" RelyCallBack="OnRely" IsAdmin="IsAdmin"></ReplyCommentTip>
-
-                }
-                else
-                {
-                    <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
-                }
-
+        @if (Model.IsHidden == true)
+        {
+            <div class="alert alert-info  rounded shadow-sm  rounded" role="alert">
+                当前抽奖处于隐藏状态，如果你看到了这个提示，请立即联系管理员
             </div>
+
+        }
+
+        <div class="rounded shadow-sm  bg-opacity mb-4 pb-3">
+            <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
+        </div>
+
+
+        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" IsShowNotFound="true" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
+
+    </div>
 
         }
 
@@ -240,14 +231,7 @@ else
                 _dataCatcheService.VoteIndexPageCatche.Clean(Id);
             }
 
-            try
-            {
-                await OnCommentPageClick(1);
-            }
-            catch (Exception ex)
-            {
-                ErrorHandler.ProcessError(ex, "获取投票评论列表失败");
-            }
+           
         }
         catch (Exception exc)
         {
@@ -263,30 +247,6 @@ else
         Model.IsHidden = !Model.IsHidden;
         StateHasChanged();
         return Task.CompletedTask;
-    }
-
-
-    private async Task OnCommentPageClick(int pageIndex)
-    {
-        try
-        {
-            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)CommentType.CommentLottery + "/" + Id + "/" + pageIndex + "/8");
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取评论列表失败");
-        }
-    }
-
-    private async Task OnRely()
-    {
-        Model.CommentCount++;
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
-    private async Task OnDeleted()
-    {
-        await OnCommentPageClick(ListComments.CurrentPage);
     }
 
     public async void OnClickUrl(NavigateModel model)

@@ -1,0 +1,59 @@
+﻿@inject HttpClient Http
+
+<div>
+    @if (CanComment)
+    {
+        <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="IsShowNotFound" RelyCallBack="OnRely" CanDeleted="CanDeleted" DeletedCallBack="OnDeleted"></CommentListView>
+        <ReplyCommentTip IsChild="false" ObjectId="@ObjectId" Type="Type" RelyCallBack="OnRely"></ReplyCommentTip>
+    }
+    else
+    {
+        <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public bool CanComment { get; set; }
+    [Parameter]
+    public bool IsShowNotFound { get; set; }
+    [Parameter]
+    public bool CanDeleted { get; set; }
+    [Parameter]
+    public string ObjectId { get; set; }
+    [Parameter]
+    public CommentType Type { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+      await OnCommentPageClick(1);
+    }
+    private async Task OnCommentPageClick(int pageIndex)
+    {
+        try
+        {
+            //获取用户编辑记录
+            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)Type + "/" + ObjectId + "/" + pageIndex + "/8");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取评论列表失败");
+        }
+    }
+
+
+    private async Task OnRely()
+    {
+        await OnCommentPageClick(ListComments.CurrentPage);
+    }
+    private async Task OnDeleted()
+    {
+        await OnCommentPageClick(ListComments.CurrentPage);
+    }
+}

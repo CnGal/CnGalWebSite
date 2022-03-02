@@ -1,32 +1,5 @@
 ﻿<CalendarHeatmapTip BeforeTreatmentDate="Model.EditCountList"></CalendarHeatmapTip>
-<div class="row mt-4">
-    <div class="col-12 col-lg-6">
-        <div style="display: flex; align-items: center;">
-            <i class="h4 m-0 me-2 font-color fa fa-code-fork fa-fw"></i>
-            <div class="w-100">
-                <span>
-                    @($"已通过的编辑：{Model.PassedExamineCount} / {Model.BasicInfor.EditCount}")
-                </span>
-                <MProgressLinear Value="@(100.0*Model.PassedExamineCount/Model.BasicInfor.EditCount)" Color="pink lighten-3" Height="10"></MProgressLinear>
-            </div>
-        </div>
-       
-    </div>
-    <div class="col-12 col-lg-6">
 
-        <div style="display: flex; align-items: center;">
-            <i class="h4  m-0 me-2 font-color fa fa-database fa-fw"></i>
-            <div class="w-100">
-                <span>
-                    @($"已使用的文件空间：{(Model.UsedFilesSpace/(1024*1024.0)).ToString("0.0")}MB / {(Model.TotalFilesSpace / (1024 * 1024.0)).ToString("0.0")}MB")
-                </span>
-                <MProgressLinear Value="@(100.0*Model.UsedFilesSpace/Model.TotalFilesSpace)" Color="pink lighten-3" Height="10"></MProgressLinear>
-            </div>
-        </div>
-     
-     
-    </div>
-</div>
 @code {
     [Parameter]
     public PersonalSpaceViewModel Model { get; set; }

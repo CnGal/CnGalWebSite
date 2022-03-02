@@ -1,126 +1,97 @@
 ﻿@inject HttpClient Http
 
 
-<div style="overflow-x: auto; overflow-y: auto;">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    状态
-                </th>
-                <th>
-                    关联对象
-
-                </th>
-                <th>
-                    编辑部分
-                </th>
-                <th>
-                    编辑时间
-                </th>
-                <th>
-                    审核时间
-                </th>
-
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var examine in pagedResultDto.Data)
-            {
-
-                <tr>
-                    <td>
-                        @if (examine.IsPassed != null)
+<div>
+    @foreach (var examine in pagedResultDto.Data)
+    {
+        <div class="rounded shadow-sm  bg-opacity mb-3 p-3">
+            <div style="display: flex; align-items: center;">
+                <div>
+                    @if (examine.IsPassed != null)
+                    {
+                        if (examine.IsPassed == true)
                         {
-                            if (examine.IsPassed == true)
-                            {
-                                <p class="text-success">已通过</p>
-                            }
-                            else
-                            {
-                                <p class="text-danger">未通过</p>
-                            }
+                            <MIcon Color="success">mdi-checkbox-marked-circle-outline</MIcon>
                         }
                         else
                         {
-                            <p class="text-primary">待审核</p>
+                            <MIcon Color="error">mdi-alert-circle </MIcon>
                         }
-                    </td>
-                    <td>
-                        @{
-                            string name = "";
-                        }
-                        @if (examine.Type == ExaminedNormalListModelType.Entry)
-                        {
-                            name = examine.RelatedName + " 编辑记录";
-                            <TabLink Text="@examine.RelatedName" Url="@("/entries/index/"+examine.RelatedId)" Icon="fa fa-codepen">
+                    }
+                    else
+                    {
+                        <MIcon Color="warning">mdi-history</MIcon>
+                    }
+                </div>
+                <div class="ms-3">
+                    @{ string name = "";}
+                    @if (examine.Type == ExaminedNormalListModelType.Entry)
+                    {
+                        name = " entries";
+
+                    }
+                    else if (examine.Type == ExaminedNormalListModelType.Article)
+                    {
+                        name = " articles";
+
+                    }
+                    else if (examine.Type == ExaminedNormalListModelType.Tag)
+                    {
+                        name = " tags";
+
+                    }
+                    else if (examine.Type == ExaminedNormalListModelType.Disambig)
+                    {
+                        name = " disambigs";
+
+                    }
+                    else if (examine.Type == ExaminedNormalListModelType.Periphery)
+                    {
+                        name = " peripheries";
+
+                    }
+
+
+                    @if (examine.Type == ExaminedNormalListModelType.Comment)
+                    {
+                        <span>
+                            @($"序号『{ examine.Id.ToString("00000")}』")
+                            <TabLink Text="@name" Url="@("/home/examined/"+examine.Id)" Icon="fa fa-pencil">
+                                @examine.Operation.GetDisplayName()
+                            </TabLink>
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            对
+                            @($"『{ examine.Id.ToString("00000")}』")
+                            <TabLink Text="@examine.RelatedName" Url="@(name+"/index/"+examine.RelatedId)" Icon="fa fa-codepen">
                                 @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName )
                             </TabLink>
-                        }
-                        else if (examine.Type == ExaminedNormalListModelType.Article)
-                        {
-                            name = examine.RelatedName + " 编辑记录";
-                            <TabLink Text="@examine.RelatedName" Url="@("/articles/index/"+examine.RelatedId)" Icon="fa fa-newspaper-o">
-                                @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName)
+                            进行
+                            <TabLink Text="@name" Url="@("/home/examined/"+examine.Id)" Icon="fa fa-pencil">
+                                @examine.Operation.GetDisplayName()
                             </TabLink>
-                        }
-                        else if (examine.Type == ExaminedNormalListModelType.Tag)
-                        {
-                            name = examine.RelatedName + " 编辑记录";
-                            <TabLink Text="@examine.RelatedName" Url="@("/tags/index/"+examine.RelatedId)" Icon="fa fa-tag">
-                                @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName )
-                            </TabLink>
-                        }
-                        else if (examine.Type == ExaminedNormalListModelType.Disambig)
-                        {
-                            name = examine.RelatedName + " 编辑记录";
-                            <TabLink Text="@examine.RelatedName" Url="@("/disambigs/index/"+examine.RelatedId)" Icon="fa fa-tag">
-                                @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName )
-                            </TabLink>
-                        }
-                        else if (examine.Type == ExaminedNormalListModelType.Periphery)
-                        {
-                            name = examine.RelatedName + " 编辑记录";
-                            <TabLink Text="@examine.RelatedName" Url="@("/peripheries/index/"+examine.RelatedId)" Icon="fa fa-shopping-basket">
-                                @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName )
-                            </TabLink>
-                        }
-                        else if (examine.Type == ExaminedNormalListModelType.Comment)
-                        {
-                            name = "评论 审核记录";
-                        }
-                        else
-                        {
-                            name = "用户主页 编辑记录";
-                            @("其他")
-                        }
-                    </td>
-                    <td>
-                        <TabLink Text="@name" Url="@("/home/examined/"+examine.Id)" Icon="fa fa-pencil">
-                            @examine.Operation.GetDisplayName()
-                        </TabLink>
-                    </td>
-                    <td>
-                        @examine.ApplyTime
-                    </td>
-                    <td>
+                            操作
+                        </span>
+                    }
+
+                    <br />
+                    <span style="color:gray;">
+                        @("申请时间："+examine.ApplyTime.ToString("yyyy-MM-dd HH:mm")) &nbsp; &nbsp;
                         @if (examine.PassedTime != null)
                         {
-                            @examine.PassedTime
-                        }
-                        else
-                        {
-                            @("无")
+                            @("审核时间："+examine.PassedTime.Value.ToString("yyyy-MM-dd HH:mm"))
                         }
 
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
 
-                    </td>
-
-                </tr>
-            }
-        </tbody>
-    </table>
-    <Pagination PageItems="@pagedResultDto.MaxResultCount" PageItemsSource="@PageItems" TotalCount="@pagedResultDto.TotalCount" OnPageClick="@OnPageClick" OnPageItemsChanged="@OnPageItemsChanged"></Pagination>
+    <MPagination Value="@pagedResultDto.CurrentPage" Class="my-4" Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick" Color="pink lighten-3" TotalVisible="7"></MPagination>
 </div>
 
 
@@ -131,25 +102,24 @@
     [Parameter]
     public string Id { get; set; }
 
-    public PagedResultDto<ExaminedNormalListModel> pagedResultDto = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<ExaminedNormalListModel> { Data = new List<ExaminedNormalListModel>(), CurrentPage = 1, TotalCount = 0 };
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40 };
+    public PagedResultDto<ExaminedNormalListModel> pagedResultDto = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<ExaminedNormalListModel>();
 
     protected override async Task OnInitializedAsync()
     {
         //获取审核列表
-        await OnPageClick(1, 10);
+        await OnPageClick(1);
     }
 
-    private async Task OnPageClick(int pageIndex, int pageItems)
+    private async Task OnPageClick(int pageIndex)
     {
         try
         {
             var result = await Http.PostAsJsonAsync<GetExamineInput>(ToolHelper.WebApiPath + "api/space/GetUserEditRecord", new GetExamineInput
             {
-                UserId=Id,
-                Sorting="Id desc",
-                MaxResultCount=pageItems,
-                CurrentPage=pageIndex
+                UserId = Id,
+                Sorting = "Id desc",
+                MaxResultCount = 10,
+                CurrentPage = pageIndex
             });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             pagedResultDto = JsonSerializer.Deserialize<PagedResultDto<ExaminedNormalListModel>>(jsonContent, ToolHelper.options);

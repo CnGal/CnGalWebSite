@@ -44,12 +44,6 @@
     public bool IsChild { get; set; }
 
     [Parameter]
-    public string CurrentUserRank { get; set; }
-
-    [Parameter]
-    public bool IsAdmin { get; set; }
-
-    [Parameter]
     public CommentType Type { get; set; }
 
     [Parameter]
@@ -88,19 +82,13 @@
             }
             else
             {
-                if(IsAdmin)
-                {
-                    await ToastService.Success("发表评论成功", "发表评论成功");
-                }
-                else
-                {
+                
                     await SwalService.Show(new SwalOption()
                     {
                         Category = SwalCategory.Success,
                         Title = "评论成功",
                         Content="评论将会在审核后发布"
                     });
-                }
 
                 await RelyCallBack.InvokeAsync();
             }

@@ -6,8 +6,8 @@
         </div>
     </div>
     <div class="p-3" style=" display: flex; flex-direction: column; align-items: center;">
-        <h1 class="h5 text-center fw-bold" style=" word-break: break-all;">@Model.Name</h1>
-        <div style="display: flex; font-size: smaller;">
+        <h1 class="h4 text-center fw-bold" style=" word-break: break-all;">@Model.Name</h1>
+        <div class="d-flex">
             @foreach (var item in Model.Ranks)
             {
                 <RankAloneViewTip Model="item"></RankAloneViewTip>

@@ -501,228 +501,228 @@
 }
 
 .bg-title-color-1 {
-    color: white;
+    color: white!important;
     background-color: #DC4251;
 }
 
 .bg-context-1:hover {
-    color: white;
+    color: white!important;
     background-color: #DC4251;
 }
 
 .bg-context-1 {
-    color: #DC4251;
+    color: #DC4251!important;
     border-color: #DC4251;
 }
 
 .bg-color-1 {
-    color: #DC4251;
+    color: #DC4251!important;
 }
 
 
 
 .bg-title-color-2 {
-    color: white;
+    color: white!important;
     background-color: tomato;
 }
 
 .bg-context-2:hover {
-    color: white;
+    color: white!important;
     background-color: tomato;
 }
 
 .bg-context-2 {
-    color: tomato;
+    color: tomato!important;
     border-color: tomato;
 }
 
 .bg-color-2 {
-    color: tomato;
+    color: tomato!important;
 }
 
 
 
 .bg-title-color-3 {
-    color: white;
+    color: white!important;
     background-color: #FF7D4E;
 }
 
 .bg-context-3:hover {
-    color: white;
+    color: white!important;
     background-color: #FF7D4E;
 }
 
 .bg-context-3 {
-    color: #FF7D4E;
+    color: #FF7D4E!important;
     border-color: #FF7D4E;
 }
 
 .bg-color-3 {
-    color: #FF7D4E;
+    color: #FF7D4E!important;
 }
 
 
 
 .bg-title-color-4 {
-    color: white;
+    color: white!important;
     background-color: #FFB700;
 }
 
 .bg-context-4:hover {
-    color: white;
+    color: white!important;
     background-color: #FFB700;
 }
 
 .bg-context-4 {
-    color: #FFB700;
+    color: #FFB700!important;
     border-color: #FFB700;
 }
 
 .bg-color-4 {
-    color: #FFB700;
+    color: #FFB700!important;
 }
 
 
 
 .bg-title-color-5 {
-    color: white;
+    color: white!important;
     background-color: peru;
 }
 
 .bg-context-5:hover {
-    color: white;
+    color: white!important;
     background-color: peru;
 }
 
 .bg-context-5 {
-    color: peru;
+    color: peru!important;
     border-color: peru;
 }
 
 .bg-color-5 {
-    color: peru;
+    color: peru!important;
 }
 
 
 
 .bg-title-color-6 {
-    color: white;
+    color: white!important;
     background-color: #28A745;
 }
 
 .bg-context-6:hover {
-    color: white;
+    color: white!important;
     background-color: #28A745;
 }
 
 .bg-context-6 {
-    color: #28A745;
+    color: #28A745!important;
     border-color: #28A745;
 }
 
 .bg-color-6 {
-    color: #28A745;
+    color: #28A745!important;
 }
 
 
 
 .bg-title-color-7 {
-    color: white;
+    color: white!important;
     background-color: #72CBBA;
 }
 
 .bg-context-7:hover {
-    color: white;
+    color: white!important;
     background-color: #72CBBA;
 }
 
 .bg-context-7 {
-    color: #72CBBA;
+    color: #72CBBA!important;
     border-color: #72CBBA;
 }
 
 .bg-color-7 {
-    color: #72CBBA;
+    color: #72CBBA!important;
 }
 
 
 .bg-title-color-8 {
-    color: white;
+    color: white!important;
     background-color: lightskyblue;
 }
 
 .bg-context-8:hover {
-    color: white;
+    color: white!important;
     background-color: lightskyblue;
 }
 
 .bg-context-8 {
-    color: lightskyblue;
+    color: lightskyblue!important;
     border-color: lightskyblue;
 }
 
 .bg-color-8 {
-    color: lightskyblue;
+    color: lightskyblue!important;
 }
 
 
 .bg-title-color-9 {
-    color: white;
+    color: white!important;
     background-color: #3694F9;
 }
 
 .bg-context-9:hover {
-    color: white;
+    color: white!important;
     background-color: #3694F9;
 }
 
 .bg-context-9 {
-    color: #3694F9;
+    color: #3694F9!important;
     border-color: #3694F9;
 }
 
 .bg-color-9 {
-    color: #3694F9;
+    color: #3694F9!important;
 }
 
 
 .bg-title-color-10 {
-    color: white;
+    color: white!important;
     background-color: #5152A9;
 }
 
 .bg-context-10:hover {
-    color: white;
+    color: white!important;
     background-color: #5152A9;
 }
 
 .bg-context-10 {
-    color: #5152A9;
+    color: #5152A9!important;
     border-color: #5152A9;
 }
 
 .bg-color-10 {
-    color: #3694F9;
+    color: #5152A9!important;
 }
 
 
 .bg-title-color-11 {
-    color: white;
+    color: white!important;
     background-color: #73448F;
 }
 
 .bg-context-11:hover {
-    color: white;
+    color: white!important;
     background-color: #73448F;
 }
 
 .bg-context-11 {
-    color: #73448F;
+    color: #73448F!important;
     border-color: #73448F;
 }
 
 .bg-color-11 {
-    color: #73448F;
+    color: #73448F!important;
 }
 .layout-title .nav-link {
     color: white;
