@@ -3,7 +3,8 @@
 
 <ErrorHandler @ref="errorHandler">
     <ErrorLogger ShowToast="false" OnErrorHandleAsync="OnErrorHandleAsync">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip"/>
+        <ImagesLargeViewTip/>
         <CascadingValue Value=this>
             @ChildContent
         </CascadingValue>
@@ -15,6 +16,7 @@
     public RenderFragment ChildContent { get; set; }
 
     ErrorHandler errorHandler;
+    CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip styleTip;
     public Task OnErrorHandleAsync(ILogger logger, Exception ex)
     {
         if (ex is OutOfMemoryException)
@@ -28,4 +30,9 @@
         }
     }
 
+    public async Task SaveTheme()
+    {
+        await styleTip.SaveTheme();
+        styleTip.Refresh();
+    }
 }

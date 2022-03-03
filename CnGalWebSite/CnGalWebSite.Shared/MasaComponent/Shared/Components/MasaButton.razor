@@ -3,7 +3,7 @@
 {
     @if (string.IsNullOrWhiteSpace(Tooltip))
     {
-        <MButton Icon="!Fab" Fab="Fab" Dark Small="Fab" Color="@Color" Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" >
+        <MButton Icon="!Fab" Fab="Fab" Dark Small="(!XSmall)&&Fab" Color="@Color" Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" XSmall="XSmall">
             <MIcon>@Icon</MIcon>
         </MButton>
 
@@ -12,7 +12,7 @@
     {
         <MTooltip Bottom>
             <ActivatorContent>
-                <MButton Icon="!Fab" Dark  Small="Fab" Fab="Fab" Color="@Color" Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled">
+                <MButton Icon="!Fab" Dark  Small="(!XSmall)&&Fab" Fab="Fab" Color="@Color" Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" XSmall="XSmall">
                     <MIcon>@Icon</MIcon>
                 </MButton>
             </ActivatorContent>
@@ -27,7 +27,7 @@ else
 {
     @if (string.IsNullOrWhiteSpace(Tooltip))
     {
-        <MButton Color="@Color" Dark Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded"  Depressed="Depressed">
+        <MButton Color="@Color" Dark Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded"  Depressed="Depressed" XSmall="XSmall">
             @if (string.IsNullOrWhiteSpace(Icon) == false)
             {
                 <MIcon>@Icon</MIcon>
@@ -40,7 +40,7 @@ else
     {
         <MTooltip Bottom>
             <ActivatorContent>
-                <MButton Color="@Color" Dark Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed">
+                <MButton Color="@Color" Dark Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall">
                     @if (string.IsNullOrWhiteSpace(Icon) == false)
                     {
                         <MIcon>@Icon</MIcon>
@@ -66,6 +66,8 @@ else
     public bool IsAsync { get; set; }
     [Parameter]
     public bool Fab { get; set; }
+    [Parameter]
+    public bool XSmall { get; set; }
     [Parameter]
     public string Text { get; set; }
     [Parameter]

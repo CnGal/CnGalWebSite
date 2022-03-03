@@ -1,13 +1,7 @@
 ﻿@if (Model.Staffs != null && Model.Staffs.Count != 0)
 {
-    <div class="  rounded shadow-sm  ps-3 pe-3 pt-2 pb-2 mb-3 bg-opacity rounded">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="Staff" TextColor="bg-color-1" Icon="fa fa-fw fa-sitemap">
         <div class="row">
-            @if (IsSmallScreen == false)
-            {
-                <div class="">
-                    <h2 class="fw-bold pb-3 m-0 bg-color-1 h5"><i class="fa fa-sitemap"></i>&nbsp;&nbsp;STAFF</h2>
-                </div>
-            }
             @{ int rx = 1;}
             @foreach (var item in Model.Staffs)
             {
@@ -42,8 +36,7 @@
                     {
                         isUsed = false;
                     }
-                    <div class="h4 col-12 col-sm-6 mb-2 @(IsLargeScreen?" col-xl-12":"")" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
-
+                    <div class="h4 col-12 mb-2" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
                         <OutlineButton IsTitile="true" Text="@infor.Modifier" ColorNum="@rx.ToString()" />
 
                         @foreach (var temp in infor.Names)
@@ -56,16 +49,10 @@
             }
 
         </div>
-
-    </div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 }
 
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
-    [Parameter]
-    public bool IsLargeScreen { get; set; }
-    [Parameter]
-    public bool IsSmallScreen { get; set; }
-
 }

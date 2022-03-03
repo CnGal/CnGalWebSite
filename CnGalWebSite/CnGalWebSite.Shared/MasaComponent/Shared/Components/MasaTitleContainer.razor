@@ -1,7 +1,7 @@
-﻿<div class="@("rounded shadow-sm  bg-opacity rounded p-3 "+Class)">
-    <div style="display: flex; flex-direction: row; justify-content: space-between;">
-        <h2 class="fw-bold font-color h5" style="margin-bottom:auto;margin-top:auto;">
-        <i class="@(Icon+" font-color")"></i> &nbsp;&nbsp;@Title
+﻿<div class="@("rounded shadow-sm  bg-opacity rounded p-3 "+Class+(IsCollapsed?" mb-3":""))">
+    <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+        <h2 class="@("fw-bold h5 m-0 "+TextColor)">
+            <i class="@Icon"></i> &nbsp;&nbsp;@Title
         </h2>
         <div>
             @ButtonContent
@@ -9,12 +9,12 @@
             {
                 @if (IsCollapsed)
                 {
-                    <Button style=" width: 75px;" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-chevron-right" Text="折叠" OnClick="@(()=>OnCollapseChanged(false))" />
+                    <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-right" Tooltip="展开" OnClick="@(()=>OnCollapseChanged(false))" />
 
                 }
                 else
                 {
-                    <Button style=" width: 75px;" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-chevron-down" Text="展开" OnClick="@(()=>OnCollapseChanged(true))" />
+                    <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-down" Tooltip="折叠" OnClick="@(()=>OnCollapseChanged(true))" />
 
                 }
             }
@@ -22,14 +22,14 @@
     </div>
     @if (Outline == false)
     {
-        <div class="mt-3" style="@(IsCollapsed?"display:none;":"display:block;")">
+        <div class="@((IsCollapsed?"d-none ":"d-block") +" mt-3")">
             @ChildContent
         </div>
     }
 </div>
 @if (Outline)
 {
-    <div class="mt-3" style="@(IsCollapsed?"display:none;":"display:block;")">
+    <div class="@((IsCollapsed?"d-none ":"d-block" )+" mt-3")">
         @ChildContent
     </div>
 }
@@ -39,6 +39,10 @@
 @code {
     [Parameter]
     public string Icon { get; set; }
+    [Parameter]
+    public string TextColor { get; set; } = "pink--text text--lighten-3";
+    [Parameter]
+    public string ButtonColor { get; set; } = "pink lighten-3";
 
     [Parameter]
     public string Title { get; set; }

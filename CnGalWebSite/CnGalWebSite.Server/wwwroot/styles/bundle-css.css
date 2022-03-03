@@ -455,41 +455,41 @@
 }
 
 .bg-title-color-pr {
-    color: white;
+    color: white!important;
     background-color: #485159;
 }
 
 .bg-context-pr:hover {
-    color: white;
+    color: white!important;
     background-color: #485159;
 }
 
 .bg-context-pr {
-    color: #485159;
+    color: #485159!important;
     border-color: #485159;
 }
 
 .bg-color-pr {
-    color: #485159;
+    color: #485159!important;
 }
 
 .bg-title-color-pb {
-    color: white;
+    color: white!important;
     background-color: #485159;
 }
 
 .bg-context-pb:hover {
-    color: white;
+    color: white!important;
     background-color: #485159;
 }
 
 .bg-context-pb {
-    color: #485159;
+    color: #485159!important;
     border-color: #485159;
 }
 
 .bg-color-pb {
-    color: #485159;
+    color: #485159!important;
 }
 /*Staff*/
 .bg-title {

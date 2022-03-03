@@ -1,4 +1,4 @@
-﻿<div class="rounded shadow-sm bg-opacity rounded pb-3">
+﻿<div class="rounded shadow-sm bg-opacity rounded pb-4">
 
     @if (Model.IsEdit == true)
     {
@@ -30,7 +30,7 @@
                     <img style="height:200px;border-radius:50%;" src="@Model.Thumbnail" alt="@Model.Name">
                 }
             </div>
-            <div class="pt-2 ps-3 pe-3">
+            <div class="pt-2 ps-4 pe-4">
                 <h1 class="fw-bold h3" style="@((Model.Type==EntryType.Staff||Model.Type==EntryType.Role)?"text-align: center;":"")">@Model.Name</h1>
                 <div class="h4" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
 
@@ -67,7 +67,7 @@
     }
     else
     {
-        <div style="display:flex;" class="ps-3 pt-3 pe-3">
+        <div style="display:flex;" class="p-4 pb-0">
             <div>
                 @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
                 {
@@ -85,7 +85,7 @@
 
                 }
             </div>
-            <div class="ps-3">
+            <div class="ps-4">
                 <h1 class="fw-bold h3">@Model.Name</h1>
                 <div class="h4" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
 

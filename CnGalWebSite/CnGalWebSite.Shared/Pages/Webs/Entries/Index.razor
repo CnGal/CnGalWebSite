@@ -31,56 +31,17 @@ else
 {
     <div id="web_bg" style="background-image: url(@EntryView.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
 }
-@if (isNotFound == true)
+@if (isNotFound)
 {
     int temp = 0;
     <NotFoundEntry IsNeedLayput="true" EntryName="@(int.TryParse(Id,out temp)?"":ToolHelper.Base64DecodeName(Id))"></NotFoundEntry>
 }
 else
 {
-    <div class="row">
-        <div class=" @(IsLargeScreen ? "col-xl-12 col-xxl-8" : "col-lg-12")">
-            @if (isReady == false)
-            {
-                <div class="  rounded shadow-sm  bg-opacity pt-3">
-
-                    <div class="row mt-2 ms-2 me-2" style="padding-right: 0;padding-left: 0;">
-                        <div class="col-12 col-md-12 col-lg-5 mt-1 mb-4">
-                            <SkeletonAvatar Round="false" />
-                        </div>
-
-                        <div class="col-12 col-md-12 col-lg-6 mt-1 mb-2">
-                            <SkeletonParagraph />
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3">
-                        <SkeletonParagraph />
-
-                    </div>
-                </div>
-
-
-                <div class=" mt-3">
-                    <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
-                        <SkeletonParagraph />
-                    </div>
-                </div>
-                <div class="mt-3" style="padding-right: 0;padding-left: 0;">
-                    <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
-                        <SkeletonParagraph />
-                        <div class="mt-2">
-                        </div>
-                        <SkeletonParagraph />
-                        <div class="mt-2">
-                        </div>
-                        <SkeletonParagraph />
-                    </div>
-                </div>
-            }
-            else
-            {
+    @if (isReady)
+    {
+        <div class="row">
+            <div class="col-12 mb-4">
                 @if (EntryView.IsHidden == true)
                 {
                     <div class="alert alert-info  rounded shadow-sm  rounded" role="alert">
@@ -99,317 +60,184 @@ else
                     </div>
                 }
 
-                <div class=" mb-3 ">
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" IsSmallScreen="IsSmallScreen"/>
+                <div>
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" IsSmallScreen="IsSmallScreen" />
                 </div>
-                @if (IsLargeScreen == false)
+            </div>
+            <div class="col-12 col-lg-4">
+                @if (EntryView.IsEdit == true && EntryView.Type == EntryType.Game)
                 {
-                    @if (EntryView.IsEdit == true && EntryView.Type == EntryType.Game)
-                    {
-                        <div class="col-12  mb-3">
-                            <EntryPerfectionInforTipView EntryId="@EntryView.Id" IsNormalScreen="true"></EntryPerfectionInforTipView>
-                        </div>
-                    }
+                    <div class="mb-4">
+                        <EntryPerfectionInforTipView EntryId="@EntryView.Id" IsNormalScreen="true"></EntryPerfectionInforTipView>
+                    </div>
+                }
                 @if (EntryView.SteamId > 0)
                 {
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard IsNormalScreen="true" Model="EntryView" />
+                    <div class="mb-4">
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
+
+                    </div>
                 }
-
-
-                <div>
+                <div class="mb-4">
                     <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
                 </div>
-                <div>
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView"/>
+                <div class=" mb-4">
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
                 </div>
-            }
-
-
-                if (IsNormalScreen == true)
+                @if (_dataCatcheService.IsApp == false && EntryView.Staffs.Count > 0)
                 {
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" IsLargeScreen="false" />
+                    <div class=" mb-4">
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" />
+                    </div>
                 }
+            </div>
+            <div class="col-12 col-lg-8">
+                @if (_dataCatcheService.IsApp)
+                {
+                    <div class="mb-4">
+                        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded shadow-sm bg-opacity "
+                               Color="pink lighten-3">
 
+                            <MTab Value="1">
+                                首页<MIcon>mdi-home</MIcon>
+                            </MTab>
+                            <MTab Value="2">
+                                相关<MIcon>fa fa-link </MIcon>
+                            </MTab>
+                            @if (EntryView.NewsOfEntry.Count != 0)
+                            {
+                                <MTab Value="3">
+                                    动态<MIcon>mdi-newspaper-variant-multiple-outline</MIcon>
+                                </MTab>
+                            }
+                            @if (_dataCatcheService.IsApp && EntryView.Staffs.Count > 0)
+                            {
+                                <MTab Value="4">
+                                    Staff<MIcon>fa fa-sitemap</MIcon>
+                                </MTab>
+                            }
 
-                <EntryTabViewTip Type="EntryView.Type" IsEdit="EntryView.IsEdit" RandomIndex="randomIndex" IsHidden="EntryView.IsHidden"
-                                 OnTabClick="OnTabClick" IsSmallScreen="IsSmallScreen" IsFavorited="IsUserFavorited" DefaultIndex="defaultIndex"></EntryTabViewTip>
+                            <MTab Value="5">
+                                周边<MIcon>mdi-basket-outline </MIcon>
+                            </MTab>
+                        </MTabs>
+                    </div>
+                    <div>
+                        <MTabsItems @bind-Value="TabIndex">
+                            <MTabItem Value="1">
+                                @if (EntryView.Pictures.Count != 0)
+                                {
+                                    <div class="mb-4">
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.ImagesCard Model="EntryView" OnRevoke="OnRevoke" />
 
-                <div class="mt-3 mb-3" style="padding-right: 0;padding-left: 0;">
-                    <div class="tab-content" id="@("pills" + randomIndex + "-tabContent")">
-                        <div class="@("tab-pane fade"+(defaultIndex==0?" show active ":"") )" id="@("pills" + randomIndex + "-0")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-0-tab")">
-                            <div>
+                                    </div>
+                                }
+                                @if (_dataCatcheService.IsApp == false && EntryView.Staffs.Count != 0)
+                                {
+                                    <div class="mb-4">
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" />
+                                    </div>
+                                }
+                                <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
 
-                                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity">
-
-                                    @if (EntryView.IsEdit == true)
-                                    {
-                                        @switch (EntryView.MainPageState)
-                                        {
-                                            case EditState.locked:
-                                                <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                                                break;
-                                            case EditState.Normal:
-                                                @if (string.IsNullOrWhiteSpace(EntryView.MainPage) == true)
-                                                {
-                                                    <AlertTip Title="编辑词条主页" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditMainPage/" + @EntryView.Id)"></AlertTip>
-                                                }
-                                                else
-                                                {
-                                                    <AlertTip Title="编辑词条主页" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditMainPage/" + @EntryView.Id)"></AlertTip>
-
-                                                }
-
-                                                break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        @if (string.IsNullOrWhiteSpace(EntryView.MainPage) == true && EntryView.MainPageState != EditState.locked)
-                                        {
-                                            <AlertTip Title="编辑词条主页" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditMainPage/" + @EntryView.Id)"></AlertTip>
-                                        }
-                                    }
-                                    @if (EntryView.MainPageState == EditState.Preview)
-                                    {
-                                        <AlertTip Title="编辑词条主页" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditMainPage/" + @EntryView.Id)" ExamineType="Operation.EstablishMainPage" OnClickRevoke="OnRevoke"></AlertTip>
-                                    }
-
-
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" IsLargeScreen="IsLargeScreen"/>
-
+                                <div>
+                                    <AuthorizeView Roles="Admin">
+                                        <AlertTip Title="管理词条评论" Type="AlertTip.AlertTipType.EntryComment" Url="@("/entries/editentrycomments/" + EntryView.Id)"></AlertTip>
+                                    </AuthorizeView>
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
                                 </div>
-                            </div>
-                        </div>
-                        <div class="@("tab-pane fade"+(defaultIndex==1?" show active ":"") )" id="@("pills" + randomIndex + "-1")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-1-tab")">
-                            <div>
-                                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity">
-                                    @if (EntryView.IsEdit == true)
-                                    {
-                                        @switch (EntryView.ImagesState)
-                                        {
-                                            case EditState.locked:
-                                                <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                                                break;
-                                            case EditState.Normal:
-                                                @if (EntryView.Pictures.Count == 0)
-                                                {
-                                                    <AlertTip Title="编辑词条图片" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditImages/" + @EntryView.Id)"></AlertTip>
-                                                }
-                                                else
-                                                {
-                                                    <AlertTip Title="编辑词条图片" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditImages/" + @EntryView.Id)"></AlertTip>
-                                                }
+                            </MTabItem>
+                            <MTabItem Value="2">
+                                <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke"></EntryRelevancesNormalListViewTip>
+                            </MTabItem>
+                            @if (EntryView.NewsOfEntry.Count != 0)
+                            {
+                                <MTabItem Value="3">
 
-                                                break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        @if (EntryView.Pictures.Count == 0 && EntryView.ImagesState != EditState.locked)
-                                        {
-                                            <AlertTip Title="编辑词条图片" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditImages/" + @EntryView.Id)"></AlertTip>
-                                        }
-                                    }
-                                    @if (EntryView.ImagesState == EditState.Preview)
-                                    {
-                                        <AlertTip Title="编辑词条图片" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditImages/" + @EntryView.Id)" ExamineType="Operation.EstablishImages" OnClickRevoke="OnRevoke"></AlertTip>
-                                    }
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.NewsTimelineCard Model="EntryView" OnRevoke="OnRevoke" />
+
+                                </MTabItem>
+                            }
 
 
-                                    @if (TabIndexNum == 1)
-                                    {
-                                        <EntryImageListViewTip Model="EntryView.Pictures"></EntryImageListViewTip>
-                                    }
 
-                                </div>
-                            </div>
+                            @if (_dataCatcheService.IsApp && EntryView.Staffs.Count > 0)
+                            {
+                                <MTabItem Value="4">
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" />
+                                </MTabItem>
+                            }
 
-                        </div>
+                            <MTabItem Value="5">
+                                    <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" />
 
-                        <div class="@("tab-pane fade"+(defaultIndex==3?" show active ":"") )" id="@("pills" + randomIndex + "-3")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-3-tab")">
-                            <div>
-                                @if (EntryView.IsEdit == true)
-                                {
-                                    @switch (EntryView.RelevancesState)
-                                    {
-                                        case EditState.locked:
-                                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                                            break;
-                                        case EditState.Normal:
-                                            @if (EntryView.ArticleRelevances.Count == 0 && EntryView.EntryRelevances.Count == 0 && EntryView.OtherRelevances.Count == 0 && EntryView.StaffGames.Count == 0 && EntryView.Roles.Count == 0)
-                                            {
-                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
-                                            }
-                                            else
-                                            {
-                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
-                                            }
+                            </MTabItem>
+                        </MTabsItems>
+                    </div>
 
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    @if (EntryView.ArticleRelevances.Count == 0 && EntryView.EntryRelevances.Count == 0 && EntryView.OtherRelevances.Count == 0 && EntryView.StaffGames.Count == 0 && EntryView.Roles.Count == 0 && EntryView.RelevancesState != EditState.locked)
-                                    {
-                                        <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
-                                    }
-                                }
-                                @if (EntryView.RelevancesState == EditState.Preview)
-                                {
-                                    <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"></AlertTip>
-                                }
-
-                                <EntryRelevancesNormalListViewTip Model="EntryView"></EntryRelevancesNormalListViewTip>
+                }
+                else
+                {
+                    <div>
+                        @if (EntryView.Pictures.Count != 0)
+                        {
+                            <div class="mb-4">
+                                <CnGalWebSite.Shared.Component.Entries.NewVersion.ImagesCard Model="EntryView" OnRevoke="OnRevoke" />
 
                             </div>
-                        </div>
-                        <div class="@("tab-pane fade"+(defaultIndex==4?" show active ":"") )" id="@("pills" + randomIndex + "-4")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-4-tab")">
-                            <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity">
-                                <CnGalWebSite.Shared.Component.Entries.NewVersion.ExaminesInforCard Model="@EntryView.Examines" IsSmallScreen="IsSmallScreen"/>
+                        }
+                    
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
+                        <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke"></EntryRelevancesNormalListViewTip>
+                        @if (EntryView.NewsOfEntry.Count != 0)
+                        {
+                            <div class="mb-4">
+                                <CnGalWebSite.Shared.Component.Entries.NewVersion.NewsTimelineCard Model="EntryView" OnRevoke="OnRevoke" />
+
                             </div>
-                        </div>
-                        <div class="@("tab-pane fade"+(defaultIndex==10?" show active ":"") )" id="@("pills" + randomIndex + "-10")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-10-tab")">
-                            <div>
-
-                                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity">
-                                    @if (EntryView.IsEdit == true)
-                                    {
-                                        @switch (EntryView.RelevancesState)
-                                        {
-                                            case EditState.locked:
-                                                <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                                                break;
-                                            case EditState.Preview:
-                                                <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
-                                                break;
-                                            case EditState.Normal:
-                                                @if (EntryView.NewsOfEntry.Count == 0)
-                                                {
-                                                    <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
-                                                }
-                                                else
-                                                {
-                                                    <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
-                                                }
-
-                                                break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        @if (EntryView.NewsOfEntry.Count == 0 && EntryView.RelevancesState != EditState.locked)
-                                        {
-                                            <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditRelevances/" + @EntryView.Id)"></AlertTip>
-                                        }
-                                    }
-                                    @if (EntryView.RelevancesState == EditState.Preview)
-                                    {
-                                        <AlertTip Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"></AlertTip>
-                                    }
-                                    
-                                    @if (EntryView.NewsOfEntry.Count > 0)
-                                    {
-                                       <CnGalWebSite.Shared.Component.Entries.NewVersion.NewsTimelineCard Model="EntryView" IsSmallScreen="IsSmallScreen"/>
-                                    }
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="@("tab-pane fade"+(defaultIndex==12?" show active ":"") )" id="@("pills" + randomIndex + "-12")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-12-tab")">
-                            <div>
-                                <AuthorizeView Roles="Admin">
-                                    <AlertTip Title="管理词条评论" Type="AlertTip.AlertTipType.EntryComment" Url="@("/entries/editentrycomments/" + EntryView.Id)"></AlertTip>
-                                </AuthorizeView>
-                               <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" IsShowNotFound="true" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries"/>
-                            </div>
-                        </div>
-
-
-                        <div class="@("tab-pane fade"+(defaultIndex==17?" show active ":"") )" id="@("pills" + randomIndex + "-17")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-17-tab")">
-                            <div>
-                                @if (EntryView.IsEdit == true)
-                                {
-                                    @switch (EntryView.InforState)
-                                    {
-                                        case EditState.locked:
-                                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                                            break;
-                                        case EditState.Preview:
-                                            <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
-                                            break;
-                                        case EditState.Normal:
-                                            @if (EntryView.Staffs.Count == 0)
-                                            {
-                                                <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
-                                            }
-                                            else
-                                            {
-                                                <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Editable" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
-                                            }
-
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    @if (EntryView.Staffs.Count == 0 && EntryView.InforState != EditState.locked)
-                                    {
-                                        <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.Blank" Url="@("/entries/EditAddInfor/" + @EntryView.Id)"></AlertTip>
-                                    }
-                                }
-
-                                @if (EntryView.InforState == EditState.Preview)
-                                {
-                                    <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + @EntryView.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"></AlertTip>
-                                }
-
-                                @if (EntryView.Staffs.Count > 0)
-                                {
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" IsLargeScreen="false" />
-                                }
-                            </div>
-                        </div>
-                        <div class="@("tab-pane fade"+(defaultIndex==20?" show active ":"") )" id="@("pills" + randomIndex + "-20")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-20-tab")">
-                            <div class=" rounded shadow-sm  bg-opacity ps-4 pe-4 pt-3 mb-3">
-                                <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" />
-                            </div>
+                        }
+                            <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" Class="mb-4"/>
+                        <div>
+                            <AuthorizeView Roles="Admin">
+                                <AlertTip Title="管理词条评论" Type="AlertTip.AlertTipType.EntryComment" Url="@("/entries/editentrycomments/" + EntryView.Id)"></AlertTip>
+                            </AuthorizeView>
+                            <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
                         </div>
                     </div>
+                }
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="  rounded shadow-sm  bg-opacity pt-3">
+
+            <div class="row mt-2 ms-2 me-2">
+                <div class="col-12 col-md-12 col-lg-5 mt-1 mb-4">
+                    <SkeletonAvatar Round="false" />
                 </div>
-            }
+
+                <div class="col-12 col-md-12 col-lg-6 mt-1 mb-2">
+                    <SkeletonParagraph />
+                </div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3">
+                <SkeletonParagraph />
+
+            </div>
         </div>
 
-        @if (IsLargeScreen)
-        {
-    <div class="col-xl-12 col-xxl-4">
-        @if (isReady)
-        {
-            @if (EntryView.IsEdit == true && EntryView.Type == EntryType.Game)
-            {
-                <EntryPerfectionInforTipView EntryId="@EntryView.Id"></EntryPerfectionInforTipView>
-            }
-            @if (EntryView.SteamId != 0)
-            {
-                <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard IsNormalScreen="false" Model="EntryView" />
-            }
-            <div>
-                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
+
+        <div class=" mt-3">
+            <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                <SkeletonParagraph />
             </div>
-            <div>
-                <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" />
-            </div>
-            @if (EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff)
-            {
-                <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="EntryView" />
-            }
-            @if (EntryView.Type == EntryType.Game)
-            {
-                <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" IsLargeScreen="true" />
-            }
-        }
-        else
-        {
+        </div>
+        <div class="mt-3" >
             <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
                 <SkeletonParagraph />
                 <div class="mt-2">
@@ -419,11 +247,9 @@ else
                 </div>
                 <SkeletonParagraph />
             </div>
-        }
-
-    </div>
-        }
-    </div>
+        </div>
+    }
+  
 }
 
 
@@ -440,9 +266,6 @@ else
         set
         {
             id = value;
-            steamInfor = null;
-            TabIndexNum = 0;
-            randomIndex = random.Next();
             if (isFirstLoad == false)
             {
                 OnReLoad();
@@ -471,23 +294,14 @@ else
             }
         }
     }
+    public StringNumber TabIndex { get; set; } = 1;
 
-    public string MainPageHtml { get; set; }
-
-    public string steam { get; set; }
-    public int currentPage { get; set; } = 1;
-    public string NoticeCard { get; set; } = "";
     bool isReady = false;
     bool isNotFound = false;
     bool isFirstLoad = true;
     public string CurrentUserRank { get; set; }
-    Random random = new Random();
-    public int randomIndex = 0;
 
     public EntryIndexViewModel EntryView { get; set; } = new EntryIndexViewModel();
-
-    public SteamInfor steamInfor { get; set; } = new SteamInfor();
-    public int TabIndexNum = 0;
 
     public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
 
@@ -605,7 +419,7 @@ else
     {
 
         //记录数据
-        if (EntryView.Name != LastLookName &&string.IsNullOrWhiteSpace(EntryView.Name)==false)
+        if (EntryView.Name != LastLookName && string.IsNullOrWhiteSpace(EntryView.Name) == false)
         {
             LastLookName = EntryView.Name;
 
@@ -657,7 +471,7 @@ else
                 CanDeleted = true;
             }
 
-          
+
             //获取是否被收藏
             if (user.Identity.IsAuthenticated)
             {
@@ -772,66 +586,31 @@ else
         }
     }
 
-
-    public async Task OnTabClick(int index)
+    public Task OnClickLogin()
     {
-        if (index == 5)
-        {
-            OpenNewPage(steam);
-        }
-        else if (index == 6)
-        {
-            Edit();
-        }
-        else if (index == 7)
-        {
-            UnEdit();
-        }
-        else if (index == 8)
-        {
-            UnHidden();
-        }
-        else if (index == 9)
-        {
+        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        return Task.CompletedTask;
+    }
 
-            Hidden();
-        }
-        else if (index == 11)
+    public async Task OnClickEditRecored()
+    {
+        var option = new DialogOption()
         {
-            NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        }
-        else if (index == 18)
+            Title = "编辑游玩记录"
+        };
+        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip>(new Dictionary<string, object>
         {
-            await OnFavoriteClick();
+            [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip.Id)] = EntryView.Id,
+            [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
 
-        }
-        else if (index == 19)
-        {
-            await OnUnFavoriteClick();
-        }
-        else if(index==21)
-        {
-            var option = new DialogOption()
-            {
-                Title = "编辑游玩记录"
-            };
-            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip>(new Dictionary<string, object>
-            {
-                [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip.Id)] = EntryView.Id,
-                [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
+        }).Render();
+        await DialogService.Show(option);
 
-            }).Render();
-            await DialogService.Show(option);
-        }
-        else
-        {
-            TabIndexNum = index;
-        }
+        
     }
 
     public async Task GetPlayedGameInfor()
     {
-
         try
         {
             GameInforModel = await Http.GetFromJsonAsync<PlayedGameInforModel>(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameInfor/" + EntryView.Id);

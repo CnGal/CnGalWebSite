@@ -1,11 +1,16 @@
-﻿<Timeline Items="AlternateTimelineItems" IsAlternate="!((IsSmallScreen) || (Model.NewsOfEntry.Count < 3))" />
-
+﻿@if (Model.RelevancesState == EditState.Preview)
+{
+    <AlertTip Title="编辑关联信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + Model.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"></AlertTip>
+}
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="动态" Icon="fa fa-fw fa-newspaper-o">
+    <Timeline Items="AlternateTimelineItems" IsAlternate="true" />
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
     [Parameter]
-    public bool IsSmallScreen { get; set; }
+    public EventCallback<Operation> OnRevoke { get; set; }
     private readonly List<TimelineItem> AlternateTimelineItems = new List<TimelineItem>();
 
     protected override async Task OnInitializedAsync()

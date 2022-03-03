@@ -1,28 +1,35 @@
-﻿
-@if ((Model.Type == EntryType.Role || Model.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(Model.MainPage)
-    && string.IsNullOrWhiteSpace(Model.MainPicture)==false&& IsLargeScreen==false)
+﻿@if (Model.MainPageState == EditState.Preview)
 {
-    <div class="row">
-        <div class="col-12">
-            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-paint-brush"></i>&nbsp;&nbsp;@(Model.Type==EntryType.Role? "立绘" : "主图")</h2>
-        </div>
-        <div class="col-12 col-lg-6">
-            <img src="@Model.MainPicture" alt="@Model.Name" style="width:100%" />
-        </div>
-    </div>
+    <AlertTip Title="编辑词条主页" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditMainPage/" + Model.Id)" ExamineType="Operation.EstablishMainPage" OnClickRevoke="OnRevoke"></AlertTip>
 }
 
-<div class="markdown-body" style="margin-bottom:0px">
-    @((MarkupString)Model.MainPage)
+<div class="row">
+    @if (string.IsNullOrWhiteSpace(Model.MainPage) == false)
+    {
+        <div class="col mb-4">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="介绍" Icon="fa fa-fw fa-home">
+                <MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
+                <div>
+                    <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Entry" Id="Model.Id" />
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </div>
+    }
+
+    @if ((Model.Type == EntryType.Role || Model.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(Model.MainPicture) == false)
+    {
+        <div class="@(string.IsNullOrWhiteSpace(Model.MainPicture)?"":"col-lg-4") col-12  d-none d-lg-flex mb-4">
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="Model" />
+        </div>
+    }
 </div>
-<div>
-    <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Entry" Id="Model.Id" />
-</div>
+
+
 
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
     [Parameter]
-    public bool IsLargeScreen { get; set; }
+    public EventCallback<Operation> OnRevoke { get; set; }
 
 }
