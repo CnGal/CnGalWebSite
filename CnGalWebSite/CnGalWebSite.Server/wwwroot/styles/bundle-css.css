@@ -994,6 +994,28 @@
     font-size: 1.5rem !important;
     line-height: 2.25rem !important;
 }
+/*相册查看组件*/
+.image-overlays {
+    opacity: .4;
+    height: 100%;
+    background-size: contain;
+    background-position: 50%;
+    background-position-x: 50%;
+    background-position-y: center;
+}
+
+.image-overlays.active {
+    opacity: 1!important;
+}
+
+.image-overlays:hover {
+    opacity: 1;
+}
+.image-contain {
+    height: 100%;
+    background-position: center top;
+    background-size: cover;
+}
 
 .ContributionCalendar-day {
     margin: 0.15rem;

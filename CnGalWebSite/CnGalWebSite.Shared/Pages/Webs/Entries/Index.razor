@@ -1,11 +1,9 @@
 ﻿@inject HttpClient Http
-@inject ExamineService _examineService
 @inject ToastService ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IAppHelper _appHelper
 @inject IJSRuntime JS
-@implements IAsyncDisposable
 @inject IDataCacheService _dataCatcheService
 
 @inject DialogService DialogService
@@ -61,16 +59,10 @@ else
                 }
 
                 <div>
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" IsSmallScreen="IsSmallScreen" />
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke"/>
                 </div>
             </div>
-            <div class="col-12 col-lg-4">
-                @if (EntryView.IsEdit == true && EntryView.Type == EntryType.Game)
-                {
-                    <div class="mb-4">
-                        <EntryPerfectionInforTipView EntryId="@EntryView.Id" IsNormalScreen="true"></EntryPerfectionInforTipView>
-                    </div>
-                }
+            <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4") ">
                 @if (EntryView.SteamId > 0)
                 {
                     <div class="mb-4">
@@ -84,14 +76,23 @@ else
                 <div class=" mb-4">
                     <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
                 </div>
+
+                @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
+                {
+                    <div class="mb-4">
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="EntryView" />
+                    </div>
+                }
                 @if (_dataCatcheService.IsApp == false && EntryView.Staffs.Count > 0)
                 {
                     <div class=" mb-4">
                         <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" />
                     </div>
                 }
+                <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke" LeftDisplay />
+
             </div>
-            <div class="col-12 col-lg-8">
+            <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8") ">
                 @if (_dataCatcheService.IsApp)
                 {
                     <div class="mb-4">
@@ -138,13 +139,26 @@ else
                                         <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" />
                                     </div>
                                 }
+
+                                @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
+                                {
+                                    <div class="mb-4">
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="EntryView" />
+                                    </div>
+                                }
                                 <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
 
                                 <div>
-                                    <AuthorizeView Roles="Admin">
-                                        <AlertTip Title="管理词条评论" Type="AlertTip.AlertTipType.EntryComment" Url="@("/entries/editentrycomments/" + EntryView.Id)"></AlertTip>
-                                    </AuthorizeView>
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
+                                    @if (EntryView.CanComment)
+                                    {
+
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+                                            <AuthorizeView Roles="Admin">
+                                                <AlertTip Title="管理词条评论" Type="AlertTip.AlertTipType.EntryComment" Url="@("/entries/editentrycomments/" + EntryView.Id)"></AlertTip>
+                                            </AuthorizeView>
+                                            <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
+                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                    }
                                 </div>
                             </MTabItem>
                             <MTabItem Value="2">
@@ -169,7 +183,7 @@ else
                             }
 
                             <MTabItem Value="5">
-                                    <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" />
+                                <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" />
 
                             </MTabItem>
                         </MTabsItems>
@@ -186,9 +200,8 @@ else
 
                             </div>
                         }
-                    
+
                         <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
-                        <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke"></EntryRelevancesNormalListViewTip>
                         @if (EntryView.NewsOfEntry.Count != 0)
                         {
                             <div class="mb-4">
@@ -196,12 +209,20 @@ else
 
                             </div>
                         }
-                            <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" Class="mb-4"/>
+                        <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke" RightDisplay />
+
+                        <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" Class="mb-4" />
                         <div>
-                            <AuthorizeView Roles="Admin">
-                                <AlertTip Title="管理词条评论" Type="AlertTip.AlertTipType.EntryComment" Url="@("/entries/editentrycomments/" + EntryView.Id)"></AlertTip>
-                            </AuthorizeView>
-                            <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
+                            @if (EntryView.CanComment)
+                            {
+
+                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+                                    <AuthorizeView Roles="Admin">
+                                        <AlertTip Title="管理词条评论" Type="AlertTip.AlertTipType.EntryComment" Url="@("/entries/editentrycomments/" + EntryView.Id)"></AlertTip>
+                                    </AuthorizeView>
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
+                                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                            }
                         </div>
                     </div>
                 }
@@ -274,26 +295,15 @@ else
 
         }
     }
-    private int defaultIndex { get; set; } = 0;
-    [Parameter]
-    public string DefaultIndex
+    public bool IsNoLeft
     {
         get
         {
-            return defaultIndex.ToString();
-        }
-        set
-        {
-            try
-            {
-                defaultIndex = int.Parse(value);
-            }
-            catch
-            {
-                defaultIndex = 0;
-            }
+            return (EntryView.Information.Count == 0 && EntryView.SteamId <= 0 && EntryView.Tags.Count == 0 && EntryView.OtherRelevances.Count == 0 && EntryView.Roles.Count == 0 &&
+                      ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false) == false && (_dataCatcheService.IsApp == false && EntryView.Staffs.Count > 0) == false);
         }
     }
+
     public StringNumber TabIndex { get; set; } = 1;
 
     bool isReady = false;
@@ -305,50 +315,19 @@ else
 
     public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
 
-    public PlayedGameInforModel GameInforModel { get; set; } = new PlayedGameInforModel();
-
     public bool IsUserFavorited { get; set; }
     public FavoriteFoldersViewModel UserFavoriteInfor { get; set; }
 
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-
-    #region 新建标签页
-
-    public async void OpenNewPage(string url)
-    {
-        await JS.InvokeAsync<string>("openNewPage", url);
-    }
-
-    #endregion
-
-
-    #region 获取屏幕大小
-
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime? JSRuntime { get; set; }
-
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    public bool IsSmallScreen { get; set; }
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; } = true;
+
     public bool IsAdmin { get; set; } = false;
     public bool CanDeleted { get; set; }
     string LastLookName = "";
-
-    private JSInterop<Index>? Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
@@ -356,9 +335,6 @@ else
         {
 
             isFirstLoad = false;
-
-            Interop = new JSInterop<Index>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
 
             //获取用户收藏夹相关信息 只需要获取一次
             var userState = await authenticationStateTask;
@@ -381,33 +357,6 @@ else
         }
 
     }
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 1100))
-        {
-            IsSmallScreen = width < 1100;
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 1100 && width < 1800))
-        {
-            IsNormalScreen = width >= 1100 && width < 1800;
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 1800))
-        {
-            IsLargeScreen = width >= 1800;
-            StateHasChanged();
-        }
-    }
-
-
-    #endregion
 
     async Task OnReLoad()
     {
@@ -476,7 +425,6 @@ else
             if (user.Identity.IsAuthenticated)
             {
                 await GetUserIsFavorited();
-                await GetPlayedGameInfor();
             }
 
             isReady = true;
@@ -592,35 +540,6 @@ else
         return Task.CompletedTask;
     }
 
-    public async Task OnClickEditRecored()
-    {
-        var option = new DialogOption()
-        {
-            Title = "编辑游玩记录"
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip>(new Dictionary<string, object>
-        {
-            [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip.Id)] = EntryView.Id,
-            [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-
-        }).Render();
-        await DialogService.Show(option);
-
-        
-    }
-
-    public async Task GetPlayedGameInfor()
-    {
-        try
-        {
-            GameInforModel = await Http.GetFromJsonAsync<PlayedGameInforModel>(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameInfor/" + EntryView.Id);
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取用户对该游戏记录信息失败");
-        }
-    }
 
 
     [Inject]
@@ -766,20 +685,4 @@ else
         }
 
     }
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
-    {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

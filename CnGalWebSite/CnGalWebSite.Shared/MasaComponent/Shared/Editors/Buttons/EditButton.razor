@@ -1,0 +1,154 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+
+    <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
+        <ActivatorContent Context="m">
+            <MTooltip Bottom>
+                <ActivatorContent Context="c">
+                    @{
+                        var attrs = new Dictionary<string, object>();
+                        m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                        c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                    }
+                    <MButton Fab Dark Small Color="pink lighten-3" @attributes="@attrs" Class="@Class">
+                        <MIcon>mdi-pencil</MIcon>
+                    </MButton>
+                </ActivatorContent>
+                <ChildContent>
+                    <span>编辑</span>
+                </ChildContent>
+            </MTooltip>
+        </ActivatorContent>
+
+        <ChildContent>
+            <div class="bg-white d-flex p-3" style="@("flex-direction: column; align-items: center; "+(ShowPerfection?"width:350px;":"width:300px;"))">
+                <div class="w-100">
+                    @if (isReady)
+                    {
+                        @if (ShowPerfection)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.PC.Perfections.SingleOverviewCard Model="Model.PerfectionInfor" OnClosed="OnClosed" />
+                            <MDivider Class="w-100"></MDivider>
+
+                        }
+                        <MButton Text Block Color="warning" OnClick="OnClickHistory">
+                            <MIcon Left>mdi-history </MIcon>
+                            历史编辑记录
+                        </MButton>
+                        @foreach (var item in Items)
+                        {
+                            <PartNavButton Model="item" />
+                        }
+                    }
+                    else
+                    {
+                        <MProgressCircular Size="60" Width="6" Indeterminate Color="pink lighten-3" Class="mt-4 mb-4"></MProgressCircular>
+                    }
+
+
+                </div>
+            </div>
+        </ChildContent>
+    </MMenu>
+@code {
+    [Parameter]
+    public ExaminedNormalListModelType Type { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public bool ShowPerfection { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+    bool isReady { get; set; }
+
+    private bool menu { get; set; }
+
+    public List<EditButtonLineModel> Items { get; set; } = new List<EditButtonLineModel>();
+
+    public Dictionary<Operation, EditState> EditStates { get; set; } = new Dictionary<Operation, EditState>();
+
+    public EditEntryInforBindModel Model { get; set; } = new EditEntryInforBindModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetExamineInfor();
+        ProcButtonList();
+        isReady = true;
+        StateHasChanged();
+    }
+
+    public async Task OnClickHistory()
+    {
+        var option = new DialogOption()
+        {
+            Title = "历史编辑记录"
+        };
+        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EditRecordListViewTip>(new Dictionary<string, object>
+        {
+            [nameof(EditRecordListViewTip.Id)] = Id,
+            [nameof(EditRecordListViewTip.Model)] = Model.Examines,
+            [nameof(EditRecordListViewTip.Type)] = Type,
+            [nameof(EditRecordListViewTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
+
+        }).Render();
+        await DialogService.Show(option);
+    }
+
+    public void ProcButtonList()
+    {
+        foreach (var item in EditStates)
+        {
+            Items.Add(new EditButtonLineModel
+            {
+                State = item.Value == EditState.Normal ? (Model.Examines.Any(s => s.Operation == item.Key) ? EditState.Normal : EditState.None) : item.Value,
+                EditCount = Model.Examines.Count(s => s.Operation == item.Key),
+                Id = long.Parse(Model.Examines.FirstOrDefault()?.RelatedId),
+                LastEditTime = Model.Examines.Where(s => s.Operation == item.Key).OrderByDescending(s => s.ApplyTime).FirstOrDefault()?.ApplyTime,
+                Operation = item.Key
+            });
+        }
+
+    }
+
+    public async Task GetExamineInfor()
+    {
+        try
+        {
+            var url = Type switch
+            {
+                ExaminedNormalListModelType.Entry => "api/entries/GetEntryEditInforBindModel/"
+            };
+            Model = await Http.GetFromJsonAsync<EditEntryInforBindModel>(ToolHelper.WebApiPath + url + Id);
+
+            switch (Type)
+            {
+                case ExaminedNormalListModelType.Entry:
+                    EditStates.Add(Operation.EstablishMain, Model.State.MainState);
+                    EditStates.Add(Operation.EstablishAddInfor, Model.State.InforState);
+                    EditStates.Add(Operation.EstablishMainPage, Model.State.MainPageState);
+                    EditStates.Add(Operation.EstablishImages, Model.State.ImagesState);
+                    EditStates.Add(Operation.EstablishRelevances, Model.State.RelevancesState);
+                    EditStates.Add(Operation.EstablishTags, Model.State.TagState);
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取词条编辑信息失败");
+            return;
+        }
+
+    }
+
+    public Task OnClosed()
+    {
+        menu = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

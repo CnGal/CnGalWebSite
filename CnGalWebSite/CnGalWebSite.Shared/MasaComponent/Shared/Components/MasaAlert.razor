@@ -1,11 +1,14 @@
-﻿<MAlert Text
-        Dense
-        Type="Type"
-        Color="@Color"
-        Icon="@Icon"
-        Border="Borders.Left">
-    @ChildContent
-</MAlert>
+﻿<div class="@(Class+( Outline?"":" rounded shadow-sm bg-opacity"))">
+    <MAlert Class=" m-0"
+            Outlined Prominent
+            Type="Type"
+            Color="@Color"
+            Icon="@Icon"
+            Border="Borders.Left">
+        @ChildContent
+    </MAlert>
+
+</div>
 
 @code {
     [Parameter]
@@ -14,6 +17,10 @@
     public string Icon { get; set; }
     [Parameter]
     public string Color { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
+    [Parameter]
+    public string Class { get; set; }
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 }

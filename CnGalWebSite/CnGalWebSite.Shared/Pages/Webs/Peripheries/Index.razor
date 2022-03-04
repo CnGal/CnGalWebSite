@@ -500,7 +500,6 @@ else
             option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EditRecordListViewTip>(new Dictionary<string, object>
             {
                 [nameof(EditRecordListViewTip.Id)] = Model.Id,
-                [nameof(EditRecordListViewTip.IsSmallScreen)] = IsSmallScreen,
                 [nameof(EditRecordListViewTip.Type)] = ExaminedNormalListModelType.Periphery,
                 [nameof(EditRecordListViewTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
             }).Render();

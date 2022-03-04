@@ -5,92 +5,104 @@
 }
 
 <div>
-    @if (Model.Roles.Count > 0)
+    @if (RightDisplay == false)
     {
-        <div>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-child" Title="登场角色" Outline Collapable>
-                <div class="row">
-                    @foreach (var item in Model.Roles)
-                    {
-                        <div class="col-12 col-lg-6 mb-3">
-                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" IsEdit="Model.IsEdit" />
-                        </div>
-                    }
+        @if (Model.Roles.Count > 0)
+        {
+            <div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-child" Title="登场角色" Outline Collapable>
+                    <div class="row">
+                        @foreach (var item in Model.Roles)
+                        {
+                            <div class="col-12 mb-3">
+                                <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" IsEdit="Model.IsEdit" />
+                            </div>
+                        }
 
-                </div>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-        </div>
+                    </div>
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            </div>
+        }
     }
-    @if (Model.StaffGames.Count > 0)
+    @if (LeftDisplay == false)
     {
-        <div>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-paper-plane-o" Title="参与作品" Outline Collapable>
-                <div class="row">
-                    @foreach (var item in Model.StaffGames)
-                    {
-                        <div class="mb-3 col-12">
-                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" IsEdit="Model.IsEdit" />
-                        </div>
-                    }
+        @if (Model.StaffGames.Count > 0)
+        {
+            <div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-paper-plane-o" Title="参与作品" Outline Collapable>
+                    <div class="row">
+                        @foreach (var item in Model.StaffGames)
+                        {
+                            <div class="mb-3 col-12">
+                                <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" IsEdit="Model.IsEdit" />
+                            </div>
+                        }
 
-                </div>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-        </div>
+                    </div>
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            </div>
+        }
+        @if (Model.EntryRelevances.Count > 0)
+        {
+            <div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-codepen" Title="相关词条" Outline Collapable>
+                    <div class="row">
+                        @foreach (var item in Model.EntryRelevances)
+                        {
+                            <div class="mb-3 col-12">
+                                <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" IsEdit="Model.IsEdit" />
+                            </div>
+                        }
+
+                    </div>
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            </div>
+
+        }
+        @if (Model.ArticleRelevances.Count > 0)
+        {
+            <div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-newspaper-o" Title="相关文章" Outline Collapable>
+                    <div class="row">
+                        @foreach (var item in Model.ArticleRelevances)
+                        {
+
+                            <div class="mb-3 col-12">
+
+                                <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item" />
+                            </div>
+                        }
+                    </div>
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            </div>
+        }
     }
-    @if (Model.EntryRelevances.Count > 0)
+    @if (RightDisplay == false)
     {
-        <div>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-codepen" Title="相关词条" Outline Collapable>
-                <div class="row">
-                    @foreach (var item in Model.EntryRelevances)
-                    {
-                        <div class="mb-3 col-12">
-                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" IsEdit="Model.IsEdit" />
-                        </div>
-                    }
+        @if (Model.OtherRelevances.Count > 0)
+        {
+            <div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="外部链接" Outline Collapable>
+                    <div class="mb-3">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning">
+                            <strong>以下为外部链接，与本站没有任何从属关系，本站亦不对其安全性负责</strong>
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+                    </div>
+                    <div class="row">
 
-                </div>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-        </div>
+                        @foreach (var item in Model.OtherRelevances)
+                        {
+                            <div class="mb-3 col-12">
+                                <RelevanceOtherTip Model="item" />
+                            </div>
+                        }
+                    </div>
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            </div>
 
+        }
     }
-    @if (Model.ArticleRelevances.Count > 0)
-    {
-        <div >
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-newspaper-o" Title="相关文章" Outline Collapable>
-                <div class="row">
-                    @foreach (var item in Model.ArticleRelevances)
-                    {
 
-                        <div class="mb-3 col-12">
-
-                            <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item" />
-                        </div>
-                    }
-                </div>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-        </div>
-    }
-    @if (Model.OtherRelevances.Count > 0)
-    {
-        <div >
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="外部链接" Outline Collapable>
-                <div class="mb-3">
-                    <AlertTip Type="AlertTip.AlertTipType.OtherLink"></AlertTip>
-                </div>
-                <div class="row">
-
-                    @foreach (var item in Model.OtherRelevances)
-                    {
-                        <div class="@(" mb-3 "+(IsForceSmall?"col-12":"col-12 col-xxl-6"))">
-                            <RelevanceOtherTip Model="item" />
-                        </div>
-                    }
-                </div>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-        </div>
-
-    }
 </div>
 
 @code {
@@ -98,6 +110,10 @@
     public EntryIndexViewModel Model { get; set; }
     [Parameter]
     public bool IsForceSmall { get; set; }
+    [Parameter]
+    public bool LeftDisplay { get; set; }
+    [Parameter]
+    public bool RightDisplay { get; set; }
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
 

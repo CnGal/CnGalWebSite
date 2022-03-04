@@ -1,0 +1,26 @@
+﻿@inject DialogService DialogService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab  Icon="mdi-gamepad-square-outline" Color="pink lighten-3" Tooltip="游玩记录" OnClick="OnClickEditGameRecored" Class="@Class"/>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+
+    public async Task OnClickEditGameRecored()
+    {
+        var option = new DialogOption()
+        {
+            Title = "编辑游玩记录"
+        };
+        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip>(new Dictionary<string, object>
+        {
+            [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip.Id)] = Id,
+            [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
+
+        }).Render();
+        await DialogService.Show(option);
+    }
+}

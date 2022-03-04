@@ -7,13 +7,34 @@
     </div>
 }
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相册" Icon="fa fa-fw fa-picture-o">
-    <EntryImageListViewTip Model="Model.Pictures" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.ImageSlideGroup Model="imagesList" />
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
+
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
 
+
+    public List<EditImageAloneModel> imagesList = new List<EditImageAloneModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        foreach (var item in Model.Pictures)
+        {
+            foreach (var infor in item.Pictures)
+            {
+                imagesList.Add(new EditImageAloneModel
+                {
+                    Modifier = item.Modifier,
+                    Note = infor.Note,
+                    Url = infor.Url
+                });
+            }
+        }
+
+    }
 }

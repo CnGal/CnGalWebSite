@@ -25,11 +25,6 @@ namespace CnGalWebSite.Shared
             if (NavigationManager.Uri.Contains("app.cngal.org") || NavigationManager.Uri.Contains("localhost"))
             {
                 isApp = _dataCacheService.IsApp;
-
-                if (_dataCacheService.IsApp == null)
-                {
-                    _dataCacheService.IsApp = false;
-                }
             }
             else
             {

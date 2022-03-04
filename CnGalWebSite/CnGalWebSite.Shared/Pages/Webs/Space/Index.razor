@@ -111,9 +111,17 @@ else
                                     <CnGalWebSite.Shared.MasaComponent.PC.Users.DataOverviewCard Model="Model"/>
                                 </div>
                                 <div>
+                                    @if(Model.CanComment)
+                                    {
+
                                       <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+                                           @if (Model.IsCurrentUser)
+                                    {
+                                        <AlertTip Title="管理空间留言" Type="AlertTip.AlertTipType.SpaceComment" Url="@("/space/editspacecomments/" + Model.Id)"></AlertTip>
+                                    }
                                           <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id" Type="CommentType.CommentUser"/>
                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                    }
                                 </div>
                              
                             </MTabItem>

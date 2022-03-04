@@ -1,5 +1,7 @@
-﻿<div class="mt-2">
-    <Timeline Items="AlternateTimelineItems" IsAlternate="!((IsSmallScreen) || (Model.Count < 3))" />
+﻿@inject IDataCacheService _dataCacheService
+
+<div class="mt-2">
+    <Timeline Items="AlternateTimelineItems" IsAlternate="!((_dataCacheService.IsApp) || (Model.Count < 3))" />
 </div>
 
 @code {
@@ -50,7 +52,7 @@
                 {
                     [nameof(ExamineInforAloneTip.Model)] = item,
                     [nameof(ExamineInforAloneTip.OnNavClick)] = OnNavClick,
-                    [nameof(ExamineInforAloneTip.IsRight)] = (IsSmallScreen || Model.Count < 3) ? false : (Model.IndexOf(item) % 2 == 1),
+                    [nameof(ExamineInforAloneTip.IsRight)] = (_dataCacheService.IsApp || Model.Count < 3) ? false : (Model.IndexOf(item) % 2 == 1),
                     [nameof(ExamineInforAloneTip.LastExamineId)] = Model.Max(s => s.Id),
                 }),
                 Description = item.ApplyTime.ToString("yyyy/M/d HH:mm")

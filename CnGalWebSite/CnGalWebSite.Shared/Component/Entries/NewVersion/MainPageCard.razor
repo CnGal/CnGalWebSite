@@ -3,10 +3,10 @@
     <AlertTip Title="编辑词条主页" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditMainPage/" + Model.Id)" ExamineType="Operation.EstablishMainPage" OnClickRevoke="OnRevoke"></AlertTip>
 }
 
-<div class="row">
+
     @if (string.IsNullOrWhiteSpace(Model.MainPage) == false)
     {
-        <div class="col mb-4">
+        <div class="mb-4">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="介绍" Icon="fa fa-fw fa-home">
                 <MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
                 <div>
@@ -15,14 +15,6 @@
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
         </div>
     }
-
-    @if ((Model.Type == EntryType.Role || Model.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(Model.MainPicture) == false)
-    {
-        <div class="@(string.IsNullOrWhiteSpace(Model.MainPicture)?"":"col-lg-4") col-12  d-none d-lg-flex mb-4">
-            <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="Model" />
-        </div>
-    }
-</div>
 
 
 
