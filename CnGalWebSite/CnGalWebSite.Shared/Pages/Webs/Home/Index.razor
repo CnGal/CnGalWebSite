@@ -46,8 +46,7 @@
         try
         {
             _dataCacheService.RefreshSearchCatche();
-
-            Carousels = await Http.GetFromJsonAsync<List<CarouselViewModel>>(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView");
+            Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView", true);
 
             Images = Carousels.Select(s => s.Image).ToList();
 
@@ -78,6 +77,6 @@
             OpenNewPage(item.Link);
         }
     }
-   
+
 
 }

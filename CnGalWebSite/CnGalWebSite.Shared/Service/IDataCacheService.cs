@@ -7,6 +7,7 @@ using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
@@ -60,7 +61,7 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<List<HomeNewsAloneViewModel>> HomePageNewsCatche { get; set; }
 
-        IPageModelCatche<List<DataModel.Model.Carousel>> HomePageCarouselsCatche { get; set; }
+        IPageModelCatche<List<CarouselViewModel>> HomePageCarouselsCatche { get; set; }
 
         IPageModelCatche<VoteViewModel> VoteIndexPageCatche { get; set; }
 
@@ -75,6 +76,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<TagContrastEditRecordViewModel> TagContrastEditRecordViewCatche { get; set; }
 
         IPageModelCatche<LotteryViewModel> LotteryIndexPageCatche { get; set; }
+
+        List<EntryInforTipViewModel> FreeGamesCatche { get; set; }
 
         SearchViewModel SearchViewModel { get; set; }
 

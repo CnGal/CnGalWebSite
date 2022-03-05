@@ -25,11 +25,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         [Display(Name = "小背景图")]
         public string SmallBackgroundPicture { get; set; }
 
-
-        public string MainPicturePath { get; set; }
-        public string BackgroundPicturePath { get; set; }
-        public string SmallBackgroundPicturePath { get; set; }
-
         [Display(Name = "类别")]
         [Required(ErrorMessage = "请选择类别")]
         public ArticleType Type { get; set; }

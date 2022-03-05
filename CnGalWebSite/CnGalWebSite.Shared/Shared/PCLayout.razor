@@ -1,8 +1,5 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
-@inject IServiceProvider Provider
-
-@inject IDataCacheService _dataCacheService
 
 <MApp>
     <MAppBar App Color="white">
@@ -17,8 +14,7 @@
         </MTabs>
         <MSpacer></MSpacer>
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="mdi-magnify" Class="mr-6" Tooltip="搜索" />
-
+        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.SearchButton Class="mr-6"/>
         <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
     </MAppBar>
 

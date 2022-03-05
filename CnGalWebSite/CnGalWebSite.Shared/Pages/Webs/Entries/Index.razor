@@ -153,9 +153,6 @@ else
                                     {
 
                                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
-                                            <AuthorizeView Roles="Admin">
-                                                <AlertTip Title="管理词条评论" Type="AlertTip.AlertTipType.EntryComment" Url="@("/entries/editentrycomments/" + EntryView.Id)"></AlertTip>
-                                            </AuthorizeView>
                                             <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
                                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                                     }
@@ -217,9 +214,6 @@ else
                             {
 
                                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
-                                    <AuthorizeView Roles="Admin">
-                                        <AlertTip Title="管理词条评论" Type="AlertTip.AlertTipType.EntryComment" Url="@("/entries/editentrycomments/" + EntryView.Id)"></AlertTip>
-                                    </AuthorizeView>
                                     <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
                                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                             }

@@ -78,6 +78,11 @@
                 ErrorHandler.ProcessError(ex, "获取历史编辑记录列表失败");
             }
         }
+        else
+        {
+            isReady = true;
+            StateHasChanged();
+        }
 
     }
 

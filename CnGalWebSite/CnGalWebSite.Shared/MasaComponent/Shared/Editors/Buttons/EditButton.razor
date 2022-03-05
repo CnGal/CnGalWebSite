@@ -36,10 +36,21 @@
                             <MIcon Left>mdi-history </MIcon>
                             历史编辑记录
                         </MButton>
-                        @foreach (var item in Items)
-                        {
-                            <PartNavButton Model="item" />
-                        }
+                        <AuthorizeView>
+                            <Authorized>
+                                @foreach (var item in Items)
+                                {
+                                    <PartNavButton Model="item" />
+                                }
+                            </Authorized>
+                            <NotAuthorized>
+                                <MButton Text Block Color="success" OnClick="OnClickLogin">
+                                    <MIcon Left>mdi-login </MIcon>
+                                    登入后编辑
+                                </MButton>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                  
                     }
                     else
                     {
@@ -144,6 +155,15 @@
         }
 
     }
+
+    private async Task OnClickLogin()
+    {
+       
+            NavigationManager.NavigateTo("account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+      
+
+    }
+
 
     public Task OnClosed()
     {

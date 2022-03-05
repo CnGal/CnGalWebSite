@@ -1,8 +1,10 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
-@inject ILocalStorageService _localStorage
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject IAuthService _authService
 
-<BootstrapBlazorRoot >
+<BootstrapBlazorRoot>
     <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
         @if (_dataCacheService.IsMasa)
         {
@@ -111,7 +113,7 @@
 
 
 @code{
- 
+
 
 }
 

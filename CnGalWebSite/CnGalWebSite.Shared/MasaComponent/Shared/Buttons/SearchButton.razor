@@ -1,0 +1,15 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="mdi-magnify" Tooltip="搜索" Class="@Class" OnClick="OnClick" />
+
+@code {
+    [Parameter]
+    public string Class { get; set; }
+
+    public Task OnClick()
+    {
+        NavigationManager.NavigateTo("/home/search");
+        return Task.CompletedTask;
+    }
+
+}

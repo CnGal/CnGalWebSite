@@ -130,7 +130,7 @@
                 autoSave.Clean();
 
                 await ToastService.Success("编辑周边相册成功", "编辑周边相册成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/peripheries/index/" + Model.Id, Model.Name, "fa fa-newspaper-o");
+                NavigationManager.NavigateTo(Provider, "/peripheries/index/" + Model.Id, Model.Name, "fa fa-shopping-basket");
             }
         }
         catch (Exception ex)

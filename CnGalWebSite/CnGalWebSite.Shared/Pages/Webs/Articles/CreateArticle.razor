@@ -43,13 +43,13 @@ else
 
                     <div class="row">
                         <div class=" col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
-                            <ImageCropperButton ImagePath="@MainImagePath" OnUploadedImage="OnCardUploadMain" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
+                            <ImageCropperButton @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
                         </div>
                         <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
-                            <ImageCropperButton ImagePath="@BackImagePath" OnUploadedImage="OnCardUploadBack" Type="ImageAspectType.None" Text="上传大背景图"></ImageCropperButton>
+                            <ImageCropperButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图"></ImageCropperButton>
                         </div>
                         <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
-                            <ImageCropperButton ImagePath="@SmallBackImagePath" OnUploadedImage="OnCardUploadSmall" Type="ImageAspectType.None" Text="上传小背景图"></ImageCropperButton>
+                            <ImageCropperButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图"></ImageCropperButton>
                         </div>
                     </div>
 
@@ -180,9 +180,6 @@ else
         others = new List<RelevancesModel>(),
         staffs = new List<RelevancesModel>()
     };
-    private string MainImagePath { get; set; } = "_content/CnGalWebSite.Shared/images/default/app.png";
-    private string BackImagePath { get; set; } = "_content/CnGalWebSite.Shared/images/default/app.png";
-    private string SmallBackImagePath { get; set; } = "_content/CnGalWebSite.Shared/images/default/app.png";
     [NotNull]
     private ValidateForm? ComplexForm { get; set; }
 
@@ -280,28 +277,6 @@ else
             ErrorHandler.ProcessError(ex, "创建文章失败");
         }
     }
-
-    private Task OnCardUploadMain(string url)
-    {
-
-        MainImagePath = url;
-        Model.MainPicture = url;
-        return Task.CompletedTask;
-    }
-
-    private Task OnCardUploadBack(string url)
-    {
-        BackImagePath = url;
-        Model.BackgroundPicture = url;
-        return Task.CompletedTask;
-    }
-    private Task OnCardUploadSmall(string url)
-    {
-        SmallBackImagePath = url;
-        Model.SmallBackgroundPicture = url;
-        return Task.CompletedTask;
-    }
-
 
     private Task DataLoaded(CreateArticleViewModel model)
     {

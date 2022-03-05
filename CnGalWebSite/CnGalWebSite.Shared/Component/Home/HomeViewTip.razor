@@ -1,108 +1,17 @@
-﻿@inject HttpClient Http
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
-@inject NavigationManager NavigationManager
-@implements IAsyncDisposable
+﻿
+<HomeListCardTip Title="近期新作" Icon="fa fa-fw fa-send" Url="/home/search/游戏/PubulishTime desc" APIUrl="api/home/GetHomeRecentIssuelGameView" Type="entries" ShowCount />
 
+<HomeListCardTip Title="即将发售" Icon="fa fa-fw  fa-send-o" Url="/home/search/游戏/PubulishTime desc" APIUrl="api/home/GetHomeNewestGameView" Type="entries" ShowCount />
 
-<HomeListCardTip Title="近期新作" TitleIcon="fa fa-send" Url="/home/search/游戏/PubulishTime desc" APIUrl="api/home/GetHomeRecentIssuelGameView"
-                IsLargeScreen="IsLargeScreen" IsNormalScreen="IsNormalScreen" IsSmallScreen="IsSmallScreen"  IsFrist="true"
-                UrlIcon="fa fa-search" UrlName="搜索" Type="entries"/>
+<HomeListCardTip Title="最近编辑" Icon="fa fa-fw  fa-pencil" Url="/home/search/游戏/LastEditTime desc" APIUrl="api/home/GetHomeRecentEditView" Type="entries" ShowCount />
 
-<HomeListCardTip   Title="即将发售" TitleIcon="fa fa-send-o" Url="/home/search/游戏/PubulishTime desc" APIUrl="api/home/GetHomeNewestGameView"
-                IsLargeScreen="IsLargeScreen" IsNormalScreen="IsNormalScreen" IsSmallScreen="IsSmallScreen" 
-                UrlIcon="fa fa-search" UrlName="搜索" Type="entries" />
+<HomeListCardTip Title="公告" Icon="fa fa-fw  fa-sticky-note-o" Url="/articles/home?ScreeningConditions=公告" APIUrl="api/home/GetHomeNoticesView" Type="articles" ShowCount />
 
-<HomeListCardTip   Title="最近编辑" TitleIcon="fa fa-pencil" Url="/home/search/游戏/LastEditTime desc" APIUrl="api/home/GetHomeRecentEditView"
-                IsLargeScreen="IsLargeScreen" IsNormalScreen="IsNormalScreen" IsSmallScreen="IsSmallScreen" 
-                UrlIcon="fa fa-search" UrlName="搜索" Type="entries"  />
+<HomeListCardTip Title="文章" Icon="fa fa-fw  fa-newspaper-o" Url="/articles" APIUrl="api/home/GetHomeArticlesView" Type="articles" ShowCount />
 
-<HomeListCardTip  Title="公告" TitleIcon="fa fa-sticky-note-o" Url="/articles/home?ScreeningConditions=公告" APIUrl="api/home/GetHomeNoticesView"
-                IsLargeScreen="IsLargeScreen" IsNormalScreen="IsNormalScreen" IsSmallScreen="IsSmallScreen" 
-                UrlIcon="fa fa-search" UrlName="搜索" Type="articles"  />
-
-<HomeListCardTip  Title="文章" TitleIcon="fa fa-newspaper-o" Url="/articles" APIUrl="api/home/GetHomeArticlesView"
-                IsLargeScreen="IsLargeScreen" IsNormalScreen="IsNormalScreen" IsSmallScreen="IsSmallScreen" 
-                UrlIcon="fa fa-newspaper-o" UrlName="文章" Type="articles"  />
-
-<FriendLinkListView  IsLargeScreen="IsLargeScreen" IsNormalScreen="IsNormalScreen" IsSmallScreen="IsSmallScreen"  />
-
+<HomeListCardTip Title="友情链接" Icon="fa fa-fw  fa-star" APIUrl="api/home/GetHomeFriendLinksView"/>
 
 @code {
-   
-    public bool IsSmallScreen { get; set; } 
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; }= true;
-   
-    
-    #region 获取屏幕大小
-
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime JSRuntime { get; set; }
-
-    private JSInterop<HomeViewTip> Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            Interop = new JSInterop<HomeViewTip>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
-        }
-    }
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 768))
-        {
-            IsSmallScreen = width < 768;
-
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 768 && width < 1517))
-        {
-            IsNormalScreen = width >= 768 && width < 1517;
-
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 1517))
-        {
-            IsLargeScreen = width >= 1517;
-            StateHasChanged();
-        }
-    }
-    #endregion
-
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
-    {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 
 
 }

@@ -14,7 +14,10 @@
             <CommentPartTip Model="Comments.Data[temp]" IsChild="false" RelyCallBack="OnRely"
                             DeletedCallBack="OnDelete" CanDeleted="CanDeleted"></CommentPartTip>
         }
-        <MPagination Value="Comments.CurrentPage" Class="my-4" Length="Comments.TotalPages" ValueChanged="OnPage" Color="pink lighten-3"  TotalVisible="7"></MPagination>
+        @if (Comments.TotalPages > 1)
+        {
+            <MPagination Value="Comments.CurrentPage" Class="my-4" Length="Comments.TotalPages" ValueChanged="OnPage" Color="pink lighten-3" TotalVisible="7"></MPagination>
+        }
     }
 
 </div>

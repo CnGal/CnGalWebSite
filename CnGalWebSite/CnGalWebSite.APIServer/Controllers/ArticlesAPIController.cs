@@ -542,8 +542,6 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 await _articleService.UpdateArticleData(article, examine);
             }
-            model.MainPicturePath = _appHelper.GetImagePath(article.MainPicture, "app.png");
-            model.BackgroundPicturePath = _appHelper.GetImagePath(article.BackgroundPicture, "app.png");
             model.MainPicture = article.MainPicture;
             model.BackgroundPicture = article.BackgroundPicture;
 
@@ -559,7 +557,6 @@ namespace CnGalWebSite.APIServer.Controllers
             model.DisplayName = article.DisplayName;
 
             model.SmallBackgroundPicture = article.SmallBackgroundPicture;
-            model.SmallBackgroundPicturePath = _appHelper.GetImagePath(article.SmallBackgroundPicture, "app.png");
             model.Id = Id;
 
 

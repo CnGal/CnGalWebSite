@@ -3,26 +3,30 @@
 @inject NavigationManager NavigationManager
 @inject IServiceProvider Provider
 @inject IJSRuntime JS
+@inject IDataCacheService _dataCacheService
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="fa fa-fw fa-newspaper-o" Class="mb-4">
+    <ButtonContent>
+            <MButton Text Block Color="pink lighten-3" OnClick="OnClickMore">
+                <MIcon Left>mdi-share-all-outline  </MIcon>
+                查看更多
+            </MButton>
 
-<div class=" rounded shadow-sm  bg-opacity ps-4 pe-4 pt-3 h-100" style=" display: flex;flex-direction: column;">
-    <div style="display: block;">
-        <TabLink style="float: right" class="btn btn-outline-dark btn-sm" Url="/articles/news" Text="动态" Icon="fa fa-newspaper-o">
-            <i class="fa fa-plane"></i>&nbsp;查看全部
-        </TabLink>
-        <h2 class="fw-bold mb-4 font-color h4"><i class="fa fa-newspaper-o"></i>&nbsp;&nbsp;最新动态</h2>
-    </div>
-    <div class="row h-100">
+    </ButtonContent>
+    <ChildContent>
+        <div class="row">
 
-        @foreach(var item in Items.Take(6))
-        {
-            <div class="mb-3 col-12 col-lg-6 pointer">
-                <HomeNewsAloneTip Model="item" OnClickNews="OnClickNews" OnClickUser="OnClickUser"></HomeNewsAloneTip>
-            </div>
-        }
-    </div>
+            @foreach (var item in Items.Take(6))
+            {
+                <div class="mb-3 col-12 col-lg-6 pointer">
+                    <HomeNewsAloneTip Model="item" OnClickNews="OnClickNews" OnClickUser="OnClickUser"></HomeNewsAloneTip>
+                </div>
+            }
+        </div>
+    </ChildContent>
 
-</div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
 @code {
 
     public List<HomeNewsAloneViewModel> Items { get; set; } = new List<HomeNewsAloneViewModel>();
@@ -33,20 +37,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (Items.Count == 0)
-        {
-            try
-            {
-                //获取主页信息
-                Items = await Http.GetFromJsonAsync<List<HomeNewsAloneViewModel>>(ToolHelper.WebApiPath + "api/home/GetHomeNewsView");
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                ErrorHandler.ProcessError(ex, "获取主页动态列表失败");
-            }
-        }
 
+        try
+        {
+            Items = await _dataCacheService.HomePageNewsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeNewsView", true);
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页动态列表失败");
+        }
     }
 
     #region 新建标签页
@@ -92,6 +93,10 @@
         }
 
     }
+    public Task OnClickMore()
+    {
+        NavigationManager.NavigateTo("/articles/news");
+        return Task.CompletedTask;
+    }
 
-  
 }

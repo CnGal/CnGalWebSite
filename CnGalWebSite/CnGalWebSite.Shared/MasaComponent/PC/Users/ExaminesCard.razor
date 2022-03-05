@@ -90,8 +90,10 @@
             </div>
         </div>
     }
-
-    <MPagination Value="@pagedResultDto.CurrentPage" Class="my-4" Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick" Color="pink lighten-3" TotalVisible="7"></MPagination>
+    @if (pagedResultDto.TotalPages > 1)
+    {
+        <MPagination Value="@pagedResultDto.CurrentPage" Class="my-4" Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick" Color="pink lighten-3" TotalVisible="7"></MPagination>
+    }
 </div>
 
 

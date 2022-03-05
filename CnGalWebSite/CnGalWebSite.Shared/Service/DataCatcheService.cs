@@ -10,6 +10,7 @@ using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
@@ -114,7 +115,7 @@ namespace CnGalWebSite.Shared.Service
         /// <summary>
         /// 主页轮播图数据缓存
         /// </summary>
-        public IPageModelCatche<List<DataModel.Model.Carousel>> HomePageCarouselsCatche { get; set; }
+        public IPageModelCatche<List<CarouselViewModel>> HomePageCarouselsCatche { get; set; }
         /// <summary>
         /// 编辑总览页面数据缓存
         /// </summary>
@@ -137,9 +138,14 @@ namespace CnGalWebSite.Shared.Service
         public IPageModelCatche<TagContrastEditRecordViewModel> TagContrastEditRecordViewCatche { get; set; }
 
         /// <summary>
+        /// 免费游戏列表
+        /// </summary>
+        public List<EntryInforTipViewModel> FreeGamesCatche { get; set; } = new List<EntryInforTipViewModel>();
+        /// <summary>
         /// 折扣页面缓存辅助类
         /// </summary>
         public DiscountPageHelper DiscountPageCatcheHelper { get; set; } = new DiscountPageHelper();
+
         /// <summary>
         /// 评论详情
         /// </summary>
@@ -164,7 +170,7 @@ namespace CnGalWebSite.Shared.Service
 
         public DataCatcheService(HttpClient httpClient, IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche, IPageModelCatche<VoteViewModel> voteIndexPageCatche,
         IPageModelCatche<PeripheryViewModel> peripheryIndexPageCatche, IPageModelCatche<TagIndexViewModel> tagIndexPageCatche, IPageModelCatche<List<HomeNewsAloneViewModel>> homePageNewsCatche,
-        IPageModelCatche<List<DataModel.Model.Carousel>> homePageCarouselsCatche, IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
+        IPageModelCatche<List<CarouselViewModel>> homePageCarouselsCatche, IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
         IPageModelCatche<LotteryViewModel> lotteryIndexPageCatche,
         IPageModelCatche<ArticleContrastEditRecordViewModel> articleContrastEditRecordViewCatche,
         IPageModelCatche<PeripheryContrastEditRecordViewModel> peripheryContrastEditRecordViewCatche,
