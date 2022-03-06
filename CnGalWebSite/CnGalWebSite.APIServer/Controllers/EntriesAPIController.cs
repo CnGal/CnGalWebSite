@@ -9,13 +9,16 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -24,6 +27,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TencentCloud.Ame.V20190916.Models;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -2312,6 +2316,65 @@ namespace CnGalWebSite.APIServer.Controllers
                 ContrastModel = result[0],
                 CurrentModel = result[1],
             };
+
+            return model;
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<GameCGModel>>> GetGameCGsAsync()
+        {
+            var entries = await _entryRepository.GetAll().Include(s => s.Pictures).AsNoTracking()
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Pictures.Count > 3)
+                .Select(item => new GameCGModel
+                {
+                    Id = item.Id,
+                    Name = item.DisplayName,
+                    Pictures = item.Pictures.Select(s => new EditImageAloneModel
+                    {
+                        Note = s.Note,
+                        Url = s.Url
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return entries;
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<GameRoleModel>>> GetGameRolesAsync()
+        {
+            var entries = await _entryRepository.GetAll().Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).AsNoTracking()
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game
+                        && s.EntryRelationFromEntryNavigation.Count(s => s.ToEntryNavigation.Type == EntryType.Role && string.IsNullOrWhiteSpace(s.ToEntryNavigation.MainPicture) == false) > 4)
+                .Select(s => new
+                {
+                    s.Id,
+                    s.DisplayName,
+                    s.MainPicture,
+                    Roles = s.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.Type == EntryType.Role).Select(s => s.ToEntryNavigation)
+                })
+                .ToListAsync();
+
+            var model = new List<GameRoleModel>();
+
+            foreach (var item in entries)
+            {
+                var temp = new GameRoleModel
+                {
+                    Name = item.DisplayName,
+                    Id = item.Id,
+                    Image = _appHelper.GetImagePath(item.MainPicture, "app.png")
+                };
+                foreach (var infor in item.Roles)
+                {
+                    var infor1 = await _appHelper.GetEntryInforTipViewModel(infor);
+                    temp.Roles.Add(infor1);
+                }
+
+                model.Add(temp);
+            }
 
             return model;
         }

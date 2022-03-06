@@ -151,17 +151,17 @@
 .article-tag-color {
     margin-left: 10px;
     border-color: gray;
-    color: white;
+    color: white!important;
     background-color: gray;
 }
 
 .article-tag-text-color {
-    color: gray;
+    color: gray!important;
 }
 
 .article-tag-color:hover {
     border-color: gray;
-    color: gray;
+    color: gray!important;
     background-color: transparent;
 }
 /*小屏幕文章操作Tab*/
@@ -185,20 +185,7 @@
     cursor: pointer;
 }
 /*超大屏幕文章操作Tab*/
-.article-tag-text-color-large {
-    color: #D25E8C;
-}
-.article-tag-color-large {
-    margin-left: 10px;
-    border-color: #D25E8C;
-    color: white;
-    background-color: #D25E8C;
-}
-    .article-tag-color-large:hover {
-        border-color: #D25E8C;
-        color: #D25E8C;
-        background-color: transparent;
-    }
+
 /*评论样式*/
 .comment-tag {
     width: fit-content;

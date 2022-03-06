@@ -1,0 +1,27 @@
+﻿<TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
+    <div class="shadow-sm rounded  bg-opacity ps-3 pe-3 h-100">
+
+        <div class=" pb-3" style="display:flex;">
+            <div class="pt-3 p-0 ps-2">
+                <img src="@Model.MainImage" style="border-radius: 50%;width: 116px;" />
+            </div>
+
+            <div class="pt-3 ps-3" style=" width: 100%;">
+                <header class="text-truncate-2">
+                    <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                </header>
+                <span class="text-truncate-3">
+                    @Model.BriefIntroduction
+                </span>
+
+            </div>
+        </div>
+
+    </div>
+
+</TabLink>
+
+@code {
+    [Parameter]
+    public EntryInforTipViewModel Model { get; set; }
+}

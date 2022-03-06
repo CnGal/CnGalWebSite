@@ -1,0 +1,38 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<div class="row">
+    @foreach (var item in _dataCacheService.GameCGsCatche.Take(2))
+    {
+        <div class="col-12 col-lg-6 mb-4">
+            <CGSlideViewTip Model="item" />
+        </div>
+    }
+
+</div>
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            if (_dataCacheService.GameCGsCatche.Count == 0)
+            {
+                _dataCacheService.GameCGsCatche = await Http.GetFromJsonAsync<List<GameCGModel>>(ToolHelper.WebApiPath + "api/entries/GetGameCGs");
+            }
+
+            _dataCacheService.GameCGsCatche.Random();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取词条主页CG预览列表失败");
+        }
+    }
+  
+}

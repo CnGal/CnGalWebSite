@@ -1,0 +1,62 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(Model.Name+" 游戏评测")" Icon="fa fa-fw fa-star">
+    <ButtonContent>
+        <MButton Text Block Color="pink lighten-3" OnClick="OnClickMore">
+            <MIcon Left>mdi-share-all-outline  </MIcon>
+            查看详情
+        </MButton>
+    </ButtonContent>
+    <ChildContent>
+        <MWindow @bind-Value="Index" Reverse>
+            @foreach (var item in Model.Evaluations)
+            {
+                <MWindowItem Value="@Model.Evaluations.IndexOf(item)">
+                    <MResponsive AspectRatio="16/9D">
+                        <ScaleTransition>
+                            <Element Show="@(Model.Evaluations.IndexOf(item)==Index)">
+                                <MCard Style=" display: contents; " OnClick="@(()=>OnClickArticle(item.Id))">
+                                    <EvaluationViewTip Model="item" />
+                                </MCard>
+                            </Element>
+                        </ScaleTransition>                      
+                    </MResponsive>
+                </MWindowItem>
+            }
+        </MWindow>
+        <MSlideGroup @bind-Value="Index" ShowArrows="true" CenterActive>
+            @foreach (var item in Model.Evaluations)
+            {
+                <MSlideItem>
+                    <MCard Class="mt-4 me-4 mb-2" Height="70" Width="150" OnClick="@(()=>{ if (!context.Active) context.Toggle.Invoke();})" RefBack="context.Ref">
+                        <div style="@($"background-image: url({item.MainImage});")" class="@((context.Active?"active":"")+" image-overlays ")">
+
+                        </div>
+                    </MCard>
+                </MSlideItem>
+            }
+        </MSlideGroup>
+
+    </ChildContent>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+
+    private StringNumber Index { get; set; } = 0;
+
+    [Parameter]
+    public GameEvaluationsModel Model { get; set; }
+
+
+    public Task OnClickMore()
+    {
+        NavigationManager.NavigateTo("/entries/index/" + Model.Id);
+        return Task.CompletedTask;
+    }
+    public Task OnClickArticle(long id)
+    {
+        NavigationManager.NavigateTo("/articles/index/" + id);
+        return Task.CompletedTask;
+    }
+}

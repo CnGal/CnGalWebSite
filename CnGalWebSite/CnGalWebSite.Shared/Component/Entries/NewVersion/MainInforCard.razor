@@ -80,7 +80,7 @@
             <div class="mt-2" style="display: flex; justify-content: flex-end;">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Entry" Class="me-4"/>
                 <CnGalWebSite.Shared.MasaComponent.PC.Entries.GameRecordButton Id="Model.Id" Class="me-4"/>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Entry" Id="Model.Id" ShowPerfection="Model.Type==EntryType.Game"/>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Entry" Id="Model.Id" ShowPerfection="Model.Type==EntryType.Game" @bind-IsHidden="Model.IsHidden"/>
 
             </div>
         </div>

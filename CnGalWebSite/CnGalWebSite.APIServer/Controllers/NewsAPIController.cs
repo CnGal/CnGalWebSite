@@ -21,6 +21,7 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.News;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -705,5 +706,23 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<ArticleInforTipViewModel>>> GetWeeklyNewsOverviewAsync()
+        {
+            var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s => s.Article).Where(s => s.State == GameNewsState.Publish).ToListAsync();
+
+            var model = new List<ArticleInforTipViewModel>();
+            foreach (var item in weeklyNews.OrderByDescending(s=>s.PublishTime).Take(8))
+            {
+                var temp = _appHelper.GetArticleInforTipViewModel(item.Article);
+                temp.DisplayName= temp.DisplayName.Replace("CnGal每周速报（", "").Replace("）", "");
+                model.Add(temp);
+            }
+
+            return model;
+        }
+
     }
 }

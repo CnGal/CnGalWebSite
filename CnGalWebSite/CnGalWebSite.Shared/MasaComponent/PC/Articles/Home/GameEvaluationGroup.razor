@@ -1,0 +1,38 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<div class="row">
+    @foreach (var item in _dataCacheService.GameEvaluationsCatche.Take(2))
+    {
+        <div class="col-12 col-lg-6 mb-4">
+            <GameEvaluationViewTip Model="item" />
+        </div>
+    }
+
+</div>
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            if (_dataCacheService.GameEvaluationsCatche.Count == 0)
+            {
+                _dataCacheService.GameEvaluationsCatche = await Http.GetFromJsonAsync<List<GameEvaluationsModel>>(ToolHelper.WebApiPath + "api/articles/GetGameEvaluations");
+            }
+
+            _dataCacheService.GameEvaluationsCatche.Random();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取文章主页游戏评测列表失败");
+        }
+    }
+
+}

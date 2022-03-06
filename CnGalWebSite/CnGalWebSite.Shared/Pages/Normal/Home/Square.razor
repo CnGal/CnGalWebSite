@@ -1,0 +1,27 @@
+﻿@page "/square"
+
+    <link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor.Chart/css/bootstrap.blazor.chart.bundle.min.css" media="none" onload="this.media='all'" />
+
+    <TitleTip Title="广场" Description="查看编辑概览，抽奖，投票，随机展示，数据汇总等众多内容"></TitleTip>
+
+<div class="row">
+    <div class="col-12 mb-4">
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Square.EditOverviewCard />
+
+    </div>
+    <div class="co-12 col-lg-3 mb-4">
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Square.NavLinkGroup/>
+    </div>
+   
+    <div class="col-12 col-lg-4 mb-4">
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Square.VoteGroup/>
+    </div>
+    <div class="col-12 col-lg-5 mb-4">
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Square.LotteryGroup/>
+    </div>
+</div>
+
+    @code {
+
+    }
+

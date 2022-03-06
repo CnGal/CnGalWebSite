@@ -1,11 +1,4 @@
-﻿@inject HttpClient Http
-@inject ExamineService _examineService
-@inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
-@inject IAppHelper _appHelper
-@inject IServiceProvider Provider
-@inject NavigationManager NavigationManager
-
+﻿
 
 <TitleTip Title="词条" Description="查看免费游戏，打折游戏，游戏CG预览，画师作品，角色展示等众多内容"></TitleTip>
 
@@ -17,6 +10,12 @@
     <div class="mb-4">
         <CnGalWebSite.Shared.MasaComponent.PC.Entries.Home.DiscountGameGroup />
 
+    </div>
+    <div>
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Home.CGSlideGroup />
+    </div>
+    <div class="mb-4">
+        <CnGalWebSite.Shared.MasaComponent.PC.Entries.Home.GameRoleGroup />
     </div>
 </div>
 

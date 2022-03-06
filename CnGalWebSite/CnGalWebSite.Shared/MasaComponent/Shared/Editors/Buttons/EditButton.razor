@@ -36,6 +36,11 @@
                             <MIcon Left>mdi-history </MIcon>
                             历史编辑记录
                         </MButton>
+                        <AuthorizeView Roles="Admin">
+                            <Authorized>
+                               <EditHiddenButton IsHidden="IsHidden" IsHiddenChanged="IsHiddenChanged" Id="Id" Type="Type" />
+                            </Authorized>
+                        </AuthorizeView>
                         <AuthorizeView>
                             <Authorized>
                                 @foreach (var item in Items)
@@ -50,7 +55,7 @@
                                 </MButton>
                             </NotAuthorized>
                         </AuthorizeView>
-                  
+
                     }
                     else
                     {
@@ -71,6 +76,10 @@
     public bool ShowPerfection { get; set; }
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public bool IsHidden { get; set; }
+    [Parameter]
+    public EventCallback<bool> IsHiddenChanged { get; set; }
 
     bool isReady { get; set; }
 
@@ -158,9 +167,9 @@
 
     private async Task OnClickLogin()
     {
-       
-            NavigationManager.NavigateTo("account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-      
+
+        NavigationManager.NavigateTo("account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+
 
     }
 

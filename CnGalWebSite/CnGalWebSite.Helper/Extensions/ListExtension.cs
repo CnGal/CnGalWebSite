@@ -8,7 +8,7 @@ namespace CnGalWebSite.Helper.Extensions
 {
     public static class ListExtension
     {
-        public static void Random<T>(this List<T> sources)
+        public static List<T> Random<T>(this List<T> sources)
         {
             Random rd = new Random();
             int index = 0;
@@ -23,6 +23,7 @@ namespace CnGalWebSite.Helper.Extensions
                     sources[index] = temp;
                 }
             }
+            return sources;
         }
     }
 }

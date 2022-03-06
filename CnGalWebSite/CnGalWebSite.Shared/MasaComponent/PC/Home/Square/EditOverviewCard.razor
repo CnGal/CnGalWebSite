@@ -1,0 +1,23 @@
+﻿@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="fa fa-fw fa-bar-chart-o">
+    <ButtonContent>
+        <MButton Text Block Color="pink lighten-3" OnClick="OnClickMore">
+            <MIcon Left>mdi-share-all-outline  </MIcon>
+            查看编辑指引
+        </MButton>
+    </ButtonContent>
+    <ChildContent>
+        <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/perfections/GetEditCountLine")" Stacked Outline HideTitle></CountLineViewTip>
+    </ChildContent>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+
+    public Task OnClickMore()
+    {
+        NavigationManager.NavigateTo("/perfections");
+        return Task.CompletedTask;
+    }
+}

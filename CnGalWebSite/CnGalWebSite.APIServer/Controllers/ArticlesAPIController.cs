@@ -12,6 +12,7 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -23,6 +24,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CnGalWebSite.Helper.Extensions;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -1185,5 +1187,61 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
 
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<GameEvaluationsModel>>> GetGameEvaluationsAsync()
+        {
+            var entries = await _entryRepository.GetAll().Include(s => s.Articles).ThenInclude(s => s.CreateUser).AsNoTracking()
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Articles.Count(s => s.Type == ArticleType.Evaluation) > 1)
+                .Select(s => new
+                {
+                    s.Id,
+                    s.DisplayName,
+                    Articles = s.Articles.Where(s => s.Type == ArticleType.Evaluation)
+                })
+                .ToListAsync();
+
+            var model = new List<GameEvaluationsModel>();
+            //初始化主页Html代码
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
+
+            foreach (var item in entries)
+            {
+                var temp = new GameEvaluationsModel
+                {
+                    Name = item.DisplayName,
+                    Id = item.Id
+                };
+                foreach (var infor in item.Articles)
+                {
+                    var infor1 = _appHelper.GetArticleInforTipViewModel(infor);
+                    infor1.BriefIntroduction = Markdown.ToHtml(infor.MainPage ?? "", pipeline);
+
+                    temp.Evaluations.Add(infor1);
+                }
+
+                model.Add(temp);
+            }
+
+            return model;
+        }
+
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<ArticleInforTipViewModel>>> GetRandomArticlesAsync()
+        {
+            var articles = await _articleRepository.GetAll().Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && string.IsNullOrWhiteSpace(s.MainPicture) == false
+            && (s.Type != ArticleType.News && s.Type != ArticleType.Evaluation)).ToListAsync();
+            articles.Random();
+
+            var model = new List<ArticleInforTipViewModel>();
+            foreach (var item in articles.Take(64))
+            {
+                model.Add(_appHelper.GetArticleInforTipViewModel(item));
+            }
+
+            return model;
+        }
     }
 }

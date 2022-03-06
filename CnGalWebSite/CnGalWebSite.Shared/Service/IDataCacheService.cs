@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.ViewModel;
+﻿using BootstrapBlazor.Components;
+using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
@@ -77,7 +78,23 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<LotteryViewModel> LotteryIndexPageCatche { get; set; }
 
+        IPageModelCatche<ChartDataSource> ChartDataCatche { get; set; }
+
+        List<ArticleInforTipViewModel> RandomArticlesCatche { get; set; }
+
+        List<VoteCardViewModel> VoteCardsCatche { get; set; }
+
+        List<LotteryCardViewModel> LotteryCardsCatche { get; set; }
+
+        List<GameCGModel> GameCGsCatche { get; set; }
+
         List<EntryInforTipViewModel> FreeGamesCatche { get; set; }
+
+        List<ArticleInforTipViewModel> WeeklyNewsOverviewCatche { get; set; }
+
+        List<GameEvaluationsModel> GameEvaluationsCatche { get; set; }
+
+        List<GameRoleModel> GameRolesCatche { get; set; }
 
         SearchViewModel SearchViewModel { get; set; }
 

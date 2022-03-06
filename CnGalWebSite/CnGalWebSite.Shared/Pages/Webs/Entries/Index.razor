@@ -42,9 +42,9 @@ else
             <div class="col-12 mb-4">
                 @if (EntryView.IsHidden == true)
                 {
-                    <div class="alert alert-info  rounded shadow-sm  rounded" role="alert">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
                         当前词条处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-                    </div>
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
                 }
                 @if (EntryView.DisambigId != 0)
@@ -53,13 +53,13 @@ else
                 }
                 @if (EntryView.Type == EntryType.Staff)
                 {
-                    <div class="alert alert-danger  rounded shadow-sm  rounded" role="alert">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error" Class="mb-3">
                         这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
-                    </div>
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
                 }
 
                 <div>
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke"/>
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" />
                 </div>
             </div>
             <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4") ">

@@ -974,7 +974,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            var entry = await _entryRepository.GetAll().Include(s => s.RelatedPeripheries).FirstOrDefaultAsync(s => s.Id == id && s.IsHidden == false);
+            var entry = await _entryRepository.GetAll().Include(s => s.RelatedPeripheries).FirstOrDefaultAsync(s => s.Id == id );
 
             if (entry == null)
             {

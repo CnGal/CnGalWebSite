@@ -7,7 +7,7 @@
     <div class="mb-2 ps-4 pe-4 pt-4">
         <h1 class="fw-bold text-center h3">@Model.Name</h1>
 
-        <p class="text-center" style="color: gray;margin-top:20px">
+        <span class="text-center w-100" style="color: gray;">
             <i class="fa fa-calendar fa-fw "></i>
             <span class="article-infor-text">@((Model.CreateTime.Year<1900?Model.LastEditTime: Model.CreateTime).ToString("yyyy-MM-dd"))</span>&nbsp;&nbsp;&nbsp;
             <i class="fa fa-eye fa-fw "></i>
@@ -29,7 +29,7 @@
             <i class="fa fa-thumbs-o-up fa-fw "></i>
             <span class="article-infor-text">@(Model.ThumbsUpCount + "人点赞")&nbsp; &nbsp; &nbsp;</span>
 
-        </p>
+        </span>
     </div>
     <div class=" ps-4 pe-4">
         <hr />
