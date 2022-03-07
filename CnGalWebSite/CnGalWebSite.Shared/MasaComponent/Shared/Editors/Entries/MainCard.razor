@@ -1,0 +1,51 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-pencil" Title="主要信息" Collapable>
+    <ValidateForm Model="@Model">
+            <div class="row">
+                <div class=" col-12 col-md-6  col-lg-3 mt-2">
+                    <ImageCropperButton @bind-ImagePath="@Model.MainPicture"  EntryType_="Model.Type" IsMainImage="true"
+                                        Text="上传主图" IsMustCropper="true"></ImageCropperButton>
+                </div>
+                <div class=" col-12 col-md-6  col-lg-3 mt-2">
+                    <ImageCropperButton @bind-ImagePath="@Model.Thumbnail"  Type="ImageAspectType._1_1" Text="上传缩略图"></ImageCropperButton>
+                </div>
+                <div class=" col-12 col-md-6  col-lg-3 mt-2">
+                    <ImageCropperButton @bind-ImagePath="@Model.BackgroundPicture"  Type="ImageAspectType.None" Text="上传大背景"></ImageCropperButton>
+                </div>
+                <div class=" col-12 col-md-6  col-lg-3 mt-2">
+                    <ImageCropperButton @bind-ImagePath="@Model.SmallBackgroundPicture"  Type="ImageAspectType.None" Text="上传小背景"></ImageCropperButton>
+                </div>
+            </div>
+
+            <div class="row  mt-4">
+                <div class="form-group col-12  col-sm-6">
+                    <Select @bind-Value="Model.Type"></Select>
+                </div>
+
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.Name" />
+                </div>
+                <div class="form-group col-12">
+                    <AlertTip Type="AlertTip.AlertTipType.CreateDisambig"></AlertTip>
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.DisplayName" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.AnotherName" />
+                </div>
+
+
+
+                <div class="form-group col-12">
+                    <BootstrapInput @bind-Value="Model.BriefIntroduction" />
+                </div>
+            </div>
+    </ValidateForm>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public EditMainViewModel Model { get; set; } = new EditMainViewModel();
+}

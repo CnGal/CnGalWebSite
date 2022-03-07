@@ -1,6 +1,8 @@
-﻿<div class="@("comment-tag me-2 "+Model.CSS)" style="@Model.Styles">@Model.Text</div>
+﻿<span class="@($"comment-tag {Class} {Model.CSS}")" style="@Model.Styles">@Model.Text</span>
 
 @code {
     [Parameter]
     public RankViewModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; } = "me-2";
 }

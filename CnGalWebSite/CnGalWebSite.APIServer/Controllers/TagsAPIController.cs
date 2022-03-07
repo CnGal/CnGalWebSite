@@ -8,6 +8,7 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -20,6 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using TencentCloud.Cme.V20191029.Models;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -870,6 +872,34 @@ namespace CnGalWebSite.APIServer.Controllers
                 ContrastModel = result[0],
                 CurrentModel = result[1],
             };
+
+            return model;
+        }
+
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<RandomTagModel>>> GetRandomTagsAsync()
+        {
+            var tags = await _tagRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entries)
+                .Where(s => s.Entries.Count > 3&&s.Name!="免费")
+                .ToListAsync();
+
+            var model = new List<RandomTagModel>();
+            foreach (var item in tags)
+            {
+                var temp = new RandomTagModel
+                {
+                    Id = item.Id,
+                    Name = item.Name
+                };
+                foreach(var infor  in item.Entries.Take(12))
+                {
+                    temp.Entries.Add(await _appHelper.GetEntryInforTipViewModel(infor));
+                }
+                model.Add(temp);
+            }
 
             return model;
         }

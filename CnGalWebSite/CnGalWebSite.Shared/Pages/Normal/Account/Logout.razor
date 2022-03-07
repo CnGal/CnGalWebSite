@@ -22,11 +22,11 @@
                 await AuthService.Logout();
                 _dataCacheService.RefreshAllCatche();
 
-                NavigationManager.NavigateTo("/account/login");
+                NavigationManager.NavigateTo("/account/login",false,true);
             }
             else
             {
-                NavigationManager.NavigateTo("/home/index");
+                NavigationManager.NavigateTo("/home/index", false, true);
 
 
             }

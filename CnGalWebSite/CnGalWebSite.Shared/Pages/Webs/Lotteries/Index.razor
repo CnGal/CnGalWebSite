@@ -4,7 +4,6 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
-@implements IAsyncDisposable
 @inject IDataCacheService _dataCatcheService
 
 @inject DialogService DialogService
@@ -35,7 +34,7 @@ else
 }
 else
 {
-    <div class="container">
+    <div>
         @if (isReady == false)
         {
             <div>
@@ -57,29 +56,21 @@ else
         }
         else
         {
-    <div class="">
+            @if (Model.IsHidden == true)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
+                    当前抽奖处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-        @if (Model.IsHidden == true)
-        {
-            <div class="alert alert-info  rounded shadow-sm  rounded" role="alert">
-                当前抽奖处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+            }
+
+            <div class="rounded shadow-sm  bg-opacity mb-4 pb-3">
+                <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
             </div>
-
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
         }
-
-        <div class="rounded shadow-sm  bg-opacity mb-4 pb-3">
-            <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
-        </div>
-
-
-        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" IsShowNotFound="true" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
-
-    </div>
-
-        }
-
-
-
     </div>
 }
 
@@ -110,49 +101,15 @@ else
     public LotteryViewModel Model { get; set; } = new LotteryViewModel();
 
     public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
-
-
-    #region 获取屏幕大小
-
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime? JSRuntime { get; set; }
-
-
-
-    public bool IsSmallScreen { get; set; }
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; }
     public bool IsAdmin { get; set; } = false;
     string LastLookName = "";
     bool isFrist = true;
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
-
-    private JSInterop<Index>? Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        try
-        {
-            await JS.InvokeAsync<string>("highlightAllCode");
-        }
-        catch
-        {
-
-        }
-
         //记录数据
         if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name) == false)
         {
@@ -168,41 +125,10 @@ else
         }
         if (firstRender)
         {
-            Interop = new JSInterop<Index>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
 
             isFrist = false;
-
-
-        }
-
-    }
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 850))
-        {
-            IsSmallScreen = width < 850;
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 850 && width < 1500))
-        {
-            IsNormalScreen = width >= 850 && width < 1500;
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 1500))
-        {
-            IsLargeScreen = width >= 1500;
-            StateHasChanged();
         }
     }
-    #endregion
-
     protected override async Task OnInitializedAsync()
     {
         try
@@ -231,7 +157,7 @@ else
                 _dataCatcheService.VoteIndexPageCatche.Clean(Id);
             }
 
-           
+
         }
         catch (Exception exc)
         {
@@ -260,25 +186,5 @@ else
             await ToastService.Error("导航失败", "请尝试刷新页面");
         }
     }
-
-
-
-
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
-    {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 
 }

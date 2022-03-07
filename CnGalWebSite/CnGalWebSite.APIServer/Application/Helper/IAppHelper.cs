@@ -19,7 +19,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <param name="userId">用户Id</param>
         /// <param name="operation">用操作表示部分</param>
         /// <returns>是否被锁定</returns>
-        Task<bool> IsEntryLockedAsync(int entryId, string userId, Operation operation);
+        Task<bool> IsEntryLockedAsync(long entryId, string userId, Operation operation);
 
 
 

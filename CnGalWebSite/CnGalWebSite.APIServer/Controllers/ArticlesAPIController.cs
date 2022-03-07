@@ -25,6 +25,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CnGalWebSite.Helper.Extensions;
+using CnGalWebSite.APIServer.Application.Users;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -43,10 +44,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEntryService _entryService;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
+        private readonly IUserService _userService;
 
-
-        public ArticlesAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository,
-            IExamineService examineService, IEntryService entryService,
+        public ArticlesAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IUserService userService,
+        IExamineService examineService, IEntryService entryService,
         UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
         {
@@ -60,6 +61,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _examineRepository = examineRepository;
             _examineService = examineService;
             _entryService = entryService;
+            _userService= userService;
         }
 
         /// <summary>
@@ -206,8 +208,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
 
-            model.LastEditUserName = createUser.UserName;
-            model.UserId = createUser.Id;
+            model.UserInfor =await _userService.GetUserInforViewModel(createUser);
             model.LastExamineId = article.Examines.Last().Id;
 
             //判断是否有权限编辑

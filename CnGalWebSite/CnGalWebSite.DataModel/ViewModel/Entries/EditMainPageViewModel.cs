@@ -1,19 +1,11 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel
 {
-    public class EditMainPageViewModel
+    public class EditMainPageViewModel : BaseEntryEditModel
     {
         public string Context { get; set; }
-
-        public string Name { get; set; }
-
-        public int Id { get; set; }
-
-        public EntryType Type { get; set; }
-
-        [Display(Name = "备注")]
-        public string Note { get; set; }
 
     }
 }

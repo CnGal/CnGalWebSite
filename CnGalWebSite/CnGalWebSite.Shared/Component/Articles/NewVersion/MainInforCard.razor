@@ -1,62 +1,57 @@
-﻿<div class="">
+﻿<div>
 
     @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
     {
         <img style="width:100%" src="@Model.MainPicture" alt="@Model.Name">
     }
-    <div class="mb-2 ps-4 pe-4 pt-4">
-        <h1 class="fw-bold text-center h3">@Model.Name</h1>
-
-        <span class="text-center w-100" style="color: gray;">
-            <i class="fa fa-calendar fa-fw "></i>
-            <span class="article-infor-text">@((Model.CreateTime.Year<1900?Model.LastEditTime: Model.CreateTime).ToString("yyyy-MM-dd"))</span>&nbsp;&nbsp;&nbsp;
-            <i class="fa fa-eye fa-fw "></i>
-            <span class="article-infor-text">@(Model.ReaderCount + "次阅读")</span>&nbsp;&nbsp;&nbsp;
-            <i class="fa fa-user fa-fw"></i>
-            <TabLink Icon="fa fa-star-o" Url="@("/space/index/" + Model.UserId)" Text="@Model.LastEditUserName" class="a-font-color" style="color:gray;">
-                <span class="article-infor-text"  style="cursor: pointer">@Model.LastEditUserName</span>
-            </TabLink>
-            @if (IsSmallScreen)
-            {
-                <br />
-            }
-            else
-            {
-                <span>&nbsp; &nbsp; &nbsp;</span>
-            }
-            <i class="fa fa-commenting-o fa-fw "></i>
-            <span class="article-infor-text">@(Model.CommentCount + "条评论")&nbsp; &nbsp; &nbsp;</span>
-            <i class="fa fa-thumbs-o-up fa-fw "></i>
-            <span class="article-infor-text">@(Model.ThumbsUpCount + "人点赞")&nbsp; &nbsp; &nbsp;</span>
-
-        </span>
-    </div>
-    <div class=" ps-4 pe-4">
-        <hr />
+    <div class=" ps-4 pe-4 pt-8">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <h1 class="fw-bold text-center h3 mb-8">@Model.Name</h1>
+            <a href="@("/space/inedex/"+Model.UserInfor.Id)" style=" display: flex; flex-direction: column; align-items: center;" class="a-font-color mb-2">
+                <img src="@Model.UserInfor.PhotoPath" alt="@Model.UserInfor.Name" style="width:50px;border-radius:50%;" class="mb-2"/>
+                <div class="d-flex" style=" align-items: center;">
+                    <span style="font-size: large; font-weight: bold; ">
+                        @Model.UserInfor.Name
+                    </span>
+                    @foreach (var item in Model.UserInfor.Ranks)
+                    {
+                        <RankAloneViewTip Model="item" Class="ms-2"></RankAloneViewTip>
+                    }
+                </div>
+            </a>
+            <div style="color:gray;">
+                <i class="fa fa-calendar fa-fw "></i>
+                <span>@((Model.CreateTime.Year<1900?Model.LastEditTime: Model.CreateTime).ToString("yyyy-MM-dd"))</span>&nbsp;&nbsp;&nbsp;
+                <i class="fa fa-eye fa-fw "></i>
+                <span>@(Model.ReaderCount + "次阅读")</span>&nbsp;&nbsp;&nbsp;
+                <i class="fa fa-thumbs-o-up fa-fw "></i>
+                <span>@(Model.ThumbsUpCount + "人点赞")&nbsp; &nbsp; &nbsp;</span>
+            </div>
+        </div>
         <div class="mt-4">
-                @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false)
-                {
-                    <div class="alert alert-primary  rounded shadow-sm  rounded" role="alert">
-                        作者：
-                        <strong> @Model.OriginalAuthor</strong>
-                        &nbsp; 原文发表在：
-                        <a href="@Model.OriginalLink" class="alert-link" style="word-wrap: break-word;word-break:break-all;" target="_blank">@Model.OriginalLink</a>
-                    </div>
-                }
+            @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+                    作者：
+                    <strong> @Model.OriginalAuthor</strong>
+                    &nbsp; 原文发表在：
+                    <a href="@Model.OriginalLink" class="text--info fw-bold" style="word-break:break-all;" target="_blank">@Model.OriginalLink</a>
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+            }
 
-                @if (Model.MainPageState == EditState.Preview || Model.MainState == EditState.Preview || Model.RelevancesState == EditState.Preview)
-                {
-                    <AlertTip Title="编辑文章" Type="AlertTip.AlertTipType.preview" Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></AlertTip>
-                }
-                <div class="markdown-body">
-                    @((MarkupString)Model.MainPage)
-                </div>
-                <div>
-                    <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Article" Id="Model.Id" />
-                </div>
-            
+            @if (Model.MainPageState == EditState.Preview || Model.MainState == EditState.Preview || Model.RelevancesState == EditState.Preview)
+            {
+                <AlertTip Title="编辑文章" Type="AlertTip.AlertTipType.preview" Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></AlertTip>
+            }
+            <div class="markdown-body">
+                @((MarkupString)Model.MainPage)
+            </div>
+            <div>
+                <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Article" Id="Model.Id" />
+            </div>
         </div>
     </div>
+
 </div>
 
 

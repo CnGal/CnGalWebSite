@@ -1,5 +1,5 @@
 ﻿<div class="  rounded shadow-sm  bg-opacity mb-3">
-    <PeripheryMainInforTip Model="Model" IsSmallScreen="true" />
+    <PeripheryMainInforTip Model="Model"/>
 </div>
 <div class="rounded shadow-sm bg-opacity mb-3">
     <PeripheryBasicInforTip Model="Model" />
@@ -7,7 +7,7 @@
 @if (Model.Pictures.Count != 0)
 {
     <div class="mb-3">
-        <PeripheryImagesViewTip Model="Model.Pictures" EditState="Model.ImagesState" IsEdit="Model.IsEdit"  Id="Model.Id" />
+        <PeripheryImagesViewTip Model="Model"/>
     </div>
 }
 <div class="">

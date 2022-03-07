@@ -26,11 +26,10 @@
                 <div class="w-100">
                     @if (isReady)
                     {
-                        @if (ShowPerfection)
+                        @if (PerfectionInfor!=null&&ShowPerfection)
                         {
-                            <CnGalWebSite.Shared.MasaComponent.PC.Perfections.SingleOverviewCard Model="Model.PerfectionInfor" OnClosed="OnClosed" />
+                            <CnGalWebSite.Shared.MasaComponent.PC.Perfections.SingleOverviewCard Model="PerfectionInfor" OnClosed="OnClosed" />
                             <MDivider Class="w-100"></MDivider>
-
                         }
                         <MButton Text Block Color="warning" OnClick="OnClickHistory">
                             <MIcon Left>mdi-history </MIcon>
@@ -89,7 +88,9 @@
 
     public Dictionary<Operation, EditState> EditStates { get; set; } = new Dictionary<Operation, EditState>();
 
-    public EditEntryInforBindModel Model { get; set; } = new EditEntryInforBindModel();
+    public List<ExaminedNormalListModel> Examines { get; set; } = new List<ExaminedNormalListModel>();
+
+    public PerfectionInforTipViewModel PerfectionInfor { get; set; } = new PerfectionInforTipViewModel();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -111,7 +112,7 @@
         option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EditRecordListViewTip>(new Dictionary<string, object>
         {
             [nameof(EditRecordListViewTip.Id)] = Id,
-            [nameof(EditRecordListViewTip.Model)] = Model.Examines,
+            [nameof(EditRecordListViewTip.Model)] = Examines,
             [nameof(EditRecordListViewTip.Type)] = Type,
             [nameof(EditRecordListViewTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
 
@@ -125,10 +126,10 @@
         {
             Items.Add(new EditButtonLineModel
             {
-                State = item.Value == EditState.Normal ? (Model.Examines.Any(s => s.Operation == item.Key) ? EditState.Normal : EditState.None) : item.Value,
-                EditCount = Model.Examines.Count(s => s.Operation == item.Key),
-                Id = long.Parse(Model.Examines.FirstOrDefault()?.RelatedId),
-                LastEditTime = Model.Examines.Where(s => s.Operation == item.Key).OrderByDescending(s => s.ApplyTime).FirstOrDefault()?.ApplyTime,
+                State = item.Value == EditState.Normal ? (Examines.Any(s => s.Operation == item.Key) ? EditState.Normal : EditState.None) : item.Value,
+                EditCount = Examines.Count(s => s.Operation == item.Key),
+                Id = long.Parse(Examines.FirstOrDefault()?.RelatedId),
+                LastEditTime = Examines.Where(s => s.Operation == item.Key).OrderByDescending(s => s.ApplyTime).FirstOrDefault()?.ApplyTime,
                 Operation = item.Key
             });
         }
@@ -139,27 +140,64 @@
     {
         try
         {
-            var url = Type switch
+            if (Type == ExaminedNormalListModelType.Entry)
             {
-                ExaminedNormalListModelType.Entry => "api/entries/GetEntryEditInforBindModel/"
-            };
-            Model = await Http.GetFromJsonAsync<EditEntryInforBindModel>(ToolHelper.WebApiPath + url + Id);
 
-            switch (Type)
+                var model = await Http.GetFromJsonAsync<EditEntryInforBindModel>(ToolHelper.WebApiPath + "api/entries/GetEntryEditInforBindModel/" + Id);
+
+                Examines = model.Examines;
+
+                if (ShowPerfection)
+                {
+                    PerfectionInfor = model.PerfectionInfor;
+                }
+
+                EditStates.Add(Operation.EstablishMain, model.State.MainState);
+                EditStates.Add(Operation.EstablishAddInfor, model.State.InforState);
+                EditStates.Add(Operation.EstablishMainPage, model.State.MainPageState);
+                EditStates.Add(Operation.EstablishImages, model.State.ImagesState);
+                EditStates.Add(Operation.EstablishRelevances, model.State.RelevancesState);
+                EditStates.Add(Operation.EstablishTags, model.State.TagState);
+
+            }
+            else if (Type == ExaminedNormalListModelType.Article)
             {
-                case ExaminedNormalListModelType.Entry:
-                    EditStates.Add(Operation.EstablishMain, Model.State.MainState);
-                    EditStates.Add(Operation.EstablishAddInfor, Model.State.InforState);
-                    EditStates.Add(Operation.EstablishMainPage, Model.State.MainPageState);
-                    EditStates.Add(Operation.EstablishImages, Model.State.ImagesState);
-                    EditStates.Add(Operation.EstablishRelevances, Model.State.RelevancesState);
-                    EditStates.Add(Operation.EstablishTags, Model.State.TagState);
-                    break;
+                var model = await Http.GetFromJsonAsync<EditArticleInforBindModel>(ToolHelper.WebApiPath + "api/articles/GetArticleEditInforBindModel/" + Id);
+
+                Examines = model.Examines;
+
+                EditStates.Add(Operation.EditArticleMain, model.State.MainState);
+                EditStates.Add(Operation.EditArticleMainPage, model.State.MainPageState);
+                EditStates.Add(Operation.EditArticleRelevanes, model.State.RelevancesState);
+
+            }
+            else if (Type == ExaminedNormalListModelType.Periphery)
+            {
+                var model = await Http.GetFromJsonAsync<EditPeripheryInforBindModel>(ToolHelper.WebApiPath + "api/Peripheries/GetPeripheryEditInforBindModel/" + Id);
+
+                Examines = model.Examines;
+
+                EditStates.Add(Operation.EditPeripheryMain, model.State.MainState);
+                EditStates.Add(Operation.EditPeripheryImages, model.State.ImagesState);
+                EditStates.Add(Operation.EditPeripheryRelatedEntries, model.State.RelatedEntriesState);
+                EditStates.Add(Operation.EditPeripheryRelatedPeripheries, model.State.RelatedPeripheriesState);
+
+            }
+            else if (Type == ExaminedNormalListModelType.Tag)
+            {
+                var model = await Http.GetFromJsonAsync<EditTagInforBindModel>(ToolHelper.WebApiPath + "api/tags/GetTagEditInforBindModel/" + Id);
+
+                Examines = model.Examines;
+
+                EditStates.Add(Operation.EditTagMain, model.State.MainState);
+                EditStates.Add(Operation.EditTagChildEntries, model.State.ChildEntriesState);
+                EditStates.Add(Operation.EditTagChildTags, model.State.ChildTagsState);
+
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取词条编辑信息失败");
+            ErrorHandler.ProcessError(ex, "获取" + Type.GetDisplayName() + "编辑信息失败");
             return;
         }
 

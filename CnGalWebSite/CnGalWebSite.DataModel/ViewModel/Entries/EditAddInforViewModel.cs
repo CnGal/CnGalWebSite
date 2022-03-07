@@ -1,20 +1,14 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Base;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel
 {
-    public class EditAddInforViewModel
+    public class EditAddInforViewModel: BaseEntryEditModel
     {
 
-        /// <summary>
-        /// 是否真实提交表单 或添加staff
-        /// </summary>
-        public string IsRealSubmit { get; set; }
-        public EntryType Type { get; set; }
-        public int Id { get; set; }
-
-        public string Name { get; set; }
         [Display(Name = "相关网站")]
         public List<SocialPlatform> SocialPlatforms { get; set; } = new List<SocialPlatform>() { };
 
@@ -107,8 +101,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string QQgroupGroup { get; set; }
         #endregion
 
-        [Display(Name = "备注")]
-        public string Note { get; set; }
+
 
     }
 

@@ -1,96 +1,14 @@
-﻿@inject ToastService? ToastService
-
-<div style=" display: flex; justify-content: center;">
-    <AuthorizeView>
-        <Authorized>
-            @if (IsCollected)
-            {
-                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" Icon="fa fa-check" Text="我已拥有" OnClick="@(() => OnClick(5))" />
-
-            }
-            else
-            {
-                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-shopping-basket" Text="拥有" OnClick="@(() => OnClick(6))" />
-
-            }
-            @if (IsFavorited)
-            {
-                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-star" Text="取消收藏" OnClick="@(() => OnClick(7))" />
-
-            }
-            else
-            {
-                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-star-o" Text="收藏" OnClick="@(() => OnClick(8))" />
-
-            }
-            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa  fa-history" Text="历史" OnClick="@(() => OnClick(11))" />
-
-            @if (IsEdit)
-            {
-                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-sign-out" Text="退出编辑" OnClick="@(() => OnClick(9))" />
-
-            }
-            else
-            {
-                <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa  fa-pencil" Text="编辑" OnClick="@(() => OnClick(2))" />
-
-            }
-
-
-        </Authorized>
-        <NotAuthorized>
-            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa  fa-history" Text="历史" OnClick="@(() => OnClick(11))" />
-
-            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-sign-in " Text="登入后记录收集进度" OnClick="@(() => OnClick(10))" />
-
-        </NotAuthorized>
-    </AuthorizeView>
-    <AuthorizeView Roles="Admin">
-        @if (IsHidden)
-        {
-            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-map-signs" Text="取消隐藏" OnClick="@(() => OnClick(3))" />
-
-        }
-        else
-        {
-            <Button Color="Color.Dark" class="me-2" Size="Size.ExtraSmall" IsOutline="true" Icon="fa fa-unlink fa-check" Text="隐藏" OnClick="@(() => OnClick(4))" />
-
-        }
-
-    </AuthorizeView>
+﻿<div style="display: flex; justify-content: center;" class="@Class">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Periphery" Class="me-4" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.CollectionButton Id="Model.Id" Class="me-4" IsCollected="Model.IsCollected" CollectionChanged="CollectionChanged"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Periphery" Id="Model.Id" @bind-IsHidden="Model.IsHidden" />
 </div>
-
-
 @code {
     [Parameter]
-    public EventCallback<int> OnArticleClick { get; set; }
-
+    public PeripheryViewModel Model { get; set; }
     [Parameter]
-    public bool IsEdit { get; set; } = false;
-
+    public string Class { get; set; }
     [Parameter]
-    public bool IsHidden { get; set; } = false;
-
-    [Parameter]
-    public bool IsCollected { get; set; } = false;
-
-    [Parameter]
-    public bool IsSmallSreeen { get; set; } = false;
-
-    [Parameter]
-    public bool IsNormalSreeen { get; set; } = false;
-
-    [Parameter]
-    public bool IsLargeSreeen { get; set; } = false;
-    [Parameter]
-    public bool IsFavorited { get; set; }
-
-    [Parameter]
-    public int CollectedCount { get; set; }
-
-    public void OnClick(int index)
-    {
-        OnArticleClick.InvokeAsync(index);
-    }
+    public EventCallback<bool> CollectionChanged { get; set; }
 
 }

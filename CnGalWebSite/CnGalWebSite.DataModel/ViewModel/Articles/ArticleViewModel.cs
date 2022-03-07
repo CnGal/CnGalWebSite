@@ -1,5 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Model;
-
+using CnGalWebSite.DataModel.ViewModel.Space;
 using System;
 using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Articles
@@ -15,18 +15,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         /// 简介
         /// </summary>
         public string BriefIntroduction { get; set; }
-        /// <summary>
-        /// 最后编辑人
-        /// </summary>
-        public string LastEditUserName { get; set; }
-
-        /// <summary>
-        /// 创建文章的用户名
-        /// </summary>
-        public string CreateUserName { get; set; }
-
-
-        public string UserId { get; set; }
 
         /// <summary>
         /// 创建文章日期
@@ -94,15 +82,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         /// 评论数
         /// </summary>
         public long CommentCount { get; set; }
-
-
-
         /// <summary>
         /// 类型
         /// </summary>
         public ArticleType Type { get; set; }
-
-
         /// <summary>
         /// 主页
         /// </summary>
@@ -112,6 +95,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         /// 相关性列表
         /// </summary>
         public List<RelevancesViewModel> Relevances { get; set; } = new List<RelevancesViewModel>();
+
+        public UserInforViewModel UserInfor { get; set; } = new UserInforViewModel();
 
         public long LastExamineId { get; set; }
 

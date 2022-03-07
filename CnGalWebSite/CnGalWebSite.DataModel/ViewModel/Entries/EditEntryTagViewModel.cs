@@ -1,17 +1,12 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel
 {
-    public class EditEntryTagViewModel
+    public class EditEntryTagViewModel : BaseEntryEditModel
     {
-        public EntryType Type { get; set; }
-        public string Name { get; set; }
-        public int Id { get; set; }
         public List<RelevancesModel> Tags { get; set; } = new List<RelevancesModel>();
-
-        [Display(Name = "备注")]
-        public string Note { get; set; }
 
     }
 }

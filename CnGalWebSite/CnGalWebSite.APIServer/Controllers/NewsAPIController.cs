@@ -431,7 +431,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 temp.Title = article.OriginalAuthor;
             }
-            model.CreateUserName = temp.Title;
+
             model.BackgroundPicture = temp.Image;
 
             return model;
@@ -616,18 +616,15 @@ namespace CnGalWebSite.APIServer.Controllers
                 OriginalLink = article.OriginalLink,
                 OriginalAuthor = article.OriginalAuthor,
                 BriefIntroduction = article.BriefIntroduction,
-                CreateUserName = article.CreateUser.UserName,
-                BackgroundPicture = _appHelper.GetImagePath(article.CreateUser.PhotoPath, "user.png")
+                UserInfor = await _userService.GetUserInforViewModel(article.CreateUser)
             };
+
             //初始化图片
             model.MainPicture = _appHelper.GetImagePath(article.MainPicture, "app.png");
 
             //初始化主页Html代码
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
             model.MainPage = Markdown.ToHtml(model.MainPage ?? "", pipeline);
-
-
-
 
             return model;
 

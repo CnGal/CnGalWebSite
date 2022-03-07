@@ -156,13 +156,17 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public List<VoteCardViewModel> VoteCardsCatche { get; set; } = new List<VoteCardViewModel>();
 
+        /// <summary>
+        /// 文章主页 随机文章
+        /// </summary>
+        public List<RandomTagModel> RandomTagsCatche { get; set; } = new List<RandomTagModel>();
 
         /// <summary>
         /// 文章主页 随机文章
         /// </summary>
         public List<ArticleInforTipViewModel> RandomArticlesCatche { get; set; } = new List<ArticleInforTipViewModel>();
         /// <summary>
-        /// 文章主页 随机文章
+        /// 文章主页 周报列表
         /// </summary>
         public List<ArticleInforTipViewModel> WeeklyNewsOverviewCatche { get; set; } = new List<ArticleInforTipViewModel>();
         /// <summary>

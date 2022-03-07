@@ -6,8 +6,6 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
-<link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor.Chart/css/bootstrap.blazor.chart.bundle.min.css" media="none" onload="this.media='all'" />
-
 @if (string.IsNullOrWhiteSpace(Model.BasicInfor.Name) == false)
 {
     <TitleTip Title="@Model.BasicInfor.Name" Description="@Model.BasicInfor.PersonalSignature"></TitleTip>

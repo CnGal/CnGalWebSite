@@ -1,0 +1,122 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(IsThumbsUp?"mdi-thumb-up ":"mdi-thumb-up-outline")" Color="pink lighten-3" Tooltip="@(IsThumbsUp?"已点赞":"点赞")" Class="@Class" OnClick="OnClickStar" />
+
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    [Parameter]
+    public bool IsThumbsUp { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+    bool isReady = false;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var user = await authenticationStateTask;
+        if (Id != 0 && isReady == false && user.User.Identity.IsAuthenticated)
+        {
+            try
+            {
+                //获取文章信息
+                var AsyncModel = await Http.GetFromJsonAsync<ArticleAsyncInforViewModel>(ToolHelper.WebApiPath + "api/articles/GetArticleAsyncInfor/" + Id);
+                IsThumbsUp = AsyncModel.IsThumbsUp;
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取与用户相关的文章信息失败");
+            }
+        }
+
+    }
+
+
+    private async Task OnClickStar()
+    {
+        //判断用户是否登录
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated)
+        {
+            if (IsThumbsUp)
+            {
+                await UnThumbsUp();
+            }
+            else
+            {
+                await ThumbsUp();
+
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("account/login");
+        }
+
+    }
+
+
+    private async Task UnThumbsUp()
+    {
+        try
+        {
+
+            var result = await Http.PostAsJsonAsync<ThumbsUpArticleModel>(ToolHelper.WebApiPath + "api/articles/ThumbsUpArticle", new ThumbsUpArticleModel { Id = Id, IsThumbsUp = false });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("取消点赞文章失败", obj.Error);
+            }
+            else
+            {
+                //await ToastService.Success("取消点赞文章成功", "取消点赞文章成功");
+                IsThumbsUp = false;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "取消点赞文章失败");
+        }
+    }
+    private async Task ThumbsUp()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<ThumbsUpArticleModel>(ToolHelper.WebApiPath + "api/articles/ThumbsUpArticle", new ThumbsUpArticleModel { Id = Id, IsThumbsUp = true });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("点赞文章失败", obj.Error);
+            }
+            else
+            {
+                //await ToastService.Success("点赞文章成功", "点赞文章成功");
+                IsThumbsUp = true;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "点赞文章失败");
+        }
+    }
+
+}

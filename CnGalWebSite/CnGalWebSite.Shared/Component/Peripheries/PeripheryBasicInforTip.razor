@@ -1,28 +1,9 @@
-﻿<div class=" ps-3 pe-3 pb-2 pt-2">
-    <div class="">
-        <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-info-circle"></i>&nbsp;&nbsp;基础信息</h2>
-    </div>
-    <div>
-        @if (Model.IsEdit == true)
-        {
+﻿@if (Model.MainState == EditState.Preview)
+{
+    <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditMain/" + Model.Id)" ExamineType="Operation.EditPeripheryMain" OnClickRevoke="OnRevoke"></AlertTip>
+}
 
-            @switch (Model.MainState)
-            {
-                case EditState.locked:
-                    <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                    break;
-                case EditState.Normal:
-                    <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.Editable" Url="@("/peripheries/EditMain/" + Model.Id)"></AlertTip>
-                    break;
-            }
-        }
-        @if (Model.MainState == EditState.Preview)
-        {
-            <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditMain/" + Model.Id)" ExamineType="Operation.EditPeripheryMain" OnClickRevoke="OnRevoke"></AlertTip>
-        }
-
-
-    </div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="fa fa-fw fa-info-circle">
     <div class="row">
 
         <div class="col-12 col-md-6">
@@ -118,7 +99,8 @@
         }
     </div>
 
-</div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
 @code {
 
     [Parameter]

@@ -43,7 +43,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
 
         [Display(Name = "开始时间")]
         public DateTime BeginTime { get; set; }
-        [Display(Name = "截止时间")]
+        [Display(Name = "结束时间")]
         public DateTime EndTime { get; set; }
         [Display(Name = "抽奖时间")]
         public DateTime LotteryTime { get; set; }

@@ -32,7 +32,7 @@ else
         else
         {
             <div class="ms-3 me-3 pt-2">
-                <CnGalWebSite.Shared.AppComponent.Pages.Articles.HeadCard Model="Model" UserInfor="UserInfor" />
+                <CnGalWebSite.Shared.AppComponent.Pages.Articles.HeadCard Model="Model" UserInfor="Model.UserInfor" />
                 <div class="mt-4">
                     @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false)
                     {
@@ -112,13 +112,7 @@ else
     public CnGalWebSite.Shared.AppComponent.Normal.Comments.ListComment comments;
 
     public bool CanEdit { get; set; }
-    public ArticleViewModel Model { get; set; } = new ArticleViewModel
-    {
-        Relevances = new List<RelevancesViewModel>(),
-        MainPage = "# 123",
-        Name = "CnGal_中文GalGame资料站"
-    };
-    public UserInforViewModel UserInfor { get; set; } = new UserInforViewModel { Ranks = new List<RankViewModel>() };
+    public ArticleViewModel Model { get; set; } = new ArticleViewModel();
     string LastLookName = "";
 
     [CascadingParameter]
@@ -181,7 +175,7 @@ else
         {
             var user = await authenticationStateTask;
             CanEdit = user.User.IsInRole("Editor");
-            if (user.User.Identity.Name == Model.LastEditUserName || user.User.Identity.Name == Model.CreateUserName)
+            if (user.User.Identity.Name == Model.UserInfor.Name)
             {
                 CanEdit = true;
             }
@@ -196,9 +190,6 @@ else
             {
                 NavigationManager.NavigateTo("/home");
             }
-
-            UserInfor = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + Model.UserId);
-
 
             isReady = true;
             isNotFound = false;

@@ -1,19 +1,15 @@
-﻿<div>
-    <div class="shadow-sm rounded  bg-opacity ps-3 pe-3 mb-2">
-        <div style="display: block;">
-            <h2 class="fw-bold pt-2 pb-2 m-0 font-color h5"><i class="fa fa-codepen"></i>&nbsp;&nbsp;参与投票的用户</h2>
-        </div>
-    </div>
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="参与投票的用户" Icon="fa fa-fw fa-users" Outline Collapable>
     <div class="row">
         @foreach (var item in Model.Users)
         {
-        <div class="@("col-12 pb-2")">
-            <UserInforCard Model="item" />
-        </div>
-        temp=!temp;
+            <div class="@("col-12 pb-2")">
+                <UserInforCard Model="item" />
+            </div>
+            temp = !temp;
         }
     </div>
-</div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
     [Parameter]

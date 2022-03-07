@@ -1,0 +1,15 @@
+﻿<div style="display: flex; justify-content: center;" class="@Class">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Article" Class="me-4" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Articles.ThumbsUpButton Id="Model.Id"  Class="me-4" />
+    @if (Model.Authority)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Article" Id="Model.Id" @bind-IsHidden="Model.IsHidden" />
+    }
+</div>
+@code {
+    [Parameter]
+    public ArticleViewModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+}
