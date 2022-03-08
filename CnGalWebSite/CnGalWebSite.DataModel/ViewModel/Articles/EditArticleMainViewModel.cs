@@ -1,22 +1,19 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Base;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Articles
 {
-    public class EditArticleViewModel
+    public class EditArticleMainViewModel : BaseEditModel
     {
-        public long Id { get; set; }
-        [Display(Name = "唯一名称")]
-        [Required(ErrorMessage = "请填写唯一名称")]
-        public string Name { get; set; }
         [Display(Name = "显示名称")]
         [Required(ErrorMessage = "请填写显示名称")]
         public string DisplayName { get; set; }
         [Display(Name = "简介")]
         [Required(ErrorMessage = "请填写简介")]
         public string BriefIntroduction { get; set; }
-        // [Required(ErrorMessage = "请上传主图")]
+
         [Display(Name = "主图")]
         public string MainPicture { get; set; }
 
@@ -26,20 +23,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         [Display(Name = "小背景图")]
         public string SmallBackgroundPicture { get; set; }
 
-
-        public string MainPicturePath { get; set; }
-        public string BackgroundPicturePath { get; set; }
-        public string SmallBackgroundPicturePath { get; set; }
-
         [Display(Name = "类别")]
         [Required(ErrorMessage = "请选择类别")]
         public ArticleType Type { get; set; }
         [Display(Name = "动态类别")]
         public string NewsType { get; set; }
 
-        [Display(Name = "正文")]
-        [Required(ErrorMessage = "请输入正文")]
-        public string Context { get; set; }
 
         [Display(Name = "原作者")]
         public string OriginalAuthor { get; set; }
@@ -50,16 +39,24 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         [Display(Name = "动态发生时间")]
         public DateTime? RealNewsTime { get; set; }
 
+        public override Result Validate()
+        {
+            if (string.IsNullOrWhiteSpace(Name) )
+            {
+                return new Result { Error = "请填写唯一名称" };
+            }
+            if ( string.IsNullOrWhiteSpace(BriefIntroduction) )
+            {
+                return new Result { Error = "请填写简介" };
+            }
+            if (string.IsNullOrWhiteSpace(DisplayName))
+            {
+                return new Result { Error = "请填写显示名称" };
+            }
 
-        public List<RelevancesModel> Roles { get; set; }
-        public List<RelevancesModel> staffs { get; set; }
-        public List<RelevancesModel> Groups { get; set; }
-        public List<RelevancesModel> Games { get; set; }
-        public List<RelevancesModel> articles { get; set; }
+            return new Result { Successful = true };
+        }
 
-        public List<RelevancesModel> others { get; set; }
 
-        [Display(Name = "备注")]
-        public string Note { get; set; }
     }
 }

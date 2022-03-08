@@ -37,5 +37,13 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Periphery currentPeriphery, Periphery newPeriphery);
 
         Task<List<PeripheryViewModel>> ConcompareAndGenerateModel(Periphery currentPeriphery, Periphery newPeriphery);
+
+        void SetDataFromEditPeripheryMainViewModel(Periphery newPeriphery, EditPeripheryMainViewModel model);
+
+        void SetDataFromEditPeripheryImagesViewModel(Periphery newPeriphery, EditPeripheryImagesViewModel model);
+
+        void SetDataFromEditPeripheryRelatedEntriesViewModel(Periphery newPeriphery, EditPeripheryRelatedEntriesViewModel model, List<Entry> entries);
+
+        void SetDataFromEditPeripheryRelatedPerpheriesViewModel(Periphery newPeriphery, EditPeripheryRelatedPeripheriesViewModel model, List<Periphery> peripheries);
     }
 }

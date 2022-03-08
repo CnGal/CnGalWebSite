@@ -1,14 +1,10 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Base;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Peripheries
 {
-    public class EditPeripheryMainViewModel
+    public class EditPeripheryMainViewModel : BaseEditModel
     {
-        public long Id { get; set; }
-
-        [Display(Name = "唯一名称")]
-        [Required(ErrorMessage = "请填写唯一名称")]
-        public string Name { get; set; }
         [Display(Name = "显示名称")]
         [Required(ErrorMessage = "请填写显示名称")]
         public string DisplayName { get; set; }
@@ -62,7 +58,18 @@ namespace CnGalWebSite.DataModel.ViewModel.Peripheries
         public int SongCount { get; set; }
         #endregion
 
-        [Display(Name = "备注")]
-        public string Note { get; set; }
+        public override Result Validate()
+        {
+            if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(DisplayName))
+            {
+                return new Result { Error = "请填写周边名称" };
+            }
+            if (string.IsNullOrWhiteSpace(MainPicture))
+            {
+                return new Result { Error = "周边必须上传主图" };
+            }
+
+            return new Result { Successful = true };
+        }
     }
 }

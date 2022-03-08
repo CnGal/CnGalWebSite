@@ -490,7 +490,6 @@ namespace CnGalWebSite.APIServer.Controllers
                 await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishMain, model.Note);
             }
 
-
             return new Result { Successful = true };
 
         }
@@ -907,7 +906,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
                 }
                 //判断名称是否重复
-                if (await _entryRepository.FirstOrDefaultAsync(s => s.Name == model.Name) != null)
+                if (await _entryRepository.FirstOrDefaultAsync(s => s.Name == model.Main.Name) != null)
                 {
                     return new Result { Error = "该词条的名称与其他词条重复", Successful = false };
                 }

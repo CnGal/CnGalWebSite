@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TencentCloud.Cme.V20191029.Models;
+using CnGalWebSite.Helper.Extensions;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -53,119 +54,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<ActionResult<Result>> CreateTagAsync(CreateTagViewModel model)
-        {
-            try
-            {
-                //获取当前用户ID
-                var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-                //检查是否超过编辑上限
-                if (await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == null) > ToolHelper.MaxEditorCount)
-                {
-                    return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
-                }
-
-                //判断名称是否重复
-                if (await _tagRepository.FirstOrDefaultAsync(s => s.Name == model.Name) != null)
-                {
-                    return new Result { Error = "该标签的名称与其他标签重复", Successful = false };
-                }
-                //判断父标签是否存在
-                Tag parentTag = null;
-
-                if (string.IsNullOrWhiteSpace(model.ParentTagName))
-                {
-                    return new Result { Error = "除四个顶级标签外，其他标签必须包含父标签", Successful = false };
-                }
-                else
-                {
-                    parentTag = await _tagRepository.FirstOrDefaultAsync(s => s.Name == model.ParentTagName);
-                    if (parentTag == null)
-                    {
-                        return new Result { Error = "父标签必须真实存在", Successful = false };
-                    }
-                }
-                //预处理 建立子标签关联信息
-                //判断关联是否存在
-                var tagIds = new List<int>();
-
-                var tagNames = new List<string>();
-                tagNames.AddRange(model.Tags.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-
-                try
-                {
-                    tagIds = await _tagService.GetTagIdsFromNames(tagNames);
-                }
-                catch (Exception ex)
-                {
-                    return new Result { Successful = false, Error = ex.Message };
-                }
-                //获取标签
-                var tags = await _tagRepository.GetAll().Where(s => tagIds.Contains(s.Id)).ToListAsync();
-
-                //判断关联是否存在
-                var entryIds = new List<int>();
-
-                var entryNames = new List<string>();
-                entryNames.AddRange(model.Entries.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-                try
-                {
-                    entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
-                }
-                catch (Exception ex)
-                {
-                    return new Result { Successful = false, Error = ex.Message };
-                }
-                //获取词条
-                var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
-
-
-                var newTag = new Tag
-                {
-                    //第一步 处理主要信息
-
-
-                    ParentCodeNavigation = parentTag,
-
-                    Name = model.Name,
-                    BriefIntroduction = model.BriefIntroduction,
-                    MainPicture = model.MainPicture,
-                    BackgroundPicture = model.BackgroundPicture,
-                    SmallBackgroundPicture = model.SmallBackgroundPicture,
-                    Thumbnail = model.Thumbnail,
-
-                    //第二步 处理子标签
-
-                    InverseParentCodeNavigation = tags,
-
-                    //第三步 处理子词条 
-
-                    Entries = entries
-                };
-
-
-                var tag = new Tag();
-                //获取审核记录
-                try
-                {
-                    tag = await _examineService.AddNewTagExaminesAsync(newTag, user, model.Note);
-                }
-                catch (Exception ex)
-                {
-                    return new Result { Successful = false, Error = ex.Message };
-
-                }
-
-
-                return new Result { Successful = true, Error = tag.Id.ToString() };
-            }
-            catch (Exception)
-            {
-                return new Result { Error = "创建标签的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
-            }
-
-        }
 
 
         [AllowAnonymous]
@@ -372,6 +260,101 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
+        [HttpPost]
+        public async Task<ActionResult<Result>> CreateTagAsync(CreateTagViewModel model)
+        {
+            try
+            {
+                //获取当前用户ID
+                var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+                //检查是否超过编辑上限
+                if (await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == null) > ToolHelper.MaxEditorCount)
+                {
+                    return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
+                }
+
+                //判断名称是否重复
+                if (await _tagRepository.FirstOrDefaultAsync(s => s.Name == model.Main.Name) != null)
+                {
+                    return new Result { Error = "该标签的名称与其他标签重复", Successful = false };
+                }
+                //判断父标签是否存在
+                Tag parentTag = null;
+
+                if (string.IsNullOrWhiteSpace(model.Main.ParentTagName))
+                {
+                    return new Result { Error = "除四个顶级标签外，其他标签必须包含父标签", Successful = false };
+                }
+                else
+                {
+                    parentTag = await _tagRepository.FirstOrDefaultAsync(s => s.Name == model.Main.ParentTagName);
+                    if (parentTag == null)
+                    {
+                        return new Result { Error = "父标签必须真实存在", Successful = false };
+                    }
+                }
+                //预处理 建立子标签关联信息
+                //判断关联是否存在
+                var tagIds = new List<int>();
+
+                var tagNames = new List<string>();
+                tagNames.AddRange(model.Tags.Tags.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+
+                try
+                {
+                    tagIds = await _tagService.GetTagIdsFromNames(tagNames);
+                }
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
+                }
+                //获取标签
+                var tags = await _tagRepository.GetAll().Where(s => tagIds.Contains(s.Id)).ToListAsync();
+
+                //判断关联是否存在
+                var entryIds = new List<int>();
+
+                var entryNames = new List<string>();
+                entryNames.AddRange(model.Entries.Entries.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                try
+                {
+                    entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
+                }
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
+                }
+                //获取词条
+                var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
+
+
+                var newTag = new Tag();
+
+                _tagService.SetDataFromEditTagMainViewModel(newTag, model.Main,parentTag);
+                _tagService.SetDataFromEditTagChildEntriesViewModel(newTag, model.Entries,entries);
+                _tagService.SetDataFromEditTagChildTagsViewModel(newTag, model.Tags,tags);
+
+                var tag = new Tag();
+                //获取审核记录
+                try
+                {
+                    tag = await _examineService.AddNewTagExaminesAsync(newTag, user, model.Note);
+                }
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
+
+                }
+
+
+                return new Result { Successful = true, Error = tag.Id.ToString() };
+            }
+            catch (Exception)
+            {
+                return new Result { Error = "创建标签的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
+            }
+
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EditTagMainViewModel>> EditMainAsync(int id)
@@ -459,14 +442,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = $"无法找到ID为{model.Id}的标签", Successful = false };
             }
 
-            newTag.ParentCodeNavigation = parentTag;
-
-            newTag.Name = model.Name;
-            newTag.BriefIntroduction = model.BriefIntroduction;
-            newTag.MainPicture = model.MainPicture;
-            newTag.BackgroundPicture = model.BackgroundPicture;
-            newTag.SmallBackgroundPicture = model.SmallBackgroundPicture;
-            newTag.Thumbnail = model.Thumbnail;
+            _tagService.SetDataFromEditTagMainViewModel(newTag, model, parentTag);
 
 
             var examines = _tagService.ExaminesCompletion(currentTag, newTag);
@@ -587,7 +563,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = $"无法找到ID为{model.Id}的标签", Successful = false };
             }
 
-            newTag.InverseParentCodeNavigation = tags;
+            _tagService.SetDataFromEditTagChildTagsViewModel(newTag, model, tags);
 
             var examines = _tagService.ExaminesCompletion(currentTag, newTag);
 
@@ -707,7 +683,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = $"无法找到ID为{model.Id}的标签", Successful = false };
             }
 
-            newTag.Entries = entries;
+            _tagService.SetDataFromEditTagChildEntriesViewModel(newTag, model, entries);
 
             var examines = _tagService.ExaminesCompletion(currentTag, newTag);
 
@@ -894,7 +870,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Id = item.Id,
                     Name = item.Name
                 };
-                foreach(var infor  in item.Entries.Take(12))
+                foreach(var infor  in item.Entries.ToList().Random().Take(12))
                 {
                     temp.Entries.Add(await _appHelper.GetEntryInforTipViewModel(infor));
                 }

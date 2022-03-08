@@ -295,3 +295,12 @@ input.te-image-file-input {
         display: none!important;
     }
 }
+.editormd-toolbar {
+    z-index: 4!important;
+}
+.editormd .CodeMirror {
+   z-index: 4!important;
+}
+.editormd-fullscreen{
+    z-index: 10000!important;
+}

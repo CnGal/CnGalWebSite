@@ -268,12 +268,12 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
 
                 //检查周边是否重名
-                if (await _peripheryRepository.GetAll().AnyAsync(s => s.Name == model.Name))
+                if (await _peripheryRepository.GetAll().AnyAsync(s => s.Name == model.Main.Name))
                 {
                     return new Result { Successful = false, Error = "该周边的名称与其他周边重复" };
                 }
                 //检查图片链接 是否包含外链
-                foreach (var item in model.Images)
+                foreach (var item in model.Images.Images)
                 {
                     if (item.Url.Contains("image.cngal.org") == false && item.Url.Contains("pic.cngal.top") == false)
                     {
@@ -281,9 +281,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                 }
                 //检查是否重复
-                foreach (var item in model.Images)
+                foreach (var item in model.Images.Images)
                 {
-                    if (model.Images.Count(s => s.Url == item.Url) > 1)
+                    if (model.Images.Images.Count(s => s.Url == item.Url) > 1)
                     {
                         return new Result { Error = "图片链接不能重复，重复的链接：" + item.Url, Successful = false };
 
@@ -293,10 +293,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 var entryIds = new List<int>();
 
                 var entryNames = new List<string>();
-                entryNames.AddRange(model.Games.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-                entryNames.AddRange(model.Groups.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-                entryNames.AddRange(model.Staffs.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-                entryNames.AddRange(model.Roles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.Entries.Games.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.Entries.Groups.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.Entries.Staffs.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.Entries.Roles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
                 try
                 {
                     entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
@@ -310,7 +310,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var peripheryIds = new List<long>();
 
                 var peripheryNames = new List<string>();
-                peripheryNames.AddRange(model.Peripheries.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                peripheryNames.AddRange(model.Peripheries.Peripheries.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
                 try
                 {
                     peripheryIds = await _peripheryService.GetPeripheryIdsFromNames(peripheryNames);
@@ -324,55 +324,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
 
-                var newPeriphery = new Periphery
-                {
-
-                    //第一步 处理主要信息
-                    Name = model.Name,
-                    DisplayName = model.DisplayName,
-                    BriefIntroduction = model.BriefIntroduction,
-                    MainPicture = model.MainPicture,
-                    BackgroundPicture = model.BackgroundPicture,
-                    SmallBackgroundPicture = model.SmallBackgroundPicture,
-                    Thumbnail = model.Thumbnail,
-                    Author = model.Author,
-                    Material = model.Material,
-                    Brand = model.Brand,
-                    IndividualParts = model.IndividualParts,
-                    IsAvailableItem = model.IsAvailableItem,
-                    IsReprint = model.IsReprint,
-                    PageCount = model.PageCount,
-                    Price = model.Price,
-                    Size = model.Size,
-                    SongCount = model.SongCount,
-                    Type = model.Type,
-                    Category = model.Category,
-                    SaleLink = model.SaleLink
-                };
-
-                //第二步 建立词条图片
-                foreach (var item in model.Images)
-                {
-
-                    newPeriphery.Pictures.Add(new EntryPicture
-                    {
-                        Url = item.Url,
-                        Modifier = item.Modifier,
-                        Note = item.Note
-                    });
-
-                }
+                var newPeriphery = new Periphery();
 
 
-                //第三步 建立周边关联词条信息
-                newPeriphery.RelatedEntries = entries;
-
-                //第四步 建立周边关联周边信息
-                newPeriphery.PeripheryRelationFromPeripheryNavigation = peripheries.Select(s => new PeripheryRelation
-                {
-                    ToPeriphery = s.Id,
-                    ToPeripheryNavigation = s
-                }).ToList();
+                _peripheryService.SetDataFromEditPeripheryMainViewModel(newPeriphery, model.Main);
+                _peripheryService.SetDataFromEditPeripheryImagesViewModel(newPeriphery, model.Images);
+                _peripheryService.SetDataFromEditPeripheryRelatedEntriesViewModel(newPeriphery, model.Entries,entries);
+                _peripheryService.SetDataFromEditPeripheryRelatedPerpheriesViewModel(newPeriphery, model.Peripheries,peripheries);
 
                 var periphery = new Periphery();
                 //获取审核记录
@@ -479,27 +437,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = $"无法找到ID为{model.Id}的周边", Successful = false };
             }
 
-
-            newPeriphery.Name = model.Name;
-            newPeriphery.DisplayName = model.DisplayName;
-            newPeriphery.BriefIntroduction = model.BriefIntroduction;
-            newPeriphery.MainPicture = model.MainPicture;
-            newPeriphery.BackgroundPicture = model.BackgroundPicture;
-            newPeriphery.SmallBackgroundPicture = model.SmallBackgroundPicture;
-            newPeriphery.Thumbnail = model.Thumbnail;
-            newPeriphery.Author = model.Author;
-            newPeriphery.Material = model.Material;
-            newPeriphery.Brand = model.Brand;
-            newPeriphery.IndividualParts = model.IndividualParts;
-            newPeriphery.IsAvailableItem = model.IsAvailableItem;
-            newPeriphery.IsReprint = model.IsReprint;
-            newPeriphery.PageCount = model.PageCount;
-            newPeriphery.Price = model.Price;
-            newPeriphery.Size = model.Size;
-            newPeriphery.SongCount = model.SongCount;
-            newPeriphery.Type = model.Type;
-            newPeriphery.Category = model.Category;
-            newPeriphery.SaleLink = model.SaleLink;
+            _peripheryService.SetDataFromEditPeripheryMainViewModel(newPeriphery, model);
 
             var examines = _peripheryService.ExaminesCompletion(currentPeriphery, newPeriphery);
 
@@ -626,21 +564,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = $"无法找到ID为{model.Id}的周边", Successful = false };
             }
 
-
-            //再遍历视图模型中的图片 对应修改
-            newPeriphery.Pictures.Clear();
-
-            foreach (var item in model.Images)
-            {
-
-                newPeriphery.Pictures.Add(new EntryPicture
-                {
-                    Url = item.Url,
-                    Modifier = item.Modifier,
-                    Note = item.Note
-                });
-
-            }
+            _peripheryService.SetDataFromEditPeripheryImagesViewModel(newPeriphery, model);
 
             var examines = _peripheryService.ExaminesCompletion(currentPeriphery, newPeriphery);
 
@@ -803,8 +727,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = $"无法找到ID为{model.Id}的周边", Successful = false };
             }
 
-            newPeriphery.RelatedEntries = entries;
-
+            _peripheryService.SetDataFromEditPeripheryRelatedEntriesViewModel(newPeriphery, model, entries);
 
             var examines = _peripheryService.ExaminesCompletion(currentPeriphery, newPeriphery);
 
@@ -930,12 +853,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Error = $"无法找到ID为{model.Id}的周边", Successful = false };
             }
 
-            newPeriphery.PeripheryRelationFromPeripheryNavigation = peripheries.Select(s => new PeripheryRelation
-            {
-                ToPeriphery = s.Id,
-                ToPeripheryNavigation = s
-            }).ToList();
-
+            _peripheryService.SetDataFromEditPeripheryRelatedPerpheriesViewModel(newPeriphery, model, peripheries);
 
             var examines = _peripheryService.ExaminesCompletion(currentPeriphery, newPeriphery);
 

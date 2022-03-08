@@ -32,5 +32,41 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// </summary>
         public EditEntryTagViewModel Tags { get; set; } = new EditEntryTagViewModel();
 
+        public override Result Validate()
+        {
+            var result = Main.Validate();
+            if(!result.Successful)
+            {
+                return result;
+            }
+            result = AddInfor.Validate();
+            if (!result.Successful)
+            {
+                return result;
+            }
+            result = MainPage.Validate();
+            if (!result.Successful)
+            {
+                return result;
+            }
+            result = Images.Validate();
+            if (!result.Successful)
+            {
+                return result;
+            }
+            result = Relevances.Validate();
+            if (!result.Successful)
+            {
+                return result;
+            }
+            result = Tags.Validate();
+            if (!result.Successful)
+            {
+                return result;
+            }
+
+            return new Result { Successful = true };
+        }
+
     }
 }

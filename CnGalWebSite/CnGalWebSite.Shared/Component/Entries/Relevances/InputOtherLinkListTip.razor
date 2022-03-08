@@ -1,34 +1,41 @@
 ﻿@inject DialogService DialogService
 @inject ToastService ToastService
-<h5 class="fw-bold">自定义链接</h5>
-<div class="row mt-4">
-    @for (int i = 0; i < Model.Count; i++)
-    {
-        int temp = i;
-        <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3">
-            <div class="card p-3" style="background-color:transparent">
-                <div class="row">
-                    <div class="col mt-2" style="padding-right:0px;">
-                        <p class="text-truncate text-center" style="font-size:.875rem">
-                            @Model[i].DisplayName：@Model[i].DisPlayValue
-                        </p>
-                    </div>
-                    <div class="col-12 d-flex" style="justify-content: space-between;">
-                        <Button IsOutline="true" Size="Size.Small" Color="Color.Danger" Icon="fa fa-trash-o" @onclick="@(()=> DeleteOther(temp))" Text="删除"></Button>
-                        <Button IsOutline="true" Size="Size.Small" Color="Color.Success" Icon="fa fa-pencil" @onclick="@(()=> EditOther(temp))" Text="编辑" class="ms-1"></Button>
-                    </div>
 
+<div class="@Class">
+    <h5 class="fw-bold mb-4">自定义链接</h5>
+    <div class="row">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            int temp = i;
+            <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3">
+                <div class="card p-3" style="background-color:transparent">
+                    <div class="row">
+                        <div class="col mt-2">
+                            <p class="text-truncate text-center">
+                                @Model[i].DisplayName：@Model[i].DisPlayValue
+                            </p>
+                        </div>
+                        <div class="col-12 d-flex" style="justify-content: space-between;">
+                            <Button IsOutline="true" Size="Size.Small" Color="Color.Danger" Icon="fa fa-trash-o" @onclick="@(()=> DeleteOther(temp))" Text="删除"></Button>
+                            <Button IsOutline="true" Size="Size.Small" Color="Color.Success" Icon="fa fa-pencil" @onclick="@(()=> EditOther(temp))" Text="编辑" class="ms-1"></Button>
+                        </div>
+
+                    </div>
                 </div>
             </div>
-        </div>}
+        }
+    </div>
+    <Button Color="Color.Primary" IsOutline="true" style="width:100px" OnClick="AddOther" Text="添加" Icon="fa fa-plus"></Button>
+
 </div>
-<Button Color="Color.Primary" IsOutline="true" class="mt-2" style="width:100px" @onclick="@(() => AddOther())" Text="添加" Icon="fa fa-plus"></Button>
 
 @code {
     [Parameter]
     public List<RelevancesModel> Model { get; set; }
     [Parameter]
     public string Title { get; set; }
+    [Parameter]
+    public string Class { get; set; }
 
     public async Task DeleteOther(int i)
     {
@@ -49,13 +56,13 @@
             Items = items,
             OnCloseAsync = () =>
             {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
+            //Trace.Log("关闭按钮被点击");
+            return Task.CompletedTask;
             },
             OnEditAsync = async context =>
             {
-                // Trace.Log("保存按钮被点击");
-                Model[i] = (RelevancesModel)context.Model;
+            // Trace.Log("保存按钮被点击");
+            Model[i] = (RelevancesModel)context.Model;
                 StateHasChanged();
                 await ToastService.Success("修改成功", "成功修改自定义链接");
                 return true;
@@ -78,13 +85,13 @@
             Items = items,
             OnCloseAsync = () =>
             {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
+            //Trace.Log("关闭按钮被点击");
+            return Task.CompletedTask;
             },
             OnEditAsync = async context =>
             {
-                // Trace.Log("保存按钮被点击");
-                Model.Add((RelevancesModel)context.Model);
+            // Trace.Log("保存按钮被点击");
+            Model.Add((RelevancesModel)context.Model);
                 StateHasChanged();
                 await ToastService.Success("添加成功", "成功添加自定义链接");
                 return true;

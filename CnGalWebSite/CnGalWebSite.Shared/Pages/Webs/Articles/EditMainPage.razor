@@ -1,0 +1,114 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+}
+
+<AutoSaveTip TItem="EditArticleMainPageViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
+
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Article" Class="mb-3" />
+    @if (isReady == false)
+    {
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+
+        </div>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-newspaper-o" Outline>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.MainPageCard Model="Model" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
+
+</div>
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    private EditArticleMainPageViewModel Model { get; set; } = new EditArticleMainPageViewModel();
+
+    private bool isReady = false;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    AutoSaveTip<EditArticleMainPageViewModel> autoSave { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取文章信息
+            Model = await Http.GetFromJsonAsync<EditArticleMainPageViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlemainpage/" + Id);
+
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑文章主页失败");
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditArticleMainPageViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlemainpage", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+
+                await ToastService.Error("编辑文章主页失败", obj.Error);
+            }
+            else
+            {
+                autoSave.Clean();
+
+                await ToastService.Success("编辑文章主页成功", "编辑文章主页成功，等待审核通过");
+                NavigationManager.NavigateTo(Provider, "/articles/index/" + obj.Error, Model.Name, "fa fa-newspaper-o");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "编辑文章主页失败");
+        }
+    }
+
+    private Task DataLoaded(EditArticleMainPageViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+
+}

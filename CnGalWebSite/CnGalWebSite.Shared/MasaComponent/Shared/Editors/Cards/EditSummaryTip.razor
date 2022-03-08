@@ -1,0 +1,34 @@
+﻿<div class="@Class">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-3">
+        我们鼓励用户创建编辑词条、文章，也设置了<TabLink Text="积分规则" Url="/articles/index/4" Icon="fa fa-newspaper-o" class="success--text fw-bold">奖励</TabLink>，十分感谢你为CnGal资料站做出的贡献
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+    @if (Type == ExaminedNormalListModelType.Entry)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success">
+            在编辑词条前请先<TabLink Text="词条规范" Url="/articles/index/2" Icon="fa fa-newspaper-o" class="success--text fw-bold">阅读《词条编辑规范》</TabLink>，我们不会审核通过不符合规范的词条
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+    }
+    else if (Type == ExaminedNormalListModelType.Article)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success">
+            在发表文章前请先<TabLink Text="文章规范" Url="/articles/index/3" Icon="fa fa-newspaper-o" class="success--text fw-bold">阅读《文章发表规范》</TabLink>，我们不会审核通过不符合规范的文章
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+    }
+    else if (Type == ExaminedNormalListModelType.Periphery)
+    {
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success">
+    在创建周边前请先<TabLink Text="周边规范" Url="/articles/index/253" Icon="fa fa-newspaper-o" class="success--text fw-bold">阅读《周边编辑规范》</TabLink>，我们不会审核通过不符合规范的周边
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public ExaminedNormalListModelType Type { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+}

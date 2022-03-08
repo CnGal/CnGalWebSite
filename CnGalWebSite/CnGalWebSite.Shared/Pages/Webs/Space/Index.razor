@@ -39,124 +39,125 @@ else
                 <div>
 
                     <div class="rounded  shadow-sm bg-opacity mb-4">
-                        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" 
+                        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded"
                                Color="pink lighten-3">
 
                             <MTab Value="1">
-                                 首页<MIcon>mdi-home</MIcon>
+                                首页<MIcon>mdi-home</MIcon>
                             </MTab>
                             <MTab Value="2">
-                                 编辑记录<MIcon>mdi-script-text-outline </MIcon>
+                                编辑记录<MIcon>mdi-script-text-outline </MIcon>
                             </MTab>
-                            @if(Model.BasicInfor.ArticleCount!=0)
+                            @if (Model.BasicInfor.ArticleCount != 0)
                             {
-                                 <MTab Value="3">
-                                     文章<MIcon>mdi-newspaper-variant-multiple-outline</MIcon>
+                                <MTab Value="3">
+                                    文章<MIcon>mdi-newspaper-variant-multiple-outline</MIcon>
                                 </MTab>
                             }
                             @if (Model.IsCurrentUser || Model.IsShowGameRecord)
-                                {
-                           <MTab Value="4">
-                                 游玩记录<MIcon>mdi-gamepad-square-outline </MIcon>
-                            </MTab>
+                            {
+                                <MTab Value="4">
+                                    游玩记录<MIcon>mdi-gamepad-square-outline </MIcon>
+                                </MTab>
                             }
-                       @if (Model.IsCurrentUser || Model.IsShowFavorites)
-                        {
-                          <MTab Value="5">
-                                  收藏夹<MIcon>mdi-heart-multiple </MIcon>
-                             </MTab>
+                            @if (Model.IsCurrentUser || Model.IsShowFavorites)
+                            {
+                                <MTab Value="5">
+                                    收藏夹<MIcon>mdi-heart-multiple </MIcon>
+                                </MTab>
                             }
-                           
+
                             <MTab Value="6">
-                                 周边<MIcon>mdi-basket-outline </MIcon>
+                                周边<MIcon>mdi-basket-outline </MIcon>
                             </MTab>
                         </MTabs>
                     </div>
-                    <div>
-                        <MTabsItems @bind-Value="TabIndex">                         
+                    <div class="row">
+                        <MTabsItems @bind-Value="TabIndex">
                             <MTabItem Value="1">
-                            
-                                   <div class="mb-4">
-                                       <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="个人介绍" Icon="fa fa-fw  fa-home">
-                                           <ChildContent>
-                                                 <MarkdownViewTip Text="@Model.MainPageContext" />
-                                           </ChildContent>
-                                           <ButtonContent>
-                                               @if(Model.IsCurrentUser)
-                                                {
-                                                       <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab  Icon="mdi-pencil " Tooltip="编辑个人介绍" OnClick="EditMainPage" />
 
-                                                }
-                                           </ButtonContent>
-                                       </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-                                  
+                                <div class="mb-4">
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="个人介绍" Icon="fa fa-fw  fa-home">
+                                        <ChildContent>
+                                            <MarkdownViewTip Text="@Model.MainPageContext" />
+                                        </ChildContent>
+                                        <ButtonContent>
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-pencil " Tooltip="编辑个人介绍" OnClick="EditMainPage" />
+
+                                            }
+                                        </ButtonContent>
+                                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
                                 </div>
-                                    <div class="row">
+                                <div class="row">
                                     <div class="col-12 col-lg-6 mb-4">
-                                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="签到概览" Icon="fa fa-fw  fa-calendar-check-o" Class="h-100">
-                                                  <CnGalWebSite.Shared.MasaComponent.PC.Users.SignInDaysCard Model="Model" />
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="签到概览" Icon="fa fa-fw  fa-calendar-check-o" Class="h-100">
+                                            <CnGalWebSite.Shared.MasaComponent.PC.Users.SignInDaysCard Model="Model" />
 
-                                       </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                                     </div>
-                                      <div class="col-12 col-lg-6 mb-4">
-                                             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="fa fa-fw  fa-pencil" Class="h-100">
-                                                 <CnGalWebSite.Shared.MasaComponent.PC.Users.EditOverviewCard Model="Model"/>
-                                       </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                    <div class="col-12 col-lg-6 mb-4">
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="fa fa-fw  fa-pencil" Class="h-100">
+                                            <CnGalWebSite.Shared.MasaComponent.PC.Users.EditOverviewCard Model="Model" />
+                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                                     </div>
-                                     
+
                                 </div>
                                 <div class="rounded  rounded shadow-sm  p-3 pb-0 bg-opacity mb-4">
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.DataOverviewCard Model="Model"/>
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.DataOverviewCard Model="Model" />
                                 </div>
                                 <div>
-                                    @if(Model.CanComment)
+                                    @if (Model.CanComment)
                                     {
 
-                                      <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
-                                           @if (Model.IsCurrentUser)
-                                    {
-                                        <AlertTip Title="管理空间留言" Type="AlertTip.AlertTipType.SpaceComment" Url="@("/space/editspacecomments/" + Model.Id)"></AlertTip>
-                                    }
-                                          <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id" Type="CommentType.CommentUser"/>
-                                       </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <AlertTip Title="管理空间留言" Type="AlertTip.AlertTipType.SpaceComment" Url="@("/space/editspacecomments/" + Model.Id)"></AlertTip>
+                                            }
+                                            <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id" Type="CommentType.CommentUser" />
+                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                                     }
                                 </div>
-                             
+
                             </MTabItem>
                             <MTabItem Value="2">
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.ExaminesCard Id="@Model.Id" />
+                                <CnGalWebSite.Shared.MasaComponent.PC.Users.ExaminesCard Id="@Model.Id" />
                             </MTabItem>
-                              @if(Model.BasicInfor.ArticleCount!=0)
-                                    {
-                              <MTabItem Value="3">
-                                 
-                                       <ArticleHomeListView Input="PublishArticleInput"></ArticleHomeListView>
-                              
-                                    </MTabItem>
-                                    }
-                            
-                           
-                                  
-                                 @if (Model.IsCurrentUser || Model.IsShowGameRecord)
-                                {
-                                     <MTabItem Value="4">
+                            @if (Model.BasicInfor.ArticleCount != 0)
+                            {
+                                <MTabItem Value="3">
+
+                                    <ArticleHomeListView Input="PublishArticleInput"></ArticleHomeListView>
+
+                                </MTabItem>
+                            }
+
+
+
+                            @if (Model.IsCurrentUser || Model.IsShowGameRecord)
+                            {
+                                <MTabItem Value="4">
                                     <UserPlayedGameListView SteamId="@Model.SteamId" UserId="@Model.Id" IsCurrentUser="Model.IsCurrentUser"></UserPlayedGameListView>
-                                  </MTabItem>
-                                  }
-                       
-                          
-                                  @if (Model.IsCurrentUser || Model.IsShowFavorites)
-                                {    <MTabItem Value="5">
-                                    <FavoriteFoldersViewTip UserId="@Model.Id" OnClickUrl="OnClickUrl"  IsCurrentUser="Model.IsCurrentUser"></FavoriteFoldersViewTip>
-                                  </MTabItem>
-                                  }
-                         
-                                 <MTabItem Value="6">
-                                  <UserOwnedPeripheryListView UserId="@Model.Id" />
+                                </MTabItem>
+                            }
+
+
+                            @if (Model.IsCurrentUser || Model.IsShowFavorites)
+                            {
+                                <MTabItem Value="5">
+                                    <FavoriteFoldersViewTip UserId="@Model.Id" OnClickUrl="OnClickUrl" IsCurrentUser="Model.IsCurrentUser"></FavoriteFoldersViewTip>
+                                </MTabItem>
+                            }
+
+                            <MTabItem Value="6">
+                                <UserOwnedPeripheryListView UserId="@Model.Id" />
                             </MTabItem>
                         </MTabsItems>
                     </div>
-                
+
                 </div>
 
 
@@ -215,7 +216,7 @@ else
 
         }
     }
-  
+
     public StringNumber TabIndex { get; set; } = 1;
 
     public string CurrentUserRank { get; set; }

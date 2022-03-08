@@ -34,5 +34,11 @@ namespace CnGalWebSite.APIServer.Application.Tags
         Task<List<int>> GetTagIdsFromNames(List<string> names);
 
         Task<List<TagIndexViewModel>> ConcompareAndGenerateModel(Tag currentTag, Tag newTag);
+
+        void SetDataFromEditTagMainViewModel(Tag newTag, EditTagMainViewModel model, Tag parentTag);
+
+        void SetDataFromEditTagChildTagsViewModel(Tag newTag, EditTagChildTagsViewModel model, List<Tag> tags);
+
+        void SetDataFromEditTagChildEntriesViewModel(Tag newTag, EditTagChildEntriesViewModel model, List<Entry> entries);
     }
 }

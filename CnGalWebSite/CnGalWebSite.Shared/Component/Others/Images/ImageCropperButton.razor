@@ -7,44 +7,47 @@
 </div>
 <div class="card text-black" style="background-color:transparent;">
     <img src="@(string.IsNullOrWhiteSpace(ImagePath)?"https://app.cngal.org/_content/CnGalWebSite.Shared/images/default/app.png":ImagePath)" class="card-img" alt="...">
-    <div class="card-img-overlay">
+    <div class="card-img-overlay d-flex">
         @if (Type == ImageAspectType.None)
         {
             @if (IsMustCropper)
             {
                 <div class="d-ssr">
-                    <label for="@Id" class="btn btn-success mb-4"><i class="fa fa-upload" aria-hidden="true"></i> @Text</label>
+                    <label for="@Id" class="btn btn-success mb-3 me-3"><i class="fa fa-fw fa-upload" aria-hidden="true"></i> @Text</label>
                 </div>
-
-
                 <div class="d-wasm">
 
-                    <ButtonUpload TValue="string" Accept="image/gif, image/jpeg, image/jpg, image/png" IsSingle="true" BrowserButtonIcon="fa fa-upload"
+                    <ButtonUpload TValue="string" Accept="image/gif, image/jpeg, image/jpg, image/png" BrowserButtonIcon="fa fa-fw fa-upload" DefaultFileList="uploadFiles" class=" me-3"
                                   OnChange="@OnCardUploadMain" OnDelete="@(fileName => Task.FromResult(true))" BrowserButtonText="@Text" ShowLabel="false"></ButtonUpload>
 
                 </div>
-
-
-
             }
             else
             {
-                <ImageUpLoadButton OnUploadedImage="OnUploaded" Text="@Text"></ImageUpLoadButton>
+                <ImageUpLoadButton OnUploadedImage="OnUploaded" Text="@Text" Class="mb-3 me-3"></ImageUpLoadButton>
             }
         }
         else
         {
             <div class="d-ssr">
-                <label for="@Id" class="btn btn-success mb-4"><i class="fa fa-upload" aria-hidden="true"></i> @Text</label>
+                <label for="@Id" class="btn btn-success mb-3 me-3"><i class="fa fa-fw fa-upload" aria-hidden="true"></i> @Text</label>
             </div>
 
             <div class="d-wasm">
 
-                <ButtonUpload TValue="string" Accept="image/gif, image/jpeg, image/jpg, image/png" IsSingle="true" BrowserButtonIcon="fa fa-upload"
+                <ButtonUpload TValue="string" Accept="image/gif, image/jpeg, image/jpg, image/png" BrowserButtonIcon="fa fa-fw fa-upload" DefaultFileList="uploadFiles" class=" me-3"
                               OnChange="@OnCardUploadMain" OnDelete="@(fileName => Task.FromResult(true))" BrowserButtonText="@Text" ShowLabel="false"></ButtonUpload>
 
             </div>
 
+        }
+
+        @if (string.IsNullOrWhiteSpace(ImagePath) == false)
+        {
+            <div>
+                <Button Color="Color.Danger" OnClick="OnClean" Icon="fa fa-fw fa-trash" class="mb-3"></Button>
+
+            </div>
         }
 
 
@@ -84,9 +87,7 @@
     [Parameter]
     public string Text { get; set; } = "上传图片";
 
-
-    [Parameter]
-    public EventCallback<string> OnUploadedImage { get; set; }
+    public List<UploadFile> uploadFiles { get; set; } = new List<UploadFile>();
 
     public string Id = "input" + new Random().Next();
     [CascadingParameter]
@@ -127,7 +128,6 @@
     {
         ImagePath = url;
         StateHasChanged();
-        await OnUploadedImage.InvokeAsync(url);
         await ImagePathChanged.InvokeAsync(url);
     }
 
@@ -143,7 +143,6 @@
             if (obj[0].Uploaded == true)
             {
                 ImagePath = obj[0].FileURL;
-                await OnUploadedImage.InvokeAsync(obj[0].FileURL);
                 await ImagePathChanged.InvokeAsync(obj[0].FileURL);
 
                 StateHasChanged();
@@ -156,7 +155,17 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "图片上传失败", "图片大小超过1MB","将图片压缩后再上传，大图可上传到相册");
+            ErrorHandler.ProcessError(ex, "图片上传失败", "图片大小超过1MB", "将图片压缩后再上传，大图可上传到相册");
         }
+    }
+
+    public async Task OnClean()
+    {
+        ImagePath = null;
+
+        uploadFiles.Clear();
+
+        await ImagePathChanged.InvokeAsync(null);
+        StateHasChanged();
     }
 }

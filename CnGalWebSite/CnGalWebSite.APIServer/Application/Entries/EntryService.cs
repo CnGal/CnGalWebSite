@@ -1737,8 +1737,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
             var model = new EditMainViewModel();
 
             model.MainPicturePath = _appHelper.GetImagePath(entry.MainPicture, "app.png");
-            model.ThumbnailPath = _appHelper.GetImagePath(entry.Thumbnail, "app.png");
-            model.BackgroundPicturePath = _appHelper.GetImagePath(entry.BackgroundPicture, "app.png");
             model.Thumbnail = entry.Thumbnail;
             model.MainPicture = entry.MainPicture;
             model.BackgroundPicture = entry.BackgroundPicture;
@@ -1749,7 +1747,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
             model.DisplayName = entry.DisplayName;
             model.AnotherName = entry.AnotherName;
             model.SmallBackgroundPicture = entry.SmallBackgroundPicture;
-            model.SmallBackgroundPicturePath = _appHelper.GetImagePath(entry.SmallBackgroundPicture, "background.png");
 
             model.Id = entry.Id;
 

@@ -10,108 +10,41 @@
 {
     <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
 }
-            else
-            {
-                <TitleTip/>
-            }
+else
+{
+    <TitleTip />
+}
 
 <AutoSaveTip TItem="EditTagMainViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
-<div class="">
-    <div class="" style="padding-right: 0;padding-left: 0;">
-        <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
-        <AlertTip Type="AlertTip.AlertTipType.TagStandard"></AlertTip>
-        @if (isReady == false)
-        {
-            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-                <h3 class="text-truncate mb-4 fw-bold">编辑标签主要信息</h3>
-                <h5 class=" mb-4 fw-bold">当前标签：（Id:）</h5>
-                <hr>
-
-                <div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                </div>
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Tag" Class="mb-3" />
+    @if (isReady == false)
+    {
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+            <SkeletonParagraph />
+            <div class="mt-2">
             </div>
-        }
-        else
-        {
-
-            <div>
-                <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-
-                    <h3 class="text-truncate mb-4 fw-bold">编辑标签主要信息</h3>
-                    <h5 class="mb-4 fw-bold">当前标签：@Model.Name（Id:@Model.Id）</h5>
-                    <hr />
-
-                    <div class="row">
-                        <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                            <ImageCropperButton @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
-                        </div>
-                        <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                            <ImageCropperButton @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图"></ImageCropperButton>
-                        </div>
-                        <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                            <ImageCropperButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图"></ImageCropperButton>
-                        </div>
-                        <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                            <ImageCropperButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图"></ImageCropperButton>
-                        </div>
-                    </div>
-
-                    <div class="form-group mt-4">
-                        <div class="row">
-                            <div class="form-group col-12  col-sm-6">
-                                <BootstrapInput @bind-Value="Model.Name" ShowLabel="true" />
-                            </div>
-                            <div class="form-group col-12  col-sm-6">
-                                <AutoComplete Items="@TagItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.ParentTagName" ShowLabel="true" />
-                            </div>
-                            <div class="form-group col-12">
-                                <BootstrapInput @bind-Value="Model.BriefIntroduction" ShowLabel="true" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
             </div>
-
-            @if (Model.Name != "游戏" && Model.Name != "角色" && Model.Name != "制作组" && Model.Name != "STAFF")
-            {
-                <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-                    <SearchTagsViewTip></SearchTagsViewTip>
-                </div>
-            }
-
-
-            <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
-                当你点击“完成”按钮时，将会立即发起审核请求，请在点击前确保内容正确无误
+            <SkeletonParagraph />
+            <div class="mt-2">
             </div>
-            <ValidateForm Model="@Model" ValidateAllProperties="true">
-
-                <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
-                    <div>
-                        <BootstrapBlazor.Components.Textarea @bind-Value="Model.Note" DisplayText="备注" />
-                        <Button class="mt-3" style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
-                    </div>
-                </div>
-
-            </ValidateForm>
-        }
-
-    </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+        </div>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-tag" Outline>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Tags.MainCard Model="Model" Class="mb-4" ShowTagSearch TagItems="TagItems"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
 </div>
-
 
 @code {
     [Parameter]
@@ -153,28 +86,7 @@
     {
         try
         {
-            //处理数据
-            if (string.IsNullOrWhiteSpace(Model.Name))
-            {
-                await ToastService.Error("编辑标签失败", "请填写所有必填项目");
-                return;
-            }
-            if (Model.Name != "游戏" && Model.Name != "角色" && Model.Name != "制作组" && Model.Name != "STAFF")
-            {
-                if (string.IsNullOrWhiteSpace(Model.ParentTagName))
-                {
-                    await ToastService.Error("编辑标签失败", "除四个顶级标签外，其他标签必须关联父标签");
-                    return;
-                }
-            }
-            else
-            {
-                if (string.IsNullOrWhiteSpace(Model.ParentTagName) == false)
-                {
-                    await ToastService.Error("编辑标签失败", "四个顶级标签不能关联父标签");
-                    return;
-                }
-            }
+
             var result = await Http.PostAsJsonAsync<EditTagMainViewModel>(ToolHelper.WebApiPath + "api/tags/EditMain", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);

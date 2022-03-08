@@ -1,0 +1,44 @@
+﻿<div class="@Class">
+    <Switch @bind-Value="IsSame" ShowLabel="true" DisplayText="显示名称与唯一名称保持一致" />
+</div>
+<div class="@Class">
+    <BootstrapInput TValue="string" Value="Name" ValueChanged="OnNameChanged" ShowLabel="true" DisplayText="唯一名称"/>
+</div>
+<div class="@Class">
+    <BootstrapInput Value="DisplayName" IsDisabled="IsSame" ValueChanged="DisplayNameChanged" ShowLabel="true"  DisplayText="显示名称"/>
+</div>
+@code {
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public EventCallback<string> NameChanged { get; set; }
+    [Parameter]
+    public string DisplayName { get; set; }
+    [Parameter]
+    public EventCallback<string> DisplayNameChanged { get; set; }
+
+    private bool IsSame { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        IsSame = Name == DisplayName;
+
+    }
+
+    public async Task OnNameChanged(string name)
+    {
+        Name = name;
+        await NameChanged.InvokeAsync(name);
+
+        if(IsSame)
+        {
+            DisplayName = name;
+           await DisplayNameChanged.InvokeAsync(name);
+        }
+
+
+    }
+}

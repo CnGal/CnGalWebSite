@@ -6,14 +6,8 @@
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Peripheries.EditImages Id="@Id" />
-}
-else
-{
+
     <CnGalWebSite.Shared.Pages.Webs.Peripheries.EditImages Id="@Id" />
-}
 
 @code{
     [Parameter]

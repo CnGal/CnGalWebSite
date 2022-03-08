@@ -1,18 +1,11 @@
-﻿@page "/articles/editarticle/{id}"
+﻿@page "/articles/editmainpage/{id}"
 @attribute [Authorize]
 
 @inject IDataCacheService _dataCacheService
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Articles.EditArticle Id="@Id" />
-}
-else
-{
-    <CnGalWebSite.Shared.Pages.Webs.Articles.EditArticle Id="@Id" />
-}
+<CnGalWebSite.Shared.Pages.Webs.Articles.EditMainPage Id="@Id" />
 
 @code{
     [Parameter]

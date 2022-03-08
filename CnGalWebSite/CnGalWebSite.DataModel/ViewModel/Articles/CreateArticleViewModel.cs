@@ -1,59 +1,46 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Base;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using static System.Net.Mime.MediaTypeNames;
+
 namespace CnGalWebSite.DataModel.ViewModel.Articles
 {
-    public class CreateArticleViewModel
+    public class CreateArticleViewModel : BaseEditModel
     {
-        [Display(Name = "唯一名称")]
-        [Required(ErrorMessage = "请填写唯一名称")]
-        public string Name { get; set; }
-        [Display(Name = "显示名称")]
-        [Required(ErrorMessage = "请填写显示名称")]
-        public string DisplayName { get; set; }
-        [Display(Name = "文章简介")]
-        [Required(ErrorMessage = "请填写文章简介")]
-        public string BriefIntroduction { get; set; }
-        //[Required(ErrorMessage = "请上传主图")]
-        [Display(Name = "主图")]
-        public string MainPicture { get; set; }
+        /// <summary>
+        /// 主要信息
+        /// </summary>
+        public EditArticleMainViewModel Main { get; set; } = new EditArticleMainViewModel();
+        /// <summary>
+        /// 主页
+        /// </summary>
+        public EditArticleMainPageViewModel MainPage { get; set; } = new EditArticleMainPageViewModel();
+        /// <summary>
+        /// 关联信息
+        /// </summary>
+        public EditArticleRelevancesViewModel Relevances { get; set; } = new EditArticleRelevancesViewModel();
 
-        [Display(Name = "背景图")]
-        public string BackgroundPicture { get; set; }
+        public override Result Validate()
+        {
+            var result = Main.Validate();
+            if (!result.Successful)
+            {
+                return result;
+            }
+            result = MainPage.Validate();
+            if (!result.Successful)
+            {
+                return result;
+            }
+            result = Relevances.Validate();
+            if (!result.Successful)
+            {
+                return result;
+            }
 
-        [Display(Name = "小背景图")]
-        public string SmallBackgroundPicture { get; set; }
-
-        [Display(Name = "类别")]
-        [Required(ErrorMessage = "请选择类别")]
-        public ArticleType Type { get; set; }
-
-        [Display(Name = "动态类别")]
-        public string NewsType { get; set; }
-
-
-        [Display(Name = "正文")]
-        public string Context { get; set; }
-
-        [Display(Name = "原作者")]
-        public string OriginalAuthor { get; set; }
-        [Display(Name = "原文链接")]
-        public string OriginalLink { get; set; }
-        [Display(Name = "发布日期")]
-        public DateTime PubishTime { get; set; } = DateTime.Now.Date;
-        [Display(Name = "动态发生时间")]
-        public DateTime? RealNewsTime { get; set; } = DateTime.Now.Date;
-
-
-        public List<RelevancesModel> Roles { get; set; }
-        public List<RelevancesModel> staffs { get; set; }
-        public List<RelevancesModel> Groups { get; set; }
-        public List<RelevancesModel> Games { get; set; }
-        public List<RelevancesModel> articles { get; set; }
-        public List<RelevancesModel> others { get; set; }
-
-        [Display(Name = "备注")]
-        public string Note { get; set; }
+            return new Result { Successful = true };
+        }
     }
 }

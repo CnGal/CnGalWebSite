@@ -4,6 +4,7 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -647,5 +648,25 @@ namespace CnGalWebSite.APIServer.Application.Tags
             return model;
         }
 
+        public void SetDataFromEditTagMainViewModel(Tag newTag, EditTagMainViewModel model,Tag parentTag)
+        {
+            newTag.ParentCodeNavigation = parentTag;
+
+            newTag.Name = model.Name;
+            newTag.BriefIntroduction = model.BriefIntroduction;
+            newTag.MainPicture = model.MainPicture;
+            newTag.BackgroundPicture = model.BackgroundPicture;
+            newTag.SmallBackgroundPicture = model.SmallBackgroundPicture;
+            newTag.Thumbnail = model.Thumbnail;
+        }
+        public void SetDataFromEditTagChildTagsViewModel(Tag newTag, EditTagChildTagsViewModel model, List<Tag> tags)
+        {
+            newTag.InverseParentCodeNavigation = tags;
+        }
+
+        public void SetDataFromEditTagChildEntriesViewModel(Tag newTag, EditTagChildEntriesViewModel model, List<Entry> entries)
+        {
+            newTag.Entries = entries;
+        }
     }
 }

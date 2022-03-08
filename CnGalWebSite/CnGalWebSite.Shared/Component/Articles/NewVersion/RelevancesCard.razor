@@ -3,25 +3,30 @@
 @inject NavigationManager NavigationManager
 
 <div style=" display: flex; flex-direction: column; align-items: flex-end;">
-    <div class="mb-2" style=" display: flex; align-items: center; flex-wrap: wrap;">
-        <i class="fa fa-tags fa-fw font-color"></i>
-        @foreach (var item in Model.Relevances)
-        {
-            @foreach (var temp in item.Informations)
+    @if (Model.Relevances.Count != 0)
+    {
+        <div class="mb-2" style=" display: flex; align-items: center; flex-wrap: wrap;">
+            <i class="fa fa-tags fa-fw font-color"></i>
+            @foreach (var item in Model.Relevances)
             {
-                @if (string.IsNullOrWhiteSpace(temp.Link))
+                @foreach (var temp in item.Informations)
                 {
-                    <button class="article-tag article-tag-color-large" @onclick="@(()=>OnClickNull(temp.DisplayName))">@temp.DisplayName</button>
+                    @if (string.IsNullOrWhiteSpace(temp.Link))
+                    {
+                        <button class="article-tag article-tag-color-large" @onclick="@(()=>OnClickNull(temp.DisplayName))">@temp.DisplayName</button>
 
-                }
-                else
-                {
-                    <TabLink class="article-tag article-tag-color-large" Url="@temp.Link" Text="@temp.DisplayName" Icon="fa fa-link">@temp.DisplayName</TabLink>
+                    }
+                    else
+                    {
+                        <TabLink class="article-tag article-tag-color-large" Url="@temp.Link" Text="@temp.DisplayName" Icon="fa fa-link">@temp.DisplayName</TabLink>
 
+                    }
                 }
             }
-        }
-    </div>
+        </div>
+
+    }
+
 
     <div>
         <i class="fa fa-pencil fa-fw font-color"></i>

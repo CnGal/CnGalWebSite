@@ -6,8 +6,10 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -896,5 +898,64 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             return model;
         }
 
+        public void SetDataFromEditPeripheryMainViewModel(Periphery newPeriphery, EditPeripheryMainViewModel model)
+        {
+
+            newPeriphery.Name = model.Name;
+            newPeriphery.DisplayName = model.DisplayName;
+            newPeriphery.BriefIntroduction = model.BriefIntroduction;
+            newPeriphery.MainPicture = model.MainPicture;
+            newPeriphery.BackgroundPicture = model.BackgroundPicture;
+            newPeriphery.SmallBackgroundPicture = model.SmallBackgroundPicture;
+            newPeriphery.Thumbnail = model.Thumbnail;
+            newPeriphery.Author = model.Author;
+            newPeriphery.Material = model.Material;
+            newPeriphery.Brand = model.Brand;
+            newPeriphery.IndividualParts = model.IndividualParts;
+            newPeriphery.IsAvailableItem = model.IsAvailableItem;
+            newPeriphery.IsReprint = model.IsReprint;
+            newPeriphery.PageCount = model.PageCount;
+            newPeriphery.Price = model.Price;
+            newPeriphery.Size = model.Size;
+            newPeriphery.SongCount = model.SongCount;
+            newPeriphery.Type = model.Type;
+            newPeriphery.Category = model.Category;
+            newPeriphery.SaleLink = model.SaleLink;
+        }
+
+        public void SetDataFromEditPeripheryImagesViewModel(Periphery newPeriphery, EditPeripheryImagesViewModel model)
+        {
+
+            //再遍历视图模型中的图片 对应修改
+            newPeriphery.Pictures.Clear();
+
+            foreach (var item in model.Images)
+            {
+
+                newPeriphery.Pictures.Add(new EntryPicture
+                {
+                    Url = item.Url,
+                    Modifier = item.Modifier,
+                    Note = item.Note
+                });
+
+            }
+        }
+
+        public void SetDataFromEditPeripheryRelatedEntriesViewModel(Periphery newPeriphery, EditPeripheryRelatedEntriesViewModel model, List<Entry> entries)
+        {
+
+            newPeriphery.RelatedEntries = entries;
+        }
+
+        public void SetDataFromEditPeripheryRelatedPerpheriesViewModel(Periphery newPeriphery, EditPeripheryRelatedPeripheriesViewModel model, List<Periphery> peripheries)
+        {
+            newPeriphery.PeripheryRelationFromPeripheryNavigation = peripheries.Select(s => new PeripheryRelation
+            {
+                ToPeriphery = s.Id,
+                ToPeripheryNavigation = s
+            }).ToList();
+
+        }
     }
 }

@@ -283,7 +283,7 @@ else
             id = value;
             if (isFirstLoad == false)
             {
-                OnReLoad();
+                OnInitializedAsync();
             }
 
 
@@ -307,11 +307,6 @@ else
 
     public EntryIndexViewModel EntryView { get; set; } = new EntryIndexViewModel();
 
-    public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
-
-    public bool IsUserFavorited { get; set; }
-    public FavoriteFoldersViewModel UserFavoriteInfor { get; set; }
-
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -329,38 +324,7 @@ else
         {
 
             isFirstLoad = false;
-
-            //获取用户收藏夹相关信息 只需要获取一次
-            var userState = await authenticationStateTask;
-            var user = userState.User;
-            if (user.Identity.IsAuthenticated)
-            {
-                string userId = string.Empty;
-                foreach (var item in user.Claims)
-                {
-                    if (item.Type == "userid")
-                    {
-                        userId = item.Value;
-                    }
-                }
-                await GetUserFavoriteInfor(userId);
-
-            }
-
-            await OnAfterRenderAsync_();
         }
-
-    }
-
-    async Task OnReLoad()
-    {
-        await OnInitializedAsync();
-        await OnAfterRenderAsync_();
-    }
-
-    async Task OnAfterRenderAsync_()
-    {
-
         //记录数据
         if (EntryView.Name != LastLookName && string.IsNullOrWhiteSpace(EntryView.Name) == false)
         {
@@ -375,21 +339,6 @@ else
 
             }
         }
-        //语法高亮
-        try
-        {
-            await JS.InvokeAsync<string>("highlightAllCode");
-        }
-        catch
-        {
-
-        }
-
-        //获取评分
-        /* if (EntryView.Type == EntryType.Game)
-         {
-             await GetPlayedGameInforAsync();
-         }*/
     }
 
     protected override async Task OnInitializedAsync()
@@ -414,13 +363,6 @@ else
                 CanDeleted = true;
             }
 
-
-            //获取是否被收藏
-            if (user.Identity.IsAuthenticated)
-            {
-                await GetUserIsFavorited();
-            }
-
             isReady = true;
             StateHasChanged();
 
@@ -433,108 +375,6 @@ else
         }
 
     }
-
-    public async Task GetUserIsFavorited()
-    {
-        try
-        {
-            var userFavoriteInfor = await Http.GetFromJsonAsync<IsObjectInUserFavoriteFolderResult>(ToolHelper.WebApiPath + "api/favorites/IsObjectInUserFavoriteFolder/" + EntryView.Id + "/" + FavoriteObjectType.Entry);
-
-            if (userFavoriteInfor != null)
-            {
-                IsUserFavorited = userFavoriteInfor.Result;
-
-                StateHasChanged();
-            }
-
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "判断该词条是否被收藏失败");
-        }
-    }
-    public async Task GetUserFavoriteInfor(string id)
-    {
-        try
-        {
-            UserFavoriteInfor = await Http.GetFromJsonAsync<FavoriteFoldersViewModel>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/" + id);
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取用户收藏夹失败");
-        }
-    }
-
-
-
-
-    private void UnEdit()
-    {
-        EntryView.IsEdit = false;
-    }
-    private void Edit()
-    {
-        EntryView.IsEdit = true;
-    }
-
-    private async void UnHidden()
-    {
-        try
-        {
-
-            var result = await Http.PostAsJsonAsync<HiddenEntryModel>(ToolHelper.WebApiPath + "api/entries/HiddenEntry", new HiddenEntryModel { Ids = new int[] { EntryView.Id }, IsHidden = false });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("显示词条失败", obj.Error);
-            }
-            else
-            {
-                await ToastService.Success("显示词条成功", "显示词条成功，离开此页面后可以请在后台恢复词条状态");
-                EntryView.IsHidden = false;
-                StateHasChanged();
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "显示词条失败");
-        }
-    }
-    private async void Hidden()
-    {
-        try
-        {
-
-            var result = await Http.PostAsJsonAsync<HiddenEntryModel>(ToolHelper.WebApiPath + "api/entries/HiddenEntry", new HiddenEntryModel { Ids = new int[] { EntryView.Id }, IsHidden = true });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("隐藏词条失败", obj.Error);
-            }
-            else
-            {
-                await ToastService.Success("隐藏词条成功", "隐藏词条成功，离开此页面后可以请在后台恢复词条状态");
-                EntryView.IsHidden = true;
-                StateHasChanged();
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "隐藏词条失败");
-        }
-    }
-
-    public Task OnClickLogin()
-    {
-        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        return Task.CompletedTask;
-    }
-
-
 
     [Inject]
     [NotNull]
@@ -599,84 +439,5 @@ else
         }
     }
 
-    private async Task OnFavoriteClick()
-    {
-        //检查是否存在默认收藏夹
-        if (UserFavoriteInfor == null || UserFavoriteInfor.Favorites == null || UserFavoriteInfor.Favorites.Count == 0)
-        {
-            await ToastService.Error("收藏词条失败", "无法获取收藏夹信息");
-        }
 
-        var favoriteFolderIds = UserFavoriteInfor.Favorites.Where(s => s.IsDefault == true).Select(s => s.Id).ToArray();
-        if (favoriteFolderIds.Length == 0)
-        {
-            //没有默认收藏夹 进入选择收藏夹界面
-
-            var option = new DialogOption()
-            {
-                Title = "选择收藏夹",
-                ShowCloseButton = false
-            };
-            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<ChooseFavoriteFolderTip>(new Dictionary<string, object>
-            {
-                [nameof(ChooseFavoriteFolderTip.UserFavoriteInfor)] = UserFavoriteInfor,
-                [nameof(ChooseFavoriteFolderTip.ObjectId)] = (long)EntryView.Id,
-                [nameof(ChooseFavoriteFolderTip.Type)] = FavoriteObjectType.Entry,
-                [nameof(ChooseFavoriteFolderTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-                [nameof(ChooseFavoriteFolderTip.OnFavorite)] = EventCallback.Factory.Create(this, async () => { IsUserFavorited = true; StateHasChanged(); }),
-            }).Render();
-            await DialogService.Show(option);
-        }
-        else
-        {
-            //直接添加到默认收藏夹
-            try
-            {
-                var result = await Http.PostAsJsonAsync<AddFavoriteObjectViewModel>(ToolHelper.WebApiPath + "api/favorites/AddFavoriteObject", new AddFavoriteObjectViewModel { FavoriteFolderIds = favoriteFolderIds, ObjectId = EntryView.Id, Type = FavoriteObjectType.Entry });
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-                //判断结果
-                if (obj.Successful == false)
-                {
-                    await ToastService.Error("收藏词条失败", obj.Error);
-                }
-                else
-                {
-                    await ToastService.Success("收藏词条成功", "收藏词条成功");
-                    IsUserFavorited = true;
-                    StateHasChanged();
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorHandler.ProcessError(ex, "收藏词条失败");
-            }
-        }
-    }
-    private async Task OnUnFavoriteClick()
-    {
-
-        try
-        {
-            var result = await Http.PostAsJsonAsync<UnFavoriteObjectsModel>(ToolHelper.WebApiPath + "api/favorites/UnFavoriteObjects", new UnFavoriteObjectsModel { ObjectId = EntryView.Id, Type = FavoriteObjectType.Entry });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("取消收藏词条失败", obj.Error);
-            }
-            else
-            {
-                await ToastService.Success("取消收藏词条成功", "取消收藏词条成功");
-                IsUserFavorited = false;
-                StateHasChanged();
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "取消收藏词条失败");
-        }
-
-    }
 }

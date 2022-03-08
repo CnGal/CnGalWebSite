@@ -15,7 +15,6 @@ namespace CnGalWebSite.Shared
     /// </summary>
     public sealed partial class App : IDisposable
     {
-        private bool? isApp = null;
 
         private System.Threading.Timer mytimer;
 
@@ -25,13 +24,9 @@ namespace CnGalWebSite.Shared
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
-            if (NavigationManager.Uri.Contains("app.cngal.org") || NavigationManager.Uri.Contains("localhost"))
+            if (NavigationManager.Uri.Contains("m.cngal.org"))
             {
-                isApp = _dataCacheService.IsApp;
-            }
-            else
-            {
-                isApp = _dataCacheService.IsApp = NavigationManager.Uri.Contains("m.cngal.org");
+                _dataCacheService.IsApp = true;
             }
         }
 
@@ -46,6 +41,17 @@ namespace CnGalWebSite.Shared
 
             if (firstRender)
             {
+                //检查是否为移动设备
+                if(NavigationManager.Uri.Contains("app.cngal.org") || NavigationManager.Uri.Contains("localhost"))
+                {
+                    var isApp=await IsMobile();
+                    if (isApp != _dataCacheService.IsApp)
+                    {
+                        _dataCacheService.IsApp = isApp;
+                        StateHasChanged();
+                    }
+             
+                }
 
                 //需要调用一次令牌刷新接口 确保登入没有过期
                 var result = await _authService.Refresh();
@@ -82,6 +88,28 @@ namespace CnGalWebSite.Shared
             });
 
         }
+
+        public async Task<bool> IsMobile()
+        {
+            try
+            {
+                var re = await JS.InvokeAsync<string>("isMobile");
+                if (re == "true")
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
         #region 释放实例
         public void Dispose()
         {

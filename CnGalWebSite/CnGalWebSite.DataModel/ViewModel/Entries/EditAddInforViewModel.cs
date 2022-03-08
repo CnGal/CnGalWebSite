@@ -101,7 +101,36 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string QQgroupGroup { get; set; }
         #endregion
 
+        public override Result Validate()
+        {
+            //调整时间
+            if (IssueTime != null)
+            {
+                IssueTime = IssueTime.Value.AddHours(IssueTime.Value.Hour < 12 ? (12 - IssueTime.Value.Hour) : 0);
+            }
+            if (Birthday != null)
+            {
+                Birthday = Birthday.Value.AddHours(Birthday.Value.Hour < 12 ? (12 - Birthday.Value.Hour) : 0);
+            }
 
+            //检查staff数据
+            if (Staffs != null)
+            {
+                foreach (var item in Staffs)
+                {
+                    if (string.IsNullOrWhiteSpace(item.PositionOfficial))
+                    {
+                        return new Result { Error = "Staff必须填写官方职位" };
+                    }
+                    if (string.IsNullOrWhiteSpace(item.NicknameOfficial))
+                    {
+                        return new Result { Error = "Staff必须填写官方昵称" };
+                    }
+                }
+            }
+
+            return new Result { Successful=true };
+        }
 
     }
 

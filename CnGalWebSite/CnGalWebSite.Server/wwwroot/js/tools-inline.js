@@ -145,15 +145,15 @@ function initUploadButton(objRef, up_to_chevereto, up_img_label) {
                 contentType: false,
                 data: formData,
                 beforeSend: function (xhr) {
-                    jQuery(up_img_label).html('<i class="fa fa-spinner fa-spin" aria-hidden="true"></i> 上传中...');
+                    jQuery(up_img_label).html('<i class="fa fa-fw fa-spinner fa-spin" aria-hidden="true"></i> 上传中...');
                 },
                 success: function (res) {
                     objRef.invokeMethodAsync('UpLoaded', res.image.url + '||' + f.size);
                  //   document.getElementsByClassName("tui-editor-contents")[0].innerHTML='<a href="' + res.image.url + '"><img src="' + res.image.url + '" alt="' + res.image.title + '"></img></a>';
-                    jQuery(up_img_label).html('<i class="fa fa-check" aria-hidden="true"></i> 上传成功,继续上传');
+                    jQuery(up_img_label).html('<i class="fa fa-fw fa-check" aria-hidden="true"></i> 上传成功,继续上传');
                 },
                 error: function () {
-                    jQuery(up_img_label).html('<i class="fa fa-times" aria-hidden="true"></i> 上传失败，重新上传');
+                    jQuery(up_img_label).html('<i class="fa fa-fw fa-times" aria-hidden="true"></i> 上传失败，重新上传');
                 }
             });
         }

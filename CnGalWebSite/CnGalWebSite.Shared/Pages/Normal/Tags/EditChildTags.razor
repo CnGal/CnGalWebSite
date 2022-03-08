@@ -6,14 +6,9 @@
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Tags.EditChildTags Id="@Id" />
-}
-else
-{
+
     <CnGalWebSite.Shared.Pages.Webs.Tags.EditChildTags Id="@Id" />
-}
+
 
 @code{
     [Parameter]

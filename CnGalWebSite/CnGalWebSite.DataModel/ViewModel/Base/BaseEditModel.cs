@@ -10,7 +10,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Base
     public class BaseEditModel
     {
         [Display(Name = "唯一名称")]
-        [Required(ErrorMessage = "请填写唯一名称")]
         public string Name { get; set; }
 
         public long Id { get; set; }

@@ -19,65 +19,41 @@ else
 
 <AutoSaveTip TItem="EditMainPageViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
-<div class="">
-    <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
-    <AlertTip Type="AlertTip.AlertTipType.EntryStandard"></AlertTip>
-    <div class="alert alert-success  rounded shadow-sm  rounded" role="alert">
-        可以在这里填写遗漏的信息、游戏的剧情、人物的性格......这个页面将会成为词条主页中最大版面的部分
-    </div>
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Entry" Class="mb-3" />
     @if (isReady == false)
     {
         <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-            <h3 class="text-truncate mb-4 fw-bold">编辑主页</h3>
-            <h5 class=" mb-4 fw-bold">当前词条：（Id:）</h5>
-            <hr>
 
-            <div>
-                <SkeletonParagraph />
-                <div class="mt-2">
-                </div>
-                <SkeletonParagraph />
-                <div class="mt-2">
-                </div>
-                <SkeletonParagraph />
-                <div class="mt-2">
-                </div>
-                <SkeletonParagraph />
-                <div class="mt-2">
-                </div>
-                <SkeletonParagraph />
+            <SkeletonParagraph />
+            <div class="mt-2">
             </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
         </div>
     }
     else
     {
         @if (Model.Type == EntryType.Staff)
         {
-            <div class="alert alert-danger  rounded shadow-sm  rounded" role="alert">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error" Class="mb-3">
                 这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
-            </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
-        else
-        {
 
-        }
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-3">
-            <h3 class="text-truncate mb-4 fw-bold">编辑主页</h3>
-            <h5 class="text-truncate mb-4 fw-bold">当前词条：@Model.Name（Id:@Model.Id）</h5>
-            <hr class="mb-4" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-codepen" Outline>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.MainPageCard Model="Model" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
-                <MarkdownEditorTip @bind-Context="@Model.Context" @ref="markdownEditorTip"></MarkdownEditorTip>
-
-         
-        </div>
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
-            <div>
-                <ValidateForm Model="@Model">
-                    <BootstrapBlazor.Components.Textarea @bind-Value="Model.Note" DisplayText="备注" />
-                </ValidateForm>
-                <Button class="mt-3" style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
-            </div>
-        </div>
     }
 
 </div>
@@ -115,20 +91,8 @@ else
 
     private async Task OnSubmit()
     {
-        //上传
         try
         {
-            Model.Context = await markdownEditorTip.GetContext();
-            if (string.IsNullOrWhiteSpace(Model.Context))
-            {
-                Model.Context = "";
-            }
-            //检查文本长度
-            if (Model.Context.Length > 100000)
-            {
-                await ToastService.Error("文本长度超过上限", "强烈建议使用链接显示图片，内嵌图片会导致性能严重下降。请控制文本量，额外的文字可以移动到关联文章中");
-                return;
-            }
             var result = await Http.PostAsJsonAsync<EditMainPageViewModel>(ToolHelper.WebApiPath + "api/entries/editmainpage", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);

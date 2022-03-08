@@ -1,34 +1,39 @@
 ﻿@inject DialogService DialogService
 @inject ToastService ToastService
-<h5 class="fw-bold">相关网站</h5>
-<div class="row mt-4">
-    @for (int i = 0; i < Model.Count; i++)
-    {
-        int temp = i;
-        <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3">
-            <div class="card p-3" style="background-color:transparent">
-                <div class="row">
-                    <div class="col mt-2" style="padding-right:0px;">
-                        <p class="text-truncate text-center" style="font-size:.875rem">
-                            @Model[i].Name：@Model[i].Link
-                        </p>
-                    </div>
-                    <div class="col-12 d-flex" style="justify-content: space-between;">
-                        <Button IsOutline="true" Size="Size.Small" Color="Color.Danger" Icon="fa fa-trash-o" @onclick="@(()=> DeleteOther(temp))" Text="删除"></Button>
-                        <Button IsOutline="true" Size="Size.Small" Color="Color.Success" Icon="fa fa-pencil" @onclick="@(()=> EditOther(temp))" Text="编辑" class="ms-1"></Button>
-                    </div>
 
+<div class="@Class">
+    <h5 class="fw-bold mb-4">相关网站</h5>
+    <div class="row">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            int temp = i;
+            <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3">
+                <div class="card p-3" style="background-color:transparent">
+                    <div class="row">
+                        <div class="col mt-2" style="padding-right:0px;">
+                            <p class="text-truncate text-center" style="font-size:.875rem">
+                                @Model[i].Name：@Model[i].Link
+                            </p>
+                        </div>
+                        <div class="col-12 d-flex" style="justify-content: space-between;">
+                            <Button IsOutline="true" Size="Size.Small" Color="Color.Danger" Icon="fa fa-trash-o" @onclick="@(()=> DeleteOther(temp))" Text="删除"></Button>
+                            <Button IsOutline="true" Size="Size.Small" Color="Color.Success" Icon="fa fa-pencil" @onclick="@(()=> EditOther(temp))" Text="编辑" class="ms-1"></Button>
+                        </div>
+
+                    </div>
                 </div>
-            </div>
-        </div>}
+            </div>}
+    </div>
+    <Button Color="Color.Primary" IsOutline="true" style="width:100px" @onclick="@(() => AddOther())" Text="添加" Icon="fa fa-plus"></Button>
 </div>
-<Button Color="Color.Primary" IsOutline="true" class="mt-2" style="width:100px" @onclick="@(() => AddOther())" Text="添加" Icon="fa fa-plus"></Button>
 
 @code {
     [Parameter]
     public List<SocialPlatform> Model { get; set; }
     [Parameter]
     public string Title { get; set; }
+    [Parameter]
+    public string Class { get; set; }
 
     public async Task DeleteOther(int i)
     {

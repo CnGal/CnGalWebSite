@@ -932,5 +932,46 @@ namespace CnGalWebSite.APIServer.Application.Articles
         }
 
 
+        public void SetDataFromEditArticleMainViewModel(Article newArticle, EditArticleMainViewModel model)
+        {
+
+            newArticle.Name = model.Name;
+            newArticle.BriefIntroduction = model.BriefIntroduction;
+            newArticle.MainPicture = model.MainPicture;
+            newArticle.BackgroundPicture = model.BackgroundPicture;
+            newArticle.Type = model.Type;
+            newArticle.OriginalAuthor = model.OriginalAuthor;
+            newArticle.OriginalLink = model.OriginalLink;
+            newArticle.PubishTime = model.PubishTime;
+            newArticle.RealNewsTime = model.RealNewsTime;
+            newArticle.DisplayName = model.DisplayName;
+            newArticle.NewsType = model.NewsType;
+            newArticle.SmallBackgroundPicture = model.SmallBackgroundPicture;
+        }
+        public void SetDataFromEditArticleMainPageViewModel(Article newArticle, EditArticleMainPageViewModel model)
+        {
+            newArticle.MainPage = model.Context;
+        }
+        public void SetDataFromEditArticleRelevancesViewModel(Article newArticle, EditArticleRelevancesViewModel model,List<Entry> entries,List<Article> articles)
+        {
+            newArticle.Outlinks.Clear();
+            newArticle.Entries = entries;
+            newArticle.ArticleRelationFromArticleNavigation = articles.Select(s => new ArticleRelation
+            {
+                ToArticle = s.Id,
+                ToArticleNavigation = s
+            }).ToList();
+
+            foreach (var item in model.Others)
+            {
+                newArticle.Outlinks.Add(new Outlink
+                {
+                    Name = item.DisplayName,
+                    BriefIntroduction = item.DisPlayValue,
+                    Link = item.Link,
+                });
+            }
+
+        }
     }
 }

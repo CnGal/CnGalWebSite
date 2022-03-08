@@ -1,38 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Base;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using static System.Net.Mime.MediaTypeNames;
+
 namespace CnGalWebSite.DataModel.ViewModel.Tags
 {
-    public class CreateTagViewModel
+    public class CreateTagViewModel: BaseEditModel
     {
-        public int Id { get; set; }
+        public EditTagMainViewModel Main { get; set; } = new EditTagMainViewModel();
+        public EditTagChildEntriesViewModel Entries { get; set; } = new EditTagChildEntriesViewModel();
+        public EditTagChildTagsViewModel Tags { get; set; } = new EditTagChildTagsViewModel();
 
-        [Display(Name = "名称")]
-        [Required(ErrorMessage = "请填写名称")]
-        public string Name { get; set; }
+        public override Result Validate()
+        {
+            var result = Main.Validate();
+            if (!result.Successful)
+            {
+                return result;
+            }
+            result = Entries.Validate();
+            if (!result.Successful)
+            {
+                return result;
+            }
+            result = Tags.Validate();
+            if (!result.Successful)
+{
+                return result;
+            }
 
-        [Display(Name = "简介")]
-        public string BriefIntroduction { get; set; }
 
-        [Display(Name = "主图")]
-        public string MainPicture { get; set; }
-
-        [Display(Name = "缩略图")]
-        public string Thumbnail { get; set; }
-
-        [Display(Name = "背景图")]
-        public string BackgroundPicture { get; set; }
-
-        [Display(Name = "小背景图")]
-        public string SmallBackgroundPicture { get; set; }
-
-        [Display(Name = "父标签")]
-        public string ParentTagName { get; set; }
-
-        public List<RelevancesModel> Entries { get; set; } = new List<RelevancesModel>();
-
-        public List<RelevancesModel> Tags { get; set; } = new List<RelevancesModel>();
-
-        [Display(Name = "备注")]
-        public string Note { get; set; }
+            return new Result { Successful = true };
+        }
     }
 }
