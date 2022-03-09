@@ -185,20 +185,7 @@
     cursor: pointer;
 }
 /*超大屏幕文章操作Tab*/
-.article-tag-text-color-large {
-    color: #D25E8C;
-}
-.article-tag-color-large {
-    margin-left: 10px;
-    border-color: #D25E8C;
-    color: white;
-    background-color: #D25E8C;
-}
-    .article-tag-color-large:hover {
-        border-color: #D25E8C;
-        color: #D25E8C;
-        background-color: transparent;
-    }
+
 /*评论样式*/
 .comment-tag {
     width: fit-content;
@@ -895,8 +882,9 @@
 .apps-footer-layout{
      position: fixed;
      bottom: 0;
+     left: 0;
      width:100%;
-     z-index:1000;
+     z-index:1;
      background-color:white;
 }
 
@@ -909,7 +897,7 @@
      color:gray;
 }
 .links-icontext-text{
-    color:#535353;
+    color:var(--main-color);
 }
 
 /*固定行数*/
@@ -1015,6 +1003,16 @@
     height: 100%;
     background-position: center top;
     background-size: cover;
+}
+
+/*移动端 小卡片 标签样式*/
+.app-card-tag {
+    background-color:  var(--main-color);
+    color: #fff;
+    border-radius: 2px;
+    padding-left: 8px;
+    padding-right: 8px;
+    display: inline-block;
 }
 
 .ContributionCalendar-day {

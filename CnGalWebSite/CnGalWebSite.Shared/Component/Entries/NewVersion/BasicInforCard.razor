@@ -3,7 +3,7 @@
 {
     <div class="mb-3">
 
-        <AlertTip Title="编辑附加信息" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditAddInfor/" + Model.Id)" ExamineType="Operation.EstablishAddInfor" OnClickRevoke="OnRevoke"></AlertTip>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton  Url="@("/entries/EditAddInfor/" + Model.Id)" ExamineType="Operation.EstablishAddInfor" OnClickRevoke="OnRevoke"/>
     </div>
 }
 
@@ -168,27 +168,27 @@
         {
             @if (item.DisplayValue.Contains("bilibili.com"))
             {
-                <BasicInforAloneTip Icon="fa-external-link-square" Text="B站：" Url="@item.DisplayValue" Class="col-12" />
+                <BasicInforAloneTip Icon="fa-external-link-square" Text="B站：" Url="@item.DisplayValue" Class="col-12  text-truncate-1" />
             }
             else if (item.DisplayValue.Contains("weibo.com"))
             {
-                <BasicInforAloneTip Icon=" fa-weibo" Text="微博：" Url="@item.DisplayValue" Class="col-12" />
+                <BasicInforAloneTip Icon=" fa-weibo" Text="微博：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
             }
             else if (item.DisplayValue.Contains("youtube.com"))
             {
-                <BasicInforAloneTip Icon="fa-youtube" Text="YouTube：" Url="@item.DisplayValue" Class="col-12" />
+                <BasicInforAloneTip Icon="fa-youtube" Text="YouTube：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
             }
             else if (item.DisplayValue.Contains("twitter.com"))
             {
-                <BasicInforAloneTip Icon="fa-twitter" Text="Twitter：" Url="@item.DisplayValue" Class="col-12" />
+                <BasicInforAloneTip Icon="fa-twitter" Text="Twitter：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
             }
             else if (item.DisplayValue.Contains("facebook.com"))
             {
-                <BasicInforAloneTip Icon="fa-facebook" Text="Facebook：" Url="@item.DisplayValue" Class="col-12" />
+                <BasicInforAloneTip Icon="fa-facebook" Text="Facebook：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
             }
             else
             {
-                <BasicInforAloneTip Icon=" fa-external-link-square" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12" />
+                <BasicInforAloneTip Icon=" fa-external-link-square" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
             }
         }
     }
@@ -198,7 +198,7 @@
         @if (Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))
         {
             var item = Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.FirstOrDefault(s => s.DisplayName == "官网");
-            <BasicInforAloneTip Icon="fa-coffee" Text="官网：" Url="@item.DisplayValue" Class="col-12" />
+            <BasicInforAloneTip Icon="fa-coffee" Text="官网：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
         }
     }
 </div>

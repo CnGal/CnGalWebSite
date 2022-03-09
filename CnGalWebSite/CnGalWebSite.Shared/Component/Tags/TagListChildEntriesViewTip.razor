@@ -1,8 +1,6 @@
 ﻿@if (Model.ChildEntriesState == EditState.Preview)
 {
-    <div class="pb-1">
-        <AlertTip Title="编辑子词条" Type="AlertTip.AlertTipType.preview" Url="@("/tags/EditChildEntries/" + Model.Id)" ExamineType="Operation.EditTagChildEntries" OnClickRevoke="OnClickRevoke"></AlertTip>
-    </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/tags/EditChildEntries/" + Model.Id)" ExamineType="Operation.EditTagChildEntries" OnClickRevoke="OnClickRevoke"/>
 }
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="子词条" Icon="fa fa-fw fa-codepen" Collapable Outline>
     <div class="row">

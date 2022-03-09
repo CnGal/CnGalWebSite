@@ -1,10 +1,21 @@
 ﻿@inject NavigationManager NavigationManager
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="mdi-magnify" Tooltip="搜索" Class="@Class" OnClick="OnClick" />
+@if (Dark)
+{
+    <MButton Icon OnClick="OnClick" Class="@Class">
+        <MIcon>mdi-magnify</MIcon>
+    </MButton>
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="mdi-magnify" Tooltip="搜索" Class="@Class" OnClick="OnClick" />
 
+}
 @code {
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public bool Dark { get; set; }
 
     public Task OnClick()
     {

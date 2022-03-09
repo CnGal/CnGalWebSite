@@ -1,0 +1,13 @@
+﻿<div class="ps-3 pe-3 text-truncate-1" style="font-size: large;">@Title</div>
+
+
+@code {
+    private string Title { get; set; }
+
+    public Task ChangeTitle(string title)
+    {
+        Title = title;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

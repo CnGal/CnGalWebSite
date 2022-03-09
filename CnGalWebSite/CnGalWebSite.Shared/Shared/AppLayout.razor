@@ -1,16 +1,45 @@
 ﻿@inherits LayoutComponentBase
-@inject HttpClient Http
-@inject ToastService? ToastService
-@inject IDataCacheService _dataCacheService
-@inject IJSRuntime JS
-@inject IAuthService _authService
 
-<div class="" style="@(_dataCacheService.ThemeSetting.IsDark?"":"display: flex; min-height: calc(100vh); background-color: rgba(255,255,255,.7);")">
-    <CascadingValue Value="this" IsFixed="true">
-        @Body
-    </CascadingValue>
-</div>
+<MApp>
+    <MAppBar App Color="pink lighten-3" Dark Dense>
+        <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
+
+        <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard @ref="homeTitleCard" />
+        <MSpacer></MSpacer>
+
+        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.SearchButton Dark />
+    </MAppBar>
+    <CnGalWebSite.Shared.MasaComponent.App.Layout.NavButton Drawer="drawer" @ref="navButton"/>
+
+    <MMain>
+        <MContainer>
+
+            <CascadingValue Value="this" IsFixed="true">
+                @Body
+            </CascadingValue>
+
+        </MContainer>
+    </MMain>
+</MApp>
 
 @code {
+    bool drawer { get; set; }
+    CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard homeTitleCard;
+    CnGalWebSite.Shared.MasaComponent.App.Layout.NavButton navButton;
 
+    public async Task ChangeTitle(string title)
+    {
+        if (homeTitleCard != null)
+        {
+            await homeTitleCard.ChangeTitle(title);
+        }
+    }
+
+    public async Task SetDrawer()
+    {
+        if(navButton!=null)
+        {
+            await navButton.SetDrawer(true);
+        }
+    }
 }

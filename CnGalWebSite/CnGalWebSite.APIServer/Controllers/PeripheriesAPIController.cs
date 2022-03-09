@@ -1066,7 +1066,7 @@ namespace CnGalWebSite.APIServer.Controllers
             };
 
             //获取编辑记录
-            model.Examines = await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => s.PeripheryId == id && s.IsPassed == true), true);
+            model.Examines = await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => s.PeripheryId == id && (s.IsPassed == true || (user != null && s.IsPassed == null && s.ApplicationUserId == user.Id))), true);
             model.Examines = model.Examines.OrderByDescending(s => s.ApplyTime).ToList();
             //获取编辑状态
             model.State = await _peripheryService.GetPeripheryEditState(user, id);

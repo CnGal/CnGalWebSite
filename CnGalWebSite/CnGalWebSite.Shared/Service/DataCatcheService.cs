@@ -142,6 +142,7 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public IPageModelCatche<ChartDataSource> ChartDataCatche { get; set; }
 
+        public List<DocumentViewModel> DocumentsCatche { get; set; } = new List<DocumentViewModel>();
         /// <summary>
         /// 免费游戏列表
         /// </summary>

@@ -1,0 +1,70 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+@if (MainItems.Count > 0)
+{
+    <div class="row">
+        <div class="col-12 col-lg-4 mb-4">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.NavCard Id="Id" Items="_dataCacheService.DocumentsCatche" IdChanged="IdChanged" />
+
+        </div>
+        <div class="col-12 col-lg-8">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.MainGroupCard Items="MainItems" Index="Id" @ref="mainGroupCard" />
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private StringNumber Index { get; set; } = 0;
+    private List<DocumentViewModel> MainItems { get; set; } = new List<DocumentViewModel>();
+    CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.MainGroupCard mainGroupCard;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            if (_dataCacheService.DocumentsCatche.Count == 0)
+            {
+                _dataCacheService.DocumentsCatche = await Http.GetFromJsonAsync<List<DocumentViewModel>>(ToolHelper.WebApiPath + "api/home/GetDocuments");
+            }
+            foreach (var item in _dataCacheService.DocumentsCatche)
+            {
+                AddItem(item);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取词条主页游戏角色列表失败");
+        }
+    }
+
+    public void AddItem(DocumentViewModel model)
+    {
+            MainItems.Add(model);
+            foreach (var item in model.Children)
+            {
+                AddItem(item);
+            }
+        
+
+    }
+
+    public async Task IdChanged(long id)
+    {
+        if (mainGroupCard != null)
+        {
+            Id = id;
+            await mainGroupCard.Refresh(id);
+
+        }
+    }
+
+}

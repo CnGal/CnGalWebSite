@@ -7,7 +7,7 @@ else
     @if (string.IsNullOrWhiteSpace(Model.Icon))
     {
         <a href="@Model.Url" target="@(Model.IsOutLink?"_blank":"")" style=" display: flex; flex-direction: row; align-items: center; justify-content: space-between; color: gray; font-size: 16px; " @onclick="Model.OnClick">
-            <div class="text-truncate me-2 links-icontext-text">@Model.Text</div>
+            <div class="text-truncate me-2">@Model.Text</div>
             <i class="fa fa-fw fa-chevron-right links-icontext-text"></i>
         </a>
     }

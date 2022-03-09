@@ -857,7 +857,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             if (user != null)
             {
                 examineQuery = await _examineRepository.GetAll().AsNoTracking()
-                               .Where(s => s.PeripheryId == id && s.ApplicationUserId == user.Id && s.IsPassed == null
+                               .Where(s => s.ArticleId == id && s.ApplicationUserId == user.Id && s.IsPassed == null
                                && (s.Operation == Operation.EditArticleMain || s.Operation == Operation.EditArticleMainPage || s.Operation == Operation.EditArticleRelevanes))
                                .Select(s => new Examine
                                {

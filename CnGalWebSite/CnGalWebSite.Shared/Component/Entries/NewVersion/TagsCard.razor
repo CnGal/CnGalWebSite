@@ -3,7 +3,7 @@
 {
     <div class="mb-3">
 
-        <AlertTip Title="编辑词条标签" Type="AlertTip.AlertTipType.preview" Url="@("/entries/Edittags/" + Model.Id)" ExamineType="Operation.EstablishTags" OnClickRevoke="OnRevoke"></AlertTip>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/Edittags/" + Model.Id)" ExamineType="Operation.EstablishTags" OnClickRevoke="OnRevoke"/>
     </div>
 }
 

@@ -1,6 +1,32 @@
-﻿<TabLink Icon="fa fa-codepen" Url="@("/peripheries/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
-    <div class="div-shadow rounded  bg-opacity ps-3 pe-3 h-100">
-            <div class=" mb-2"  style="display:flex;">
+﻿@inject IDataCacheService _dataCatcheService
+
+@if (_dataCatcheService.IsApp)
+{
+    <TabLink Icon="fa fa-codepen" Url="@("/peripheries/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
+        <div class="div-shadow rounded  bg-opacity h-100">
+            <div style="display: flex; align-items: center;">
+                <div>
+                    <img style=" width: 160px; " src="@Model.MainImage">
+                </div>
+                <div class="me-2 ms-2">
+                    <header class="text-truncate-1">
+                        <span class="app-card-tag">周边</span>
+                        <span class="fw-bold" style=" display: inline;">@Model.Name</span>
+                    </header>
+                    <span class="text-truncate-2">
+                        @Model.BriefIntroduction
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </TabLink>
+}
+else
+{
+    <TabLink Icon="fa fa-codepen" Url="@("/peripheries/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
+        <div class="div-shadow rounded  bg-opacity ps-3 pe-3 h-100">
+            <div class=" mb-2" style="display:flex;">
                 <div class="pt-3">
                     <img style=" width: 250px; " src="@Model.MainImage">
                 </div>
@@ -25,7 +51,7 @@
                                         @foreach (var infor in item.Contents)
                                         {
                                             <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id>0)" IsShowExistTag="@IsEdit"
-                                                           Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" Icon="fa fa-codepen"  IsNotShowTip="@(infor.Id==-1)" />
+                                                                                                            Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" Icon="fa fa-codepen" IsNotShowTip="@(infor.Id==-1)" />
                                         }
                                     </div>
                                 </div>
@@ -48,10 +74,12 @@
                 <span class="article-home-infor-text">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
             </p>
             <div style="height: 1px;"></div>
-       
-    </div>
 
-</TabLink>
+        </div>
+
+    </TabLink>
+}
+
 
 @code {
     [Parameter]

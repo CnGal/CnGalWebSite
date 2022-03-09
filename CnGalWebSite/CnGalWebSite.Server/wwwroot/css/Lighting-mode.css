@@ -193,7 +193,7 @@ a {
 }
 /*Tab栏样式*/
 .tab-color {
-    color:var(--main-color);
+    color:var(--main-color)!important;
     background-color: transparent;
     transition: all .6s ease;
 }
@@ -208,7 +208,7 @@ a {
     color: white !important;
 }
 .tab-Bottom-color {
-    color:gray;
+    color:gray!important;
     background-color: transparent;
     transition: all .6s ease;
 }
@@ -221,7 +221,7 @@ a {
     color:var(--main-color) !important; 
 }
 .tab-Pivot-color {
-    color:gray;
+    color:gray!important;
     background-color: transparent;
     transition: all .6s ease;
 }
@@ -251,35 +251,35 @@ a {
     border-radius: 5px;
     word-break: keep-all;
     background: #F0F0F0;
-    color: gray;
+    color: gray!important;
     transition: all .6s ease;
 }
 .tab-Badge-color.active .line {
     background-color:var(--main-color) !important;
-    color:white;
+    color:white!important;
 }
 .tab-Badge-color:hover .line{
     background-color:var(--main-color) !important;
-    color:white;
+    color:white!important;
 }
 
 .bg-title-color-main {
-    color: white;
+    color: white!important;
     background-color: var(--main-color);
 }
 
 .bg-context-main:hover {
-    color: white;
+    color: white!important;
     background-color: var(--main-color);
 }
 
 .bg-context-main {
-    color:var(--main-color);
+    color:var(--main-color)!important;
     border-color: var(--main-color);
 }
 
 .bg-color-main {
-    color: var(--main-color);
+    color: var(--main-color)!important;
 }
     .bg-main {
     background-color: var(--main-color);
@@ -289,11 +289,11 @@ a {
     border-color: var(--main-color);
 }
 .page-link:hover {
-    color:white;
+    color:white!important;
     background-color: var(--main-color);
 }
 .dropdown-item.active, .dropdown-item:active {
-    color: #fff;
+    color: #fff!important;
     text-decoration: none;
     background-color:var(--main-color);
 }

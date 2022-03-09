@@ -1,6 +1,6 @@
 ﻿@if (Model.MainState == EditState.Preview)
 {
-    <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditMain/" + Model.Id)" ExamineType="Operation.EditPeripheryMain" OnClickRevoke="OnRevoke"></AlertTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/peripheries/EditMain/" + Model.Id)" ExamineType="Operation.EditPeripheryMain" OnClickRevoke="OnRevoke"/>
 }
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="fa fa-fw fa-info-circle">

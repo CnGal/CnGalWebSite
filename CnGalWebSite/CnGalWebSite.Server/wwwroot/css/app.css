@@ -882,8 +882,9 @@
 .apps-footer-layout{
      position: fixed;
      bottom: 0;
+     left: 0;
      width:100%;
-     z-index:1000;
+     z-index:1;
      background-color:white;
 }
 
@@ -896,7 +897,7 @@
      color:gray;
 }
 .links-icontext-text{
-    color:#535353;
+    color:var(--main-color);
 }
 
 /*固定行数*/
@@ -1002,4 +1003,14 @@
     height: 100%;
     background-position: center top;
     background-size: cover;
+}
+
+/*移动端 小卡片 标签样式*/
+.app-card-tag {
+    background-color:  var(--main-color);
+    color: #fff;
+    border-radius: 2px;
+    padding-left: 8px;
+    padding-right: 8px;
+    display: inline-block;
 }

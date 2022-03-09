@@ -42,15 +42,15 @@ namespace CnGalWebSite.Shared
             if (firstRender)
             {
                 //检查是否为移动设备
-                if(NavigationManager.Uri.Contains("app.cngal.org") || NavigationManager.Uri.Contains("localhost"))
+                if (NavigationManager.Uri.Contains("app.cngal.org") || NavigationManager.Uri.Contains("localhost"))
                 {
-                    var isApp=await IsMobile();
+                    var isApp = await IsMobile();
                     if (isApp != _dataCacheService.IsApp)
                     {
                         _dataCacheService.IsApp = isApp;
                         StateHasChanged();
                     }
-             
+
                 }
 
                 //需要调用一次令牌刷新接口 确保登入没有过期

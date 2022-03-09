@@ -5,7 +5,7 @@
 @using System.Text.Json
 @inject SwalService SwalService
 <div class=" ps-4 pe-4 pt-3 pb-3 mb-3 @(IsChild ? "comment-layout-child" : "comment-layout")  comment-layout-transition shadow-sm rounded  bg-opacity"  style="cursor:default">
-    <div class="new-row-warp no-margin">
+    <div>
         <AuthorizeView>
             <Authorized>
                 @foreach (var item in context.User.Claims)
@@ -22,14 +22,14 @@
                 @{userName = context.User.Identity.Name;}
                 <UserRankTextViewTip UserId="@userId" UserName="@userName" Image="@image" Text="@DateTime.Now.ToCstTime().ToString("yyyy年M月d日 H:mm")"></UserRankTextViewTip>
 
-                <Textarea class="col-12 mt-3 comment-rely-textarea" style="height: 120px; width: 100%;" placeholder="还不快点说点什么呀~" @bind-Value="@Text"></Textarea>
+                <Textarea class=" mt-3 comment-rely-textarea" style="height: 120px; width: 100%;" placeholder="还不快点说点什么呀~" @bind-Value="@Text"></Textarea>
 
-                <div class="col-12 no-padding mt-2">
+                <div class="mt-2">
                     <button class="comment-reply-layout-btn comment-reply-layout-btn-color" @onclick="OnComment">发表评论</button>
                 </div>
             </Authorized>
             <NotAuthorized>
-                <div class="col-12 no-padding mt-2">
+                <div>
                     <button class="comment-reply-layout-btn comment-reply-layout-btn-color" @onclick="OnLoginClick">登入后发表评论</button>
                 </div>
             </NotAuthorized>

@@ -4,14 +4,14 @@
 
 @if (Model.IsSignIn)
 {
-    <MButton Text Class="w-100" Color="green">
+    <MButton Text Class="w-100" Color="green" Left="Left">
         <MIcon Left>mdi-clipboard-check</MIcon>
         @($"连续签到 {Model.SignInDays} 天")
     </MButton>
 }
 else
 {
-    <MButton Text Class="w-100" Color="pink lighten-3" OnClick="SignIn">
+    <MButton Text Class="w-100" Color="pink lighten-3" OnClick="SignIn" Left="Left">
         <MIcon Left>mdi-clipboard-text</MIcon>
         每日签到
     </MButton>
@@ -21,7 +21,8 @@ else
 @code {
     [Parameter]
     public UserInforViewModel Model { get; set; } = new UserInforViewModel();
-
+    [Parameter]
+    public bool Left { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

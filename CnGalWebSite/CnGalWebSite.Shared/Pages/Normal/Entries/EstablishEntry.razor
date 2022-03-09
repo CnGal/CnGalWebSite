@@ -4,14 +4,8 @@
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Entries.EstablishEntry Name="@Name" />
-}
-else
-{
+
     <CnGalWebSite.Shared.Pages.Webs.Entries.EstablishEntry Name="@Name"  />
-}
 
 @code{
     [SupplyParameterFromQuery]

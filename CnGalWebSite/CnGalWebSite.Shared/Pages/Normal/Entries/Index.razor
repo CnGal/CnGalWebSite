@@ -3,14 +3,9 @@
 
 @inject IDataCacheService _dataCacheService
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Entries.Index Id="@Id" DefaultIndex="@DefaultIndex" />
-}
-else
-{
+
     <CnGalWebSite.Shared.Pages.Webs.Entries.Index Id="@Id" />
-}
+
 @code{
     [Parameter]
     public string Id { get; set; }

@@ -1,6 +1,6 @@
 ﻿<div>
 
-    @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false)
+    @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false&& HiddenImage)
     {
         <img style="width:100%" src="@Model.MainPicture" alt="@Model.Name">
     }
@@ -41,7 +41,7 @@
 
             @if (Model.MainPageState == EditState.Preview || Model.MainState == EditState.Preview || Model.RelevancesState == EditState.Preview)
             {
-                <AlertTip Title="编辑文章" Type="AlertTip.AlertTipType.preview" Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></AlertTip>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton>
             }
             <div class="markdown-body">
                 @((MarkupString)Model.MainPage)
@@ -59,7 +59,7 @@
     [Parameter]
     public ArticleViewModel Model { get; set; } = new ArticleViewModel();
     [Parameter]
-    public bool IsSmallScreen { get; set; }
+    public bool HiddenImage { get; set; }
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
 

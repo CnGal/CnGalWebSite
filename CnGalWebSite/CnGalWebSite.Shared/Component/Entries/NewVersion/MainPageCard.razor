@@ -1,6 +1,6 @@
 ﻿@if (Model.MainPageState == EditState.Preview)
 {
-    <AlertTip Title="编辑词条主页" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditMainPage/" + Model.Id)" ExamineType="Operation.EstablishMainPage" OnClickRevoke="OnRevoke"></AlertTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditMainPage/" + Model.Id)" ExamineType="Operation.EstablishMainPage" OnClickRevoke="OnRevoke"/>
 }
 
 

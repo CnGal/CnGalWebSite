@@ -74,7 +74,7 @@
                             </AuthorizeRouteView>
                         </Found>
                         <NotFound>
-                            <LayoutView Layout="@typeof(AccountLayout)">
+                            <LayoutView Layout="@typeof(MainLayout)">
                                 <NotFoundError></NotFoundError>
                             </LayoutView>
                         </NotFound>
@@ -85,20 +85,20 @@
             else if (_dataCacheService.IsApp == true)
             {
                 <CascadingAuthenticationState>
-                    <Router AppAssembly="@typeof(MobileLayout).Assembly" PreferExactMatches="@true">
+                    <Router AppAssembly="@typeof(AppLayout).Assembly" PreferExactMatches="@true">
                         <Found Context="routeData">
                             <AuthorizeRouteView RouteData="@routeData"
-                                                DefaultLayout="@typeof(MobileLayout)">
+                                                DefaultLayout="@typeof(AppLayout)">
                                 <NotAuthorized>
                                     <NotAuthorizedTipView IsNeedLayput="true"></NotAuthorizedTipView>
                                 </NotAuthorized>
                                 <Authorizing>
-                                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(MobileLayout)" />
+                                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(AppLayout)" />
                                 </Authorizing>
                             </AuthorizeRouteView>
                         </Found>
                         <NotFound>
-                            <LayoutView Layout="@typeof(AccountLayout)">
+                            <LayoutView Layout="@typeof(AppLayout)">
                                 <NotFoundError></NotFoundError>
                             </LayoutView>
                         </NotFound>

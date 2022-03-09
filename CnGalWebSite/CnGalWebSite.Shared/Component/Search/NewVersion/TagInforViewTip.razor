@@ -1,33 +1,64 @@
-﻿<TabLink Icon="fa fa-tag" Url="@("/tags/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
-    <div class="div-shadow rounded  bg-opacity ps-3 pe-3">
-        <div class="mb-2"  style="display:flex;">
-            <div class="pt-3">
-                <img style=" width: 250px; "  src="@Model.MainImage">
-            </div>
-            <div class="pt-3 ps-3">
-                <header>
-                    <div class="article-home-tag">标签</div>
-                    <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
-                </header>
-                <div class="text-truncate-3">
-                    @Model.BriefIntroduction
+﻿@inject IDataCacheService _dataCatcheService
+
+@if (_dataCatcheService.IsApp)
+{
+    <TabLink Icon="fa fa-tag" Url="@("/tags/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
+        <div class="div-shadow rounded  bg-opacity h-100">
+            <div style="display: flex; align-items: center;">
+                <div>
+                    <img style=" width: 160px; " src="@Model.MainImage">
                 </div>
-              
+                <div class="pt-3 ps-3">
+                    <header class="text-truncate-1">
+                        <span class="app-card-tag">标签</span>
+                        <span class="fw-bold" style=" display: inline;">@Model.Name</span>
+                    </header>
+                    <div class="text-truncate-2">
+                        @Model.BriefIntroduction
+                    </div>
+
+                </div>
             </div>
         </div>
 
-        <p class="" style="color: gray;">
-            <i class="fa fa-calendar fa-fw"></i>
-            <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+    </TabLink>
 
-            <i class="fa fa-eye fa-fw"></i>
-            <span class="article-home-infor-text">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
-        </p>
-        <div style="height: 1px;"></div>
+}
+else
+{
+    <TabLink Icon="fa fa-tag" Url="@("/tags/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
+        <div class="div-shadow rounded  bg-opacity ps-3 pe-3">
+            <div class="mb-2" style="display:flex;">
+                <div class="pt-3">
+                    <img style=" width: 250px; " src="@Model.MainImage">
+                </div>
+                <div class="pt-3 ps-3">
+                    <header  class="text-truncate-2">
+                        <div class="article-home-tag">标签</div>
+                        <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                    </header>
+                    <div class="text-truncate-3">
+                        @Model.BriefIntroduction
+                    </div>
 
-    </div>
+                </div>
+            </div>
 
-</TabLink>
+            <p class="" style="color: gray;">
+                <i class="fa fa-calendar fa-fw"></i>
+                <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+
+                <i class="fa fa-eye fa-fw"></i>
+                <span class="article-home-infor-text">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
+            </p>
+            <div style="height: 1px;"></div>
+
+        </div>
+
+    </TabLink>
+
+}
+
 
 
 

@@ -5,14 +5,9 @@
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Entries.EditTags Id="@Id" />
-}
-else
-{
+
     <CnGalWebSite.Shared.Pages.Webs.Entries.EditTags Id="@Id" />
-}
+
 
 @code{
     [Parameter]

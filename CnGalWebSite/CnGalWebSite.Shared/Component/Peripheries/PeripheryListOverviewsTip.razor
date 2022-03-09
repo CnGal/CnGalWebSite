@@ -2,13 +2,13 @@
 @if (Model.RelatedEntriesState == EditState.Preview)
 {
     <div>
-        <AlertTip Title="编辑关联词条信息" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditRelatedEntries/" + Model.Id)" ExamineType="Operation.EditPeripheryRelatedEntries" OnClickRevoke="OnRevoke"></AlertTip>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/peripheries/EditRelatedEntries/" + Model.Id)" ExamineType="Operation.EditPeripheryRelatedEntries" OnClickRevoke="OnRevoke"/>
     </div>
 }
 @if (Model.RelatedPeripheriesState == EditState.Preview)
 {
     <div>
-        <AlertTip Title="编辑关联周边信息" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditRelatedPeripheries/" + Model.Id)" ExamineType="Operation.EditPeripheryRelatedPeripheries" OnClickRevoke="OnRevoke"></AlertTip>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/peripheries/EditRelatedPeripheries/" + Model.Id)" ExamineType="Operation.EditPeripheryRelatedPeripheries" OnClickRevoke="OnRevoke"/>
     </div>
 }
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边合集" Icon="fa fa-fw fa-shopping-basket" Outline>

@@ -62,9 +62,5 @@
     <ProjectReference Include="..\CnGalWebSite.DataModel\CnGalWebSite.DataModel.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Helper\CnGalWebSite.Helper.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="MasaComponent\App\" />
-  </ItemGroup>
 
 </Project>

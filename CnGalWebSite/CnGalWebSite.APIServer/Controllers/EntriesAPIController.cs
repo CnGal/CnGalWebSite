@@ -1246,7 +1246,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取完善度列表
             model.PerfectionChecks = await _perfectionService.GetEntryPerfectionCheckList(model.PerfectionInfor.Id);
             //获取编辑记录
-            model.Examines = await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => s.EntryId == id && s.IsPassed == true), true);
+            model.Examines = await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => s.EntryId == id && (s.IsPassed == true || (user != null && s.IsPassed == null && s.ApplicationUserId == user.Id))), true);
             model.Examines = model.Examines.OrderByDescending(s => s.ApplyTime).ToList();
             //获取编辑状态
             model.State = await _entryService.GetEntryEditState(user, id);

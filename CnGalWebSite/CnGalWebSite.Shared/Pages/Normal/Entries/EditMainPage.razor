@@ -5,14 +5,8 @@
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Entries.EditMainPage Id="@Id" />
-}
-else
-{
     <CnGalWebSite.Shared.Pages.Webs.Entries.EditMainPage Id="@Id" />
-}
+
 
 @code{
     [Parameter]
