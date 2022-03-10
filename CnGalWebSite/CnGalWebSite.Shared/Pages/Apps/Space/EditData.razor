@@ -24,16 +24,16 @@
 
             <div class="row">
                 <div class=" col-12 col-md-6  col-lg-3 mt-2">
-                    <ImageCropperButton ImagePath="@Model.PhotoPath" OnUploadedImage="OnCardUpload1" Type="ImageAspectType._1_1" Text="上传头像"></ImageCropperButton>
+                    <ImageCropperButton @bind-ImagePath="@Model.PhotoName" Type="ImageAspectType._1_1" Text="上传头像"></ImageCropperButton>
                 </div>
                 <div class=" col-12 col-md-6  col-lg-3 mt-2">
-                    <ImageCropperButton ImagePath="@Model.BackgroundPath" OnUploadedImage="OnCardUpload2" Type="ImageAspectType._4_1A2" Text="上传空间主图"></ImageCropperButton>
+                    <ImageCropperButton @bind-ImagePath="@Model.BackgroundName" Type="ImageAspectType._4_1A2" Text="上传空间主图"></ImageCropperButton>
                 </div>
                 <div class=" col-12 col-md-6  col-lg-3 mt-2">
-                    <ImageCropperButton ImagePath="@Model.MBgImagePath" OnUploadedImage="OnCardUpload3" Type="ImageAspectType.None" Text="上传大背景"></ImageCropperButton>
+                    <ImageCropperButton @bind-ImagePath="@Model.MBgImageName" Type="ImageAspectType.None" Text="上传大背景"></ImageCropperButton>
                 </div>
                 <div class=" col-12 col-md-6  col-lg-3 mt-2">
-                    <ImageCropperButton ImagePath="@Model.SBgImagePath" OnUploadedImage="OnCardUpload4" Type="ImageAspectType.None" Text="上传小背景"></ImageCropperButton>
+                    <ImageCropperButton @bind-ImagePath="@Model.SBgImageName" Type="ImageAspectType.None" Text="上传小背景"></ImageCropperButton>
                 </div>
             </div>
             <hr />
@@ -216,55 +216,7 @@
             ErrorHandler.ProcessError(ex, "保存用户信息失败");
         }
     }
-    private Task OnCardUpload1(string url)
-    {
-
-        Model.PhotoPath = url;
-        Model.PhotoName = url;
-        return Task.CompletedTask;
-
-    }
-    private Task OnCardUpload2(string url)
-    {
-        Model.BackgroundPath = url;
-        Model.BackgroundName = url;
-        return Task.CompletedTask;
-    }
-
-    private Task OnCardUpload3(string url)
-    {
-        Model.MBgImagePath = url;
-        Model.MBgImageName = url;
-        return Task.CompletedTask;
-    }
-    private Task OnCardUpload4(string url)
-    {
-        Model.SBgImageName = url;
-        Model.SBgImagePath = url;
-        return Task.CompletedTask;
-
-    }
-    private async Task<bool> OnCardDelete1(string file)
-    {
-        Model.PhotoName = "";
-        return true;
-    }
-    private async Task<bool> OnCardDelete2(string file)
-    {
-        Model.BackgroundName = "";
-        return true;
-    }
-    private async Task<bool> OnCardDelete3(string file)
-    {
-        Model.MBgImageName = "";
-        return true;
-    }
-    private async Task<bool> OnCardDelete4(string file)
-    {
-        Model.SBgImageName = "";
-        return true;
-    }
-
+  
 
     private Task DataLoaded(EditUserDataViewModel model)
     {

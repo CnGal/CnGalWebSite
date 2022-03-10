@@ -1,4 +1,5 @@
 ﻿@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
 
 
 <div>
@@ -92,7 +93,7 @@
     }
     @if (pagedResultDto.TotalPages > 1)
     {
-        <MPagination Value="@pagedResultDto.CurrentPage" Class="my-4" Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick" Color="pink lighten-3" TotalVisible="7"></MPagination>
+        <MPagination Value="@pagedResultDto.CurrentPage" Class="my-4" Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
     }
 </div>
 

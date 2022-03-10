@@ -304,3 +304,16 @@ input.te-image-file-input {
 .editormd-fullscreen{
     z-index: 10000!important;
 }
+.layout.is-page .layout-header {
+    background-color: var(--main-color);
+}
+.layout.is-page .layout-side .layout-banner {
+    background-color: var(--hover-color);
+}
+.layout-header-bar {
+    background-color: var(--hover-color);
+    border-color: var(--hover-color);
+}
+.layout-drawer:hover {
+    background-color: var(--active-color);
+}

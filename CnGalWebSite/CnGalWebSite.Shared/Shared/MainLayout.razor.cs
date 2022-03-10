@@ -33,6 +33,9 @@ namespace CnGalWebSite.Shared.Shared
         private Task<AuthenticationState> authenticationStateTask { get; set; }
         [CascadingParameter]
         public ErrorHandler ErrorHandler { get; set; }
+        [CascadingParameter]
+        private CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip CnGalRootTip { get; set; }
+
         [NotNull]
         private StyleTip styleTip { get; set; }
 
@@ -231,14 +234,9 @@ namespace CnGalWebSite.Shared.Shared
                 new MenuItem() { Text = "免费游戏", Icon = "fa fa-fw fa-gift", Url = "/free" },
 
                 new MenuItem() { Text = "文章", Icon = "fa fa-fw fa-newspaper-o", Url = "/articles/home" },
-                new MenuItem() { Text = "词条", Icon = "fa fa-fw fa-codepen", Url="/null", IsCollapsed=false, Items=new List<MenuItem>{
-                    new MenuItem() { Text = "游戏", Icon = "fa fa-fw fa-gamepad", Url = "/entries/home/游戏" },
-                    new MenuItem() { Text = "角色", Icon = "fa fa-fw fa-group", Url = "/entries/home/角色" },
-                    new MenuItem() { Text = "STAFF", Icon = "fa fa-fw fa-star", Url = "/entries/home/STAFF" },
-                    new MenuItem() { Text = "制作组", Icon = "fa fa-fw fa-object-group", Url = "/entries/home/制作组" }
-                } },
+                new MenuItem() { Text = "词条", Icon = "fa fa-fw fa-codepen", Url="/entries/home"},
 
-                new MenuItem() { Text = "分类", Icon = "fa fa-fw fa-tags", Url="/null",IsCollapsed=true, Items=new List<MenuItem>{
+                new MenuItem() { Text = "分类", Icon = "fa fa-fw fa-tags", Url="/null",IsCollapsed=false, Items=new List<MenuItem>{
                     new MenuItem() { Text = "游戏", Icon = "fa fa-fw fa-gamepad", Url = "/tags/index/1" },
                     new MenuItem() { Text = "角色", Icon = "fa fa-fw fa-group", Url = "/tags/index/2" },
                     new MenuItem() { Text = "STAFF", Icon = "fa fa-fw fa-star", Url = "/tags/index/3"},

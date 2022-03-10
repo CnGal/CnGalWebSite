@@ -36,7 +36,7 @@ namespace CnGalWebSite.Shared.Service
             _useNewtonsoft = useNewtonsoft;
         }
 
-        public async Task<TModel> GetCatche(string apiUrl, bool noRefresh = false)
+        public async Task<TModel> GetCatche(string apiUrl, bool noRefresh = true)
         {
             //判断是否两次请求同一个API
             //是则清除缓存

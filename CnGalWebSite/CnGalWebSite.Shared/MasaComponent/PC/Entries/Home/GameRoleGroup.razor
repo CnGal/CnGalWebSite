@@ -6,7 +6,7 @@
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(Items[Index.ToInt32()].Name+" 角色预览")" Icon="fa fa-fw fa-picture-o">
         <ButtonContent>
-            <MButton Text Block Color="pink lighten-3" OnClick="OnClickMore">
+            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
                 <MIcon Left>mdi-share-all-outline  </MIcon>
                 查看详情
             </MButton>

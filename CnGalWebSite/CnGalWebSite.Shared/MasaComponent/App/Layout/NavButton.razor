@@ -14,12 +14,12 @@
             <NotAuthorized>
                 <LoginButton />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-                <MButton Text Block Color="pink lighten-3" Left OnClick="@(()=>OnClickUrl("/"))">
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/"))">
                     <MIcon Left>mdi-home</MIcon>
                     主页
                 </MButton>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-                <MButton Text Block Color="pink lighten-3" Left OnClick="@(()=>OnClickUrl("/home/setting"))">
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/home/setting"))">
                     <MIcon Left>mdi-cog</MIcon>
                     设置
                 </MButton>

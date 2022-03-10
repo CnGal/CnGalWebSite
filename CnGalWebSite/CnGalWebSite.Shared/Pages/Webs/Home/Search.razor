@@ -90,7 +90,7 @@
                 {
                     @if (_dataCacheService.IsApp)
                     {
-                        <MPagination Value="@_dataCacheService.SearchViewModel.pagedResultDto.CurrentPage" Class="my-4" Length="@_dataCacheService.SearchViewModel.pagedResultDto.TotalPages" ValueChanged="@((e)=>OnPageClick(e,_dataCacheService.SearchViewModel.pagedResultDto.MaxResultCount))" Color="pink lighten-3" TotalVisible="5"></MPagination>
+                        <MPagination Value="@_dataCacheService.SearchViewModel.pagedResultDto.CurrentPage" Class="my-4" Length="@_dataCacheService.SearchViewModel.pagedResultDto.TotalPages" ValueChanged="@((e)=>OnPageClick(e,_dataCacheService.SearchViewModel.pagedResultDto.MaxResultCount))" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="5"></MPagination>
                     }
                     else
                     {

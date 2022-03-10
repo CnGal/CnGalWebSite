@@ -427,12 +427,8 @@ namespace CnGalWebSite.APIServer.Controllers
             model.Email = ToolHelper.GetxxxString(user.Email);
             model.Phone = ToolHelper.GetxxxString(user.PhoneNumber);
             model.UserName = user.UserName;
-            model.PhotoPath = _appHelper.GetImagePath(user.PhotoPath, "user.png");
-            model.BackgroundPath = _appHelper.GetImagePath(user.BackgroundImage, "userbackground.jpg");
             model.BackgroundName = user.BackgroundImage;
-            model.MBgImagePath = _appHelper.GetImagePath(user.MBgImage, "background.png");
             model.MBgImageName = user.MBgImage;
-            model.SBgImagePath = _appHelper.GetImagePath(user.SBgImage, "background.png");
             model.SBgImageName = user.SBgImage;
             model.PhotoName = user.PhotoPath;
             model.Birthday = user.Birthday;
@@ -502,7 +498,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     UserName = model.UserName,
                     PersonalSignature = model.PersonalSignature,
-                    PhotoPath = model.PhotoPath,
+                    PhotoPath = model.PhotoName,
                     BackgroundImage = model.BackgroundName,
                     MBgImage = model.MBgImageName,
                     SBgImage = model.SBgImageName

@@ -1,71 +1,82 @@
 ﻿@inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
+@inject IDataCacheService _dataCacheService
 
-    <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
-        <ActivatorContent Context="m">
-            <MTooltip Bottom>
-                <ActivatorContent Context="c">
-                    @{
-                        var attrs = new Dictionary<string, object>();
-                        m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
-                        c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
-                    }
-                    <MButton Fab Dark Small Color="pink lighten-3" @attributes="@attrs" Class="@Class">
+<MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
+    <ActivatorContent Context="m">
+        <MTooltip Bottom>
+            <ActivatorContent Context="c">
+                @{
+                    var attrs = new Dictionary<string, object>();
+                    m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                    c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                }
+                @if (_dataCacheService.ThemeSetting.IsDark)
+                {
+                    <MButton Fab Small @attributes="@attrs" Class="@Class">
                         <MIcon>mdi-pencil</MIcon>
                     </MButton>
-                </ActivatorContent>
-                <ChildContent>
-                    <span>编辑</span>
-                </ChildContent>
-            </MTooltip>
-        </ActivatorContent>
+                }
+                else
+                {
+                    <MButton Fab Dark Small Color="@_dataCacheService.ThemeSetting.Theme" @attributes="@attrs" Class="@Class">
+                        <MIcon>mdi-pencil</MIcon>
+                    </MButton>
+                }
 
-        <ChildContent>
-            <div class="bg-white d-flex p-3" style="@("flex-direction: column; align-items: center; "+(ShowPerfection?"width:350px;":"width:300px;"))">
-                <div class="w-100">
-                    @if (isReady)
+            </ActivatorContent>
+            <ChildContent>
+                <span>编辑</span>
+            </ChildContent>
+        </MTooltip>
+    </ActivatorContent>
+
+    <ChildContent>
+        <div class="bg-opacity d-flex p-3" style="@("flex-direction: column; align-items: center; "+(ShowPerfection?"width:350px;":"width:300px;"))">
+            <div class="w-100">
+                @if (isReady)
+                {
+                    @if (PerfectionInfor != null && ShowPerfection)
                     {
-                        @if (PerfectionInfor!=null&&ShowPerfection)
-                        {
-                            <CnGalWebSite.Shared.MasaComponent.PC.Perfections.SingleOverviewCard Model="PerfectionInfor" OnClosed="OnClosed" />
-                            <MDivider Class="w-100"></MDivider>
-                        }
-                        <MButton Text Block Color="warning" OnClick="OnClickHistory">
-                            <MIcon Left>mdi-history </MIcon>
-                            历史编辑记录
-                        </MButton>
-                        <AuthorizeView Roles="Admin">
-                            <Authorized>
-                               <EditHiddenButton IsHidden="IsHidden" IsHiddenChanged="IsHiddenChanged" Id="Id" Type="Type" />
-                            </Authorized>
-                        </AuthorizeView>
-                        <AuthorizeView>
-                            <Authorized>
-                                @foreach (var item in Items)
-                                {
-                                    <PartNavButton Model="item" />
-                                }
-                            </Authorized>
-                            <NotAuthorized>
-                                <MButton Text Block Color="success" OnClick="OnClickLogin">
-                                    <MIcon Left>mdi-login </MIcon>
-                                    登入后编辑
-                                </MButton>
-                            </NotAuthorized>
-                        </AuthorizeView>
-
+                        <CnGalWebSite.Shared.MasaComponent.PC.Perfections.SingleOverviewCard Model="PerfectionInfor" OnClosed="OnClosed" />
+                        <MDivider Class="w-100"></MDivider>
                     }
-                    else
-                    {
-                        <MProgressCircular Size="60" Width="6" Indeterminate Color="pink lighten-3" Class="mt-4 mb-4"></MProgressCircular>
-                    }
+                    <MButton Text Block Color="warning" OnClick="OnClickHistory">
+                        <MIcon Left>mdi-history </MIcon>
+                        历史编辑记录
+                    </MButton>
+                    <AuthorizeView Roles="Admin">
+                        <Authorized>
+                            <EditHiddenButton IsHidden="IsHidden" IsHiddenChanged="IsHiddenChanged" Id="Id" Type="Type" />
+                        </Authorized>
+                    </AuthorizeView>
+                    <AuthorizeView>
+                        <Authorized>
+                            @foreach (var item in Items)
+                            {
+                                <PartNavButton Model="item" />
+                            }
+                        </Authorized>
+                        <NotAuthorized>
+                            <MButton Text Block Color="success" OnClick="OnClickLogin">
+                                <MIcon Left>mdi-login </MIcon>
+                                登入后编辑
+                            </MButton>
+                        </NotAuthorized>
+                    </AuthorizeView>
+
+                }
+                else
+                {
+                    <MProgressCircular Size="60" Width="6" Indeterminate Color="@_dataCacheService.ThemeSetting.Theme" Class="mt-4 mb-4"></MProgressCircular>
+                }
 
 
-                </div>
             </div>
-        </ChildContent>
-    </MMenu>
+        </div>
+    </ChildContent>
+</MMenu>
 @code {
     [Parameter]
     public ExaminedNormalListModelType Type { get; set; }

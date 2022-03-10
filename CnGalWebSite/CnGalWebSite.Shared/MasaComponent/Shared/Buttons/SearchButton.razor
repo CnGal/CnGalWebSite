@@ -1,16 +1,25 @@
 ﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
-@if (Dark)
+@*@if (Dark)
 {
     <MButton Icon OnClick="OnClick" Class="@Class">
         <MIcon>mdi-magnify</MIcon>
     </MButton>
 }
 else
-{
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="mdi-magnify" Tooltip="搜索" Class="@Class" OnClick="OnClick" />
-
-}
+{*@
+    <MTooltip Bottom>
+        <ActivatorContent>
+            <MButton Icon Dark Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" OnClick="OnClick">
+                <MIcon>mdi-magnify</MIcon>
+            </MButton>
+        </ActivatorContent>
+        <ChildContent>
+            <span>搜索</span>
+        </ChildContent>
+    </MTooltip>
+@*}*@
 @code {
     [Parameter]
     public string Class { get; set; }

@@ -1,0 +1,5 @@
+﻿@page "/weeklynews"
+
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="@(_dataCacheService.WeeklyNewsOverviewCatche.FirstOrDefault()?.Id??281)" />

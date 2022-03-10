@@ -83,7 +83,7 @@ else
 
                     <div class="mb-4">
                         <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded shadow-sm bg-opacity "
-                               Color="pink lighten-3">
+                               Color="@_dataCatcheService.ThemeSetting.Theme">
 
                             <MTab Value="1">
                                 首页<MIcon>mdi-home</MIcon>
@@ -162,36 +162,6 @@ else
             }
             else
             {
-                <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4") ">
-                    @if (EntryView.SteamId > 0)
-                    {
-                        <div class="mb-4">
-                            <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
-
-                        </div>
-                    }
-                    <div class="mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
-                    </div>
-                    <div class=" mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
-                    </div>
-
-                    @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
-                    {
-                        <div class="mb-4">
-                            <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="EntryView" />
-                        </div>
-                    }
-                    @if (_dataCatcheService.IsApp == false && EntryView.Staffs.Count > 0)
-                    {
-                        <div class=" mb-4">
-                            <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" />
-                        </div>
-                    }
-                    <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke" LeftDisplay />
-
-                </div>
                 <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8") ">
 
                     <div>
@@ -228,6 +198,36 @@ else
 
                 </div>
 
+                <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4") ">
+                    @if (EntryView.SteamId > 0)
+                    {
+                        <div class="mb-4">
+                            <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
+
+                        </div>
+                    }
+                    <div class="mb-4">
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
+                    </div>
+                    <div class=" mb-4">
+                        <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
+                    </div>
+
+                    @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
+                    {
+                        <div class="mb-4">
+                            <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="EntryView" />
+                        </div>
+                    }
+                    @if (_dataCatcheService.IsApp == false && EntryView.Staffs.Count > 0)
+                    {
+                        <div class=" mb-4">
+                            <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="EntryView" />
+                        </div>
+                    }
+                    <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke" LeftDisplay />
+
+                </div>
 
             }
 

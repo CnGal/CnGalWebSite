@@ -1,4 +1,7 @@
-﻿<div class="rounded shadow-sm bg-opacity">
+﻿@inject IDataCacheService _dataCacheService
+
+
+<div class="rounded shadow-sm bg-opacity">
     <MTreeview @bind-Open="@initiallyOpen"
                Active="new List<long> { Id}"
                Items="Items"
@@ -9,10 +12,10 @@
                ItemChildren="u => u.Children"
                ItemText="u => u.Title"
                OpenOnClick
-               Color="pink lighten-3"
+               Color="@_dataCacheService.ThemeSetting.Theme"
                ActiveChanged="ActiveChanged">
         <PrependContent>
-            @if (string.IsNullOrWhiteSpace(context.Item.Icon)==false)
+            @if (string.IsNullOrWhiteSpace(context.Item.Icon) == false)
             {
                 <MIcon>
                     @context.Item.Icon
@@ -28,7 +31,7 @@
     [Parameter]
     public long Id { get; set; }
     [Parameter]
-    public EventCallback< long> IdChanged { get; set; }
+    public EventCallback<long> IdChanged { get; set; }
 
     List<long> initiallyOpen = new();
 
@@ -40,7 +43,7 @@
     public void ChangeOpen(long id)
     {
         var item = Items.FirstOrDefault(s => s.Children.Any(s => s.Id == id));
-        if(item!=null)
+        if (item != null)
         {
             initiallyOpen.Clear();
             initiallyOpen.Add(item.Id);
@@ -52,7 +55,7 @@
         Id = items.First();
         ChangeOpen(Id);
         StateHasChanged();
-        await  IdChanged.InvokeAsync(Id);
+        await IdChanged.InvokeAsync(Id);
     }
 
 }

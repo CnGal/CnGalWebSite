@@ -1,7 +1,7 @@
 ﻿
 @if (Model.RelevancesState == EditState.Preview)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Title="编辑关联词条" Type="AlertTip.AlertTipType.preview" Url="@("/entries/EditRelevances/" + Model.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditRelevances/" + Model.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"/>
 }
 
 <div>

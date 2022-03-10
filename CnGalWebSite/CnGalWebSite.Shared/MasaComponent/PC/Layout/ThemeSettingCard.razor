@@ -1,0 +1,123 @@
+﻿@inject IDataCacheService _dataCacheService
+
+<MDialog @bind-Value="Dialog"
+         MaxWidth="440">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            主题设置
+        </MCardTitle>
+        <MCardTitle Class="text-h6">
+            主题颜色
+        </MCardTitle>
+        <MCardText>
+
+            你可以从下方选择一个喜欢的颜色作为主题颜色，选择黑色可以进入夜间模式
+        </MCardText>
+
+        <MCardText>
+            <MButtonGroup Borderless Value="colorString" ValueChanged="ValueChanged" Style="display: flex; flex-wrap: wrap; border-radius: 0; ">
+                <MButton Value="@("red")" Color="red" Small Style="min-width: 28px;" />
+                <MButton Value="@("pink lighten-2")" Color="pink lighten-2" Small Style="min-width: 28px;" />
+                <MButton Value="@("purple")" Color="purple" Small Style="min-width: 28px;" />
+                <MButton Value="@("deep-purple")" Color="deep-purple" Small Style="min-width: 28px;" />
+                <MButton Value="@("indigo")" Color="indigo" Small Style="min-width: 28px;" />
+                <MButton Value="@("blue")" Color="blue" Small Style="min-width: 28px;" />
+                <MButton Value="@("light-blue")" Color="light-blue" Small Style="min-width: 28px;" />
+                <MButton Value="@("cyan")" Color="cyan" Small Style="min-width: 28px;" />
+                <MButton Value="@("teal")" Color="teal" Small Style="min-width: 28px;" />
+                <MButton Value="@("green")" Color="green" Small Style="min-width: 28px;" />
+                <MButton Value="@("light-green")" Color="light-green" Small Style="min-width: 28px;" />
+                <MButton Value="@("lime")" Color="lime" Small Style="min-width: 28px;" />
+                <MButton Value="@("yellow")" Color="yellow" Small Style="min-width: 28px;" />
+                <MButton Value="@("amber")" Color="amber" Small Style="min-width: 28px;" />
+                <MButton Value="@("orange")" Color="orange" Small Style="min-width: 28px;" />
+                <MButton Value="@("deep-orange")" Color="deep-orange" Small Style="min-width: 28px;" />
+                <MButton Value="@("brown")" Color="brown" Small Style="min-width: 28px;" />
+                <MButton Value="@("blue-grey")" Color="blue-grey" Small Style="min-width: 28px;" />
+                <MButton Value="@("grey")" Color="grey" Small Style="min-width: 28px;" />
+                <MButton Value="@("white")" Color="black" Small Style="min-width: 28px;" />
+            </MButtonGroup>
+        </MCardText>
+        <MCardActions>
+            <MButton Color="green darken-1"
+                     Text
+                     OnClick="ReturnOldLayout">
+                回到旧版布局
+            </MButton>
+            <MSpacer></MSpacer>
+            <MButton Color="green darken-1"
+                     Text
+                     OnClick="()=> Dialog = false">
+                完成
+            </MButton>
+        </MCardActions>
+    </MCard>
+</MDialog>
+
+@code {
+
+    StringNumber colorString = "pink lighten-2";
+    bool Dialog { get; set; }
+
+    [CascadingParameter]
+    private CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip CnGalRootTip { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(string.IsNullOrWhiteSpace( _dataCacheService.ThemeSetting.Theme))
+        {
+            _dataCacheService.ThemeSetting.Theme = colorString.ToString();
+            _dataCacheService.ThemeSetting.IsDark = false;
+            if (CnGalRootTip != null)
+            {
+                await CnGalRootTip.SaveTheme();
+            }
+            return;
+        }
+
+        if (_dataCacheService.ThemeSetting.Theme.Contains("color") == false)
+        {
+            colorString = _dataCacheService.ThemeSetting.Theme;
+        }
+
+    }
+    public Task Refresh(bool dialog)
+    {
+        Dialog = dialog;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public async Task ReturnOldLayout()
+    {
+        _dataCacheService.ThemeSetting.IsMasa = false;
+        if (CnGalRootTip != null)
+        {
+            await CnGalRootTip.SaveTheme();
+        }
+    }
+
+    public async Task ValueChanged(StringNumber value)
+    {
+        if(value==null)
+        {
+            value= colorString = "pink lighten-2";
+        }
+        colorString = value;
+        _dataCacheService.ThemeSetting.Theme=value?.ToString();
+        if(_dataCacheService.ThemeSetting.Theme == "white")
+        {
+            _dataCacheService.ThemeSetting.IsDark = true;
+        }
+        else
+        {
+            _dataCacheService.ThemeSetting.IsDark = false;
+        }
+        if (CnGalRootTip != null)
+        {
+            await CnGalRootTip.SaveTheme();
+        }
+
+    }
+}
+

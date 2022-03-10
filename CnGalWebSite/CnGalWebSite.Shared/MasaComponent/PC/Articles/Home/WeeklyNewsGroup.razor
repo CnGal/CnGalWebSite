@@ -5,7 +5,7 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="CnGal每周速报" Icon="fa fa-fw fa-newspaper-o">
     <ButtonContent>
-        <MButton Text Block Color="pink lighten-3" OnClick="OnClickMore">
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
             <MIcon Left>mdi-share-all-outline  </MIcon>
             查看更多
         </MButton>

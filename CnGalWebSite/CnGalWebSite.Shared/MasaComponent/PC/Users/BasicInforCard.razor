@@ -1,4 +1,5 @@
 ﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 <div class=" rounded shadow-sm  bg-opacity p-3 mb-3">
     <div style=" display: flex; justify-content: space-around; ">
@@ -16,7 +17,7 @@
             <div style="color:gray;">收藏总数</div>
         </div>
     </div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <div class="mb-4">
         <div style=" display: flex; justify-content: space-between;">
             @{ int level = ToolHelper.GetUserLevel(Model.BasicInfor.Integral);}
@@ -27,10 +28,10 @@
                 @(level==10?Model.BasicInfor.Integral:(Model.BasicInfor.Integral+" / "+ToolHelper.GetLevelIntegral(level)))
             </span>
         </div>
-        <MProgressLinear Value="@(level==10?100:(100.0*Model.BasicInfor.Integral/ToolHelper.GetLevelIntegral(level)))"  Color="pink lighten-3"></MProgressLinear>
+        <MProgressLinear Value="@(level==10?100:(100.0*Model.BasicInfor.Integral/ToolHelper.GetLevelIntegral(level)))" Color="@_dataCacheService.ThemeSetting.Theme"></MProgressLinear>
     </div>
     <div style="display: flex; justify-content: flex-end; margin-bottom: -40px;">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab  Icon="mdi-pencil " Tooltip="编辑个人资料" OnClick="OnClickEdit" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-pencil " Tooltip="编辑个人资料" OnClick="OnClickEdit" />
     </div>
     <div class="row">
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-star" Text="@("贡献值："+Model.ContributionValue)" Class="col-12" /> <br />
@@ -59,7 +60,7 @@
 
     public Task OnClickEdit()
     {
-        NavigationManager.NavigateTo("/space/editdata/"+Model.Id);
+        NavigationManager.NavigateTo("/space/editdata/" + Model.Id);
         return Task.CompletedTask;
     }
 

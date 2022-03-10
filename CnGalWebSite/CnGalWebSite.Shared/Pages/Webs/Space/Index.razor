@@ -5,6 +5,7 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
+@inject IDataCacheService _dataCacheService
 
 @if (string.IsNullOrWhiteSpace(Model.BasicInfor.Name) == false)
 {
@@ -40,7 +41,7 @@ else
 
                     <div class="rounded  shadow-sm bg-opacity mb-4">
                         <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
-                               Color="pink lighten-3">
+                               Color="@_dataCacheService.ThemeSetting.Theme">
 
                             <MTab Value="1">
                                 首页<MIcon>mdi-home</MIcon>

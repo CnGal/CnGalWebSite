@@ -6,19 +6,19 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="CnGal资料站" Icon="fa fa-fw fa-anchor" Class="h-100">
 
     <div class="w-100">
-        <MButton Text Block Color="pink lighten-3" OnClick="@(()=>OnClick("/about"))">
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/about"))">
             <MIcon Left>fa fa-fw fa-info</MIcon>
             关于我们
         </MButton>
-        <MButton Text Block Color="pink lighten-3" OnClick="@(()=>OnClick("/articles/createarticle"))">
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/articles/createarticle"))">
             <MIcon Left>fa fa-fw fa-sitemap</MIcon>
             组织架构
         </MButton>
-        <MButton Text Block Color="pink lighten-3" OnClick="@(()=>OnClick("/tags/createtag"))">
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/tags/createtag"))">
             <MIcon Left>fa fa-fw fa-legal</MIcon>
             隐私政策
         </MButton>
-        <MButton Text Block Color="pink lighten-3" OnClick="@(()=>OnClick("/data"))">
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/data"))">
             <MIcon Left>fa fa-fw fa-line-chart</MIcon>
             数据汇总
         </MButton>

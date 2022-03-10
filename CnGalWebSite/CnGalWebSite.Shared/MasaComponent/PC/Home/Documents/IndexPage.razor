@@ -48,12 +48,12 @@
 
     public void AddItem(DocumentViewModel model)
     {
-            MainItems.Add(model);
-            foreach (var item in model.Children)
-            {
-                AddItem(item);
-            }
-        
+        MainItems.Add(model);
+        foreach (var item in model.Children)
+        {
+            AddItem(item);
+        }
+
 
     }
 

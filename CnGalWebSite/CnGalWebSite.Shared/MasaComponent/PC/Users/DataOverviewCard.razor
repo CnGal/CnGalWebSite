@@ -1,31 +1,33 @@
-﻿    <div class="row">
-        <div class="col-12 col-lg-6 mb-3">
-            <div style="display: flex; align-items: center;">
-                <i class="h4 m-0 me-2 font-color fa fa-code-fork fa-fw"></i>
-                <div class="w-100">
-                    <span>
-                        @($"编辑总数：{Model.PassedExamineCount} / {Model.TotalExamine}")
-                    </span>
-                    <MProgressLinear Value="@(Model.TotalExamine==0?0:(100.0*Model.PassedExamineCount/Model.TotalExamine))" Color="pink lighten-3" Height="10"></MProgressLinear>
-                </div>
+﻿@inject IDataCacheService _dataCacheService
+
+<div class="row">
+    <div class="col-12 col-lg-6 mb-3">
+        <div style="display: flex; align-items: center;">
+            <i class="h4 m-0 me-2 font-color fa fa-code-fork fa-fw"></i>
+            <div class="w-100">
+                <span>
+                    @($"编辑总数：{Model.PassedExamineCount} / {Model.TotalExamine}")
+                </span>
+                <MProgressLinear Value="@(Model.TotalExamine==0?0:(100.0*Model.PassedExamineCount/Model.TotalExamine))" Color="@_dataCacheService.ThemeSetting.Theme" Height="10"></MProgressLinear>
             </div>
-
         </div>
-        <div class="col-12 col-lg-6 mb-3">
 
-            <div style="display: flex; align-items: center;">
-                <i class="h4  m-0 me-2 font-color fa fa-database fa-fw"></i>
-                <div class="w-100">
-                    <span>
-                        @($"文件空间：{(Model.UsedFilesSpace/(1024*1024.0)).ToString("0.0")}MB / {(Model.TotalFilesSpace / (1024 * 1024.0)).ToString("0.0")}MB")
-                    </span>
-                    <MProgressLinear Value="@(Model.TotalFilesSpace==0?0:(100.0*Model.UsedFilesSpace/Model.TotalFilesSpace))" Color="pink lighten-3" Height="10"></MProgressLinear>
-                </div>
-            </div>
-
-
-        </div>
     </div>
+    <div class="col-12 col-lg-6 mb-3">
+
+        <div style="display: flex; align-items: center;">
+            <i class="h4  m-0 me-2 font-color fa fa-database fa-fw"></i>
+            <div class="w-100">
+                <span>
+                    @($"文件空间：{(Model.UsedFilesSpace/(1024*1024.0)).ToString("0.0")}MB / {(Model.TotalFilesSpace / (1024 * 1024.0)).ToString("0.0")}MB")
+                </span>
+                <MProgressLinear Value="@(Model.TotalFilesSpace==0?0:(100.0*Model.UsedFilesSpace/Model.TotalFilesSpace))" Color="@_dataCacheService.ThemeSetting.Theme" Height="10"></MProgressLinear>
+            </div>
+        </div>
+
+
+    </div>
+</div>
 
 @code {
     [Parameter]

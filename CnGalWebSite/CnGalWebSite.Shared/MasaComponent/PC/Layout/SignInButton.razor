@@ -1,5 +1,6 @@
 ﻿@inject ToastService ToastService
 @inject HttpClient Http
+@inject IDataCacheService _dataCacheService
 
 
 @if (Model.IsSignIn)
@@ -11,7 +12,7 @@
 }
 else
 {
-    <MButton Text Class="w-100" Color="pink lighten-3" OnClick="SignIn" Left="Left">
+    <MButton Text Class="w-100" Color="@_dataCacheService.ThemeSetting.Theme" OnClick="SignIn" Left="Left">
         <MIcon Left>mdi-clipboard-text</MIcon>
         每日签到
     </MButton>

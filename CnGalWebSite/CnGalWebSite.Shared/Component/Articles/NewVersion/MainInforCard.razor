@@ -1,6 +1,6 @@
 ﻿<div>
 
-    @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false&& HiddenImage)
+    @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false && HiddenImage == false)
     {
         <img style="width:100%" src="@Model.MainPicture" alt="@Model.Name">
     }
@@ -8,7 +8,7 @@
         <div style="display: flex; flex-direction: column; align-items: center;">
             <h1 class="fw-bold text-center h3 mb-8">@Model.Name</h1>
             <a href="@("/space/inedex/"+Model.UserInfor.Id)" style=" display: flex; flex-direction: column; align-items: center;" class="a-font-color mb-2">
-                <img src="@Model.UserInfor.PhotoPath" alt="@Model.UserInfor.Name" style="width:50px;border-radius:50%;" class="mb-2"/>
+                <img src="@Model.UserInfor.PhotoPath" alt="@Model.UserInfor.Name" style="width:50px;border-radius:50%;" class="mb-2" />
                 <div class="d-flex" style=" align-items: center;">
                     <span style="font-size: large; font-weight: bold; ">
                         @Model.UserInfor.Name
@@ -35,7 +35,7 @@
                     作者：
                     <strong> @Model.OriginalAuthor</strong>
                     &nbsp; 原文发表在：
-                    <a href="@Model.OriginalLink" class="text--info fw-bold" style="word-break:break-all;" target="_blank">@Model.OriginalLink</a>
+                    <a href="@Model.OriginalLink" class="info--text fw-bold" style="word-break:break-all;" target="_blank">@Model.OriginalLink</a>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
             }
 

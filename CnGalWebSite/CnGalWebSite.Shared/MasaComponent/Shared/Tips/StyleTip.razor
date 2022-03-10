@@ -135,11 +135,16 @@ else
 }
 
 @code {
+    public bool isMasa = true;
+    public bool isOnMouse = false;
+
     public string colorMain = "#f48fb1";
     public string colorHover = "#D979A2";
     public string colorActive = "#CC578C";
     public string colorString = "color3";
 
+    [Parameter]
+    public EventCallback<bool> OnStateChanged { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -151,15 +156,11 @@ else
                 await LoadTheme();
                 //保存本地主题配置 更新数据结构
                 await SaveTheme();
+
             }
             catch
             {
 
-            }
-
-            if (_dataCacheService.ThemeSetting.IsOnMouse)
-            {
-                await InitMouse();
             }
         }
     }
@@ -177,12 +178,26 @@ else
             return;
         }
         _dataCacheService.ThemeSetting = theme;
-        ProcColor();
+        Refresh();
         StateHasChanged();
     }
 
     public void ProcColor()
     {
+        //if(_dataCacheService.ThemeSetting.IsMasa==false)
+        //{
+        //    if(_dataCacheService.ThemeSetting.IsMasa)
+        //    {
+        //        _dataCacheService.ThemeSetting.Theme = "pink lighten-2";
+
+        //    }
+        //    else
+        //    {
+        //        colorString = "color3";
+
+        //    }
+        //}
+
         switch (_dataCacheService.ThemeSetting.Theme)
         {
             case "color1":
@@ -215,16 +230,108 @@ else
                 colorHover = "#7E5B95";
                 colorActive = "#9D72BA";
                 break;
+            case "red":
+                colorMain = "#F44336";
+                colorHover = "#D32F2F";
+                colorActive = "#B71C1C";
+                break;
+            case "pink lighten-2":
+                colorMain = "#F06292";
+                colorHover = "#D81B60";
+                colorActive = "#880E4F";
+                break;
+            case "purple":
+                colorMain = "#9C27B0";
+                colorHover = "#7B1FA2";
+                colorActive = "#4A148C";
+                break;
+            case "deep-purple":
+                colorMain = "#673AB7";
+                colorHover = "#512DA8";
+                colorActive = "#311B92";
+                break;
+            case "indigo":
+                colorMain = "#3F51B5";
+                colorHover = "#303F9F";
+                colorActive = "#1A237E";
+                break;
+            case "blue":
+                colorMain = "#2196F3";
+                colorHover = "#1976D2";
+                colorActive = "#0D47A1";
+                break;
+            case "light-blue":
+                colorMain = "#03A9F4";
+                colorHover = "#039BE5";
+                colorActive = "#01579B";
+                break;
+            case "cyan":
+                colorMain = "#00BCD4";
+                colorHover = "#0097A7";
+                colorActive = "#006064";
+                break;
+            case "teal":
+                colorMain = "#009688";
+                colorHover = "#00796B";
+                colorActive = "#004D40";
+                break;
+            case "green":
+                colorMain = "#4CAF50";
+                colorHover = "#388E3C";
+                colorActive = "#1B5E20";
+                break;
+            case "light-green":
+                colorMain = "#8BC34A";
+                colorHover = "#689F38";
+                colorActive = "#33691E";
+                break;
+            case "lime":
+                colorMain = "#CDDC39";
+                colorHover = "#AFB42B";
+                colorActive = "#827717";
+                break;
+            case "yellow":
+                colorMain = "#FFEB3B";
+                colorHover = "#FBC02D";
+                colorActive = "#F57F17";
+                break;
+            case "amber":
+                colorMain = "#FFC107";
+                colorHover = "#FFA000";
+                colorActive = "#FF6F00";
+                break;
+            case "orange":
+                colorMain = "#FF9800";
+                colorHover = "#F57C00";
+                colorActive = "#E65100";
+                break;
+            case "deep-orange":
+                colorMain = "#FF5722";
+                colorHover = "#E64A19";
+                colorActive = "#BF360C";
+                break;
+            case "brown":
+                colorMain = "#795548";
+                colorHover = "#5D4037";
+                colorActive = "#3E2723";
+                break;
+            case "blue-grey":
+                colorMain = "#607D8B";
+                colorHover = "#455A64";
+                colorActive = "#263238";
+                break;
+            case "grey":
+                colorMain = "#9E9E9E";
+                colorHover = "#616161";
+                colorActive = "#212121";
+                break;
+            case "white":
+                colorMain = "#FFFFFF";
+                colorHover = "#757575";
+                colorActive = "#616161";
+                break;
 
         }
-
-        if (_dataCacheService.ThemeSetting.IsDark)
-        {
-            colorMain = "#1F1F1F";
-            colorHover = "#262626";
-            colorActive = "#1F1F1F";
-        }
-
     }
 
     /// <summary>
@@ -253,11 +360,16 @@ else
     /// </summary>
     public async void Refresh()
     {
-        if (_dataCacheService.ThemeSetting.IsOnMouse)
+        if (_dataCacheService.ThemeSetting.IsOnMouse && isOnMouse != _dataCacheService.ThemeSetting.IsOnMouse)
         {
             await InitMouse();
         }
         ProcColor();
+
+
+        await OnStateChanged.InvokeAsync(isMasa != _dataCacheService.ThemeSetting.IsMasa);
+        isMasa = _dataCacheService.ThemeSetting.IsMasa;
+
         StateHasChanged();
     }
 }

@@ -18,11 +18,11 @@
         <div>
             <div>
                 <MTextField @bind-Value="Model.Email"
-                            Color="pink lighten-3"
+                            Color="@_dataCacheService.ThemeSetting.Theme"
                             Label="电子邮件"></MTextField>
             </div>
             <div>
-                <MTextField Dense Label="用户名" Color="pink lighten-3"
+                <MTextField Dense Label="用户名" Color="@_dataCacheService.ThemeSetting.Theme"
                             @bind-Value="Model.Name"></MTextField>
             </div>
             <div>

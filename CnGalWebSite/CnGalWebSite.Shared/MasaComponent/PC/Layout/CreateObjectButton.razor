@@ -1,7 +1,8 @@
 ﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 
-<MMenu OffsetY  @bind-Value="menu">
+<MMenu OffsetY @bind-Value="menu">
     <ActivatorContent Context="m">
         <MTooltip Bottom>
             <ActivatorContent Context="c">
@@ -10,7 +11,7 @@
                     m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                 }
-                <MButton Icon Color="pink lighten-3" Class="@Class" @attributes="@attrs">
+                <MButton Icon Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs">
                     <MIcon>mdi-plus</MIcon>
                 </MButton>
             </ActivatorContent>
@@ -21,21 +22,21 @@
     </ActivatorContent>
 
     <ChildContent>
-        <div class="bg-white  p-3" style="width:200px;">
+        <div class="bg-opacity p-3" style="width:200px;">
             <div class="w-100">
-                <MButton Text Block Color="pink lighten-3" OnClick="@(()=>OnClick("/entries/establishentry"))">
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/entries/establishentry"))">
                     <MIcon Left>fa fa-fw fa-codepen</MIcon>
                     创建词条
                 </MButton>
-                <MButton Text Block Color="pink lighten-3" OnClick="@(()=>OnClick("/articles/createarticle"))">
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/articles/createarticle"))">
                     <MIcon Left>fa fa-fw fa-newspaper-o</MIcon>
                     发表文章
                 </MButton>
-                <MButton Text Block Color="pink lighten-3" OnClick="@(()=>OnClick("/tags/createtag"))">
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/tags/createtag"))">
                     <MIcon Left>fa fa-fw fa-tags</MIcon>
                     创建标签
                 </MButton>
-                <MButton Text Block Color="pink lighten-3" OnClick="@(()=>OnClick("/peripheries/createperiphery"))">
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/peripheries/createperiphery"))">
                     <MIcon Left>fa fa-fw fa-shopping-basket</MIcon>
                     创建周边
                 </MButton>

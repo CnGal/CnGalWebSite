@@ -2,9 +2,10 @@
 @inject ToastService? ToastService
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(IsThumbsUp?"mdi-thumb-up ":"mdi-thumb-up-outline")" Color="pink lighten-3" Tooltip="@(IsThumbsUp?"已点赞":"点赞")" Class="@Class" OnClick="OnClickStar" />
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(IsThumbsUp?"mdi-thumb-up ":"mdi-thumb-up-outline")" Tooltip="@(IsThumbsUp?"已点赞":"点赞")" Class="@Class" OnClick="OnClickStar" />
 
 
 @code {

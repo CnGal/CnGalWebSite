@@ -18,28 +18,28 @@
         </div>
     </a>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-    <MButton Text Block Color="pink lighten-3" Left OnClick="@(()=>OnClickUrl("/"))">
+    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/"))">
         <MIcon Left>mdi-home</MIcon>
         主页
     </MButton>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <CnGalWebSite.Shared.MasaComponent.PC.Layout.SignInButton Model="_dataCacheService.UserInfor" Left />
-    <MButton Text Block Color="pink lighten-3" Left OnClick="OnClickSpace">
+    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSpace">
         <MIcon Left>mdi-star</MIcon>
         个人空间
     </MButton>
-    <MButton Text Block Color="pink lighten-3" Left OnClick="@(()=>OnClickUrl("/home/messagecenter"))">
+    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/home/messagecenter"))">
         <MIcon Left>mdi-comment-text-multiple  </MIcon>
         消息通知
     </MButton>
-    <MButton Text Block Color="pink lighten-3" Left OnClick="@(()=>OnClickUrl("/home/editlist"))">
+    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/home/editlist"))">
         <MIcon Left>mdi-plus  </MIcon>
         投稿
     </MButton>
 
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
 
-    <MButton Text Block Color="pink lighten-3" Left OnClick="@(()=>OnClickUrl("/home/setting"))">
+    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/home/setting"))">
         <MIcon Left>mdi-cog</MIcon>
         设置
     </MButton>

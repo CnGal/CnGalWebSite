@@ -28,7 +28,17 @@ namespace CnGalWebSite.Shared
             {
                 _dataCacheService.IsApp = true;
             }
+
+            _dataCacheService.RefreshApp = EventCallback.Factory.Create(this, async () => await OnRefresh());
         }
+
+
+        public Task OnRefresh()
+        {
+            StateHasChanged();
+            return Task.CompletedTask;
+        }
+
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {

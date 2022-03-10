@@ -1,8 +1,9 @@
 ﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(Model.Name+" 游戏评测")" Icon="fa fa-fw fa-star">
     <ButtonContent>
-        <MButton Text Block Color="pink lighten-3" OnClick="OnClickMore">
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
             <MIcon Left>mdi-share-all-outline  </MIcon>
             查看详情
         </MButton>
@@ -19,7 +20,7 @@
                                     <EvaluationViewTip Model="item" />
                                 </MCard>
                             </Element>
-                        </ScaleTransition>                      
+                        </ScaleTransition>
                     </MResponsive>
                 </MWindowItem>
             }

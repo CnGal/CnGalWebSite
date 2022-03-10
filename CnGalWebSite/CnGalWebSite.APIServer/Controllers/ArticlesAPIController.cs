@@ -1309,7 +1309,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<List<GameEvaluationsModel>>> GetGameEvaluationsAsync()
         {
             var entries = await _entryRepository.GetAll().Include(s => s.Articles).ThenInclude(s => s.CreateUser).AsNoTracking()
-                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Articles.Count(s => s.Type == ArticleType.Evaluation) > 1)
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Articles.Count(s => s.Type == ArticleType.Evaluation) > 0)
                 .Select(s => new
                 {
                     s.Id,

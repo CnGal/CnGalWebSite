@@ -3,9 +3,9 @@
 
 <ErrorHandler @ref="errorHandler">
     <ErrorLogger ShowToast="false" OnErrorHandleAsync="OnErrorHandleAsync">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip"/>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" OnStateChanged="OnStateChanged"/>
         <ImagesLargeViewTip/>
-        <CascadingValue Value=this>
+        <CascadingValue Value=this IsFixed="true">
             @ChildContent
         </CascadingValue>
     </ErrorLogger>
@@ -32,7 +32,19 @@
 
     public async Task SaveTheme()
     {
-        await styleTip.SaveTheme();
-        styleTip.Refresh();
+        if(styleTip!=null)
+        {
+            await styleTip.SaveTheme();
+            styleTip.Refresh();
+        }
+    }
+
+    public async Task OnStateChanged(bool refreshApp)
+    {
+        if(refreshApp)
+        {
+            await _dataCacheService.RefreshApp.InvokeAsync();
+        }
+        StateHasChanged();
     }
 }

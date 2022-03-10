@@ -1,7 +1,8 @@
 ﻿@inject DialogService DialogService
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab  Icon="mdi-gamepad-square-outline" Color="pink lighten-3" Tooltip="游玩记录" OnClick="OnClickEditGameRecored" Class="@Class"/>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-gamepad-square-outline" Tooltip="游玩记录" OnClick="OnClickEditGameRecored" Class="@Class" />
 
 @code {
     [Parameter]

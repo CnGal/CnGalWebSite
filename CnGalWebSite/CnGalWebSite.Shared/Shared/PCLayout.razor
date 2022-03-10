@@ -1,12 +1,13 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
-<MApp>
-    <MAppBar App Color="white">
+<MApp  Dark="_dataCacheService.ThemeSetting.IsDark" >
+    <MAppBar App  Color="@(_dataCacheService.ThemeSetting.IsDark?null:"white")">
         <div style=" word-break: keep-all;" class="ms-4 me-8">
             <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip />
         </div>
-        <MTabs Color="pink lighten-3">
+        <MTabs Color="@_dataCacheService.ThemeSetting.Theme">
             <MTab OnClick="OnNavHomeClick">首页</MTab>
             <MTab OnClick="OnNavEntryClick">词条</MTab>
             <MTab OnClick="OnNavArticleClick">文章</MTab>
@@ -14,7 +15,17 @@
         </MTabs>
         <MSpacer></MSpacer>
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.SearchButton Class="mr-6"/>
+        <MTooltip Bottom>
+            <ActivatorContent>
+                <MButton Icon Dark Color="@_dataCacheService.ThemeSetting.Theme" Class="mr-6" OnClick="OnNavSearchClick">
+                    <MIcon>mdi-magnify</MIcon>
+                </MButton>
+            </ActivatorContent>
+            <ChildContent>
+                <span>搜索</span>
+            </ChildContent>
+        </MTooltip>
+
         <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
     </MAppBar>
 
@@ -27,7 +38,7 @@
         </MContainer>
     </MMain>
 
-    <MFooter App Padless Absolute Color="white">
+    <MFooter App Padless Absolute Color="@(_dataCacheService.ThemeSetting.IsDark?null:"white")">
         <CnGalWebSite.Shared.MasaComponent.Shared.Tips.MainFooterTip />
     </MFooter>
 </MApp>
@@ -53,6 +64,11 @@
     public Task OnNavSquareClick()
     {
         NavigationManager.NavigateTo("/square");
+        return Task.CompletedTask;
+    }
+    public Task OnNavSearchClick()
+    {
+        NavigationManager.NavigateTo("/home/search");
         return Task.CompletedTask;
     }
 }

@@ -8,12 +8,7 @@
 @inject IDataCacheService _dataCacheService
 @inject IServiceProvider Provider
 
-
-<StyleTip ColorString="@_dataCacheService.ThemeSetting.Theme" IsDark="_dataCacheService.ThemeSetting.IsDark" @ref="styleTip" IsOnMouse="_dataCacheService.ThemeSetting.IsOnMouse" IsOnBgImage="_dataCacheService.ThemeSetting.IsOnBgImage"></StyleTip>
-
-<link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/pc.min.css">
-
-<ImagesLargeViewTip></ImagesLargeViewTip>
+<MApp  Dark="_dataCacheService.ThemeSetting.IsDark" >
 
 <Layout SideWidth="0" IsPage="true" ShowGotoTop="false" ShowCollapseBar="true"
         IsFullSide="@_dataCacheService.ThemeSetting.IsFullSide" IsFixedHeader="@_dataCacheService.ThemeSetting.IsFixedHeader" IsFixedFooter="@_dataCacheService.ThemeSetting.IsFixedFooter" ShowFooter="@_dataCacheService.ThemeSetting.ShowFooter"
@@ -136,9 +131,9 @@
     </Footer>
 </Layout>
 
-<Drawer Placement="Placement.Right" @bind-IsOpen="@_dataCacheService.ThemeSetting.IsOpen" IsBackdrop="true" OnClickBackdrop="@(async () => {await _dataCacheService.SavaTheme.InvokeAsync(); })">
+<Drawer Placement="Placement.Right" @bind-IsOpen="@_dataCacheService.ThemeSetting.IsOpen" IsBackdrop="true" OnClickBackdrop="@(async () => {if (CnGalRootTip != null) { await CnGalRootTip.SaveTheme(); } })">
     <div class="layout-drawer-body">
-        <div class="btn btn-info-1 w-100" @onclick="@(async e => { _dataCacheService.ThemeSetting.IsOpen = false;await _dataCacheService.SavaTheme.InvokeAsync(); })">点击关闭</div>
+        <div class="btn btn-info-1 w-100" @onclick="@(async e => { _dataCacheService.ThemeSetting.IsOpen = false;if (CnGalRootTip != null) { await CnGalRootTip.SaveTheme(); } })">点击关闭</div>
         <div class="page-layout-demo-option">
             <p>布局调整</p>
             <div class="row">
@@ -259,6 +254,14 @@
                     <span>@(_dataCacheService.ThemeSetting.IsOnBgImage ? "背景图" : "背景图")</span>
                 </div>
             </div>
+            <div class="row mt-3">
+                <div class="col-6 d-flex align-items-center">
+                    <Switch @bind-Value="@_dataCacheService.ThemeSetting.IsMasa" OnColor="@Color.Success" OffColor="@Color.Secondary"></Switch>
+                </div>
+                <div class="col-6 text-right">
+                    <span>@(_dataCacheService.ThemeSetting.IsMasa ? "新版" : "旧版")</span>
+                </div>
+            </div>
         </div>
         <AuthorizeView>
             <Authorized>
@@ -270,3 +273,5 @@
 
     </div>
 </Drawer>
+
+</MApp>

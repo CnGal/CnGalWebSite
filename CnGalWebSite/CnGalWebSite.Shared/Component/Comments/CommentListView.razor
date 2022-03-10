@@ -1,4 +1,7 @@
-﻿<div class="mb-3">
+﻿@inject IDataCacheService _dataCacheService
+
+
+<div class="mb-3">
     @if (Comments.TotalCount == 0)
     {
         if (IsShowNotFound)
@@ -16,7 +19,7 @@
         }
         @if (Comments.TotalPages > 1)
         {
-            <MPagination Value="Comments.CurrentPage" Class="my-4" Length="Comments.TotalPages" ValueChanged="OnPage" Color="pink lighten-3" TotalVisible="7"></MPagination>
+            <MPagination Value="Comments.CurrentPage" Class="my-4" Length="Comments.TotalPages" ValueChanged="OnPage" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
         }
     }
 
@@ -26,7 +29,8 @@
 
 @code {
     [Parameter]
-    public PagedResultDto<CommentViewModel> Comments {
+    public PagedResultDto<CommentViewModel> Comments
+    {
         get;
         set;
     }
@@ -93,7 +97,7 @@
     {
         await RelyCallBack.InvokeAsync();
     }
-    public async Task OnDelete ()
+    public async Task OnDelete()
     {
         await RelyCallBack.InvokeAsync();
     }
@@ -101,7 +105,7 @@
     private long PlusId()
     {
         long result = 0;
-        foreach(var item in Comments.Data)
+        foreach (var item in Comments.Data)
         {
             result += PlusCommentId(item);
         }
@@ -115,7 +119,7 @@
         long sum = 0;
         sum += index.Id;
 
-        foreach(var item in index.InverseParentCodeNavigation)
+        foreach (var item in index.InverseParentCodeNavigation)
         {
             sum += PlusCommentId(item);
         }

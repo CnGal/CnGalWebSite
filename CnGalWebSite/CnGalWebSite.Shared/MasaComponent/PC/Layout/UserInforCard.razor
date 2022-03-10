@@ -1,6 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
-<div class="bg-white d-flex p-3" style="flex-direction: column; align-items: center; ">
+<div class="bg-opacity d-flex p-3" style="flex-direction: column; align-items: center; ">
     <div class="d-flex" style="align-items: center; flex-direction: column; ">
         <img src="@Model.PhotoPath" alt="@Model.Name" style="width:60px;border-radius:50%;" />
         <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
@@ -16,19 +17,19 @@
     <MDivider Class="w-100"></MDivider>
     <div class="w-100">
         <SignInButton Model="Model" />
-        <MButton Text Block Color="pink lighten-3" OnClick="OnClickUserSpace">
+        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickUserSpace">
             <MIcon Left>mdi-star</MIcon>
             个人空间
         </MButton>
-        <MButton Text Block Color="pink lighten-3" OnClick="OnClickMessage">
+        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickMessage">
             <MIcon Left>mdi-comment-text-multiple  </MIcon>
             消息通知
         </MButton>
-        <MButton Text Block Color="pink lighten-3">
+        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" StopPropagation OnClick="OnClickSetting">
             <MIcon Left>mdi-cog</MIcon>
             主题设置
         </MButton>
-        <MButton Text Block Color="pink lighten-3" OnClick="OnClickLogout">
+        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickLogout">
             <MIcon Left>mdi-logout</MIcon>
             退出登入
         </MButton>
@@ -42,6 +43,8 @@
     public UserInforViewModel Model { get; set; } = new UserInforViewModel();
     [Parameter]
     public EventCallback OnClosed { get; set; }
+    [Parameter]
+    public EventCallback OnClickSetting { get; set; }
 
     private async Task OnClickUserSpace()
     {

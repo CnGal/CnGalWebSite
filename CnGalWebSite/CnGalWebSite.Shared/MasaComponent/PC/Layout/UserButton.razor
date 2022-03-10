@@ -1,5 +1,4 @@
 ﻿@inject NavigationManager NavigationManager
-@inject IServiceProvider Provider
 @inject HttpClient Http
 @inject IDataCacheService _dataCacheService
 @inject ToastService ToastService
@@ -15,7 +14,7 @@
                         m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                         c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     }
-                    <MButton Icon Color="pink lighten-3" Class="@Class" @attributes="@attrs">
+                    <MButton Icon Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs">
                         <img style="width:35px;border-radius:50%;" src="@_dataCacheService.UserInfor.PhotoPath" alt="@_dataCacheService.UserInfor.Name" />
                     </MButton>
                 </ActivatorContent>
@@ -27,7 +26,7 @@
 
         <ChildContent>
           <div style="width:300px;">
-              <UserInforCard Model="@_dataCacheService.UserInfor" OnClosed="OnClosed"/>
+              <UserInforCard Model="@_dataCacheService.UserInfor" OnClosed="OnClosed" OnClickSetting="OnClickSetting"/>
           </div>
         </ChildContent>
     </MMenu>
@@ -36,6 +35,8 @@
 
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public EventCallback OnClickSetting { get; set; }
 
     private bool menu { get; set; }
 
