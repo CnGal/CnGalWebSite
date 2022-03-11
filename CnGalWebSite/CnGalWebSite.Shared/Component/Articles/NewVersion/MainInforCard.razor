@@ -13,10 +13,14 @@
                     <span style="font-size: large; font-weight: bold; ">
                         @Model.UserInfor.Name
                     </span>
-                    @foreach (var item in Model.UserInfor.Ranks)
+                    @if (Model.UserInfor.Ranks != null)
                     {
-                        <RankAloneViewTip Model="item" Class="ms-2"></RankAloneViewTip>
+                        @foreach (var item in Model.UserInfor.Ranks)
+                        {
+                            <RankAloneViewTip Model="item" Class="ms-2"></RankAloneViewTip>
+                        }
                     }
+
                 </div>
             </a>
             <div style="color:gray;">
@@ -60,6 +64,7 @@
     public ArticleViewModel Model { get; set; } = new ArticleViewModel();
     [Parameter]
     public bool HiddenImage { get; set; }
+
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
 

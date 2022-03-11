@@ -315,5 +315,5 @@ input.te-image-file-input {
     border-color: var(--hover-color);
 }
 .layout-drawer:hover {
-    background-color: var(--active-color);
+    background-color: var(--hover-color);
 }

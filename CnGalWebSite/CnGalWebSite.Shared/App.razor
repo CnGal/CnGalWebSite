@@ -6,9 +6,34 @@
 
 <BootstrapBlazorRoot>
     <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
-        @if (_dataCacheService.ThemeSetting.IsMasa)
+
+        @if (_dataCacheService.IsApp)
         {
-            @if (_dataCacheService.IsApp == false)
+            <CascadingAuthenticationState>
+                <Router AppAssembly="@typeof(AppLayout).Assembly" PreferExactMatches="@true">
+                    <Found Context="routeData">
+                        <AuthorizeRouteView RouteData="@routeData"
+                                            DefaultLayout="@typeof(AppLayout)">
+                            <NotAuthorized>
+                                <NotAuthorizedTipView IsNeedLayput="true"></NotAuthorizedTipView>
+                            </NotAuthorized>
+                            <Authorizing>
+                                <RouteView RouteData="@routeData" DefaultLayout="@typeof(AppLayout)" />
+                            </Authorizing>
+                        </AuthorizeRouteView>
+                    </Found>
+                    <NotFound>
+                        <LayoutView Layout="@typeof(AppLayout)">
+                            <NotFoundError></NotFoundError>
+                        </LayoutView>
+                    </NotFound>
+                </Router>
+            </CascadingAuthenticationState>
+        }
+        else
+        {
+
+            @if (_dataCacheService.ThemeSetting.IsMasa)
             {
                 <CascadingAuthenticationState>
                     <Router AppAssembly="@typeof(PCLayout).Assembly" PreferExactMatches="@true">
@@ -32,33 +57,7 @@
 
                 </CascadingAuthenticationState>
             }
-            else if (_dataCacheService.IsApp == true)
-            {
-                <CascadingAuthenticationState>
-                    <Router AppAssembly="@typeof(AppLayout).Assembly" PreferExactMatches="@true">
-                        <Found Context="routeData">
-                            <AuthorizeRouteView RouteData="@routeData"
-                                                DefaultLayout="@typeof(AppLayout)">
-                                <NotAuthorized>
-                                    <NotAuthorizedTipView IsNeedLayput="true"></NotAuthorizedTipView>
-                                </NotAuthorized>
-                                <Authorizing>
-                                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(AppLayout)" />
-                                </Authorizing>
-                            </AuthorizeRouteView>
-                        </Found>
-                        <NotFound>
-                            <LayoutView Layout="@typeof(AppLayout)">
-                                <NotFoundError></NotFoundError>
-                            </LayoutView>
-                        </NotFound>
-                    </Router>
-                </CascadingAuthenticationState>
-            }
-        }
-        else
-        {
-            @if (_dataCacheService.IsApp == false)
+            else
             {
                 <CascadingAuthenticationState>
                     <Router AppAssembly="@typeof(MainLayout).Assembly" PreferExactMatches="@true">
@@ -82,32 +81,7 @@
 
                 </CascadingAuthenticationState>
             }
-            else if (_dataCacheService.IsApp == true)
-            {
-                <CascadingAuthenticationState>
-                    <Router AppAssembly="@typeof(AppLayout).Assembly" PreferExactMatches="@true">
-                        <Found Context="routeData">
-                            <AuthorizeRouteView RouteData="@routeData"
-                                                DefaultLayout="@typeof(AppLayout)">
-                                <NotAuthorized>
-                                    <NotAuthorizedTipView IsNeedLayput="true"></NotAuthorizedTipView>
-                                </NotAuthorized>
-                                <Authorizing>
-                                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(AppLayout)" />
-                                </Authorizing>
-                            </AuthorizeRouteView>
-                        </Found>
-                        <NotFound>
-                            <LayoutView Layout="@typeof(AppLayout)">
-                                <NotFoundError></NotFoundError>
-                            </LayoutView>
-                        </NotFound>
-                    </Router>
-                </CascadingAuthenticationState>
-            }
         }
-
-
     </CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
 </BootstrapBlazorRoot>
 

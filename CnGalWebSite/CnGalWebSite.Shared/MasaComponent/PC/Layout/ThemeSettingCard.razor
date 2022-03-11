@@ -15,7 +15,7 @@
         </MCardText>
 
         <MCardText>
-            <MButtonGroup Borderless Value="colorString" ValueChanged="ValueChanged" Style="display: flex; flex-wrap: wrap; border-radius: 0; ">
+            <MButtonGroup Borderless Value="colorString" ValueChanged="ColorValueChanged" Style="display: flex; flex-wrap: wrap; border-radius: 0; ">
                 <MButton Value="@("red")" Color="red" Small Style="min-width: 28px;" />
                 <MButton Value="@("pink lighten-2")" Color="pink lighten-2" Small Style="min-width: 28px;" />
                 <MButton Value="@("purple")" Color="purple" Small Style="min-width: 28px;" />
@@ -38,12 +38,25 @@
                 <MButton Value="@("white")" Color="black" Small Style="min-width: 28px;" />
             </MButtonGroup>
         </MCardText>
+        <MCardTitle Class="text-h6">
+            背景图
+        </MCardTitle>
+        <MCardText>
+            显示背景图会将卡片设置为半透明状态，目前建议使用明亮的图片作为背景
+        </MCardText>
+        <MCardText Class="pb-0">
+            <MSwitch Value="_show" ValueChanged="BackgroundValueChanged" Label="@(_show?"显示背景图":"隐藏背景图")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
+        </MCardText>
         <MCardActions>
-            <MButton Color="green darken-1"
-                     Text
-                     OnClick="ReturnOldLayout">
-                回到旧版布局
-            </MButton>
+            @if (_dataCacheService.IsApp == false)
+            {
+                <MButton Color="green darken-1"
+                         Text
+                         OnClick="ReturnOldLayout">
+                    回到旧版布局
+                </MButton>
+            }
+
             <MSpacer></MSpacer>
             <MButton Color="green darken-1"
                      Text
@@ -57,6 +70,7 @@
 @code {
 
     StringNumber colorString = "pink lighten-2";
+    bool _show = false;
     bool Dialog { get; set; }
 
     [CascadingParameter]
@@ -64,7 +78,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if(string.IsNullOrWhiteSpace( _dataCacheService.ThemeSetting.Theme))
+        _show = _dataCacheService.ThemeSetting.IsOnBgImage;
+
+        if (string.IsNullOrWhiteSpace(_dataCacheService.ThemeSetting.Theme))
         {
             _dataCacheService.ThemeSetting.Theme = colorString.ToString();
             _dataCacheService.ThemeSetting.IsDark = false;
@@ -74,11 +90,7 @@
             }
             return;
         }
-
-        if (_dataCacheService.ThemeSetting.Theme.Contains("color") == false)
-        {
-            colorString = _dataCacheService.ThemeSetting.Theme;
-        }
+        colorString = _dataCacheService.ThemeSetting.Theme;
 
     }
     public Task Refresh(bool dialog)
@@ -97,7 +109,7 @@
         }
     }
 
-    public async Task ValueChanged(StringNumber value)
+    public async Task ColorValueChanged(StringNumber value)
     {
         if(value==null)
         {
@@ -118,6 +130,17 @@
             await CnGalRootTip.SaveTheme();
         }
 
+    }
+
+    public async Task BackgroundValueChanged(bool show)
+    {
+        _show = show;
+        _dataCacheService.ThemeSetting.IsOnBgImage = show;
+
+        if (CnGalRootTip != null)
+        {
+            await CnGalRootTip.SaveTheme();
+        }
     }
 }
 

@@ -1,10 +1,10 @@
 ﻿<div>
     <div class=" mb-3 ">
-        <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="Model" IsSmallScreen="true" />
+        <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="Model" HiddenButton ForceSmall/>
     </div>
     @if (Model.SteamId > 0)
     {
-        <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard IsNormalScreen="true" Model="Model" />
+        <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="Model" />
     }
     @if (Model.Information.Count > 0)
     {
@@ -21,28 +21,23 @@
     }
     @if (Model.Staffs.Count > 0)
     {
-        <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="Model" IsLargeScreen="false" />
+        <div class="mb-3">
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.StaffInforCard Model="Model" />
+
+        </div>
     }
 
     @if (string.IsNullOrWhiteSpace(Model.MainPage) == false)
     {
         <div class="mb-3">
-            <TitleCollapseCard Icon="fa-home" Title="主页">
-                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity mt-3">
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="Model" IsLargeScreen="false" />
-                </div>
-            </TitleCollapseCard>
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="Model" />
         </div>
 
     }
     @if (Model.Pictures.Count > 0)
     {
         <div class="mb-3">
-            <TitleCollapseCard Icon="fa-picture-o" Title="相册">
-                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity mt-3">
-                    <EntryImageListViewTip Model="Model.Pictures"></EntryImageListViewTip>
-                </div>
-            </TitleCollapseCard>
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.ImagesCard Model="Model" />
         </div>
 
 
@@ -51,11 +46,7 @@
     @if (Model.NewsOfEntry.Count > 0)
     {
         <div class="mb-3">
-            <TitleCollapseCard Icon="fa-newspaper-o" Title="动态">
-                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity mt-3">
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.NewsTimelineCard Model="Model" IsSmallScreen="true" />
-                </div>
-            </TitleCollapseCard>
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.NewsTimelineCard Model="Model" />
         </div>
 
     }

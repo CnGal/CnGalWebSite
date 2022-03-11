@@ -115,12 +115,12 @@ a {
 }
 .comment-reply-color:hover {
     border-color: var(--main-color);
-    color:  var(--main-color);
+    color:  var(--main-color)!important;
     background-color: transparent;
 }
 .comment-reply-color {
     border-color:  var(--main-color);
-    color: white;
+    color: white!important;
     background-color:  var(--main-color);
 }
 .btn-check:active + .btn-outline-dark, .btn-check:checked + .btn-outline-dark, .btn-outline-dark.active, .btn-outline-dark.dropdown-toggle.show, .btn-outline-dark:active {
@@ -284,12 +284,16 @@ a {
     .bg-main {
     background-color: var(--main-color);
 }
+
+/*修正Masa样式对Bootsharp的影响*/
+
 .page-item.active .page-link {
     background-color: var(--main-color);
     border-color: var(--main-color);
 }
 .page-link:hover {
     color:white!important;
+    border-color: var(--main-color);
     background-color: var(--main-color);
 }
 .dropdown-item.active, .dropdown-item:active {

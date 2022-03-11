@@ -36,9 +36,6 @@ namespace CnGalWebSite.Shared.Shared
         [CascadingParameter]
         private CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip CnGalRootTip { get; set; }
 
-        [NotNull]
-        private StyleTip styleTip { get; set; }
-
         private string image = null;
         private string userId = null;
         private string userName = null;

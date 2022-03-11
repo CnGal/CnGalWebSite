@@ -6,7 +6,7 @@
     <div class="row">
         @foreach (var item in Model.ChildrenEntries)
         {
-            <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3">
+            <div class="@(ForceSmall?"col-12 col-md-6 mb-3":"col-12 col-md-6 col-lg-4 col-xxl-3 mb-3")">
                 <TagChildEntryInforTip Model="item" />
             </div>
         }
@@ -19,5 +19,8 @@
     public TagIndexViewModel Model { get; set; } = new TagIndexViewModel();
     [Parameter]
     public EventCallback<Operation> OnClickRevoke { get; set; }
+    [Parameter]
+    public bool ForceSmall { get; set; }
+
 
 }

@@ -7,7 +7,12 @@
         {
             @if (SteamInfor.PriceNow > 0)
             {
-                <BasicInforAloneTip Icon="fa-money" Text="@("当前价格：" + SteamInfor.PriceNowString + (SteamInfor.CutNow == 0 ? "" : " - 折扣 " + SteamInfor.CutNow + "%"))" Class="col-12" />
+                <span class="col-12">
+                    <i class="fa fa-fw font-color fa-money"></i>&nbsp; &nbsp;
+                    <span>当前价格：¥ </span>
+                    <s>@((SteamInfor.OriginalPrice/100.0).ToString("0.00"))</s>
+                    <span> @(" "+SteamInfor.PriceNowString + (SteamInfor.CutNow == 0 ? "" : " - 折扣 " + SteamInfor.CutNow + "%"))</span>
+                </span>
                 @if (SteamInfor.CutLowest > 0)
                 {
                     <BasicInforAloneTip Icon="fa-area-chart" Text="@("历史最低：" + SteamInfor.PriceLowestString + (SteamInfor.CutLowest == 0 ? "" : " - 折扣 " + SteamInfor.CutLowest + "%"))" Class="col-12" />

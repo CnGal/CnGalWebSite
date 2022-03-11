@@ -47,3 +47,9 @@ body {
 .bg-opacity {
     background-color: rgba(255, 255, 255, 0.7);
 }
+.theme--light.m-application {
+    background-color:transparent;
+}
+.m-main__wrap {
+    background-color: transparent;
+}

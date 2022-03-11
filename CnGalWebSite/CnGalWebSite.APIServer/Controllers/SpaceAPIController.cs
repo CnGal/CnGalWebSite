@@ -278,31 +278,20 @@ namespace CnGalWebSite.APIServer.Controllers
             return await _examineService.GetPaginatedResult(input, 0, input.UserId);
         }
 
-        [HttpGet("{currentPage}/{MaxResultCount}")]
-        public async Task<ActionResult<PagedResultDto<Message>>> GetUserMessageAsync(int currentPage, int MaxResultCount)
+        [HttpGet]
+        public async Task<ActionResult<List<Message>>> GetUserMessagesAsync()
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            var input = new GetMessageInput
-            {
-                CurrentPage = currentPage,
-                MaxResultCount = MaxResultCount,
-                ScreeningConditions = "全部"
-            };
-            var dtos = await _messageService.GetPaginatedResult(input, user.Id);
+            var messages= await _messageRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == user.Id).AsNoTracking().ToListAsync();
 
-            //需要清除环回引用
-            foreach (var item in dtos.Data)
+            foreach(var item in messages)
             {
-                if (item.ApplicationUser != null)
-                {
-                    item.ApplicationUser = null;
-                }
-                //获取图片链接
-                item.Image = _appHelper.GetImagePath(item.Image, "user.png");
+                item.Image = _appHelper.GetImagePath(item.Image,"user.png");
             }
-            return dtos;
+
+            return messages;
         }
 
         [HttpGet("{currentPage}/{MaxResultCount}/{IsVisual}")]

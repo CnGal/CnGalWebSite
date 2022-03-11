@@ -1,0 +1,45 @@
+﻿@if (Show)
+{
+    <div id="web_bg" style="@($"background-image: url({BigImage})")" class=" d-none d-sm-block"></div>
+    <div id="web_bg" style="@($"background-image: url({SmallImage})")" class=" d-none bg-d-lg-block"></div>
+}
+@code {
+    string BigImage = "";
+    string SmallImage = "";
+
+    [Parameter]
+    public bool Show { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        string mimage = null;
+        string simage = null;
+        if(authenticationStateTask!=null)
+        {
+            var user = await authenticationStateTask;
+            if(user.User.Identity.IsAuthenticated)
+            {
+                foreach (var item in user.User.Claims)
+                {
+                    if (item.Type == "mbgimage")
+                    {
+                        mimage = item.Value;
+                    }
+                    else if (item.Type == "sbgimage")
+                    {
+                        simage = item.Value;
+                    }
+                }
+
+            }
+        }
+        BigImage = mimage ?? "https://app.cngal.org/_content/CnGalWebSite.Shared/images/oppsitebackground.png";
+        SmallImage = simage ?? "https://app.cngal.org/_content/CnGalWebSite.Shared/images/CnGal5thMin.png";
+
+        StateHasChanged();
+    }
+}

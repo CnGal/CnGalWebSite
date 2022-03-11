@@ -1,14 +1,21 @@
 ﻿@inherits LayoutComponentBase
 @inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
 
-<MApp>
-    <MAppBar App Color="@_dataCacheService.ThemeSetting.Theme" Dark Dense>
+@if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip Show />
+}
+<MApp Dark="_dataCacheService.ThemeSetting.IsDark">
+    <MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:_dataCacheService.ThemeSetting.Theme)" Dark Dense>
         <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
 
         <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard @ref="homeTitleCard" />
         <MSpacer></MSpacer>
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.SearchButton Dark />
+        <MButton Icon OnClick="OnClickSearch">
+            <MIcon>mdi-magnify</MIcon>
+        </MButton>
     </MAppBar>
     <CnGalWebSite.Shared.MasaComponent.App.Layout.NavButton Drawer="drawer" @ref="navButton" />
 
@@ -34,6 +41,11 @@
         {
             await homeTitleCard.ChangeTitle(title);
         }
+    }
+    public Task OnClickSearch()
+    {
+        NavigationManager.NavigateTo("/home/search/全部");
+        return Task.CompletedTask;
     }
 
     public async Task SetDrawer()

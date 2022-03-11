@@ -6,7 +6,7 @@ namespace CnGalWebSite.Shared.Service
     {
         void Init(string baseUrl, bool useNewtonsoft = false);
 
-        Task<TModel> GetCatche(string apiUrl, bool noRefresh = false);
+        Task<TModel> GetCatche(string apiUrl, bool noRefresh = true);
 
         void Clean(string apiUrl);
 

@@ -2,26 +2,7 @@
 <div>
     <TitleCollapseCard Icon="fa-codepen" Title="关联词条">
         <div class="mt-3">
-            @if (IsEdit == true)
-            {
-                <div>
-                    @switch (RelatedEntriesState)
-                    {
-                        case EditState.locked:
-                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                            break;
-                        case EditState.Normal:
-                            <AlertTip Title="编辑关联词条信息" Type="@(Entries.Count==0?AlertTip.AlertTipType.Blank: AlertTip.AlertTipType.Editable)" Url="@("/peripheries/EditRelatedEntries/" + Id)"></AlertTip>
-                            break;
-                    }
-                </div>
-            }
-            @if (RelatedEntriesState == EditState.Preview)
-            {
-                <div>
-                    <AlertTip Title="编辑关联词条信息" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditRelatedEntries/" + Id)" ExamineType="Operation.EditPeripheryRelatedEntries" OnClickRevoke="OnClickRevoke"></AlertTip>
-                </div>
-            }
+
 
             <div>
                 @foreach (var item in Entries)
@@ -41,26 +22,7 @@
 <div class="mt-3">
     <TitleCollapseCard Icon="fa-shopping-basket" Title="关联周边">
         <div class="mt-3">
-            @if (IsEdit == true)
-            {
-                <div>
-                    @switch (RelatedPeripheriesState)
-                    {
-                        case EditState.locked:
-                            <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                            break;
-                        case EditState.Normal:
-                            <AlertTip Title="编辑关联周边信息" Type="@(Peripheries.Count==0?AlertTip.AlertTipType.Blank: AlertTip.AlertTipType.Editable)" Url="@("/peripheries/EditRelatedPeripheries/" + Id)"></AlertTip>
-                            break;
-                    }
-                </div>
-            }
-            @if (RelatedPeripheriesState == EditState.Preview)
-            {
-                <div>
-                    <AlertTip Title="编辑关联周边信息" Type="AlertTip.AlertTipType.preview" Url="@("/peripheries/EditRelatedPeripheries/" + Id)" ExamineType="Operation.EditPeripheryRelatedEntries" OnClickRevoke="OnClickRevoke"></AlertTip>
-                </div>
-            }
+
             @if (Type != PeripheryType.Set)
             {
                 @foreach (var item in Peripheries)

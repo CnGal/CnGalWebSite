@@ -27,10 +27,14 @@
                     @Model.BriefIntroduction
                 </span>
             </div>
+            @if (HiddenButton == false)
+            {
+                <div class="mt-2" style="display: flex; justify-content: flex-end;">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Tag" Id="Model.Id" @bind-IsHidden="Model.IsHidden" />
+                </div>
 
-            <div class="mt-2" style="display: flex; justify-content: flex-end;">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Tag" Id="Model.Id" @bind-IsHidden="Model.IsHidden" />
-            </div>
+
+            }
         </div>
     </div>
 
@@ -39,6 +43,8 @@
 @code {
     [Parameter]
     public TagIndexViewModel Model { get; set; }
+    [Parameter]
+    public bool HiddenButton { get; set; }
 
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }

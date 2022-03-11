@@ -2,8 +2,13 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<MApp  Dark="_dataCacheService.ThemeSetting.IsDark" >
-    <MAppBar App  Color="@(_dataCacheService.ThemeSetting.IsDark?null:"white")">
+
+@if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip Show />
+}
+<MApp Dark="_dataCacheService.ThemeSetting.IsDark">
+    <MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:"white")">
         <div style=" word-break: keep-all;" class="ms-4 me-8">
             <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip />
         </div>
@@ -68,7 +73,7 @@
     }
     public Task OnNavSearchClick()
     {
-        NavigationManager.NavigateTo("/home/search");
+        NavigationManager.NavigateTo("/home/search/全部");
         return Task.CompletedTask;
     }
 }

@@ -231,13 +231,19 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Where(s => s.Type == ArticleType.Notice && s.Name.Contains("更新"))
                 .Select(s => new DocumentViewModel { Id = s.Id, Title = s.DisplayName.Replace("网站","") })
                 .ToListAsync();
-            model.Add(new DocumentViewModel
+            var tempDocument = new DocumentViewModel
             {
                 Icon = "mdi-cloud-upload-outline ",
                 Id = 99998,
                 Title = "更新日志",
                 Children = articles.OrderByDescending(s => s.Id).ToList()
+            };
+            tempDocument.Children.Insert(0, new DocumentViewModel
+            {
+                Title = "概览",
+                Id = 300,
             });
+            model.Add(tempDocument);
 
 
             //公告

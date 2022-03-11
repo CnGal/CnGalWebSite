@@ -9,7 +9,7 @@
            Dense>
         <AuthorizeView>
             <Authorized>
-                <UserButton OnClosed="OnClose" />
+                <UserButton OnClosed="OnClose"  OnClickSetting="OnOpenSetting"/>
             </Authorized>
             <NotAuthorized>
                 <LoginButton />
@@ -19,18 +19,28 @@
                     主页
                 </MButton>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/home/setting"))">
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnOpenSetting">
                     <MIcon Left>mdi-cog</MIcon>
-                    设置
+                    主题设置
+                </MButton>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/about"))">
+                    <MIcon Left>mdi-information-outline</MIcon>
+                    关于我们
                 </MButton>
             </NotAuthorized>
         </AuthorizeView>
     </MList>
 </MNavigationDrawer>
-
+@if (isOpen)
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Layout.ThemeSettingCard @ref="themeSettingCard" />
+}
 @code {
     [Parameter]
     public bool Drawer { get; set; }
+
+    CnGalWebSite.Shared.MasaComponent.PC.Layout.ThemeSettingCard themeSettingCard;
+    bool isOpen;
 
     public Task SetDrawer(bool drawer)
     {
@@ -52,5 +62,17 @@
         Drawer = false;
         StateHasChanged();
         return Task.CompletedTask;
+    }
+
+    public async Task OnOpenSetting()
+    {
+        isOpen = true;
+        StateHasChanged();
+        await OnClose();
+
+        if (themeSettingCard != null)
+        {
+            await themeSettingCard.Refresh(true);
+        }
     }
 }

@@ -683,10 +683,51 @@ input.form-control{
 .markdown-body {
     background-color: transparent; 
 }
-.layout-header-bar {
+
+.layout.is-page.color1 .layout-side .layout-banner {
+    background-color:#262626;
+}
+.layout.is-page.color1 .layout-header-bar {
     background-color: #262626;
     border-color: #262626;
 }
-.layout.is-page .layout-side .layout-banner {
+
+.layout.is-page.color2 .layout-side .layout-banner {
     background-color:#262626;
+}
+.layout.is-page.color2 .layout-header-bar {
+    background-color: #262626;
+    border-color: #262626;
+}
+
+.layout.is-page.color3 .layout-side .layout-banner {
+    background-color:#262626;
+}
+.layout.is-page.color3 .layout-header-bar {
+    background-color: #262626;
+    border-color: #262626;
+}
+
+.layout.is-page.color4 .layout-side .layout-banner {
+    background-color:#262626;
+}
+.layout.is-page.color4 .layout-header-bar {
+    background-color: #262626;
+    border-color: #262626;
+}
+
+.layout.is-page.color5 .layout-side .layout-banner {
+    background-color:#262626;
+}
+.layout.is-page.color5 .layout-header-bar {
+    background-color: #262626;
+    border-color: #262626;
+}
+
+.layout.is-page.color6 .layout-side .layout-banner {
+    background-color:#262626;
+}
+.layout.is-page.color6 .layout-header-bar {
+    background-color: #262626;
+    border-color: #262626;
 }

@@ -1,0 +1,19 @@
+﻿@if (Model.Type == MessageType.ExaminePassed)
+{
+    <ExaminedMessageTip Model="Model" ></ExaminedMessageTip>
+}
+else if (Model.Type == MessageType.ExamineUnPassed)
+{
+    <ExaminedMessageTip Model="Model"></ExaminedMessageTip>
+}
+else if (Model.Type == MessageType.ArticleReply || Model.Type == MessageType.CommentReply || Model.Type == MessageType.SpaceReply)
+{
+    <CommentRpelyMessageTip CommentId="string.IsNullOrWhiteSpace(Model.AdditionalInfor)?0:long.Parse(Model.AdditionalInfor)" Model="Model"></CommentRpelyMessageTip>
+
+}
+
+@code {
+    [Parameter]
+    public CnGalWebSite.DataModel.Model.Message Model { get; set; }
+
+}

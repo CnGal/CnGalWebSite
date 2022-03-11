@@ -4,7 +4,7 @@
     {
         public bool UseTabSet { get; set; }
 
-        public string Theme { get; set; } = "pink";
+        public string Theme { get; set; } = "pink lighten-2";
 
         public bool IsOpen { get; set; }
 
