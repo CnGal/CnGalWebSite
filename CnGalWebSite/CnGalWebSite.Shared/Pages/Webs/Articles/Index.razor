@@ -59,10 +59,6 @@ else
                 当前文章处于隐藏状态，如果你看到了这个提示，请立即联系管理员
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
-        @if (Model.DisambigId != 0)
-        {
-            <AlertTip Title="@Model.DisambigName" Type="AlertTip.AlertTipType.ArticleDisPlayDisambigTip" Url="@("/disambigs/index/" + Model.DisambigId)"></AlertTip>
-        }
 
         <div class="rounded shadow-sm bg-opacity mb-4 pb-4">
             <CnGalWebSite.Shared.Component.Articles.NewVersion.MainInforCard Model="Model" OnRevoke="OnRevoke" />

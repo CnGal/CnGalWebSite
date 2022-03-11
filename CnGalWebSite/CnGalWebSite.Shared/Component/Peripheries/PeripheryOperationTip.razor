@@ -1,7 +1,7 @@
 ﻿<div style="display: flex; justify-content: center;" class="@Class">
     <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Periphery" Class="me-4" />
     <CnGalWebSite.Shared.MasaComponent.PC.Peripheries.CollectionButton Id="Model.Id" Class="me-4" IsCollected="Model.IsCollected" CollectionChanged="CollectionChanged"/>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Periphery" Id="Model.Id" @bind-IsHidden="Model.IsHidden" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Periphery" Id="Model.Id" @bind-IsHidden="Model.IsHidden"  @bind-IsEdit="Model.IsEdit"/>
 </div>
 @code {
     [Parameter]

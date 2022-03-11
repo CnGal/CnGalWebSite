@@ -116,7 +116,7 @@
             {
                 <CnGalWebSite.Shared.MasaComponent.PC.Entries.GameRecordButton Id="Model.Id" Class="me-4" />
             }
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Entry" Id="Model.Id" ShowPerfection="Model.Type==EntryType.Game" @bind-IsHidden="Model.IsHidden" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Entry" Id="Model.Id" ShowPerfection="Model.Type==EntryType.Game" @bind-IsHidden="Model.IsHidden"  IsEdit="Model.IsEdit" IsEditChanged="OnPreEdit"/>
 
         </div>
     }
@@ -136,4 +136,6 @@
 
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
+    [Parameter]
+    public EventCallback<bool> OnPreEdit { get; set; }
 }

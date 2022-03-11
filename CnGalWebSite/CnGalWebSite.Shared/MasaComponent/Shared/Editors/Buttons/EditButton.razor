@@ -3,7 +3,7 @@
 @inject DialogService DialogService
 @inject IDataCacheService _dataCacheService
 
-<MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
+<MMenu OffsetY CloseOnContentClick="false" Value="IsEdit" ValueChanged="ValueChanged">
     <ActivatorContent Context="m">
         <MTooltip Bottom>
             <ActivatorContent Context="c">
@@ -87,13 +87,15 @@
     [Parameter]
     public string Class { get; set; }
     [Parameter]
+    public bool IsEdit { get; set; }
+    [Parameter]
     public bool IsHidden { get; set; }
     [Parameter]
     public EventCallback<bool> IsHiddenChanged { get; set; }
+    [Parameter]
+    public EventCallback<bool> IsEditChanged { get; set; }
 
     bool isReady { get; set; }
-
-    private bool menu { get; set; }
 
     public List<EditButtonLineModel> Items { get; set; } = new List<EditButtonLineModel>();
 
@@ -222,11 +224,18 @@
 
     }
 
-
-    public Task OnClosed()
+    public async Task ValueChanged(bool value)
     {
-        menu = false;
+        IsEdit = value;
+        await IsEditChanged.InvokeAsync(IsEdit);
+    }
+
+
+    public async Task OnClosed()
+    {
+        IsEdit = false;
+        await IsEditChanged.InvokeAsync(IsEdit);
+
         StateHasChanged();
-        return Task.CompletedTask;
     }
 }

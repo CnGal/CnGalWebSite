@@ -24,8 +24,6 @@ namespace CnGalWebSite.Shared.Service
     {
         bool IsApp { get; set; }
 
-        bool IsMasa { get; set; }
-
         EventCallback RefreshApp { get; set; }
 
         EventCallback SavaTheme { get; set; }

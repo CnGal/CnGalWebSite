@@ -3,7 +3,7 @@
     <CnGalWebSite.Shared.MasaComponent.PC.Articles.ThumbsUpButton Id="Model.Id"  Class="me-4" />
     @if (Model.Authority)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Article" Id="Model.Id" @bind-IsHidden="Model.IsHidden" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Article" Id="Model.Id" @bind-IsHidden="Model.IsHidden" @bind-IsEdit="Model.IsEdit" />
     }
 </div>
 @code {

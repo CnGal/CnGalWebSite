@@ -47,10 +47,7 @@ else
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
                 }
-                @if (EntryView.DisambigId != 0)
-                {
-                    <AlertTip Title="@EntryView.DisambigName" Type="AlertTip.AlertTipType.EntryDisPlayDisambigTip" Url="@("/disambigs/index/" + @EntryView.DisambigId)"></AlertTip>
-                }
+
                 @if (EntryView.Type == EntryType.Staff)
                 {
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error" Class="mb-3">
@@ -59,7 +56,7 @@ else
                 }
 
                 <div>
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" />
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" OnPreEdit="OnPreEdit"/>
                 </div>
             </div>
             @if (_dataCatcheService.IsApp)
@@ -445,6 +442,13 @@ else
         {
             ErrorHandler.ProcessError(ex, "撤销审核请求失败");
         }
+    }
+
+    public Task OnPreEdit(bool value)
+    {
+        EntryView.IsEdit = value;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
 
 

@@ -209,7 +209,7 @@ namespace CnGalWebSite.APIServer.Controllers
                             new DocumentViewModel
                             {
                                 Title = "概述",
-                                Id = 636,
+                                Id = 767,
                             },
                             new DocumentViewModel
                             {
@@ -228,7 +228,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //更新日志
             var articles = await _articleRepository.GetAll().AsNoTracking()
-                .Where(s => s.Type == ArticleType.Notice && s.Name.Contains("更新"))
+                .Where(s => s.Type == ArticleType.Notice && s.Name.Contains("更新") && s.Id != 766)
                 .Select(s => new DocumentViewModel { Id = s.Id, Title = s.DisplayName.Replace("网站","") })
                 .ToListAsync();
             var tempDocument = new DocumentViewModel
@@ -241,14 +241,14 @@ namespace CnGalWebSite.APIServer.Controllers
             tempDocument.Children.Insert(0, new DocumentViewModel
             {
                 Title = "概览",
-                Id = 300,
+                Id = 766,
             });
             model.Add(tempDocument);
 
 
             //公告
             articles = await _articleRepository.GetAll().AsNoTracking()
-              .Where(s => s.Type == ArticleType.Notice && s.Name.Contains("更新") == false && s.Id != 150 && s.Id != 225 && s.Id != 636)
+              .Where(s => s.Type == ArticleType.Notice && s.Name.Contains("更新") == false && s.Id != 150 && s.Id != 225 && s.Id != 767 && s.Id != 766)
               .Select(s => new DocumentViewModel { Id = s.Id, Title = s.DisplayName })
               .ToListAsync();
 

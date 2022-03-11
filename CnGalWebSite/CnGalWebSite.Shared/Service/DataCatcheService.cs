@@ -33,10 +33,6 @@ namespace CnGalWebSite.Shared.Service
         /// 是否为APP模式
         /// </summary>
         public bool IsApp { get; set; }
-        /// <summary>
-        /// 是否使用Masa布局框架
-        /// </summary>
-       public  bool IsMasa { get; set; } = true;
 
         /// <summary>
         /// 刷新渲染框架方法

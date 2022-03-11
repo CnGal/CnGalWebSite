@@ -16,7 +16,7 @@
 {
     <link href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/github-markdown-dark.css" rel="stylesheet" media="none" onload="this.media='all'">
     <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/vs2015.min.css" media="none" onload="this.media='all'" />
-    <link rel="stylesheet" href="/styles/dark-cover.min.css" />
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/dark-cover.min.css" />
     <style>
         [data-bs-toggle="lgbSelect"] .form-select {
             background-color: transparent;
@@ -38,7 +38,7 @@ else
     -->
     <link rel="stylesheet" href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/github-markdown-css/4.0.0/github-markdown.min.css" media="none" onload="this.media='all'" />
     <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/styles/atom-one-light.min.css" media="none" onload="this.media='all'" />
-    <link rel="stylesheet" href="/styles/Lighting-mode.min.css" />
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/Lighting-mode.min.css" />
 
     <style>
         #__vconsole .vc-switch {
@@ -52,7 +52,7 @@ else
 
     if (_dataCacheService.ThemeSetting.IsOnBgImage)
     {
-        <link rel="stylesheet" href="/styles/show-background.min.css" />
+        <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/show-background.min.css" />
         <style>
             .layout.is-page .layout-footer {
                 background-color: transparent !important;
@@ -142,7 +142,15 @@ else
         {
             return;
         }
+
         _dataCacheService.ThemeSetting = theme;
+
+        if (_dataCacheService.ThemeSetting.Theme != null && _dataCacheService.ThemeSetting.Theme.Contains("color"))
+        {
+            _dataCacheService.ThemeSetting.Theme = "pink lighten-2";
+            await SaveTheme();
+        }
+
         Refresh();
         StateHasChanged();
     }
@@ -252,6 +260,7 @@ else
                 colorActive = "#616161";
                 break;
             default:
+                _dataCacheService.ThemeSetting.Theme = "pink lighten-2";
                 colorMain = "#F06292";
                 colorHover = "#D81B60";
                 colorActive = "#880E4F";

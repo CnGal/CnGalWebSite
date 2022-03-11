@@ -13,12 +13,12 @@
                 {
                     @if (string.IsNullOrWhiteSpace(temp.Link))
                     {
-                        <button class="article-tag article-tag-color-large" @onclick="@(()=>OnClickNull(temp.DisplayName))">@temp.DisplayName</button>
+                        <button class="article-tag article-tag-color-large me-2" @onclick="@(()=>OnClickNull(temp.DisplayName))">@temp.DisplayName</button>
 
                     }
                     else
                     {
-                        <TabLink class="article-tag article-tag-color-large" Url="@temp.Link" Text="@temp.DisplayName" Icon="fa fa-link">@temp.DisplayName</TabLink>
+                        <TabLink class="article-tag article-tag-color-large me-2" Url="@temp.Link" Text="@temp.DisplayName" Icon="fa fa-link">@temp.DisplayName</TabLink>
 
                     }
                 }
@@ -30,7 +30,7 @@
 
     <div>
         <i class="fa fa-pencil fa-fw font-color"></i>
-        <span class="font-color">最后编辑：@Model.LastEditTime.ToString("yyyy-MM-dd")</span>
+        <span class="font-color me-2">最后编辑：@Model.LastEditTime.ToString("yyyy-MM-dd")</span>
     </div>
 </div>
 
