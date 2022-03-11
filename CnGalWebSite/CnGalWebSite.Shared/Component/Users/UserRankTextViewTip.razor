@@ -17,7 +17,7 @@
                     <RankAloneViewTip Model="item"></RankAloneViewTip>
                 }
             </div>
-            <div class="comment-time a-font-color me-2">@Text</div>
+            <span class="me-2">@Text</span>
 
         </div>
         <a href="@("/space/index/"+UserId)" style="display: flex;align-items: center;">
@@ -43,7 +43,7 @@ else
                     <div class="comment-username" style="color:gray;">@Time?.ToTimeFromNowString()</div>
                 }
             </a>
-            <div class="comment-time a-font-color">@Text</div>
+            <span>@Text</span>
         </div>
     </div>
 }

@@ -1,6 +1,6 @@
 ﻿@inject ToastService ToastService
-
 @inject HttpClient Http
+
 <style>
     .modal-footer {
         display: none;
@@ -10,7 +10,7 @@
 <div>
     @if (isReady)
     {
-        <CnGalWebSite.Shared.Component.Entries.NewVersion.ExaminesInforCard IsSmallScreen="IsSmallScreen" Model="Model" OnNavClick="OnNavClick"/>
+        <CnGalWebSite.Shared.Component.Entries.NewVersion.ExaminesInforCard  Model="Model" OnNavClick="OnNavClick" />
     }
     else
     {
@@ -32,12 +32,11 @@
     public ExaminedNormalListModelType Type { get; set; }
 
     [Parameter]
-    public bool IsSmallScreen { get; set; }
-
-    [Parameter]
     public EventCallback OnClickClose { get; set; }
 
+    [Parameter]
     public List<ExaminedNormalListModel> Model { get; set; } = new List<ExaminedNormalListModel>();
+
     private readonly List<TimelineItem> AlternateTimelineItems = new List<TimelineItem>();
 
     [CascadingParameter]
@@ -49,37 +48,46 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
+        @if (Model.Count == 0)
         {
-            if (Type == ExaminedNormalListModelType.Article)
+            try
             {
-                var model = await Http.GetFromJsonAsync<EditArticleInforBindModel>(ToolHelper.WebApiPath + "api/articles/GetArticleEditInforBindModel/" + Id);
-                Model = model.Examines;
-            }
-            else if (Type == ExaminedNormalListModelType.Periphery)
-            {
-                var model = await Http.GetFromJsonAsync<EditPeripheryInforBindModel>(ToolHelper.WebApiPath + "api/peripheries/GetPeripheryEditInforBindModel/" + Id);
-                Model = model.Examines;
-            }
-            else if (Type == ExaminedNormalListModelType.Tag)
-            {
-                var model = await Http.GetFromJsonAsync<EditTagInforBindModel>(ToolHelper.WebApiPath + "api/tags/GetTagEditInforBindModel/" + Id);
-                Model = model.Examines;
-            }
+                if (Type == ExaminedNormalListModelType.Article)
+                {
+                    var model = await Http.GetFromJsonAsync<EditArticleInforBindModel>(ToolHelper.WebApiPath + "api/articles/GetArticleEditInforBindModel/" + Id);
+                    Model = model.Examines;
+                }
+                else if (Type == ExaminedNormalListModelType.Periphery)
+                {
+                    var model = await Http.GetFromJsonAsync<EditPeripheryInforBindModel>(ToolHelper.WebApiPath + "api/peripheries/GetPeripheryEditInforBindModel/" + Id);
+                    Model = model.Examines;
+                }
+                else if (Type == ExaminedNormalListModelType.Tag)
+                {
+                    var model = await Http.GetFromJsonAsync<EditTagInforBindModel>(ToolHelper.WebApiPath + "api/tags/GetTagEditInforBindModel/" + Id);
+                    Model = model.Examines;
+                }
 
 
 
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取历史编辑记录列表失败");
+            }
+        }
+        else
+        {
             isReady = true;
             StateHasChanged();
         }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取历史编辑记录列表失败");
-        }
+
     }
 
     public async Task OnNavClick()
     {
-       await OnClickClose.InvokeAsync();
+        await OnClickClose.InvokeAsync();
     }
 }

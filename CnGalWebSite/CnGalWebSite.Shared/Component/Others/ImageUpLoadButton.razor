@@ -3,9 +3,9 @@
 @inject IJSRuntime JS
 @inject HttpClient Http
 
-    <div class="">
+    <div class="@Class">
         <input id="@up_to_chevereto" type="file" accept="image/*" multiple="multiple" class="up_to_chevereto"/>
-        <label for="@up_to_chevereto" id="@up_img_label" class="btn btn-success mb-4"><i class="fa fa-cloud-upload" aria-hidden="true"></i> @Text</label>
+        <label for="@up_to_chevereto" id="@up_img_label" class="btn btn-success"><i class="fa fa-cloud-upload" aria-hidden="true"></i> @Text</label>
     </div>
 
 @code {
@@ -13,6 +13,8 @@
     public EventCallback<string> OnUploadedImage { get; set; }
     [Parameter]
     public string Text { get; set; } = "上传图片到图床";
+    [Parameter]
+    public string Class { get; set; }
 
     private DotNetObjectReference<ImageUpLoadButton> objRef;
 

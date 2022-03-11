@@ -1,0 +1,234 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="附加信息" Class="@Class" Collapable>
+    @switch (Model.Type)
+    {
+        case EntryType.Game:
+            <div class="row">
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.SteamId" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <DateTimePicker @bind-Value="@Model.IssueTime" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="@Model.IssueTimeString" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.Original" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <AutoComplete Items="@EntryGroupItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.ProductionGroup" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.Engine" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.Publisher" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.IssueMethod" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.OfficialWebsite" ShowLabel="true" />
+                </div>
+
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.QQgroupGame" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12">
+                    <CheckboxList TValue="List<string>" Value="@GamePlatformsValue" ValueChanged="GamePlatformsValueChanged" ShowBorder="true" Items="@GamePlatforms" DisplayText="游戏平台" ShowLabel="true"></CheckboxList>
+                </div>
+                <div class="col-12 p-3">
+                    <Divider></Divider>
+                </div>
+            </div>
+            <h5 class="fw-bold mb-4">STAFF</h5>
+            <StaffEditorChartListTip Staffs="Model.Staffs"></StaffEditorChartListTip>
+
+            break;
+        case EntryType.ProductionGroup:
+            <ValidateForm Model="@Model" ValidateAllProperties="true">
+                <div class="row">
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.QQgroupGroup" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.WeiboId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.BilibiliId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.AcFunId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.ZhihuId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.AfdianId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.PixivId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.TwitterId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.YouTubeId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.FacebookId" />
+                    </div>
+                </div>
+            </ValidateForm>
+            break;
+        case EntryType.Role:
+            <div class="row">
+                <div class="form-group col-12  col-sm-6">
+                    <AutoComplete Items="@EntryStaffItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.CV" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <Select @bind-Value="Model.Gender" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.FigureData" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.FigureSubjective" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <DateTimePicker @bind-Value="@Model.Birthday" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.Haircolor" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.Pupilcolor" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.ClothesAccessories" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.Character" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.RoleIdentity" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.BloodType" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.RoleHeight" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.RoleTaste" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.RoleAge" ShowLabel="true" />
+                </div>
+
+            </div>
+            break;
+        case EntryType.Staff:
+            <ValidateForm Model="@Model" ValidateAllProperties="true">
+                <div class="row">
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.WeiboId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.BilibiliId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.AcFunId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.ZhihuId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.AfdianId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.PixivId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.TwitterId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.YouTubeId" />
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.FacebookId" />
+                    </div>
+                </div>
+            </ValidateForm>
+            break;
+    }
+
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <InputSocialPlatformListTip Model="Model.SocialPlatforms"></InputSocialPlatformListTip>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+    @code {
+        [Parameter]
+        public EditAddInforViewModel Model { get; set; }
+        [Parameter]
+        public string  Class { get; set; }
+        [Parameter]
+        public IEnumerable<string> EntryGroupItems { get; set; }
+        [Parameter]
+        public IEnumerable<string> EntryStaffItems { get; set; }
+
+        List<SelectedItem> GamePlatforms { get; set; } = new List<SelectedItem>();
+
+        private List<string> GamePlatformsValue { get; set; } = new List<string>();
+
+        protected override async Task OnInitializedAsync()
+        {
+
+            //设置游戏平台
+            if (Model.Type == EntryType.Game)
+            {
+                foreach (var item in Model.GamePlatforms)
+                {
+                    GamePlatforms.Add(new SelectedItem
+                    {
+                        Text = item.GamePlatformType.ToString(),
+                        Value = item.GamePlatformType.ToString(),
+                        Active = item.IsSelected
+                    });
+                    if (item.IsSelected == true)
+                    {
+                        GamePlatformsValue.Add(item.GamePlatformType.ToString());
+                    }
+                }
+            }
+
+        }
+
+        public Task GamePlatformsValueChanged(List<string> games)
+        {
+            GamePlatformsValue = games;
+            //处理游戏平台数据
+            Model.GamePlatforms.Clear();
+            foreach (var item in GamePlatforms)
+            {
+                bool isSelected = false;
+                foreach (var infor in GamePlatformsValue)
+                {
+                    if (infor == item.Value)
+                    {
+                        isSelected = true;
+                    }
+                }
+                Model.GamePlatforms.Add(new GamePlatformModel
+                {
+                    GamePlatformType = (GamePlatformType)Enum.Parse(typeof(GamePlatformType), item.Value),
+                    IsSelected = isSelected
+                });
+            }
+
+            return Task.CompletedTask;
+        }
+
+    }

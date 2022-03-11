@@ -1,25 +1,9 @@
-﻿<style>
-    .divider.divider-horizontal .divider-text.is-center {
-        color: white;
-        background-color: var(--main-color);
-        border-radius: 7.6px;
-        padding-bottom: 2px;
-    }
+﻿
 
-    .divider .divider-wrap {
-         margin: 0; 
-    }
-
-    .divider {
-        background-color: var(--main-color);
-    }
-</style>
-
-<div class="font-color" style="display:flex;flex-direction: column;">
-    <Divider Text="其他登入方式" Alignment="Alignment.Center" class=" mt-3 mb-3"></Divider>
-    <div class="mt-2" style="display: flex; flex-direction: row; justify-content: space-around;">
-        <ThirdPartyLoginButton ReturnUrl="@ReturnUrl" Type="ThirdPartyLoginType.Gitee" OnRedirecting="OnRedirecting"></ThirdPartyLoginButton>
-        <ThirdPartyLoginButton ReturnUrl="@ReturnUrl" Type="ThirdPartyLoginType.QQ" OnRedirecting="OnRedirecting"></ThirdPartyLoginButton>
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider Text="其他登入方式"/>
+    <div class="mt-2" style="display: flex; flex-direction: row; justify-content: center;">
+        <ThirdPartyLoginButton ReturnUrl="@ReturnUrl" Type="ThirdPartyLoginType.QQ" OnRedirecting="OnRedirecting"/>
     </div>
 </div>
 

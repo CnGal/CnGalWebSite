@@ -3,6 +3,8 @@ using CnGalWebSite.DataModel.ViewModel.Ranks;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 namespace CnGalWebSite.DataModel.ViewModel.Admin
 {
     public class ExaminedNormalListModel
@@ -35,12 +37,19 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
     public enum ExaminedNormalListModelType
     {
+        [Display(Name ="词条")]
         Entry,
+        [Display(Name = "文章")]
         Article,
+        [Display(Name = "用户")]
         User,
+        [Display(Name = "标签")]
         Tag,
+        [Display(Name = "评论")]
         Comment,
+        [Display(Name = "消歧义页")]
         Disambig,
+        [Display(Name = "周边")]
         Periphery
     }
 }

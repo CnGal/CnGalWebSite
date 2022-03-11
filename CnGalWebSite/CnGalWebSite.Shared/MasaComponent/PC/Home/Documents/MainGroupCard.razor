@@ -1,0 +1,40 @@
+﻿
+
+@if (Items.Count > 0)
+{
+
+    <MWindow @bind-Value="Index" Reverse>
+        @foreach (var item in Items)
+        {
+            <MWindowItem Value="item.Id">
+
+                <ScaleTransition>
+                    <Element Show="item.Id==Index">
+                        <MCard Style=" display: contents; ">
+                            <MainViewTip Id="@item.Id" />
+                        </MCard>
+                    </Element>
+                </ScaleTransition>
+            </MWindowItem>
+        }
+    </MWindow>
+
+}
+
+
+@code {
+    [Parameter]
+    public StringNumber Index { get; set; }
+    [Parameter]
+    public List<DocumentViewModel> Items { get; set; } = new List<DocumentViewModel>();
+
+    public Task Refresh(long index)
+    {
+        Index = index;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+
+
+}

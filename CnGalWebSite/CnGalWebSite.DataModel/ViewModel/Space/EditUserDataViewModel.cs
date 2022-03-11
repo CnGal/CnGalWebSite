@@ -24,16 +24,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         [Display(Name = "头像")]
         public string PhotoName { get; set; }
 
-
-        public string PhotoPath { get; set; }
-
-        public string BackgroundPath { get; set; }
         public string BackgroundName { get; set; }
 
-        public string MBgImagePath { get; set; }
         public string MBgImageName { get; set; }
 
-        public string SBgImagePath { get; set; }
         public string SBgImageName { get; set; }
 
 

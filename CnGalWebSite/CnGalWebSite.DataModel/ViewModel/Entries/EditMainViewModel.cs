@@ -1,13 +1,10 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel
 {
-    public class EditMainViewModel
+    public class EditMainViewModel : BaseEntryEditModel
     {
-        public int Id { get; set; }
-        [Display(Name = "唯一名称")]
-        [Required(ErrorMessage = "请填写唯一名称")]
-        public string Name { get; set; }
         [Display(Name = "显示名称")]
         [Required(ErrorMessage = "请填写显示名称")]
         public string DisplayName { get; set; }
@@ -26,22 +23,20 @@ namespace CnGalWebSite.DataModel.ViewModel
         [Display(Name = "小背景图")]
         public string SmallBackgroundPicture { get; set; }
 
-
-        [Display(Name = "类别")]
-        [Required(ErrorMessage = "请选择类别")]
-        public EntryType Type { get; set; }
-
         [Display(Name = "主图")]
         public string MainPicturePath { get; set; }
 
-        public string ThumbnailPath { get; set; }
-
-        public string BackgroundPicturePath { get; set; }
-
-        public string SmallBackgroundPicturePath { get; set; }
-
-        [Display(Name = "备注")]
-        public string Note { get; set; }
-
+        public override Result Validate()
+        {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                return new Result { Error = "必须填写词条名称" };
+            }
+            if (string.IsNullOrWhiteSpace(DisplayName))
+            {
+                return new Result { Error = "必须填写词条显示名称" };
+            }
+            return new Result { Successful = true };
+        }
     }
 }

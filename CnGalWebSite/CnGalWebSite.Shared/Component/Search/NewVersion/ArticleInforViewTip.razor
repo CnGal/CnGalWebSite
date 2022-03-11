@@ -1,41 +1,68 @@
-﻿<TabLink Icon="fa fa-newspaper-o" Url="@("/articles/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
-    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 h-100">
-        <div class="mb-2"  style="display:flex;">
-            <div class="pt-3">
-                <img  style=" width: 250px; " src="@Model.MainImage">
-            </div>
-            <div class="ps-3 pt-3">
-                <header class="text-truncate-2">
-                    <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
-                    <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
-                </header>
-                <span class="text-truncate-3">
-                    @Model.BriefIntroduction
-                </span>
+﻿@inject IDataCacheService _dataCatcheService
+
+@if (_dataCatcheService.IsApp)
+{
+    <TabLink Icon="fa fa-newspaper-o" Url="@("/articles/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
+        <div class="div-shadow rounded  bg-opacity h-100">
+            <div  style="display: flex; align-items: center;">
+                <div>
+                    <img style=" width: 160px; " src="@Model.MainImage">
+                </div>
+                <div class="me-2 ms-2">
+                    <header class="text-truncate-1">
+                        <span class="app-card-tag">@Model.Type.GetDisplayName()</span>
+                        <span class="fw-bold" style=" display: inline;">@Model.DisplayName</span>
+                    </header>
+                    <span class="text-truncate-2">
+                        @Model.BriefIntroduction
+                    </span>
+                </div>
             </div>
         </div>
-        <p class="" style="color: gray;">
-            <i class="fa fa-calendar fa-fw"></i>
-            <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+    </TabLink>
+}
+else
+{
+    <TabLink Icon="fa fa-newspaper-o" Url="@("/articles/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
+        <div class="div-shadow rounded  bg-opacity ps-3 pe-3 h-100">
+            <div class="mb-2" style="display:flex;">
+                <div class="pt-3">
+                    <img style=" width: 250px; " src="@Model.MainImage">
+                </div>
+                <div class="ps-3 pt-3">
+                    <header class="text-truncate-2">
+                        <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
+                        <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                    </header>
+                    <span class="text-truncate-3">
+                        @Model.BriefIntroduction
+                    </span>
+                </div>
+            </div>
+            <p class="" style="color: gray;">
+                <i class="fa fa-calendar fa-fw"></i>
+                <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
 
-            <i class="fa fa-commenting-o fa-fw"></i>
-            <span class="article-home-infor-text">@(Model.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
+                <i class="fa fa-commenting-o fa-fw"></i>
+                <span class="article-home-infor-text">@(Model.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
 
-            <i class="fa fa-eye fa-fw d-none d-sm-inline"></i>
-            <span class="article-home-infor-text d-none d-sm-inline">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
+                <i class="fa fa-eye fa-fw d-none d-sm-inline"></i>
+                <span class="article-home-infor-text d-none d-sm-inline">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
 
-            <i class="fa fa-thumbs-o-up fa-fw d-none d-sm-inline"></i>
-            <span class="article-home-infor-text d-none d-sm-inline">@(Model.ThumbsUpCount)人点赞&nbsp;&nbsp;&nbsp;</span>
+                <i class="fa fa-thumbs-o-up fa-fw d-none d-sm-inline"></i>
+                <span class="article-home-infor-text d-none d-sm-inline">@(Model.ThumbsUpCount)人点赞&nbsp;&nbsp;&nbsp;</span>
 
-            <i class="fa fa-user fa-fw"></i>
-            <span class="article-home-infor-text">@Model.CreateUserName&nbsp;&nbsp;&nbsp;</span>
-        </p>
-        <div style="height: 1px;"></div>
-    </div>
-</TabLink>
-   
+                <i class="fa fa-user fa-fw"></i>
+                <span class="article-home-infor-text">@Model.CreateUserName&nbsp;&nbsp;&nbsp;</span>
+            </p>
+            <div style="height: 1px;"></div>
+        </div>
+    </TabLink>
 
-    @code {
-        [Parameter]
-        public ArticleInforTipViewModel Model { get; set; }
-    }
+}
+
+
+@code {
+    [Parameter]
+    public ArticleInforTipViewModel Model { get; set; }
+}

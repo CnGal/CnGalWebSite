@@ -1,96 +1,173 @@
-﻿<TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
-    <div class="div-shadow rounded  bg-opacity aticle-home-layout ps-3 pe-3 h-100">
-        @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
-        {
-            <div class="" style="display:flex;">
-                <div class="pt-3 pb-3">
-                    <img  style=" width: 250px; " src="@Model.MainImage">
+﻿@inject IDataCacheService _dataCatcheService
+
+@if (_dataCatcheService.IsApp)
+{
+    <TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
+        <div class="div-shadow rounded  bg-opacity h-100">
+            @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
+            {
+                <div style="display: flex; align-items: center;">
+                    <div>
+                        <img style=" width: 160px; " src="@Model.MainImage">
+                    </div>
+                    <div class="ms-2 me-2 w-100">
+                        <span class="text-truncate-1">
+                            <span class="app-card-tag">@Model.Type.GetDisplayName()</span>
+                            <span class="fw-bold" style=" display: inline;">@Model.DisplayName</span>
+                        </span>
+                        <span class="text-truncate-2">
+                            @Model.BriefIntroduction
+                        </span>
+
+                    </div>
                 </div>
-                <div class="pt-3 ps-3" style=" width: 100%;">
-                    <header class="text-truncate-2">
-                        <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
-                        <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
-                    </header>
-                    <span class="@((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)?"text-truncate-2":"text-truncate-3")">
-                        @Model.BriefIntroduction
-                    </span>
-                    @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)
-                    {
+            }
+            else
+            {
+                <div style="display: flex; align-items: center;">
+                    <div class="p-2">
+                        <img src="@Model.MainImage" style="border-radius: 50%;width: 80px;" />
+                    </div>
 
-                        <div class="d-none d-sm-flex row">
+                    <div class="ms-2 me-2 w-100">
+                        <span class="text-truncate-2">
 
-                            @foreach (var item in Model.AddInfors)
-                            {
-                                <div class="@(Model.AddInfors.Count==1? "col-12":"col-12 col-lg-6")">
-                                    <div class="h4 mt-2" style="margin-bottom: 0.1rem; display: flex;  flex-wrap: wrap; ">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" ColorNum="@ColorNum" />
-                                        @foreach (var infor in item.Contents)
-                                        {
-                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id>0)" IsShowExistTag="@IsEdit"
-                                                           Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" Icon="fa fa-codepen"  IsNotShowTip="@(infor.Id==-1)" />
-                                        }
+                            <span class="app-card-tag">@Model.Type.GetDisplayName()</span>
+                            <span class="fw-bold" style=" display: inline;">@Model.DisplayName</span>
+                        </span>
+                        <span class="@((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)?"text-truncate-1":"text-truncate-2")">
+                            @Model.BriefIntroduction
+                        </span>
+                        @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)
+                        {
+
+                            <div class="d-flex row">
+
+                                @foreach (var item in Model.AddInfors)
+                                {
+                                    <div class="@(Model.AddInfors.Count==1? "col-12":"col-12 col-lg-6")">
+                                        <div class="h4 mt-1 mb-1" style="margin-bottom: 0.1rem; display: flex;  flex-wrap: wrap; ">
+                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" ColorNum="@ColorNum" />
+                                            @foreach (var infor in item.Contents)
+                                            {
+                                                <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id>0)" IsShowExistTag="@IsEdit"
+                                                                                                                Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" Icon="fa fa-codepen" IsNotShowTip="@(infor.Id==-1)" />
+                                            }
+                                        </div>
                                     </div>
-                                </div>
 
-                            }
+                                }
 
-                        </div>
-                    }
+                            </div>
+                        }
+
+                    </div>
                 </div>
-            </div>
-        }
-        else
-        {
-            <div class=" pb-3"  style="display:flex;">
-                <div class="pt-3 p-0 ps-2">
-                    <img  src="@Model.MainImage" style="border-radius: 50%;width: 116px;" />
-                </div>
+            }
 
-                <div class="pt-3 ps-3" style=" width: 100%;">
-                    <header class="text-truncate-2">
+        </div>
 
-                        <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
-                        <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
-                    </header>
-                    <span class="@((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)?"text-truncate-2":"text-truncate-3")">
-                        @Model.BriefIntroduction
-                    </span>
-                    @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)
-                    {
+    </TabLink>
 
-                        <div class="d-none d-sm-flex row">
+}
+else
+{
+    <TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
+        <div class="div-shadow rounded  bg-opacity ps-3 pe-3 h-100">
+            @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
+            {
+                <div class="" style="display:flex;">
+                    <div class="pt-3 pb-3">
+                        <img style=" width: 250px; " src="@Model.MainImage">
+                    </div>
+                    <div class="pt-3 ps-3" style=" width: 100%;">
+                        <header class="text-truncate-1">
+                            <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
+                            <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                        </header>
+                        <span class="@((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)?"text-truncate-2":"text-truncate-4")">
+                            @Model.BriefIntroduction
+                        </span>
+                        @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)
+                        {
 
-                            @foreach (var item in Model.AddInfors)
-                            {
-                                <div class="@(Model.AddInfors.Count==1? "col-12":"col-12 col-lg-6")">
-                                    <div class="h4 mt-2" style="margin-bottom: 0.1rem; display: flex;  flex-wrap: wrap; ">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" ColorNum="@ColorNum" />
-                                        @foreach (var infor in item.Contents)
-                                        {
-                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id>0)" IsShowExistTag="@IsEdit"
-                                                                                                            Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" Icon="fa fa-codepen" IsNotShowTip="@(infor.Id==-1)" />
-                                        }
+                            <div class="d-none d-sm-flex row">
+
+                                @foreach (var item in Model.AddInfors)
+                                {
+                                    <div class="@(Model.AddInfors.Count==1? "col-12":"col-12 col-lg-6")">
+                                        <div class="h4 mt-2" style="margin-bottom: 0.1rem; display: flex;  flex-wrap: wrap; ">
+                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" ColorNum="@ColorNum" />
+                                            @foreach (var infor in item.Contents)
+                                            {
+                                                <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id>0)" IsShowExistTag="@IsEdit"
+                                                                                                                Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" Icon="fa fa-codepen" IsNotShowTip="@(infor.Id==-1)" />
+                                            }
+                                        </div>
                                     </div>
-                                </div>
 
-                            }
+                                }
 
-                        </div>
-                    }
-
+                            </div>
+                        }
+                    </div>
                 </div>
-            </div>
-        }
+            }
+            else
+            {
+                <div class=" pb-3" style="display:flex;">
+                    <div class="pt-3 p-0 ps-2">
+                        <img src="@Model.MainImage" style="border-radius: 50%;width: 116px;" />
+                    </div>
 
-    </div>
+                    <div class="pt-3 ps-3" style=" width: 100%;">
+                        <header class="text-truncate-2">
 
-</TabLink>
-  
-    @code {
-        [Parameter]
-        public EntryInforTipViewModel Model { get; set; }
-        [Parameter]
-        public string ColorNum { get; set; }
-        [Parameter]
-        public bool IsEdit { get; set; }
-    }
+                            <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
+                            <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                        </header>
+                        <span class="@((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)?"text-truncate-2":"text-truncate-3")">
+                            @Model.BriefIntroduction
+                        </span>
+                        @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)
+                        {
+
+                            <div class="d-none d-sm-flex row">
+
+                                @foreach (var item in Model.AddInfors)
+                                {
+                                    <div class="@(Model.AddInfors.Count==1? "col-12":"col-12 col-lg-6")">
+                                        <div class="h4 mt-2" style="margin-bottom: 0.1rem; display: flex;  flex-wrap: wrap; ">
+                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" ColorNum="@ColorNum" />
+                                            @foreach (var infor in item.Contents)
+                                            {
+                                                <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id>0)" IsShowExistTag="@IsEdit"
+                                                                                                                Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" Icon="fa fa-codepen" IsNotShowTip="@(infor.Id==-1)" />
+                                            }
+                                        </div>
+                                    </div>
+
+                                }
+
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            }
+
+        </div>
+
+    </TabLink>
+
+}
+
+
+@code {
+    [Parameter]
+    public EntryInforTipViewModel Model { get; set; }
+    [Parameter]
+    public string ColorNum { get; set; }
+    [Parameter]
+    public bool IsEdit { get; set; }
+}

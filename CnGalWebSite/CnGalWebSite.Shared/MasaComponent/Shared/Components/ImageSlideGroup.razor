@@ -1,0 +1,69 @@
+﻿@inject ImagesLargeViewService ImagesLargeViewService
+@inject IDataCacheService _dataCatcheService
+@inject IJSRuntime JS
+
+
+<div>
+
+    <MWindow @bind-Value="Index" Reverse>
+        @foreach (var item in Model)
+        {
+            <MWindowItem Value="@Model.IndexOf(item)" >
+                <MResponsive AspectRatio="16/9D">
+                    <MCard Style=" display: contents; "  OnClick="OnClickImage">
+                        <div style="@($"background-image: url({item.Url});")" class="image-contain">
+
+                        </div>
+                    </MCard>
+                </MResponsive>
+              
+            </MWindowItem>
+        }
+    </MWindow>
+    <MSlideGroup @bind-Value="Index" ShowArrows="true" CenterActive>
+        @foreach (var item in Model)
+        {
+            <MSlideItem>
+                <MCard Class="mt-4 me-4 mb-2" Height="90" Width="160" OnClick="@(()=>{ if (!context.Active) context.Toggle.Invoke();})" RefBack="context.Ref">
+                    <div style="@($"background-image: url({item.Url});")" class="@((context.Active?"active":"")+" image-overlays ")">
+
+                    </div>
+                </MCard>
+            </MSlideItem>
+        }
+    </MSlideGroup>
+
+</div>
+
+@code {
+    private StringNumber Index { get; set; } = 0;
+
+    [Parameter]
+    public List<EditImageAloneModel> Model { get; set; }
+
+    #region 新建标签页
+
+    public async void OpenNewPage(string url)
+    {
+        await JS.InvokeAsync<string>("openNewPage", url);
+    }
+
+    #endregion
+
+    public async void OnClickImage()
+    {
+        if (_dataCatcheService.IsApp)
+        {
+            OpenNewPage(Model[Index.ToInt32()].Url);
+        }
+        else
+        {
+            ImagesLargeViewService.ViewLargeImages(new ImagesLargeViewModel
+            {
+                Index = Index.ToInt32(),
+                Pictures = Model
+            });
+        }
+
+    }
+}

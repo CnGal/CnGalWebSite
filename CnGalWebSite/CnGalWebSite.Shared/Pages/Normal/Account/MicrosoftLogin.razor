@@ -7,20 +7,22 @@
 @inject IDataCacheService _dataCacheService
 
 <TitleTip></TitleTip>
-<CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
-
-@if (_dataCacheService.IsApp == false)
-{
-    @if (isReady)
+<CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+    @if (_dataCacheService.IsApp == false)
     {
-        <ThirdPartyLoginTip Code="@Code" ReturnUrl="@ReturnUrl" Type="type"></ThirdPartyLoginTip>
-    }
-    else
-    {
-        <AccountWaitingTip Title="正在重定向" Subtitle="你正在第三方账户登入，我们正在检查以确保一切正常"></AccountWaitingTip>
+        @if (isReady)
+        {
+            <ThirdPartyLoginTip Code="@Code" ReturnUrl="@ReturnUrl" Type="type"></ThirdPartyLoginTip>
+        }
+        else
+        {
+            <AccountWaitingTip Title="正在重定向" Subtitle="你正在第三方账户登入，我们正在检查以确保一切正常"></AccountWaitingTip>
 
+        }
     }
-}
+</CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+
+
 
 
 @code {

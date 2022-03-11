@@ -19,60 +19,37 @@ else
 
 <AutoSaveTip TItem="EditImagesViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
-<div class="">
-    <div class="" style="padding-right: 0;padding-left: 0;">
-        <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
-        <AlertTip Type="AlertTip.AlertTipType.EntryStandard"></AlertTip>
-        <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
-            可以在这里上传游戏的宣传图，不涉及<strong>剧透、侵权、违法</strong>的游戏CG和角色立绘等图片
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Entry" Class="mb-3" />
+
+    @if (isReady == false)
+    {
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
         </div>
+    }
+    else
+    {
         @if (Model.Type == EntryType.Staff)
         {
-            <div class="alert alert-danger  rounded shadow-sm  rounded" role="alert">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error" Class="mb-3">
                 这个词条可能涉及到现实人物，请勿过分较真，也请谨慎编辑，仔细斟酌词句
-            </div>
-        }
-        else
-        {
-
-        }
-        @if (isReady == false)
-        {
-            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-                <h3 class="text-truncate mb-4 fw-bold">编辑图片</h3>
-                <h5 class="mb-4 fw-bold">当前词条：（Id:）</h5>
-                <hr>
-
-                <div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-3">
-                <h3 class="text-truncate mb-4 fw-bold">编辑图片</h3>
-                <h5 class="mb-4 fw-bold">当前词条：@Model.Name（Id:@Model.Id）</h5>
-                <hr class="mb-4" />
-                <ImagesListEditorViewTip Images="Model.Images" @ref="ImagesListEditorView"></ImagesListEditorViewTip>
-            </div>
-            <div class="rounded shadow-sm bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
-                <div>
-                    <ValidateForm Model="@Model">
-                        <BootstrapBlazor.Components.Textarea @bind-Value="Model.Note" DisplayText="备注" />
-                    </ValidateForm>
-                    <Button class="mt-3" style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
-                </div>
-            </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
 
-    </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-codepen" Outline>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.ImagesCard Model="Model" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+    }
 </div>
 
 
@@ -81,8 +58,6 @@ else
     public string Id { get; set; }
     public EditImagesViewModel Model { get; set; } = new EditImagesViewModel();
     bool isReady = false;
-    [NotNull]
-    private ImagesListEditorViewTip? ImagesListEditorView;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -110,9 +85,6 @@ else
     {
         try
         {
-            //复制数据
-            Model.Images = ImagesListEditorView.Images;
-
             var result = await Http.PostAsJsonAsync<EditImagesViewModel>(ToolHelper.WebApiPath + "api/entries/editimages", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);

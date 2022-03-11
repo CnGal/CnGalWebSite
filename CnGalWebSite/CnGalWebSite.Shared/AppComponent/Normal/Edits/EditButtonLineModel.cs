@@ -32,6 +32,9 @@ namespace CnGalWebSite.Shared.AppComponent.Normal.Edits
             Operation.EditTagMain => "主要信息",
             Operation.EditTagChildTags => "子标签",
             Operation.EditTagChildEntries => "子词条",
+            Operation.EditArticleMain => "主要信息",
+            Operation.EditArticleMainPage => "主页",
+            Operation.EditArticleRelevanes => "关联信息",
             _ => "",
         };
         public string Link => Operation switch
@@ -49,6 +52,9 @@ namespace CnGalWebSite.Shared.AppComponent.Normal.Edits
             Operation.EditTagMain => "tags/editmain/" + Id,
             Operation.EditTagChildTags => "tags/editchildtags/" + Id,
             Operation.EditTagChildEntries => "tags/editchildentries/" + Id,
+            Operation.EditArticleMain => "articles/editmain/" + Id,
+            Operation.EditArticleMainPage => "articles/editmainpage/" + Id,
+            Operation.EditArticleRelevanes => "articles/editrelevances/" + Id,
             _ => "",
         };
         public string Color => State switch

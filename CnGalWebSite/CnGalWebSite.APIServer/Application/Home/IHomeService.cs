@@ -52,7 +52,7 @@ namespace CnGalWebSite.APIServer.Application.Home
         /// 获取轮播图
         /// </summary>
         /// <returns></returns>
-        Task<List<Carousel>> GetHomeCarouselsViewAsync();
+        Task<List<CarouselViewModel>> GetHomeCarouselsViewAsync();
         /// <summary>
         /// 获取动态
         /// </summary>

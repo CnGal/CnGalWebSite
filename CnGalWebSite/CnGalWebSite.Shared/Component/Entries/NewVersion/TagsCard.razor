@@ -1,71 +1,34 @@
-﻿@if (Model.Tags.Count > 0 || Model.IsEdit)
+﻿
+@if (Model.TagState == EditState.Preview)
 {
-    <div class="rounded shadow-sm bg-opacity rounded ps-3 pe-3 pb-2 pt-2 mb-3">
-        <div class="">
-            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-tags"></i>&nbsp;&nbsp;标签</h2>
-        </div>
+    <div class="mb-3">
+
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/Edittags/" + Model.Id)" ExamineType="Operation.EstablishTags" OnClickRevoke="OnRevoke"/>
+    </div>
+}
+
+
+@if (Model.Tags.Count > 0)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="标签" Icon="fa fa-fw fa-tags">
         <div>
-            @{ bool isFirstBadge = true;}
             @foreach (var item in Model.Tags)
             {
-            <TabLink type="button" class="@(" btn btn-dark m-1 btn-xs ps-2 pe-2 "+(isFirstBadge ? " ms-0" : ""))" Url="@("/tags/index/"+item.Id)"
-                     Text="@item.Name" Icon="fa fa-tag">
-                @item.Name
-            </TabLink>
-                isFirstBadge = false;
-            }
-            @if (Model.IsEdit == true)
-            {
-                @switch (Model.TagState)
-                {
-                    case EditState.locked:
-                        <button type="button" class="@("btn btn-secondary m-1 btn-xs ps-2 pe-2 "+(isFirstBadge ? " ms-0" : ""))">
-                            锁定
-                        </button>
-                        break;
-                    case EditState.Preview:
-                        <TabLink type="button" class="@("btn btn-warning m-1 btn-xs ps-2 pe-2 "+(isFirstBadge ? " ms-0" : ""))" Url="@("/entries/EditTags/" + Model.Id)"
-                                  Text="编辑词条标签" Icon="fa fa-pencil">
-                            预览
-                        </TabLink>
-                        break;
-                    case EditState.Normal:
-                        @if (Model.Tags.Count == 0)
-                        {
-                            <TabLink type="button" class="@("btn btn-success m-1 btn-xs ps-2 pe-2 "+(isFirstBadge ? " ms-0" : ""))" Url="@("/entries/EditTags/" + Model.Id)"
-                                      Text="编辑词条标签" Icon="fa fa-pencil">
-                                添加
-                            </TabLink>
-                        }
-                        else
-                        {
-                            <TabLink type="button" class="@("btn btn-primary m-1 btn-xs ps-2 pe-2 "+(isFirstBadge ? " ms-0" : ""))" Url="@("/entries/EditTags/" + Model.Id)"
-                                      Text="编辑词条标签" Icon="fa fa-pencil">
-                                编辑
-                            </TabLink>
-                        }
-
-                        break;
-                }
-            }
-            else
-            {
-                @if (Model.Tags.Count == 0)
-                {
-                    <TabLink class="@("badge-btn btn btn-success m-1 "+(isFirstBadge ? "ms-0" : ""))" Url="@("/entries/EditTags/" + Model.Id)" Text="编辑词条标签" Icon="fa fa-pencil">
-                        添加
-                    </TabLink>
-                }
+                <TabLink type="button" class="btn btn-dark m-1 ms-0 me-2 btn-xs ps-2 pe-2 " Url="@("/tags/index/"+item.Id)"
+                         Text="@item.Name" Icon="fa fa-tag">
+                    @item.Name
+                </TabLink>
             }
 
 
         </div>
-    </div>
-
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 }
 
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
 
 }

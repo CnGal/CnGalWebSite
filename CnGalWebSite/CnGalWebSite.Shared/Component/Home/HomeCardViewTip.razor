@@ -1,11 +1,13 @@
 ﻿
-@if (IsSmallScreen)
+@if (Circle)
 {
-    <TabLink Icon="@Icon" Url="@Url" Text="@Name" class="a-font-color">
-        <div class="h-100 ">
-            <img src="@Image" class="card-img-top" alt="@Name" />
-            <div class="card-body" style="padding: 0px; padding: 0px; padding-top: 0.5rem; padding-left: 0.4rem; padding-right: 0.4rem;">
-                <span class="home-card-name-text">@Name</span>
+    <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color">
+        <div class=" h-100 ">
+            <img src="@Image" class="card-img-top" alt="@Name" style="border-radius:50%" />
+            <div class="pt-2">
+                <p class="m-0 text-center home-card-name-text" style="font-size:16px">@Name</p>
+                @if (Circle)
+                {
                     <div class="row" style="color:gray">
                         <div class="col-6">
                             <i class="fa fa-eye fa-fw "></i>
@@ -16,43 +18,22 @@
                             <span class="article-infor-text">@CommentCount</span>
                         </div>
                     </div>
+                }
+
             </div>
         </div>
-    </TabLink>
-
-}
-else
-{
-    if (IsRole)
-    {
-        <TabLink Icon="@Icon" Url="@Url" Text="@Name" class="a-font-color">
-            <div class=" h-100 ">
-                <img src="@Image" class="card-img-top" alt="@Name" style="border-radius:50%" />
-                <div class="pt-2">
-                    <p class="m-0 text-center home-card-name-text" style="font-size:16px">@Name</p>
-                        <div class="row" style="color:gray">
-                            <div class="col-6">
-                                <i class="fa fa-eye fa-fw "></i>
-                                <span class="article-infor-text">@ReadCount</span>
-                            </div>
-                            <div class="col-6">
-                                <i class="fa fa-comments-o fa-fw "></i>
-                                <span class="article-infor-text">@CommentCount</span>
-                            </div>
-                        </div>
-                </div>
-            </div>
-        </TabLink>
+        </a>
 
     }
     else
     {
-        <TabLink Icon="@Icon" Url="@Url" Text="@Name" class="a-font-color">
-            <div class=" h-100 " >
+        <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color">
+            <div class=" h-100 ">
                 <img src="@Image" class="card-img-top" alt="@Name" />
                 <div class="pt-2">
                     <span class="home-card-name-text">@Name</span>
-
+                    @if (ShowCount)
+                    {
                         <div class="row" style="color:gray">
                             <div class="col-6">
                                 <i class="fa fa-eye fa-fw "></i>
@@ -63,16 +44,15 @@ else
                                 <span class="article-infor-text">@CommentCount</span>
                             </div>
                         </div>
+                    }
+
                 </div>
             </div>
-        </TabLink>
+        </a>
 
     }
-}
 
 @code {
-    [Parameter]
-    public long Id { get; set; }
     [Parameter]
     public string Name { get; set; }
     [Parameter]
@@ -86,7 +66,9 @@ else
     [Parameter]
     public int CommentCount { get; set; }
     [Parameter]
-    public bool IsSmallScreen { get; set; }
+    public bool ShowCount { get; set; }
     [Parameter]
-    public bool IsRole { get; set; }
+    public bool Outlink { get; set; }
+    [Parameter]
+    public bool Circle { get; set; }
 }

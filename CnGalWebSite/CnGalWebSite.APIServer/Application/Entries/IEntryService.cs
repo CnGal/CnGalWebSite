@@ -9,6 +9,7 @@ using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Tag = CnGalWebSite.DataModel.Model.Tag;
 
 namespace CnGalWebSite.APIServer.Application.Entries
 {
@@ -45,5 +46,29 @@ namespace CnGalWebSite.APIServer.Application.Entries
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Entry currentEntry, Entry newEntry);
 
         Task<List<EntryIndexViewModel>> ConcompareAndGenerateModel(Entry currentEntry, Entry newEntry);
+
+        EditMainViewModel GetEditMainViewModel(Entry entry);
+
+        EditAddInforViewModel GetEditAddInforViewModel(Entry entry);
+
+        EditImagesViewModel GetEditImagesViewModel(Entry entry);
+
+        EditRelevancesViewModel GetEditRelevancesViewModel(Entry entry);
+
+        EditMainPageViewModel GetEditMainPageViewModel(Entry entry);
+
+        EditEntryTagViewModel GetEditTagsViewModel(Entry entry);
+
+        void SetDataFromEditMainViewModel(Entry newEntry, EditMainViewModel model);
+
+        void SetDataFromEditAddInforViewModel(Entry newEntry, EditAddInforViewModel model);
+
+        void SetDataFromEditImagesViewModel(Entry newEntry, EditImagesViewModel model);
+
+        void SetDataFromEditRelevancesViewModel(Entry newEntry, EditRelevancesViewModel model, List<Entry> entries, List<Article> articles);
+
+        void SetDataFromEditMainPageViewModel(Entry newEntry, EditMainPageViewModel model);
+
+        void SetDataFromEditTagsViewModel(Entry newEntry, EditEntryTagViewModel model, List<Tag> tags);
     }
 }

@@ -41,5 +41,11 @@ namespace CnGalWebSite.APIServer.Application.Articles
         List<ArticleViewModel> ConcompareAndGenerateModel(Article currentArticle, Article newArticle);
 
         Task<ArticleEditState> GetArticleEditState(ApplicationUser user, long id);
+
+        void SetDataFromEditArticleMainViewModel(Article newArticle, EditArticleMainViewModel model);
+
+        void SetDataFromEditArticleMainPageViewModel(Article newArticle, EditArticleMainPageViewModel model);
+
+        void SetDataFromEditArticleRelevancesViewModel(Article newArticle, EditArticleRelevancesViewModel model, List<Entry> entries, List<Article> articles);
     }
 }

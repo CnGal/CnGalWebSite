@@ -1,53 +1,96 @@
-﻿<Timeline Items="AlternateTimelineItems" IsAlternate="!((IsSmallScreen) || (Model.NewsOfEntry.Count < 3))" />
+﻿@inject IDataCacheService _dataCatcheService
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
 
+
+@if (Model.RelevancesState == EditState.Preview)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditRelevances/" + Model.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"/>
+}
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="动态" Icon="fa fa-fw fa-newspaper-o">
+    <Scroll style="max-height:500px">
+        <MTimeline Dense="_dataCatcheService.IsApp||Model.NewsOfEntry.Count<3" Class="ms-2 me-2">
+            @foreach (var item in Model.NewsOfEntry.OrderByDescending(s=>s.HappenedTime))
+            {
+                <MTimelineItem Large>
+                    <IconContent>
+                        <MAvatar Class="pointer" @onclick="@(()=>OnClickImage(item))">
+                            <MImage Src="@item.Image"></MImage>
+                        </MAvatar>
+                    </IconContent>
+                    <OppositeContent>
+                        <span>@item.HappenedTime.ToString("yyyy-MM-dd HH:mm")</span>
+                    </OppositeContent>
+                    <ChildContent>
+                        <MCard Class="elevation-2"  @onclick="@(()=>ViewAt(item))">
+                            <MCardTitle Class="fw-bold">
+                                @item.Title
+                            </MCardTitle>
+                            <MCardText>
+                                @item.BriefIntroduction
+                            </MCardText>
+                        </MCard>
+                    </ChildContent>
+                </MTimelineItem>
+            }
+        </MTimeline>
+    </Scroll>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
     [Parameter]
-    public bool IsSmallScreen { get; set; }
-    private readonly List<TimelineItem> AlternateTimelineItems = new List<TimelineItem>();
+    public EventCallback<Operation> OnRevoke { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    #region 新建标签页
+
+    public async void OpenNewPage(string url)
     {
-        //初始化动态时间线
-        InitNewsTimeLine();
+        await JS.InvokeAsync<string>("openNewPage", url);
     }
-    public Color GetColor(int index)
+
+    #endregion
+
+    public Task OnClickImage(NewsModel item)
     {
-        switch (index)
+        if (item.GroupId != 0 && item.GroupId != Model.Id)
         {
-            case 0:
-                return Color.Primary;
-            case 1:
-                return Color.Info;
-            case 2:
-                return Color.Success;
-            case 3:
-                return Color.Warning;
-            default:
-                return Color.Danger;
+            NavigationManager.NavigateTo("/entries/index/" + item.GroupId);
         }
-    }
-    public void InitNewsTimeLine()
-    {
-        int next = 0;
-        AlternateTimelineItems.Clear();
-        foreach (var item in Model.NewsOfEntry.OrderByDescending(s => s.HappenedTime))
+        else if (string.IsNullOrWhiteSpace(item.UserId) == false)
         {
-            AlternateTimelineItems.Add(new TimelineItem
+
+
+            NavigationManager.NavigateTo("/space/index/" + item.UserId);
+
+        }
+        return Task.CompletedTask;
+    }
+
+    public async void ViewAt(NewsModel item)
+    {
+        if (string.IsNullOrWhiteSpace(item.Title))
+        {
+            return;
+        }
+        if (item.Link.Contains("cngal.org"))
+        {
+            NavigationManager.NavigateTo(item.Link);
+        }
+        else
+        {
+            try
             {
-                Color = GetColor((next++) % 4),
-                Component = BootstrapDynamicComponent.CreateComponent<CnGalWebSite.Shared.Component.Entries.TimeLinePart>(new Dictionary<string, object>
-                {
-                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.Title)] = item.Title,
-                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.BriefIntroduction)] = item.BriefIntroduction,
-                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.HappenedTime)] = item.HappenedTime,
-                    [nameof(CnGalWebSite.Shared.Component.Entries.TimeLinePart.Link)] = item.Link,
-                }),
-                Description = item.HappenedTime.ToString("yyyy-MM-dd")
-            });
+                await JS.InvokeAsync<string>("trackEvent", "动态", "点击", item.Title, "1", "click");
+            }
+            catch (Exception exc)
+            {
+
+            }
+            OpenNewPage(item.Link);
+
         }
     }
-
 }

@@ -3,26 +3,33 @@
 @inject IJSRuntime JS
 @inject HttpClient Http
 
-<ImageUpLoadButton OnUploadedImage="UpLoaded"></ImageUpLoadButton>
-<div class="row">
-    @for (int i = 0; i < images.Count; i++)
+<div class="@Class">
+    <ImageUpLoadButton OnUploadedImage="UpLoaded"/>
+    @if (images.Count != 0)
     {
-        <div class="col-6 col-md-6 col-lg-4 col-xl-3 col-xxl-2 col mb-3">
-            <div class="card ps-3 pt-2 pb-2 pe-3 h-100" style="background-color:transparent">
-                <div class="h-100">
-                    <div style="display: flex; justify-content: center;">
-                        <img src="@images[i].ImagePath" style="width: 100%;background-color:transparent" alt="...">
-                    </div>
-                    <div class=" mt-2">
-                        <p class="text-center" style="font-size: inherit; word-break: break-word; ">
-                            @images[i].ImagePath
-                        </p>
-                    </div>
+        <div class="row mt-3">
+            @for (int i = 0; i < images.Count; i++)
+            {
+                <div class="col-6 col-md-6 col-lg-4 col-xl-3 col-xxl-2 col mb-3">
+                    <div class="card ps-3 pt-2 pb-2 pe-3 h-100" style="background-color:transparent">
+                        <div class="h-100">
+                            <div style="display: flex; justify-content: center;">
+                                <img src="@images[i].ImagePath" style="width: 100%;background-color:transparent" alt="...">
+                            </div>
+                            <div class=" mt-2">
+                                <p class="text-center" style="font-size: inherit; word-break: break-word; ">
+                                    @images[i].ImagePath
+                                </p>
+                            </div>
 
+                        </div>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     }
+
+
 </div>
 
 
@@ -31,10 +38,11 @@
 
     [Parameter]
     public EventCallback<string> OnUploadedImage { get; set; }
-
+    [Parameter]
+    public string Class { get; set; }
     [Parameter]
     public List<ImagesUploadAloneModel> images { get; set; } = new List<ImagesUploadAloneModel>();
-   
+
     public async Task<string> UpLoaded(string url)
     {
         DefaultFormatFileList.Add(new UploadFile

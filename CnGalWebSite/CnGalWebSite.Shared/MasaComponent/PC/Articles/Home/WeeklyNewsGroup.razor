@@ -1,0 +1,58 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="CnGal每周速报" Icon="fa fa-fw fa-newspaper-o">
+    <ButtonContent>
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
+            <MIcon Left>mdi-share-all-outline  </MIcon>
+            查看更多
+        </MButton>
+    </ButtonContent>
+    <ChildContent>
+        <MSlideGroup ShowArrows="true">
+            <ChildContent>
+                @foreach (var item in _dataCacheService.WeeklyNewsOverviewCatche)
+                {
+                    <MSlideItem>
+                        <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"
+                               OnClick="@context.Toggle"
+                               RefBack="@context.Ref">
+                            <WeeklyNewsViewTip Model="item" />
+                        </MCard>
+                    </MSlideItem>
+                }
+            </ChildContent>
+
+        </MSlideGroup>
+    </ChildContent>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            if (_dataCacheService.WeeklyNewsOverviewCatche.Count == 0)
+            {
+                _dataCacheService.WeeklyNewsOverviewCatche = await Http.GetFromJsonAsync<List<ArticleInforTipViewModel>>(ToolHelper.WebApiPath + "api/news/GetWeeklyNewsOverview");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取文章主页周报列表失败");
+        }
+    }
+    public Task OnClickMore()
+    {
+        NavigationManager.NavigateTo("/weeklynews");
+        return Task.CompletedTask;
+    }
+
+}

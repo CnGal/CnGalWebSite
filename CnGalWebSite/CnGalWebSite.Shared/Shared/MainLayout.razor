@@ -8,265 +8,274 @@
 @inject IDataCacheService _dataCacheService
 @inject IServiceProvider Provider
 
+@if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip Show />
+}
+<MApp  Dark="_dataCacheService.ThemeSetting.IsDark" >
 
-<StyleTip ColorString="@_dataCacheService.ThemeSetting.Theme" IsDark="_dataCacheService.ThemeSetting.IsDark" @ref="styleTip" IsOnMouse="_dataCacheService.ThemeSetting.IsOnMouse" IsOnBgImage="_dataCacheService.ThemeSetting.IsOnBgImage"></StyleTip>
+    <Layout SideWidth="0" IsPage="true" ShowGotoTop="false" ShowCollapseBar="true"
+            IsFullSide="@_dataCacheService.ThemeSetting.IsFullSide" IsFixedHeader="@_dataCacheService.ThemeSetting.IsFixedHeader" IsFixedFooter="@_dataCacheService.ThemeSetting.IsFixedFooter" ShowFooter="@_dataCacheService.ThemeSetting.ShowFooter"
+            Menus="@Menus" UseTabSet="@_dataCacheService.ThemeSetting.UseTabSet" AdditionalAssemblies="new[] { GetType().Assembly }" class="@_dataCacheService.ThemeSetting.Theme">
+        <Header>
+            <div class="ms-3 flex-sm-fill d-none d-sm-block">
+                <HomeNoticesTip />
 
-<link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/pc.min.css">
-
-<ImagesLargeViewTip></ImagesLargeViewTip>
-
-<Layout SideWidth="0" IsPage="true" ShowGotoTop="false" ShowCollapseBar="true"
-        IsFullSide="@_dataCacheService.ThemeSetting.IsFullSide" IsFixedHeader="@_dataCacheService.ThemeSetting.IsFixedHeader" IsFixedFooter="@_dataCacheService.ThemeSetting.IsFixedFooter" ShowFooter="@_dataCacheService.ThemeSetting.ShowFooter"
-        Menus="@Menus" UseTabSet="@_dataCacheService.ThemeSetting.UseTabSet" AdditionalAssemblies="new[] { GetType().Assembly }" class="@_dataCacheService.ThemeSetting.Theme">
-    <Header>
-        <div class="ms-3 flex-sm-fill d-none d-sm-block">
-            <HomeNoticesTip />
-
-        </div>
-        <div class="d-flex" style="align-items: center;">
-            @if (UnreadedMessages.Count > 0)
-            {
-                <DropdownWidget class="px-3 d-none d-sm-block" @onclick="OnClickMessage">
-                    <DropdownWidgetItem Icon="fa fa-envelope-o" ShowArrow="false" BadgeNumber="@(UnreadedMessages.Count.ToString())">
-                    </DropdownWidgetItem>
-                </DropdownWidget>
-            }
-
-
-            <AuthorizeView>
-                <Authorized>
-                    @foreach (var item in context.User.Claims)
-                    {
-                        if (item.Type == "image")
-                        {
-                            image = item.Value;
-                        }
-                        else if (item.Type == "userid")
-                        {
-                            userId = item.Value;
-                        }
-                    }
-                    @{userName = context.User.Identity.Name;}
-                    <img src="@(image??"https://app.cngal.org/_content/CnGalWebSite.Shared/images/user.png")" class="layout-avatar-right" alt="头像" />
-                    <TabLink Text="个人空间" Url="@("/space/index/"+userId)" Icon="fa fa-star-o" class="d-sm-block nav-link" style="color: white; word-wrap: break-word; word-break: break-all; width: max-content;">
-                        @context.User.Identity.Name
-                    </TabLink>
-                </Authorized>
-                <NotAuthorized>
-                    <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/user.png" class="layout-avatar-right" alt="头像" />
-                    <TabLink Text="登入" Url="/account/login" Icon="fa fa-sign-in" class="nav-link" style="color:white">
-                        登入
-                    </TabLink>
-                </NotAuthorized>
-
-            </AuthorizeView>
-            <TabLink Text="搜索" Url="/home/search/全部" Icon="fa fa-search" class="layout-drawer" style="color: white; margin-right: 0px; height: 50px;" aria-label="搜索">
-                <i class="fa fa-search"></i>
-            </TabLink>
-            <AuthorizeView>
-                <Authorized>
-                    <CreateWidgetTip></CreateWidgetTip>
-                </Authorized>
-            </AuthorizeView>
-            <div class="layout-drawer" @onclick="@(e => _dataCacheService.ThemeSetting.IsOpen = !_dataCacheService.ThemeSetting.IsOpen)" style=" height: 50px;"><i class="fa fa-gears"></i></div>
-
-        </div>
-
-    </Header>
-    <Side>
-        <TabLink class="layout-banner" Text="主页" Url="/" Icon="fa fa-home">
-            <img class="layout-logo" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" alt="logo" />
-            <div class="layout-title">
-                <span>CnGal资料站</span>
             </div>
-        </TabLink>
+            <div class="d-flex" style="align-items: center;">
+                @if (UnreadedMessages.Count > 0)
+                {
+                    <DropdownWidget class="px-3 d-none d-sm-block" @onclick="OnClickMessage">
+                        <DropdownWidgetItem Icon="fa fa-envelope-o" ShowArrow="false" BadgeNumber="@(UnreadedMessages.Count.ToString())">
+                        </DropdownWidgetItem>
+                    </DropdownWidget>
+                }
 
-        <div class="layout-user">
-            <AuthorizeView>
-                <Authorized>
-                    <img class="layout-avatar" src="@(image??"https://app.cngal.org/_content/CnGalWebSite.Shared/images/user.png")" alt="头像">
-                    <div class="layout-title">
-                        <TabLink Text="个人空间" Url="@("/space/index/"+userId)" Icon="fa fa-star-o" class="nav-link">
+
+                <AuthorizeView>
+                    <Authorized>
+                        @foreach (var item in context.User.Claims)
+                        {
+                            if (item.Type == "image")
+                            {
+                                image = item.Value;
+                            }
+                            else if (item.Type == "userid")
+                            {
+                                userId = item.Value;
+                            }
+                        }
+                        @{userName = context.User.Identity.Name;}
+                        <img src="@(image??"https://app.cngal.org/_content/CnGalWebSite.Shared/images/user.png")" class="layout-avatar-right" alt="头像" />
+                        <TabLink Text="个人空间" Url="@("/space/index/"+userId)" Icon="fa fa-star-o" class="d-sm-block nav-link" style="color: white; word-wrap: break-word; word-break: break-all; width: max-content;">
                             @context.User.Identity.Name
                         </TabLink>
-                    </div>
-                    <div class="layout-user-state"></div>
-                </Authorized>
-                <NotAuthorized>
-                    <img class="layout-avatar" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/user.png" alt="头像">
-                    <div class="layout-title">
+                    </Authorized>
+                    <NotAuthorized>
+                        <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/user.png" class="layout-avatar-right" alt="头像" />
                         <TabLink Text="登入" Url="/account/login" Icon="fa fa-sign-in" class="nav-link" style="color:white">
                             登入
                         </TabLink>
+                    </NotAuthorized>
+
+                </AuthorizeView>
+                <TabLink Text="搜索" Url="/home/search/全部" Icon="fa fa-search" class="layout-drawer" style="color: white; margin-right: 0px; height: 50px;" aria-label="搜索">
+                    <i class="fa fa-search"></i>
+                </TabLink>
+                <AuthorizeView>
+                    <Authorized>
+                        <CreateWidgetTip></CreateWidgetTip>
+                    </Authorized>
+                </AuthorizeView>
+                <div class="layout-drawer" @onclick="@(e => _dataCacheService.ThemeSetting.IsOpen = !_dataCacheService.ThemeSetting.IsOpen)" style=" height: 50px;"><i class="fa fa-gears"></i></div>
+
+            </div>
+
+        </Header>
+        <Side>
+            <TabLink class="layout-banner" Text="主页" Url="/" Icon="fa fa-home">
+                <img class="layout-logo" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" alt="logo" />
+                <div class="layout-title">
+                    <span>CnGal资料站</span>
+                </div>
+            </TabLink>
+
+            <div class="layout-user">
+                <AuthorizeView>
+                    <Authorized>
+                        <img class="layout-avatar" src="@(image??"https://app.cngal.org/_content/CnGalWebSite.Shared/images/user.png")" alt="头像">
+                        <div class="layout-title">
+                            <TabLink Text="个人空间" Url="@("/space/index/"+userId)" Icon="fa fa-star-o" class="nav-link">
+                                @context.User.Identity.Name
+                            </TabLink>
+                        </div>
+                        <div class="layout-user-state"></div>
+                    </Authorized>
+                    <NotAuthorized>
+                        <img class="layout-avatar" src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/user.png" alt="头像">
+                        <div class="layout-title">
+                            <TabLink Text="登入" Url="/account/login" Icon="fa fa-sign-in" class="nav-link" style="color:white">
+                                登入
+                            </TabLink>
+                        </div>
+                        <div class="layout-user-state"></div>
+                    </NotAuthorized>
+                </AuthorizeView>
+
+            </div>
+        </Side>
+        <Main>
+
+            <CascadingValue Value="this" IsFixed="true">
+                @Body
+            </CascadingValue>
+        </Main>
+        <Footer>
+            <div class="text-center flex-fill p-1 d-wasm d-wasm-sm-block" style="color: #EBEEF5">
+                &copy; 2022 - CnGal资料站 -&nbsp;<TabLink Text="关于" Url="/home/about" Icon="fa fa-bolt" style="color:white">关于</TabLink>
+                @if (IsNormalScreen == false && IsSmallScreen == false)
+                {
+                    <a class="ms-4" target="_blank" rel="noopener" href="http://beian.miit.gov.cn" one-link-mark="yes" style="color:white">粤ICP备15055899号</a>
+                }
+                <br />
+                <a rel="noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="知识共享许可协议" style="border-width:0" src="//app.cngal.org/_content/CnGalWebSite.Shared/images/CC4.png" /></a>
+                本站内容采用&nbsp;<a rel="noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:white">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议</a>&nbsp;进行许可。
+                @if (IsSmallScreen == false && IsNormalScreen == true)
+                {
+                    <br />
+                    <br />
+                    <a class="ms-4" target="_blank" rel="noopener" href="http://beian.miit.gov.cn" one-link-mark="yes" style="color:white">粤ICP备15055899号</a>
+                }
+                @if (IsSmallScreen == true && IsNormalScreen == false)
+                {
+                    <br />
+                    <a class="ms-4" target="_blank" rel="noopener" href="http://beian.miit.gov.cn" one-link-mark="yes" style="color:white">粤ICP备15055899号</a>
+                }
+            </div>
+        </Footer>
+    </Layout>
+
+    <Drawer Placement="Placement.Right" @bind-IsOpen="@_dataCacheService.ThemeSetting.IsOpen" IsBackdrop="true" OnClickBackdrop="@(async () => {if (CnGalRootTip != null) { await CnGalRootTip.SaveTheme(); } })">
+        <div class="layout-drawer-body">
+            <div class="btn btn-info-1 w-100" @onclick="@(async e => { _dataCacheService.ThemeSetting.IsOpen = false;if (CnGalRootTip != null) { await CnGalRootTip.SaveTheme(); } })">点击关闭</div>
+            <div class="page-layout-demo-option">
+                <p>布局调整</p>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="layout-item @(_dataCacheService.ThemeSetting.IsFullSide ? "active d-flex" : "d-flex")" @onclick="@(e => _dataCacheService.ThemeSetting.IsFullSide = true)" data-toggle="tooltip" title="左右结构">
+                            <div class="layout-left d-flex flex-column">
+                                <div class="layout-left-header"></div>
+                                <div class="layout-left-body flex-fill"></div>
+                            </div>
+                            <div class="layout-right d-flex flex-column flex-fill">
+                                <div class="layout-right-header"></div>
+                                <div class="layout-right-body flex-fill"></div>
+                                <div class="layout-right-footer"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="layout-user-state"></div>
-                </NotAuthorized>
+                    <div class="col-6">
+                        <div class="layout-item flex-column @(_dataCacheService.ThemeSetting.IsFullSide ? "d-flex" : "active d-flex")" @onclick="@(e => _dataCacheService.ThemeSetting.IsFullSide = false)" data-toggle="tooltip" title="上下结构">
+                            <div class="layout-top">
+                            </div>
+                            <div class="layout-body d-flex flex-fill">
+                                <div class="layout-left">
+                                </div>
+                                <div class="layout-right flex-fill">
+                                </div>
+                            </div>
+                            <div class="layout-footer">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-layout-demo-option">
+                <p>固定调整</p>
+                <div class="row">
+                    <div class="col-6 d-flex align-items-center">
+                        <Switch @bind-Value="@_dataCacheService.ThemeSetting.IsFixedHeader" OnColor="@Color.Success" OffColor="@Color.Secondary"></Switch>
+                    </div>
+                    <div class="col-6 text-right">
+                        <span>固定页头</span>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-6 d-flex align-items-center">
+                        <Switch @bind-Value="@_dataCacheService.ThemeSetting.IsFixedFooter" OnColor="@Color.Success" OffColor="@Color.Secondary"></Switch>
+                    </div>
+                    <div class="col-6 text-right">
+                        <span>固定页脚</span>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-6 d-flex align-items-center">
+                        <Switch @bind-Value="@_dataCacheService.ThemeSetting.ShowFooter" OnColor="@Color.Success" OffColor="@Color.Primary"></Switch>
+                    </div>
+                    <div class="col-6 text-right">
+                        <span>显示页脚</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-layout-demo-option">
+                <p>主题配色</p>
+                <div class="row">
+                    <div class="col-2">
+                        <span class="color color1" @onclick="@(e => _dataCacheService.ThemeSetting.Theme = "blue")"></span>
+                    </div>
+                    <div class="col-2">
+                        <span class="color color2" @onclick="@(e => _dataCacheService.ThemeSetting.Theme = "green")"></span>
+                    </div>
+                    <div class="col-2">
+                        <span class="color color3" @onclick="@(e => _dataCacheService.ThemeSetting.Theme = "pink lighten-2")"></span>
+                    </div>
+                    <div class="col-2">
+                        <span class="color color4" @onclick="@(e => _dataCacheService.ThemeSetting.Theme = "orange")"></span>
+                    </div>
+                    <div class="col-2">
+                        <span class="color color5" @onclick="@(e => _dataCacheService.ThemeSetting.Theme = "blue-grey")"></span>
+                    </div>
+                    <div class="col-2">
+                        <span class="color color6" @onclick="@(e => _dataCacheService.ThemeSetting.Theme = "purple")"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-layout-demo-option">
+                <p>更多设置</p>
+                <div class="row">
+                    <div class="col-6 d-flex align-items-center">
+                        <Switch @bind-Value="@_dataCacheService.ThemeSetting.UseTabSet" OnColor="@Color.Success" OffColor="@Color.Primary"></Switch>
+                    </div>
+                    <div class="col-6 text-right">
+                        <span>@(_dataCacheService.ThemeSetting.UseTabSet ? "多标签" : "单页")</span>
+                    </div>
+
+                </div>
+                <div class="row mt-3">
+                    <div class="col-6 d-flex align-items-center">
+                        <Switch @bind-Value="@_dataCacheService.ThemeSetting.IsDark" OnColor="@Color.Success" OffColor="@Color.Primary"></Switch>
+                    </div>
+                    <div class="col-6 text-right">
+                        <span>@(_dataCacheService.ThemeSetting.IsDark ? "深色" : "浅色")</span>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-6 d-flex align-items-center">
+                        <Switch @bind-Value="@_dataCacheService.ThemeSetting.IsOnMouse" OnColor="@Color.Success" OffColor="@Color.Secondary"></Switch>
+                    </div>
+                    <div class="col-6 text-right">
+                        <span>@(_dataCacheService.ThemeSetting.IsOnMouse ? "礼花" : "礼花")</span>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-6 d-flex align-items-center">
+                        <Switch @bind-Value="@_dataCacheService.ThemeSetting.IsOnBgImage" OnColor="@Color.Success" OffColor="@Color.Secondary"></Switch>
+                    </div>
+                    <div class="col-6 text-right">
+                        <span>@(_dataCacheService.ThemeSetting.IsOnBgImage ? "背景图" : "背景图")</span>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-6 d-flex align-items-center">
+                        <Switch @bind-Value="@_dataCacheService.ThemeSetting.IsMasa" OnColor="@Color.Success" OffColor="@Color.Secondary"></Switch>
+                    </div>
+                    <div class="col-6 text-right">
+                        <span>@(_dataCacheService.ThemeSetting.IsMasa ? "回到旧版布局" : "切换新版布局")</span>
+                    </div>
+                </div>
+            </div>
+            <AuthorizeView>
+                <Authorized>
+                    <div class="btn btn-info-1 w-100 mt-3" @onclick="@(()=>Logout())">退出登入</div>
+                </Authorized>
             </AuthorizeView>
+            <div class="btn btn-info-1 w-100 d-wasm mt-3" @onclick="@NavigateToWASM">切换客户端模式</div>
+            <div class="btn btn-info-1 w-100 d-ssr mt-3" @onclick="@NavigateToSSR">切换服务端模式</div>
 
         </div>
-    </Side>
-    <Main>
+    </Drawer>
 
-        <CascadingValue Value="this" IsFixed="true">
-            @Body
-        </CascadingValue>
-    </Main>
-    <Footer>
-        <div class="text-center flex-fill p-1 d-wasm d-wasm-sm-block" style="color: #EBEEF5">
-            &copy; 2022 - CnGal资料站 -&nbsp;<TabLink Text="关于" Url="/home/about" Icon="fa fa-bolt" style="color:white">关于</TabLink>
-            @if (IsNormalScreen == false && IsSmallScreen == false)
-            {
-                <a class="ms-4" target="_blank" rel="noopener" href="http://beian.miit.gov.cn" one-link-mark="yes" style="color:white">粤ICP备15055899号</a>
-            }
-            <br />
-            <a rel="noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="知识共享许可协议" style="border-width:0" src="//app.cngal.org/_content/CnGalWebSite.Shared/images/CC4.png" /></a>
-            本站内容采用&nbsp;<a rel="noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" style="color:white">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议</a>&nbsp;进行许可。
-            @if (IsSmallScreen == false && IsNormalScreen == true)
-            {
-                <br />
-                <br />
-                <a class="ms-4" target="_blank" rel="noopener" href="http://beian.miit.gov.cn" one-link-mark="yes" style="color:white">粤ICP备15055899号</a>
-            }
-            @if (IsSmallScreen == true && IsNormalScreen == false)
-            {
-                <br />
-                <a class="ms-4" target="_blank" rel="noopener" href="http://beian.miit.gov.cn" one-link-mark="yes" style="color:white">粤ICP备15055899号</a>
-            }
-        </div>
-    </Footer>
-</Layout>
-
-<Drawer Placement="Placement.Right" @bind-IsOpen="@_dataCacheService.ThemeSetting.IsOpen" IsBackdrop="true" OnClickBackdrop="@(async () => {await _dataCacheService.SavaTheme.InvokeAsync(); })">
-    <div class="layout-drawer-body">
-        <div class="btn btn-info-1 w-100" @onclick="@(async e => { _dataCacheService.ThemeSetting.IsOpen = false;await _dataCacheService.SavaTheme.InvokeAsync(); })">点击关闭</div>
-        <div class="page-layout-demo-option">
-            <p>布局调整</p>
-            <div class="row">
-                <div class="col-6">
-                    <div class="layout-item @(_dataCacheService.ThemeSetting.IsFullSide ? "active d-flex" : "d-flex")" @onclick="@(e => _dataCacheService.ThemeSetting.IsFullSide = true)" data-toggle="tooltip" title="左右结构">
-                        <div class="layout-left d-flex flex-column">
-                            <div class="layout-left-header"></div>
-                            <div class="layout-left-body flex-fill"></div>
-                        </div>
-                        <div class="layout-right d-flex flex-column flex-fill">
-                            <div class="layout-right-header"></div>
-                            <div class="layout-right-body flex-fill"></div>
-                            <div class="layout-right-footer"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="layout-item flex-column @(_dataCacheService.ThemeSetting.IsFullSide ? "d-flex" : "active d-flex")" @onclick="@(e => _dataCacheService.ThemeSetting.IsFullSide = false)" data-toggle="tooltip" title="上下结构">
-                        <div class="layout-top">
-                        </div>
-                        <div class="layout-body d-flex flex-fill">
-                            <div class="layout-left">
-                            </div>
-                            <div class="layout-right flex-fill">
-                            </div>
-                        </div>
-                        <div class="layout-footer">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="page-layout-demo-option">
-            <p>固定调整</p>
-            <div class="row">
-                <div class="col-6 d-flex align-items-center">
-                    <Switch @bind-Value="@_dataCacheService.ThemeSetting.IsFixedHeader" OnColor="@Color.Success" OffColor="@Color.Secondary"></Switch>
-                </div>
-                <div class="col-6 text-right">
-                    <span>固定页头</span>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-6 d-flex align-items-center">
-                    <Switch @bind-Value="@_dataCacheService.ThemeSetting.IsFixedFooter" OnColor="@Color.Success" OffColor="@Color.Secondary"></Switch>
-                </div>
-                <div class="col-6 text-right">
-                    <span>固定页脚</span>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-6 d-flex align-items-center">
-                    <Switch @bind-Value="@_dataCacheService.ThemeSetting.ShowFooter" OnColor="@Color.Success" OffColor="@Color.Primary"></Switch>
-                </div>
-                <div class="col-6 text-right">
-                    <span>显示页脚</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="page-layout-demo-option">
-            <p>主题配色</p>
-            <div class="row">
-                <div class="col-2">
-                    <span class="color color1" @onclick="@(e => _dataCacheService.ThemeSetting.Theme = "color1")"></span>
-                </div>
-                <div class="col-2">
-                    <span class="color color2" @onclick="@(e => _dataCacheService.ThemeSetting.Theme = "color2")"></span>
-                </div>
-                <div class="col-2">
-                    <span class="color color3" @onclick="@(e => _dataCacheService.ThemeSetting.Theme = "color3")"></span>
-                </div>
-                <div class="col-2">
-                    <span class="color color4" @onclick="@(e => _dataCacheService.ThemeSetting.Theme = "color4")"></span>
-                </div>
-                <div class="col-2">
-                    <span class="color color5" @onclick="@(e => _dataCacheService.ThemeSetting.Theme = "color5")"></span>
-                </div>
-                <div class="col-2">
-                    <span class="color color6" @onclick="@(e => _dataCacheService.ThemeSetting.Theme = "color6")"></span>
-                </div>
-            </div>
-        </div>
-
-        <div class="page-layout-demo-option">
-            <p>更多设置</p>
-            <div class="row">
-                <div class="col-6 d-flex align-items-center">
-                    <Switch @bind-Value="@_dataCacheService.ThemeSetting.UseTabSet" OnColor="@Color.Success" OffColor="@Color.Primary"></Switch>
-                </div>
-                <div class="col-6 text-right">
-                    <span>@(_dataCacheService.ThemeSetting.UseTabSet ? "多标签" : "单页")</span>
-                </div>
-
-            </div>
-            <div class="row mt-3">
-                <div class="col-6 d-flex align-items-center">
-                    <Switch @bind-Value="@_dataCacheService.ThemeSetting.IsDark" OnColor="@Color.Success" OffColor="@Color.Primary"></Switch>
-                </div>
-                <div class="col-6 text-right">
-                    <span>@(_dataCacheService.ThemeSetting.IsDark ? "深色" : "浅色")</span>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-6 d-flex align-items-center">
-                    <Switch @bind-Value="@_dataCacheService.ThemeSetting.IsOnMouse" OnColor="@Color.Success" OffColor="@Color.Secondary"></Switch>
-                </div>
-                <div class="col-6 text-right">
-                    <span>@(_dataCacheService.ThemeSetting.IsOnMouse ? "礼花" : "礼花")</span>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-6 d-flex align-items-center">
-                    <Switch @bind-Value="@_dataCacheService.ThemeSetting.IsOnBgImage" OnColor="@Color.Success" OffColor="@Color.Secondary"></Switch>
-                </div>
-                <div class="col-6 text-right">
-                    <span>@(_dataCacheService.ThemeSetting.IsOnBgImage ? "背景图" : "背景图")</span>
-                </div>
-            </div>
-        </div>
-        <AuthorizeView>
-            <Authorized>
-                <div class="btn btn-info-1 w-100 mt-3" @onclick="@(()=>Logout())">退出登入</div>
-            </Authorized>
-        </AuthorizeView>
-        <div class="btn btn-info-1 w-100 d-wasm mt-3" @onclick="@NavigateToWASM">切换客户端模式</div>
-        <div class="btn btn-info-1 w-100 d-ssr mt-3" @onclick="@NavigateToSSR">切换服务端模式</div>
-
-    </div>
-</Drawer>
+</MApp>

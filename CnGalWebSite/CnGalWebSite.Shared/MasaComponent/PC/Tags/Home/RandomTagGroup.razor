@@ -1,0 +1,63 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+@foreach (var item in _dataCacheService.RandomTagsCatche.Take(1))
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@item.Name" Icon="fa fa-fw fa-hashtag">
+        <ButtonContent>
+            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClickMore("/tags/index/"+item.Id))">
+                <MIcon Left>mdi-share-all-outline  </MIcon>
+                查看标签详情
+            </MButton>
+        </ButtonContent>
+        <ChildContent>
+            <MSlideGroup ShowArrows="true">
+                <ChildContent>
+                    @foreach (var temp in item.Entries)
+                    {
+                        <MSlideItem>
+                            <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"
+                                   OnClick="@context.Toggle"
+                                   RefBack="@context.Ref">
+                                <RandomTagViewTip Model="temp" />
+                            </MCard>
+                        </MSlideItem>
+                    }
+                </ChildContent>
+
+            </MSlideGroup>
+        </ChildContent>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            if (_dataCacheService.RandomTagsCatche.Count == 0)
+            {
+                _dataCacheService.RandomTagsCatche = await Http.GetFromJsonAsync<List<RandomTagModel>>(ToolHelper.WebApiPath + "api/tags/GetRandomTags");
+            }
+
+            _dataCacheService.RandomTagsCatche.Random();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取广场随机标签列表失败");
+        }
+    }
+    public Task OnClickMore(string url)
+    {
+        NavigationManager.NavigateTo(url);
+        return Task.CompletedTask;
+    }
+
+}

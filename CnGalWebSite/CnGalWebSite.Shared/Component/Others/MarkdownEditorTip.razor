@@ -16,13 +16,13 @@
         <AlertTip Type="AlertTip.AlertTipType.MarkdownTip"></AlertTip>
 
     }
-    <ImagesUploadViewTip images="images" OnUploadedImage="OnUploadImage"></ImagesUploadViewTip>
-    <div class="alert alert-success  rounded shadow-sm  rounded mb-4" role="alert" style="margin:0px">
-        不了解Markdown？可以在这<a href="http://www.markdown.cn/" target="_blank" class="alert-link">查看语法说明</a>
-    </div>
+    <ImagesUploadViewTip images="images" OnUploadedImage="OnUploadImage" Class="mb-3"/>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4">
+            不了解Markdown？可以在这<a href="http://www.markdown.cn/" target="_blank" rel="noreferrer" class="success--text fw-bold">查看语法说明</a>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     @if (isReady)
     {
-            <EditorMdViewTip Context="@Context" @ref="markdownEditorTip" ContextChanged="ContextValueChanged"></EditorMdViewTip>
+       <EditorMdViewTip Context="@Context" @ref="markdownEditorTip" ContextChanged="ContextValueChanged"></EditorMdViewTip>
     }
 
 </div>

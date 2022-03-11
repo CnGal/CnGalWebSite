@@ -1,0 +1,100 @@
+﻿@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+@inject ToastService ToastService
+
+@if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor.PhotoPath) == false)
+{
+    <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
+        <ActivatorContent Context="m">
+            <MTooltip Bottom>
+                <ActivatorContent Context="c">
+                    @{
+                        var attrs = new Dictionary<string, object>();
+                        m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                        c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                    }
+                    <MButton Icon Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs">
+                        <img style="width:35px;border-radius:50%;" src="@_dataCacheService.UserInfor.PhotoPath" alt="@_dataCacheService.UserInfor.Name" />
+                    </MButton>
+                </ActivatorContent>
+                <ChildContent>
+                    <span>@_dataCacheService.UserInfor.Name</span>
+                </ChildContent>
+            </MTooltip>
+        </ActivatorContent>
+
+        <ChildContent>
+          <div style="width:300px;">
+              <UserInforCard Model="@_dataCacheService.UserInfor" OnClosed="OnClosed" OnClickSetting="OnClickSetting"/>
+          </div>
+        </ChildContent>
+    </MMenu>
+}
+@code {
+
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public EventCallback OnClickSetting { get; set; }
+
+    private bool menu { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            //清除登入令牌
+            _dataCacheService.LoginKey = "";
+            _dataCacheService.IsOnThirdPartyLogin = true;
+            _dataCacheService.ThirdPartyLoginTempModel = null;
+
+            await RefreshUserInfor();
+        }
+    }
+
+    public async Task RefreshUserInfor()
+    {
+        var user = await authenticationStateTask;
+        if (user.User.Identity.IsAuthenticated)
+        {
+            try
+            {
+                string userId = "";
+                foreach (var item in user.User.Claims)
+                {
+                    if (item.Type == "userid")
+                    {
+                        userId = item.Value;
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(userId) == false)
+                {
+                    var model = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + userId);
+
+
+                    _dataCacheService.UserInfor = model;
+                    StateHasChanged();
+                }
+
+            }
+            catch
+            {
+                await ToastService.Error("获取用户信息失败", "未知错误，请在确保网络正常后联系开发人员");
+            }
+        }
+    }
+
+    public Task OnClosed()
+    {
+        menu = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

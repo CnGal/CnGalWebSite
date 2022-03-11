@@ -202,7 +202,7 @@ else
                 return;
             }
 
-            if (Model.LotteryTime < Model.EndTime)
+            if (Model.Type== LotteryType.Automatic&& Model.LotteryTime < Model.EndTime)
             {
                 await ToastService.Error("编辑抽奖失败", "结束时间必须早于抽奖时间");
                 return;

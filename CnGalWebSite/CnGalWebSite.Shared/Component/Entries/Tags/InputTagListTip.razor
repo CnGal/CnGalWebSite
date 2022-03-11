@@ -4,19 +4,20 @@
 @inject ToastService ToastService
 @inject IServiceProvider Provider
 
-
-<div class="row">
-    @for (int i = 0; i < Model.Count; i++)
-    {
-        int temp = i;
-        <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mt-2">
-            <AutoComplete Items="@AutoCompleteItems" IsLikeMatch="true" IgnoreCase="true" Id="name" @bind-Value="Model[temp].DisplayName" placeholder="标签" />
-        </div>
-    }
-</div>
-<div>
-    <Button Color="Color.Primary" IsOutline="true" class="mt-4" style="width:100px" @onclick="@(() => OnAdd())" Text="添加" Icon="fa fa-plus"></Button>
-    <Button Color="Color.Success" IsOutline="true" class="ms-2 mt-4" style="width:100px" @onclick="@(() => OnCreate())" Text="创建" Icon="fa fa-cubes"></Button>
+<div class="@Class">
+    <div class="row">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            int temp = i;
+            <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-2">
+                <AutoComplete Items="@AutoCompleteItems" IsLikeMatch="true" IgnoreCase="true" Id="name" @bind-Value="Model[temp].DisplayName" placeholder="标签" />
+            </div>
+        }
+    </div>
+    <div>
+        <Button Color="Color.Primary" IsOutline="true" style="width:100px" OnClick="OnAdd" Text="添加" Icon="fa fa-plus"></Button>
+        <Button Color="Color.Success" IsOutline="true" class="ms-2" style="width:100px" OnClick="OnCreate" Text="创建" Icon="fa fa-cubes"></Button>
+    </div>
 </div>
 
 @code {
@@ -24,6 +25,8 @@
     public List<RelevancesModel> Model { get; set; }
     [Parameter]
     public IEnumerable<string> AutoCompleteItems { get; set; }
+    [Parameter]
+    public string Class { get; set; }
 
     private async Task OnAdd()
     {

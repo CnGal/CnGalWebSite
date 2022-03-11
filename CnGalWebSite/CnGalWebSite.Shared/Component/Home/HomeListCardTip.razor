@@ -1,98 +1,54 @@
 ﻿@inject ToastService ToastService
 @inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
 
-@if (IsSmallScreen)
-{
-    <div class=" rounded shadow-sm  bg-opacity rounded ps-3 pe-3 pt-3 pb-3 mb-2 @(IsFrist?"":"mt-4")" style="display: flex; flex-direction: row; justify-content: space-between;">
-        <h2 class="fw-bold font-color h4" style="margin-bottom:auto;margin-top:auto;"><i class="@TitleIcon"></i>&nbsp;&nbsp;@Title</h2>
-        <TabLink style="float: right"  class="btn btn-outline-dark  btn-sm"  Url="@Url" Text="@UrlName" Icon="@UrlIcon">
-            <i class="fa fa-plane"></i>&nbsp;查看全部
-        </TabLink>
-    </div>
-
-    <div class="row">
-        @for (int i = 0; i < Items.Count && i < ItemNum * 2; i++)
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@Title" Icon="@Icon" Class="mb-4">
+    <ButtonContent>
+        @if (string.IsNullOrWhiteSpace(Url) == false)
         {
-            long temp = Items[i].Id;
-            string tempName = Items[i].DisPlayName;
-            <div class="col-6 col-md-3 mb-2 mt-2">
-                <div class="rounded shadow-sm bg-opacity rounded pb-1 h-100">
-                    <HomeCardViewTip Icon="fa fa-codepen" Id="temp" Image="@Items[i].Image" ReadCount="Items[i].ReadCount" CommentCount="Items[i].CommentCount" IsSmallScreen="true" 
-                                     Name="@Items[i].DisPlayName" Url="@("/"+Type+"/index/" + temp)" ></HomeCardViewTip>
+            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
+                <MIcon Left>mdi-share-all-outline  </MIcon>
+                查看更多
+            </MButton>
+        }
+
+    </ButtonContent>
+    <ChildContent>
+        <div class="row">
+            @foreach (var item in Items.Take(12))
+            {
+                <div class="col-12 col-md-4 col-lg-3 col-xl-2 mb-2">
+                    <HomeCardViewTip Icon="fa fa-codepen" Image="@item.Image" ReadCount="item.ReadCount" CommentCount="item.CommentCount"  ShowCount="ShowCount" Circle="Circle" Outlink="Outlink"
+                                     Name="@item.Name" Url="@item.Url"/>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    </ChildContent>
 
-}
-else
-{
-    <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 @(IsFrist?"":"mt-4")">
-        <TabLink style="float: right"  class="btn btn-outline-dark btn-sm" Url="@Url" Text="@UrlName" Icon="@UrlIcon">
-            <i class="fa fa-plane"></i>&nbsp;查看全部
-        </TabLink>
-        <h2 class="fw-bold mb-4 font-color h4"><i class="@TitleIcon"></i>&nbsp;&nbsp;@Title</h2>
-        @if (IsNormalScreen)
-        {
-            <div class="row">
-                @for (int i = 0; i < Items.Count && i < ItemNum * 2; i++)
-                {
-                    long temp = Items[i].Id;
-                    string tempName = Items[i].DisPlayName;
-                    <div class="col-6 col-md-3 mb-2">
-                        <HomeCardViewTip Icon="fa fa-codepen" Id="temp" Image="@Items[i].Image" ReadCount="Items[i].ReadCount" CommentCount="Items[i].CommentCount"
-                                         Name="@Items[i].DisPlayName" Url="@("/"+Type+"/index/" + temp)"></HomeCardViewTip>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="row">
-                @for (int i = 0; i < Items.Count && i < 12; i++)
-                {
-                    long temp = Items[i].Id;
-                    string tempName = Items[i].DisPlayName;
-                    <div class="col-12 col-md-6 col-lg-2 mb-2">
-                        <HomeCardViewTip Icon="fa fa-codepen" Id="temp" Image="@Items[i].Image" ReadCount="Items[i].ReadCount" CommentCount="Items[i].CommentCount"
-                                         Name="@Items[i].DisPlayName" Url="@("/"+Type+"/index/" + temp)" ></HomeCardViewTip>
-                    </div>
-                }
-            </div>
-        }
-
-    </div>
-}
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 
 @code {
     int ItemNum = 4;
 
-    public List<EntryHomeAloneViewModel> Items { get; set; } = new List<EntryHomeAloneViewModel>();
+    public List<AppComponent.Normal.Cards.MainImageCardModel> Items { get; set; } = new List<AppComponent.Normal.Cards.MainImageCardModel>();
     [Parameter]
     public string Url { get; set; }
     [Parameter]
     public string Title { get; set; }
     [Parameter]
-    public string TitleIcon { get; set; }
+    public string Icon { get; set; }
     [Parameter]
-    public string UrlName { get; set; }
+    public bool ShowCount { get; set; }
     [Parameter]
-    public string UrlIcon { get; set; }
+    public bool Circle { get; set; }
+    [Parameter]
+    public bool Outlink { get; set; }
     [Parameter]
     public string Type { get; set; }
     [Parameter]
     public string APIUrl { get; set; }
-
-    [Parameter]
-    public bool IsSmallScreen { get; set; }
-    [Parameter]
-    public bool IsNormalScreen { get; set; }
-    [Parameter]
-    public bool IsLargeScreen { get; set; }
-
-    [Parameter]
-    public bool IsFrist { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -100,19 +56,21 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (Items.Count == 0)
+        try
         {
-            try
-            {
-                //获取主页信息
-                Items = await Http.GetFromJsonAsync<List<EntryHomeAloneViewModel>>(ToolHelper.WebApiPath + APIUrl);
-                StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                ErrorHandler.ProcessError(ex, "获取主页词条列表失败");
-            }
+            //获取主页信息
+            Items = await _dataCacheService.GetHomePageListCardMode(APIUrl, Type, 12, false);
+            StateHasChanged();
         }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页词条列表失败");
+        }
+    }
 
+    public Task OnClickMore()
+    {
+        NavigationManager.NavigateTo(Url);
+        return Task.CompletedTask;
     }
 }

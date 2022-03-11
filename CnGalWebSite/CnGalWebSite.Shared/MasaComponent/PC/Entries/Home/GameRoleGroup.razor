@@ -1,0 +1,80 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+@if (Items.Count > 0)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(Items[Index.ToInt32()].Name+" 角色预览")" Icon="fa fa-fw fa-picture-o">
+        <ButtonContent>
+            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
+                <MIcon Left>mdi-share-all-outline  </MIcon>
+                查看详情
+            </MButton>
+        </ButtonContent>
+        <ChildContent>
+            <MWindow @bind-Value="Index" Reverse>
+                @foreach (var item in Items)
+                {
+                    <MWindowItem Value="@Items.IndexOf(item)">
+               
+                            <ScaleTransition>
+                                <Element Show="@(Items.IndexOf(item)==Index)">
+                                    <MCard Style=" display: contents; ">
+                                        <GameRoleViewTip Model="item" />
+                                    </MCard>
+                                </Element>
+                            </ScaleTransition>
+                    </MWindowItem>
+                }
+            </MWindow>
+            <MSlideGroup @bind-Value="Index" ShowArrows="true" CenterActive>
+                @foreach (var item in Items)
+                {
+                    <MSlideItem>
+                        <MCard Class="mt-4 me-4 mb-2" Height="70" Width="150" OnClick="@(()=>{ if (!context.Active) context.Toggle.Invoke();})" RefBack="context.Ref">
+                            <div style="@($" background-image: url({item.Image});")" class="@((context.Active?" active":"")+" image-overlays ")">
+
+                            </div>
+                        </MCard>
+                    </MSlideItem>
+                }
+            </MSlideGroup>
+
+        </ChildContent>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private StringNumber Index { get; set; } = 0;
+    private List<GameRoleModel> Items { get; set; } = new List<GameRoleModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            if (_dataCacheService.GameRolesCatche.Count == 0)
+            {
+                _dataCacheService.GameRolesCatche = await Http.GetFromJsonAsync<List<GameRoleModel>>(ToolHelper.WebApiPath + "api/entries/GetGameRoles");
+            }
+
+            Items = _dataCacheService.GameRolesCatche.Random().Take(12).ToList();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取词条主页游戏角色列表失败");
+        }
+    }
+
+    public Task OnClickMore()
+    {
+        NavigationManager.NavigateTo("/entries/index/" + Items[Index.ToInt32()].Id);
+        return Task.CompletedTask;
+    }
+
+}

@@ -1,0 +1,61 @@
+﻿@inject IDataCacheService _dataCacheService
+
+
+<div class="rounded shadow-sm bg-opacity">
+    <MTreeview @bind-Open="@initiallyOpen"
+               Active="new List<long> { Id}"
+               Items="Items"
+               TItem="DocumentViewModel"
+               TKey="long"
+               Activatable
+               ItemKey="u => u.Id"
+               ItemChildren="u => u.Children"
+               ItemText="u => u.Title"
+               OpenOnClick
+               Color="@_dataCacheService.ThemeSetting.Theme"
+               ActiveChanged="ActiveChanged">
+        <PrependContent>
+            @if (string.IsNullOrWhiteSpace(context.Item.Icon) == false)
+            {
+                <MIcon>
+                    @context.Item.Icon
+                </MIcon>
+            }
+        </PrependContent>
+    </MTreeview>
+</div>
+
+@code {
+    [Parameter]
+    public List<DocumentViewModel> Items { get; set; } = new List<DocumentViewModel>();
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public EventCallback<long> IdChanged { get; set; }
+
+    List<long> initiallyOpen = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ChangeOpen(Id);
+    }
+
+    public void ChangeOpen(long id)
+    {
+        var item = Items.FirstOrDefault(s => s.Children.Any(s => s.Id == id));
+        if (item != null)
+        {
+            initiallyOpen.Clear();
+            initiallyOpen.Add(item.Id);
+        }
+    }
+
+    public async Task ActiveChanged(List<long> items)
+    {
+        Id = items.First();
+        ChangeOpen(Id);
+        StateHasChanged();
+        await IdChanged.InvokeAsync(Id);
+    }
+
+}

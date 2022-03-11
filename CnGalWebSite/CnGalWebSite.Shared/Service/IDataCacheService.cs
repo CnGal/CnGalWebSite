@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.ViewModel;
+﻿using BootstrapBlazor.Components;
+using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
@@ -7,6 +8,7 @@ using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
@@ -20,7 +22,7 @@ namespace CnGalWebSite.Shared.Service
 {
     public interface IDataCacheService
     {
-        bool? IsApp { get; set; }
+        bool IsApp { get; set; }
 
         EventCallback RefreshApp { get; set; }
 
@@ -58,7 +60,7 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<List<HomeNewsAloneViewModel>> HomePageNewsCatche { get; set; }
 
-        IPageModelCatche<List<DataModel.Model.Carousel>> HomePageCarouselsCatche { get; set; }
+        IPageModelCatche<List<CarouselViewModel>> HomePageCarouselsCatche { get; set; }
 
         IPageModelCatche<VoteViewModel> VoteIndexPageCatche { get; set; }
 
@@ -73,6 +75,28 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<TagContrastEditRecordViewModel> TagContrastEditRecordViewCatche { get; set; }
 
         IPageModelCatche<LotteryViewModel> LotteryIndexPageCatche { get; set; }
+
+        IPageModelCatche<ChartDataSource> ChartDataCatche { get; set; }
+
+        List<DocumentViewModel> DocumentsCatche { get; set; }
+
+        List<RandomTagModel> RandomTagsCatche { get; set; }
+
+        List<ArticleInforTipViewModel> RandomArticlesCatche { get; set; }
+
+        List<VoteCardViewModel> VoteCardsCatche { get; set; }
+
+        List<LotteryCardViewModel> LotteryCardsCatche { get; set; }
+
+        List<GameCGModel> GameCGsCatche { get; set; }
+
+        List<EntryInforTipViewModel> FreeGamesCatche { get; set; }
+
+        List<ArticleInforTipViewModel> WeeklyNewsOverviewCatche { get; set; }
+
+        List<GameEvaluationsModel> GameEvaluationsCatche { get; set; }
+
+        List<GameRoleModel> GameRolesCatche { get; set; }
 
         SearchViewModel SearchViewModel { get; set; }
 

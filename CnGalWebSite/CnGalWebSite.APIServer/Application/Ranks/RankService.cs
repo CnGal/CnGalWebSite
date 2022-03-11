@@ -22,17 +22,15 @@ namespace CnGalWebSite.APIServer.Application.Ranks
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<RankUser, int> _rankUserRepository;
         private readonly IRepository<Examine, int> _examineRepository;
-        private readonly IUserService _userService;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Rank>, string, SortOrder, IEnumerable<Rank>>> SortLambdaCacheRank = new();
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<RankUser>, string, SortOrder, IEnumerable<RankUser>>> SortLambdaCacheRankUser = new();
 
-        public RankService(IRepository<Rank, int> rankRepository, IRepository<RankUser, int> rankUserRepository, IUserService userService, IRepository<Examine, int> examineRepository,
+        public RankService(IRepository<Rank, int> rankRepository, IRepository<RankUser, int> rankUserRepository,  IRepository<Examine, int> examineRepository,
             IRepository<ApplicationUser, string> userRepository)
         {
             _rankUserRepository = rankUserRepository;
             _rankRepository = rankRepository;
-            _userService = userService;
             _examineRepository = examineRepository;
             _userRepository = userRepository;
         }
@@ -229,7 +227,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
         {
             var nowTime = DateTime.Now.ToCstTime();
             //用户等级头衔
-            var level = _userService.GetUserLevel(user);
+            var level = ToolHelper.GetUserLevel(user.DisplayIntegral);
             //获取用户目前的等级头衔
             var levelRank = await _rankUserRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Rank.Name.Contains("Lv ")).Select(s => s.Rank.Name).FirstOrDefaultAsync();
             //比较是否过时

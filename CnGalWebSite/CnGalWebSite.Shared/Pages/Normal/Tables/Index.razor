@@ -1,5 +1,6 @@
 ﻿@page "/tables/index"
 @page "/tables"
+@page "/data"
 
 @inject HttpClient Http
 @inject ToastService? ToastService
@@ -133,16 +134,16 @@
             Model = await Http.GetFromJsonAsync<TableViewModel>(ToolHelper.WebApiPath + "api/tables/Gettableview");
             StateHasChanged();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-             ErrorHandler.ProcessError(ex, "获取汇总数据失败");
+            ErrorHandler.ProcessError(ex, "获取汇总数据失败");
         }
     }
     public async void OnClickUrl(NavigateModel model)
     {
         try
         {
-            NavigationManager.NavigateTo(Provider,model.Url, model.Title, model.Icon);
+            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
         }
         catch
         {

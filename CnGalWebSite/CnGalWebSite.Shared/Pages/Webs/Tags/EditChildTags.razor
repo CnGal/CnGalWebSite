@@ -15,75 +15,36 @@ else
     <TitleTip />
 }
 
-<AutoSaveTip TItem="EditTagChildTagsViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
-
-<div class="">
-    <div class="" style="padding-right: 0;padding-left: 0;">
-        <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
-        <AlertTip Type="AlertTip.AlertTipType.TagStandard"></AlertTip>
-        <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
-            未填写的项目将会自动忽略，不需要手动删除
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Tag" Class="mb-3" />
+    @if (isReady == false)
+    {
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
         </div>
-        <div class="alert alert-danger  rounded shadow-sm  rounded" role="alert">
-            在删除子标签后一定要为子标签添加父标签
-        </div>
-        @if (isReady == false)
-        {
-            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-                <h3 class="text-truncate mb-4 fw-bold">编辑子标签</h3>
-                <h5 class=" mb-4 fw-bold">当前标签：（Id:）</h5>
-                <hr>
-
-                <div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-                <h3 class="text-truncate mb-4 fw-bold">编辑子标签</h3>
-                <h5 class="mb-4 fw-bold">当前标签：@Model.Name（Id:@Model.Id）</h5>
-                <hr />
-                <h5 class="fw-bold mb-2">子标签</h5>
-                <InputTagListTip AutoCompleteItems="TagItems" Model="Model.Tags"></InputTagListTip>
-            </div>
-
-
-
-            <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-                <SearchTagsViewTip></SearchTagsViewTip>
-            </div>
-
-            <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
-                当你点击“完成”按钮时，将会立即发起审核请求，请在点击前确保内容正确无误
-            </div>
-            <ValidateForm Model="@Model" ValidateAllProperties="true">
-
-                <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
-                    <div>
-                        <BootstrapBlazor.Components.Textarea @bind-Value="Model.Note" DisplayText="备注" />
-                        <Button class="mt-3" style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
-                    </div>
-                </div>
-
-            </ValidateForm>
-        }
-
-    </div>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-tag" Outline>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Tags.ChildTagsCard Model="Model" Class="mb-4" TagItems="TagItems" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
 </div>
+
+
 
 
 @code {
@@ -124,9 +85,6 @@ else
     {
         try
         {
-            //处理数据
-
-
             var result = await Http.PostAsJsonAsync<EditTagChildTagsViewModel>(ToolHelper.WebApiPath + "api/tags/EditChildTags", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);

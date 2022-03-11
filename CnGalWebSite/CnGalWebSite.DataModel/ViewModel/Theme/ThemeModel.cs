@@ -2,27 +2,29 @@
 {
     public class ThemeModel
     {
-        public bool UseTabSet { get; set; } = false;
+        public bool UseTabSet { get; set; }
 
-        public string Theme { get; set; } = "color3";
+        public string Theme { get; set; } = "pink lighten-2";
 
         public bool IsOpen { get; set; }
 
         public bool IsFixedHeader { get; set; } = true;
 
-        public bool IsFixedFooter { get; set; } = false;
+        public bool IsFixedFooter { get; set; } 
 
         public bool IsFullSide { get; set; } = true;
 
         public bool ShowFooter { get; set; } = true;
 
-        public bool IsDark { get; set; } = false;
+        public bool IsDark { get; set; } 
 
-        public bool IsDebug { get; set; } = false;
+        public bool IsDebug { get; set; }
 
-        public bool IsOnMouse { get; set; } = false;
+        public bool IsOnMouse { get; set; }
 
-        public bool IsOnBgImage { get; set; } = false;
+        public bool IsOnBgImage { get; set; }
+
+        public bool IsMasa { get; set; } = true;
 
         public DisplayMode ListDisplayMode { get; set; }
     }

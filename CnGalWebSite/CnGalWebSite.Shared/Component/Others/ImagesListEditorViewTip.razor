@@ -7,8 +7,10 @@
 @inject NavigationManager NavigationManager
 
 
-<ImageUpLoadButton OnUploadedImage="AddImage"></ImageUpLoadButton>
-<div class="row">
+<ImageUpLoadButton OnUploadedImage="AddImage" />
+@if(Images.Count!=0)
+            {
+<div class="row mt-3">
     @for (int i = 0; i < Images.Count; i++)
     {
         int temp = i;
@@ -33,6 +35,8 @@
         </div>
     }
 </div>
+            }
+
 
 @code {
     [Parameter]

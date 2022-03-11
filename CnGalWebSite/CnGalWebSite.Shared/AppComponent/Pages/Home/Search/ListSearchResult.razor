@@ -2,194 +2,106 @@
 @inject ToastService? ToastService
 @inject IDataCacheService _dataCacheService
 
-@if (is404 == true)
-{
-    <CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard Type="未找到词条"></CnGalWebSite.Shared.AppComponent.Normal.Errors.NotFountCard>
-}
 
-@if (isReady)
-{
 <div class="row">
-
-    <Virtualize ItemsProvider="@LoadEntries" @ref="virtualize" OverscanCount="4">
-        @if (Type == DisplayMode.Image)
-        {
-            @if (context.article != null)
+    @foreach (var context in Model)
+    {
+            @if (_dataCacheService.ThemeSetting.ListDisplayMode == DisplayMode.Image)
             {
-                <div class="col-6 mb-3">
-                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new AppComponent.Normal.Cards.MainImageCardModel { CommentCount = context.article.CommentCount, Image = context.article.MainImage, Name = context.article.DisplayName, ReadCount = context.article.ReaderCount, Url = "/articles/index/" + context.article.Id })" />
-
-                </div>
-
-            }
-            else if (context.entry != null)
-            {
-                @if (context.entry.Type == EntryType.Game || context.entry.Type == EntryType.ProductionGroup)
+                @if (context.article != null)
                 {
                     <div class="col-6 mb-3">
-                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new AppComponent.Normal.Cards.MainImageCardModel { CommentCount = context.entry.CommentCount, Image = context.entry.MainImage, Name = context.entry.DisplayName, ReadCount = context.entry.ReaderCount, Url = "/entries/index/" + context.entry.Id })" />
+                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new AppComponent.Normal.Cards.MainImageCardModel { CommentCount = context.article.CommentCount, Image = context.article.MainImage, Name = context.article.DisplayName, ReadCount = context.article.ReaderCount, Url = "/articles/index/" + context.article.Id })" />
 
                     </div>
 
                 }
-                else if (context.entry.Type == EntryType.Staff || context.entry.Type == EntryType.Role)
+                else if (context.entry != null)
+                {
+                    @if (context.entry.Type == EntryType.Game || context.entry.Type == EntryType.ProductionGroup)
+                    {
+                        <div class="col-6 mb-3">
+                            <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new AppComponent.Normal.Cards.MainImageCardModel { CommentCount = context.entry.CommentCount, Image = context.entry.MainImage, Name = context.entry.DisplayName, ReadCount = context.entry.ReaderCount, Url = "/entries/index/" + context.entry.Id })" />
+
+                        </div>
+
+                    }
+                    else if (context.entry.Type == EntryType.Staff || context.entry.Type == EntryType.Role)
+                    {
+                        <div class="col-6 mb-3">
+                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.StaffOrRoleCard Model="@(new Entries.Normal.Relevances.StaffOrRoleCardModel { Image = context.entry.MainImage, Name = context.entry.DisplayName, InforModel = context.entry.AddInfors.FirstOrDefault(), Description = context.entry.Name, EntryId = context.entry.Id })" />
+                        </div>
+
+                    }
+
+                }
+                else if (context.periphery != null)
                 {
                     <div class="col-6 mb-3">
-                        <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.StaffOrRoleCard Model="@(new Entries.Normal.Relevances.StaffOrRoleCardModel { Image = context.entry.MainImage, Name = context.entry.DisplayName, InforModel = context.entry.AddInfors.FirstOrDefault(), Description = context.entry.Name, EntryId = context.entry.Id })" />
+                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new AppComponent.Normal.Cards.MainImageCardModel { CommentCount = context.periphery.CommentCount, Image = context.periphery.MainImage, Name = context.periphery.Name, ReadCount = context.periphery.ReaderCount, Url = "/peripheries/index/" + context.periphery.Id })" />
+
+                    </div>
+
+                }
+                else if (context.tag != null)
+                {
+                    <div class="col-6 mb-3">
+                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new AppComponent.Normal.Cards.MainImageCardModel { CommentCount = 0, Image = context.tag.MainImage, Name = context.tag.Name, ReadCount = context.tag.ReaderCount, Url = "/tags/index/" + context.tag.Id })" />
+
                     </div>
 
                 }
 
             }
-            else if (context.periphery != null)
+            else
             {
-                <div class="col-6 mb-3">
-                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new AppComponent.Normal.Cards.MainImageCardModel { CommentCount = context.periphery.CommentCount, Image = context.periphery.MainImage, Name = context.periphery.Name, ReadCount = context.periphery.ReaderCount, Url = "/peripheries/index/" + context.periphery.Id })" />
-
-                </div>
-
-            }
-            else if (context.tag != null)
-            {
-                <div class="col-6 mb-3">
-                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new AppComponent.Normal.Cards.MainImageCardModel { CommentCount = 0, Image = context.tag.MainImage, Name = context.tag.Name, ReadCount = context.tag.ReaderCount, Url = "/tags/index/" + context.tag.Id })" />
-
-                </div>
-
-            }
-
-        }
-        else
-        {
-            @if (context.article != null)
-            {
-                <div class="col-12 mb-3">
-                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ArticleCrad Model="@(new Entries.Normal.Relevances.ArticleCardModel { Description = context.article.BriefIntroduction, Image = context.article.MainImage, ArticleId = context.article.Id, Title = context.article.DisplayName })" />
-                </div>
-
-            }
-            else if (context.entry != null)
-            {
-                @if (context.entry.Type == EntryType.Game || context.entry.Type == EntryType.ProductionGroup)
+                @if (context.article != null)
                 {
                     <div class="col-12 mb-3">
-                        <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.GameCard Model="@(new Entries.Normal.Relevances.GameCardModel { Description = context.entry.BriefIntroduction, Image = context.entry.MainImage, EntryId = context.entry.Id, Title = context.entry.DisplayName })" />
+                        <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ArticleCrad Model="@(new Entries.Normal.Relevances.ArticleCardModel { Description = context.article.BriefIntroduction, Image = context.article.MainImage, ArticleId = context.article.Id, Title = context.article.DisplayName })" />
                     </div>
+
                 }
-                else
+                else if (context.entry != null)
                 {
-                    <div class="col-12 mb-3">
-                        <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.StaffCard Model="@(new Entries.Normal.Relevances.StaffCardModel { Description = context.entry.BriefIntroduction, Image = context.entry.MainImage, EntryId = context.entry.Id, Title = context.entry.DisplayName })" />
+                    @if (context.entry.Type == EntryType.Game || context.entry.Type == EntryType.ProductionGroup)
+                    {
+                        <div class="col-12 mb-3">
+                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.GameCard Model="@(new Entries.Normal.Relevances.GameCardModel { Description = context.entry.BriefIntroduction, Image = context.entry.MainImage, EntryId = context.entry.Id, Title = context.entry.DisplayName })" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-12 mb-3">
+                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.StaffCard Model="@(new Entries.Normal.Relevances.StaffCardModel { Description = context.entry.BriefIntroduction, Image = context.entry.MainImage, EntryId = context.entry.Id, Title = context.entry.DisplayName })" />
+                        </div>
+
+                    }
+                }
+                else if (context.periphery != null)
+                {
+                    <div class="col-6 mb-3">
+                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.ImageTextCard Model="@(new AppComponent.Normal.Cards.ImageTextCardModel {  Image = context.periphery.MainImage,Description=context.periphery.BriefIntroduction, Name = context.periphery.Name,  Url = "/peripheries/index/" + context.periphery.Id })" />
+
+                    </div>
+
+                }
+                else if (context.tag != null)
+                {
+                    <div class="col-6 mb-3">
+                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.ImageTextCard Model="@(new AppComponent.Normal.Cards.ImageTextCardModel { Image = context.tag.MainImage,Description=context.tag.BriefIntroduction, Name = context.tag.Name, Url = "/tags/index/" + context.tag.Id })" />
+
                     </div>
 
                 }
             }
-            else if (context.periphery != null)
-            {
-                <div class="col-6 mb-3">
-                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.ImageTextCard Model="@(new AppComponent.Normal.Cards.ImageTextCardModel {  Image = context.periphery.MainImage,Description=context.periphery.BriefIntroduction, Name = context.periphery.Name,  Url = "/peripheries/index/" + context.periphery.Id })" />
 
-                </div>
-
-            }
-            else if (context.tag != null)
-            {
-                <div class="col-6 mb-3">
-                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.ImageTextCard Model="@(new AppComponent.Normal.Cards.ImageTextCardModel { Image = context.tag.MainImage,Description=context.tag.BriefIntroduction, Name = context.tag.Name, Url = "/tags/index/" + context.tag.Id })" />
-
-                </div>
-
-            }
-        }
-    </Virtualize>
+    }
 </div>
-
-}
-
 
 
 @code {
 
-    public PagedSortedAndFilterInput Input { get; set; }
-    [NotNull]
-    public Virtualize<SearchAloneModel>? virtualize { get; set; }
-
-    public int MaxResultCount { get; set; } = 20;
-
-    public int StartIndex { get; set; } = 1;
     [Parameter]
-    public string Sorting { get; set; }
-
-    [Parameter]
-    public string FilterText { get; set; }
-
-    [Parameter]
-    public string ScreeningConditions { get; set; }
-
-    private DisplayMode Type;
-
-    private bool is404 = false;
-    bool isReady = true;
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
-
-    private async Task<PagedResultDto<SearchAloneModel>> OnGetNewItems()
-    {
-        try
-        {
-            Type = _dataCacheService.ThemeSetting.ListDisplayMode;
-
-            var result = await Http.PostAsJsonAsync<GetSearchInput>(ToolHelper.WebApiPath + "api/home/search", new GetSearchInput {  MaxResultCount = MaxResultCount, ScreeningConditions = ScreeningConditions, Sorting = Sorting,FilterText=FilterText ,StartIndex=StartIndex});
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<SearchViewModel>(jsonContent, ToolHelper.options).pagedResultDto;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取搜索结果");
-            return new  PagedResultDto<SearchAloneModel> { Data=new List<SearchAloneModel>()};
-        }
-    }
-
-    private async ValueTask<ItemsProviderResult<SearchAloneModel>> LoadEntries(ItemsProviderRequest request)
-    {
-        try
-        {
-            StartIndex = request.StartIndex;
-            MaxResultCount = request.Count;
-            var entries = await OnGetNewItems();
-
-            if (is404 != (entries.TotalCount == 0 || entries.Data.Count == 0))
-            {
-                is404 = (entries.TotalCount == 0 || entries.Data.Count == 0);
-                StateHasChanged();
-            }
-            return new ItemsProviderResult<SearchAloneModel>(entries.Data, entries.TotalCount);
-
-        }
-        catch (Exception exc)
-        {
-            return new ItemsProviderResult<SearchAloneModel>(new List<SearchAloneModel>(), 0);
-        }
-
-
-    }
-
-    public async Task RefreshDataAsync()
-    {
-
-        await virtualize.RefreshDataAsync();
-        StateHasChanged();
-    }
-    public async Task ChangeDisplayMode(DisplayMode type)
-    {
-        _dataCacheService.ThemeSetting.ListDisplayMode= Type = type;
-        await _dataCacheService.SavaTheme.InvokeAsync();
-        isReady = false;
-        StateHasChanged();
-
-
-        isReady = true;
-        StateHasChanged();
-    }
-
+    public List<SearchAloneModel> Model { get; set; }
 }

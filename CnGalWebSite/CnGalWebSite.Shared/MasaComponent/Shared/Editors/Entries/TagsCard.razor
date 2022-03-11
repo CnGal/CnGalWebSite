@@ -1,0 +1,20 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+    标签可以帮助我们对词条进行分类；可以关注一下标签的层级关系哦，确保添加的都是最后一级的标签
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-tags" Title="标签" Class="mb-4" Collapable>
+    <InputTagListTip AutoCompleteItems="@TagItems" Model="Model.Tags"></InputTagListTip>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+<SearchTagsViewTip  Class="@Class"/>
+
+@code {
+    [Parameter]
+    public EditEntryTagViewModel Model { get; set; }
+    [Parameter]
+    public IEnumerable<string> TagItems { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+}

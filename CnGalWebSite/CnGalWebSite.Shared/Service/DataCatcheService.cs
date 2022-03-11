@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Application.Dtos;
+﻿using BootstrapBlazor.Components;
+using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
@@ -10,6 +11,7 @@ using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
@@ -30,7 +32,8 @@ namespace CnGalWebSite.Shared.Service
         /// <summary>
         /// 是否为APP模式
         /// </summary>
-        public bool? IsApp { get; set; } = null;
+        public bool IsApp { get; set; }
+
         /// <summary>
         /// 刷新渲染框架方法
         /// </summary>
@@ -109,7 +112,7 @@ namespace CnGalWebSite.Shared.Service
         /// <summary>
         /// 主页轮播图数据缓存
         /// </summary>
-        public IPageModelCatche<List<DataModel.Model.Carousel>> HomePageCarouselsCatche { get; set; }
+        public IPageModelCatche<List<CarouselViewModel>> HomePageCarouselsCatche { get; set; }
         /// <summary>
         /// 编辑总览页面数据缓存
         /// </summary>
@@ -130,11 +133,57 @@ namespace CnGalWebSite.Shared.Service
         /// 编辑对比页面数据缓存 标签
         /// </summary>
         public IPageModelCatche<TagContrastEditRecordViewModel> TagContrastEditRecordViewCatche { get; set; }
+        /// <summary>
+        /// 图表缓存
+        /// </summary>
+        public IPageModelCatche<ChartDataSource> ChartDataCatche { get; set; }
 
+        public List<DocumentViewModel> DocumentsCatche { get; set; } = new List<DocumentViewModel>();
+        /// <summary>
+        /// 免费游戏列表
+        /// </summary>
+        public List<EntryInforTipViewModel> FreeGamesCatche { get; set; } = new List<EntryInforTipViewModel>();
+
+        /// <summary>
+        /// 广场抽奖列表缓存
+        /// </summary>
+        public List<LotteryCardViewModel> LotteryCardsCatche { get; set; } = new List<LotteryCardViewModel>();
+        /// <summary>
+        /// 广场投票列表缓存
+        /// </summary>
+        public List<VoteCardViewModel> VoteCardsCatche { get; set; } = new List<VoteCardViewModel>();
+
+        /// <summary>
+        /// 文章主页 随机文章
+        /// </summary>
+        public List<RandomTagModel> RandomTagsCatche { get; set; } = new List<RandomTagModel>();
+
+        /// <summary>
+        /// 文章主页 随机文章
+        /// </summary>
+        public List<ArticleInforTipViewModel> RandomArticlesCatche { get; set; } = new List<ArticleInforTipViewModel>();
+        /// <summary>
+        /// 文章主页 周报列表
+        /// </summary>
+        public List<ArticleInforTipViewModel> WeeklyNewsOverviewCatche { get; set; } = new List<ArticleInforTipViewModel>();
+        /// <summary>
+        /// 文章主页 游戏评测预览
+        /// </summary>
+        public List<GameEvaluationsModel> GameEvaluationsCatche { get; set; } = new List<GameEvaluationsModel>();
+
+        /// <summary>
+        /// 词条主页 CG预览列表
+        /// </summary>
+        public List<GameCGModel> GameCGsCatche { get; set; } = new List<GameCGModel>();
+        /// <summary>
+        /// 词条主页 角色预览列表
+        /// </summary>
+        public List<GameRoleModel> GameRolesCatche { get; set; } = new List<GameRoleModel> ();
         /// <summary>
         /// 折扣页面缓存辅助类
         /// </summary>
         public DiscountPageHelper DiscountPageCatcheHelper { get; set; } = new DiscountPageHelper();
+
         /// <summary>
         /// 评论详情
         /// </summary>
@@ -159,12 +208,13 @@ namespace CnGalWebSite.Shared.Service
 
         public DataCatcheService(HttpClient httpClient, IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche, IPageModelCatche<VoteViewModel> voteIndexPageCatche,
         IPageModelCatche<PeripheryViewModel> peripheryIndexPageCatche, IPageModelCatche<TagIndexViewModel> tagIndexPageCatche, IPageModelCatche<List<HomeNewsAloneViewModel>> homePageNewsCatche,
-        IPageModelCatche<List<DataModel.Model.Carousel>> homePageCarouselsCatche, IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
+        IPageModelCatche<List<CarouselViewModel>> homePageCarouselsCatche, IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
         IPageModelCatche<LotteryViewModel> lotteryIndexPageCatche,
         IPageModelCatche<ArticleContrastEditRecordViewModel> articleContrastEditRecordViewCatche,
         IPageModelCatche<PeripheryContrastEditRecordViewModel> peripheryContrastEditRecordViewCatche,
         IPageModelCatche<TagContrastEditRecordViewModel> tagContrastEditRecordViewCatche,
-        IPageModelCatche<EntryContrastEditRecordViewModel> entryContrastEditRecordViewCatche)
+        IPageModelCatche<EntryContrastEditRecordViewModel> entryContrastEditRecordViewCatche,
+        IPageModelCatche<ChartDataSource> chartDataCatche)
         {
             _httpClient = httpClient;
             (EntryIndexPageCatche = entryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/entries/GetEntryView/");
@@ -178,6 +228,7 @@ namespace CnGalWebSite.Shared.Service
             (ArticleContrastEditRecordViewCatche = articleContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/articles/GetContrastEditRecordViews/");
             (PeripheryContrastEditRecordViewCatche = peripheryContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/peripheries/GetContrastEditRecordViews/");
             (TagContrastEditRecordViewCatche = tagContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/tags/GetContrastEditRecordViews/");
+            (ChartDataCatche = chartDataCatche).Init("",true);
             HomePageNewsCatche = homePageNewsCatche;
             HomePageCarouselsCatche = homePageCarouselsCatche;
         }

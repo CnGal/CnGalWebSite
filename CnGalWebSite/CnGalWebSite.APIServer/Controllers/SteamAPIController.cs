@@ -2,6 +2,7 @@
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -22,12 +23,13 @@ namespace CnGalWebSite.APIServer.Controllers
     {
 
         private readonly IRepository<Entry, int> _entryRepository;
+        private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<SteamInfor, int> _steamInforRepository;
         private readonly IAppHelper _appHelper;
         private readonly ISteamInforService _steamInforService;
         private readonly IRepository<ApplicationUser, string> _userRepository;
 
-        public SteamAPIController(IRepository<SteamInfor, int> steamInforRepository, ISteamInforService steamInforService,
+        public SteamAPIController(IRepository<SteamInfor, int> steamInforRepository, ISteamInforService steamInforService, IRepository<Tag, int> tagRepository,
         IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<ApplicationUser, string> userRepository)
         {
             _entryRepository = entryRepository;
@@ -35,6 +37,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _steamInforRepository = steamInforRepository;
             _steamInforService = steamInforService;
             _userRepository = userRepository;
+            _tagRepository = tagRepository;
         }
 
         [AllowAnonymous]
@@ -184,6 +187,26 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
 
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<EntryInforTipViewModel>>> GetFreeGamesAsync()
+        {
+            var tag = await _tagRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Name == "免费");
+            if(tag == null)
+            {
+                return NotFound("未找到免费的标签");
+            }
+
+            var model = new List<EntryInforTipViewModel>();
+            foreach (var entry in tag.Entries)
+            {
+                model.Add(await _appHelper.GetEntryInforTipViewModel(entry));
+            }
+
+            return model;
+        }
+
 
     }
 }

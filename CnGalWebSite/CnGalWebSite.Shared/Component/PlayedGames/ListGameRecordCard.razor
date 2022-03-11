@@ -1,19 +1,19 @@
 ﻿<div class="row">
     @foreach (var item in Model.Where(s=>s.IsHidden==false))
     {
-        <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mt-3">
+        <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mb-3">
             <GameRecordViewCard Model="item" OnChanged="OnChanged" IsSmallScreen="IsSmallScreen" IsCurrentUser="IsCurrentUser" />
         </div>
     }
 </div>
 @if (Model.Any(s => s.IsHidden)&& IsCurrentUser)
 {
-    <div class="mt-3">
+    <div class="mb-3">
         <TitleCollapseCard Icon="fa-unlink" Title="折叠的项目"  @bind-IsCollapsed="IsCollapsed">
             <div class="row">
                 @foreach (var item in Model.Where(s=>s.IsHidden))
                 {
-                    <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mt-3">
+                    <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mb-3">
                         <GameRecordViewCard Model="item" OnChanged="OnChanged" IsSmallScreen="IsSmallScreen" />
                     </div>
                 }

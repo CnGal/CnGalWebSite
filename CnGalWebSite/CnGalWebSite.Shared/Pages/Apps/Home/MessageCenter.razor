@@ -1,31 +1,18 @@
-﻿@page "/home/messagecenter"
-
-@attribute [Authorize]
-
-
-@inject HttpClient Http
-@inject ExamineService _examineService
+﻿@inject HttpClient Http
 @inject ToastService ToastService
 @inject NavigationManager NavigationManager
 @inject IAppHelper _appHelper
-@inject IJSRuntime JS
-@inject DialogService DialogService
 @inject IDataCacheService _dataCacheService
 
 
 <TitleTip Title="消息中心"></TitleTip>
 
 
-<CnGalWebSite.Shared.AppComponent.Pages.Account.HeadBar Title="消息中心" />
-
 @if (isReady)
 {
-    <div style=" margin-top: 45px; width: 100%;" >
-        <div class="p-3">
-            <CnGalWebSite.Shared.AppComponent.Pages.Home.MessageCenters.ListMessageCard />
 
-        </div>
-    </div>
+    <CnGalWebSite.Shared.AppComponent.Pages.Home.MessageCenters.ListMessageCard />
+
 }
 else
 {

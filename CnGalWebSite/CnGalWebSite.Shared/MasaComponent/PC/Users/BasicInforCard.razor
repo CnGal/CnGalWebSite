@@ -1,0 +1,67 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<div class=" rounded shadow-sm  bg-opacity p-3 mb-3">
+    <div style=" display: flex; justify-content: space-around; ">
+        <div style=" display: flex; flex-direction: column; align-items: center; ">
+            <div class="fw-bold">@Model.BasicInfor.EditCount</div>
+            <div style="color:gray;">累计编辑</div>
+        </div>
+        <div style=" display: flex; flex-direction: column; align-items: center; ">
+            <div class="fw-bold">@Model.BasicInfor.ArticleCount</div>
+            <div style="color:gray;">发表文章</div>
+        </div>
+
+        <div style=" display: flex; flex-direction: column; align-items: center; ">
+            <div class="fw-bold">@Model.BasicInfor.FavoriteCount</div>
+            <div style="color:gray;">收藏总数</div>
+        </div>
+    </div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <div class="mb-4">
+        <div style=" display: flex; justify-content: space-between;">
+            @{ int level = ToolHelper.GetUserLevel(Model.BasicInfor.Integral);}
+            <span>
+                <i class="font-color fa fa-magic fa-fw"></i>&nbsp; &nbsp;@("Lv："+level)
+            </span>
+            <span style=" color: gray;">
+                @(level==10?Model.BasicInfor.Integral:(Model.BasicInfor.Integral+" / "+ToolHelper.GetLevelIntegral(level)))
+            </span>
+        </div>
+        <MProgressLinear Value="@(level==10?100:(100.0*Model.BasicInfor.Integral/ToolHelper.GetLevelIntegral(level)))" Color="@_dataCacheService.ThemeSetting.Theme"></MProgressLinear>
+    </div>
+    <div style="display: flex; justify-content: flex-end; margin-bottom: -40px;">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-pencil " Tooltip="编辑个人资料" OnClick="OnClickEdit" />
+    </div>
+    <div class="row">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-star" Text="@("贡献值："+Model.ContributionValue)" Class="col-12" /> <br />
+
+        @if (Model.Birthday != null)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-birthday-cake" Text="@("生日："+Model.Birthday.Value.ToString("M") )" Class="col-12" /> <br />
+
+        }
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-hourglass-2" Text="@("在线时间："+ Model.OnlineTime.ToString("0.0")+"小时")" Class="col-12" /> <br />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-bullhorn" Text="@("注册时间："+Model.RegisteTime.ToString("yyyy-MM-dd HH:mm"))" Class="col-12" /> <br />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-calendar-check-o" Text="@("最后访问："+Model.LastOnlineTime.ToString("yyyy-MM-dd HH:mm"))" Class="col-12" /> <br />
+        @if (Model.LastEditTime != null)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-pencil" Text="@("上次编辑时间："+Model.LastEditTime.Value.ToString("yyyy-MM-dd HH:mm"))" Class="col-12" /> <br />
+        }
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-id-card-o" Text="@("UID："+Model.Id)" Class="col-12" /> <br />
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public PersonalSpaceViewModel Model { get; set; }
+
+
+    public Task OnClickEdit()
+    {
+        NavigationManager.NavigateTo("/space/editdata/" + Model.Id);
+        return Task.CompletedTask;
+    }
+
+}

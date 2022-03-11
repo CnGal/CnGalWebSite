@@ -22,6 +22,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Home;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -627,12 +628,20 @@ namespace CnGalWebSite.APIServer.Controllers
                 examine.PassedTime = DateTime.Now.ToCstTime();
                 examine.IsPassed = true;
                 examine.ContributionValue = model.ContributionValue;
+
+                _entryRepository.Clear();
+                _articleRepository.Clear();
+                _peripheryRepository.Clear();
+                _tagRepository.Clear();
+                _commentRepository.Clear();
+                _disambigRepository.Clear();
+
                 try
                 {
                     examine = await _examineRepository.UpdateAsync(examine);
 
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
 
                 }
@@ -644,12 +653,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             else
             {
-                entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == examine.EntryId);
-                article = await _articleRepository.FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
-                tag = await _tagRepository.FirstOrDefaultAsync(s => s.Id == examine.TagId);
-                comment = await _commentRepository.FirstOrDefaultAsync(s => s.Id == examine.CommentId);
-                disambig = await _disambigRepository.FirstOrDefaultAsync(s => s.Id == examine.DisambigId);
-                periphery = await _peripheryRepository.FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
+
                 //修改审核状态
                 examine.Comments = model.Comments;
                 examine.PassedAdminName = userAdmin.UserName;
@@ -669,6 +673,13 @@ namespace CnGalWebSite.APIServer.Controllers
                         await _examineRepository.UpdateAsync(item);
                     }
                 }
+
+                entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == examine.EntryId);
+                article = await _articleRepository.FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
+                tag = await _tagRepository.FirstOrDefaultAsync(s => s.Id == examine.TagId);
+                comment = await _commentRepository.FirstOrDefaultAsync(s => s.Id == examine.CommentId);
+                disambig = await _disambigRepository.FirstOrDefaultAsync(s => s.Id == examine.DisambigId);
+                periphery = await _peripheryRepository.FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
             }
             //给用户发送通知
             if (article != null)

@@ -15,7 +15,7 @@
 }
 
 .bg-opacity {
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: white;
 }
 /*用户个人空间Tab*/
 .li-user-space {
@@ -151,17 +151,17 @@
 .article-tag-color {
     margin-left: 10px;
     border-color: gray;
-    color: white;
+    color: white!important;
     background-color: gray;
 }
 
 .article-tag-text-color {
-    color: gray;
+    color: gray!important;
 }
 
 .article-tag-color:hover {
     border-color: gray;
-    color: gray;
+    color: gray!important;
     background-color: transparent;
 }
 /*小屏幕文章操作Tab*/
@@ -185,20 +185,7 @@
     cursor: pointer;
 }
 /*超大屏幕文章操作Tab*/
-.article-tag-text-color-large {
-    color: #D25E8C;
-}
-.article-tag-color-large {
-    margin-left: 10px;
-    border-color: #D25E8C;
-    color: white;
-    background-color: #D25E8C;
-}
-    .article-tag-color-large:hover {
-        border-color: #D25E8C;
-        color: #D25E8C;
-        background-color: transparent;
-    }
+
 /*评论样式*/
 .comment-tag {
     width: fit-content;
@@ -246,7 +233,6 @@
     margin-top: 0px;
     margin-left:10px;
     padding: 0 10px;
-    height: 23px;
     border: 1px solid #00A4FF;
     border-radius: 2px;
     box-shadow: none;
@@ -455,41 +441,41 @@
 }
 
 .bg-title-color-pr {
-    color: white;
+    color: white!important;
     background-color: #485159;
 }
 
 .bg-context-pr:hover {
-    color: white;
+    color: white!important;
     background-color: #485159;
 }
 
 .bg-context-pr {
-    color: #485159;
+    color: #485159!important;
     border-color: #485159;
 }
 
 .bg-color-pr {
-    color: #485159;
+    color: #485159!important;
 }
 
 .bg-title-color-pb {
-    color: white;
+    color: white!important;
     background-color: #485159;
 }
 
 .bg-context-pb:hover {
-    color: white;
+    color: white!important;
     background-color: #485159;
 }
 
 .bg-context-pb {
-    color: #485159;
+    color: #485159!important;
     border-color: #485159;
 }
 
 .bg-color-pb {
-    color: #485159;
+    color: #485159!important;
 }
 /*Staff*/
 .bg-title {
@@ -501,228 +487,228 @@
 }
 
 .bg-title-color-1 {
-    color: white;
+    color: white!important;
     background-color: #DC4251;
 }
 
 .bg-context-1:hover {
-    color: white;
+    color: white!important;
     background-color: #DC4251;
 }
 
 .bg-context-1 {
-    color: #DC4251;
+    color: #DC4251!important;
     border-color: #DC4251;
 }
 
 .bg-color-1 {
-    color: #DC4251;
+    color: #DC4251!important;
 }
 
 
 
 .bg-title-color-2 {
-    color: white;
+    color: white!important;
     background-color: tomato;
 }
 
 .bg-context-2:hover {
-    color: white;
+    color: white!important;
     background-color: tomato;
 }
 
 .bg-context-2 {
-    color: tomato;
+    color: tomato!important;
     border-color: tomato;
 }
 
 .bg-color-2 {
-    color: tomato;
+    color: tomato!important;
 }
 
 
 
 .bg-title-color-3 {
-    color: white;
+    color: white!important;
     background-color: #FF7D4E;
 }
 
 .bg-context-3:hover {
-    color: white;
+    color: white!important;
     background-color: #FF7D4E;
 }
 
 .bg-context-3 {
-    color: #FF7D4E;
+    color: #FF7D4E!important;
     border-color: #FF7D4E;
 }
 
 .bg-color-3 {
-    color: #FF7D4E;
+    color: #FF7D4E!important;
 }
 
 
 
 .bg-title-color-4 {
-    color: white;
+    color: white!important;
     background-color: #FFB700;
 }
 
 .bg-context-4:hover {
-    color: white;
+    color: white!important;
     background-color: #FFB700;
 }
 
 .bg-context-4 {
-    color: #FFB700;
+    color: #FFB700!important;
     border-color: #FFB700;
 }
 
 .bg-color-4 {
-    color: #FFB700;
+    color: #FFB700!important;
 }
 
 
 
 .bg-title-color-5 {
-    color: white;
+    color: white!important;
     background-color: peru;
 }
 
 .bg-context-5:hover {
-    color: white;
+    color: white!important;
     background-color: peru;
 }
 
 .bg-context-5 {
-    color: peru;
+    color: peru!important;
     border-color: peru;
 }
 
 .bg-color-5 {
-    color: peru;
+    color: peru!important;
 }
 
 
 
 .bg-title-color-6 {
-    color: white;
+    color: white!important;
     background-color: #28A745;
 }
 
 .bg-context-6:hover {
-    color: white;
+    color: white!important;
     background-color: #28A745;
 }
 
 .bg-context-6 {
-    color: #28A745;
+    color: #28A745!important;
     border-color: #28A745;
 }
 
 .bg-color-6 {
-    color: #28A745;
+    color: #28A745!important;
 }
 
 
 
 .bg-title-color-7 {
-    color: white;
+    color: white!important;
     background-color: #72CBBA;
 }
 
 .bg-context-7:hover {
-    color: white;
+    color: white!important;
     background-color: #72CBBA;
 }
 
 .bg-context-7 {
-    color: #72CBBA;
+    color: #72CBBA!important;
     border-color: #72CBBA;
 }
 
 .bg-color-7 {
-    color: #72CBBA;
+    color: #72CBBA!important;
 }
 
 
 .bg-title-color-8 {
-    color: white;
+    color: white!important;
     background-color: lightskyblue;
 }
 
 .bg-context-8:hover {
-    color: white;
+    color: white!important;
     background-color: lightskyblue;
 }
 
 .bg-context-8 {
-    color: lightskyblue;
+    color: lightskyblue!important;
     border-color: lightskyblue;
 }
 
 .bg-color-8 {
-    color: lightskyblue;
+    color: lightskyblue!important;
 }
 
 
 .bg-title-color-9 {
-    color: white;
+    color: white!important;
     background-color: #3694F9;
 }
 
 .bg-context-9:hover {
-    color: white;
+    color: white!important;
     background-color: #3694F9;
 }
 
 .bg-context-9 {
-    color: #3694F9;
+    color: #3694F9!important;
     border-color: #3694F9;
 }
 
 .bg-color-9 {
-    color: #3694F9;
+    color: #3694F9!important;
 }
 
 
 .bg-title-color-10 {
-    color: white;
+    color: white!important;
     background-color: #5152A9;
 }
 
 .bg-context-10:hover {
-    color: white;
+    color: white!important;
     background-color: #5152A9;
 }
 
 .bg-context-10 {
-    color: #5152A9;
+    color: #5152A9!important;
     border-color: #5152A9;
 }
 
 .bg-color-10 {
-    color: #3694F9;
+    color: #5152A9!important;
 }
 
 
 .bg-title-color-11 {
-    color: white;
+    color: white!important;
     background-color: #73448F;
 }
 
 .bg-context-11:hover {
-    color: white;
+    color: white!important;
     background-color: #73448F;
 }
 
 .bg-context-11 {
-    color: #73448F;
+    color: #73448F!important;
     border-color: #73448F;
 }
 
 .bg-color-11 {
-    color: #73448F;
+    color: #73448F!important;
 }
 .layout-title .nav-link {
     color: white;
@@ -809,12 +795,12 @@
 }
 
 .a-font-color {
-    color: var(--bs-body-color);
+    color: var(--bs-body-color) !important;
 }
 
-    .a-font-color:hover {
-        color: var(--bs-body-color);
-    }
+.a-font-color:hover {
+    color: var(--bs-body-color) !important;
+}
 .home-card-name-text {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -895,8 +881,9 @@
 .apps-footer-layout{
      position: fixed;
      bottom: 0;
+     left: 0;
      width:100%;
-     z-index:1000;
+     z-index:1;
      background-color:white;
 }
 
@@ -909,7 +896,7 @@
      color:gray;
 }
 .links-icontext-text{
-    color:#535353;
+    color:var(--main-color);
 }
 
 /*固定行数*/
@@ -973,6 +960,58 @@
     font-size: small !important;
     padding-top: 2px;
     font-weight: normal;
+}
+/*页脚*/
+.load-footer a:hover {
+    color: var(--hover-color)!important;
+}
+
+.load-footer a {
+    color: gray!important;
+}
+
+.pointer{
+    cursor:pointer!important;
+}
+
+.login-h1-text{  
+    font-family: Roboto !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+    font-size: 1.5rem !important;
+    line-height: 2.25rem !important;
+}
+/*相册查看组件*/
+.image-overlays {
+    opacity: .4;
+    height: 100%;
+    background-size: contain;
+    background-position: 50%;
+    background-position-x: 50%;
+    background-position-y: center;
+}
+
+.image-overlays.active {
+    opacity: 1!important;
+}
+
+.image-overlays:hover {
+    opacity: 1;
+}
+.image-contain {
+    height: 100%;
+    background-position: center top;
+    background-size: cover;
+}
+
+/*移动端 小卡片 标签样式*/
+.app-card-tag {
+    background-color:  var(--main-color);
+    color: #fff;
+    border-radius: 2px;
+    padding-left: 8px;
+    padding-right: 8px;
+    display: inline-block;
 }
 
 .ContributionCalendar-day {

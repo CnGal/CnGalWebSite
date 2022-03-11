@@ -4,17 +4,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 {
     public class PersonalSpaceViewModel
     {
-        public string Name { get; set; }
+        public string Id { get; set; }
 
         public string Email { get; set; }
 
         public string MainPageContext { get; set; }
-
-        public string PersonalSignature { get; set; }
-
-        public string Id { get; set; }
-
-        public string PhotoPath { get; set; }
 
         public DateTime? Birthday { get; set; }
 
@@ -22,17 +16,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 
         public bool IsCurrentUser { get; set; }
 
-        public int SignInDays { get; set; }
-
-        public bool IsSignIn { get; set; }
-
-        public int Integral { get; set; }
-
-        public int Level { get; set; }
-
         public int ContributionValue { get; set; }
-
-        public bool IsExamineList { get; set; }
 
         public int EditEntryNum { get; set; }
 
@@ -42,7 +26,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 
         public DateTime RegisteTime { get; set; }
 
-        public string BackgroundImagePath { get; set; }
         public long TotalExamine { get; set; }
         public DateTime LastOnlineTime { get; set; }
         /// <summary>
@@ -60,8 +43,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         /// </summary>
         public double OnlineTime { get; set; }
 
-        public List<KeyValuePair<DateTime, int>> EditCountList { get; set; }
-        public List<KeyValuePair<DateTime, int>> SignInDaysList { get; set; }
+        public List<KeyValuePair<DateTime, int>> EditCountList { get; set; } = new List<KeyValuePair<DateTime, int>>();
+        public List<KeyValuePair<DateTime, int>> SignInDaysList { get; set; } = new List<KeyValuePair<DateTime, int>>();
 
         public long TotalFilesSpace { get; set; }
         public long UsedFilesSpace { get; set; }
@@ -77,6 +60,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         public bool IsShowGameRecord { get; set; }
 
         public string SteamId { get; set; }
+
+        /// <summary>
+        /// 用户基础信息
+        /// </summary>
+        public UserInforViewModel BasicInfor { get; set; } = new UserInforViewModel();
 
     }
 }

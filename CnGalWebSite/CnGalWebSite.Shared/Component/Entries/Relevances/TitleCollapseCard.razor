@@ -14,11 +14,9 @@
 
 </div>
 
-<CascadingValue Value=this>
     <div style="@(IsCollapsed?"display:none;":"display:block;")">
         @ChildContent
     </div>
-</CascadingValue>
 
 @code {
     [Parameter]

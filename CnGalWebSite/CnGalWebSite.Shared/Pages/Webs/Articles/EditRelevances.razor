@@ -1,0 +1,127 @@
+﻿@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+}
+
+<AutoSaveTip TItem="EditArticleRelevancesViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
+
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Article" Class="mb-3" />
+    @if (isReady == false)
+    {
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+
+        </div>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-newspaper-o" Outline>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.RelevancesCard Model="Model" Class="mb-4" EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" ArticleItems="ArticleItems"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
+
+</div>
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    private EditArticleRelevancesViewModel Model { get; set; } = new EditArticleRelevancesViewModel();
+
+    private bool isReady = false;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    AutoSaveTip<EditArticleRelevancesViewModel> autoSave { get; set; }
+
+    private IEnumerable<string> EntryGameItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> EntryRoleItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> EntryGroupItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> EntryStaffItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> ArticleItems { get; set; } = new string[1] { "" };
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取文章信息
+            Model = await Http.GetFromJsonAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlerelevances/" + Id);
+            //获取所有词条
+            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
+            EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1");
+            EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2");
+            EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3");
+            //获取所有文章
+            ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取编辑文章关联信息失败");
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlerelevances", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+
+                await ToastService.Error("编辑文章关联信息失败", obj.Error);
+            }
+            else
+            {
+                autoSave.Clean();
+
+                await ToastService.Success("编辑文章关联信息成功", "编辑文章关联信息成功，等待审核通过");
+                NavigationManager.NavigateTo(Provider, "/articles/index/" + obj.Error, Model.Name, "fa fa-newspaper-o");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "编辑文章关联信息失败");
+        }
+    }
+
+    private Task DataLoaded(EditArticleRelevancesViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+
+}

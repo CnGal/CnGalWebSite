@@ -1,20 +1,14 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Base;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel
 {
-    public class EditAddInforViewModel
+    public class EditAddInforViewModel: BaseEntryEditModel
     {
 
-        /// <summary>
-        /// 是否真实提交表单 或添加staff
-        /// </summary>
-        public string IsRealSubmit { get; set; }
-        public EntryType Type { get; set; }
-        public int Id { get; set; }
-
-        public string Name { get; set; }
         [Display(Name = "相关网站")]
         public List<SocialPlatform> SocialPlatforms { get; set; } = new List<SocialPlatform>() { };
 
@@ -107,8 +101,36 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string QQgroupGroup { get; set; }
         #endregion
 
-        [Display(Name = "备注")]
-        public string Note { get; set; }
+        public override Result Validate()
+        {
+            //调整时间
+            if (IssueTime != null)
+            {
+                IssueTime = IssueTime.Value.AddHours(IssueTime.Value.Hour < 12 ? (12 - IssueTime.Value.Hour) : 0);
+            }
+            if (Birthday != null)
+            {
+                Birthday = Birthday.Value.AddHours(Birthday.Value.Hour < 12 ? (12 - Birthday.Value.Hour) : 0);
+            }
+
+            //检查staff数据
+            if (Staffs != null)
+            {
+                foreach (var item in Staffs)
+                {
+                    if (string.IsNullOrWhiteSpace(item.PositionOfficial))
+                    {
+                        return new Result { Error = "Staff必须填写官方职位" };
+                    }
+                    if (string.IsNullOrWhiteSpace(item.NicknameOfficial))
+                    {
+                        return new Result { Error = "Staff必须填写官方昵称" };
+                    }
+                }
+            }
+
+            return new Result { Successful=true };
+        }
 
     }
 

@@ -133,7 +133,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<Carousel>>> GetHomeCarouselsViewAsync()
+        public async Task<ActionResult<List<CarouselViewModel>>> GetHomeCarouselsViewAsync()
         {
             return await _homeService.GetHomeCarouselsViewAsync();
 
@@ -153,7 +153,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 FriendLinks = await _homeService.GetHomeFriendLinksViewAsync(),
                 Notices = await _homeService.GetHomeNoticesViewAsync(),
                 Articles = await _homeService.GetHomeArticlesViewAsync(),
-                Carousels = await _homeService.GetHomeCarouselsViewAsync()
+                //Carousels = await _homeService.GetHomeCarouselsViewAsync()
             };
 
             return model;
@@ -191,6 +191,91 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<IEnumerable<string>>> GetSearchTipListAsync()
         {
             return await _entryRepository.GetAll().Where(s => s.IsHidden != true).AsNoTracking().Select(s => s.Name).Where(s => string.IsNullOrWhiteSpace(s) == false).ToArrayAsync();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<DocumentViewModel>>> GetDocumentsAsync()
+        {
+
+            var model = new List<DocumentViewModel>
+                {
+                    new DocumentViewModel
+                    {
+                        Icon = "mdi-information-outline ",
+                        Title = "关于我们",
+                        Id=99999,
+                        Children = new List<DocumentViewModel>
+                        {
+                            new DocumentViewModel
+                            {
+                                Title = "概述",
+                                Id = 767,
+                            },
+                            new DocumentViewModel
+                            {
+                                Title = "组织架构",
+                                Id = 150,
+                            },
+                            new DocumentViewModel
+                            {
+                                Title = "隐私政策",
+                                Id = 225,
+                            }
+                        }
+                    }
+                };
+
+
+            //更新日志
+            var articles = await _articleRepository.GetAll().AsNoTracking()
+                .Where(s => s.Type == ArticleType.Notice && s.Name.Contains("更新") && s.Id != 766)
+                .Select(s => new DocumentViewModel { Id = s.Id, Title = s.DisplayName.Replace("网站","") })
+                .ToListAsync();
+            var tempDocument = new DocumentViewModel
+            {
+                Icon = "mdi-cloud-upload-outline ",
+                Id = 99998,
+                Title = "更新日志",
+                Children = articles.OrderByDescending(s => s.Id).ToList()
+            };
+            tempDocument.Children.Insert(0, new DocumentViewModel
+            {
+                Title = "概览",
+                Id = 766,
+            });
+            model.Add(tempDocument);
+
+
+            //公告
+            articles = await _articleRepository.GetAll().AsNoTracking()
+              .Where(s => s.Type == ArticleType.Notice && s.Name.Contains("更新") == false && s.Id != 150 && s.Id != 225 && s.Id != 767 && s.Id != 766)
+              .Select(s => new DocumentViewModel { Id = s.Id, Title = s.DisplayName })
+              .ToListAsync();
+
+            model.Add(new DocumentViewModel
+            {
+                Icon = "mdi-clipboard-check-multiple-outline ",
+                Id = 99997,
+                Title = "公告",
+                Children = articles.OrderByDescending(s => s.Id).ToList()
+            });
+
+            //周报
+
+            articles = await _articleRepository.GetAll().AsNoTracking()
+             .Where(s => s.Type == ArticleType.News && s.Name.Contains("CnGal每周速报"))
+             .Select(s => new DocumentViewModel { Id = s.Id, Title = s.Name.Replace("CnGal每周速报（","").Replace("）","") })
+             .ToListAsync();
+
+            model.Add(new DocumentViewModel
+            {
+                Icon = "mdi-newspaper-variant ",
+                Id = 99996,
+                Title = "CnGal每周速报",
+                Children = articles.OrderByDescending(s => s.Id).ToList()
+            });
+
+            return model;
         }
 
 

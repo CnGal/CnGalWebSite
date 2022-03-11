@@ -3,6 +3,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using CnGalWebSite.DataModel.ViewModel.Votes;
+using CnGalWebSite.Helper.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -38,22 +39,7 @@ namespace CnGalWebSite.DataModel.Helper
 
         //临时储存的信息
 
-        /// <summary>
-        /// 获得枚举的displayName
-        /// </summary>
-        /// <param name="eum"></param>
-        /// <returns></returns>
-        public static string GetDisplayName(this Enum eum)
-        {
-            if (eum == null)
-            {
-                return string.Empty;
-            }
-            var type = eum.GetType();//先获取这个枚举的类型
-            var field = type.GetField(eum.ToString());//通过这个类型获取到值
-            var obj = (DisplayAttribute)field.GetCustomAttribute(typeof(DisplayAttribute));//得到特性
-            return obj.Name ?? "";
-        }
+     
 
         public static List<string> GetImageLinks(string context)
         {

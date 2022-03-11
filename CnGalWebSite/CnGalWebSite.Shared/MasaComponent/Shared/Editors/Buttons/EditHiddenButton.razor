@@ -1,0 +1,59 @@
+﻿@inject ToastService ToastService
+@inject HttpClient Http
+
+<MButton Text Block Color="warning" OnClick="OnHidden">
+    <MIcon Left>@(IsHidden? "mdi-eye " : "mdi-eye-off")</MIcon>
+    @(IsHidden?("取消隐藏" + Type.GetDisplayName()):("隐藏"+Type.GetDisplayName()))
+</MButton>
+
+@code {
+    [Parameter]
+    public bool IsHidden { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+    [Parameter]
+    public ExaminedNormalListModelType Type { get; set; }
+    [Parameter]
+    public EventCallback<bool> IsHiddenChanged { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private async void OnHidden()
+    {
+        var str = (IsHidden ? "显示" : "隐藏") + Type.GetDisplayName();
+
+        try
+        {
+            var url = Type switch
+            {
+                ExaminedNormalListModelType.Article => "api/articles/HiddenArticle",
+                ExaminedNormalListModelType.Entry => "api/entries/HiddenEntry",
+                ExaminedNormalListModelType.Periphery => "api/peripheries/HiddenPeriphery",
+                ExaminedNormalListModelType.Tag => "api/tags/HiddenTag"
+            };
+
+
+            var result = await Http.PostAsJsonAsync<HiddenArticleModel>(ToolHelper.WebApiPath + url, new HiddenArticleModel { Ids = new long[] { Id }, IsHidden = !IsHidden });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(str + "失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success(str + "成功", str + "成功，离开此页面后可以请在后台恢复状态");
+                IsHidden = !IsHidden;
+                await IsHiddenChanged.InvokeAsync(IsHidden);
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, str + "失败");
+        }
+    }
+
+}

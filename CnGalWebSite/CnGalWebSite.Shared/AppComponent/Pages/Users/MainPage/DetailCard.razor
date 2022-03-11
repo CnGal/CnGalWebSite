@@ -51,12 +51,12 @@
         Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
         {
             Name = "等级",
-            Value = "Lv " + Model.Level
+            Value = "Lv " + ToolHelper.GetUserLevel( Model.BasicInfor.Integral)
         });
         Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
         {
             Name = "积分",
-            Value = Model.Integral.ToString()
+            Value = Model.BasicInfor.Integral.ToString()
         });
         Informations.Add(new CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.BasicInforPairModel
         {

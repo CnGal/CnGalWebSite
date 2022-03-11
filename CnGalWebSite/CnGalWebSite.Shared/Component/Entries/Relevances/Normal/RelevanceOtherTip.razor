@@ -1,6 +1,7 @@
-﻿
-<TabLink target="_blank" Url="@Model.Link" class="a-font-color"  rel="noreferrer">
-    <div class="div-shadow rounded  bg-opacity aticle-home-layout p-3 h-100" >
+﻿@inject IDataCacheService _dataCatcheService
+
+<TabLink target="_blank" Url="@Model.Link" class="a-font-color" rel="noreferrer">
+    <div class="div-shadow rounded  bg-opacity aticle-home-layout p-3 h-100">
         <div class="" style="height: 100%; align-content: center;display:flex;">
             @{
                 string imageStr = Model.Image;
@@ -43,7 +44,7 @@
                     {
                         imageStr = "https://app.cngal.org/_content/CnGalWebSite.Shared/images/DLsite.png";
                     }
-                    else if (Model.DisplayName.Contains( "维基百科"))
+                    else if (Model.DisplayName.Contains("维基百科"))
                     {
                         imageStr = "https://app.cngal.org/_content/CnGalWebSite.Shared/images/Wiki.png";
                     }
@@ -55,21 +56,7 @@
 
                 if (string.IsNullOrWhiteSpace(imageStr))
                 {
-                        <div style="display: flex; flex-direction: column; justify-content: center;">
-                            <header class="text-truncate-2">
-                                <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
-                            </header>
-                            <span class="text-truncate-3">
-                                @Model.DisplayValue
-                            </span>
-                        </div>
-                }
-                else
-                {
-                    <div class="" style=" display: flex; flex-direction: column; justify-content: center;">
-                        <img src="@imageStr" style="width: 116px;" />
-                    </div>
-                    <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
+                    <div style="display: flex; flex-direction: column; justify-content: center;">
                         <header class="text-truncate-2">
                             <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
                         </header>
@@ -77,6 +64,38 @@
                             @Model.DisplayValue
                         </span>
                     </div>
+                }
+                else
+                {
+                    if (_dataCatcheService.IsApp)
+                    {
+                        <div style=" display: flex; flex-direction: column; justify-content: center;">
+                            <img src="@imageStr" style="width: 80px;" />
+                        </div>
+                        <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
+                            <header class="text-truncate-2">
+                                <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                            </header>
+                            <span class="text-truncate-3">
+                                @Model.DisplayValue
+                            </span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div style=" display: flex; flex-direction: column; justify-content: center;">
+                            <img src="@imageStr" style="width: 116px;" />
+                        </div>
+                        <div class="ps-3" style="display: flex; flex-direction: column; justify-content: center;">
+                            <header class="text-truncate-2">
+                                <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                            </header>
+                            <span class="text-truncate-3">
+                                @Model.DisplayValue
+                            </span>
+                        </div>
+                    }
+
                 }
             }
 
@@ -86,7 +105,7 @@
 
 </TabLink>
 
-    @code {
-        [Parameter]
-        public RelevancesKeyValueModel Model { get; set; }
-    }
+@code {
+    [Parameter]
+    public RelevancesKeyValueModel Model { get; set; }
+}

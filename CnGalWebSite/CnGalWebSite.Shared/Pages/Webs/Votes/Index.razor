@@ -4,7 +4,6 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
-@implements IAsyncDisposable
 @inject IDataCacheService _dataCatcheService
 
 @inject DialogService DialogService
@@ -36,77 +35,58 @@ else
 }
 else
 {
-    <div class="row">
-        @if (isReady == false)
-        {
-            <div class="col-12">
-                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
-                    <SkeletonParagraph />
-                    <hr class="m-2" />
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
+    @if (isReady == false)
+    {
+        <div>
+            <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                <SkeletonParagraph />
+                <hr class="m-2" />
+                <SkeletonParagraph />
+                <div class="mt-2">
                 </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
             </div>
+        </div>
+    }
+    else
+    {
+
+
+        @if (Model.IsHidden == true)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
+                当前投票处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
         }
-        else
-        {
-            <div class="col-12 @(IsLargeScreen ? " col-xl-6" : "")">
 
-                @if (Model.IsHidden == true)
-                {
-                    <div class="alert alert-info  rounded shadow-sm  rounded" role="alert">
-                        当前投票处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-                    </div>
-
-                }
-
-                <div class="rounded shadow-sm  bg-opacity mb-4 pb-3">
-                    <div>
-                        <CnGalWebSite.Shared.Component.Votes.MainPage.MainInforCard Model="Model" />
-
-                    </div>
-                    <AuthorizeView Roles="Admin">
-                        <Authorized>
-                            <div class="ms-3 me-3 mt-3">
-                                <CnGalWebSite.Shared.Component.Votes.MainPage.ExtraButtonCard Model="Model" StateChanged="HiddenStateChanged" />
-                            </div>
-                        </Authorized>
-                    </AuthorizeView>
-                    <div class="ms-3 me-3 mt-3">
-                        <CnGalWebSite.Shared.Component.Votes.MainPage.OptionsInforCard Model="Model" IsShowResult="Model.ShowResult" />
-                    </div>
-                    @if (Model.ShowResult == false || Model.IsAllowModification)
-                    {
-                        <div class="ms-3 me-3 mt-3">
-                            <CnGalWebSite.Shared.Component.Votes.MainPage.VoteButtonCard Model="Model" OnVoted="OnVoted" OnReVoted="OnReVoted" />
-                        </div>
-                    }
-                </div>
-
-
-                @if (Model.CanComment)
-                {
-                    <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="false" IsSmallScreen="IsSmallScreen" CurrentUserRank="@CurrentUserRank" RelyCallBack="OnRely" IsAdmin="@IsAdmin" CanDeleted="IsAdmin" DeletedCallBack="OnDeleted"></CommentListView>
-                    <ReplyCommentTip CurrentUserRank="@CurrentUserRank" IsChild="false" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentVote" RelyCallBack="OnRely" IsAdmin="IsAdmin"></ReplyCommentTip>
-
-                }
-                else
-                {
-                    <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
-                }
+        <div class="rounded shadow-sm  bg-opacity mb-4 pb-3">
+            <div>
+                <CnGalWebSite.Shared.Component.Votes.MainPage.MainInforCard Model="Model" />
 
             </div>
-            @if (IsLargeScreen)
+            <AuthorizeView Roles="Admin">
+                <Authorized>
+                    <div class="ms-3 me-3 mt-3">
+                        <CnGalWebSite.Shared.Component.Votes.MainPage.ExtraButtonCard Model="Model" StateChanged="HiddenStateChanged" />
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+            <div class="ms-3 me-3 mt-3">
+                <CnGalWebSite.Shared.Component.Votes.MainPage.OptionsInforCard Model="Model" IsShowResult="Model.ShowResult" />
+            </div>
+            @if (Model.ShowResult == false || Model.IsAllowModification)
             {
-    <div class="col-xl-6">
+                <div class="ms-3 me-3 mt-3">
+                    <CnGalWebSite.Shared.Component.Votes.MainPage.VoteButtonCard Model="Model" OnVoted="OnVoted" OnReVoted="OnReVoted" />
+                </div>
+            }
+        </div>
         @if (Model.Users.Count != 0)
         {
             <CnGalWebSite.Shared.Component.Votes.MainPage.ListUserInforCard Model="Model" />
@@ -116,15 +96,13 @@ else
             <CnGalWebSite.Shared.Component.Votes.MainPage.RelevanceInforCard Model="Model" />
         }
 
-    </div>
-            }
-        }
 
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+            <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentVote" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
-
-    </div>
+    }
 }
-
 
 @code {
     private string id = "";
@@ -152,22 +130,6 @@ else
     public VoteViewModel Model { get; set; } = new VoteViewModel();
 
     public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
-
-
-    #region 获取屏幕大小
-
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime? JSRuntime { get; set; }
-
-
-
-    public bool IsSmallScreen { get; set; }
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; }
     public bool IsAdmin { get; set; } = false;
     string LastLookName = "";
     bool isFrist = true;
@@ -177,26 +139,12 @@ else
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    private JSInterop<Index>? Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        try
-        {
-            await JS.InvokeAsync<string>("highlightAllCode");
-        }
-        catch
-        {
-
-        }
 
         //记录数据
-        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name)==false)
+        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name) == false)
         {
             LastLookName = Model.Name;
             try
@@ -210,41 +158,10 @@ else
         }
         if (firstRender)
         {
-            Interop = new JSInterop<Index>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
-
             isFrist = false;
-
-
         }
 
     }
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 850))
-        {
-            IsSmallScreen = width < 850;
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 850 && width < 1500))
-        {
-            IsNormalScreen = width >= 850 && width < 1500;
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 1500))
-        {
-            IsLargeScreen = width >= 1500;
-            StateHasChanged();
-        }
-    }
-    #endregion
-
     protected override async Task OnInitializedAsync()
     {
         try
@@ -344,25 +261,4 @@ else
             await ToastService.Error("导航失败", "请尝试刷新页面");
         }
     }
-
-
-
-
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
-    {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-    }
-    #endregion
-
 }

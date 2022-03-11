@@ -1,0 +1,79 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+@if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip Show />
+}
+<MApp Dark="_dataCacheService.ThemeSetting.IsDark">
+    <MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:"white")">
+        <div style=" word-break: keep-all;" class="ms-4 me-8">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip />
+        </div>
+        <MTabs Color="@_dataCacheService.ThemeSetting.Theme">
+            <MTab OnClick="OnNavHomeClick">首页</MTab>
+            <MTab OnClick="OnNavEntryClick">词条</MTab>
+            <MTab OnClick="OnNavArticleClick">文章</MTab>
+            <MTab OnClick="OnNavSquareClick">广场</MTab>
+        </MTabs>
+        <MSpacer></MSpacer>
+
+        <MTooltip Bottom>
+            <ActivatorContent>
+                <MButton Icon Dark Color="@_dataCacheService.ThemeSetting.Theme" Class="mr-6" OnClick="OnNavSearchClick">
+                    <MIcon>mdi-magnify</MIcon>
+                </MButton>
+            </ActivatorContent>
+            <ChildContent>
+                <span>搜索</span>
+            </ChildContent>
+        </MTooltip>
+
+        <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
+    </MAppBar>
+
+    <MMain>
+        <MContainer>
+            <div class="mt-3 mb-3">
+                @Body
+            </div>
+
+        </MContainer>
+    </MMain>
+
+    <MFooter App Padless Absolute Color="@(_dataCacheService.ThemeSetting.IsDark?null:"white")">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.MainFooterTip />
+    </MFooter>
+</MApp>
+
+@code {
+    public Task OnNavHomeClick()
+    {
+        NavigationManager.NavigateTo("/");
+        return Task.CompletedTask;
+    }
+
+    public Task OnNavEntryClick()
+    {
+        NavigationManager.NavigateTo("/entries/home");
+        return Task.CompletedTask;
+    }
+
+    public Task OnNavArticleClick()
+    {
+        NavigationManager.NavigateTo("/articles/home");
+        return Task.CompletedTask;
+    }
+    public Task OnNavSquareClick()
+    {
+        NavigationManager.NavigateTo("/square");
+        return Task.CompletedTask;
+    }
+    public Task OnNavSearchClick()
+    {
+        NavigationManager.NavigateTo("/home/search/全部");
+        return Task.CompletedTask;
+    }
+}

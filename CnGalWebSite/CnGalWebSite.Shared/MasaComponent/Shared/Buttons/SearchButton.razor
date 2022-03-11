@@ -1,0 +1,35 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+@*@if (Dark)
+{
+    <MButton Icon OnClick="OnClick" Class="@Class">
+        <MIcon>mdi-magnify</MIcon>
+    </MButton>
+}
+else
+{*@
+    <MTooltip Bottom>
+        <ActivatorContent>
+            <MButton Icon Dark Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" OnClick="OnClick">
+                <MIcon>mdi-magnify</MIcon>
+            </MButton>
+        </ActivatorContent>
+        <ChildContent>
+            <span>搜索</span>
+        </ChildContent>
+    </MTooltip>
+@*}*@
+@code {
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public bool Dark { get; set; }
+
+    public Task OnClick()
+    {
+        NavigationManager.NavigateTo("/home/search");
+        return Task.CompletedTask;
+    }
+
+}

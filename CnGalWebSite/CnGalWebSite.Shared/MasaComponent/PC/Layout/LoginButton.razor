@@ -1,0 +1,37 @@
+﻿@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <Authorized>
+        <CreateObjectButton Class="mr-6" />
+        <UserButton Class="me-4" OnClickSetting="OnOpenSetting" />
+    </Authorized>
+    <NotAuthorized>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="mdi-login" Class="mr-6" Tooltip="登入" OnClick="OnClickLogin" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="mdi-cog" Class="me-4" Tooltip="设置" OnClick="OnOpenSetting" StopPropagation />
+    </NotAuthorized>
+</AuthorizeView>
+@if (isOpen)
+{
+    <ThemeSettingCard @ref="themeSettingCard" />
+}
+@code {
+    ThemeSettingCard themeSettingCard;
+    bool isOpen;
+
+    private async void OnClickLogin()
+    {
+
+        NavigationManager.NavigateTo("/account/login");
+
+    }
+
+    public async Task OnOpenSetting()
+    {
+        isOpen = true;
+        StateHasChanged();
+        if (themeSettingCard != null)
+        {
+            await themeSettingCard.Refresh(true);
+        }
+    }
+}

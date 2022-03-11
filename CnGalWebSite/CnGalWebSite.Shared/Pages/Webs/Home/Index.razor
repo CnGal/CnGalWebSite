@@ -1,37 +1,35 @@
 ﻿@inject HttpClient Http
 @inject ToastService? ToastService
 @inject IJSRuntime JS
-@implements IAsyncDisposable
 @inject IDataCacheService _dataCacheService
 
 
 <TitleTip></TitleTip>
 
 
-    <div class="">
-        <div class="row">
-            <div class=" mb-4 @(IsLargeScreen?"col-12 col-md-9":"col-12")">
-                <BootstrapBlazor.Components.Carousel Images="@Images" IsFade="true" OnClick="OnClick" class="h-100 rounded shadow-sm"></BootstrapBlazor.Components.Carousel>
-            </div>
-            <div class=" mb-4 @(IsLargeScreen?"col-12 col-md-3":"col-12")">
-                <HomeNewsViewTip></HomeNewsViewTip>
-            </div>
-            <div class="col-12 mb-4">
-                <HomeViewTip></HomeViewTip>
-            </div>
-        </div>
+
+<div>
+    <div class=" mb-4">
+        <BootstrapBlazor.Components.Carousel Images="@Images" IsFade="true" OnClick="OnClick" class="rounded shadow-sm"></BootstrapBlazor.Components.Carousel>
     </div>
+    <div class="mb-4">
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.NoticeCard/>
+    </div>
+    <div class=" mb-4">
+        <HomeNewsViewTip></HomeNewsViewTip>
+    </div>
+    <div class=" mb-4">
+        <HomeViewTip></HomeViewTip>
+    </div>
+</div>
+
 
 
 
 @code {
 
     private List<string> Images = new List<string>();
-    private List<DataModel.Model.Carousel> Carousels { get; set; } = new List<DataModel.Model.Carousel>();
-
-    public bool IsSmallScreen { get; set; }
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; } = true;
+    private List<CarouselViewModel> Carousels { get; set; } = new List<CarouselViewModel>();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -51,20 +49,12 @@
         try
         {
             _dataCacheService.RefreshSearchCatche();
+            Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView", true);
 
-            Carousels = await Http.GetFromJsonAsync<List<DataModel.Model.Carousel>>(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView");
+            Images = Carousels.Select(s => s.Image).ToList();
 
-            //序列化轮播图
-            if (Carousels != null)
-            {
-                Images = new List<string>();
-                foreach (var item in Carousels)
-                {
-                    Images.Add(item.Image);
-                }
-            }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取主页轮播图列表失败");
         }
@@ -75,90 +65,21 @@
 
     private async Task OnClick(string imageUrl)
     {
-        //查找图片对应的Link
-        foreach (var item in Carousels)
+
+        var item = Carousels.FirstOrDefault(s => s.Image == imageUrl);
+        if (item != null)
         {
-            if (item.Image == imageUrl)
+            try
             {
-                try
-                {
-                    await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", $"【{item.Id}】{item.Link}", "1", "click");
-                }
-                catch (Exception exc)
-                {
-
-                }
-                OpenNewPage(item.Link);
+                await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", item.Link, "1", "click");
             }
-        }
-    }
-    #region 获取屏幕大小
+            catch (Exception exc)
+            {
 
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime JSRuntime { get; set; }
-
-    private JSInterop<Index> Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            Interop = new JSInterop<Index>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
+            }
+            OpenNewPage(item.Link);
         }
     }
 
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 768))
-        {
-            IsSmallScreen = width < 768;
-
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 768 && width < 1630))
-        {
-            IsNormalScreen = width >= 768 && width < 1630;
-
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 1630))
-        {
-            IsLargeScreen = width >= 1630;
-            StateHasChanged();
-        }
-    }
-    #endregion
-
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
-    {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 
 }

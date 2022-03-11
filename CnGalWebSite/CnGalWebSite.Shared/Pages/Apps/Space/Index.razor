@@ -7,16 +7,16 @@
 @inject DialogService DialogService
 @inject IDataCacheService _dataCatcheService
 
-@if (string.IsNullOrWhiteSpace(PersonalSpace.Name) == false)
+@if (string.IsNullOrWhiteSpace(PersonalSpace.BasicInfor.Name) == false)
 {
-    <TitleTip Title="@(PersonalSpace.Name + " - CnGal 中文galgame资料站")" Description="@PersonalSpace.PersonalSignature" Image="@PersonalSpace.PhotoPath"></TitleTip>
+    <TitleTip Title="@(PersonalSpace.BasicInfor.Name + " - CnGal 中文galgame资料站")" Description="@PersonalSpace.BasicInfor.PersonalSignature" Image="@PersonalSpace.BasicInfor.PhotoPath"></TitleTip>
 }
 else
 {
     <TitleTip></TitleTip>
 }
 
-<CnGalWebSite.Shared.AppComponent.Pages.Users.MainPage.HeadBar Title="@UserInfor.UserName" UserId="@UserInfor.Id" />
+<CnGalWebSite.Shared.AppComponent.Pages.Users.MainPage.HeadBar Title="@UserInfor.Name" UserId="@UserInfor.Id" />
 
 @if (isReady)
 {
@@ -59,7 +59,7 @@ else
 @if (isNotFound == false)
 {
     <CnGalWebSite.Shared.AppComponent.Pages.Users.MainPage.UserFooter @ref="userFooter" Image="@UserInfor.PhotoPath" RelyCallBack="RefreshComment"
-                                                                          UserId="@id" UserName="@UserInfor.UserName" BriefIntroduction="@UserInfor.PersonalSignature" />
+                                                                          UserId="@id" UserName="@UserInfor.Name" BriefIntroduction="@UserInfor.PersonalSignature" />
 }
 
 @code {
@@ -159,12 +159,12 @@ else
     {
 
         //记录数据
-        if (PersonalSpace.Name != LastLookName && PersonalSpace.Name != "CnGal_中文GalGame资料站")
+        if (PersonalSpace.BasicInfor.Name != LastLookName && PersonalSpace.BasicInfor.Name != "CnGal_中文GalGame资料站")
         {
-            LastLookName = PersonalSpace.Name;
+            LastLookName = PersonalSpace.BasicInfor.Name;
             try
             {
-                await JS.InvokeAsync<string>("trackEvent", "用户主页", "浏览", PersonalSpace.Name, "1", "look");
+                await JS.InvokeAsync<string>("trackEvent", "用户主页", "浏览", PersonalSpace.BasicInfor.Name, "1", "look");
             }
             catch (Exception exc)
             {
@@ -188,7 +188,7 @@ else
             UserArticles = await Http.GetFromJsonAsync<List<ArticleInforTipViewModel>>(ToolHelper.WebApiPath + "api/articles/GetUserAllArticles/" + Id);
             UserPeripheries = await Http.GetFromJsonAsync<List<GameOverviewPeripheriesModel>>(ToolHelper.WebApiPath + "api/peripheries/GetUserOverviewPeripheries/" + Id);
             //判断如果名称为空则返回主页
-            if (string.IsNullOrWhiteSpace(PersonalSpace.Name))
+            if (string.IsNullOrWhiteSpace(PersonalSpace.BasicInfor.Name))
             {
                 NavigationManager.NavigateTo("/home");
             }

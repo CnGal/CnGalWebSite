@@ -1,0 +1,38 @@
+﻿<a href="@("votes/index/"+Model.Id)" class=" a-font-color">
+    <div class="shadow-sm rounded  bg-opacity h-100" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="">
+            <div>
+                <img class="img-fluid" src="@Model.MainPicture">
+            </div>
+            <div class="p-3">
+                <header class="text-truncate-2">
+                    @if (DateTime.Now.ToCstTime() < Model.BeginTime)
+                    {
+                        <span class="bg-primary article-home-tag me-2" style=" border-radius: 5px; ">未开始</span>
+                    }
+                    else if (DateTime.Now.ToCstTime() > Model.EndTime)
+                    {
+                        <span class="bg-danger article-home-tag me-2">已结束</span>
+                    }
+                    else
+                    {
+                        <span class="bg-success article-home-tag me-2">正在进行</span>
+                    }
+
+                    <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                </header>
+                <span class="text-truncate-4">
+                    @Model.BriefIntroduction
+                </span>
+
+            </div>
+        </div>
+    </div>
+</a>
+
+
+@code {
+    [Parameter]
+    public VoteCardViewModel Model { get; set; }
+
+}

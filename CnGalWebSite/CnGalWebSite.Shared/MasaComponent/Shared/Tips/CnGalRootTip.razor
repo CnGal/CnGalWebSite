@@ -1,0 +1,50 @@
+﻿@inject IDataCacheService _dataCacheService
+@using Microsoft.Extensions.Logging
+
+<ErrorHandler @ref="errorHandler">
+    <ErrorLogger ShowToast="false" OnErrorHandleAsync="OnErrorHandleAsync">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" OnStateChanged="OnStateChanged"/>
+        <ImagesLargeViewTip/>
+        <CascadingValue Value=this IsFixed="true">
+            @ChildContent
+        </CascadingValue>
+    </ErrorLogger>
+</ErrorHandler>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    ErrorHandler errorHandler;
+    CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip styleTip;
+    public Task OnErrorHandleAsync(ILogger logger, Exception ex)
+    {
+        if (ex is OutOfMemoryException)
+        {
+            throw ex;
+        }
+        else
+        {
+            errorHandler.ProcessError(ex, "发生未经捕获的异常", "代码里有Bug");
+            return Task.CompletedTask;
+        }
+    }
+
+    public async Task SaveTheme()
+    {
+        if(styleTip!=null)
+        {
+            await styleTip.SaveTheme();
+            styleTip.Refresh();
+        }
+    }
+
+    public async Task OnStateChanged(bool refreshApp)
+    {
+        if(refreshApp)
+        {
+            await _dataCacheService.RefreshApp.InvokeAsync();
+        }
+        StateHasChanged();
+    }
+}

@@ -202,7 +202,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<ExaminedViewModel>(ToolHelper.WebApiPath + "api/admin/examined", new ExaminedViewModel { id = examineId, isPassed = isPassed, comments = "" });
+            var result = await Http.PostAsJsonAsync<ExaminedViewModel>(ToolHelper.WebApiPath + "api/examines/proc", new ExaminedViewModel { id = examineId, isPassed = isPassed, comments = "" });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果

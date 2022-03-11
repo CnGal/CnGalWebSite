@@ -9,9 +9,9 @@
 @inject DialogService DialogService
 @inject IDataCacheService _dataCatcheService
 
-@if (string.IsNullOrWhiteSpace(_dataCatcheService.UserInfor.UserName) == false)
+@if (string.IsNullOrWhiteSpace(_dataCatcheService.UserInfor.Name) == false)
 {
-    <TitleTip Title="@(_dataCatcheService.UserInfor.UserName + " - CnGal 中文galgame资料站")" Description="@_dataCatcheService.UserInfor.PersonalSignature" Image="@_dataCatcheService.UserInfor.PhotoPath"></TitleTip>
+    <TitleTip Title="@(_dataCatcheService.UserInfor.Name + " - CnGal 中文galgame资料站")" Description="@_dataCatcheService.UserInfor.PersonalSignature" Image="@_dataCatcheService.UserInfor.PhotoPath"></TitleTip>
 }
 else
 {

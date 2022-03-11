@@ -4,52 +4,45 @@
 
 <TitleTip></TitleTip>
 
+<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCarousel />
 
-<CnGalWebSite.Shared.AppComponent.Pages.Home.HeadBar Model="Model" />
-
-
-<div style="margin-top: 55px; width: 100%;margin-bottom:65px; ">
-    <div class="ms-2 me-2">
-        <div class="mt-3 mb-3 p-0">
-            <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCarousel />
-
-            <div class="tab-content" id="@("pills" + randomIndex + "-tabContent")">
-                <div class="@("tab-pane fade" + (defaultIndex == 0 ? " show active " : "") )" id="@("pills" + randomIndex + "-0")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-0-tab")">
-                    <div>
-                        <CnGalWebSite.Shared.AppComponent.Pages.Home.Index />
-                    </div>
-                </div>
-                <div class="@("tab-pane fade" + (defaultIndex == 1 ? " show active " : "") )" id="@("pills" + randomIndex + "-1")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-1-tab")">
-
-                    @if(isReadyTab1)
-            {
-                    <div>
-                        <CnGalWebSite.Shared.AppComponent.Pages.Entries.Index />
-                    </div>
-            }
-                </div>
-                <div class="@("tab-pane fade" + (defaultIndex == 2 ? " show active " : "") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
-                    @if (isReadyTab2)
-                    {
-                        <div>
-                            <CnGalWebSite.Shared.AppComponent.Pages.Articles.Home />
-                        </div>
-                    }
-
-                </div>
-                <div class="@("tab-pane fade" + (defaultIndex == 3 ? " show active " : "") )" id="@("pills" + randomIndex + "-3")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-3-tab")">
-                    @if (isReadyTab3)
-                    {
-                        <div>
-                            <CnGalWebSite.Shared.AppComponent.Pages.Home.Others.Index />
-                        </div>
-                    }
-
-                </div>
+<div style="width: 100%; margin-bottom: 50px;">
+    <div class="tab-content" id="@("pills" + randomIndex + "-tabContent")">
+        <div class="@("tab-pane fade" + (defaultIndex == 0 ? " show active " : "") )" id="@("pills" + randomIndex + "-0")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-0-tab")">
+            <div>
+                <CnGalWebSite.Shared.AppComponent.Pages.Home.Index />
             </div>
+        </div>
+        <div class="@("tab-pane fade" + (defaultIndex == 1 ? " show active " : "") )" id="@("pills" + randomIndex + "-1")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-1-tab")">
+
+            @if (isReadyTab1)
+            {
+                <div>
+                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Index />
+                </div>
+            }
+        </div>
+        <div class="@("tab-pane fade" + (defaultIndex == 2 ? " show active " : "") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
+            @if (isReadyTab2)
+            {
+                <div>
+                    <CnGalWebSite.Shared.AppComponent.Pages.Articles.Home />
+                </div>
+            }
+
+        </div>
+        <div class="@("tab-pane fade" + (defaultIndex == 3 ? " show active " : "") )" id="@("pills" + randomIndex + "-3")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-3-tab")">
+            @if (isReadyTab3)
+            {
+                <div>
+                    <CnGalWebSite.Shared.AppComponent.Pages.Home.Others.Index />
+                </div>
+            }
+
         </div>
     </div>
 </div>
+
 
 
 <CnGalWebSite.Shared.AppComponent.Pages.Home.HomeFooter OnTabClick="OnTabClick" DefaultIndex="defaultIndex" RandomIndex="randomIndex" />
@@ -143,7 +136,7 @@
 
     public async Task OnTabClick(int index)
     {
-        if(index==1)
+        if (index == 1)
         {
             isReadyTab1 = true;
         }

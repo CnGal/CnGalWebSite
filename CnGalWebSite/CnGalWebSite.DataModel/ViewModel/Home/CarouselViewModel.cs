@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace CnGalWebSite.DataModel.ViewModel.Home
+{
+    public class CarouselViewModel
+    {
+        public string Image { get; set; }
+
+        public string Link { get; set; }
+
+        public int Priority { get; set; }
+    }
+}

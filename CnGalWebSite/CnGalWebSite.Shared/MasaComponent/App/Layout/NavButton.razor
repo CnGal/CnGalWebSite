@@ -1,0 +1,78 @@
+﻿@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+@inject ToastService ToastService
+
+
+<MNavigationDrawer @bind-Value="Drawer" App Temporary>
+    <MList Nav Class="mt-4"
+           Dense>
+        <AuthorizeView>
+            <Authorized>
+                <UserButton OnClosed="OnClose"  OnClickSetting="OnOpenSetting"/>
+            </Authorized>
+            <NotAuthorized>
+                <LoginButton />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/"))">
+                    <MIcon Left>mdi-home</MIcon>
+                    主页
+                </MButton>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnOpenSetting">
+                    <MIcon Left>mdi-cog</MIcon>
+                    主题设置
+                </MButton>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/about"))">
+                    <MIcon Left>mdi-information-outline</MIcon>
+                    关于我们
+                </MButton>
+            </NotAuthorized>
+        </AuthorizeView>
+    </MList>
+</MNavigationDrawer>
+@if (isOpen)
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Layout.ThemeSettingCard @ref="themeSettingCard" />
+}
+@code {
+    [Parameter]
+    public bool Drawer { get; set; }
+
+    CnGalWebSite.Shared.MasaComponent.PC.Layout.ThemeSettingCard themeSettingCard;
+    bool isOpen;
+
+    public Task SetDrawer(bool drawer)
+    {
+        Drawer = drawer;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task OnClickUrl(string url)
+    {
+        NavigationManager.NavigateTo(url);
+        Drawer = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task OnClose()
+    {
+        Drawer = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public async Task OnOpenSetting()
+    {
+        isOpen = true;
+        StateHasChanged();
+        await OnClose();
+
+        if (themeSettingCard != null)
+        {
+            await themeSettingCard.Refresh(true);
+        }
+    }
+}

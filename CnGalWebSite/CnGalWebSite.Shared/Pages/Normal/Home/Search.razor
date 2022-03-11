@@ -5,18 +5,13 @@
 
 @inject IDataCacheService _dataCacheService
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Home.Search ScreeningConditions="@ScreeningConditions" Sorting="@SearchString" FilterText="@FilterText" />
-}
-else
-{
+
     <CnGalWebSite.Shared.Pages.Webs.Home.Search ScreeningConditions="@ScreeningConditions" SearchString="@SearchString" FilterText="@FilterText" />
-}
+
 @code{
 
     [Parameter]
-    public string ScreeningConditions { get; set; }
+    public string ScreeningConditions { get; set; } = "全部";
     [Parameter]
     public string SearchString { get; set; }
     [Parameter]

@@ -12,63 +12,65 @@
 
 
 <TitleTip Title="修改绑定手机"></TitleTip>
-<CnGalWebSite.Shared.AppComponent.Normal.Redirections.MakeAccountLayoutRight />
+<CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
 
-
-@if (isReady == false)
-{
-    <SecondAuthenticationCheckTip ReturnUrl="@ReturnUrl" OnPassed="OnPassed"></SecondAuthenticationCheckTip>
-}
-else
-{
-
-    if (state == "输入新手机号码")
+    @if (isReady == false)
     {
-        <div class="p-3">
+        <SecondAuthenticationCheckTip ReturnUrl="@ReturnUrl" OnPassed="OnPassed"></SecondAuthenticationCheckTip>
+    }
+    else
+    {
 
-            <h1 class="h4 mb-4 text-center">请输入新手机号码</h1>
-            <div  class="form-group  mb-0">
+        if (state == "输入新手机号码")
+        {
+            <div class="p-3">
 
-                <div class="row">
-                    <div class="form-group col-12  col-sm-12">
-                        <BootstrapInput @bind-Value="ModelBefore.NewPhone" ShowLabel="true"/>
+                <h1 class=" login-h1-text mb-4 text-center">请输入新手机号码</h1>
+                <div class="form-group  mb-0">
+
+                    <div class="row">
+                        <div class="form-group col-12  col-sm-12">
+                            <BootstrapInput @bind-Value="ModelBefore.NewPhone" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12">
+                            <Button Color="Color.Dark" IsAsync="true" style="width:100%" OnClick="ConfirmEmailBefore">确定</Button>
+                        </div>
+
                     </div>
-                    <div class="form-group col-12">
-                        <Button Color="Color.Dark" IsAsync="true" style="width:100%" OnClick="ConfirmEmailBefore">确定</Button>
-                    </div>
-
                 </div>
             </div>
-        </div>
-    }
-    else if (state == "验证新手机号码")
-    {
-        <div class="p-3">
-            <h1 class="h4 mb-3 text-center">验证手机号码</h1>
-            <p class="mb-4">我们已经向<strong>@(ModelBefore.NewPhone)</strong>发送了一封验证短信，请在下方填写其中的验证码</p>
-            <div   class="form-group mt-4  mb-0">
+        }
+        else if (state == "验证新手机号码")
+        {
+            <div class="p-3">
+                <h1 class=" login-h1-text mb-3 text-center">验证手机号码</h1>
+                <span class="mb-4">我们已经向<strong>@(ModelBefore.NewPhone)</strong>发送了一封验证短信，请在下方填写其中的验证码</span>
+                <div class="form-group mt-4  mb-0">
 
-                <div class="row">
-                    <div class="form-group col-12">
-                        <div id="captcha-box"></div>
-                    </div>
-                    <div class="form-group col">
-                        <BootstrapInput @bind-Value="ModelAfter.NumToken" ShowLabel="true"/>
-                    </div>
+                    <div class="row">
+                        <div class="form-group col-12">
+                            <div id="captcha-box"></div>
+                        </div>
+                        <div class="form-group col">
+                            <BootstrapInput @bind-Value="ModelAfter.NumToken" ShowLabel="true" />
+                        </div>
 
-                    <div class="form-group col-auto" style=" display: flex; align-items: flex-end;">
-                        <PostVerificationCodeTip Email="@ModelBefore.NewPhone" SmsType="DataModel.Models.SMSType.ChangeMobilePhoneNumber"></PostVerificationCodeTip>
-                    </div>
-                    <div class="form-group col-12">
-                        <Button Color="Color.Dark" IsAsync="true" style="width:100%" OnClick="ConfirmEmailAfter">验证</Button>
-                    </div>
+                        <div class="form-group col-auto" style=" display: flex; align-items: flex-end;">
+                            <PostVerificationCodeTip Email="@ModelBefore.NewPhone" SmsType="DataModel.Models.SMSType.ChangeMobilePhoneNumber"></PostVerificationCodeTip>
+                        </div>
+                        <div class="form-group col-12">
+                            <Button Color="Color.Dark" IsAsync="true" style="width:100%" OnClick="ConfirmEmailAfter">验证</Button>
+                        </div>
 
+                    </div>
                 </div>
             </div>
-        </div>
 
+        }
     }
-}
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+
 
 
 
@@ -118,9 +120,9 @@ else
                 StateHasChanged();
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "向新手机发送验证码失败","手机号无效");
+            ErrorHandler.ProcessError(ex, "向新手机发送验证码失败", "手机号无效");
         }
     }
     private async Task ConfirmEmailAfter()
@@ -144,7 +146,7 @@ else
                 NavigationManager.NavigateTo(string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ToolHelper.Base64DecodeUrl(ReturnUrl));
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "验证新手机号码失败");
         }

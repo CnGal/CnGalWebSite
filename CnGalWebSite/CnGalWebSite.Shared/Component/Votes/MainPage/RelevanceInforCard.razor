@@ -1,14 +1,10 @@
-﻿<div class="mb-4">
-    <div class="shadow-sm rounded  bg-opacity ps-3 pe-3 mb-2">
-        <div style="display: block;">
-            <h2 class="fw-bold pt-2 pb-2 m-0 font-color h5"><i class="fa fa-codepen"></i>&nbsp;&nbsp;相关推荐</h2>
-        </div>
-    </div>
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相关推荐" Icon="fa fa-fw fa-codepen" Outline Collapable>
     <div>
         @foreach (var item in Model.Entries)
         {
             <div class="mt-2">
-                <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main"/>
+                <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" />
 
             </div>
         }
@@ -30,8 +26,7 @@
             </div>
         }
     </div>
-</div>
-
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 @code {
     [Parameter]
     public VoteViewModel Model { get; set; }

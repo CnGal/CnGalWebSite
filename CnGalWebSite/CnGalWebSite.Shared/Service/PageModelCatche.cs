@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using BootstrapBlazor.Components;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Security.Policy;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace CnGalWebSite.Shared.Service
 {
@@ -14,24 +17,26 @@ namespace CnGalWebSite.Shared.Service
         /// 请求的URL
         /// </summary>
         private string _baseUrl { get; set; } = string.Empty;
+        private bool _useNewtonsoft { get; set; }
 
         private string _lastRequestUrl { get; set; } = string.Empty;
         /// <summary>
         /// 缓存列表
         /// </summary>
-        public Dictionary<string, TModel> _catches { get; set; } = new Dictionary<string, TModel>();
+        private Dictionary<string, TModel> _catches { get; set; } = new Dictionary<string, TModel>();
 
         public PageModelCatche(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        public void Init(string baseUrl)
+        public void Init(string baseUrl,bool useNewtonsoft = false)
         {
             _baseUrl = baseUrl ?? string.Empty;
+            _useNewtonsoft = useNewtonsoft;
         }
 
-        public async Task<TModel> GetCatche(string apiUrl, bool noRefresh = false)
+        public async Task<TModel> GetCatche(string apiUrl, bool noRefresh = true)
         {
             //判断是否两次请求同一个API
             //是则清除缓存
@@ -47,7 +52,20 @@ namespace CnGalWebSite.Shared.Service
             }
             else
             {
-                var temp = await _httpClient.GetFromJsonAsync<TModel>(_baseUrl + apiUrl);
+                //获取数据
+                TModel temp = null;
+                if(_useNewtonsoft)
+                {
+                    var str = await _httpClient.GetStringAsync(_baseUrl + apiUrl);
+                    Newtonsoft.Json.Linq.JObject obj = Newtonsoft.Json.Linq.JObject.Parse(str);
+                    temp = obj.ToObject<TModel>();
+                }
+                else
+                {
+                    temp=  await _httpClient.GetFromJsonAsync<TModel>(_baseUrl + apiUrl);
+                }
+
+                //保存数据
                 if (_catches.Any(s => s.Key == _baseUrl + apiUrl))
                 {
                     _catches[_baseUrl + apiUrl] = temp;

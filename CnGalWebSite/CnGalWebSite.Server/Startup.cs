@@ -56,6 +56,8 @@ namespace CnGalWebSite.Server
             services.AddScoped<IAppHelper, AppHelper>();
             services.AddScoped(x => new ExamineService());
             services.AddScoped(x => new ImagesLargeViewService());
+            services.AddMasaBlazor();
+
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }

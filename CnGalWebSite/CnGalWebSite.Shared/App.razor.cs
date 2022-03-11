@@ -1,7 +1,11 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Theme;
+﻿using CnGalWebSite.DataModel.Helper;
+using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Theme;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using System;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.Shared
@@ -9,36 +13,23 @@ namespace CnGalWebSite.Shared
     /// <summary>
     /// 
     /// </summary>
-    public sealed partial class App
+    public sealed partial class App : IDisposable
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        [Inject]
-        private IJSRuntime JSRuntime { get; set; }
 
-        private bool? isApp = null;
+        private System.Threading.Timer mytimer;
+
+        [CascadingParameter]
+        private Task<AuthenticationState> authenticationStateTask { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
-            if (NavigationManager.Uri.Contains("app.cngal.org") || NavigationManager.Uri.Contains("localhost"))
+            if (NavigationManager.Uri.Contains("m.cngal.org"))
             {
-                isApp = _dataCacheService.IsApp;
-
-                if (_dataCacheService.IsApp == null)
-                {
-                    _dataCacheService.IsApp = false;
-                }
-            }
-            else
-            {
-                isApp = _dataCacheService.IsApp = NavigationManager.Uri.Contains("m.cngal.org");
+                _dataCacheService.IsApp = true;
             }
 
             _dataCacheService.RefreshApp = EventCallback.Factory.Create(this, async () => await OnRefresh());
-            _dataCacheService.SavaTheme = EventCallback.Factory.Create(this, async () => await SaveTheme());
-
         }
 
 
@@ -49,11 +40,70 @@ namespace CnGalWebSite.Shared
         }
 
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender && OperatingSystem.IsBrowser())
+            {
+                await JS.InvokeVoidAsync("$.loading");
+            }
+
+            if (firstRender)
+            {
+                //检查是否为移动设备
+                if (NavigationManager.Uri.Contains("app.cngal.org") || NavigationManager.Uri.Contains("localhost"))
+                {
+                    var isApp = await IsMobile();
+                    if (isApp != _dataCacheService.IsApp)
+                    {
+                        _dataCacheService.IsApp = isApp;
+                        StateHasChanged();
+                    }
+
+                }
+
+                //需要调用一次令牌刷新接口 确保登入没有过期
+                var result = await _authService.Refresh();
+                if (result != null && result.Code != LoginResultCode.OK)
+                {
+                    StateHasChanged();
+                }
+
+                //启动定时器
+                mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 60 * 10);
+
+            }
+        }
+
+
+        public async void Send(object o)
+        {
+            await InvokeAsync(async () =>
+            {
+                try
+                {
+                    var authState = await authenticationStateTask;
+                    var user = authState.User;
+                    if (user.Identity.IsAuthenticated)
+                    {
+                        await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/MakeUserOnline");
+                    }
+                }
+
+                catch
+                {
+
+                }
+            });
+
+        }
+
         public async Task<bool> IsMobile()
         {
             try
             {
-                var re = await JSRuntime.InvokeAsync<string>("isMobile");
+                var re = await JS.InvokeAsync<string>("isMobile");
                 if (re == "true")
                 {
                     return true;
@@ -70,61 +120,17 @@ namespace CnGalWebSite.Shared
 
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        #region 释放实例
+        public void Dispose()
         {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender && OperatingSystem.IsBrowser())
+            if (mytimer != null)
             {
-                await JSRuntime.InvokeVoidAsync("$.loading");
+                mytimer.Dispose();
+                mytimer = null;
             }
-
-            if (firstRender)
-            {
-                if (isApp == null)
-                {
-                    _dataCacheService.IsApp = await IsMobile();
-                    StateHasChanged();
-                }
-                //mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 10);
-                try
-                {
-                    //读取本地主题配置
-                    await LoadTheme();
-                    //保存本地主题配置 更新数据结构
-                    await SaveTheme();
-                }
-                catch
-                {
-
-                }
-            }
+            GC.SuppressFinalize(this);
         }
+        #endregion
 
-        /// <summary>
-        /// 读取本地主题配置 并刷新
-        /// </summary>
-        /// <returns></returns>
-        public async Task LoadTheme()
-        {
-
-            var theme = await _localStorage.GetItemAsync<ThemeModel>("theme");
-            if (theme == null)
-            {
-                return;
-            }
-            _dataCacheService.ThemeSetting = theme;
-
-            StateHasChanged();
-        }
-
-        /// <summary>
-        /// 保存本地主题配置
-        /// </summary>
-        /// <returns></returns>
-        public async Task SaveTheme()
-        {
-            await _localStorage.SetItemAsync("theme", _dataCacheService.ThemeSetting);
-        }
     }
 }

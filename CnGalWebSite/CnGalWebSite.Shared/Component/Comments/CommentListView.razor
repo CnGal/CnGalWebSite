@@ -1,4 +1,7 @@
-﻿<div class="mb-3">
+﻿@inject IDataCacheService _dataCacheService
+
+
+<div class="mb-3">
     @if (Comments.TotalCount == 0)
     {
         if (IsShowNotFound)
@@ -11,10 +14,13 @@
         @for (int i = 0; i < Comments.Data.Count; i++)
         {
             int temp = i;
-            <CommentPartTip Model="Comments.Data[temp]" IsChild="false" CurrentUserRank="@CurrentUserRank" RelyCallBack="OnRely" IsSmallScreen="IsSmallScreen"
-                            IsAdmin="IsAdmin" DeletedCallBack="OnDelete" CanDeleted="CanDeleted"></CommentPartTip>
+            <CommentPartTip Model="Comments.Data[temp]" IsChild="false" RelyCallBack="OnRely"
+                            DeletedCallBack="OnDelete" CanDeleted="CanDeleted"></CommentPartTip>
         }
-        <PageDtoTip CurrentPage="Comments.CurrentPage" ShowBtnCount="1" TotalPages="Comments.TotalPages" IsSmallScreen="IsSmallScreen" OnPageChanged="OnPage"></PageDtoTip>
+        @if (Comments.TotalPages > 1)
+        {
+            <MPagination Value="Comments.CurrentPage" Class="my-4" Length="Comments.TotalPages" ValueChanged="OnPage" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
+        }
     }
 
 </div>
@@ -23,7 +29,8 @@
 
 @code {
     [Parameter]
-    public PagedResultDto<CommentViewModel> Comments {
+    public PagedResultDto<CommentViewModel> Comments
+    {
         get;
         set;
     }
@@ -32,21 +39,12 @@
     public EventCallback<int> OnPageChanged { get; set; }
 
     [Parameter]
-    public string CurrentUserRank { get; set; }
-    [Parameter]
-    public bool IsAdmin { get; set; }
-    [Parameter]
     public bool CanDeleted { get; set; }
     [Parameter]
     public EventCallback RelyCallBack { get; set; }
 
     [Parameter]
     public EventCallback DeletedCallBack { get; set; }
-    [Parameter]
-    /// <summary>
-    /// 是否小屏幕
-    /// </summary>
-    public bool IsSmallScreen { get; set; }
 
     [Parameter]
     /// <summary>
@@ -99,7 +97,7 @@
     {
         await RelyCallBack.InvokeAsync();
     }
-    public async Task OnDelete ()
+    public async Task OnDelete()
     {
         await RelyCallBack.InvokeAsync();
     }
@@ -107,7 +105,7 @@
     private long PlusId()
     {
         long result = 0;
-        foreach(var item in Comments.Data)
+        foreach (var item in Comments.Data)
         {
             result += PlusCommentId(item);
         }
@@ -121,7 +119,7 @@
         long sum = 0;
         sum += index.Id;
 
-        foreach(var item in index.InverseParentCodeNavigation)
+        foreach (var item in index.InverseParentCodeNavigation)
         {
             sum += PlusCommentId(item);
         }

@@ -9,10 +9,11 @@
 <TitleTip Title="创建周边"></TitleTip>
 <AutoSaveTip TItem="CreatePeripheryViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
-@if (isReady == false)
-{
-    <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-        <div>
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Periphery" Class="mb-3" />
+    @if (isReady == false)
+    {
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
             <SkeletonParagraph />
             <div class="mt-2">
             </div>
@@ -27,153 +28,25 @@
             </div>
             <SkeletonParagraph />
         </div>
-    </div>
-}
-else
-{
-    <div class="">
-        <div>
-            <AlertTip Type="AlertTip.AlertTipType.Reward"></AlertTip>
-            <AlertTip Type="AlertTip.AlertTipType.PeripheryStandard"></AlertTip>
-            <ValidateForm Model="@Model" ValidateAllProperties="true" @ref="ComplexForm">
-                <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 mb-4">
-                    <h3 class="text-truncate mb-4 fw-bold">填写主要信息</h3>
-                    <hr />
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="创建周边" Icon="fa fa-fw  fa-shopping-basket" Outline>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Peripheries.MainCard Model="Model.Main" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Peripheries.ImagesCard Model="Model.Images" Class="mb-4" />
 
-                    <div class="row">
-                        <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                            <ImageCropperButton @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
-                        </div>
-                        <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                            <ImageCropperButton @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图"></ImageCropperButton>
-                        </div>
-                        <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                            <ImageCropperButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图"></ImageCropperButton>
-                        </div>
-                        <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
-                            <ImageCropperButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图"></ImageCropperButton>
-                        </div>
-                    </div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Peripheries.RelatedEntriesCard Model="Model.Entries" Class="mb-4" EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Peripheries.RelatedPeripheriesCard Model="Model.Peripheries" Class="mb-4" PeripheryItems="PeripheryItems" />
 
-                    <div class="form-group mt-4">
-                        <div class="row">
-                            <div class="form-group col-12  col-sm-6">
-                                <BootstrapInput @bind-Value="Model.Name" />
-                            </div>
-                            <div class="form-group col-12  col-sm-6">
-                                <BootstrapInput @bind-Value="Model.DisplayName" />
-                            </div>
-                            <div class="form-group col-12  col-sm-6">
-                                <Select @bind-Value="Model.Type" />
-                            </div>
-                            <div class="form-group col-12  col-sm-6">
-                                <BootstrapInput @bind-Value="Model.Category" />
-                            </div>
-                            <div class="form-group col-12">
-                                <Textarea @bind-Value="Model.BriefIntroduction" rows="3" />
-                            </div>
-                            <div class="form-group col-12  col-sm-6">
-                                <BootstrapInput @bind-Value="Model.Author" />
-                            </div>
-                            <div class="form-group col-12 col-sm-6">
-                                <BootstrapInput @bind-Value="Model.Material" />
-                            </div>
-                            <div class="form-group col-12  col-sm-6">
-                                <BootstrapInput @bind-Value="Model.Size" />
-                            </div>
-                            <div class="form-group col-12 col-sm-6">
-                                <BootstrapInput @bind-Value="Model.Brand" />
-                            </div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
+</div>
 
-                            <div class="form-group col-12  col-sm-6">
-                                <BootstrapInput @bind-Value="Model.IndividualParts" />
-                            </div>
-                            <div class="form-group col-12 col-sm-6">
-                                <BootstrapInput @bind-Value="Model.Price" />
-                            </div>
-                            <div class="form-group col-12">
-                                <BootstrapInput @bind-Value="Model.SaleLink" />
-                            </div>
-                            <div class="form-group col-12 col-sm-6">
-                                <Switch @bind-Value="Model.IsReprint" />
-                            </div>
-                            <div class="form-group col-12  col-sm-6">
-                                <Switch @bind-Value="Model.IsAvailableItem" />
-                            </div>
-                            @if (Model.Type == PeripheryType.SetorAlbumEtc)
-                            {
-                                <div class="form-group col-12 col-sm-6">
-                                    <BootstrapInputNumber @bind-Value="Model.PageCount" />
-                                </div>
-                            }
-                            @if (Model.Type == PeripheryType.Ost)
-                            {
-                                <div class="form-group col-12 col-sm-6">
-                                    <BootstrapInputNumber @bind-Value="Model.SongCount" />
-                                </div>
-                            }
-                        </div>
-                    </div>
-
-
-                </div>
-            </ValidateForm>
-            <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
-                可以在这里上传周边相关图片，仍在售卖的设定集，画册请只上传宣传图
-            </div>
-
-            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-                <h3 class="text-truncate mb-4 fw-bold">相册</h3>
-                <hr />
-                <ImagesListEditorViewTip Images="Model.Images" @ref="ImagesListEditorView"></ImagesListEditorViewTip>
-
-            </div>
-            <div class="alert alert-success  rounded shadow-sm  rounded" role="alert">
-                请尽量填写此部分，我们会根据名称自动关联词条，请确保词条存在
-            </div>
-            <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
-                未填写的词条将会自动忽略，不需要手动删除
-            </div>
-            <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
-                <h3 class="text-truncate mb-4 fw-bold">
-                    添加关联信息
-                </h3>
-                <hr />
-                <InputRelevancesListTip AutoCompleteItems="@PeripheryItems" Model="Model.Peripheries" Title="周边"></InputRelevancesListTip>
-                <hr class="mt-4" />
-                <InputRelevancesListTip AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色"></InputRelevancesListTip>
-                <hr class="mt-4" />
-                <InputRelevancesListTip AutoCompleteItems="@EntryStaffItems" Model="Model.Staffs" Title="STAFF"></InputRelevancesListTip>
-                <hr class="mt-4" />
-                <InputRelevancesListTip AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></InputRelevancesListTip>
-                <hr class="mt-4" />
-                <InputRelevancesListTip AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组"></InputRelevancesListTip>
-            </div>
-            <div class="alert alert-warning  rounded shadow-sm  rounded" role="alert">
-                当你点击“完成”按钮时，将会立即发起审核请求，请在点击前确保内容正确无误
-            </div>
-
-            <ValidateForm Model="@Model" ValidateAllProperties="true">
-
-                <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
-                    <div>
-                        <BootstrapBlazor.Components.Textarea @bind-Value="Model.Note" DisplayText="备注" />
-                        <Button class="mt-3" style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
-                    </div>
-                </div>
-
-            </ValidateForm>
-        </div>
-    </div>
-
-}
 
 
 @code {
     private CreatePeripheryViewModel Model { get; set; } = new CreatePeripheryViewModel();
-
-    [NotNull]
-    private ValidateForm? ComplexForm { get; set; }
 
     private bool isReady = false;
     private IEnumerable<string> EntryGameItems { get; set; } = new string[1] { "" };
@@ -213,25 +86,6 @@ else
     {
         try
         {
-            //处理数据
-            if (string.IsNullOrWhiteSpace(Model.Name) || string.IsNullOrWhiteSpace(Model.DisplayName))
-            {
-                await ToastService.Error("创建周边失败", "请填写所有必填项目");
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(Model.MainPicture))
-            {
-                await ToastService.Error("创建周边失败", "周边必须上传主图");
-                return;
-            }
-            if (Model.Staffs.Count == 0 && Model.Games.Count == 0 && Model.Groups.Count == 0 && Model.Roles.Count == 0)
-            {
-                await ToastService.Error("创建周边失败", "周边至少需要关联一个词条");
-                return;
-            }
-
-            Model.Images = ImagesListEditorView.Images;
-
             var result = await Http.PostAsJsonAsync<CreatePeripheryViewModel>(ToolHelper.WebApiPath + "api/peripheries/CreatePeriphery", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
@@ -246,7 +100,7 @@ else
                 autoSave.Clean();
 
                 await ToastService.Success("创建周边成功", "创建周边成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/peripheries/index/" + obj.Error, Model.Name, "fa fa-newspaper-o");
+                NavigationManager.NavigateTo(Provider, "/peripheries/index/" + obj.Error, Model.Name, "fa fa-shopping-basket");
             }
         }
         catch (Exception ex)

@@ -1,0 +1,310 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject ILocalStorageService _localStorage
+
+@inject IJSRuntime JS
+
+
+<style>
+    :root {
+        --main-color: @colorMain;
+        --hover-color: @colorHover;
+        --active-color: @colorActive;
+    }
+</style>
+
+@if (_dataCacheService.ThemeSetting.IsDark)
+{
+    <link href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/github-markdown-dark.css" rel="stylesheet" media="none" onload="this.media='all'">
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/vs2015.min.css" media="none" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/dark-cover.min.css" />
+    <style>
+        [data-bs-toggle="lgbSelect"] .form-select {
+            background-color: transparent;
+            color: white;
+        }
+    </style>
+    @if(_dataCacheService.IsApp)
+    {
+        <style>
+            .bg-opacity {
+            background-color: transparent;
+            }
+        </style>
+    }
+}
+else
+{
+    <!-- <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/editor.md/css/editormd.min.css" media="none" onload="this.media='all'" />
+    -->
+    <link rel="stylesheet" href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/github-markdown-css/4.0.0/github-markdown.min.css" media="none" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/styles/atom-one-light.min.css" media="none" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/Lighting-mode.min.css" />
+
+    <style>
+        #__vconsole .vc-switch {
+            margin-right: 20px;
+            box-shadow: 0 0.5rem 1rem rgb(255, 255, 255, 15%) !important;
+        }
+        .m-application a {
+            color: var(--main-color);
+        }
+    </style>
+
+    if (_dataCacheService.ThemeSetting.IsOnBgImage)
+    {
+        <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/show-background.min.css" />
+        <style>
+            .layout.is-page .layout-footer {
+                background-color: transparent !important;
+                box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 50%) !important;
+            }
+        </style>
+
+    }
+    else
+    {
+        <style>
+                .layout.is-page .layout-side {
+                    background-color: @colorMain !important;
+                }
+
+                .layout.is-page .layout-footer {
+                    background-color: @colorHover !important;
+                }
+                #web_bg {
+                    display: none;
+                }
+        </style>
+    }
+}
+@if (_dataCacheService.ThemeSetting.IsOnMouse)
+{
+    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/mouse.min.css" />
+
+
+}
+
+@if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
+{
+
+}
+else
+{
+    <style>
+        .bgimage-ison {
+            display: none !important;
+        }
+    </style>
+}
+
+
+@code {
+    public bool isMasa = true;
+    public bool isOnMouse = false;
+
+    public string colorMain = "#f48fb1";
+    public string colorHover = "#D979A2";
+    public string colorActive = "#CC578C";
+
+    [Parameter]
+    public EventCallback<bool> OnStateChanged { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                //读取本地主题配置
+                await LoadTheme();
+                //保存本地主题配置 更新数据结构
+                await SaveTheme();
+
+            }
+            catch
+            {
+
+            }
+        }
+    }
+
+    /// <summary>
+    /// 读取本地主题配置 并刷新
+    /// </summary>
+    /// <returns></returns>
+    public async Task LoadTheme()
+    {
+
+        var theme = await _localStorage.GetItemAsync<ThemeModel>("theme");
+        if (theme == null)
+        {
+            return;
+        }
+
+        _dataCacheService.ThemeSetting = theme;
+
+        if (_dataCacheService.ThemeSetting.Theme != null && _dataCacheService.ThemeSetting.Theme.Contains("color"))
+        {
+            _dataCacheService.ThemeSetting.Theme = "pink lighten-2";
+            await SaveTheme();
+        }
+
+        Refresh();
+        StateHasChanged();
+    }
+
+    public void ProcColor()
+    {
+        switch (_dataCacheService.ThemeSetting.Theme)
+        {
+            case "red":
+                colorMain = "#F44336";
+                colorHover = "#D32F2F";
+                colorActive = "#B71C1C";
+                break;
+            case "pink lighten-2":
+                colorMain = "#F06292";
+                colorHover = "#D81B60";
+                colorActive = "#880E4F";
+                break;
+            case "purple":
+                colorMain = "#9C27B0";
+                colorHover = "#7B1FA2";
+                colorActive = "#4A148C";
+                break;
+            case "deep-purple":
+                colorMain = "#673AB7";
+                colorHover = "#512DA8";
+                colorActive = "#311B92";
+                break;
+            case "indigo":
+                colorMain = "#3F51B5";
+                colorHover = "#303F9F";
+                colorActive = "#1A237E";
+                break;
+            case "blue":
+                colorMain = "#2196F3";
+                colorHover = "#1976D2";
+                colorActive = "#0D47A1";
+                break;
+            case "light-blue":
+                colorMain = "#03A9F4";
+                colorHover = "#039BE5";
+                colorActive = "#01579B";
+                break;
+            case "cyan":
+                colorMain = "#00BCD4";
+                colorHover = "#0097A7";
+                colorActive = "#006064";
+                break;
+            case "teal":
+                colorMain = "#009688";
+                colorHover = "#00796B";
+                colorActive = "#004D40";
+                break;
+            case "green":
+                colorMain = "#4CAF50";
+                colorHover = "#388E3C";
+                colorActive = "#1B5E20";
+                break;
+            case "light-green":
+                colorMain = "#8BC34A";
+                colorHover = "#689F38";
+                colorActive = "#33691E";
+                break;
+            case "lime":
+                colorMain = "#CDDC39";
+                colorHover = "#AFB42B";
+                colorActive = "#827717";
+                break;
+            case "yellow":
+                colorMain = "#FFEB3B";
+                colorHover = "#FBC02D";
+                colorActive = "#F57F17";
+                break;
+            case "amber":
+                colorMain = "#FFC107";
+                colorHover = "#FFA000";
+                colorActive = "#FF6F00";
+                break;
+            case "orange":
+                colorMain = "#FF9800";
+                colorHover = "#F57C00";
+                colorActive = "#E65100";
+                break;
+            case "deep-orange":
+                colorMain = "#FF5722";
+                colorHover = "#E64A19";
+                colorActive = "#BF360C";
+                break;
+            case "brown":
+                colorMain = "#795548";
+                colorHover = "#5D4037";
+                colorActive = "#3E2723";
+                break;
+            case "blue-grey":
+                colorMain = "#607D8B";
+                colorHover = "#455A64";
+                colorActive = "#263238";
+                break;
+            case "grey":
+                colorMain = "#9E9E9E";
+                colorHover = "#616161";
+                colorActive = "#212121";
+                break;
+            case "white":
+                colorMain = "#FFFFFF";
+                colorHover = "#757575";
+                colorActive = "#616161";
+                break;
+            default:
+                _dataCacheService.ThemeSetting.Theme = "pink lighten-2";
+                colorMain = "#F06292";
+                colorHover = "#D81B60";
+                colorActive = "#880E4F";
+                break;
+
+        }
+    }
+
+    /// <summary>
+    /// 保存本地主题配置
+    /// </summary>
+    /// <returns></returns>
+    public async Task SaveTheme()
+    {
+        await _localStorage.SetItemAsync("theme", _dataCacheService.ThemeSetting);
+    }
+
+    private async Task InitMouse()
+    {
+        try
+        {
+            await JS.InvokeAsync<string>("InitMouse");
+        }
+        catch
+        {
+
+        }
+    }
+
+    /// <summary>
+    /// 刷新
+    /// </summary>
+    public async void Refresh()
+    {
+        if (_dataCacheService.ThemeSetting.IsOnMouse && isOnMouse != _dataCacheService.ThemeSetting.IsOnMouse)
+        {
+            await InitMouse();
+        }
+        ProcColor();
+
+
+        await OnStateChanged.InvokeAsync(isMasa != _dataCacheService.ThemeSetting.IsMasa);
+        isMasa = _dataCacheService.ThemeSetting.IsMasa;
+
+        StateHasChanged();
+    }
+}

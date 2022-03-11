@@ -1,18 +1,18 @@
 ﻿
 
 <TagHeadNavTip TagList="Model.Taglevels" />
-<TagMainInforCard Model="Model" IsSmallScreen="true"/>
+<TagMainInforCard Model="Model" HiddenButton/>
 
 @if (Model.ChildrenTags.Count != 0 )
 {
     <div class="mb-3">
-        <TagListChildTagsViewTip Model="Model.ChildrenTags"  EditState="Model.ChildTagsState" Id="Model.Id" />
+        <TagListChildTagsViewTip Model="Model"  />
     </div>
 }
 @if (Model.ChildrenEntries.Count != 0 )
 {
     <div class="">
-        <TagListChildEntriesViewTip Model="Model.ChildrenEntries"  EditState="Model.ChildEntriesState" Id="Model.Id" />
+        <TagListChildEntriesViewTip Model="Model" />
     </div>
 }
 

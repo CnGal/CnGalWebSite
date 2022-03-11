@@ -30,11 +30,12 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         Task UpdateUserData(ApplicationUser user, Examine examine);
 
-        int GetUserLevel(ApplicationUser user);
 
         Task<UserEditInforBindModel> GetUserEditInforBindModel(ApplicationUser user);
 
         Task AddUserIntegral(AddUserIntegralModel model);
+
+        Task<UserInforViewModel> GetUserInforViewModel(ApplicationUser user);
 
     }
 }

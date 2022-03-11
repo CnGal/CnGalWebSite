@@ -1,0 +1,60 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="投票" Icon="fa fa-fw fa-dropbox" Class="h-100">
+    <ButtonContent>
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
+            <MIcon Left>mdi-share-all-outline  </MIcon>
+            查看更多
+        </MButton>
+    </ButtonContent>
+    <ChildContent>
+        <MSlideGroup ShowArrows="true">
+            <ChildContent>
+                @foreach (var item in _dataCacheService.VoteCardsCatche)
+                {
+                    <MSlideItem>
+                        <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"
+                               OnClick="@context.Toggle"
+                               RefBack="@context.Ref">
+                            <VoteViewTip Model="item" />
+                        </MCard>
+                    </MSlideItem>
+                }
+            </ChildContent>
+
+        </MSlideGroup>
+    </ChildContent>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            if (_dataCacheService.VoteCardsCatche.Count == 0)
+            {
+                _dataCacheService.VoteCardsCatche = await Http.GetFromJsonAsync<List<VoteCardViewModel>>(ToolHelper.WebApiPath + "api/votes/GetVoteCards");
+            }
+
+            _dataCacheService.VoteCardsCatche.Random();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取广场投票列表失败");
+        }
+    }
+    public Task OnClickMore()
+    {
+        NavigationManager.NavigateTo("/votes/home");
+        return Task.CompletedTask;
+    }
+
+}

@@ -2,11 +2,15 @@
 @page "/home"
 @page "/"
 @inject IDataCacheService _dataCacheService
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Home.Index></CnGalWebSite.Shared.Pages.Apps.Home.Index>
-}
-else
-{
-    <CnGalWebSite.Shared.Pages.Webs.Home.Index></CnGalWebSite.Shared.Pages.Webs.Home.Index>
-}
+
+
+
+    @if (_dataCacheService.IsApp == true)
+    {
+        <CnGalWebSite.Shared.Pages.Apps.Home.Index></CnGalWebSite.Shared.Pages.Apps.Home.Index>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.Pages.Webs.Home.Index></CnGalWebSite.Shared.Pages.Webs.Home.Index>
+    }
+

@@ -1,0 +1,72 @@
+﻿@inject IDataCacheService _dataCacheService
+
+
+<div class="@("rounded shadow-sm  bg-opacity p-3 " + Class + (IsCollapsed ? " mb-3" : ""))">
+    <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+        <h2 class="@("fw-bold h5 m-0 " + (string.IsNullOrWhiteSpace(TextColor)?"font-color":TextColor))">
+            <i class="@Icon"></i> &nbsp;&nbsp;@Title
+        </h2>
+        <div>
+            @ButtonContent
+            @if (Collapable)
+            {
+                @if (IsCollapsed)
+                {
+                    <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-right" Tooltip="展开" OnClick="@(() => OnCollapseChanged(false))" />
+
+                }
+                else
+                {
+                    <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-down" Tooltip="折叠" OnClick="@(() => OnCollapseChanged(true))" />
+
+                }
+            }
+        </div>
+    </div>
+    @if (Outline == false)
+    {
+        <div class="@((IsCollapsed ? "d-none " : "d-block") + " mt-3")">
+            @ChildContent
+        </div>
+    }
+</div>
+@if (Outline)
+{
+    <div class="@((IsCollapsed ? "d-none " : "d-block") + " mt-3")">
+        @ChildContent
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Icon { get; set; }
+    [Parameter]
+    public string TextColor { get; set; }
+    [Parameter]
+    public string ButtonColor { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public RenderFragment ButtonContent { get; set; }
+    [Parameter]
+    public bool Collapable { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
+
+    [Parameter]
+    public bool IsCollapsed { get; set; }
+    [Parameter]
+    public EventCallback<bool> IsCollapsedChanged { get; set; }
+
+    private async Task OnCollapseChanged(bool state)
+    {
+        IsCollapsed = state;
+        await IsCollapsedChanged.InvokeAsync(state);
+        StateHasChanged();
+    }
+}

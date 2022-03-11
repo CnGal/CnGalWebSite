@@ -1,0 +1,61 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<MMenu OffsetY @bind-Value="menu">
+    <ActivatorContent Context="m">
+        <MTooltip Bottom>
+            <ActivatorContent Context="c">
+                @{
+                    var attrs = new Dictionary<string, object>();
+                    m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                    c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                }
+                <MButton Icon Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs">
+                    <MIcon>mdi-plus</MIcon>
+                </MButton>
+            </ActivatorContent>
+            <ChildContent>
+                <span>创建</span>
+            </ChildContent>
+        </MTooltip>
+    </ActivatorContent>
+
+    <ChildContent>
+        <div class="bg-opacity p-3" style="width:200px;">
+            <div class="w-100">
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/entries/establishentry"))">
+                    <MIcon Left>fa fa-fw fa-codepen</MIcon>
+                    创建词条
+                </MButton>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/articles/createarticle"))">
+                    <MIcon Left>fa fa-fw fa-newspaper-o</MIcon>
+                    发表文章
+                </MButton>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/tags/createtag"))">
+                    <MIcon Left>fa fa-fw fa-tags</MIcon>
+                    创建标签
+                </MButton>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/peripheries/createperiphery"))">
+                    <MIcon Left>fa fa-fw fa-shopping-basket</MIcon>
+                    创建周边
+                </MButton>
+
+            </div>
+        </div>
+    </ChildContent>
+</MMenu>
+@code {
+
+    [Parameter]
+    public string Class { get; set; }
+
+    private bool menu { get; set; }
+
+
+    public Task OnClick(string url)
+    {
+        NavigationManager.NavigateTo(url);
+        return Task.CompletedTask;
+    }
+}

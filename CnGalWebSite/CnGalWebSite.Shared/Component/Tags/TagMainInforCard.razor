@@ -1,155 +1,51 @@
-﻿<div class=" rounded shadow-sm  bg-opacity rounded mb-3">
-    @if (Model.IsEdit == true)
-    {
-
-        @switch (Model.MainState)
-        {
-            case EditState.locked:
-                <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
-                break;
-            case EditState.Normal:
-                <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.Editable" Url="@("/tags/EditMain/" + Model.Id)"></AlertTip>
-                break;
-        }
-    }
+﻿<div class="rounded shadow-sm bg-opacity rounded pb-4">
     @if (Model.MainState == EditState.Preview)
     {
-        <AlertTip Title="编辑主要信息" Type="AlertTip.AlertTipType.preview" Url="@("/tags/EditMain/" + Model.Id)" ExamineType="Operation.EditTagMain" OnClickRevoke="OnClickRevoke"></AlertTip>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/tags/EditMain/" + Model.Id)" ExamineType="Operation.EditTagMain" OnClickRevoke="OnRevoke"  Class="ms-4 me-4 mt-4"/>
     }
+    <div class="row m-0">
+        <div class="d-md-flex d-none col-auto ps-4 pt-4">
+            <img style="height:200px;" src="@Model.MainPicture" alt="@Model.Name">
 
-    @if (IsSmallScreen)
-    {
-        <div class="">
-            <div class="pb-3">
-                <img style="width:100%;height:auto;" src="@Model.MainPicture" alt="@Model.Name">
-            </div>
-            <div class="ps-3 pe-3 pb-3">
-                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; flex-direction: row; align-items: center;">
-                    <h1 class="fw-bold h3">@Model.Name</h1>
-                    @if (IsShowButton)
-                    {
-                        <div style="display: flex; flex-wrap: wrap; flex-direction: row; align-items: center; justify-content: flex-end;">
+        </div>
+        <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;">
 
-                            <AuthorizeView Roles="Admin">
-                                @if (Model.IsHidden)
-                                {
-                                    <Button Color="Color.Info" class="me-3" style="float: right" Size="Size.Small" IsOutline="true" Icon="fa fa-map-signs" Text="取消隐藏" OnClick="@(() => OnClick(4))" />
+            <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name">
 
-                                }
-                                else
-                                {
-                                    <Button Color="Color.Danger" class="me-3" style="float: right" Size="Size.Small" IsOutline="true" Icon="fa fa-unlink fa-check" Text="隐藏" OnClick="@(() => OnClick(5))" />
+        </div>
+        <div class="ps-4 pt-4 pe-4 col">
+            <h1 class="fw-bold h3 mb-4">@Model.Name</h1>
 
-                                }
-
-                            </AuthorizeView>
-                            <Button Color="Color.Warning" IsOutline="true" Text="历史" Size="Size.Small" Icon="fa fa-history" OnClick="@(() => OnClick(0))"
-                                    style="float: right" class="me-3"></Button>
-
-                            <AuthorizeView>
-                                <Authorized>
-                                    @if (Model.IsEdit)
-                                    {
-                                        <Button Color="Color.Primary" IsOutline="true" Text="退出编辑" Size="Size.Small" Icon="fa fa-sign-out" OnClick="@(() => OnClick(1))"
-                                                style="float: right"></Button>
-                                    }
-                                    else
-                                    {
-                                        <Button Color="Color.Success" IsOutline="true" Text="编辑" Size="Size.Small" Icon="fa fa-pencil" OnClick="@(() => OnClick(2))"
-                                                style="float: right"></Button>
-                                    }
-
-                                </Authorized>
-                                <NotAuthorized>
-                                    <Button Color="Color.Success" Size="Size.Small" IsOutline="true" Icon="fa fa-sign-in " Text="登入后编辑" OnClick="@(() => OnClick(3))" style="float: right" />
-                                </NotAuthorized>
-                            </AuthorizeView>
-                        </div>
-                    }
-
-
-
-                </div>
-                <span style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;">
+            <div class="d-md-none-co">
+                <span class="text-truncate-3">
                     @Model.BriefIntroduction
                 </span>
             </div>
-        </div>
-    }
-    else
-    {
-        <div class="p-3" style="display:flex;">
-            <div class="">
-                <img style="height:200px;" src="@Model.MainPicture" alt="@Model.Name">
-            </div>
-            <div class="ms-3 w-100">
-                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; flex-direction: row; align-items: center;">
-                    <h1 class="fw-bold h3">@Model.Name</h1>
-                    @if (IsShowButton)
-                    {
-                        <div style="display: flex; flex-wrap: wrap; flex-direction: row; align-items: center; justify-content: flex-end;">
 
-                            <AuthorizeView Roles="Admin">
-                                @if (Model.IsHidden)
-                                {
-                                    <Button Color="Color.Info" class="me-3" style="float: right" Size="Size.Small" IsOutline="true" Icon="fa fa-map-signs" Text="取消隐藏" OnClick="@(() => OnClick(4))" />
-
-                                }
-                                else
-                                {
-                                    <Button Color="Color.Danger" class="me-3" style="float: right" Size="Size.Small" IsOutline="true" Icon="fa fa-unlink fa-check" Text="隐藏" OnClick="@(() => OnClick(5))" />
-
-                                }
-
-                            </AuthorizeView>
-                            <Button Color="Color.Warning" IsOutline="true" Text="历史" Size="Size.Small" Icon="fa fa-history" OnClick="@(() => OnClick(0))"
-                                    style="float: right" class="me-3"></Button>
-
-                            <AuthorizeView>
-                                <Authorized>
-                                    @if (Model.IsEdit)
-                                    {
-                                        <Button Color="Color.Primary" IsOutline="true" Text="退出编辑" Size="Size.Small" Icon="fa fa-sign-out" OnClick="@(() => OnClick(1))"
-                                                style="float: right"></Button>
-                                    }
-                                    else
-                                    {
-                                        <Button Color="Color.Success" IsOutline="true" Text="编辑" Size="Size.Small" Icon="fa fa-pencil" OnClick="@(() => OnClick(2))"
-                                                style="float: right"></Button>
-                                    }
-
-                                </Authorized>
-                                <NotAuthorized>
-                                    <Button Color="Color.Success" Size="Size.Small" IsOutline="true" Icon="fa fa-sign-in " Text="登入后编辑" OnClick="@(() => OnClick(3))" style="float: right" />
-                                </NotAuthorized>
-                            </AuthorizeView>
-                        </div>
-                    }
-
-                </div>
-                <span style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;">
+            <div class="d-md-flex d-none">
+                <span class="text-truncate-3">
                     @Model.BriefIntroduction
                 </span>
             </div>
+            @if (HiddenButton == false)
+            {
+                <div class="mt-2" style="display: flex; justify-content: flex-end;">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Tag" Id="Model.Id" @bind-IsHidden="Model.IsHidden"  @bind-IsEdit="Model.IsEdit"/>
+                </div>
+
+
+            }
         </div>
-    }
+    </div>
 
 </div>
 
 @code {
     [Parameter]
-    public TagIndexViewModel Model { get; set; } = new TagIndexViewModel();
+    public TagIndexViewModel Model { get; set; }
     [Parameter]
-    public EventCallback<int> OnTagClick { get; set; }
-    [Parameter]
-    public EventCallback<Operation> OnClickRevoke { get; set; }
-    [Parameter]
-    public bool IsSmallScreen { get; set; }
-    [Parameter]
-    public bool IsShowButton { get; set; }
+    public bool HiddenButton { get; set; }
 
-    public void OnClick(int index)
-    {
-        OnTagClick.InvokeAsync(index);
-    }
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
 }

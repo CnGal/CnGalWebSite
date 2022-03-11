@@ -1,21 +1,12 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel
 {
-    public class EditImagesViewModel
+    public class EditImagesViewModel : BaseEntryEditModel
     {
-        public int Id { get; set; }
-
-        public string Name { get; set; }
-
-        public EntryType Type { get; set; }
-
         public List<EditImageAloneModel> Images { get; set; } = new List<EditImageAloneModel>();
-
-        [Display(Name = "备注")]
-        public string Note { get; set; }
-
     }
 
     public class EditImageAloneModel

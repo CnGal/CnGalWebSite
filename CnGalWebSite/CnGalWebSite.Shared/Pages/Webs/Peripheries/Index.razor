@@ -5,7 +5,6 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
-@implements IAsyncDisposable
 @inject IDataCacheService _dataCatcheService
 
 @inject DialogService DialogService
@@ -35,91 +34,62 @@ else
 }
 else
 {
-    <div class="row">
-        <div class="col-12 @(IsLargeScreen?" col-xl-6":"")">
-            @if (isReady == false)
-            {
-                <div style="padding-right: 0;padding-left: 0;">
-                    <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
-                        <SkeletonParagraph />
-                        <hr class="m-2" />
-                        <SkeletonParagraph />
-                        <div class="mt-2">
-                        </div>
-                        <SkeletonParagraph />
-                        <div class="mt-2">
-                        </div>
-                        <SkeletonParagraph />
-                        <div class="mt-2">
-                        </div>
-                        <SkeletonParagraph />
-                    </div>
-                </div>
-            }
-            else
-            {
-                @if (Model.IsHidden == true)
-                {
-                    <div class="alert alert-info  rounded shadow-sm  rounded" role="alert">
-                        当前周边处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-                    </div>
-
-                }
-
-                <div class="  rounded shadow-sm  bg-opacity mb-3">
-                    <PeripheryMainInforTip Model="Model" IsSmallScreen="IsSmallScreen"/>
-                    <div>
-                        <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Periphery" Id="Model.Id" />
-                    </div>
-                    <div class="mt-4 pb-4">
-                        <PeripheryOperationTip IsEdit="Model.IsEdit" IsHidden="Model.IsHidden" OnArticleClick="OnArticleClick" CollectedCount="Model.CollectedCount" IsCollected="Model.IsCollected"
-                                               IsFavorited="IsUserFavorited"></PeripheryOperationTip>
-                    </div>
-
-                </div>
-                <div class="rounded shadow-sm bg-opacity mb-3">
-                    <PeripheryBasicInforTip Model="Model" OnRevoke="OnRevoke" />
-                </div>
-
-                @if (Model.Pictures.Count != 0 || Model.IsEdit)
-                {
-                    <div class="mb-3">
-                        <PeripheryImagesViewTip Model="Model.Pictures" EditState="Model.ImagesState" IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" />
-                    </div>
-                }
-                @if (IsLargeScreen == false)
-                {
-                    <div class="">
-                        <PeripheryListOverviewsTip Model="Model.PeripheryOverviewModels" @ref="peripheryOverViewTip" RelatedEntriesState="Model.RelatedEntriesState" RelatedPeripheriesState="Model.RelatedPeripheriesState"
-                                                    IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" Type="Model.Type" />
-                    </div>
-                }
-
-
-                @if (Model.CanComment)
-                {
-                    <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="false" IsSmallScreen="IsSmallScreen" CurrentUserRank="@CurrentUserRank" RelyCallBack="OnRely" IsAdmin="@IsAdmin" CanDeleted="IsAdmin" DeletedCallBack="OnDeleted"></CommentListView>
-                    <ReplyCommentTip CurrentUserRank="@CurrentUserRank" IsChild="false" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentPeriphery" RelyCallBack="OnRely" IsAdmin="IsAdmin"></ReplyCommentTip>
-
-                }
-                else
-                {
-                    <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
-                }
-            }
-        </div>
-
-        @if (IsLargeScreen)
+    <div>
+        @if (isReady == false)
         {
-            <div class="col-xl-6">
-                <div class="">
-                    <PeripheryListRelevancesViewTip Entries="Model.Entries" Peripheries="Model.Peripheries" RelatedEntriesState="Model.RelatedEntriesState" RelatedPeripheriesState="Model.RelatedPeripheriesState"
-                                                    IsEdit="Model.IsEdit" OnClickRevoke="OnRevoke" Id="Model.Id" Type="Model.Type" />
-                </div>
-                <div class="">
-                    <PeripheryListOverviewsTip Model="Model.PeripheryOverviewModels" @ref="peripheryOverViewTip" />
+            <div style="padding-right: 0;padding-left: 0;">
+                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                    <SkeletonParagraph />
+                    <hr class="m-2" />
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
+                    <div class="mt-2">
+                    </div>
+                    <SkeletonParagraph />
                 </div>
             </div>
+        }
+        else
+        {
+            @if (Model.IsHidden == true)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
+                    当前周边处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+            }
+
+            <div class="  rounded shadow-sm  bg-opacity mb-3">
+                <PeripheryMainInforTip Model="Model"/>
+                <div>
+                    <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Periphery" Id="Model.Id" />
+                </div>
+                <div class="mt-4 pb-4">
+                    <PeripheryOperationTip Model="Model" CollectionChanged="CollectionChanged"></PeripheryOperationTip>
+                </div>
+
+            </div>
+            <div class="rounded shadow-sm bg-opacity mb-3">
+                <PeripheryBasicInforTip Model="Model" OnRevoke="OnRevoke" />
+            </div>
+
+            @if (Model.Pictures.Count != 0)
+            {
+                <div class="mb-3">
+                    <PeripheryImagesViewTip Model="Model" OnRevoke="OnRevoke"/>
+                </div>
+            }
+            <div class="">
+                <PeripheryListOverviewsTip Model="Model" @ref="peripheryOverViewTip" OnRevoke="OnRevoke" />
+            </div>
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentPeriphery" />
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
         }
     </div>
 }
@@ -158,50 +128,22 @@ else
     public bool IsUserFavorited { get; set; }
     public FavoriteFoldersViewModel UserFavoriteInfor { get; set; }
     private PeripheryListOverviewsTip peripheryOverViewTip;
-
-    #region 获取屏幕大小
-
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime? JSRuntime { get; set; }
-
-
-
-    public bool IsSmallScreen { get; set; }
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; }
     public bool IsAdmin { get; set; } = false;
     string LastLookName = "";
     bool isFrist = true;
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    private JSInterop<Index>? Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        try
-        {
-            await JS.InvokeAsync<string>("highlightAllCode");
-        }
-        catch
-        {
-
-        }
 
         //记录数据
-        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name)==false)
+        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name) == false)
         {
             LastLookName = Model.Name;
             try
@@ -215,56 +157,11 @@ else
         }
         if (firstRender)
         {
-            Interop = new JSInterop<Index>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
 
             isFrist = false;
-
-            //获取用户收藏夹相关信息 只需要获取一次
-            var userState = await authenticationStateTask;
-            var user = userState.User;
-            if (user.Identity.IsAuthenticated)
-            {
-                string userId = string.Empty;
-                foreach (var item in user.Claims)
-                {
-                    if (item.Type == "userid")
-                    {
-                        userId = item.Value;
-                    }
-                }
-                await GetUserFavoriteInfor(userId);
-
-            }
         }
 
     }
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 850))
-        {
-            IsSmallScreen = width < 850;
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 850 && width < 1500))
-        {
-            IsNormalScreen = width >= 850 && width < 1500;
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 1500))
-        {
-            IsLargeScreen = width >= 1500;
-            StateHasChanged();
-        }
-    }
-    #endregion
-
     protected override async Task OnInitializedAsync()
     {
         try
@@ -287,18 +184,9 @@ else
             if (user.User.Identity.IsAuthenticated)
             {
                 IsAdmin = user.User.IsInRole("Editor");
-                //判断文章是否被收藏
-                await GetUserIsFavorited();
             }
 
-            try
-            {
-                await OnCommentPageClick(1);
-            }
-            catch (Exception ex)
-            {
-                ErrorHandler.ProcessError(ex, "获取周边评论列表失败");
-            }
+
         }
         catch (Exception exc)
         {
@@ -309,336 +197,10 @@ else
 
     }
 
-    public async Task GetUserIsFavorited()
+    public async Task CollectionChanged(bool isCollected)
     {
-        try
-        {
-            var userFavoriteInfor = await Http.GetFromJsonAsync<IsObjectInUserFavoriteFolderResult>(ToolHelper.WebApiPath + "api/favorites/IsObjectInUserFavoriteFolder/" + Model.Id + "/" + FavoriteObjectType.Periphery);
-            if (userFavoriteInfor != null)
-            {
-                IsUserFavorited = userFavoriteInfor.Result;
-
-                StateHasChanged();
-            }
-
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "判断该周边是否被收藏失败");
-        }
-    }
-    public async Task GetUserFavoriteInfor(string id)
-    {
-        try
-        {
-            UserFavoriteInfor = await Http.GetFromJsonAsync<FavoriteFoldersViewModel>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/" + id);
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取用户收藏夹失败");
-        }
-    }
-
-    private void UnEdit()
-    {
-        Model.IsEdit = false;
-        StateHasChanged();
-    }
-    private void Edit()
-    {
-        Model.IsEdit = true;
-        StateHasChanged();
-    }
-
-    private async void UnHidden()
-    {
-        try
-        {
-
-            var result = await Http.PostAsJsonAsync<HiddenPeripheryModel>(ToolHelper.WebApiPath + "api/peripheries/HiddenPeriphery", new HiddenPeripheryModel { Ids = new long[] { Model.Id }, IsHidden = false });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("显示周边失败", obj.Error);
-            }
-            else
-            {
-                await ToastService.Success("显示周边成功", "显示周边成功，离开此页面后可以请在后台恢复文章状态");
-                Model.IsHidden = false;
-                StateHasChanged();
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "显示周边失败");
-        }
-    }
-    private async void Hidden()
-    {
-        try
-        {
-            var result = await Http.PostAsJsonAsync<HiddenPeripheryModel>(ToolHelper.WebApiPath + "api/peripheries/HiddenPeriphery", new HiddenPeripheryModel { Ids = new long[] { Model.Id }, IsHidden = true });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("隐藏周边失败", obj.Error);
-            }
-            else
-            {
-                await ToastService.Success("隐藏周边成功", "隐藏周边成功，离开此页面后可以请在后台恢复文章状态");
-                Model.IsHidden = true;
-                StateHasChanged();
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "隐藏周边失败");
-        }
-    }
-
-    private async void UnCollected()
-    {
-        try
-        {
-            Result obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/peripheries/UnCollectPeriphery/" + Model.Id);
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("取消拥有周边失败", obj.Error);
-            }
-            else
-            {
-                await ToastService.Success("取消拥有周边成功", "取消拥有周边成功");
-                Model.CollectedCount--;
-                Model.IsCollected = false;
-                await peripheryOverViewTip.CollectionChanged(false, Model.Id);
-                StateHasChanged();
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "取消拥有周边失败");
-        }
-    }
-    private async void Collect()
-    {
-        try
-        {
-            Result obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/peripheries/CollectPeriphery/" + Model.Id);
-
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("拥有周边失败", obj.Error);
-            }
-            else
-            {
-                await ToastService.Success("拥有周边成功", "拥有周边成功");
-                await peripheryOverViewTip.CollectionChanged(true, Model.Id);
-                Model.CollectedCount++;
-                Model.IsCollected = true;
-                StateHasChanged();
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "拥有周边失败");
-        }
-    }
-
-
-    public async void ViewAtOther(string url, string name)
-    {
-        if (string.IsNullOrWhiteSpace(url) == false)
-        {
-            NavigationManager.NavigateTo(Provider, url, name, "fa fa-link");
-        }
-        else
-        {
-            await ToastService.Error("该词条不存在", "无法找到词条：" + name + "，你也可以亲自创建该词条哦");
-        }
-
-    }
-
-    public async Task OnArticleClick(int index)
-    {
-        if (index == 2)
-        {
-            Model.IsEdit = true;
-            StateHasChanged();
-        }
-        else if (index == 3)
-        {
-
-            UnHidden();
-        }
-        else if (index == 4)
-        {
-            Hidden();
-        }
-        else if (index == 5)
-        {
-
-            UnCollected();
-        }
-        else if (index == 6)
-        {
-            Collect();
-        }
-        else if (index == 7)
-        {
-
-            await OnUnFavoriteClick();
-        }
-        else if (index == 8)
-        {
-            await OnFavoriteClick();
-        }
-        else if (index == 9)
-        {
-            Model.IsEdit = false;
-            StateHasChanged();
-        }
-        else if (index == 10)
-        {
-            NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        }
-        else if (index == 11)
-        {
-            var option = new DialogOption()
-            {
-                Title = "历史编辑记录"
-            };
-            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EditRecordListViewTip>(new Dictionary<string, object>
-            {
-                [nameof(EditRecordListViewTip.Id)] = Model.Id,
-                [nameof(EditRecordListViewTip.IsSmallScreen)] = IsSmallScreen,
-                [nameof(EditRecordListViewTip.Type)] = ExaminedNormalListModelType.Periphery,
-                [nameof(EditRecordListViewTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-            }).Render();
-            await DialogService.Show(option);
-        }
-    }
-
-    private async Task OnCommentPageClick(int pageIndex)
-    {
-        try
-        {
-            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)CommentType.CommentPeriphery + "/" + Id + "/" + pageIndex + "/8");
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取评论列表失败");
-        }
-    }
-
-    private async Task OnRely()
-    {
-        Model.CommentCount++;
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
-    private async Task OnDeleted()
-    {
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
-
-    public async void OnClickUrl(NavigateModel model)
-    {
-        try
-        {
-            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
-        }
-        catch
-        {
-            await ToastService.Error("导航失败", "请尝试刷新页面");
-        }
-    }
-
-    private async Task OnFavoriteClick()
-    {
-        //检查是否存在默认收藏夹
-        if (UserFavoriteInfor == null || UserFavoriteInfor.Favorites == null || UserFavoriteInfor.Favorites.Count == 0)
-        {
-            await ToastService.Error("收藏周边失败", "无法获取收藏夹信息");
-        }
-
-        var favoriteFolderIds = UserFavoriteInfor.Favorites.Where(s => s.IsDefault == true).Select(s => s.Id).ToArray();
-        if (favoriteFolderIds.Length == 0)
-        {
-            //没有默认收藏夹 进入选择收藏夹界面
-
-            var option = new DialogOption()
-            {
-                Title = "选择收藏夹",
-                ShowCloseButton = false
-            };
-            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<ChooseFavoriteFolderTip>(new Dictionary<string, object>
-            {
-                [nameof(ChooseFavoriteFolderTip.UserFavoriteInfor)] = UserFavoriteInfor,
-                [nameof(ChooseFavoriteFolderTip.ObjectId)] = Model.Id,
-                [nameof(ChooseFavoriteFolderTip.Type)] = FavoriteObjectType.Periphery,
-                [nameof(ChooseFavoriteFolderTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-                [nameof(ChooseFavoriteFolderTip.OnFavorite)] = EventCallback.Factory.Create(this, () => { IsUserFavorited = true; StateHasChanged(); }),
-            }).Render();
-            await DialogService.Show(option);
-        }
-        else
-        {
-            //直接添加到默认收藏夹
-            try
-            {
-                var result = await Http.PostAsJsonAsync<AddFavoriteObjectViewModel>(ToolHelper.WebApiPath + "api/favorites/AddFavoriteObject", new AddFavoriteObjectViewModel { FavoriteFolderIds = favoriteFolderIds, ObjectId = Model.Id, Type = FavoriteObjectType.Periphery });
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-                //判断结果
-                if (obj.Successful == false)
-                {
-                    await ToastService.Error("收藏周边失败", obj.Error);
-                }
-                else
-                {
-                    await ToastService.Success("收藏周边成功", "收藏周边成功");
-                    IsUserFavorited = true;
-                    StateHasChanged();
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorHandler.ProcessError(ex, "收藏周边失败");
-            }
-        }
-    }
-
-    private async Task OnUnFavoriteClick()
-    {
-
-        try
-        {
-            var result = await Http.PostAsJsonAsync<UnFavoriteObjectsModel>(ToolHelper.WebApiPath + "api/favorites/UnFavoriteObjects", new UnFavoriteObjectsModel { ObjectId = Model.Id, Type = FavoriteObjectType.Periphery });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("取消收藏周边失败", obj.Error);
-            }
-            else
-            {
-                await ToastService.Success("取消收藏周边成功", "收藏周边成功");
-                IsUserFavorited = false;
-                StateHasChanged();
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "取消收藏周边失败");
-        }
-
+        Model.IsCollected = isCollected;
+        peripheryOverViewTip.CollectionChanged(isCollected, Model.Id);
     }
 
     [Inject]
@@ -694,21 +256,5 @@ else
             ErrorHandler.ProcessError(ex, "撤销审核请求失败");
         }
     }
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
-    {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 
 }

@@ -1,0 +1,16 @@
+﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="@Class">
+    你的编辑目前在审核中，你的修改不会显示给其他用户，在此期间你可以<TabLink Url="@Url" Icon="fa fa-edit" class="warning--text fw-bold">重新编辑</TabLink>或<a class="warning--text fw-bold" @onclick="@(()=>{ OnClickRevoke.InvokeAsync(ExamineType); })">撤销编辑</a>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+@code {
+    [Parameter]
+    public string Url { get; set; } = "/";
+
+    [Parameter]
+    public string Class { get; set; } = "mb-4";
+
+    [Parameter]
+    public Operation ExamineType { get; set; }
+
+    [Parameter]
+    public EventCallback<Operation> OnClickRevoke { get; set; }
+}

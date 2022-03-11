@@ -5,14 +5,11 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
-@implements IAsyncDisposable
+@inject IDataCacheService _dataCacheService
 
-
-<link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor.Chart/css/bootstrap.blazor.chart.bundle.min.css" media="none" onload="this.media='all'" />
-
-@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+@if (string.IsNullOrWhiteSpace(Model.BasicInfor.Name) == false)
 {
-    <TitleTip Title="@Model.Name" Description="@Model.PersonalSignature"></TitleTip>
+    <TitleTip Title="@Model.BasicInfor.Name" Description="@Model.BasicInfor.PersonalSignature"></TitleTip>
 }
 
 @if (string.IsNullOrWhiteSpace(Model.SBgImage) == false)
@@ -23,378 +20,172 @@
 {
     <div id="web_bg" style="background-image: url(@Model.MBgImage)" class=" d-none d-sm-block bgimage-ison"></div>
 }
-
-<div class="row">
-    <div class="col-12 @(IsLargeScreen?" col-xl-9":"")">
-        @if (isNotFound == true)
-        {
-            <NotFoundUser IsNeedLayput="true"></NotFoundUser>
-        }
-        else
-        {
-            @if (IsLargeScreen == false)
-            {
-                <UserInforTip Length="ScreenLength" UserId="@Id" @ref="userInforTip" OnClickUrl="OnClickUrl"></UserInforTip>
-            }
-
-            <div class="row" style="padding-right: 0;padding-left: 0;">
-                @if (IsSmallScreen && isReady)
-                {
-                    <div class="col-12 mb-3">
-                        <SpaceTabViewTip OnTabClick="OnTabClick" IsSmallSreeen="true" IsCurrentUser="Model.IsCurrentUser" IsShowGameRecord="Model.IsShowGameRecord"
-                                         RandomIndex="randomIndex" IsShowFavorites="Model.IsShowFavorites" DefaultIndex="defaultIndex"></SpaceTabViewTip>
-                    </div>
-                }
-                <div class="@(IsSmallScreen?"col-12":"") @(IsNormalScreen?"col-9":"") @(IsLargeScreen?"col-12":"") mb-2">
-
-
-                    @if (isReady == false)
-                    {
-                        <div class="rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-                            <div>
-                                <SkeletonParagraph />
-                                <div class="mt-2">
-                                </div>
-                                <SkeletonParagraph />
-                                <div class="mt-2">
-                                </div>
-                                <SkeletonParagraph />
-                                <div class="mt-2">
-                                </div>
-                                <SkeletonParagraph />
-                                <div class="mt-2">
-                                </div>
-                                <SkeletonParagraph />
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                <div class="tab-content" id="@("pills"+randomIndex+"-tabContent")">
-                    <div class="@("tab-pane fade"+(defaultIndex==1?"show active":"") )" id="@("pills"+randomIndex+"-1")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-1-tab")">
-                        <div class="rounded  rounded shadow-sm  p-4 bg-opacity">
-                            <div>
-                                @if (Model.IsCurrentUser == true)
-                                {
-                                    <Button ButtonType="ButtonType.Button" IsOutline="true" Size="Size.Small" Color="Color.Primary" Icon="fa fa-pencil " class="mb-4"
-                                            @onclick="EditMainPage">
-                                        &nbsp;&nbsp;编辑&nbsp;&nbsp;
-                                    </Button>
-                                }
-                                <MarkdownViewTip Text="@Model.MainPageContext"/>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="@("tab-pane fade"+(defaultIndex==0?" show active ":"") )" id="@("pills"+randomIndex+"-0")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-0-tab")">
-                        <div class="rounded  rounded shadow-sm  p-4 bg-opacity">
-                            <CalendarHeatmapTip BeforeTreatmentDate="Model.SignInDaysList" ShowTip="false"></CalendarHeatmapTip>
-                            <div class="mt-4 mb-1" style="display: flex; justify-content: center;">
-                                @if (Model.IsCurrentUser == true)
-                                {
-                                    if (Model.IsSignIn == false)
-                                    {
-                                        <Button ButtonType="ButtonType.Button" Color="Color.Success" Icon="fa fa-calendar-plus-o"
-                                                IsOutline="true" @onclick="SignIn" IsAsync="true">
-
-                                            &nbsp; &nbsp;今天还没有签到哦~点我签到    &nbsp; &nbsp;
-                                        </Button>
-                                    }
-                                    else
-                                    {
-                                        <Button ButtonType="ButtonType.Button" Color="Color.Success" Icon="fa fa-calendar-check-o"
-                                                IsOutline="false" IsDisabled="true">
-                                            @(" 连续签到"+Model.SignInDays+"天~ ")
-                                        </Button>
-                                    }
-
-                                }
-                            </div>
-                        </div>
-                    </div>
-                    <div class="@("tab-pane fade"+(defaultIndex==2?" show active ":"") )" id="@("pills"+randomIndex+"-2")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-2-tab")">
-                        <div class="rounded  rounded shadow-sm  p-4 bg-opacity">
-                            <div>
-                                <p class="text-center" style="font-size: large; font-weight: bold;">编辑概览</p>
-                                <CalendarHeatmapTip BeforeTreatmentDate="Model.EditCountList"></CalendarHeatmapTip>
-
-                                <div class="row mt-2" style="padding-right: 0;padding-left: 0;">
-                                    <div class="col-12 col-md-12 col-lg-12 col-xl-6 mt-1 mb-2">
-                                        <Chart ChartType="ChartType.Pie" OnInitAsync="@OnPieInit" @ref="PieChart" />
-                                    </div>
-                                    <div class="col-12 col-md-12 col-lg-12 col-xl-6 mt-1 mb-2">
-                                        <Chart ChartType="ChartType.Pie" OnInitAsync="@OnPieInitFile" @ref="PieChartFile" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="@("tab-pane fade"+(defaultIndex==3?" show active ":"") )" id="@("pills"+randomIndex+"-3")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-3-tab")">
-                        <div class="rounded  rounded shadow-sm  p-4 bg-opacity">
-                            <div>
-
-                                <h5 class="fw-bold mb-3">基本信息</h5>
-                                <h6>@Model.Name（UID：@Model.Id）</h6>
-                                <!-- <h6>邮箱：@Model.Email</h6>-->
-                                <h6>生日：@(Model.Birthday?.ToString("M")??"未知")</h6>
-                                @if (Model.IsCurrentUser == true)
-                                {
-                                    <Button ButtonType="ButtonType.Button" IsOutline="true" Size="Size.Small" Color="Color.Primary" Icon="fa fa-pencil " @onclick="EditData"
-                                            class="mt-2 mb-1">
-                                        &nbsp;&nbsp; 编辑&nbsp;&nbsp;
-                                    </Button>
-                                }
-                                <hr />
-                                <h5 class="fw-bold mb-3">用户认证</h5>
-                                @if (Model.Role == "Admin")
-                                {
-                                    <h6 class="text-danger">管理员</h6>
-                                }
-                                else
-                                {
-                                    <h6 class="text-success">普通用户</h6>
-                                }
-
-                                <hr />
-                                <h5 class="fw-bold mb-3">统计信息</h5>
-                                <div class="row mt-2" style="padding-right: 0; padding-left: 0">
-                                    <div class="col-12 col-md-12 col-lg-6">
-                                        <h6>积分：@Model.Integral</h6>
-
-                                    </div>
-                                    <div class="col-12 col-md-12 col-lg-6">
-                                        <h6>贡献值：@Model.ContributionValue</h6>
-
-                                    </div>
-                                    <div class="col-12 col-md-12 col-lg-6">
-                                        <h6>编辑词条：@Model.EditEntryNum</h6>
-                                    </div>
-                                    <div class="col-12 col-md-12 col-lg-6">
-                                        <h6>发表文章：@Model.CreateArticleNum</h6>
-
-                                    </div>
-                                </div>
-
-                                <hr />
-                                <h5 class="fw-bold mb-3">活跃概况</h5>
-                                <div class="row mt-2" style="padding-right: 0; padding-left: 0">
-                                    <div class="col-12 col-md-12 col-lg-6">
-                                        <h6>等级：Lv.@(Model.Level)</h6>
-
-                                    </div>
-                                    <div class="col-12 col-md-12 col-lg-6">
-                                        <h6>在线时间：@Model.OnlineTime.ToString("0.0") 小时</h6>
-
-                                    </div>
-                                    <div class="col-12 col-md-12 col-lg-6">
-                                        <h6>注册时间：@Model.RegisteTime.ToString("yyyy/MM/dd HH:mm")</h6>
-                                    </div>
-                                    <div class="col-12 col-md-12 col-lg-6">
-                                        <h6>最后访问：@Model.LastOnlineTime.ToString("yyyy/MM/dd HH:mm")</h6>
-                                    </div>
-                                    <div class="col-12 col-md-12 col-lg-6">
-                                        <h6>上次编辑时间：@(Model.LastEditTime?.ToString("yyyy/MM/dd HH:mm") ?? "无")</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="@("tab-pane fade"+(defaultIndex==4?" show active ":"") )" id="@("pills"+randomIndex+"-4")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-4-tab")">
-                        <div class="rounded  rounded shadow-sm  p-4 bg-opacity">
-                            <div style="overflow-x: auto; overflow-y: auto;">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                状态
-                                            </th>
-                                            <th>
-                                                关联对象
-
-                                            </th>
-                                            <th>
-                                                编辑部分
-                                            </th>
-                                            <th>
-                                                编辑时间
-                                            </th>
-                                            <th>
-                                                审核时间
-                                            </th>
-
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var examine in pagedResultDto.Data)
-                                        {
-
-                                            <tr>
-                                                <td>
-                                                    @if (examine.IsPassed != null)
-                                                    {
-                                                        if (examine.IsPassed == true)
-                                                        {
-                                                            <p class="text-success">已通过</p>
-                                                        }
-                                                        else
-                                                        {
-                                                            <p class="text-danger">未通过</p>
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        <p class="text-primary">待审核</p>
-                                                    }
-                                                </td>
-                                                <td>
-                                                    @{
-                                                        string name = "";
-                                                    }
-                                                    @if (examine.Type == ExaminedNormalListModelType.Entry)
-                                                    {
-                                                        name = examine.RelatedName + " 编辑记录";
-                                                        <TabLink Text="@examine.RelatedName" Url="@("/entries/index/"+examine.RelatedId)" Icon="fa fa-codepen">
-                                                            @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName )
-                                                        </TabLink>
-                                                    }
-                                                    else if (examine.Type == ExaminedNormalListModelType.Article)
-                                                    {
-                                                        name = examine.RelatedName + " 编辑记录";
-                                                        <TabLink Text="@examine.RelatedName" Url="@("/articles/index/"+examine.RelatedId)" Icon="fa fa-newspaper-o">
-                                                            @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName)
-                                                        </TabLink>
-                                                    }
-                                                    else if (examine.Type == ExaminedNormalListModelType.Tag)
-                                                    {
-                                                        name = examine.RelatedName + " 编辑记录";
-                                                        <TabLink Text="@examine.RelatedName" Url="@("/tags/index/"+examine.RelatedId)" Icon="fa fa-tag">
-                                                            @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName )
-                                                        </TabLink>
-                                                    }
-                                                    else if (examine.Type == ExaminedNormalListModelType.Disambig)
-                                                    {
-                                                        name = examine.RelatedName + " 编辑记录";
-                                                        <TabLink Text="@examine.RelatedName" Url="@("/disambigs/index/"+examine.RelatedId)" Icon="fa fa-tag">
-                                                            @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName )
-                                                        </TabLink>
-                                                    }
-                                                    else if (examine.Type == ExaminedNormalListModelType.Periphery)
-                                                    {
-                                                        name = examine.RelatedName + " 编辑记录";
-                                                        <TabLink Text="@examine.RelatedName" Url="@("/peripheries/index/"+examine.RelatedId)" Icon="fa fa-shopping-basket">
-                                                            @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName )
-                                                        </TabLink>
-                                                    }
-                                                    else if (examine.Type == ExaminedNormalListModelType.Comment)
-                                                    {
-                                                        name = "评论 审核记录";
-                                                    }
-                                                    else
-                                                    {
-                                                        name = "用户主页 编辑记录";
-                                                        @("其他")
-                                                    }
-                                                </td>
-                                                <td>
-                                                    <TabLink Text="@name" Url="@("/home/examined/"+examine.Id)" Icon="fa fa-pencil">
-                                                        @examine.Operation.GetDisplayName()
-                                                    </TabLink>
-                                                </td>
-                                                <td>
-                                                    @examine.ApplyTime
-                                                </td>
-                                                <td>
-                                                    @if (examine.PassedTime != null)
-                                                    {
-                                                        @examine.PassedTime
-                                                    }
-                                                    else
-                                                    {
-                                                        @("无")
-                                                    }
-
-
-                                                </td>
-
-                                            </tr>
-
-
-                                        }
-                                    </tbody>
-                                </table>
-                                <Pagination PageItems="@(pagedResultDto.MaxResultCount )" PageItemsSource="@PageItems" TotalCount="@Model.TotalExamine" OnPageClick="@OnPageClick" OnPageItemsChanged="@OnPageItemsChanged"></Pagination>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="@("tab-pane fade"+(defaultIndex==5?" show active ":"") )" id="@("pills"+randomIndex+"-5")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-5-tab")">
-                        <MessageListView Messages="ListMessages" OnPageChanged="OnMessagePageClick" IsSmallScreen="IsSmallScreen" OnRefreshMessage="@(()=>OnMessagePageClick(1))"
-                                         OnClickUrl="OnClickUrl" />
-                    </div>
-                    <div class="@("tab-pane fade"+(defaultIndex==6?" show active ":"") )" id="@("pills"+randomIndex+"-6")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-6-tab")">
-                        @if (Model.CanComment)
-                        {
-                            @if (Model.IsCurrentUser)
-                            {
-                                <AlertTip Title="管理空间留言" Type="AlertTip.AlertTipType.SpaceComment" Url="@("/space/editspacecomments/" + Model.Id)"></AlertTip>
-                            }
-                            <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="true" IsSmallScreen="IsSmallScreen" RelyCallBack="OnRely" IsAdmin="IsAdmin" CanDeleted="CanDeleted" DeletedCallBack="OnDeleted"></CommentListView>
-                            <ReplyCommentTip IsChild="false" ObjectId="@Model.Id" Type="CommentType.CommentUser" RelyCallBack="OnRely" IsAdmin="IsAdmin"></ReplyCommentTip>
-                        }
-                        else
-                        {
-                            <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
-                        }
-                    </div>
-                    <div class="@("tab-pane fade"+(defaultIndex==7?" show active ":"") )" id="@("pills"+randomIndex+"-7")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-7-tab")">
-                        <ArticleHomeListView Input="PublishArticleInput"></ArticleHomeListView>
-                    </div>
-                    <div class="@("tab-pane fade"+(defaultIndex==9?" show active ":"") )" id="@("pills"+randomIndex+"-9")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-9-tab")">
-                        @if (Model.IsCurrentUser||Model.IsShowGameRecord)
-                        {
-                            <UserPlayedGameListView SteamId="@Model.SteamId" UserId="@Model.Id" IsCurrentUser="Model.IsCurrentUser"></UserPlayedGameListView>
-                        }
-
-                    </div>
-                    <div class="@("tab-pane fade"+(defaultIndex==10 ?"show active ":"") )" id="@("pills"+randomIndex+"-10")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-10-tab")">
-                        @if (Model.IsCurrentUser || Model.IsShowFavorites)
-                        {
-                            <FavoriteFoldersViewTip UserId="@Model.Id" OnClickUrl="OnClickUrl" @ref="FavoritesTip" IsCurrentUser="Model.IsCurrentUser"></FavoriteFoldersViewTip>
-                        }
-                    </div>
-                    <div class="@("tab-pane fade"+(defaultIndex==11 ?"show active ":"") )" id="@("pills"+randomIndex+"-11")" role="tabpanel" aria-labelledby="@("pills"+randomIndex+"-11-tab")">
-                      
-                           <UserOwnedPeripheryListView UserId="@Model.Id"/>
-                        
-                    </div>
-                </div>
-                    }
-
-                </div>
-                @if (IsNormalScreen && isReady)
-                {
-                    <div class="col-3">
-                        <SpaceTabViewTip OnTabClick="OnTabClick" IsCurrentUser="Model.IsCurrentUser" IsShowGameRecord="Model.IsShowGameRecord"  IsShowFavorites="Model.IsShowFavorites" 
-                                         RandomIndex="randomIndex" DefaultIndex="defaultIndex"></SpaceTabViewTip>
-                    </div>
-                }
-            </div>
-        }
-
-    </div>
-
-    @if (IsLargeScreen)
+@if (isNotFound)
+{
+    <NotFoundUser IsNeedLayput="true"></NotFoundUser>
+}
+else
+{
+    @if (isReady)
     {
-        <div class="col-xl-3">
 
-            <UserInforTip Length="75" UserId="@Id" @ref="userInforTip" OnClickUrl="OnClickUrl"></UserInforTip>
-            @if (isReady)
-            {
-                <SpaceTabViewTip OnTabClick="OnTabClick" IsCurrentUser="Model.IsCurrentUser" RandomIndex="randomIndex" IsShowGameRecord="Model.IsShowGameRecord"
-                                 IsShowFavorites="Model.IsShowFavorites" DefaultIndex="defaultIndex"></SpaceTabViewTip>
-            }
+        <div class="row">
+            <div class="col-12 col-lg-4">
+                <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Model="Model.BasicInfor" />
+                <CnGalWebSite.Shared.MasaComponent.PC.Users.BasicInforCard Model="Model" />
+            </div>
+            <div class="col-12 col-lg-8">
+
+
+                <div>
+
+                    <div class="rounded  shadow-sm bg-opacity mb-4">
+                        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
+                               Color="@_dataCacheService.ThemeSetting.Theme">
+
+                            <MTab Value="1">
+                                首页<MIcon>mdi-home</MIcon>
+                            </MTab>
+                            <MTab Value="2">
+                                编辑记录<MIcon>mdi-script-text-outline </MIcon>
+                            </MTab>
+                            @if (Model.BasicInfor.ArticleCount != 0)
+                            {
+                                <MTab Value="3">
+                                    文章<MIcon>mdi-newspaper-variant-multiple-outline</MIcon>
+                                </MTab>
+                            }
+                            @if (Model.IsCurrentUser || Model.IsShowGameRecord)
+                            {
+                                <MTab Value="4">
+                                    游玩记录<MIcon>mdi-gamepad-square-outline </MIcon>
+                                </MTab>
+                            }
+                            @if (Model.IsCurrentUser || Model.IsShowFavorites)
+                            {
+                                <MTab Value="5">
+                                    收藏夹<MIcon>mdi-heart-multiple </MIcon>
+                                </MTab>
+                            }
+
+                            <MTab Value="6">
+                                周边<MIcon>mdi-basket-outline </MIcon>
+                            </MTab>
+                        </MTabs>
+                    </div>
+                    <div class="row">
+                        <MTabsItems @bind-Value="TabIndex">
+                            <MTabItem Value="1">
+
+                                <div class="mb-4">
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="个人介绍" Icon="fa fa-fw  fa-home">
+                                        <ChildContent>
+                                            <MarkdownViewTip Text="@Model.MainPageContext" />
+                                        </ChildContent>
+                                        <ButtonContent>
+                                            @if (Model.IsCurrentUser)
+                                            {
+                                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-pencil " Tooltip="编辑个人介绍" OnClick="EditMainPage" />
+
+                                            }
+                                        </ButtonContent>
+                                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 col-lg-6 mb-4">
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="签到概览" Icon="fa fa-fw  fa-calendar-check-o" Class="h-100">
+                                            <CnGalWebSite.Shared.MasaComponent.PC.Users.SignInDaysCard Model="Model" />
+
+                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                    </div>
+                                    <div class="col-12 col-lg-6 mb-4">
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="fa fa-fw  fa-pencil" Class="h-100">
+                                            <CnGalWebSite.Shared.MasaComponent.PC.Users.EditOverviewCard Model="Model" />
+                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                    </div>
+
+                                </div>
+                                <div class="rounded  rounded shadow-sm  p-3 pb-0 bg-opacity mb-4">
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.DataOverviewCard Model="Model" />
+                                </div>
+                                <div>
+                                    @if (Model.CanComment)
+                                    {
+
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+                                            <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id" Type="CommentType.CommentUser" />
+                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                    }
+                                </div>
+
+                            </MTabItem>
+                            <MTabItem Value="2">
+                                <CnGalWebSite.Shared.MasaComponent.PC.Users.ExaminesCard Id="@Model.Id" />
+                            </MTabItem>
+                            @if (Model.BasicInfor.ArticleCount != 0)
+                            {
+                                <MTabItem Value="3">
+
+                                    <ArticleHomeListView Input="PublishArticleInput"></ArticleHomeListView>
+
+                                </MTabItem>
+                            }
+
+
+
+                            @if (Model.IsCurrentUser || Model.IsShowGameRecord)
+                            {
+                                <MTabItem Value="4">
+                                    <UserPlayedGameListView SteamId="@Model.SteamId" UserId="@Model.Id" IsCurrentUser="Model.IsCurrentUser"></UserPlayedGameListView>
+                                </MTabItem>
+                            }
+
+
+                            @if (Model.IsCurrentUser || Model.IsShowFavorites)
+                            {
+                                <MTabItem Value="5">
+                                    <FavoriteFoldersViewTip UserId="@Model.Id" OnClickUrl="OnClickUrl" IsCurrentUser="Model.IsCurrentUser"></FavoriteFoldersViewTip>
+                                </MTabItem>
+                            }
+
+                            <MTabItem Value="6">
+                                <UserOwnedPeripheryListView UserId="@Model.Id" />
+                            </MTabItem>
+                        </MTabsItems>
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+
+    }
+    else
+    {
+        <div class="rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+
+            <div class="mt-2">
+                <SkeletonParagraph />
+            </div>
+
+            <div class="mt-2">
+                <SkeletonParagraph />
+            </div>
+
+            <div class="mt-2">
+                <SkeletonParagraph />
+            </div>
+
+            <div class="mt-2">
+                <SkeletonParagraph />
+            </div>
         </div>
     }
-</div>
 
+
+}
 
 
 @code {
@@ -410,8 +201,6 @@
         set
         {
             id = value;
-            TabIndex = 1;
-            randomIndex = Randomer.Next();
             if (isFirstLoad == true)
             {
 
@@ -424,57 +213,17 @@
 
         }
     }
-    private int defaultIndex { get; set; } = 1;
-    [Parameter]
-    public string DefaultIndex
-    {
-        get
-        {
-            return defaultIndex.ToString();
-        }
-        set
-        {
-            try
-            {
-                defaultIndex = int.Parse(value);
-            }
-            catch
-            {
-                defaultIndex = 1;
-            }
-        }
-    }
 
-    public int TabIndex { get; set; } = 1;
+    public StringNumber TabIndex { get; set; } = 1;
 
-    public string steam { get; set; }
     public string CurrentUserRank { get; set; }
     public int currentPage { get; set; } = 1;
     public string NoticeCard { get; set; } = "";
     bool isReady = false;
     bool isFirstLoad = true;
     bool isNotFound = false;
-    public int randomIndex = 0;
 
-    [NotNull]
-    private Chart? PieChart { get; set; }
-    [NotNull]
-    private Chart? PieChartFile { get; set; }
-    [NotNull]
-    private FavoriteFoldersViewTip? FavoritesTip { get; set; }
-
-    private IEnumerable<int> PageItems => new int[] { 3, 10, 20, 40 };
-    private IEnumerable<string> ExamineState { get; set; } = new List<string>() { "未通过", "已通过", "待审核" };
-
-    private static Random Randomer { get; set; } = new Random();
-    public PersonalSpaceViewModel Model { get; set; } = new PersonalSpaceViewModel
-    {
-        EditCountList = new List<KeyValuePair<DateTime, int>>()
-    };
-    public PagedResultDto<ExaminedNormalListModel> pagedResultDto = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<ExaminedNormalListModel> { Data = new List<ExaminedNormalListModel>(), CurrentPage = 1, TotalCount = 0 };
-    public PagedResultDto<CnGalWebSite.DataModel.Model.Message> ListMessages = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CnGalWebSite.DataModel.Model.Message> { Data = new List<CnGalWebSite.DataModel.Model.Message>(), CurrentPage = 1, TotalCount = 0 };
-    public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
-
+    public PersonalSpaceViewModel Model { get; set; } = new PersonalSpaceViewModel();
 
 
     public PagedSortedAndFilterInput PublishArticleInput { get; set; } = new PagedSortedAndFilterInput();
@@ -484,77 +233,24 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    [NotNull]
-    private UserInforTip? userInforTip;
-
-    #region 获取屏幕大小
-
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime? JSRuntime { get; set; }
-
-
-
-    public bool IsSmallScreen { get; set; } = true;
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; }
-    public int ScreenLength { get; set; } = 75;
-    public bool IsAdmin { get; set; } = false;
-    public bool CanDeleted { get; set; }
-    string LastLookName = "";
-
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    private JSInterop<Index>? Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
+    public bool IsAdmin { get; set; } = false;
+    public bool CanDeleted { get; set; }
+
+    string LastLookName = "";
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            Interop = new JSInterop<Index>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
-
-            isFirstLoad = false;
-
-
-        }
-        //判断是否需要切换到消息页面
-        /*if(CurrentIndex!="-1")
-            {
-            if (CurrentIndex == "5")
-            {
-            string result = await JS.InvokeAsync<string>("ActiveTab", "#pills" + randomIndex + "-5-tab");
-                if (result == "成功")
-        {
-        CurrentIndex = "-1";
-            }
-            }
-            else
-            {
-            string result = await JS.InvokeAsync<string>("ActiveTab", "#pills" + randomIndex + "-1-tab");
-            if (result == "成功")
-                {
-                CurrentIndex = "-1";
-    }
-    }
-        }*/
 
         //记录数据
-        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name) == false)
+        if (LastLookName != Model.BasicInfor.Name && string.IsNullOrWhiteSpace(Model.BasicInfor.Name) == false)
         {
-            LastLookName = Model.Name;
+            LastLookName = Model.BasicInfor.Name;
             try
             {
-                await JS.InvokeAsync<string>("trackEvent", "用户主页", "浏览", Model.Name, "1", "look");
+                await JS.InvokeAsync<string>("trackEvent", "用户主页", "浏览", Model.BasicInfor.Name, "1", "look");
             }
             catch (Exception exc)
             {
@@ -562,31 +258,6 @@
             }
         }
     }
-
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-
-        IsSmallScreen = width < 1000;
-        IsNormalScreen = width >= 1000 && width < 1700;
-
-
-        IsLargeScreen = width >= 1700;
-
-        ScreenLength = width / 10;
-        if (ScreenLength < 75)
-        {
-            ScreenLength = 75;
-        }
-        StateHasChanged();
-    }
-    #endregion
-
     protected override async Task OnInitializedAsync()
     {
 
@@ -621,22 +292,6 @@
             PublishArticleInput.FilterText = Model.Id;
             PlayedGameInput.FilterText = Model.Id;
 
-
-
-            if (user.Identity.Name == Model.Name && user.Identity.IsAuthenticated)
-            {
-                //获取审核列表
-                await OnPageClick(1, 10);
-                //获取消息列表
-                await OnMessagePageClick(1);
-            }
-            if (userInforTip != null && Model != null)
-            {
-                //获取留言
-                await OnCommentPageClick(1);
-                await userInforTip.Refresh(Model.Id);
-            }
-
             isReady = true;
             StateHasChanged();
 
@@ -650,106 +305,11 @@
     }
 
 
-    private Task<ChartDataSource> OnPieInit()
-    {
-        var ds = new ChartDataSource();
-
-        ds.Options.Title = "审核概览";
-
-        ds.Labels = ExamineState;
-        List<object> temp = new List<object>();
-
-        temp.Add(Model.UnpassedExamineCount);
-        temp.Add(Model.PassedExamineCount);
-        temp.Add(Model.PassingExamineCount);
-
-        ds.Data.Add(new ChartDataset()
-        {
-            Label = "审核状态",
-            Data = temp
-        });
-        return Task.FromResult(ds);
-    }
-
-    private Task<ChartDataSource> OnPieInitFile()
-    {
-        var ds = new ChartDataSource();
-
-
-        ds.Options.Title = "文件空间概览";
-
-        double tempUsed = ((double)Model.UsedFilesSpace / 1024 / 1024);
-        double tempUnUsed = ((double)(Model.TotalFilesSpace - Model.UsedFilesSpace) / 1024 / 1024);
-        List<string> FileSpace = new List<string>();
-        string tempStr = "已使用 " + tempUsed.ToString("0.0") + "MB";
-        FileSpace.Add(tempStr);
-        tempStr = "未使用 " + tempUnUsed.ToString(".0") + "MB";
-        FileSpace.Add(tempStr);
-
-        ds.Labels = FileSpace;
-
-        List<object> temp = new List<object>();
-
-        temp.Add(tempUsed);
-        temp.Add(tempUnUsed);
-
-
-
-        ds.Data.Add(new ChartDataset()
-        {
-            Label = "文件储存状态",
-            Data = temp
-        });
-        return Task.FromResult(ds);
-    }
-    //private Logger? Trace { get; set; }
-
-    private async Task OnPageClick(int pageIndex, int pageItems)
+    private async Task EditMainPage()
     {
         try
         {
-            //获取用户编辑记录
-            pagedResultDto.Data = (await Http.GetFromJsonAsync<IEnumerable<ExaminedNormalListModel>>(ToolHelper.WebApiPath + "api/space/getusereditrecord/" + Model.Id + "/" + pageIndex + "/" + pageItems)).ToList();
-            pagedResultDto.CurrentPage = pageIndex;
-            pagedResultDto.MaxResultCount = pageItems;
-            if (pagedResultDto.Data == null)
-            {
-                pagedResultDto.Data = new List<ExaminedNormalListModel>();
-            }
-            StateHasChanged();
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑记录失败");
-        }
-    }
-    private async Task OnPageItemsChanged(int pageItems)
-    {
-        try
-        {
-            //获取用户编辑记录
-            pagedResultDto.Data = (await Http.GetFromJsonAsync<IEnumerable<ExaminedNormalListModel>>(ToolHelper.WebApiPath + "api/space/getusereditrecord/" + Model.Id + "/1/" + pageItems)).ToList();
-            pagedResultDto.MaxResultCount = pageItems;
-            if (pagedResultDto.Data == null)
-            {
-                pagedResultDto.Data = new List<ExaminedNormalListModel>();
-            }
-            StateHasChanged();
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑记录失败");
-        }
-    }
-
-
-
-
-    private async void EditMainPage()
-    {
-        try
-        {
-            NavigationManager.NavigateTo(Provider,"/space/editmainpage/" + Model.Id, "编辑主页", "fa fa-pencil");
+            NavigationManager.NavigateTo(Provider, "/space/editmainpage/" + Model.Id, "编辑主页", "fa fa-pencil");
         }
         catch
         {
@@ -757,132 +317,15 @@
         }
     }
 
-    private async void EditData()
-    {
-        try
-        {
-            NavigationManager.NavigateTo(Provider,"/space/editdata/" + Model.Id, "编辑资料", "fa fa-pencil");
-        }
-        catch
-        {
-            await ToastService.Error("跳转到编辑页面失败", "可未知错误，请在确保网络正常后联系开发人员");
-        }
-    }
-    private async Task SignIn()
-    {
-        try
-        {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/signIn");
-            if (result.Successful == true)
-            {
-                Model.IsSignIn = true;
-                Model.SignInDays++;
-                StateHasChanged();
-                await ToastService.Success("签到成功", "已获得5积分");
-            }
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "签到失败");
-        }
-    }
-
-    public async void OnTabClick(int index)
-    {
-        TabIndex = index;
-
-        if (index == 5)
-        {
-            //
-            await OnReadedAllMessage();
-        }
-    }
-
-    private async Task OnMessagePageClick(int pageIndex)
-    {
-        try
-        {
-            //获取用户编辑记录
-            ListMessages = await Http.GetFromJsonAsync<PagedResultDto<CnGalWebSite.DataModel.Model.Message>>(ToolHelper.WebApiPath + "api/space/GetUserMessage/" + pageIndex + "/10");
-            StateHasChanged();
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取消息列表失败");
-        }
-    }
-
-    public async Task OnReadedAllMessage()
-    {
-        try
-        {
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/ReadedAllMessages/");
-            //判断结果
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("使消息已读失败", obj.Error);
-            }
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "设置消息已读失败");
-        }
-    }
-    private async Task OnCommentPageClick(int pageIndex)
-    {
-        try
-        {
-            //获取用户编辑记录
-            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)CommentType.CommentUser + "/" + Model.Id + "/" + pageIndex + "/8");
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取评论列表失败");
-        }
-    }
-    private async Task OnRely()
-    {
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
-    private async Task OnDeleted()
-    {
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
     public async void OnClickUrl(NavigateModel model)
     {
         try
         {
-            NavigationManager.NavigateTo(Provider,model.Url, model.Title, model.Icon);
+            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
         }
         catch
         {
             await ToastService.Error("导航失败", "请尝试刷新页面");
         }
     }
-
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
-    {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
-        if (PieChart != null)
-        {
-            PieChart.Dispose();
-        }
-        if (PieChartFile != null)
-        {
-            PieChartFile.Dispose();
-        }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

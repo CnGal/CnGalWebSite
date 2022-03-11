@@ -30,6 +30,7 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Markdown = Markdig.Markdown;
 using Tag = CnGalWebSite.DataModel.Model.Tag;
+using CnGalWebSite.Helper.Extensions;
 
 namespace CnGalWebSite.APIServer.ExamineX
 {

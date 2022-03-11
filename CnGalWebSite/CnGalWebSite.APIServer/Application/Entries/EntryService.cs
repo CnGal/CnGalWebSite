@@ -20,6 +20,12 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using CnGalWebSite.Helper.Extensions;
+using Microsoft.VisualBasic;
+using Nest;
+using System.Text.RegularExpressions;
+using TencentCloud.Ssl.V20191205.Models;
+using Tag = CnGalWebSite.DataModel.Model.Tag;
 
 namespace CnGalWebSite.APIServer.Application.Entries
 {
@@ -273,6 +279,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             entry.LastEditTime = DateTime.Now.ToCstTime();
 
         }
+
         public void UpdateEntryDataMain(Entry entry, EntryMain_1_0 examine)
         {
             entry.Name = examine.Name;
@@ -374,19 +381,26 @@ namespace CnGalWebSite.APIServer.Application.Entries
                             //查找是否修改发行时间 对下文不影响 只是更新字段缓存
                             if (item.DisplayName == "发行时间")
                             {
-                                try
+                                if (item.DisplayValue == null)
                                 {
-                                    entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy年M月d日", null);
+                                    entry.PubulishTime = null;
                                 }
-                                catch
+                                else
                                 {
                                     try
                                     {
-                                        entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy/M/d", null);
+                                        entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy年M月d日", null);
                                     }
                                     catch
                                     {
+                                        try
+                                        {
+                                            entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy/M/d", null);
+                                        }
+                                        catch
+                                        {
 
+                                        }
                                     }
                                 }
                             }
@@ -1716,6 +1730,863 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
 
             return model;
+        }
+
+        public EditMainViewModel GetEditMainViewModel(Entry entry)
+        {
+            var model = new EditMainViewModel();
+
+            model.MainPicturePath = _appHelper.GetImagePath(entry.MainPicture, "app.png");
+            model.Thumbnail = entry.Thumbnail;
+            model.MainPicture = entry.MainPicture;
+            model.BackgroundPicture = entry.BackgroundPicture;
+
+            model.Name = entry.Name;
+            model.BriefIntroduction = entry.BriefIntroduction;
+            model.Type = entry.Type;
+            model.DisplayName = entry.DisplayName;
+            model.AnotherName = entry.AnotherName;
+            model.SmallBackgroundPicture = entry.SmallBackgroundPicture;
+
+            model.Id = entry.Id;
+
+            return model;
+        }
+
+        public EditAddInforViewModel GetEditAddInforViewModel(Entry entry)
+        {
+
+            var model = new EditAddInforViewModel
+            {
+                Type = entry.Type,
+                Id = entry.Id,
+                Name = entry.Name
+            };
+
+            //根据类别进行序列化
+            switch (entry.Type)
+            {
+                case EntryType.Game:
+                    model.Staffs = new List<StaffModel>();
+                    model.GamePlatforms = new List<GamePlatformModel>
+                    {
+                        new GamePlatformModel { GamePlatformType = GamePlatformType.Android, IsSelected = false },
+                        new GamePlatformModel { GamePlatformType = GamePlatformType.Windows, IsSelected = false },
+                        new GamePlatformModel { GamePlatformType = GamePlatformType.DOS, IsSelected = false },
+                        new GamePlatformModel { GamePlatformType = GamePlatformType.IOS, IsSelected = false },
+                        new GamePlatformModel { GamePlatformType = GamePlatformType.Linux, IsSelected = false },
+                        new GamePlatformModel { GamePlatformType = GamePlatformType.Mac, IsSelected = false },
+                        new GamePlatformModel { GamePlatformType = GamePlatformType.NS, IsSelected = false },
+                        new GamePlatformModel { GamePlatformType = GamePlatformType.PS, IsSelected = false },
+                        new GamePlatformModel { GamePlatformType = GamePlatformType.HarmonyOS, IsSelected = false }
+};
+                    //遍历基本信息
+                    foreach (var item in entry.Information)
+                    {
+                        if (item.Modifier == "基本信息")
+                        {
+                            switch (item.DisplayName)
+                            {
+                                case "发行时间":
+                                    try
+                                    {
+                                        model.IssueTime = DateTime.ParseExact(item.DisplayValue, "yyyy年M月d日", null);
+                                    }
+                                    catch
+                                    {
+                                        try
+                                        {
+                                            model.IssueTime = DateTime.ParseExact(item.DisplayValue, "yyyy/M/d", null);
+                                        }
+                                        catch
+                                        {
+                                            model.IssueTime = null;
+                                        }
+                                    }
+
+                                    break;
+                                case "发行时间备注":
+                                    model.IssueTimeString = item.DisplayValue;
+                                    break;
+                                case "原作":
+                                    model.Original = item.DisplayValue;
+                                    break;
+                                case "制作组":
+                                    model.ProductionGroup = item.DisplayValue;
+                                    break;
+                                case "游戏平台":
+
+                                    var sArray = Regex.Split(item.DisplayValue, "、", RegexOptions.IgnoreCase);
+                                    foreach (var str in sArray)
+                                    {
+                                        switch (str)
+                                        {
+                                            case "Windows":
+                                                foreach (var temp in model.GamePlatforms)
+                                                {
+                                                    if (temp.GamePlatformType == GamePlatformType.Windows)
+                                                    {
+                                                        temp.IsSelected = true;
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                            case "Linux":
+                                                foreach (var temp in model.GamePlatforms)
+                                                {
+                                                    if (temp.GamePlatformType == GamePlatformType.Linux)
+                                                    {
+                                                        temp.IsSelected = true;
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                            case "Mac":
+                                                foreach (var temp in model.GamePlatforms)
+                                                {
+                                                    if (temp.GamePlatformType == GamePlatformType.Mac)
+                                                    {
+                                                        temp.IsSelected = true;
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                            case "IOS":
+                                                foreach (var temp in model.GamePlatforms)
+                                                {
+                                                    if (temp.GamePlatformType == GamePlatformType.IOS)
+                                                    {
+                                                        temp.IsSelected = true;
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                            case "Android":
+                                                foreach (var temp in model.GamePlatforms)
+                                                {
+                                                    if (temp.GamePlatformType == GamePlatformType.Android)
+                                                    {
+                                                        temp.IsSelected = true;
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                            case "PS":
+                                                foreach (var temp in model.GamePlatforms)
+                                                {
+                                                    if (temp.GamePlatformType == GamePlatformType.PS)
+                                                    {
+                                                        temp.IsSelected = true;
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                            case "NS":
+                                                foreach (var temp in model.GamePlatforms)
+                                                {
+                                                    if (temp.GamePlatformType == GamePlatformType.NS)
+                                                    {
+                                                        temp.IsSelected = true;
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                            case "DOS":
+                                                foreach (var temp in model.GamePlatforms)
+                                                {
+                                                    if (temp.GamePlatformType == GamePlatformType.DOS)
+                                                    {
+                                                        temp.IsSelected = true;
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                            case "HarmonyOS":
+                                                foreach (var temp in model.GamePlatforms)
+                                                {
+                                                    if (temp.GamePlatformType == GamePlatformType.HarmonyOS)
+                                                    {
+                                                        temp.IsSelected = true;
+                                                        break;
+                                                    }
+                                                }
+                                                break;
+                                        }
+                                    }
+                                    break;
+                                case "引擎":
+                                    model.Engine = item.DisplayValue;
+                                    break;
+                                case "发行商":
+                                    model.Publisher = item.DisplayValue;
+                                    break;
+                                case "发行方式":
+                                    model.IssueMethod = item.DisplayValue;
+                                    break;
+                                case "官网":
+                                    model.OfficialWebsite = item.DisplayValue;
+                                    break;
+                                case "Steam平台Id":
+                                    model.SteamId = item.DisplayValue;
+                                    break;
+                                case "QQ群":
+                                    model.QQgroupGame = item.DisplayValue;
+                                    break;
+                            }
+                        }
+                        else if (item.Modifier == "STAFF")
+                        {
+                            var staffModel = new StaffModel
+                            {
+                                Id = item.Id
+                            };
+                            foreach (var infor in item.Additional)
+                            {
+                                switch (infor.DisplayName)
+                                {
+                                    case "职位（官方称呼）":
+                                        staffModel.PositionOfficial = infor.DisplayValue;
+                                        break;
+                                    case "昵称（官方称呼）":
+                                        staffModel.NicknameOfficial = infor.DisplayValue;
+                                        break;
+                                    case "职位（通用）":
+                                        staffModel.PositionGeneral = (PositionGeneralType)Enum.Parse(typeof(PositionGeneralType), infor.DisplayValue);
+                                        break;
+                                    case "角色":
+                                        staffModel.Role = infor.DisplayValue;
+                                        break;
+                                    case "隶属组织":
+                                        staffModel.SubordinateOrganization = infor.DisplayValue;
+                                        break;
+                                    case "子项目":
+                                        staffModel.Subcategory = infor.DisplayValue;
+                                        break;
+                                }
+                            }
+                            model.Staffs.Add(staffModel);
+
+                        }
+                        else if (item.Modifier == "相关网站")
+                        {
+                            var socialPlatform = new SocialPlatform
+                            {
+                                Name = item.DisplayName,
+                                Link = item.DisplayValue
+                            };
+
+                            model.SocialPlatforms.Add(socialPlatform);
+
+                        }
+                    }
+                    break;
+                case EntryType.ProductionGroup:
+                    //遍历基本信息
+                    foreach (var item in entry.Information)
+                    {
+                        if (item.Modifier == "基本信息")
+                        {
+                            switch (item.DisplayName)
+                            {
+                                case "QQ群":
+                                    model.QQgroupGroup = item.DisplayValue;
+                                    break;
+                            }
+                        }
+                        else if (item.Modifier == "相关网站")
+                        {
+                            if (item.DisplayValue.Contains("weibo.com"))
+                            {
+                                model.WeiboId = item.DisplayValue.Replace("https://weibo.com/u/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("bilibili.com"))
+                            {
+                                model.BilibiliId = item.DisplayValue.Replace("https://space.bilibili.com/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("acfun.cn"))
+                            {
+                                model.AcFunId = item.DisplayValue.Replace("https://www.acfun.cn/u/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("zhihu.com"))
+                            {
+                                model.ZhihuId = item.DisplayValue.Replace("https://www.zhihu.com/people/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("afdian.net"))
+                            {
+                                model.AfdianId = item.DisplayValue.Replace("https://afdian.net/@", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("pixiv.net"))
+                            {
+                                model.PixivId = item.DisplayValue.Replace("https://www.pixiv.net/users/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("twitter.com"))
+                            {
+                                model.TwitterId = item.DisplayValue.Replace("https://twitter.com/", "").Replace("https://www.twitter.com/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("youtube.com"))
+                            {
+                                model.YouTubeId = item.DisplayValue.Replace("https://www.youtube.com/channel/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("facebook.com"))
+                            {
+                                model.FacebookId = item.DisplayValue.Replace("https://www.facebook.com/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else
+                            {
+                                var socialPlatform = new SocialPlatform
+                                {
+                                    Name = item.DisplayName,
+                                    Link = item.DisplayValue
+                                };
+
+                                model.SocialPlatforms.Add(socialPlatform);
+                            }
+
+                        }
+
+                    }
+                    break;
+                case EntryType.Role:
+                    //遍历基本信息
+                    foreach (var item in entry.Information)
+                    {
+                        if (item.Modifier == "基本信息")
+                        {
+                            switch (item.DisplayName)
+                            {
+                                case "声优":
+                                    model.CV = item.DisplayValue;
+                                    break;
+                                case "性别":
+                                    model.Gender = (GenderType)Enum.Parse(typeof(GenderType), item.DisplayValue);
+                                    break;
+                                case "身材数据":
+                                    model.FigureData = item.DisplayValue;
+                                    break;
+                                case "身材(主观)":
+                                    model.FigureSubjective = item.DisplayValue;
+                                    break;
+                                case "生日":
+                                    try
+                                    {
+                                        model.Birthday = DateTime.ParseExact(item.DisplayValue, "M月d日", null);
+                                    }
+                                    catch
+                                    {
+
+                                        model.Birthday = null;
+
+                                    }
+                                    break;
+                                case "发色":
+                                    model.Haircolor = item.DisplayValue;
+                                    break;
+                                case "瞳色":
+                                    model.Pupilcolor = item.DisplayValue;
+                                    break;
+                                case "服饰":
+                                    model.ClothesAccessories = item.DisplayValue;
+                                    break;
+                                case "性格":
+                                    model.Character = item.DisplayValue;
+                                    break;
+                                case "角色身份":
+                                    model.RoleIdentity = item.DisplayValue;
+                                    break;
+                                case "血型":
+                                    model.BloodType = item.DisplayValue;
+                                    break;
+                                case "身高":
+                                    model.RoleHeight = item.DisplayValue;
+                                    break;
+                                case "兴趣":
+                                    model.RoleTaste = item.DisplayValue;
+                                    break;
+                                case "年龄":
+                                    model.RoleAge = item.DisplayValue;
+                                    break;
+                            }
+                        }
+                        else if (item.Modifier == "相关网站")
+                        {
+                            var socialPlatform = new SocialPlatform
+                            {
+                                Name = item.DisplayName,
+                                Link = item.DisplayValue
+                            };
+
+                            model.SocialPlatforms.Add(socialPlatform);
+
+                        }
+
+                    }
+                    break;
+                case EntryType.Staff:
+                    //遍历基本信息
+                    foreach (var item in entry.Information)
+                    {
+                        if (item.Modifier == "基本信息")
+                        {
+
+                        }
+                        else if (item.Modifier == "相关网站")
+                        {
+                            if (item.DisplayValue.Contains("weibo.com"))
+                            {
+                                model.WeiboId = item.DisplayValue.Replace("https://weibo.com/u/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("bilibili.com"))
+                            {
+                                model.BilibiliId = item.DisplayValue.Replace("https://space.bilibili.com/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("acfun.cn"))
+                            {
+                                model.AcFunId = item.DisplayValue.Replace("https://www.acfun.cn/u/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("zhihu.com"))
+                            {
+                                model.ZhihuId = item.DisplayValue.Replace("https://www.zhihu.com/people/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("afdian.net"))
+                            {
+                                model.AfdianId = item.DisplayValue.Replace("https://afdian.net/@", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("pixiv.net"))
+                            {
+                                model.PixivId = item.DisplayValue.Replace("https://www.pixiv.net/users/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("twitter.com"))
+                            {
+                                model.TwitterId = item.DisplayValue.Replace("https://twitter.com/", "").Replace("https://www.twitter.com/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("youtube.com"))
+                            {
+                                model.YouTubeId = item.DisplayValue.Replace("https://www.youtube.com/channel/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else if (item.DisplayValue.Contains("facebook.com"))
+                            {
+                                model.FacebookId = item.DisplayValue.Replace("https://www.facebook.com/", "").Split('/').FirstOrDefault();
+
+                            }
+                            else
+                            {
+                                var socialPlatform = new SocialPlatform
+                                {
+                                    Name = item.DisplayName,
+                                    Link = item.DisplayValue
+                                };
+
+                                model.SocialPlatforms.Add(socialPlatform);
+                            }
+
+                        }
+                    }
+
+
+                    break;
+            }
+
+            return model;
+        }
+
+        public EditImagesViewModel GetEditImagesViewModel(Entry entry)
+        {
+            //根据类别生成首个视图模型
+            var model = new EditImagesViewModel
+            {
+                Name = entry.Name,
+                Id = entry.Id,
+            };
+            //处理图片
+            var Images = new List<EditImageAloneModel>();
+            foreach (var item in entry.Pictures)
+            {
+                Images.Add(new EditImageAloneModel
+                {
+                    Url = _appHelper.GetImagePath(item.Url, ""),
+                    Modifier = item.Modifier,
+                    Note = item.Note
+                });
+            }
+
+            model.Images = Images;
+            return model;
+        }
+
+        public EditRelevancesViewModel GetEditRelevancesViewModel(Entry entry)
+        {
+            var model = new EditRelevancesViewModel
+            {
+                Id = entry.Id,
+                Name = entry.Name,
+                Type = entry.Type
+            };
+            //处理附加信息
+            var roles = new List<RelevancesModel>();
+            var staffs = new List<RelevancesModel>();
+            var articles = new List<RelevancesModel>();
+            var groups = new List<RelevancesModel>();
+            var games = new List<RelevancesModel>();
+            var news = new List<RelevancesModel>();
+            var others = new List<RelevancesModel>();
+            foreach (var nav in entry.EntryRelationFromEntryNavigation)
+            {
+                var item = nav.ToEntryNavigation;
+                switch (item.Type)
+                {
+                    case EntryType.Role:
+                        roles.Add(new RelevancesModel
+                        {
+                            DisplayName = item.Name
+                        });
+                        break;
+                    case EntryType.Staff:
+                        staffs.Add(new RelevancesModel
+                        {
+                            DisplayName = item.Name
+                        });
+                        break;
+                    case EntryType.ProductionGroup:
+                        groups.Add(new RelevancesModel
+                        {
+                            DisplayName = item.Name
+                        });
+                        break;
+                    case EntryType.Game:
+                        games.Add(new RelevancesModel
+                        {
+                            DisplayName = item.Name
+                        });
+                        break;
+                }
+            }
+            foreach (var item in entry.Articles)
+            {
+                switch (item.Type)
+                {
+                    case ArticleType.News:
+                        news.Add(new RelevancesModel
+                        {
+                            DisplayName = item.Name
+                        });
+                        break;
+                    default:
+                        articles.Add(new RelevancesModel
+                        {
+                            DisplayName = item.Name
+                        });
+                        break;
+                }
+            }
+            foreach (var item in entry.Outlinks)
+            {
+                others.Add(new RelevancesModel
+                {
+                    DisplayName = item.Name,
+                    DisPlayValue = item.BriefIntroduction,
+                    Link = item.Link
+                });
+            }
+
+            model.Roles = roles;
+            model.staffs = staffs;
+            model.articles = articles;
+            model.Groups = groups;
+            model.Games = games;
+            model.others = others;
+            model.news = news;
+
+            return model;
+        }
+
+        public EditEntryTagViewModel GetEditTagsViewModel(Entry entry)
+        {
+            var model = new EditEntryTagViewModel
+            {
+                Id = entry.Id,
+                Name = entry.Name,
+                Type = entry.Type
+            };
+            //处理标签
+            var tags = new List<RelevancesModel>();
+            foreach (var item in entry.Tags)
+            {
+                tags.Add(new RelevancesModel
+                {
+                    DisplayName = item.Name
+                });
+            }
+
+            model.Tags = tags;
+
+            return model;
+        }
+
+        public EditMainPageViewModel GetEditMainPageViewModel(Entry entry)
+        {
+
+            var model = new EditMainPageViewModel();
+            model.Context = entry.MainPage;
+            model.Id = entry.Id;
+            model.Type = entry.Type;
+            model.Name = entry.Name;
+
+            return model;
+
+        }
+
+        public void SetDataFromEditMainViewModel(Entry newEntry, EditMainViewModel model)
+        {
+            newEntry.Name = model.Name;
+            newEntry.BriefIntroduction = model.BriefIntroduction;
+            newEntry.MainPicture = model.MainPicture;
+            newEntry.Thumbnail = model.Thumbnail;
+            newEntry.BackgroundPicture = model.BackgroundPicture;
+            newEntry.Type = model.Type;
+            newEntry.DisplayName = model.DisplayName;
+            newEntry.SmallBackgroundPicture = model.SmallBackgroundPicture;
+            newEntry.AnotherName = model.AnotherName;
+        }
+
+        public void SetDataFromEditAddInforViewModel(Entry newEntry, EditAddInforViewModel model)
+        {
+            newEntry.Information.Clear();
+            //根据类别进行序列化操作
+            switch (model.Type)
+            {
+                case EntryType.Game:
+                    //遍历一遍当前视图中staffs 
+                    foreach (var item in model.Staffs)
+                    {
+
+                        var staffs = new List<BasicEntryInformationAdditional>
+                        {
+                            new BasicEntryInformationAdditional { DisplayName = "职位（官方称呼）", DisplayValue = item.PositionOfficial },
+                            new BasicEntryInformationAdditional { DisplayName = "昵称（官方称呼）", DisplayValue = item.NicknameOfficial },
+                            new BasicEntryInformationAdditional { DisplayName = "职位（通用）", DisplayValue = item.PositionGeneral.ToString() },
+                            new BasicEntryInformationAdditional { DisplayName = "角色", DisplayValue = item.Role },
+                            new BasicEntryInformationAdditional { DisplayName = "隶属组织", DisplayValue = item.SubordinateOrganization },
+                            new BasicEntryInformationAdditional { DisplayName = "子项目", DisplayValue = item.Subcategory }
+                        };
+                        newEntry.Information.Add(new BasicEntryInformation
+                        {
+                            Modifier = "STAFF",
+                            DisplayName = item.Subcategory + item.PositionOfficial,
+                            DisplayValue = item.NicknameOfficial,
+                            Additional = staffs
+                        });
+                    }
+                    //序列化游戏平台
+                    string gamePlatforms = null;
+                    var isFirst = true;
+                    foreach (var item in model.GamePlatforms)
+                    {
+                        if (item.IsSelected == true)
+                        {
+                            if (isFirst == true)
+                            {
+                                isFirst = false;
+                            }
+                            else
+                            {
+                                gamePlatforms += "、";
+                            }
+                            gamePlatforms += item.GamePlatformType.ToString();
+                        }
+                    }
+                    //添加基本信息
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行时间", DisplayValue = model.IssueTime?.ToString("yyyy年M月d日") });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行时间备注", DisplayValue = model.IssueTimeString });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "原作", DisplayValue = model.Original });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "制作组", DisplayValue = model.ProductionGroup });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "游戏平台", DisplayValue = gamePlatforms });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "引擎", DisplayValue = model.Engine });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行商", DisplayValue = model.Publisher });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发行方式", DisplayValue = model.IssueMethod });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "官网", DisplayValue = model.OfficialWebsite });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "Steam平台Id", DisplayValue = model.SteamId });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "QQ群", DisplayValue = model.QQgroupGame });
+                    break;
+                case EntryType.ProductionGroup:
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "QQ群", DisplayValue = model.QQgroupGroup });
+                    break;
+                case EntryType.Role:
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "声优", DisplayValue = model.CV });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "性别", DisplayValue = model.Gender.ToString() });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身材数据", DisplayValue = model.FigureData });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身材(主观)", DisplayValue = model.FigureSubjective });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "生日", DisplayValue = model.Birthday?.ToString("M月d日") });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "发色", DisplayValue = model.Haircolor });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "瞳色", DisplayValue = model.Pupilcolor });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "性格", DisplayValue = model.Character });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "角色身份", DisplayValue = model.RoleIdentity });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "血型", DisplayValue = model.BloodType });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "身高", DisplayValue = model.RoleHeight });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "兴趣", DisplayValue = model.RoleTaste });
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "年龄", DisplayValue = model.RoleAge });
+
+
+                    break;
+                case EntryType.Staff:
+                    break;
+            }
+            //序列化相关网站
+
+            //加载在基本信息中的网站
+            if (string.IsNullOrWhiteSpace(model.WeiboId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
+                {
+                    Name = "微博",
+                    Link = "https://weibo.com/u/" + model.WeiboId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.BilibiliId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
+                {
+                    Name = "Bilibili",
+                    Link = "https://space.bilibili.com/" + model.BilibiliId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.AcFunId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
+                {
+                    Name = "AcFun",
+                    Link = "https://www.acfun.cn/u/" + model.AcFunId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.ZhihuId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
+                {
+                    Name = "知乎",
+                    Link = "https://www.zhihu.com/people/" + model.ZhihuId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.AfdianId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
+                {
+                    Name = "爱发电",
+                    Link = "https://afdian.net/@" + model.AfdianId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.PixivId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
+                {
+                    Name = "Pixiv",
+                    Link = "https://www.pixiv.net/users/" + model.PixivId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.TwitterId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
+                {
+                    Name = "Twitter",
+                    Link = "https://twitter.com/" + model.TwitterId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.YouTubeId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
+                {
+                    Name = "YouTube",
+                    Link = "https://www.youtube.com/channel/" + model.YouTubeId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.FacebookId) == false)
+            {
+                model.SocialPlatforms.Add(new SocialPlatform
+                {
+                    Name = "Facebook",
+                    Link = "https://www.facebook.com/" + model.FacebookId
+                });
+            }
+
+
+            //遍历一遍当前视图中 相关网站
+            foreach (var item in model.SocialPlatforms)
+            {
+                newEntry.Information.Add(new BasicEntryInformation
+                {
+                    Modifier = "相关网站",
+                    DisplayName = item.Name,
+                    DisplayValue = item.Link
+                });
+            }
+
+            var tempList = newEntry.Information.ToList();
+            tempList.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayValue));
+            newEntry.Information = tempList;
+        }
+
+        public void SetDataFromEditImagesViewModel(Entry newEntry, EditImagesViewModel model)
+        {
+            //再遍历视图模型中的图片 对应修改
+            newEntry.Pictures.Clear();
+
+            foreach (var item in model.Images)
+            {
+
+                newEntry.Pictures.Add(new EntryPicture
+                {
+                    Url = item.Url,
+                    Modifier = item.Modifier,
+                    Note = item.Note
+                });
+
+            }
+        }
+
+        public void SetDataFromEditRelevancesViewModel(Entry newEntry, EditRelevancesViewModel model,List< Entry> entries,List<Article> articles)
+        {
+            newEntry.Outlinks.Clear();
+            newEntry.Articles = articles;
+            newEntry.EntryRelationFromEntryNavigation = entries.Select(s => new EntryRelation
+            {
+                ToEntry = s.Id,
+                ToEntryNavigation = s
+            }).ToList();
+
+            foreach (var item in model.others)
+            {
+                newEntry.Outlinks.Add(new Outlink
+                {
+                    Name = item.DisplayName,
+                    BriefIntroduction = item.DisPlayValue,
+                    Link = item.Link,
+                });
+            }
+        }
+
+        public void SetDataFromEditMainPageViewModel(Entry newEntry, EditMainPageViewModel model)
+        {
+            newEntry.MainPage = model.Context;
+        }
+
+        public void SetDataFromEditTagsViewModel(Entry newEntry, EditEntryTagViewModel model,List<Tag> tags)
+        {
+            newEntry.Tags = tags;
         }
     }
 }

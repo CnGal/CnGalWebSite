@@ -104,7 +104,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             _userIntegralRepository = userIntegralRepository;
         }
 
-        public async Task<bool> IsEntryLockedAsync(int entryId, string userId, Operation operation)
+        public async Task<bool> IsEntryLockedAsync(long entryId, string userId, Operation operation)
         {
             if (await _examineRepository.FirstOrDefaultAsync(s => s.EntryId == entryId && s.ApplicationUserId != userId && s.IsPassed == null && s.Operation == operation) == null)
             {

@@ -1,0 +1,27 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(Model.Name+" CG预览")" Icon="fa fa-fw fa-picture-o">
+    <ButtonContent>
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
+            <MIcon Left>mdi-share-all-outline  </MIcon>
+            查看详情
+        </MButton>
+    </ButtonContent>
+    <ChildContent>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.ImageSlideGroup Model="Model.Pictures" />
+    </ChildContent>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public GameCGModel Model { get; set; }
+
+
+    public Task OnClickMore()
+    {
+        NavigationManager.NavigateTo("/entries/index/" + Model.Id);
+        return Task.CompletedTask;
+    }
+}

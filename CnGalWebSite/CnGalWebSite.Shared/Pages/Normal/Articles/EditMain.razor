@@ -1,0 +1,18 @@
+﻿@page "/articles/editmain/{id}"
+@attribute [Authorize]
+
+@inject IDataCacheService _dataCacheService
+
+<MakeSureInWASMTip></MakeSureInWASMTip>
+
+<CnGalWebSite.Shared.Pages.Webs.Articles.EditMain Id="@Id" />
+
+@code{
+    [Parameter]
+    public string Id { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        //清空当前缓存
+        _dataCacheService.ArticleIndexPageCatche.Clean(Id);
+    }
+}

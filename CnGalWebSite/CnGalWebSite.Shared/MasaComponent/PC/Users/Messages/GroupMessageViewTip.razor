@@ -1,0 +1,42 @@
+﻿@inject IDataCacheService _dataCacheService
+
+
+@if (Model.Count == 0)
+{
+    <NotFoundTip IsNeedLayput="true" />
+}
+else
+{
+    @foreach (var item in Model.Skip((CurrentPage - 1) * MaxCount).Take(MaxCount))
+    {
+        <MessageViewTip Model="item" />
+    }
+
+    @if (TotalPages > 1)
+    {
+        <MPagination Value="@CurrentPage" Class="my-4" Length="@TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
+    }
+}
+
+@code {
+    [Parameter]
+    public List<CnGalWebSite.DataModel.Model.Message> Model { get; set; }
+
+    private int MaxCount { get; set; } = 10;
+
+    private int TotalPages { get; set; }
+
+    private int CurrentPage { get; set; } = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        TotalPages = Model.Count / MaxCount + 1;
+    }
+
+    private Task OnPageClick(int pageIndex)
+    {
+        CurrentPage = pageIndex;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

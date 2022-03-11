@@ -13,31 +13,34 @@
 @inject IAppHelper? _appHelper
 
 <TitleTip></TitleTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+    <style>
+        .swal2-icon.swal2-info {
+            border-color: #009ef7;
+            color: #009ef7;
+        }
 
-<style>
-    .swal2-icon.swal2-info {
-        border-color: #009ef7;
-        color: #009ef7;
-    }
+        .bg-opacity {
+            background-color: rgba(255,255,255,.8);
+        }
+    </style>
+    <div class="p-3">
+        <div>
 
-    .bg-opacity {
-        background-color: rgba(255,255,255,.8);
-    }
-</style>
-<div class="p-3">
-    <div>
+            <h1 class=" login-h1-text text-center">你已进入APP模式</h1>
 
-        <h1 class="h4 text-center">你已进入APP模式</h1>
-
-        <div class="text-center">
-            APP模式将会带来更加稳定的编辑体验，你可以将 app.cngal.org 加入收藏夹，便于再次进入~
-        </div>
-        <div class="mt-3 text-center">
-            <Button Icon="fa fa-star" Text="添加收藏夹" @onclick="OnClickRight" Color="Color.Dark" IsOutline="true" class="ms-2" Size="Size.Small"></Button>
-            <Button Icon="fa fa-check" Text="我知道了" @onclick="OnClickLeft" Color="Color.Dark"  Size="Size.Small" class="ms-3"></Button>
+            <div class="text-center">
+                APP模式将会带来更加稳定的编辑体验，你可以将 app.cngal.org 加入收藏夹，便于再次进入~
+            </div>
+            <div class="mt-3 text-center">
+                <Button Icon="fa fa-star" Text="添加收藏夹" @onclick="OnClickRight" Color="Color.Dark" IsOutline="true" class="ms-2" Size="Size.Small"></Button>
+                <Button Icon="fa fa-check" Text="我知道了" @onclick="OnClickLeft" Color="Color.Dark" Size="Size.Small" class="ms-3"></Button>
+            </div>
         </div>
     </div>
-</div>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+
 
 
 @code {

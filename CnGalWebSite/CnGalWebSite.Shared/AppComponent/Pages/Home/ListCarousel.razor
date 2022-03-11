@@ -9,7 +9,7 @@
 
 @code {
     private List<string> Images = new List<string>();
-    private List<DataModel.Model.Carousel> Carousels { get; set; } = new List<DataModel.Model.Carousel>();
+    private List<CarouselViewModel> Carousels { get; set; } = new List<CarouselViewModel>();
 
     public bool IsSmallScreen { get; set; }
     public bool IsNormalScreen { get; set; }
@@ -61,7 +61,7 @@
             {
                 try
                 {
-                    await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", $"【{item.Id}】{item.Link}", "1", "click");
+                    await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", item.Link, "1", "click");
                 }
                 catch (Exception exc)
                 {

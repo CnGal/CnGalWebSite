@@ -1,26 +1,18 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel
 {
-    public class EditRelevancesViewModel
+    public class EditRelevancesViewModel : BaseEntryEditModel
     {
-        public EntryType Type { get; set; }
-        public string Name { get; set; }
-        public int Id { get; set; }
-
         public List<RelevancesModel> Roles { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> staffs { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> Groups { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> Games { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> articles { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> news { get; set; } = new List<RelevancesModel>();
-
         public List<RelevancesModel> others { get; set; } = new List<RelevancesModel>();
-
-        [Display(Name = "备注")]
-        public string Note { get; set; }
-
     }
     public class RelevancesModel
     {
