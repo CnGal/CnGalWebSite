@@ -67,10 +67,18 @@ namespace CnGalWebSite.APIServer.Application.Home
         public async Task<List<EntryHomeAloneViewModel>> GetHomeRecentEditViewAsync()
         {
             var model = new List<EntryHomeAloneViewModel>();
+            var tempDateTimeNow = DateTime.Now.ToCstTime();
+
+            var entryIds = await _entryRepository.GetAll().AsNoTracking().OrderByDescending(s => s.PubulishTime)
+                    .Where(s => s.Type == EntryType.Game && s.PubulishTime < tempDateTimeNow && s.Name != null && s.Name != "" && s.IsHidden != true).Select(s=>s.Id).Take(12).ToListAsync();
+            entryIds.AddRange(await _entryRepository.GetAll().AsNoTracking()
+                    .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && s.PubulishTime > tempDateTimeNow)
+                    .OrderBy(s => s.PubulishTime).Select(s => s.Id).Take(12).ToListAsync());
+
 
             //获取近期编辑
             var entry_result2 = await _entryRepository.GetAll().OrderByDescending(s => s.LastEditTime).AsNoTracking()
-                .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true).Take(12).ToListAsync();
+                .Where(s => s.Type == EntryType.Game && s.Name != null && s.Name != "" && s.IsHidden != true && entryIds.Contains(s.Id) == false).Take(12).ToListAsync();
             if (entry_result2 != null)
             {
                 foreach (var item in entry_result2)

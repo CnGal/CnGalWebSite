@@ -95,6 +95,13 @@
     {
         <MPagination Value="@pagedResultDto.CurrentPage" Class="my-4" Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
     }
+    @if (pagedResultDto.Data.Count == 0)
+    {
+        <div class="mb-3">
+            <NotFoundTip IsNeedLayput="true" />
+        </div>
+
+    }
 </div>
 
 
