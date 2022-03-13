@@ -1,0 +1,22 @@
+﻿@inject IDataCacheService _dataCacheService
+
+@if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip Show />
+}
+@if (_dataCacheService.IsApp == false)
+{
+    <FloatToolTip />
+
+}
+
+<CascadingValue Value=this IsFixed="true">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+
+}

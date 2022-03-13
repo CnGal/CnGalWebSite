@@ -1,10 +1,11 @@
 ﻿@inject HttpClient Http
 @inject IDataCacheService _dataCacheService
+@inject ToastService ToastService
     <TitleTip Title="消息中心"></TitleTip>
 
     <div class="row">
         <div class="col-12 col-lg-3 mb-4">
-            <MList>
+            <MList Class="p-0">
                 <MListItemGroup @bind-Value="selected" Color="@_dataCacheService.ThemeSetting.Theme">
                     <MListItem @key="0">
                         <MListItemIcon>
@@ -113,11 +114,44 @@
                 PassedItems = Model.Where(s => s.Type == MessageType.ExaminePassed).ToList();
                 UnPassedItems = Model.Where(s => s.Type == MessageType.ExamineUnPassed).ToList();
 
+                if (UnPassedItems.Any(s => s.IsReaded == false))
+                {
+                    selected = 2;
+                }
+                if (PassedItems.Any(s => s.IsReaded == false))
+                {
+                    selected = 1;
+                }
+                if (RelyItems.Any(s => s.IsReaded == false))
+                {
+                    selected = 0;
+                }
+
                 isReady = true;
+                StateHasChanged();
+                OnReadedAllMessage();
             }
             catch (Exception ex)
             {
                 ErrorHandler.ProcessError(ex, "获取编辑文章主要信息失败");
             }
         }
+
+        public async Task OnReadedAllMessage()
+        {
+            try
+            {
+                var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/ReadedAllMessages/");
+                //判断结果
+                if (obj.Successful == false)
+                {
+                    await ToastService.Error("使消息已读失败", obj.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "设置消息已读失败");
+            }
+        }
+
     }

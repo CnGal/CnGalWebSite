@@ -5,31 +5,34 @@
 
 @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor.PhotoPath) == false)
 {
-    <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
-        <ActivatorContent Context="m">
-            <MTooltip Bottom>
-                <ActivatorContent Context="c">
-                    @{
-                        var attrs = new Dictionary<string, object>();
-                        m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
-                        c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
-                    }
-                    <MButton Icon Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs">
-                        <img style="width:35px;border-radius:50%;" src="@_dataCacheService.UserInfor.PhotoPath" alt="@_dataCacheService.UserInfor.Name" />
-                    </MButton>
-                </ActivatorContent>
-                <ChildContent>
-                    <span>@_dataCacheService.UserInfor.Name</span>
-                </ChildContent>
-            </MTooltip>
-        </ActivatorContent>
+    <MBadge Content="messageCount" Value="messageCount!=0" Color="@_dataCacheService.ThemeSetting.Theme"  OffsetX="30" OffsetY="20">
+        <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
+            <ActivatorContent Context="m">
+                <MTooltip Bottom>
+                    <ActivatorContent Context="c">
+                        @{
+                            var attrs = new Dictionary<string, object>();
+                            m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                            c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                        }
+                        <MButton Icon Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs">
+                            <img style="width:35px;border-radius:50%;" src="@_dataCacheService.UserInfor.PhotoPath" alt="@_dataCacheService.UserInfor.Name" />
+                        </MButton>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <span>@_dataCacheService.UserInfor.Name</span>
+                    </ChildContent>
+                </MTooltip>
+            </ActivatorContent>
 
-        <ChildContent>
-          <div style="width:300px;">
-              <UserInforCard Model="@_dataCacheService.UserInfor" OnClosed="OnClosed" OnClickSetting="OnClickSetting"/>
-          </div>
-        </ChildContent>
-    </MMenu>
+            <ChildContent>
+                <div style="width:300px;">
+                    <UserInforCard Model="@_dataCacheService.UserInfor" OnClosed="OnClosed" OnClickSetting="OnClickSetting" MessageCount="messageCount" MessageCountChanged="MessageCountChanged"/>
+                </div>
+            </ChildContent>
+        </MMenu>
+    </MBadge>
+
 }
 @code {
 
@@ -39,6 +42,7 @@
     public EventCallback OnClickSetting { get; set; }
 
     private bool menu { get; set; }
+    private long messageCount { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -77,7 +81,7 @@
                 if (string.IsNullOrWhiteSpace(userId) == false)
                 {
                     var model = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + userId);
-
+                    await GetUserUnreadedMessages();
 
                     _dataCacheService.UserInfor = model;
                     StateHasChanged();
@@ -89,6 +93,27 @@
                 await ToastService.Error("获取用户信息失败", "未知错误，请在确保网络正常后联系开发人员");
             }
         }
+    }
+
+    public async Task GetUserUnreadedMessages()
+    {
+        try
+        {
+            messageCount = await Http.GetFromJsonAsync<long>(ToolHelper.WebApiPath + "api/space/GetUserUnReadedMessageCount");
+            StateHasChanged();
+        }
+        catch
+        {
+            messageCount = 0;
+        }
+
+    }
+
+    public Task MessageCountChanged(long count)
+    {
+        messageCount = count;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
 
     public Task OnClosed()

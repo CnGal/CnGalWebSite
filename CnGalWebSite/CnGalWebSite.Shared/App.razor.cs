@@ -83,14 +83,9 @@ namespace CnGalWebSite.Shared
             {
                 try
                 {
-                    var authState = await authenticationStateTask;
-                    var user = authState.User;
-                    if (user.Identity.IsAuthenticated)
-                    {
-                        await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/MakeUserOnline");
-                    }
-                }
 
+                    await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/MakeUserOnline");
+                }
                 catch
                 {
 

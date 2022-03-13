@@ -269,9 +269,9 @@ namespace CnGalWebSite.Shared.Service
                 HomeListCards.Add(new KeyValuePair<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>, string>(items, apiUrl));
                 return items;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                return new List<AppComponent.Normal.Cards.MainImageCardModel>();
             }
         }
         public void RefreshAllCatche()

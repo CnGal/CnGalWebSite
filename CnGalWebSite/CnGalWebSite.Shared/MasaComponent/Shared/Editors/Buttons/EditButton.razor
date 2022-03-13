@@ -108,12 +108,11 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         await GetExamineInfor();
         ProcButtonList();
         isReady = true;
-        StateHasChanged();
     }
 
     public async Task OnClickHistory()
@@ -135,6 +134,7 @@
 
     public void ProcButtonList()
     {
+        Items.Clear();
         foreach (var item in EditStates)
         {
             Items.Add(new EditButtonLineModel
@@ -151,6 +151,7 @@
 
     public async Task GetExamineInfor()
     {
+        var editStates = new Dictionary<Operation, EditState>();
         try
         {
             if (Type == ExaminedNormalListModelType.Entry)
@@ -165,12 +166,12 @@
                     PerfectionInfor = model.PerfectionInfor;
                 }
 
-                EditStates.Add(Operation.EstablishMain, model.State.MainState);
-                EditStates.Add(Operation.EstablishAddInfor, model.State.InforState);
-                EditStates.Add(Operation.EstablishMainPage, model.State.MainPageState);
-                EditStates.Add(Operation.EstablishImages, model.State.ImagesState);
-                EditStates.Add(Operation.EstablishRelevances, model.State.RelevancesState);
-                EditStates.Add(Operation.EstablishTags, model.State.TagState);
+                editStates.Add(Operation.EstablishMain, model.State.MainState);
+                editStates.Add(Operation.EstablishAddInfor, model.State.InforState);
+                editStates.Add(Operation.EstablishMainPage, model.State.MainPageState);
+                editStates.Add(Operation.EstablishImages, model.State.ImagesState);
+                editStates.Add(Operation.EstablishRelevances, model.State.RelevancesState);
+                editStates.Add(Operation.EstablishTags, model.State.TagState);
 
             }
             else if (Type == ExaminedNormalListModelType.Article)
@@ -179,9 +180,9 @@
 
                 Examines = model.Examines;
 
-                EditStates.Add(Operation.EditArticleMain, model.State.MainState);
-                EditStates.Add(Operation.EditArticleMainPage, model.State.MainPageState);
-                EditStates.Add(Operation.EditArticleRelevanes, model.State.RelevancesState);
+                editStates.Add(Operation.EditArticleMain, model.State.MainState);
+                editStates.Add(Operation.EditArticleMainPage, model.State.MainPageState);
+                editStates.Add(Operation.EditArticleRelevanes, model.State.RelevancesState);
 
             }
             else if (Type == ExaminedNormalListModelType.Periphery)
@@ -190,10 +191,10 @@
 
                 Examines = model.Examines;
 
-                EditStates.Add(Operation.EditPeripheryMain, model.State.MainState);
-                EditStates.Add(Operation.EditPeripheryImages, model.State.ImagesState);
-                EditStates.Add(Operation.EditPeripheryRelatedEntries, model.State.RelatedEntriesState);
-                EditStates.Add(Operation.EditPeripheryRelatedPeripheries, model.State.RelatedPeripheriesState);
+                editStates.Add(Operation.EditPeripheryMain, model.State.MainState);
+                editStates.Add(Operation.EditPeripheryImages, model.State.ImagesState);
+                editStates.Add(Operation.EditPeripheryRelatedEntries, model.State.RelatedEntriesState);
+                editStates.Add(Operation.EditPeripheryRelatedPeripheries, model.State.RelatedPeripheriesState);
 
             }
             else if (Type == ExaminedNormalListModelType.Tag)
@@ -202,11 +203,13 @@
 
                 Examines = model.Examines;
 
-                EditStates.Add(Operation.EditTagMain, model.State.MainState);
-                EditStates.Add(Operation.EditTagChildEntries, model.State.ChildEntriesState);
-                EditStates.Add(Operation.EditTagChildTags, model.State.ChildTagsState);
+                editStates.Add(Operation.EditTagMain, model.State.MainState);
+                editStates.Add(Operation.EditTagChildEntries, model.State.ChildEntriesState);
+                editStates.Add(Operation.EditTagChildTags, model.State.ChildTagsState);
 
             }
+
+            EditStates = editStates;
         }
         catch (Exception ex)
         {

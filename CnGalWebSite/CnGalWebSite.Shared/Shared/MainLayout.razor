@@ -8,13 +8,10 @@
 @inject IDataCacheService _dataCacheService
 @inject IServiceProvider Provider
 
-@if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
-{
-    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip Show />
-}
+
 <MApp  Dark="_dataCacheService.ThemeSetting.IsDark" >
 
-    <Layout SideWidth="0" IsPage="true" ShowGotoTop="false" ShowCollapseBar="true"
+    <Layout SideWidth="0" IsPage="true" ShowGotoTop="false" ShowCollapseBar="true" style="background-color:transparent!important;"
             IsFullSide="@_dataCacheService.ThemeSetting.IsFullSide" IsFixedHeader="@_dataCacheService.ThemeSetting.IsFixedHeader" IsFixedFooter="@_dataCacheService.ThemeSetting.IsFixedFooter" ShowFooter="@_dataCacheService.ThemeSetting.ShowFooter"
             Menus="@Menus" UseTabSet="@_dataCacheService.ThemeSetting.UseTabSet" AdditionalAssemblies="new[] { GetType().Assembly }" class="@_dataCacheService.ThemeSetting.Theme">
         <Header>
@@ -107,7 +104,11 @@
         <Main>
 
             <CascadingValue Value="this" IsFixed="true">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
                 @Body
+
+                </CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
+
             </CascadingValue>
         </Main>
         <Footer>

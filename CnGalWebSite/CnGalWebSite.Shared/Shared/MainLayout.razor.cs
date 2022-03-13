@@ -20,7 +20,7 @@ namespace CnGalWebSite.Shared.Shared
     /// <summary>
     /// 
     /// </summary>
-    public sealed partial class MainLayout : IAsyncDisposable
+    public sealed partial class MainLayout
     {
 
         public UserUnReadedMessagesModel UnreadedMessages { get; set; } = new UserUnReadedMessagesModel();
@@ -68,20 +68,6 @@ namespace CnGalWebSite.Shared.Shared
             await base.OnAfterRenderAsync(firstRender);
             if (firstRender)
             {
-                try
-                {
-                    Interop = new JSInterop<MainLayout>(JSRuntime);
-                    await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
-
-                }
-                catch
-                {
-
-                }
-
-
-                //启动定时器
-                mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 60 * 10);
 
                 //加载调试工具
                 if (_dataCacheService.ThemeSetting.IsDebug)
@@ -96,47 +82,8 @@ namespace CnGalWebSite.Shared.Shared
 
                     }
                 }
-
-
-
-
-                //需要调用一次令牌刷新接口 确保登入没有过期
-                var result = await _authService.Refresh();
-                if (result != null && result.Code != LoginResultCode.OK)
-                {
-                    ErrorHandler.ProcessError(new Exception(result.ErrorDescribe), "尝试自动登入失败");
-                    StateHasChanged();
-                }
-
-                //var authState = await authenticationStateTask;
-                //var user = authState.User;
-                //获取用户信息
-                //GetUserInfor(user);
-                StateHasChanged();
                 //读取用户未读信息
                 await GetUserUnreadedMessages();
-
-                //设置用户身份
-                try
-                {
-                    await JS.InvokeAsync<string>("setCustomVar", "登录状态", string.IsNullOrWhiteSpace(userId) ? "未登入" : "已登入");
-                }
-                catch (Exception)
-                {
-
-                }
-                //记录数据
-                if (string.IsNullOrWhiteSpace(userName) == false && string.IsNullOrWhiteSpace(userId) == false)
-                {
-                    try
-                    {
-                        await JS.InvokeAsync<string>("trackEvent", "登入", userId, userName, "1", "login");
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-                }
             }
 
 
@@ -305,30 +252,6 @@ namespace CnGalWebSite.Shared.Shared
             return menus;
         }
 
-        private System.Threading.Timer mytimer;
-
-        public async void Send(object o)
-        {
-            await InvokeAsync(async () =>
-            {
-                try
-                {
-                    var authState = await authenticationStateTask;
-                    var user = authState.User;
-                    if (user.Identity.IsAuthenticated)
-                    {
-                        await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/MakeUserOnline");
-                    }
-                }
-
-                catch
-                {
-
-                }
-            });
-
-        }
-
         public void OnSearch()
         {
             NavigationManager.NavigateTo("/home/search/全部");
@@ -406,27 +329,5 @@ namespace CnGalWebSite.Shared.Shared
             await _dataCacheService.RefreshApp.InvokeAsync();
             StateHasChanged();
         }
-
-        #region 释放实例
-        private async ValueTask DisposeAsyncCore()
-        {
-            if (Interop != null)
-            {
-                await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-                Interop.Dispose();
-                Interop = null;
-            }
-            if (mytimer != null)
-            {
-                mytimer.Dispose();
-                mytimer = null;
-            }
-        }
-        public async ValueTask DisposeAsync()
-        {
-            await DisposeAsyncCore();
-            GC.SuppressFinalize(this);
-        }
-        #endregion
     }
 }

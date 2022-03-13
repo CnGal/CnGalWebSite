@@ -34,7 +34,7 @@
 
     string color = "success";
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         color = ToolHelper.GetEntryPerfectionLevelColor(Model.Level);
         if (Model.Grade == 0)

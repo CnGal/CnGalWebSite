@@ -30,9 +30,13 @@
         </div>
         <MProgressLinear Value="@(level==10?100:(100.0*Model.BasicInfor.Integral/ToolHelper.GetLevelIntegral(level)))" Color="@_dataCacheService.ThemeSetting.Theme"></MProgressLinear>
     </div>
-    <div style="display: flex; justify-content: flex-end; margin-bottom: -40px;">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-pencil " Tooltip="编辑个人资料" OnClick="OnClickEdit" />
-    </div>
+    @if (Model.IsCurrentUser)
+    {
+        <div style="display: flex; justify-content: flex-end; margin-bottom: -40px;">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-pencil " Tooltip="编辑个人资料" OnClick="OnClickEdit" />
+        </div>
+
+    }
     <div class="row">
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-star" Text="@("贡献值："+Model.ContributionValue)" Class="col-12" /> <br />
 

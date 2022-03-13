@@ -30,10 +30,22 @@
             <MIcon Left>mdi-star</MIcon>
             个人空间
         </MButton>
-        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickMessage">
-            <MIcon Left>mdi-comment-text-multiple  </MIcon>
-            消息通知
-        </MButton>
+        @if (MessageCount > 0)
+        {
+            <MButton Text Block Color="warning" OnClick="OnClickMessage">
+                <MIcon Left>mdi-comment-text-multiple</MIcon>
+                @(MessageCount+"条新消息")
+            </MButton>
+
+        }
+        else
+        {
+            <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickMessage">
+                <MIcon Left>mdi-comment-text-multiple  </MIcon>
+                消息通知
+            </MButton>
+
+        }
         <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" StopPropagation OnClick="OnClickSetting">
             <MIcon Left>mdi-cog</MIcon>
             主题设置
@@ -54,6 +66,10 @@
     public EventCallback OnClosed { get; set; }
     [Parameter]
     public EventCallback OnClickSetting { get; set; }
+    [Parameter]
+    public long MessageCount { get; set; }
+    [Parameter]
+    public EventCallback< long> MessageCountChanged { get; set; }
 
     private async Task OnClickUserSpace()
     {
@@ -67,6 +83,9 @@
     }
     private async Task OnClickMessage()
     {
+        MessageCount = 0;
+        MessageCountChanged.InvokeAsync(0);
+        StateHasChanged();
         NavigationManager.NavigateTo("/space/messages");
         await OnClosed.InvokeAsync();
     }

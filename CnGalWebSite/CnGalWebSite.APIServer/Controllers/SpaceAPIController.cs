@@ -612,13 +612,13 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UserUnReadedMessagesModel>> GetUserUnReadedMessagesAsync(string id)
+        [HttpGet]
+        public async Task<ActionResult<long>> GetUserUnReadedMessageCountAsync()
         {
-            return new UserUnReadedMessagesModel
-            {
-                Count = await _messageRepository.CountAsync(s => s.ApplicationUserId == id && s.IsReaded == false)
-            };
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            return await _messageRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsReaded == false);
         }
 
         [HttpGet("{id}")]

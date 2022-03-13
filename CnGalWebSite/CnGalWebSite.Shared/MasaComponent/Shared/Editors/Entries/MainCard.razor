@@ -19,7 +19,7 @@
 
             <div class="row">
                 <div class="form-group col-12  col-sm-6">
-                    <Select @bind-Value="Model.Type"></Select>
+                    <Select TValue="EntryType" Value="Model.Type" ValueChanged="OnTypeChanged" ShowLabel="true" DisplayText="类型"></Select>
                 </div>
 
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
@@ -40,5 +40,13 @@
     public EditMainViewModel Model { get; set; }
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public EventCallback<EntryType> TypeChanged { get; set; }
+
+    public async Task OnTypeChanged(EntryType type)
+    {
+        Model.Type = type;
+        await TypeChanged.InvokeAsync(type);
+    }
 
 }

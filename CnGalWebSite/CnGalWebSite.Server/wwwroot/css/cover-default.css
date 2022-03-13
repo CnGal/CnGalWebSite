@@ -256,17 +256,17 @@ input.te-image-file-input {
 }
 /*Markdown编辑器*/
 .markdown-body img {
-    background-color: transparent;
-    height: auto;
+    background-color: transparent!important;
+    height: auto!important;
 }
 
 .markdown-body {
-    background-color: transparent;
+    background-color: transparent!important;
    
 }
 
 .markdown-body b, .markdown-body strong {
-    font-weight: bolder;
+    font-weight: bolder!important;
 }
 
 /*修正Masa样式对Bootsharp的影响*/
