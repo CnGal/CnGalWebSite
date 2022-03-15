@@ -5,6 +5,7 @@
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject IDataCacheService _dataCacheService
+@implements IDisposable
 
 
 @if (IsFrist)
@@ -141,7 +142,7 @@ else
                 return;
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "发送验证码失败");
             IsFrist = false;

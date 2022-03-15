@@ -3,6 +3,7 @@
 @attribute [Authorize(Roles = "Admin")]
 @inject HttpClient Http
 @inject ToastService ToastService
+@implements IDisposable
 
 
 <TitleTip></TitleTip>
@@ -158,4 +159,15 @@
             });
         }
     }
+
+    public void Dispose()
+    {
+        if (mytimer != null)
+        {
+            mytimer?.Dispose();
+
+            mytimer = null;
+        }
+    }
+}
 }

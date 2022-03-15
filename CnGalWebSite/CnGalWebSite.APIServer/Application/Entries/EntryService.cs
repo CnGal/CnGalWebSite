@@ -415,6 +415,20 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         }
                     }
                 }
+                else
+                {
+                    if (entry.Type == EntryType.Game)
+                    {
+                        if (item.Modifier == "基本信息")
+                        {
+                            //查找是否修改发行时间 对下文不影响 只是更新字段缓存
+                            if (item.DisplayName == "发行时间")
+                            {
+                                entry.PubulishTime = null;
+                            }
+                        }
+                    }
+                }
             }
 
             //更新最后编辑时间

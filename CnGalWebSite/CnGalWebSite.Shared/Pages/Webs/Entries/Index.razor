@@ -107,13 +107,6 @@ else
 
                                     </div>
                                 }
-                                @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
-                                {
-                                    <div class="mb-4">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.VerticalDrawingCard Model="EntryView" />
-                                    </div>
-                                }
-
 
                                 @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
                                 {

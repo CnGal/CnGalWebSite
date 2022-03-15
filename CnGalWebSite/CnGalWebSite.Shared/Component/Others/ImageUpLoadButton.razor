@@ -2,11 +2,12 @@
 @inject ToastService? ToastService
 @inject IJSRuntime JS
 @inject HttpClient Http
+@implements IDisposable
 
-    <div class="@Class">
-        <input id="@up_to_chevereto" type="file" accept="image/*" multiple="multiple" class="up_to_chevereto"/>
-        <label for="@up_to_chevereto" id="@up_img_label" class="btn btn-success"><i class="fa fa-cloud-upload" aria-hidden="true"></i> @Text</label>
-    </div>
+<div class="@Class">
+    <input id="@up_to_chevereto" type="file" accept="image/*" multiple="multiple" class="up_to_chevereto" />
+    <label for="@up_to_chevereto" id="@up_img_label" class="btn btn-success"><i class="fa fa-cloud-upload" aria-hidden="true"></i> @Text</label>
+</div>
 
 @code {
     [Parameter]
@@ -34,7 +35,7 @@
             try
             {
                 objRef = DotNetObjectReference.Create(this);
-                await JS.InvokeAsync<string>("initUploadButton",objRef, "#"+up_to_chevereto, "#" + up_img_label);
+                await JS.InvokeAsync<string>("initUploadButton", objRef, "#" + up_to_chevereto, "#" + up_img_label);
             }
             catch (Exception exc)
             {
@@ -74,7 +75,7 @@
                 await ToastService.Error("保存上传文件信息失败", obj.Error);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存上传文件信息失败");
         }

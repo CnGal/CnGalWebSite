@@ -257,6 +257,11 @@ else
 
             }
         }
+
+        if(firstRender)
+        {
+            isFirstLoad = false;
+        }
     }
     protected override async Task OnInitializedAsync()
     {

@@ -83,7 +83,7 @@ else
                 }
 
                 //检查参数是否合法
-                if (string.IsNullOrWhiteSpace(Code) || string.IsNullOrWhiteSpace(ReturnUrl))
+                if (string.IsNullOrWhiteSpace(Code) && string.IsNullOrWhiteSpace(ReturnUrl))
                 {
                     await ShowInformation("第三方登入失败", "[Code:303] 回调链接不正确，请联系管理员", EventCallback.Factory.Create<MouseEventArgs>(this, () =>
                     {

@@ -5,20 +5,11 @@
 <TitleTip></TitleTip>
 <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
 
-    @if (_dataCacheService.IsApp == false)
-    {
-        <ThirdPartyLoginTip Code="@Code" ReturnUrl="@State" Type="type"></ThirdPartyLoginTip>
-
-    }
-
+    <ThirdPartyLoginTip Code="@Code" ReturnUrl="@State" Type="type"></ThirdPartyLoginTip>
 </CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
 
 
 @code {
-    [Parameter]
-    public string ParameterStr { get; set; }
-
-    bool isReady = false;
     [Parameter]
     [SupplyParameterFromQuery]
     public string Code { get; set; }

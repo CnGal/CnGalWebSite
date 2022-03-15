@@ -8,8 +8,7 @@
 
 <TitleTip></TitleTip>
 <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
-    @if (_dataCacheService.IsApp == false)
-    {
+
         @if (isReady)
         {
             <ThirdPartyLoginTip Code="@Code" ReturnUrl="@ReturnUrl" Type="type"></ThirdPartyLoginTip>
@@ -19,7 +18,6 @@
             <AccountWaitingTip Title="正在重定向" Subtitle="你正在第三方账户登入，我们正在检查以确保一切正常"></AccountWaitingTip>
 
         }
-    }
 </CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
 
 

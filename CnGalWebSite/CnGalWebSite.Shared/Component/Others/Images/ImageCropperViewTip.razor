@@ -38,9 +38,9 @@
 
     </div>
 
-    <div class="mt-3" style="display: flex; justify-content: space-between;">
-        <Button Color="Color.Danger" Icon="fa fa-close" @onclick="CancelCropAsync" IsAsync="true" Text="放弃裁剪"></Button>
-        <Button Color="Color.Success" Icon="fa fa-check" class="me-1" @onclick="DoneCrop" IsAsync="true" Text="确认裁剪"></Button>
+    <div class="mt-3" style="display: flex;">
+        <Button Color="Color.Primary" Icon="fa fa-close me-3" @onclick="CancelCropAsync" IsAsync="true" Text="直接上传"></Button>
+        <Button Color="Color.Success" Icon="fa fa-check" @onclick="DoneCrop" IsAsync="true" Text="确认裁剪"></Button>
 
     </div>
 
@@ -191,7 +191,7 @@
         }
         catch(Exception exc)
         {
-            await ToastService.Error("图片上传失败", "图片上传失败，超过1MB的图片请上传到相册，请检查网络正常后联系管理员");
+            await ToastService.Error("图片裁剪失败", "图片过于复杂无法处理，请尝试压缩图片或直接上传");
             return;
         }
         //回调
@@ -220,7 +220,7 @@
         }
         catch
         {
-            await ToastService.Error("图片上传失败", "图片上传失败，超过1MB的图片请上传到相册，请检查网络正常后联系管理员");
+            await ToastService.Error("图片上传失败", "超过1MB的图片请上传到相册");
         }
         //回调
         if (string.IsNullOrWhiteSpace(PreviewImagePath) == false)
