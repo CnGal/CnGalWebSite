@@ -24,14 +24,18 @@
     </MButton>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <CnGalWebSite.Shared.MasaComponent.PC.Layout.SignInButton Model="_dataCacheService.UserInfor" Left />
-    <AuthorizeView Roles="Admin">
-        <Authorized>
-            <MButton Text Block Color="success" OnClick="@(()=>OnClickUrl("/admin/index"))">
-                <MIcon Left>mdi-shield-crown </MIcon>
-                管理员后台
-            </MButton>
-        </Authorized>
-    </AuthorizeView>
+    @if (ToolHelper.IsApp == false)
+    {
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <MButton Text Block Color="success" OnClick="@(()=>OnClickUrl("/admin/index"))">
+                    <MIcon Left>mdi-shield-crown </MIcon>
+                    管理员后台
+                </MButton>
+            </Authorized>
+        </AuthorizeView>
+    }
+
     <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSpace">
         <MIcon Left>mdi-star</MIcon>
         个人空间

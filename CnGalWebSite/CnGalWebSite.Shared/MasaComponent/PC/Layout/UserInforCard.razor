@@ -17,14 +17,18 @@
     <MDivider Class="w-100"></MDivider>
     <div class="w-100">
         <SignInButton Model="Model" />
-        <AuthorizeView Roles="Admin">
-            <Authorized>
-                <MButton Text Block Color="success" OnClick="OnClickAdmin">
-                    <MIcon Left>mdi-shield-crown </MIcon>
-                    管理员后台
-                </MButton>
-            </Authorized>
-        </AuthorizeView>
+        @if (ToolHelper.IsApp == false)
+        {
+            <AuthorizeView Roles="Admin">
+                <Authorized>
+                    <MButton Text Block Color="success" OnClick="OnClickAdmin">
+                        <MIcon Left>mdi-shield-crown </MIcon>
+                        管理员后台
+                    </MButton>
+                </Authorized>
+            </AuthorizeView>
+
+        }
 
         <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickUserSpace">
             <MIcon Left>mdi-star</MIcon>

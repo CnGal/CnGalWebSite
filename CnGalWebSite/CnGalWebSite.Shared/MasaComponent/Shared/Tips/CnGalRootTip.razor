@@ -2,13 +2,27 @@
 @using Microsoft.Extensions.Logging
 
 <ErrorHandler @ref="errorHandler">
-    <ErrorLogger ShowToast="false" OnErrorHandleAsync="OnErrorHandleAsync">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" OnStateChanged="OnStateChanged"/>
-        <ImagesLargeViewTip/>
+    @if (ToolHelper.IsApp)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" OnStateChanged="OnStateChanged" />
+        <ImagesLargeViewTip />
         <CascadingValue Value=this IsFixed="true">
             @ChildContent
         </CascadingValue>
-    </ErrorLogger>
+
+    }
+    else
+    {
+        <ErrorLogger ShowToast="false" OnErrorHandleAsync="OnErrorHandleAsync">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" OnStateChanged="OnStateChanged" />
+            <ImagesLargeViewTip />
+            <CascadingValue Value=this IsFixed="true">
+                @ChildContent
+            </CascadingValue>
+        </ErrorLogger>
+    }
+
+
 </ErrorHandler>
 
 @code {

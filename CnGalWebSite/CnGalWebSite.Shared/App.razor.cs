@@ -24,7 +24,7 @@ namespace CnGalWebSite.Shared
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
-            if (NavigationManager.Uri.Contains("m.cngal.org"))
+            if (NavigationManager.Uri.Contains("m.cngal.org")||ToolHelper.IsApp)
             {
                 _dataCacheService.IsApp = true;
             }
@@ -44,9 +44,17 @@ namespace CnGalWebSite.Shared
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender && OperatingSystem.IsBrowser())
+            if (firstRender &&( OperatingSystem.IsBrowser()||ToolHelper.IsApp))
             {
+                try
+                {
                 await JS.InvokeVoidAsync("$.loading");
+
+                }
+                catch
+                {
+
+                }
             }
 
             if (firstRender)

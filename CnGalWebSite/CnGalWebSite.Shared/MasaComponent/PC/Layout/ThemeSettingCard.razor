@@ -48,7 +48,7 @@
             <MSwitch Value="_show" ValueChanged="BackgroundValueChanged" Label="@(_show?"显示背景图":"隐藏背景图")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
         </MCardText>
         <MCardActions>
-            @if (_dataCacheService.IsApp == false)
+            @if (_dataCacheService.IsApp == false&&ToolHelper.IsApp==false)
             {
                 <MButton Color="green darken-1"
                          Text
