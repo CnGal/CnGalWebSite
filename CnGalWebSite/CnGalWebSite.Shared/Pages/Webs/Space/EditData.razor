@@ -8,6 +8,13 @@
 
 
 <TitleTip Title="编辑个人资料"></TitleTip>
+
+<style>
+    .swal2-content {
+        word-break: break-all!important;
+    }
+</style>
+
 <AutoSaveTip TItem="EditUserDataViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 <div class="rounded shadow-sm p-4 bg-opacity rounded">
@@ -107,6 +114,9 @@
                 <a href="@(ToolHelper.GetThirdPartyLoginUrl(ToolHelper.Base64EncodeUrl(NavigationManager.Uri), ThirdPartyLoginType.QQ))" class="ms-3" one-link-mark="yes">修改</a>
             </p>
         }
+        <p>
+           <TabLink OnClick="GetToken" class="font-color">获取登入令牌</TabLink>
+       </p>
 
         <hr />
         <h5 class="fw-bold mb-3">基本信息</h5>
@@ -189,6 +199,52 @@
         catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取编辑用户资料失败");
+        }
+    }
+
+    public async Task GetToken()
+    {
+
+        try
+        {
+            var result = await Http.GetFromJsonAsync<LoginResult>(ToolHelper.WebApiPath + "api/account/RefreshJWToken");
+
+            if (result.Code == LoginResultCode.OK)
+            {
+                SwalOption op = null;
+
+                op = new SwalOption()
+                {
+                    Category = SwalCategory.Success,
+                    Title = "登入令牌",
+                    Content = result.Token,
+                    ShowClose = false
+                };
+
+                op.ButtonTemplate = new RenderFragment(builder =>
+                {
+                    builder.OpenComponent<Button>(0);
+                    builder.AddAttribute(1, nameof(Button.Text), "我知道了");
+                    builder.AddAttribute(2, nameof(Button.Icon), "fa fa-check");
+                    builder.AddAttribute(3, nameof(Button.Color), Color.Success);
+                    builder.AddAttribute(4, nameof(Button.IsOutline), true);
+                    builder.AddAttribute(5, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async () =>
+                    {
+                        await op.Close();
+                    }));
+                    builder.CloseComponent();
+                });
+                await SwalService.Show(op);
+            }
+            else
+            {
+                await ToastService.Error("获取登入令牌失败", result.ErrorDescribe);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取登入令牌失败");
         }
     }
 

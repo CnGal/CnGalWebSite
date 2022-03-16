@@ -739,7 +739,7 @@ namespace CnGalWebSite.APIServer.Application.Users
                 Ranks = await _rankService.GetUserRanks(user),
                 Integral = user.DisplayIntegral,
                 EditCount = await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true),
-                ArticleCount = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id),
+                ArticleCount = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id&&string.IsNullOrWhiteSpace(s.Name)==false&&s.IsHidden==false),
                 FavoriteCount = await _favoriteObjectRepository.GetAll().Include(s => s.FavoriteFolder).CountAsync(s => s.FavoriteFolder.ApplicationUserId == user.Id)
             };
             //计算连续签到天数和今天是否签到

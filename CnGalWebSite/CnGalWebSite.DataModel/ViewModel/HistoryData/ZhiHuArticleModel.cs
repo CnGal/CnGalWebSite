@@ -5,6 +5,8 @@ namespace CnGalWebSite.DataModel.ViewModel.HistoryData
     {
         public string Title { get; set; }
 
+        public string OriginalAuthor { get; set; }
+
         public string Url { get; set; }
 
         public string MainPage { get; set; }
@@ -14,5 +16,7 @@ namespace CnGalWebSite.DataModel.ViewModel.HistoryData
         public bool IsCutImage { get; set; }
 
         public DateTime PublishTime { get; set; }
+
+        public DateTime? PostTime { get; set; }
     }
 }
