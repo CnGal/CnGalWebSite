@@ -30,7 +30,8 @@ namespace CnGalWebSite.DataModel.Helper
 
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";
 
-        public static bool IsApp = false;
+        public static bool IsMaui = true;
+        public static bool IsApp = true;
 
         public static readonly JsonSerializerOptions options = new()
         {

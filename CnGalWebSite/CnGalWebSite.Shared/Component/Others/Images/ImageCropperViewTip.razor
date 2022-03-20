@@ -206,7 +206,7 @@
     {
         try
         {
-            List<UploadResult> obj = await _appHelper.UploadFilesAsync(new List<IBrowserFile> { file }, 15 * 1024 * 1024, 1, ToolHelper.WebApiPath + "api/files/postfile" + Type.GetDisplayName());
+            List<UploadResult> obj = await _appHelper.UploadFilesAsync(new List<IBrowserFile> { file }, 5 * 1024 * 1024, 1, ToolHelper.WebApiPath + "api/files/postfile" + Type.GetDisplayName());
             if (obj[0].Uploaded == true)
             {
 
@@ -215,12 +215,14 @@
             }
             else
             {
-                await ToastService.Error("图片上传失败", $"<{file.Name}> " + obj[0].Error);
+                await ToastService.Error("图片上传失败", $"<{file.Name}> {obj[0].Error}");
+                return;
             }
         }
-        catch
+        catch(Exception ex)
         {
             await ToastService.Error("图片上传失败", "超过1MB的图片请上传到相册");
+            return;
         }
         //回调
         if (string.IsNullOrWhiteSpace(PreviewImagePath) == false)

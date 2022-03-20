@@ -9,6 +9,7 @@ using CnGalWebSite.DataModel.ViewModel.Files;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -26,16 +27,18 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<FileManager, int> _fileManagerRepository;
         private readonly IRepository<UserFile, int> _userFileRepository;
         private readonly IFileService _fileService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         private readonly IAppHelper _appHelper;
 
-        public FilesAPIController(IRepository<UserFile, int> userFileRepository, IRepository<FileManager, int> fileManagerRepository, IAppHelper appHelper,
-            IFileService fileService)
+        public FilesAPIController(IRepository<UserFile, int> userFileRepository, IRepository<FileManager, int> fileManagerRepository, IAppHelper appHelper, UserManager<ApplicationUser> userManager,
+        IFileService fileService)
         {
             _appHelper = appHelper;
             _fileManagerRepository = fileManagerRepository;
             _userFileRepository = userFileRepository;
             _fileService = fileService;
+            _userManager= userManager;
         }
 
         private async Task<ActionResult<List<UploadResult>>> PostFileMain(IEnumerable<IFormFile> files, double x = 0, double y = 0, int server = 0)
@@ -48,7 +51,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 total += item.Length;
             }
-            if (total > 500 * 1024 * 1024)
+            if (total > 500 * 1024 * 1024 && await _userManager.IsInRoleAsync(user, "Editor")==false)
             {
                 return new List<UploadResult> { new UploadResult { Uploaded = false, Error = "该用户总文件空间不足" } };
             }
@@ -68,7 +71,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             else
             {
-                if (fileManager.UsedSize + total > fileManager.TotalSize)
+                if (fileManager.UsedSize + total > fileManager.TotalSize && await _userManager.IsInRoleAsync(user, "Editor") == false)
                 {
                     return new List<UploadResult> { new UploadResult { Uploaded = false, Error = "该用户总文件空间不足" } };
                 }

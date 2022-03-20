@@ -127,7 +127,7 @@ else
                             {
                                 <MTabItem Value="3">
 
-                                    <ArticleHomeListView Input="PublishArticleInput"></ArticleHomeListView>
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.ArticlesCard Id="@Model.Id"/>
 
                                 </MTabItem>
                             }
@@ -225,8 +225,6 @@ else
 
     public PersonalSpaceViewModel Model { get; set; } = new PersonalSpaceViewModel();
 
-
-    public PagedSortedAndFilterInput PublishArticleInput { get; set; } = new PagedSortedAndFilterInput();
     public PagedSortedAndFilterInput PlayedGameInput { get; set; } = new PagedSortedAndFilterInput();
 
 
@@ -294,7 +292,6 @@ else
             //Id = Model.Id;
 
             //复制用户Id
-            PublishArticleInput.FilterText = Model.Id;
             PlayedGameInput.FilterText = Model.Id;
 
             isReady = true;

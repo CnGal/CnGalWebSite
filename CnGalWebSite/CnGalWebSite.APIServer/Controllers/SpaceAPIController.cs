@@ -208,7 +208,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 BasicInfor = await _userService.GetUserInforViewModel(user),
                 SignInDaysList = user.SignInDays.Select(s => new KeyValuePair<DateTime, int>(s.Time.Date, 1)).ToList(),
 
-        };
+
+            };
 
             //提前将MarkDown语法转为Html
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();

@@ -47,9 +47,7 @@
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton>
             }
-            <div class="markdown-body">
-                @((MarkupString)Model.MainPage)
-            </div>
+            <MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true"/>
             <div>
                 <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Article" Id="Model.Id" />
             </div>

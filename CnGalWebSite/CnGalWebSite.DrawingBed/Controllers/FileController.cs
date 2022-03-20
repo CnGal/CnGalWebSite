@@ -117,6 +117,8 @@ namespace CnGalWebSite.DrawingBed.Controllers
                 return new Result { Successful = false, Error = ex.Message };
             }
         }
+
+
         private async Task<string> UploadFileToBserver(string filePath)
         {
             using var content = new MultipartFormDataContent();

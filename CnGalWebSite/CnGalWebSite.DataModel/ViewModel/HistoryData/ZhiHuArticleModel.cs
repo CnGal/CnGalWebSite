@@ -3,6 +3,8 @@ namespace CnGalWebSite.DataModel.ViewModel.HistoryData
 {
     public class ZhiHuArticleModel
     {
+        public long Id { get; set; }
+
         public string Title { get; set; }
 
         public string OriginalAuthor { get; set; }

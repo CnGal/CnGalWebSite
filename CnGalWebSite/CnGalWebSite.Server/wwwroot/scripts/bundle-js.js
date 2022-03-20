@@ -244,6 +244,19 @@ function copyUrl() {
     window.clipboardData.setData("Text", clipBoardContent);
     alert("复制成功!");
 }
+function copyText(text) {
+    let transfer = document.createElement('input');
+    document.body.appendChild(transfer);
+    transfer.value = text;
+    transfer.focus();
+    transfer.select();
+    if (document.execCommand('copy')) {
+        transfer.blur();
+        this.$message.success('链接已复制成功,Ctrl + V 即可粘贴内容');
+    }
+    document.body.removeChild(transfer);
+}
+
 function tool_scroll(t, i) {
 
     if (i === "dispose") {
@@ -528,7 +541,7 @@ function browserVersion() {
             return 0;
         }
     } else if (isFirefox) {
-        if (userAgent.split('Firefox/')[1].split('.')[0] < 53) {
+        if (userAgent.split('Firefox/')[1].split('.')[0] < 72) {
             return 1;
         }
         else {

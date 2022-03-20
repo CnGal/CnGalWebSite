@@ -79,7 +79,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         static async Task Proc()
         {
             Console.WriteLine("=================================================");
-            Console.WriteLine("           CnGal资料站 投稿工具 v0.1");
+            Console.WriteLine("           CnGal资料站 投稿工具 v0.3");
             Console.WriteLine("=================================================");
 
             Console.WriteLine("[1] 读取配置文件");
@@ -142,7 +142,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 {
                     if (zhihuArticle.PostTime != null)
                     {
-                        OutputHelper.Write(OutputLevel.Warning, $"[7] 链接 {item} 已于 {zhihuArticle.PostTime} 提交审核");
+                        OutputHelper.Write(OutputLevel.Warning, $"[7] 链接 {item} 已于 {zhihuArticle.PostTime} 提交审核[Id:{zhihuArticle.Id}]");
                         continue;
                     }
                 }
@@ -163,7 +163,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
                 var article = GenerateArticle(zhihuArticle);
 
-                await SubmitArticle(article);
+                zhihuArticle.Id = await SubmitArticle(article);
                 zhihuArticle.PostTime = DateTime.Now.ToCstTime();
                 postData.Save();
 
@@ -178,7 +178,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             Console.ReadKey();
         }
 
-        static async Task SubmitArticle(CreateArticleViewModel model)
+        static async Task<long> SubmitArticle(CreateArticleViewModel model)
         {
             try
             {
@@ -191,12 +191,14 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 {
                     throw new Exception(obj.Error);
                 }
-                Console.WriteLine($"[7] 已提交{model.Main.Type.GetDisplayName()}《{model.Main.Name}》审核");
+                Console.WriteLine($"[7] 已提交{model.Main.Type.GetDisplayName()}《{model.Main.Name}》审核[Id:{obj.Error}]");
+                return long.Parse(obj.Error);
 
             }
             catch (Exception ex)
             {
                 OutputHelper.PressError(ex, "提交文章审核失败");
+                return 0;
             }
         }
 
@@ -221,35 +223,37 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                     if (result.Code == LoginResultCode.OK)
                     {
                         setting.Token = result.Token;
-                        setting.Save();
+              
                         break;
                     }
                     else
                     {
                         setting.Token = null;
-                        setting.Save();
+           
 
                     }
                 }
                 catch (Exception ex)
                 {
                     setting.Token = null;
-                    setting.Save();
+    
                     OutputHelper.PressError(ex, "登入失败", "令牌无效");
                 }
             }
 
             try
             {
-                var model = await client.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserView/");
-                setting.UserName = model.Name;
+                var model = await client.GetFromJsonAsync<PersonalSpaceViewModel>(ToolHelper.WebApiPath + "api/space/GetUserView/");
+                setting.UserName = model.BasicInfor.Name;
             }
             catch (Exception ex)
             {
                 setting.Token = null;
-                setting.Save();
+        
                 OutputHelper.PressError(ex, "获取用户信息失败");
             }
+
+            setting.Save();
         }
 
         static CreateArticleViewModel GenerateArticle(ZhiHuArticleModel model)
@@ -390,7 +394,8 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 var node = document.GetElementbyId("root");
                 string htmlStr = "";
                 string name = "";
-                string image =null;
+                string image = null;
+                string author = null;
                 //正文
                 try
                 {
@@ -398,16 +403,28 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 }
                 catch
                 {
-                    htmlStr = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes[1].ChildNodes.MaxBy(s => s.InnerText.Length).LastChild.LastChild.InnerHtml;
+
                 }
                 //主图
                 try
                 {
-                    image = ToolHelper.MidStrEx(node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.FirstOrDefault(s => s.Name == "img").OuterHtml, "src=\"", "\"");
+                    var tempNode = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.FirstOrDefault(s => s.Name == "img");
+                    if (tempNode == null)
+                    {
+                        tempNode = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.FirstOrDefault(s => s.OuterHtml.Contains("background-image"));
+                        if(tempNode!=null)
+                        {
+                            image= ToolHelper.MidStrEx(tempNode.OuterHtml, "url(", "?source");
+                        }
+                    }
+                    else
+                    {
+                        image = ToolHelper.MidStrEx(tempNode.OuterHtml, "src=\"", "\"");
+                    }
                 }
                 catch
                 {
-                    
+
                 }
                 //标题
                 try
@@ -416,7 +433,16 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 }
                 catch
                 {
-                    name = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes[1].ChildNodes[0].FirstChild.InnerText;
+
+                }
+                //作者
+                try
+                {
+                    author = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes[0].ChildNodes[1].FirstChild.FirstChild.LastChild.FirstChild.InnerText;
+                }
+                catch
+                {
+
                 }
                 //时间
                 try
@@ -446,10 +472,14 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
 
                 article.MainPage = converter.Convert(htmlStr);
-                article.OriginalAuthor = ToolHelper.MidStrEx(article.MainPage, "原作者：", "\r");
                 article.MainPage = await imageHelper.ProgressImage(article.MainPage);
                 article.Title = name;
                 article.Url = url;
+                article.OriginalAuthor = ToolHelper.MidStrEx(article.MainPage, "原作者：", "\r");
+                if (string.IsNullOrWhiteSpace(article.OriginalAuthor) && author != null)
+                {
+                    article.OriginalAuthor = author;
+                }
                 article.Image = image ?? ToolHelper.GetImageLinks(article.MainPage).FirstOrDefault();
                 return article;
             }
@@ -707,44 +737,13 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
         public string DataPath { get; set; } = "Links.txt";
 
-        public string TempPath { get; set; } = Path.Combine(System.Environment.CurrentDirectory, "Data");
+        public string TempPath { get; set; } =  "Data";
 
         public string TransferDepositFileAPI { get; set; } = "https://api.cngal.top/";
 
         public string UserName { get; set; }
 
-        public List<ArticleTypeString> ArticleTypeStrings { get; set; } = new List<ArticleTypeString>
-        {
-            new ArticleTypeString
-            {
-                Type=ArticleType.News,
-                Texts=new List<string>
-                {
-                    "国G七日报",
-                    "2021中文恋爱游戏大赛参赛制作组",
-                    "Steam",
-                }
-            },
-            new ArticleTypeString
-            {
-                Type=ArticleType.Interview,
-                Texts=new List<string>
-                {
-                    "访谈",
-                    "专访"
-                }
-            },
-            new ArticleTypeString
-            {
-                Type=ArticleType.Evaluation,
-                Texts=new List<string>
-                {
-                    "评测",
-                    "测评",
-                    "浅评"
-                }
-            },
-        };
+        public List<ArticleTypeString> ArticleTypeStrings { get; set; } = new List<ArticleTypeString>();
 
         public void Init()
         {
@@ -768,10 +767,76 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                     TempPath = temp.TempPath;
                     TransferDepositFileAPI = temp.TransferDepositFileAPI;
                     UserName = temp.UserName;
+                    ArticleTypeStrings.Clear();
+                    ArticleTypeStrings = temp.ArticleTypeStrings;
                 }
             }
             catch
             {
+                ArticleTypeStrings = new List<ArticleTypeString>
+                                        {
+                                            new ArticleTypeString
+                                            {
+                                                Type=ArticleType.News,
+                                                Texts=new List<string>
+                                                {
+                                                    "国G七日报",
+                                                    "2021中文恋爱游戏大赛参赛制作组",
+                                                    "Steam",
+                                                }
+                                            },
+                                            new ArticleTypeString
+                                            {
+                                                Type=ArticleType.Interview,
+                                                Texts=new List<string>
+                                                {
+                                                    "访谈",
+                                                    "专访"
+                                                }
+                                            },
+                                            new ArticleTypeString
+                                            {
+                                                Type=ArticleType.Evaluation,
+                                                Texts=new List<string>
+                                                {
+                                                    "评测",
+                                                    "测评",
+                                                    "浅评"
+                                                }
+                                            },
+                                            new ArticleTypeString
+                                            {
+                                                Type=ArticleType.None,
+                                                Texts=new List<string>
+                                                {
+                                                    "杂谈"
+                                                }
+                                            },
+                                            new ArticleTypeString
+                                            {
+                                                Type=ArticleType.Fan,
+                                                Texts=new List<string>
+                                                {
+                                                    "二创"
+                                                }
+                                            },
+                                            new ArticleTypeString
+                                            {
+                                                Type=ArticleType.Peripheral,
+                                                Texts=new List<string>
+                                                {
+                                                    "周边"
+                                                }
+                                            },
+                                            new ArticleTypeString
+                                            {
+                                                Type=ArticleType.Strategy,
+                                                Texts=new List<string>
+                                                {
+                                                    "攻略"
+                                                }
+                                            },
+                                        };
                 Save();
             }
 

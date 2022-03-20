@@ -3,7 +3,7 @@
 {
     <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color">
         <div class=" h-100 ">
-            <img src="@Image" class="card-img-top" alt="@Name" style="border-radius:50%" />
+            <img loading="lazy"  src="@Image" class="card-img-top" alt="@Name" style="border-radius:50%" />
             <div class="pt-2">
                 <p class="m-0 text-center home-card-name-text" style="font-size:16px">@Name</p>
                 @if (Circle)
@@ -29,7 +29,7 @@
     {
         <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color">
             <div class=" h-100 ">
-                <img src="@Image" class="card-img-top" alt="@Name" />
+                <img loading="lazy"  src="@Image" class="card-img-top" alt="@Name" />
                 <div class="pt-2">
                     <span class="home-card-name-text">@Name</span>
                     @if (ShowCount)

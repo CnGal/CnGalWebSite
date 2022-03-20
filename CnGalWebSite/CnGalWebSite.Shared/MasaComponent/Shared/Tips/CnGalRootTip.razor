@@ -2,7 +2,7 @@
 @using Microsoft.Extensions.Logging
 
 <ErrorHandler @ref="errorHandler">
-    @if (ToolHelper.IsApp)
+    @if (ToolHelper.IsMaui)
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" OnStateChanged="OnStateChanged" />
         <ImagesLargeViewTip />

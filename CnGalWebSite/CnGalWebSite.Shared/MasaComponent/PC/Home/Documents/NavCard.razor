@@ -52,6 +52,10 @@
 
     public async Task ActiveChanged(List<long> items)
     {
+        if(items.Any()==false)
+        {
+            return;
+        }
         Id = items.First();
         ChangeOpen(Id);
         StateHasChanged();

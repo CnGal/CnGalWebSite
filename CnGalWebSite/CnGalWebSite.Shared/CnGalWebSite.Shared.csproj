@@ -31,6 +31,13 @@
     <Content Include="..\CnGalWebSite.Server\wwwroot\styles\show-background.min.css" Link="wwwroot\css\show-background.min.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\CnGalWebSite.Server\wwwroot\scripts\bundle-js.min.js" Link="wwwroot\js\bundle-js.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\CnGalWebSite.WebAssembly\wwwroot\js\common.js" Link="wwwroot\js\common.js" />
+    <Content Update="C:\Users\Little Fish\.nuget\packages\bootstrapblazor.tableexport\6.0.0\contentFiles\any\net6.0\wwwroot\js\export.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="wwwroot\css\vs.min.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

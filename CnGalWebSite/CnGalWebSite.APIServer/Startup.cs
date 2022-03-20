@@ -45,16 +45,7 @@ namespace CnGalWebSite.APIServer
         {
             //添加数据库连接池
             services.AddDbContextPool<AppDbContext>(options =>
-                options.UseMySql(Configuration.GetConnectionString("CnaglDBConnection"), ServerVersion.AutoDetect(Configuration.GetConnectionString("CnaglDBConnection")),
-                    o =>
-                    {
-                        o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-                        o.EnableRetryOnFailure(
-                            maxRetryCount: 5,
-                            maxRetryDelay: TimeSpan.FromSeconds(30),
-                            errorNumbersToAdd: new int[] { 2 }
-                         );
-                    }).UseBatchEF_MySQLPomelo());
+                options.UseMySql(Configuration.GetConnectionString("CnGalDBConnection"), ServerVersion.AutoDetect(Configuration.GetConnectionString("CnGalDBConnection"))).UseBatchEF_MySQLPomelo());
             // services.AddMvc(async => async.EnableEndpointRouting = false);
             //不使用终结点路由
             services.AddControllersWithViews(a => a.EnableEndpointRouting = false);

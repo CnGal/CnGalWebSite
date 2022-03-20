@@ -1,0 +1,63 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject HttpClient Http
+
+
+@if (pagedResultDto.Data.Count == 0)
+{
+    <NotFoundTip IsNeedLayput="true" />
+}
+else
+{
+    @foreach (var item in pagedResultDto.Data)
+    {
+        <div class="mb-3">
+            <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item" />
+
+        </div>
+    }
+
+    @if (pagedResultDto.TotalPages > 1)
+    {
+        <MPagination Value="CurrentPage" Class="my-4" Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
+    }
+}
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    [Parameter]
+    public string Id { get; set; }
+
+    public PagedResultDto<ArticleInforTipViewModel> pagedResultDto = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<ArticleInforTipViewModel>();
+
+    int CurrentPage = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //获取审核列表
+        await OnPageClick(1);
+    }
+
+    private async Task OnPageClick(int pageIndex)
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<PagedSortedAndFilterInput>(ToolHelper.WebApiPath + "api/articles/GetArticleHomeList", new PagedSortedAndFilterInput
+            {
+                Sorting = "Id desc",
+                CurrentPage = (pageIndex-1)*10,
+                FilterText = Id
+            });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            pagedResultDto = JsonSerializer.Deserialize<PagedResultDto<ArticleInforTipViewModel>>(jsonContent, ToolHelper.options);
+            CurrentPage = pageIndex;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取用户发表文章列表失败");
+        }
+    }
+}
