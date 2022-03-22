@@ -367,7 +367,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //判断是否为锁定状态
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryMain)))
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id == id&&  s.IsPassed == null && (s.Operation == Operation.EditPeripheryMain)))
             {
                 return NotFound();
             }
@@ -486,7 +486,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //判断是否为锁定状态
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryImages)))
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id == id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryImages)))
             {
                 return NotFound();
             }
@@ -612,7 +612,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return NotFound();
             }
             //判断是否为锁定状态
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryRelatedEntries)))
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id == id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryRelatedEntries)))
             {
                 return NotFound();
             }
@@ -773,7 +773,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return NotFound();
             }
             //判断是否为锁定状态
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryRelatedPeripheries)))
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id == id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryRelatedPeripheries)))
             {
                 return NotFound();
             }

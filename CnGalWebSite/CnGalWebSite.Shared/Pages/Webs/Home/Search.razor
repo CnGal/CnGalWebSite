@@ -22,7 +22,7 @@
     <div class="shadow-sm bg-opacity rounded">
         <div style=" display: flex; justify-content: center; " class="pt-3 ps-3 pe-3">
             <div style="display: flex; justify-content: center; max-width: 500px; width: 100%; ">
-                <AutoComplete Items="Items" IsLikeMatch="true" PlaceHolder="可以搜索哦~" @bind-Value="_dataCacheService.SearchViewModel.pagedResultDto.FilterText" OnEnterAsync="OnSearchString" style=" width: 100%;"></AutoComplete>
+                <AutoComplete Items="Items" IsLikeMatch="true" PlaceHolder="可以搜索哦~" @bind-Value="_dataCacheService.SearchViewModel.pagedResultDto.FilterText" style=" width: 100%;"></AutoComplete>
                 <Button OnClick="@OnSearchString" Color="Color.Dark" IsAsync="true" Icon="fa fa-search" style="width: 100px;" class="ms-3">&nbsp;&nbsp;搜索</Button>
             </div>
         </div>

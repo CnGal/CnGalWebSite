@@ -17,7 +17,7 @@
     <MDivider Class="w-100"></MDivider>
     <div class="w-100">
         <SignInButton Model="Model" />
-        @if (ToolHelper.IsApp == false)
+        @if (ToolHelper.IsMaui == false)
         {
             <AuthorizeView Roles="Admin">
                 <Authorized>

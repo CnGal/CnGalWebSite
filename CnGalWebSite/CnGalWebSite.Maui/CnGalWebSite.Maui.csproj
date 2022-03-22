@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<PropertyGroup>
         <TargetFrameworks>net6.0-android</TargetFrameworks>
@@ -12,10 +12,10 @@
 		<EnableDefaultCssItems>false</EnableDefaultCssItems>
 
 		<!-- Display name -->
-		<ApplicationTitle>CnGalWebSite.Maui</ApplicationTitle>
+		<ApplicationTitle>CnGal资料站</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.cngalwebsite.maui</ApplicationId>
+		<ApplicationId>com.cngal.maui</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationVersion>1</ApplicationVersion>
@@ -28,14 +28,16 @@
 		<SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-android'">21.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.17763.0</TargetPlatformMinVersion>
+
+
 	</PropertyGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\appicon.svg" ForegroundFile="Resources\appiconfg.svg" Color="#512BD4" />
-
+        <MauiIcon Include="Resources\appicon.svg" ForegroundFile="Resources\appiconfg.svg" Color="#F06292" />
+    
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\appiconfg.svg" Color="#512BD4" />
+		<MauiSplashScreen Include="Resources\appiconfg.svg" Color="#F06292" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
@@ -65,5 +67,11 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\CnGalWebSite.Shared\CnGalWebSite.Shared.csproj" />
 	</ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="ILLink.Descriptors.xml">
+        <LogicalName>ILLink.Descriptors.xml</LogicalName>
+      </EmbeddedResource>
+    </ItemGroup>
 
 </Project>

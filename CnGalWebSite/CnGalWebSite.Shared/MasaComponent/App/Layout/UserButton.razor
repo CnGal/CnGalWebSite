@@ -24,7 +24,7 @@
     </MButton>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <CnGalWebSite.Shared.MasaComponent.PC.Layout.SignInButton Model="_dataCacheService.UserInfor" Left />
-    @if (ToolHelper.IsApp == false)
+    @if (ToolHelper.IsMaui == false)
     {
         <AuthorizeView Roles="Admin">
             <Authorized>
