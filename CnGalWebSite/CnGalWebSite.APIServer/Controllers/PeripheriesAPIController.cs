@@ -599,14 +599,14 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<EditPeripheryRelatedEntriesViewModel>> EditRelatedEntries(long Id)
+        public async Task<ActionResult<EditPeripheryRelatedEntriesViewModel>> EditRelatedEntries(long id)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //获取词条
             var periphery = await _peripheryRepository.GetAll().AsNoTracking()
                 .Include(s => s.RelatedEntries)
-                .FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
+                .FirstOrDefaultAsync(s => s.Id == id && s.IsHidden != true);
             if (periphery == null)
             {
                 return NotFound();
@@ -762,12 +762,12 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<EditPeripheryRelatedPeripheriesViewModel>> EditRelatedPeripheries(long Id)
+        public async Task<ActionResult<EditPeripheryRelatedPeripheriesViewModel>> EditRelatedPeripheries(long id)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //获取词条
-            var periphery = await _peripheryRepository.GetAll().AsNoTracking().Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation).ThenInclude(s => s.PeripheryRelationFromPeripheryNavigation).FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
+            var periphery = await _peripheryRepository.GetAll().AsNoTracking().Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation).ThenInclude(s => s.PeripheryRelationFromPeripheryNavigation).FirstOrDefaultAsync(s => s.Id == id && s.IsHidden != true);
             if (periphery == null)
             {
                 return NotFound();

@@ -362,17 +362,18 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            //获取周边
+            //判断是否为锁定状态
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id==id && s.IsPassed == null && (s.Operation == Operation.EditTagMain)))
+            {
+                return NotFound("当前标签该部分已经被另一名用户编辑，正在等待审核，请等待审核结束后再进行编辑");
+            }
+
+
+            //获取标签
             var tag = await _tagRepository.GetAll().Include(s => s.ParentCodeNavigation).FirstOrDefaultAsync(s => s.Id == id && s.IsHidden != true);
             if (tag == null)
             {
                 return NotFound();
-            }
-
-            //判断是否为锁定状态
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id&&s.Id==id && s.IsPassed == null && (s.Operation == Operation.EditTagMain)))
-            {
-                return NotFound("当前标签该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑");
             }
 
             //获取审核记录

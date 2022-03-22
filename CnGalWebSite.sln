@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Helper", "CnGa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.Maui", "CnGalWebSite\CnGalWebSite.Maui\CnGalWebSite.Maui.csproj", "{504711A8-BCF7-4BC8-990B-2D8CE3093ED7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnGalWebSite.PostTools", "CnGalWebSite\CnGalWebSite.PostTools\CnGalWebSite.PostTools.csproj", "{9971238F-C11C-4355-8EE1-FE666842B359}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.PostTools", "CnGalWebSite\CnGalWebSite.PostTools\CnGalWebSite.PostTools.csproj", "{9971238F-C11C-4355-8EE1-FE666842B359}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
