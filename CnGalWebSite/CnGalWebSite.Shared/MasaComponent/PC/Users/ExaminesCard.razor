@@ -2,6 +2,27 @@
 @inject IDataCacheService _dataCacheService
 
 
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 class="fw-bold m-0 font-color h5"><i class="fa fa-filter"></i>&nbsp;&nbsp;筛选</h2>
+                </div>
+                <Select TValue="ExaminedNormalListPassType" Value="ScreenType" ValueChanged="OnScreenTypeChanged" style="width:120px"></Select>
+            </div>
+
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 class="fw-bold  m-0 font-color h5"><i class="fa fa-sort-amount-desc"></i>&nbsp;&nbsp;排序</h2>
+                </div>
+                <Select TValue="ExaminedNormalListSortType" Value="OrderType" ValueChanged="OnOrderTypeChangedChanged" style="width:120px"></Select>
+            </div>
+
+        </div>
+    </div>
+
 <div>
     @foreach (var examine in pagedResultDto.Data)
     {
@@ -112,7 +133,50 @@
     [Parameter]
     public string Id { get; set; }
 
+    public string Sorting { get; set; } = "Id desc";
+    public string ScreeningConditions { get; set; } = "All";
+    public int PageIndex { get; set; } = 1;
+
     public PagedResultDto<ExaminedNormalListModel> pagedResultDto = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<ExaminedNormalListModel>();
+    public ExaminedNormalListPassType ScreenType { get; set; }
+    public ExaminedNormalListSortType OrderType { get; set; }
+
+
+    public async Task OnScreenTypeChanged(ExaminedNormalListPassType type)
+    {
+        ScreenType = type;
+        switch(type)
+        {
+            case ExaminedNormalListPassType.All:
+                ScreeningConditions = "All";
+                break;
+            case ExaminedNormalListPassType.Passed:
+                ScreeningConditions = "Passed";
+                break;
+            case ExaminedNormalListPassType.Passing:
+                ScreeningConditions = "Passing";
+                break;
+            case ExaminedNormalListPassType.UnPassed:
+                ScreeningConditions = "UnPassed";
+                break;
+        }
+        await OnPageClick(1);
+    }
+    public async Task OnOrderTypeChangedChanged(ExaminedNormalListSortType type)
+    {
+        OrderType = type;
+        switch (type)
+        {
+            case  ExaminedNormalListSortType.EditTime:
+                Sorting = "Id desc";
+                break;
+            case ExaminedNormalListSortType.ExamineTime:
+                Sorting = "PassedTime desc";
+                break;
+        }
+        await OnPageClick(PageIndex);
+
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -122,14 +186,16 @@
 
     private async Task OnPageClick(int pageIndex)
     {
+        PageIndex = pageIndex;
         try
         {
             var result = await Http.PostAsJsonAsync<GetExamineInput>(ToolHelper.WebApiPath + "api/space/GetUserEditRecord", new GetExamineInput
             {
                 UserId = Id,
-                Sorting = "Id desc",
+                Sorting = Sorting,
                 MaxResultCount = 10,
-                CurrentPage = pageIndex
+                CurrentPage = pageIndex,
+                ScreeningConditions = ScreeningConditions
             });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             pagedResultDto = JsonSerializer.Deserialize<PagedResultDto<ExaminedNormalListModel>>(jsonContent, ToolHelper.options);
@@ -141,25 +207,5 @@
             ErrorHandler.ProcessError(ex, "获取编辑记录失败");
         }
     }
-    private async Task OnPageItemsChanged(int pageItems)
-    {
-        try
-        {
-            var result = await Http.PostAsJsonAsync<GetExamineInput>(ToolHelper.WebApiPath + "api/space/GetUserEditRecord", new GetExamineInput
-            {
-                UserId = Id,
-                Sorting = "Id desc",
-                MaxResultCount = pageItems,
-                CurrentPage = pagedResultDto.CurrentPage
-            });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            pagedResultDto = JsonSerializer.Deserialize<PagedResultDto<ExaminedNormalListModel>>(jsonContent, ToolHelper.options);
 
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑记录失败");
-        }
-    }
 }

@@ -4,8 +4,12 @@
 @inject IDataCacheService _dataCacheService
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
+@if (ToolHelper.IsSSR == false)
+{
+    <CnGalWebSite.Shared.Pages.Webs.Articles.EditRelevances Id="@Id" />
 
-<CnGalWebSite.Shared.Pages.Webs.Articles.EditRelevances Id="@Id" />
+}
+
 
 @code{
     [Parameter]

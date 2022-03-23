@@ -3,11 +3,15 @@
 
 @inject IDataCacheService _dataCacheService
 
-    <MakeSureInWASMTip></MakeSureInWASMTip>
+<MakeSureInWASMTip></MakeSureInWASMTip>
+@if (ToolHelper.IsSSR == false)
+{
+    <CnGalWebSite.Shared.Pages.Webs.Space.EditMainPage Id="@Id"></CnGalWebSite.Shared.Pages.Webs.Space.EditMainPage>
 
-        <CnGalWebSite.Shared.Pages.Webs.Space.EditMainPage Id="@Id"></CnGalWebSite.Shared.Pages.Webs.Space.EditMainPage>
+}
 
-    @code{
-        [Parameter]
-        public string Id { get; set; }
-    }
+
+@code{
+    [Parameter]
+    public string Id { get; set; }
+}

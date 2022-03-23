@@ -5,8 +5,12 @@
 @inject IDataCacheService _dataCacheService
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
-
+@if (ToolHelper.IsSSR == false)
+{
     <CnGalWebSite.Shared.Pages.Webs.Peripheries.EditRelatedPeripheries Id="@Id" />
+
+}
+
 
 
 @code{

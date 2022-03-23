@@ -239,40 +239,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("{id}/{currentPage}/{MaxResultCount}")]
-        public async Task<ActionResult<IEnumerable<ExaminedNormalListModel>>> GetUserEditRecordAsync(string id, int currentPage, int MaxResultCount)
-        {
-            ApplicationUser user = null;
-            //获取当前用户ID
-            try
-            {
-                user = await _userManager.Users
-                                          .Include(s => s.Examines)
-                                          .SingleAsync(x => x.Id == id);
-            }
-            catch
-            {
-                return NotFound();
-            }
-            if (user == null)
-            {
-                //未找到用户
-                return NotFound();
-            }
-
-            var input = new GetExamineInput
-            {
-                CurrentPage = currentPage,
-                MaxResultCount = MaxResultCount,
-                Sorting = "Id desc",
-                ScreeningConditions = "全部"
-            };
-            var dtos = await _examineService.GetPaginatedResult(input, 0, user.Id);
-
-            return dtos.Data;
-        }
-
-        [AllowAnonymous]
         [HttpPost]
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetUserEditRecordAsync(GetExamineInput input)
         {

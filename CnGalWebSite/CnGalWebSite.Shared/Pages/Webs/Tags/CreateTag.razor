@@ -6,10 +6,8 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
-@if (string.IsNullOrWhiteSpace(Model.Name) == false)
-{
-    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
-}
+
+    <TitleTip Title="创建标签"></TitleTip>
 
 <AutoSaveTip TItem="CreateTagViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 

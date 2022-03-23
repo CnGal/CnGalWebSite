@@ -1,7 +1,7 @@
 ﻿<TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.EntryId)" Text="@Model.Name" class="a-font-color">
         <div class="shadow-sm pointer rounded  bg-opacity h-100">
             <div class="h-100" style="display: flex; flex-direction: column;">
-                <img class="w-100" src="@Model.Image" alt="@Model.Name">
+                <img  loading="lazy"  class="w-100" src="@Model.Image" alt="@Model.Name">
                 <div class="p-3 pb-2 h-100" style=" display: flex; flex-direction: column; justify-content: space-between;">
                     <div style="display: flex; width: 100%;">
                         <div style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">

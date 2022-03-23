@@ -27,7 +27,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TencentCloud.Ame.V20190916.Models;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers

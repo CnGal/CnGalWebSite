@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using TencentCloud.Ckafka.V20190819.Models;
 
 namespace CnGalWebSite.APIServer.Controllers
 {

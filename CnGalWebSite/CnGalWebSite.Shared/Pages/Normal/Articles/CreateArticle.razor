@@ -5,14 +5,12 @@
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Articles.CreateArticle />
-}
-else
+@if (ToolHelper.IsSSR == false)
 {
     <CnGalWebSite.Shared.Pages.Webs.Articles.CreateArticle />
+
 }
+
 
 @code{
 

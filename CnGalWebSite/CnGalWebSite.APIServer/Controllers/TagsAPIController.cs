@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using TencentCloud.Cme.V20191029.Models;
 using CnGalWebSite.Helper.Extensions;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -206,56 +205,69 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         /// <summary>
-        /// 获取在词条编辑页面的简单表示 仅显示层级 例如 游戏->按时长分->短篇
-        /// </summary>
-        /// <param name="tagName"></param>
-        /// <returns></returns>
-        [AllowAnonymous]
-        [HttpGet("{tagName}")]
-        public async Task<ActionResult<GetTagInEntryViewModel>> GetTagInEntryViewAsync(string tagName)
-        {
-            if (string.IsNullOrWhiteSpace(tagName))
-            {
-                return NotFound("标签名称不能为空");
-            }
-
-            tagName = ToolHelper.Base64DecodeName(tagName);
-
-            var tag = await _tagRepository.GetAll().Where(s => s.IsHidden != true).AsNoTracking().Include(s => s.ParentCodeNavigation).FirstOrDefaultAsync(s => s.Name == tagName);
-            var result = await _appHelper.GetTagListStringAsync(tag);
-            if (result == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                return new GetTagInEntryViewModel { Result = result };
-            }
-        }
-
-        /// <summary>
         /// 获取搜索结果 标签数量很少 可以简化
         /// </summary>
         /// <param name="tagName"></param>
         /// <returns></returns>
-        [HttpGet("{tagName}")]
+        [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<string>>> SearchTagAsync(string tagName)
+        public async Task<ActionResult<List<TagTreeModel>>> GetTagsTreeViewAsync()
         {
-            if (string.IsNullOrWhiteSpace(tagName))
+
+            var tags = await _tagRepository.GetAll().Where(s => s.ParentCodeNavigation == null && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false).AsNoTracking()
+                .Include(s => s.InverseParentCodeNavigation).ThenInclude(s => s.InverseParentCodeNavigation).ThenInclude(s => s.InverseParentCodeNavigation).ThenInclude(s => s.InverseParentCodeNavigation)
+                .ToListAsync();
+
+            var result = new List<TagTreeModel>();
+            foreach (var item in tags)
             {
-                return NotFound("标签名称不能为空");
+                var temp = new TagTreeModel
+                {
+                    Title = item.Name,
+                    Id = item.Id,
+                    Icon = item.Id switch
+                    {
+                        1 => "mdi-gamepad-square ",
+                        2 => "mdi-account ",
+                        3 => "mdi-star",
+                        4 => "mdi-group ",
+                        _ => "mdi-tag-multiple-outline"
+                    },
+                    Children = item.InverseParentCodeNavigation.Where(s=>string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false)
+                    .Select(s => new TagTreeModel
+                    {
+                        Id = s.Id,
+                        Title = s.Name,
+                        Icon=s.InverseParentCodeNavigation.Any()? "mdi-tag-multiple " : "mdi-tag-outline ",
+                        Children = s.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false)
+                        .Select(s => new TagTreeModel
+                        {
+                            Id = s.Id,
+                            Title = s.Name,
+                            Icon = s.InverseParentCodeNavigation.Any() ? "mdi-tag-multiple " : "mdi-tag-outline ",
+
+                            Children = s.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false)
+                            .Select(s => new TagTreeModel
+                            {
+                                Id = s.Id,
+                                Title = s.Name,
+                                Icon = s.InverseParentCodeNavigation.Any() ? "mdi-tag-multiple " : "mdi-tag-outline ",
+
+                                Children = s.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false)
+                                .Select(s => new TagTreeModel
+                                {
+                                    Id = s.Id,
+                                    Title = s.Name
+                                }).ToList()
+                            }).ToList()
+                        }).ToList()
+                    }).ToList()
+                };
+
+                result.Add(temp);
             }
 
-            tagName = ToolHelper.Base64DecodeName(tagName);
 
-            var que = _tagRepository.GetAll().Where(s => s.IsHidden != true).AsNoTracking().Include(s => s.ParentCodeNavigation).Where(s => s.Name.Contains(tagName));
-
-            var result = new List<string>();
-            foreach (var item in que)
-            {
-                result.Add(await _appHelper.GetTagListStringAsync(item));
-            }
             return result;
 
         }

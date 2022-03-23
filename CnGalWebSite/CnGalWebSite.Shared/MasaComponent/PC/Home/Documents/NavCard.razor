@@ -7,10 +7,11 @@
                Items="Items"
                TItem="DocumentViewModel"
                TKey="long"
-               Activatable
                ItemKey="u => u.Id"
                ItemChildren="u => u.Children"
                ItemText="u => u.Title"
+
+               Activatable
                OpenOnClick
                Color="@_dataCacheService.ThemeSetting.Theme"
                ActiveChanged="ActiveChanged">

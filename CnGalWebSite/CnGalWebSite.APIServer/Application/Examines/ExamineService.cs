@@ -107,13 +107,13 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
                 switch (input.ScreeningConditions)
                 {
-                    case "待审核":
+                    case "Passing":
                         query = query.Where(s => s.IsPassed == null);
                         break;
-                    case "已通过":
+                    case "Passed":
                         query = query.Where(s => s.IsPassed == true);
                         break;
-                    case "未通过":
+                    case "UnPassed":
                         query = query.Where(s => s.IsPassed == false);
                         break;
 
@@ -1976,7 +1976,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             await _entryRepository.UpdateAsync(entry);
 
             //更新完善度
-            await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
+            //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
         }
 
         public async Task ExamineEstablishAddInforAsync(Entry entry, EntryAddInfor examine)
@@ -1987,7 +1987,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             await _entryRepository.UpdateAsync(entry);
 
             //更新完善度
-            await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
+            //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
             var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
 
@@ -2078,7 +2078,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             await _entryRepository.UpdateAsync(entry);
 
             //更新完善度
-            await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
+            //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
         }
 
@@ -2089,7 +2089,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             await _entryRepository.UpdateAsync(entry);
 
             //更新完善度
-            await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
+            //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
             var admin = new ApplicationUser
             {
@@ -2175,7 +2175,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             await _entryRepository.UpdateAsync(entry);
 
             //更新完善度
-            await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
+            //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
         }
 
@@ -2187,7 +2187,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             await _entryRepository.UpdateAsync(entry);
 
             //更新完善度
-            await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
+            //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
         }
         #endregion

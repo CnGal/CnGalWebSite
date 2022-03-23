@@ -3,10 +3,6 @@
 @inject IDataCacheService _dataCacheService
 
 
-@if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
-{
-    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip Show />
-}
 <MApp Dark="_dataCacheService.ThemeSetting.IsDark">
     <MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:"white")">
         <div style=" word-break: keep-all;" class="ms-4 me-8">

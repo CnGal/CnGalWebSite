@@ -2,13 +2,17 @@
 @attribute [Authorize]
 
 @inject IDataCacheService _dataCacheService
-    <MakeSureInWASMTip></MakeSureInWASMTip>
+<MakeSureInWASMTip></MakeSureInWASMTip>
+
+@if (ToolHelper.IsSSR == false)
+{
+    <CnGalWebSite.Shared.Pages.Webs.Space.EditData Id="@Id"></CnGalWebSite.Shared.Pages.Webs.Space.EditData>
+
+}
 
 
 
-        <CnGalWebSite.Shared.Pages.Webs.Space.EditData Id="@Id"></CnGalWebSite.Shared.Pages.Webs.Space.EditData>
-    
-    @code{
-        [Parameter]
-        public string Id { get; set; }
-    }
+@code{
+    [Parameter]
+    public string Id { get; set; }
+}

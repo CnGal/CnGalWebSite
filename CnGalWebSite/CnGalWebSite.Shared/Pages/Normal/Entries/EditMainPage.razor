@@ -5,7 +5,11 @@
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
 
+@if (ToolHelper.IsSSR == false)
+{
     <CnGalWebSite.Shared.Pages.Webs.Entries.EditMainPage Id="@Id" />
+
+}
 
 
 @code{

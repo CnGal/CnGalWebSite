@@ -1,7 +1,7 @@
 ﻿<div class="rounded shadow-sm bg-opacity rounded pb-4">
     @if (Model.MainState == EditState.Preview)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/tags/EditMain/" + Model.Id)" ExamineType="Operation.EditTagMain" OnClickRevoke="OnRevoke"  Class="ms-4 me-4 mt-4"/>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/tags/EditMain/" + Model.Id)" ExamineType="Operation.EditTagMain" OnClickRevoke="OnRevoke"  Class="ms-4 me-4 pt-4"/>
     }
     <div class="row m-0">
         <div class="d-md-flex d-none col-auto ps-4 pt-4">
@@ -32,8 +32,6 @@
                 <div class="mt-2" style="display: flex; justify-content: flex-end;">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Tag" Id="Model.Id" @bind-IsHidden="Model.IsHidden"  @bind-IsEdit="Model.IsEdit"/>
                 </div>
-
-
             }
         </div>
     </div>

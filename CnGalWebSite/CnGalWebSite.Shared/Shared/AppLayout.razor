@@ -2,10 +2,7 @@
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
 
-@if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
-{
-    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip Show />
-}
+
 <MApp Dark="_dataCacheService.ThemeSetting.IsDark">
     <MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:_dataCacheService.ThemeSetting.Theme)" Dark Dense>
         <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>

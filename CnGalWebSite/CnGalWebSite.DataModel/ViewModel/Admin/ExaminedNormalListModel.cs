@@ -52,4 +52,24 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         [Display(Name = "周边")]
         Periphery
     }
+
+    public enum ExaminedNormalListPassType
+    {
+        [Display(Name = "全部")]
+        All,
+        [Display(Name = "已通过")]
+        Passed,
+        [Display(Name = "待审核")]
+        Passing,
+        [Display(Name = "未通过")]
+        UnPassed
+    }
+
+    public enum ExaminedNormalListSortType
+    {
+        [Display(Name = "编辑时间")]
+        EditTime,
+        [Display(Name = "审核时间")]
+        ExamineTime,
+    }
 }

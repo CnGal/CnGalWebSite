@@ -1,4 +1,5 @@
 ﻿@inject IDataCacheService _dataCacheService
+@inject IJSRuntime JS
 
 @if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
 {
@@ -17,6 +18,56 @@
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        var user = await authenticationStateTask;
+
+        if (user.User.Identity.IsAuthenticated)
+        {
+            var image = "";
+            var userId = "";
+            var userName = user.User.Identity.Name;
+
+            foreach (var item in user.User.Claims)
+            {
+                if (item.Type == "image")
+                {
+                    image = item.Value;
+                }
+                else if (item.Type == "userid")
+                {
+                    userId = item.Value;
+                }
+            }
+
+            //设置用户身份
+            try
+            {
+                await JS.InvokeAsync<string>("setCustomVar", "登录状态", string.IsNullOrWhiteSpace(userId) ? "未登入" : "已登入");
+            }
+            catch (Exception)
+            {
+
+            }
+            //记录数据
+            if (string.IsNullOrWhiteSpace(userName) == false && string.IsNullOrWhiteSpace(userId) == false)
+            {
+                try
+                {
+                    await JS.InvokeAsync<string>("trackEvent", "登入", userId, userName, "1", "login");
+                }
+                catch (Exception)
+                {
+
+                }
+
+            }
+        }
+
+    }
 
 }

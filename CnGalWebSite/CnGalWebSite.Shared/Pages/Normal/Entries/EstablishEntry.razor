@@ -4,8 +4,12 @@
 
 <MakeSureInWASMTip></MakeSureInWASMTip>
 
+@if (ToolHelper.IsSSR == false)
+{
+    <CnGalWebSite.Shared.Pages.Webs.Entries.EstablishEntry Name="@Name" />
 
-    <CnGalWebSite.Shared.Pages.Webs.Entries.EstablishEntry Name="@Name"  />
+}
+
 
 @code{
     [SupplyParameterFromQuery]

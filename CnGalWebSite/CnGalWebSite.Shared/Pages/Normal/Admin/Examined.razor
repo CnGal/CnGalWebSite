@@ -74,14 +74,16 @@
 
 
                 </div>
-            </div> }
+            </div>
+        }
         else
         {
             @if (Model.prepositionExamineId > 0)
             {
                 <div class="alert alert-secondary  rounded shadow-sm  rounded mt-4" role="alert">
                     当前审核拥有一个前置审核，请先<a @onclick="@(() => ExaminePrepositionExamine())" class="alert-link">审核</a>其前置审核
-                </div>}
+                </div>
+            }
             <ExamineViewTip Title="@Title" Model="Model" CustomerTimelineItems="CustomerTimelineItems" OnClickUrl="OnClickUrl"></ExamineViewTip>
             <AuthorizeView Roles="Admin">
                 @if (Model.isExamined == false && Model.prepositionExamineId <= 0)
@@ -99,14 +101,16 @@
                             </div>
                         </ValidateForm>
 
-                        <div class="form-group col-12">
+                        <div>
                             <Button type="button" Color="Color.Success" style="width: 100px;" @onclick="@(()=>OnExamine(true))" IsAsync="true">通过</Button>
                             <Button type="button" Color="Color.Danger" style="float: right;width: 100px;" @onclick="@(()=>OnExamine(false))" IsAsync="true">驳回</Button>
                         </div>
                         <div>
                         </div>
-                    </div>}
-            </AuthorizeView>}
+                    </div>
+                }
+            </AuthorizeView>
+        }
 
     </div>
 </div>

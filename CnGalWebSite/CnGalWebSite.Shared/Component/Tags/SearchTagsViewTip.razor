@@ -1,51 +1,62 @@
 ﻿@inject HttpClient Http
 @inject ToastService? ToastService
+@inject IDataCacheService _dataCacheService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="可选标签" Icon="fa fa-fw fa-search" Collapable Class="@Class">
-    <div style="width:300px">
-        <Search IgnoreCase="true" IsLikeMatch="true" PlaceHolder="搜索标签" Items="Items" OnSearch="@OnSearch"></Search>
-    </div>
-    <ul class="list-group list-group-flush mb-2">
-        @for (int i = 0; i < SearchResult.Count; i++)
-        {
-            <li class="list-group-item" style="background-color: transparent;">@(i+1) . @SearchResult[i]  </li>
-        }
-    </ul>
-
+        <MTextField Value="_search" ValueChanged="OnSearch" TValue="string" Class="ps-3 pe-3"
+                    Label="可以搜索标签哦~"
+                    Clearable
+                    Color="@_dataCacheService.ThemeSetting.Theme"
+                    ClearIcon="mdi-close-circle-outline"></MTextField>
+    <MTreeview Items="Items"
+               Search="@_search"
+               TItem="TagTreeModel"
+               TKey="long"
+               ItemKey="r=>r.Id"
+               ItemText="r=>r.Title"
+               ItemChildren="r=>r.Children"
+               Activatable
+               OpenOnClick
+               Color="@_dataCacheService.ThemeSetting.Theme">
+        <PrependContent>
+            @if (string.IsNullOrWhiteSpace(context.Item.Icon) == false)
+            {
+                <MIcon Color="@_dataCacheService.ThemeSetting.Theme">
+                    @context.Item.Icon
+                </MIcon>
+            }
+        </PrependContent>
+    </MTreeview>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+
+
 
 @code {
     [Parameter]
     public string Class { get; set; }
 
     private List<string> SearchResult = new List<string>();
-    private IEnumerable<string> Items { get; set; } = new string[1] { "" };
+    private List<TagTreeModel> Items { get; set; } = new List<TagTreeModel>();
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    private string _search;
+
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             //获取所有标签
-            Items = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags");
+            Items = await Http.GetFromJsonAsync<List<TagTreeModel>>(ToolHelper.WebApiPath + "api/tags/GetTagsTreeView");
         }
         catch
         {
             await ToastService.Error("无法连接到服务器", "请确保网络正常后联系开发人员");
         }
     }
-    private async Task OnSearch(string str)
+    private async Task OnSearch(string text)
     {
-        try
-        {
-            str = ToolHelper.Base64EncodeName(str);
-            SearchResult = (await Http.GetFromJsonAsync<IEnumerable<string>>(ToolHelper.WebApiPath + "api/tags/searchtag/" + str)).ToList();
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法找到指定标签");
-        }
+        _search = text;
     }
 }

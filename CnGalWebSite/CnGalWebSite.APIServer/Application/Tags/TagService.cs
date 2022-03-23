@@ -211,10 +211,7 @@ namespace CnGalWebSite.APIServer.Application.Tags
                     }
                 }
             }
-            else
-            {
-                tag.ParentCodeNavigation = null;
-            }
+
             //更新最后编辑时间
             tag.LastEditTime = DateTime.Now.ToCstTime();
 

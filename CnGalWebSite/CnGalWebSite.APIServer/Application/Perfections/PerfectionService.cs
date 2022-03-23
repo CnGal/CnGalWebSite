@@ -310,7 +310,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
         public async Task UpdateAllEntryPerfectionsAsync()
         {
-            var entries = await _entryRepository.GetAll().Where(s => s.Type == EntryType.Game && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
+            var entries = await _entryRepository.GetAll().AsNoTracking().Where(s => s.Type == EntryType.Game && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
             foreach (var item in entries)
             {
                 await UpdateEntryPerfectionResultAsync(item);
@@ -322,10 +322,9 @@ namespace CnGalWebSite.APIServer.Application.Perfections
             try
             {
                 //查找词条
-                var entry = await _entryRepository.GetAll().Where(s => s.Type == EntryType.Game).AsNoTracking()
+                var entry = await _entryRepository.GetAll().AsNoTracking().AsSplitQuery()
                     .Include(s => s.Information).ThenInclude(s => s.Additional)
-                    .Include(s => s.Outlinks)
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                    .Include(s => s.EntryRelationFromEntryNavigation)
                     .Include(s => s.Articles)
                     .Include(s => s.Pictures)
                     .Include(s => s.Tags)

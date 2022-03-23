@@ -694,7 +694,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 //尝试向上索引
                 while (tag.ParentCodeNavigation != null)
                 {
-                    tag = await _tagRepository.GetAll().Include(s => s.ParentCodeNavigation).FirstOrDefaultAsync(s => s.Name == tag.ParentCodeNavigation.Name);
+                    tag = await _tagRepository.GetAll().AsNoTracking().Include(s => s.ParentCodeNavigation).FirstOrDefaultAsync(s => s.Name == tag.ParentCodeNavigation.Name);
                     if (tag != null)
                     {
                         result = tag.Name + "->" + result;
@@ -710,7 +710,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public async Task<bool> IsTagLockedAsync(int tagId, string userId, Operation operation)
         {
-            if (await _examineRepository.FirstOrDefaultAsync(s => s.TagId == tagId && s.ApplicationUserId != userId && s.IsPassed == null && s.Operation == operation) == null)
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.TagId == tagId && s.ApplicationUserId != userId && s.IsPassed == null && s.Operation == operation)==false)
             {
                 return false;
             }
