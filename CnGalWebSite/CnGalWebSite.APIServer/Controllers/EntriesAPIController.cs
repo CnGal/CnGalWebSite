@@ -136,22 +136,16 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <summary>
         /// 通过Id获取为页面显示优化后的词条信息
         /// </summary>
-        /// <param name="_id"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("{_id}")]
+        [HttpGet("{id}")]
         [AllowAnonymous]
-        // [Authorize]
-        public async Task<ActionResult<EntryIndexViewModel>> GetEntryViewAsync(string _id)
+        public async Task<ActionResult<EntryIndexViewModel>> GetEntryViewAsync(int id)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //通过Id获取词条 
-            Entry entry = null;
-            try
-            {
-                var id = -1;
-                id = int.Parse(_id);
-                entry = await _entryRepository.GetAll().Include(s => s.Disambig)
+            Entry entry= await _entryRepository.GetAll().Include(s => s.Disambig)
                     .Include(s => s.Outlinks)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
@@ -159,18 +153,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     .Include(s => s.Articles).ThenInclude(s => s.Entries)
                     .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
                     .AsSplitQuery().FirstOrDefaultAsync(x => x.Id == id);
-            }
-            catch (Exception)
-            {
-                entry = await _entryRepository.GetAll().Include(s => s.Disambig)
-                    .Include(s => s.Outlinks)
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                    .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
-                    .Include(s => s.Articles).ThenInclude(s => s.Entries)
-                    .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
-                    .AsSplitQuery().FirstOrDefaultAsync(x => x.Name == ToolHelper.Base64DecodeName(_id));
-            }
+          
 
             if (entry == null)
             {
@@ -1362,6 +1345,14 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             return model;
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{name}")]
+        public async Task<ActionResult<int>> GetId(string name)
+        {
+            var name_=ToolHelper.Base64DecodeName(name);
+            return await _entryRepository.GetAll().AsNoTracking().Where(s => s.Name == name_).Select(s => s.Id).FirstOrDefaultAsync();
         }
     }
 }

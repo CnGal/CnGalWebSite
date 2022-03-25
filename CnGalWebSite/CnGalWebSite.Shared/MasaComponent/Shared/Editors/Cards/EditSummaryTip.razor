@@ -17,8 +17,15 @@
     }
     else if (Type == ExaminedNormalListModelType.Periphery)
     {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success">
+            在创建周边前请先<TabLink Text="周边规范" Url="/articles/index/253" Icon="fa fa-newspaper-o" class="success--text fw-bold">阅读《周边编辑规范》</TabLink>，我们不会审核通过不符合规范的周边
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+    }
+    else if (Type == ExaminedNormalListModelType.Tag)
+    {
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success">
-    在创建周边前请先<TabLink Text="周边规范" Url="/articles/index/253" Icon="fa fa-newspaper-o" class="success--text fw-bold">阅读《周边编辑规范》</TabLink>，我们不会审核通过不符合规范的周边
+    在创建标签前请先<TabLink Text="标签规范" Url="/articles/index/254" Icon="fa fa-newspaper-o" class="success--text fw-bold">阅读《标签编辑规范》</TabLink>，我们不会审核通过不符合规范的标签
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
     }

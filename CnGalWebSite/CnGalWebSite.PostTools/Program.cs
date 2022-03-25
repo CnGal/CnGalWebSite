@@ -22,6 +22,11 @@ using Markdig;
 using System.Net;
 using System.Text;
 using System.Security.Policy;
+using CnGalWebSite.DataModel.ViewModel.Accounts;
+using ReverseMarkdown.Converters;
+using CnGalWebSite.DataModel.ViewModel;
+using System.Collections.Generic;
+using CnGalWebSite.DataModel.ViewModel.Base;
 
 namespace CnGalWebSite.PostTools // Note: actual namespace depends on the project name.
 {
@@ -33,6 +38,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         private static PostData postData = new PostData(client, setting);
         private static List<string> links = new List<string>();
         private static CurrentData currentData = new CurrentData(client, setting);
+        private static AccountHelper accountHelper = new AccountHelper(client, setting);
 
         //因为要用到HttpRequest请求页面，所以这里设置了请求的头部信息useragents，可以让服务器以为这是浏览器发起的请求。
         private readonly static string[] usersagents = new string[] {
@@ -78,35 +84,63 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
         static async Task Proc()
         {
-            Console.WriteLine("=================================================");
-            Console.WriteLine("           CnGal资料站 投稿工具 v0.3");
-            Console.WriteLine("=================================================");
+            OutputHelper.Repeat();
+            OutputHelper.WriteCenter("CnGal资料站 投稿工具 v0.3",1.8);
+            OutputHelper.Repeat();
 
-            Console.WriteLine("[1] 读取配置文件");
+            Console.WriteLine("-> 读取配置文件");
             setting.Init();
             setting.Load();
-            Console.WriteLine("[2] 读取图片缓存");
+            Console.WriteLine("-> 读取图片缓存");
             imageHelper.Load();
 
-            Console.WriteLine("[3] 读取已处理的文章");
+            Console.WriteLine("-> 读取已处理的文章");
             postData.Load();
 
-            Console.WriteLine("[4] 获取现有的词条和文章");
+            Console.WriteLine("-> 获取现有的词条和文章");
             await currentData.LoadAsync();
 
-            Console.WriteLine("[5] 登入账户");
+            Console.WriteLine("-> 登入账户");
 
-            await LoginAsync();
+            await accountHelper.LoginAsync();
+            while (true)
+            {
+                OutputHelper.Repeat();
+                Console.WriteLine("(1) 导入其他平台文章  (2) 合并词条  (3)退出登入");
+                var text = Console.ReadLine();
+                int index = 0;
+                while (int.TryParse(text, out index) == false || index < 1 || index > 3)
+                {
+                    Console.WriteLine("请输入1,2或3");
+                    text = Console.ReadLine();
+                }
 
+                switch (index)
+                {
+                    case 1:
+                        await ProcZhihu();
+                        break;
+                    case 2:
+                        await ProcMergeEntry();
+                        break;
+                    case 3:
+                        accountHelper.Logout();
+                        await accountHelper.LoginAsync();
+                        break;
+                }
+            }
+        }
 
+        static async Task ProcMergeEntry()
+        {
             //尝试读取数据文件
             bool isFirst = true;
-            Console.WriteLine("[6] 读取链接");
+            Console.WriteLine("-> 读取词条");
             while (links.Count == 0)
             {
                 try
                 {
-                    using var fs1 = new FileStream(setting.DataPath, FileMode.Open, FileAccess.Read);
+                    using var fs1 = new FileStream(setting.MergeEntriesFileName, FileMode.Open, FileAccess.Read);
                     using var sr1 = new StreamReader(fs1);
                     while (sr1.EndOfStream == false)
                     {
@@ -119,21 +153,332 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 }
                 catch (Exception ex)
                 {
-                    File.Create(setting.DataPath).Close();
+                    File.Create(setting.MergeEntriesFileName).Close();
                 }
 
-                if (isFirst && links.Any() == false)
+                if (isFirst)
                 {
-                    Console.WriteLine($"请在{setting.DataPath}文件中输入要导入的链接，每行填写一个链接，目前只支持知乎链接，填写完毕后按下回车");
-                    Console.ReadKey();
-
+                    Console.WriteLine($"请在{setting.MergeEntriesFileName}文件中输入要合并的词条，每行只填写一项，会自动忽略前后空格，目前不支持合并游戏");
+                    Console.WriteLine($"例如：");
+                    Console.WriteLine($"cngal -> CnGal");
+                    Console.WriteLine($"cngal资料站 -> CnGal");
+                    Console.WriteLine($"按下回车【Enter】确认，按下【Esc】返回");
                 }
+                if (links.Any() == false)
+                {
+                    if (isFirst == false)
+                    {
+                        Console.WriteLine($"请在{setting.MergeEntriesFileName}文件中输入要导入的链接");
+                    }
+                    var key = Console.ReadKey();
+                    if (key.Key == ConsoleKey.Escape)
+                    {
+                        return;
+                    }
+                }
+
                 isFirst = false;
             }
-            Console.WriteLine($"[6] 已读取{links.Count}条链接");
+            Console.WriteLine($"-> 已读取{links.Count}个词条");
 
             //循环读取链接并生成审核模型
-            Console.WriteLine("[7] 开始处理链接");
+            Console.WriteLine("-> 开始处理词条");
+
+            foreach (var item in links)
+            {
+                OutputHelper.Write(OutputLevel.Infor, $"-> 正在处理第 {links.IndexOf(item) + 1} 个词条");
+
+                var tempstr = item.Split("->");
+                if (tempstr.Length != 2)
+                {
+                    OutputHelper.Write(OutputLevel.Dager, $"格式错误：{item}");
+                    continue;
+                }
+
+                var tempMergeEntry = new MergeEntryModel
+                {
+                    SubName = tempstr[0].Trim(),
+                    HostName = tempstr[1].Trim(),
+                };
+
+                if (string.IsNullOrWhiteSpace(tempMergeEntry.HostName) || string.IsNullOrWhiteSpace(tempMergeEntry.SubName))
+                {
+                    OutputHelper.Write(OutputLevel.Dager, $"词条名称不能为空");
+                    continue;
+                }
+
+                var mergeEntry = postData.mergeEntries.FirstOrDefault(s => s.HostName == tempMergeEntry.HostName && s.SubName == tempMergeEntry.SubName);
+                //if (mergeEntry != null && mergeEntry.PostTime != null)
+                //{
+                //    OutputHelper.Write(OutputLevel.Warning, $"-> 链接 {item} 已于 {mergeEntry.PostTime} 提交审核[HostId:{mergeEntry.HostId}][SubId:{mergeEntry.SubId}]");
+                //    continue;
+                //}
+                //else
+                //{
+                    mergeEntry = tempMergeEntry;
+                //}
+
+                Console.WriteLine("获取词条");
+                try
+                {
+                    await GetMergeEntryId(mergeEntry);
+                }
+                catch (Exception ex)
+                {
+                    OutputHelper.PressError(ex, "获取词条失败", "请确保词条存在");
+                    continue;
+                }
+
+                Console.WriteLine("生成审核记录");
+                try
+                {
+                    await GenerateMergeEntry(mergeEntry);
+                }
+                catch (Exception ex)
+                {
+                    OutputHelper.PressError(ex, "生成审核记录失败");
+                    continue;
+                }
+
+                postData.mergeEntries.Add(mergeEntry);
+                postData.Save();
+
+                Console.WriteLine("发送审核记录");
+                try
+                {
+                    await PostExamine(mergeEntry);
+                }
+                catch (Exception ex)
+                {
+                    OutputHelper.PressError(ex, "发送审核记录失败");
+                    continue;
+                }
+
+                Console.WriteLine("隐藏从词条");
+                try
+                {
+                    await HideSubEntry(mergeEntry);
+                }
+                catch (Exception ex)
+                {
+                    OutputHelper.PressError(ex, "递交隐藏从词条申请失败");
+                    continue;
+                }
+
+                mergeEntry.PostTime = DateTime.Now.ToCstTime();
+                postData.Save();
+
+            }
+
+            //成功
+            OutputHelper.Repeat();
+            Console.WriteLine($"总计处理{links.Count}个词条，感谢您使用本投稿工具");
+            OutputHelper.Repeat();
+            Console.WriteLine("按任意键返回上级菜单");
+            Console.ReadKey();
+        }
+
+        static async Task GenerateMergeEntry(MergeEntryModel model)
+        {
+            //获取词条
+            var subEntry = await client.GetFromJsonAsync<EntryIndexViewModel>(ToolHelper.WebApiPath + "api/entries/GetEntryView/" + model.SubId);
+
+            if(subEntry==null)
+            {
+                throw new Exception("无法获取从词条");
+            }
+            if(subEntry.Type== EntryType.Game)
+            {
+                throw new Exception("目前不支持合并游戏");
+            }
+
+            //获取从词条关联的各个游戏
+            var reEntryIds= subEntry.Roles.Select(x =>x.Id).ToList();
+            reEntryIds.AddRange(subEntry.ProductionGroups.Select(x => x.Id));//这里是显示名称 极少部分词条可能会有问题
+            reEntryIds.AddRange(subEntry.EntryRelevances.Select(x => x.Id));
+            reEntryIds.AddRange(subEntry.StaffGames.Select(x => x.Id));
+
+            //替换关联信息
+            foreach(var item in reEntryIds)
+            {
+                var examineModel = await client.GetFromJsonAsync<EditRelevancesViewModel>(ToolHelper.WebApiPath + "api/entries/editrelevances/" + item);
+                ReplaceEntryName(examineModel.Games, model.SubName, model.HostName);
+                ReplaceEntryName(examineModel.staffs, model.SubName, model.HostName);
+                ReplaceEntryName(examineModel.Roles, model.SubName, model.HostName);
+                ReplaceEntryName(examineModel.Groups, model.SubName, model.HostName);
+
+                model.Examines.Add(examineModel);
+            }
+
+            //游戏
+            var reGameIds = subEntry.EntryRelevances.Where(s => s.Type == EntryType.Game).Select(x => x.Id).ToList();
+            reGameIds.AddRange(subEntry.StaffGames.Select(x => x.Id));
+
+            //替换Staff，开发商和发行商
+            foreach (var item in reGameIds)
+            {
+                var examineModel = await client.GetFromJsonAsync<EditAddInforViewModel>(ToolHelper.WebApiPath + "api/entries/EditAddInfor/" + item);
+                var tempStaffs = examineModel.Staffs.Where(s => s.NicknameOfficial == model.SubName);
+                foreach (var temp in tempStaffs)
+                {
+                    temp.NicknameOfficial = model.HostName;
+                }
+                if (string.IsNullOrWhiteSpace(examineModel.Publisher) == false)
+                {
+                    examineModel.Publisher.Replace(model.SubName, model.HostName);
+
+                }
+                if (string.IsNullOrWhiteSpace(examineModel.ProductionGroup) == false)
+                {
+                    examineModel.ProductionGroup.Replace(model.SubName, model.HostName);
+
+                }
+
+                model.Examines.Add(examineModel);
+
+            }
+
+
+            //获取从词条关联的各个文章
+            //获取从词条关联的各个游戏
+            var reArticleIds = subEntry.ArticleRelevances.Select(x => x.Id).ToList();
+
+            //替换关联信息
+            foreach (var item in reArticleIds)
+            {
+                var examineModel = await client.GetFromJsonAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlerelevances/" + item);
+                ReplaceEntryName(examineModel.Games, model.SubName, model.HostName);
+                ReplaceEntryName(examineModel.Staffs, model.SubName, model.HostName);
+                ReplaceEntryName(examineModel.Roles, model.SubName, model.HostName);
+                ReplaceEntryName(examineModel.Groups, model.SubName, model.HostName);
+
+                model.Examines.Add(examineModel);
+            }
+        }
+
+        static void ReplaceEntryName(List<RelevancesModel> list,string oldName,string newName)
+        {
+            var temp = list.FirstOrDefault(s => s.DisplayName == oldName);
+            if (temp!=null)
+            {
+                temp.DisPlayValue = newName;
+            }
+        }
+
+        static async Task GetMergeEntryId(MergeEntryModel model)
+        {
+            //获取词条
+            model.HostId = await client.GetFromJsonAsync<int>(ToolHelper.WebApiPath + "api/entries/GetId/" + ToolHelper.Base64EncodeName(model.HostName));
+            model.SubId = await client.GetFromJsonAsync<int>(ToolHelper.WebApiPath + "api/entries/GetId/" + ToolHelper.Base64EncodeName(model.SubName));
+
+
+        }
+
+        static async Task PostExamine(MergeEntryModel model)
+        {
+            foreach (var item in model.Examines)
+            {
+                HttpResponseMessage result = item.GetType().Name switch
+                {
+                    "EditArticleRelevancesViewModel" => await client.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/editarticlerelevances", item as EditArticleRelevancesViewModel),
+                    "EditAddInforViewModel" => await client.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/EditAddInfor", item as EditAddInforViewModel),
+                    "EditRelevancesViewModel" => await client.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/editrelevances", item as EditRelevancesViewModel),
+                    _ => null
+                };
+
+                string jsonContent = result.Content.ReadAsStringAsync().Result;
+                Result obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                //判断结果
+                if (obj.Successful == false)
+                {
+                    throw new Exception(obj.Error);
+                }
+            }
+        }
+
+        static async Task HideSubEntry(MergeEntryModel model)
+        {
+            try
+            {
+
+                var result = await client.PostAsJsonAsync<HiddenArticleModel>(ToolHelper.WebApiPath + "api/entries/HiddenEntry", new HiddenArticleModel { Ids = new long[] { model.SubId }, IsHidden = true });
+                string jsonContent = result.Content.ReadAsStringAsync().Result;
+                Result obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                //判断结果
+                if (obj.Successful == false)
+                {
+                    throw new Exception(obj.Error);
+                }
+
+            }
+            catch
+            { 
+                var examineModel = await client.GetFromJsonAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/EditMain/" + model.SubId);
+                examineModel.Name = examineModel.DisplayName = "已删除_" + examineModel.Name;
+
+
+                var result= await client.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/EditMain", examineModel);
+                string jsonContent = result.Content.ReadAsStringAsync().Result;
+                Result obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                //判断结果
+                if (obj.Successful == false)
+                {
+                    throw new Exception(obj.Error);
+                }
+
+                OutputHelper.Write(OutputLevel.Warning, $"隐藏从词条失败，可能当前未以管理员角色登入，已尝试递交隐藏请求");
+
+            }
+        }
+
+        static async Task ProcZhihu()
+        {
+            //尝试读取数据文件
+            bool isFirst = true;
+            Console.WriteLine("-> 读取链接");
+            while (links.Count == 0)
+            {
+                try
+                {
+                    using var fs1 = new FileStream(setting.ArticlesFileName, FileMode.Open, FileAccess.Read);
+                    using var sr1 = new StreamReader(fs1);
+                    while (sr1.EndOfStream == false)
+                    {
+                        var str = await sr1.ReadLineAsync();
+                        if (string.IsNullOrWhiteSpace(str) == false)
+                        {
+                            links.Add(str);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    File.Create(setting.ArticlesFileName).Close();
+                }
+
+                if (isFirst)
+                {
+                    Console.WriteLine($"请在{setting.ArticlesFileName}文件中输入要导入的链接，每行填写一个链接，目前只支持知乎链接，按下回车【Enter】确认，按下【Esc】返回");
+                }
+                if (links.Any() == false)
+                {
+                    if(isFirst==false)
+                    {
+                        Console.WriteLine($"请在{setting.ArticlesFileName}文件中输入要导入的链接");
+                    }
+                    var key = Console.ReadKey();
+                    if(key.Key== ConsoleKey.Escape)
+                    {
+                        return;
+                    }
+                }
+
+                isFirst = false;
+            }
+            Console.WriteLine($"-> 已读取{links.Count}条链接");
+
+            //循环读取链接并生成审核模型
+            Console.WriteLine("-> 开始处理链接");
 
             foreach (var item in links)
             {
@@ -142,7 +487,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 {
                     if (zhihuArticle.PostTime != null)
                     {
-                        OutputHelper.Write(OutputLevel.Warning, $"[7] 链接 {item} 已于 {zhihuArticle.PostTime} 提交审核[Id:{zhihuArticle.Id}]");
+                        OutputHelper.Write(OutputLevel.Warning, $"-> 链接 {item} 已于 {zhihuArticle.PostTime} 提交审核[Id:{zhihuArticle.Id}]");
                         continue;
                     }
                 }
@@ -155,7 +500,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
                 if (currentData.articles.Any(s => s == zhihuArticle.Title))
                 {
-                    OutputHelper.Write(OutputLevel.Dager, $"[7] 链接 {item} 与现有文章《{zhihuArticle.Title}》重名，请手动上传");
+                    OutputHelper.Write(OutputLevel.Dager, $"-> 链接 {item} 与现有文章《{zhihuArticle.Title}》重名，请手动上传");
                     continue;
                 }
 
@@ -167,14 +512,14 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 zhihuArticle.PostTime = DateTime.Now.ToCstTime();
                 postData.Save();
 
-                OutputHelper.Write( OutputLevel.Infor,$"[7] 处理完成第 {links.IndexOf(item) + 1} 条链接");
+                OutputHelper.Write(OutputLevel.Infor, $"-> 处理完成第 {links.IndexOf(item) + 1} 条链接");
             }
 
             //成功
-            Console.WriteLine("=================================================");
-            Console.WriteLine($"[8] 总计处理{links.Count}条链接，感谢您使用本投稿工具");
-            Console.WriteLine("=================================================");
-            Console.WriteLine("按任意键关闭");
+            OutputHelper.Repeat();
+            Console.WriteLine($"总计处理{links.Count}条链接，感谢您使用本投稿工具");
+            OutputHelper.Repeat();
+            Console.WriteLine("按任意键返回上级菜单");
             Console.ReadKey();
         }
 
@@ -200,60 +545,6 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 OutputHelper.PressError(ex, "提交文章审核失败");
                 return 0;
             }
-        }
-
-
-        static async Task LoginAsync()
-        {
-            while (true)
-            {
-                if (string.IsNullOrWhiteSpace(setting.Token))
-                {
-                    Console.WriteLine("请输入登入令牌，可以在个人空间->编辑个人资料->获取登入令牌中获取，输入完毕后请按下回车");
-                    setting.Token = Console.ReadLine();
-                }
-
-
-                try
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", setting.Token);
-
-                    //调用刷新接口
-                    var result = await client.GetFromJsonAsync<LoginResult>(ToolHelper.WebApiPath + "api/account/RefreshJWToken");
-                    if (result.Code == LoginResultCode.OK)
-                    {
-                        setting.Token = result.Token;
-              
-                        break;
-                    }
-                    else
-                    {
-                        setting.Token = null;
-           
-
-                    }
-                }
-                catch (Exception ex)
-                {
-                    setting.Token = null;
-    
-                    OutputHelper.PressError(ex, "登入失败", "令牌无效");
-                }
-            }
-
-            try
-            {
-                var model = await client.GetFromJsonAsync<PersonalSpaceViewModel>(ToolHelper.WebApiPath + "api/space/GetUserView/");
-                setting.UserName = model.BasicInfor.Name;
-            }
-            catch (Exception ex)
-            {
-                setting.Token = null;
-        
-                OutputHelper.PressError(ex, "获取用户信息失败");
-            }
-
-            setting.Save();
         }
 
         static CreateArticleViewModel GenerateArticle(ZhiHuArticleModel model)
@@ -490,11 +781,116 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         }
     }
 
+    public class MergeEntryModel
+    {
+        public int HostId { get; set; }
+        public string HostName { get; set; }
 
+        public int SubId { get; set; }
+        public string SubName { get; set; }
+
+        public List<BaseEditModel> Examines = new List<BaseEditModel>();
+
+        public DateTime? PostTime { get; set; }
+    }
+
+    public class AccountHelper
+    {
+        private readonly Setting setting;
+        private readonly HttpClient client;
+
+        public AccountHelper(HttpClient _client, Setting _setting)
+        {
+            client = _client;
+            setting = _setting;
+        }
+
+        public async Task LoginAsync()
+        {
+            while (true)
+            {
+                if (string.IsNullOrWhiteSpace(setting.Token))
+                {
+                    Console.WriteLine("请输入登入令牌，可以在个人空间->编辑个人资料->获取登入令牌中获取，输入完毕后请按下回车");
+
+
+                    var token = Console.ReadLine();
+                    try
+                    {
+                        var result = await client.PostAsJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = token });
+                        string jsonContent = result.Content.ReadAsStringAsync().Result;
+                        LoginResult obj = System.Text.Json.JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
+                        //判断结果
+                        if (obj.Code == LoginResultCode.OK)
+                        {
+                            setting.Token = obj.Token;
+                        }
+                        else
+                        {
+                            throw new Exception(obj.ErrorInfor);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        OutputHelper.PressError(ex, "登入失败", "令牌无效");
+                        continue;
+                    }
+                }
+
+                try
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", setting.Token);
+
+                    //调用刷新接口
+                    var result = await client.GetFromJsonAsync<LoginResult>(ToolHelper.WebApiPath + "api/account/RefreshJWToken");
+                    if (result.Code == LoginResultCode.OK)
+                    {
+                        setting.Token = result.Token;
+
+                        break;
+                    }
+                    else
+                    {
+                        setting.Token = null;
+
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    setting.Token = null;
+
+                    OutputHelper.PressError(ex, "登入失败", "令牌无效");
+                }
+            }
+
+            try
+            {
+                var model = await client.GetFromJsonAsync<PersonalSpaceViewModel>(ToolHelper.WebApiPath + "api/space/GetUserView/");
+                setting.UserName = model.BasicInfor.Name;
+            }
+            catch (Exception ex)
+            {
+                setting.Token = null;
+
+                OutputHelper.PressError(ex, "获取用户信息失败");
+            }
+
+            setting.Save();
+        }
+
+        public void Logout()
+        {
+            setting.Token = null;
+            setting.Save();
+        }
+
+    }
 
     public class PostData
     {
         public readonly List<ZhiHuArticleModel> articles = new List<ZhiHuArticleModel>();
+        public readonly List<MergeEntryModel> mergeEntries = new List<MergeEntryModel>();
         private readonly Setting setting;
         private readonly HttpClient client;
 
@@ -515,6 +911,15 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                     JsonSerializer serializer = new JsonSerializer();
                     articles.AddRange((List<ZhiHuArticleModel>)serializer.Deserialize(file, typeof(List<ZhiHuArticleModel>)));
                 }
+
+                path = Path.Combine(setting.TempPath, "MergeEntries.json");
+
+                using (StreamReader file = File.OpenText(path))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    mergeEntries.AddRange((List<MergeEntryModel>)serializer.Deserialize(file, typeof(List<MergeEntryModel>)));
+                }
+
             }
             catch
             {
@@ -530,6 +935,14 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, articles);
+            }
+
+            path = Path.Combine(setting.TempPath, "MergeEntries.json");
+
+            using (StreamWriter file = File.CreateText(path))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, mergeEntries);
             }
         }
     }
@@ -702,7 +1115,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
     {
         public static void PressError(Exception ex, string message = "", string reason = "服务器网络异常", string resolvent = "检查网络是否正常，加群761794704反馈")
         {
-            Write( OutputLevel.Dager,$"> {message}\n> 报错：{ex.Message}\n> 原因：{reason}\n> 解决方法：{resolvent}");
+            Write( OutputLevel.Dager,$"> {message}\n> 原因：{reason}\n> 解决方法：{resolvent}\n> 报错：{ex.Message}\n> 调用：\n{ex.StackTrace}");
         }
 
         public static void Write(OutputLevel level, string text)
@@ -722,6 +1135,30 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             Console.WriteLine(text);
             Console.ForegroundColor = ConsoleColor.White;
         }
+
+        public static void WriteCenter(string text,double rate=2, int count = 50)
+        {
+            var space = (count - text.Length* rate) /2;
+
+            for(int i=0;i<space;i++)
+            {
+                Console.Write(' ');
+            }
+            Console.WriteLine(text);
+        }
+
+
+        public static void Repeat(string text="=", bool lineBreak = true, int count = 50)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                Console.Write(text);
+            }
+            if (lineBreak)
+            {
+                Console.WriteLine();
+            }
+        }
     }
 
     public enum OutputLevel
@@ -735,7 +1172,9 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
     {
         public string Token { get; set; }
 
-        public string DataPath { get; set; } = "Links.txt";
+        public string ArticlesFileName { get; set; } = "Links.txt";
+
+        public string MergeEntriesFileName { get; set; } = "MergeEntries.txt";
 
         public string TempPath { get; set; } =  "Data";
 
@@ -763,7 +1202,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                     var temp = (Setting)serializer.Deserialize(file, typeof(Setting));
 
                     Token = temp.Token;
-                    DataPath = temp.DataPath;
+                    ArticlesFileName = temp.ArticlesFileName;
                     TempPath = temp.TempPath;
                     TransferDepositFileAPI = temp.TransferDepositFileAPI;
                     UserName = temp.UserName;

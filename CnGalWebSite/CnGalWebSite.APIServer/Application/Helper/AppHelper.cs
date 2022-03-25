@@ -1596,8 +1596,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
             var signInDaysIntegral = 5;
             var entryIntegral = 50;
 
-            var tagIntegral = entryIntegral;
-            var disambigIntegral = entryIntegral;
+            var tagIntegral = signInDaysIntegral * 6;
+            var disambigIntegral = signInDaysIntegral * 6;
             var peripheryIntegral = entryIntegral;
             var commentIntegral = signInDaysIntegral;
             var commentLimited = 5;

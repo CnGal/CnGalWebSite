@@ -116,7 +116,7 @@
             </p>
         }
         <p>
-           <TabLink OnClick="GetToken" class="font-color">获取登入令牌</TabLink>
+           <TabLink OnClick="GetToken" class="font-color">获取一次性登入代码</TabLink>
        </p>
 
         <hr />
@@ -221,17 +221,17 @@
 
         try
         {
-            var result = await Http.GetFromJsonAsync<LoginResult>(ToolHelper.WebApiPath + "api/account/RefreshJWToken");
+            var result = await Http.GetFromJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/GetOneTimeCode");
 
-            if (result.Code == LoginResultCode.OK)
+            if (string.IsNullOrWhiteSpace(result.Code)==false)
             {
                 SwalOption op = null;
 
                 op = new SwalOption()
                 {
                     Category = SwalCategory.Success,
-                    Title = "登入令牌",
-                    Content = result.Token,
+                    Title = "一次性登入代码",
+                    Content = result.Code,
                     ShowClose = false
                 };
 
@@ -243,7 +243,7 @@
                     builder.AddAttribute(3, nameof(Button.Color), Color.Success);
                     builder.AddAttribute(5, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async () =>
                     {
-                        await CopyText(result.Token);
+                        await CopyText(result.Code);
                         await op.Close();
                     }));
                     builder.CloseComponent();
@@ -252,13 +252,13 @@
             }
             else
             {
-                await ToastService.Error("获取登入令牌失败", result.ErrorDescribe);
+                await ToastService.Error("获取一次性登入代码失败", "获取一次性登入代码失败");
             }
 
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取登入令牌失败");
+            ErrorHandler.ProcessError(ex, "获取一次性登入代码失败");
         }
     }
 

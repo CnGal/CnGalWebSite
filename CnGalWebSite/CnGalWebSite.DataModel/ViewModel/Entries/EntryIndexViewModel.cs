@@ -205,7 +205,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// </summary>
         public string DisplayName { get; set; }
 
-        public long Id { get; set; }
+        public int Id { get; set; }
     }
 
     public class InformationsModel
