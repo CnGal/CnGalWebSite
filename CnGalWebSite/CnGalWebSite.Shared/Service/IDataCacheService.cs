@@ -14,6 +14,7 @@ using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Theme;
 using CnGalWebSite.DataModel.ViewModel.Votes;
+using CnGalWebSite.Helper.ViewModel.Articles;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -97,6 +98,8 @@ namespace CnGalWebSite.Shared.Service
         List<GameEvaluationsModel> GameEvaluationsCatche { get; set; }
 
         List<GameRoleModel> GameRolesCatche { get; set; }
+
+        NewsSummaryCacheModel NewsSummaryCache { get; set; }
 
         SearchViewModel SearchViewModel { get; set; }
 

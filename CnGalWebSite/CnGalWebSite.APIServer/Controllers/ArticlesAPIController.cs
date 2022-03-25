@@ -27,6 +27,7 @@ using System.Threading.Tasks;
 using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.APIServer.Application.Users;
 using StackExchange.Redis;
+using Microsoft.VisualBasic;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -37,6 +38,7 @@ namespace CnGalWebSite.APIServer.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRepository<Entry, int> _entryRepository;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<ThumbsUp, long> _thumbsUpRepository;
         private readonly IRepository<Comment, long> _commentUpRepository;
@@ -48,7 +50,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IUserService _userService;
 
         public ArticlesAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IUserService userService,
-        IExamineService examineService, IEntryService entryService,
+        IExamineService examineService, IEntryService entryService, IRepository<ApplicationUser, string> userRepository,
         UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
         {
@@ -63,6 +65,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _examineService = examineService;
             _entryService = entryService;
             _userService= userService;
+            _userRepository = userRepository;
         }
 
         /// <summary>
@@ -1205,6 +1208,45 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 result.Add(item);
                 model.RemoveAll(s => s.GroupName == item.GroupName);
+            }
+            //查找每一组的微博链接和简介
+            
+            var userIds = result.Where(s => string.IsNullOrWhiteSpace(s.UserId) == false).Select(s => s.UserId);
+            var users = await _userRepository.GetAll().Where(s => userIds.Contains(s.Id)).Select(s => new
+            {
+                s.Id,
+                s.PersonalSignature
+            }).ToListAsync();
+
+            var entryIds = result.Where(s => s.GroupId>0).Select(s => s.GroupId);
+            var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).Select(s => new
+            {
+                s.Id,
+                s.BriefIntroduction,
+                Informations = s.Information.Where(s=>s.Modifier=="相关网站"&&s.DisplayName=="微博")
+            }).ToListAsync();
+
+
+            foreach (var item in result)
+            {
+                if (item.GroupId!=0)
+                {
+                    var temp = entries.FirstOrDefault(s => s.Id == item.GroupId);
+                    if(temp!=null)
+                    {
+                        item.Outlink = temp.Informations.FirstOrDefault()?.DisplayValue;
+                        item.BriefIntroduction = temp.BriefIntroduction;
+                    }
+                    
+                }
+                else if(string.IsNullOrWhiteSpace(item.UserId)==false)
+                {
+                    var temp =users.FirstOrDefault(s=>s.Id==item.UserId);
+                    if(temp!=null)
+                    {
+                        item.BriefIntroduction = temp.PersonalSignature;
+                    }
+                }
             }
 
             return result;

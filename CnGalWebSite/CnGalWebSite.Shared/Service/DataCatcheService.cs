@@ -17,6 +17,7 @@ using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Theme;
 using CnGalWebSite.DataModel.ViewModel.Votes;
+using CnGalWebSite.Helper.ViewModel.Articles;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -188,6 +189,10 @@ namespace CnGalWebSite.Shared.Service
         /// 评论详情
         /// </summary>
         public CommentViewModel DetailComment { get; set; } = new CommentViewModel();
+        /// <summary>
+        /// 动态汇总缓存
+        /// </summary>
+        public NewsSummaryCacheModel NewsSummaryCache { get; set; } = new NewsSummaryCacheModel();
         /// <summary>
         /// 当前登入的用户的信息
         /// </summary>

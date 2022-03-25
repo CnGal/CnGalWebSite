@@ -1,9 +1,6 @@
-﻿
+﻿@inject IDataCacheService _dataCacheService
 @inject HttpClient Http
-@inject ExamineService _examineService
-@inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
-@inject IAppHelper _appHelper
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
@@ -14,123 +11,94 @@
     }
 </style>
 
-<div class="container" style="padding-right: 0; padding-left: 0">
-    <div class="row article-layout-center">
-        <div class="col-12">
-            <AlertTip Type="AlertTip.AlertTipType.PubulishArticle"></AlertTip>
-        </div>
-        <div class="col-12 col-md-12 col-lg-3 mb-4">
-            <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3">
+<div>
+    <MTabs @bind-Value="@_dataCacheService.NewsSummaryCache.TabIndex" IconsAndText Grow CenterActive Class="shadow-sm bg-opacity rounded"
+           Color="@_dataCacheService.ThemeSetting.Theme">
 
-                <h4 class="fw-bold mb-3">筛选</h4>
-                <h5>
-                    <button type="button" class="badge-btn btn btn-primary" @onclick="@(() => OnCondited("全部"))">全部</button>
-                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(() => OnCondited("本年"))">本年</button>
-                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(() => OnCondited("本月"))">本月</button>
-                    <button type="button" class="badge-btn btn  btn-primary" @onclick="@(() => OnCondited("本周"))">本周</button>
-                </h5>
-                <hr />
-                <BootstrapBlazor.Components.Search Items="ArticleItems" IsLikeMatch="true" PlaceHolder="可以搜索哦~" OnSearch="@OnSearch"></BootstrapBlazor.Components.Search>
-            </div>
-        </div>
-        <div class="col-12  col-md-12 col-lg-9 mb-4">
-            @if (isReady)
+        <MTab Value="1" OnClick="@(() => OnCondited("本周"))">
+            本周<MIcon>mdi-av-timer </MIcon>
+        </MTab>
+        <MTab Value="2" OnClick="@(() => OnCondited("本月"))">
+            本月<MIcon>mdi-clock-outline</MIcon>
+        </MTab>
+        <MTab Value="4" OnClick="@(() => OnCondited("本年"))">
+            本年<MIcon>mdi-calendar-text </MIcon>
+        </MTab>
+        <MTab Value="5" OnClick="@(() => OnCondited("全部"))">
+            全部<MIcon>mdi-all-inclusive</MIcon>
+        </MTab>
+
+    </MTabs>
+    <div class="mt-4">
+        @if (isReady)
+        {
+            @foreach (var item in _dataCacheService.NewsSummaryCache.Items.Skip((_dataCacheService.NewsSummaryCache.CurrentPage - 1) * _dataCacheService.NewsSummaryCache.MaxCount).Take(_dataCacheService.NewsSummaryCache.MaxCount))
             {
-                @foreach (var item in Model)
-                {
 
-                    <div class="mb-3">
-                        <NewsSummaryAloneViewTip Model="item" />
+                <div class="mb-3">
+                    <NewsSummaryAloneViewTip Model="item" />
 
-                    </div>
-                }
-                if (Model.Count == 0)
-                {
-                    <NotFoundTip IsNeedLayput="true" />
-                }
-            }
-            else
-            {
-                <div style="height:300px">
-                    <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%"/>
                 </div>
             }
+            if (_dataCacheService.NewsSummaryCache.Items.Count == 0)
+            {
+                <NotFoundTip IsNeedLayput="true" />
+            }
+        }
+        else
+        {
+            <div style="height:300px">
+                <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
+            </div>
+        }
 
-        </div>
     </div>
+
+    @if (_dataCacheService.NewsSummaryCache.TotalPages > 1)
+    {
+        <MPagination Value="@_dataCacheService.NewsSummaryCache.CurrentPage" Class="my-4" Length="@_dataCacheService.NewsSummaryCache.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
+    }
 </div>
 
 
 @code {
 
-    [Parameter]
-    public string TimeString { get; set; } = "本月";
-
     bool isReady = false;
 
-    private IEnumerable<string> ArticleItems { get; set; } = new string[1] { "" };
-
-    public List<NewsSummaryAloneViewModel> Model = new List<NewsSummaryAloneViewModel>();
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    private Task OnPageClick(int pageIndex)
+    {
+        _dataCacheService.NewsSummaryCache.CurrentPage = pageIndex;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        try
+        if (_dataCacheService.NewsSummaryCache.Items.Count == 0)
         {
-            //获取所有文章
-            ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
+            await OnCondited("本周");
+        }
 
-            await OnCondited(TimeString);
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取所有文章名称列表失败");
-        }
+        isReady = true;
     }
 
     private async Task OnCondited(string name)
     {
-        TimeString = name;
         isReady = false;
         StateHasChanged();
         try
         {
-            if (string.IsNullOrWhiteSpace(TimeString))
-            {
-                TimeString = "本月";
-            }
-            Model = await Http.GetFromJsonAsync<List<NewsSummaryAloneViewModel>>(ToolHelper.WebApiPath + "api/articles/GetNewSummary/" + TimeString);
+            _dataCacheService.NewsSummaryCache.Items = await Http.GetFromJsonAsync<List<NewsSummaryAloneViewModel>>(ToolHelper.WebApiPath + "api/articles/GetNewSummary/" + name);
+            _dataCacheService.NewsSummaryCache.CurrentPage = 1;
             isReady = true;
             StateHasChanged();
         }
         catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取动态分类汇总列表失败");
-        }
-    }
-
-    public async void OnClickUrl(NavigateModel model)
-    {
-        try
-        {
-            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
-        }
-        catch
-        {
-            await ToastService.Error("导航失败", "请尝试刷新页面");
-        }
-    }
-
-    private async Task OnSearch(string text)
-    {
-        try
-        {
-            NavigationManager.NavigateTo(Provider, "/home/search/文章/Id desc/" + text, "搜索", "fa fa-search");
-        }
-        catch
-        {
-            await ToastService.Error("导航失败", "请重试");
         }
     }
 }

@@ -1,31 +1,74 @@
-﻿<div class="shadow-sm bg-opacity p-3">
-    <TabLink Url="@(Model.GroupId==-1?("/space/index/"+Model.UserId):( "/entries/index/"+Model.GroupId+"/10"))" Icon="fa fa-codepen" Text="@Model.GroupName" class="a-font-color mb-3" style=" display: flex; align-items: center; ">
-        <img src="@Model.GroupImage" style="height:50px;width:50px;border-radius:50%;" />
-        <div class="ms-3" style="font-size: x-large; font-weight: bold;">@Model.GroupName</div>
-    </TabLink>
-    <Collapse>
-        <CollapseItems>
-            @{ bool isFrist = true;}
-            @foreach (var item in Model.Articles)
-            {
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@inject IJSRuntime JS
 
+<MExpansionPanels>
+    <MExpansionPanel @key="0">
+        <MExpansionPanelHeader>
+            <div class="" style=" display: flex; align-items: center; ">
+                <img src="@Model.GroupImage" style="height:50px;width:50px;border-radius:50%;" />
+                <div class="ms-3" style="font-size: x-large; font-weight: bold;">@Model.GroupName</div>
+            </div>
+        </MExpansionPanelHeader>
+        <MExpansionPanelContent>
+            <div>
+                @if (string.IsNullOrWhiteSpace(Model.BriefIntroduction) == false)
+                {
+                    <div class="mb-2">@Model.BriefIntroduction</div>
 
-
-                    <CollapseItem Text="@(item.DisplayName+" - "+item.LastEditTime.ToTimeFromNowString())" IsCollapsed="true">
-                        <NewsSummaryAloneTip Model="item"/>
-                    </CollapseItem>
-
-                    @if(isFrist)
+                }
+                <div style=" display: flex; flex-direction: row; ">
+                    @if (string.IsNullOrWhiteSpace(Model.Outlink) == false)
                     {
-                        isFrist = false;
+                        <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickWeibo" Class="me-3">
+                            <MIcon Left>mdi-share-all-outline</MIcon>
+                            访问微博主页
+                        </MButton>
                     }
-            }
 
-        </CollapseItems>
-    </Collapse>
-</div>
+                    <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMainPage">
+                        <MIcon Left>mdi-share-all-outline</MIcon>
+                        @(Model.GroupId>0?"查看词条":"查看个人空间")
+                    </MButton>
+
+                </div>
+            </div>
+        </MExpansionPanelContent>
+    </MExpansionPanel>
+
+    @foreach (var item in Model.Articles)
+    {
+        <MExpansionPanel @key="@(Model.Articles.IndexOf(item)+1)">
+            <MExpansionPanelHeader>
+                @(item.DisplayName+" - "+item.LastEditTime.ToTimeFromNowString())
+            </MExpansionPanelHeader>
+            <MExpansionPanelContent>
+                <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item" Outline />
+            </MExpansionPanelContent>
+        </MExpansionPanel>
+    }
+</MExpansionPanels>
 
 @code {
     [Parameter]
     public NewsSummaryAloneViewModel Model { get; set; }
+
+    #region 新建标签页
+    public async void OpenNewPage(string url)
+    {
+        await JS.InvokeAsync<string>("openNewPage", url);
+    }
+    #endregion
+
+    public Task OnClickWeibo()
+    {
+        OpenNewPage(Model.Outlink);
+        return Task.CompletedTask;
+    }
+
+    public Task OnClickMainPage()
+    {
+        NavigationManager.NavigateTo(Model.GroupId > 0 ? ("entries/index/" + Model.GroupId) : ("space/index/" + Model.UserId));
+        return Task.CompletedTask;
+    }
 }

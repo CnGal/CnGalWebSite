@@ -3,8 +3,8 @@
 @if (_dataCatcheService.IsApp)
 {
     <TabLink Icon="fa fa-newspaper-o" Url="@("/articles/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
-        <div class="div-shadow rounded  bg-opacity h-100">
-            <div  style="display: flex; align-items: center;">
+        <div class="@((Outline?"":"div-shadow rounded  bg-opacity ")+" h-100")">
+            <div style="display: flex; align-items: center;">
                 <div>
                     <img loading="lazy" style=" width: 160px; " src="@Model.MainImage">
                 </div>
@@ -24,12 +24,12 @@
 else
 {
     <TabLink Icon="fa fa-newspaper-o" Url="@("/articles/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
-        <div class="div-shadow rounded  bg-opacity ps-3 pe-3 h-100">
+        <div class="@((Outline?"":"div-shadow rounded  bg-opacity  ps-3 pe-3 ")+" h-100")">
             <div class="mb-2" style="display:flex;">
-                <div class="pt-3">
+                <div class="@((Outline?"":"pt-3"))">
                     <img loading="lazy"  style=" width: 250px; " src="@Model.MainImage">
                 </div>
-                <div class="ps-3 pt-3">
+                <div class="@((Outline?"":" pt-3")+" ps-3")">
                     <header class="text-truncate-2">
                         <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
                         <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
@@ -39,7 +39,7 @@ else
                     </span>
                 </div>
             </div>
-            <p class="" style="color: gray;">
+            <span class="@((Outline?"":"pb-3 "))" style="color: gray;">
                 <i class="fa fa-calendar fa-fw"></i>
                 <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
 
@@ -54,8 +54,7 @@ else
 
                 <i class="fa fa-user fa-fw"></i>
                 <span class="article-home-infor-text">@Model.CreateUserName&nbsp;&nbsp;&nbsp;</span>
-            </p>
-            <div style="height: 1px;"></div>
+            </span>
         </div>
     </TabLink>
 
@@ -65,4 +64,6 @@ else
 @code {
     [Parameter]
     public ArticleInforTipViewModel Model { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
 }

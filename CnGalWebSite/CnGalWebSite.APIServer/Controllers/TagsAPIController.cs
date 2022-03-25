@@ -227,7 +227,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Id = item.Id,
                     Icon = item.Id switch
                     {
-                        1 => "mdi-gamepad-square ",
+                        1 => "mdi-gamepad-square",
                         2 => "mdi-account ",
                         3 => "mdi-star",
                         4 => "mdi-group ",
@@ -744,6 +744,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return dtos;
         }
+
         [HttpGet]
         public async Task<ActionResult<ListTagsInforViewModel>> ListTagsAsync()
         {
