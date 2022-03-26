@@ -1,18 +1,15 @@
-﻿@page "/articles/news/{TimeString}"
-@page "/articles/news"
+﻿@page "/articles/news"
 
 @inject IDataCacheService _dataCacheService
 
 @if (_dataCacheService.IsApp == true)
 {
-    <CnGalWebSite.Shared.Pages.Apps.Articles.NewsSummary TimeString="@TimeString" />
+    <CnGalWebSite.Shared.Pages.Apps.Articles.NewsSummary />
 }
 else
 {
     <CnGalWebSite.Shared.Pages.Webs.Articles.NewsSummary/>
 }
 @code{
-    [Parameter]
-    public string TimeString { get; set; }
 
 }

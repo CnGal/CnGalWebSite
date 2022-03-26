@@ -85,7 +85,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         static async Task Proc()
         {
             OutputHelper.Repeat();
-            OutputHelper.WriteCenter("CnGal资料站 投稿工具 v0.3",1.8);
+            OutputHelper.WriteCenter("CnGal资料站 投稿工具 v0.4",1.8);
             OutputHelper.Repeat();
 
             Console.WriteLine("-> 读取配置文件");
@@ -186,7 +186,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
             foreach (var item in links)
             {
-                OutputHelper.Write(OutputLevel.Infor, $"-> 正在处理第 {links.IndexOf(item) + 1} 个词条");
+                Console.WriteLine($"正在处理第 {links.IndexOf(item) + 1} 个词条");
 
                 var tempstr = item.Split("->");
                 if (tempstr.Length != 2)
@@ -208,15 +208,15 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 }
 
                 var mergeEntry = postData.mergeEntries.FirstOrDefault(s => s.HostName == tempMergeEntry.HostName && s.SubName == tempMergeEntry.SubName);
-                //if (mergeEntry != null && mergeEntry.PostTime != null)
-                //{
-                //    OutputHelper.Write(OutputLevel.Warning, $"-> 链接 {item} 已于 {mergeEntry.PostTime} 提交审核[HostId:{mergeEntry.HostId}][SubId:{mergeEntry.SubId}]");
-                //    continue;
-                //}
-                //else
-                //{
+                if (mergeEntry != null && mergeEntry.PostTime != null)
+                {
+                    OutputHelper.Write(OutputLevel.Warning, $"-> 链接 {item} 已于 {mergeEntry.PostTime} 提交审核[HostId:{mergeEntry.HostId}][SubId:{mergeEntry.SubId}]");
+                    continue;
+                }
+                else
+                {
                     mergeEntry = tempMergeEntry;
-                //}
+                }
 
                 Console.WriteLine("获取词条");
                 try
@@ -268,6 +268,8 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 mergeEntry.PostTime = DateTime.Now.ToCstTime();
                 postData.Save();
 
+                OutputHelper.Write(OutputLevel.Infor, $"-> 处理完成第 {links.IndexOf(item) + 1} 个词条");
+
             }
 
             //成功
@@ -280,6 +282,9 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
         static async Task GenerateMergeEntry(MergeEntryModel model)
         {
+            //清空
+            model.Examines.Clear();
+
             //获取词条
             var subEntry = await client.GetFromJsonAsync<EntryIndexViewModel>(ToolHelper.WebApiPath + "api/entries/GetEntryView/" + model.SubId);
 

@@ -1,7 +1,7 @@
 ﻿<TabLink Icon="fa fa-newspaper-o" Url="@(string.IsNullOrWhiteSpace(Model.Link) ? ("/articles/index/" + Model.Id) : Model.Link)" target="_blank" Text="@Model.Name" class="a-font-color">
     <div class="bg-opacity" style="cursor: pointer ">
         <div class="h-100">
-            <img src="@Model.MainImage" class="card-img-top" style=" width: 170px; height: auto;" alt="@Model.Name" />
+            <img loading="lazy" src="@Model.MainImage" class="card-img-top" style=" width: 170px; height: auto;" alt="@Model.Name" />
         </div>
         <div class="mb-2" style="padding: 0px; padding: 0px; padding-top: 0.5rem; ">
             <span class="home-card-name-text" style="font-size:inherit">@Model.Name</span>

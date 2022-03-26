@@ -1,7 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject HttpClient Http
 @inject ToastService? ToastService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
 <TitleTip Title="动态汇总"></TitleTip>
@@ -35,7 +34,7 @@
             @foreach (var item in _dataCacheService.NewsSummaryCache.Items.Skip((_dataCacheService.NewsSummaryCache.CurrentPage - 1) * _dataCacheService.NewsSummaryCache.MaxCount).Take(_dataCacheService.NewsSummaryCache.MaxCount))
             {
 
-                <div class="mb-3">
+                <div class="mb-4">
                     <NewsSummaryAloneViewTip Model="item" />
 
                 </div>
