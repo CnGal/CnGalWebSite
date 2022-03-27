@@ -342,7 +342,7 @@
         //如果不是词条类型 切换排序
         if (index != 0)
         {
-            if (_dataCacheService.SearchViewModel.pagedResultDto.Sorting.Contains("PubulishTime"))
+            if (_dataCacheService.SearchViewModel.pagedResultDto.Sorting?.Contains("PubulishTime")??false)
             {
                 _dataCacheService.SearchViewModel.pagedResultDto.Sorting = "Default";
                 StateHasChanged();

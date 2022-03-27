@@ -17,7 +17,7 @@
 
 @if (isReady)
 {
-    <TitleTip Title="@("『"+ExaminesOverview.ObjectName+"』第" +ContrastId+"次编辑记录")" Description="@ExaminesOverview.ObjectBriefIntroduction" Image="@ExaminesOverview.Image"></TitleTip>
+    <TitleTip Title="@("『"+ExaminesOverview.ObjectName+"』第" +(ExaminesOverview.Examines.FindIndex(s=>s.Id==ContrastId)+1)+"次编辑记录")" Description="@ExaminesOverview.ObjectBriefIntroduction" Image="@ExaminesOverview.Image"></TitleTip>
 }
 
 @if (isReady)
@@ -30,7 +30,7 @@
             {
                 <div class="  rounded shadow-sm  bg-opacity pt-3">
 
-                    <div class="row mt-2 ms-2 me-2" style="padding-right: 0;padding-left: 0;">
+                    <div class="row mt-2 ms-2 me-2 ps-0 pe-0" >
                         <div class="col-12 col-md-12 col-lg-5 mt-1 mb-4">
                             <SkeletonAvatar Round="false" />
                         </div>
@@ -53,7 +53,7 @@
                         <SkeletonParagraph />
                     </div>
                 </div>
-                <div class="mt-3" style="padding-right: 0;padding-left: 0;">
+                <div class="mt-3 ps-0 pe-0">
                     <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
                         <SkeletonParagraph />
                         <div class="mt-2">
@@ -91,7 +91,7 @@
             {
                 <div class="  rounded shadow-sm  bg-opacity pt-3">
 
-                    <div class="row mt-2 ms-2 me-2" style="padding-right: 0;padding-left: 0;">
+                    <div class="row mt-2 ms-2 me-2 ps-0 pe-0">
                         <div class="col-12 col-md-12 col-lg-5 mt-1 mb-4">
                             <SkeletonAvatar Round="false" />
                         </div>
@@ -114,7 +114,7 @@
                         <SkeletonParagraph />
                     </div>
                 </div>
-                <div class="mt-3" style="padding-right: 0;padding-left: 0;">
+                <div class="mt-3 ps-0 pe-0">
                     <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
                         <SkeletonParagraph />
                         <div class="mt-2">
@@ -297,25 +297,25 @@ else
             StateHasChanged();
             if (ExaminesOverview.Type == ExaminedNormalListModelType.Entry)
             {
-                EntryContrast = await _dataCatcheService.EntryContrastEditRecordViewCatche.GetCatche(conId + "/" + curId, true);
+                EntryContrast = await _dataCatcheService.EntryContrastEditRecordViewCatche.GetCatche(conId + "/" + (curId=="0"?ExaminesOverview.Examines.Last().Id: curId), true);
                 ContrastId = EntryContrast.ContrastId;
                 CurrentId = EntryContrast.CurrentId;
             }
             else if (ExaminesOverview.Type == ExaminedNormalListModelType.Article)
             {
-                ArticleContrast = await _dataCatcheService.ArticleContrastEditRecordViewCatche.GetCatche(conId + "/" + curId, true);
+                ArticleContrast = await _dataCatcheService.ArticleContrastEditRecordViewCatche.GetCatche(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId), true);
                 ContrastId = ArticleContrast.ContrastId;
                 CurrentId = ArticleContrast.CurrentId;
             }
             else if (ExaminesOverview.Type == ExaminedNormalListModelType.Periphery)
             {
-                PeripheryContrast = await _dataCatcheService.PeripheryContrastEditRecordViewCatche.GetCatche(conId + "/" + curId, true);
+                PeripheryContrast = await _dataCatcheService.PeripheryContrastEditRecordViewCatche.GetCatche(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId), true);
                 ContrastId = PeripheryContrast.ContrastId;
                 CurrentId = PeripheryContrast.CurrentId;
             }
             else if (ExaminesOverview.Type == ExaminedNormalListModelType.Tag)
             {
-                TagContrast = await _dataCatcheService.TagContrastEditRecordViewCatche.GetCatche(conId + "/" + curId, true);
+                TagContrast = await _dataCatcheService.TagContrastEditRecordViewCatche.GetCatche(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId), true);
                 ContrastId = TagContrast.ContrastId;
                 CurrentId = TagContrast.CurrentId;
             }
