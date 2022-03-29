@@ -4,7 +4,10 @@
     </div>
     @if (Model.SteamId > 0)
     {
-        <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="Model" />
+        <div class="mb-3">
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="Model" />
+
+        </div>
     }
     @if (Model.Information.Count > 0)
     {
