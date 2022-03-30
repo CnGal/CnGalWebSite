@@ -69,12 +69,20 @@ else
 
                         </div>
                     }
-                    <div class="mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
-                    </div>
-                    <div class=" mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
-                    </div>
+                    @if (EntryView.Information.Any())
+                    {
+                        <div class="mb-4">
+                            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
+                        </div>
+
+                    }
+                    @if (EntryView.Tags.Any())
+                    {
+                        <div class=" mb-4">
+                            <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
+                        </div>
+
+                    }
                 </div>
                 <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8") ">
 
@@ -196,12 +204,22 @@ else
 
                         </div>
                     }
-                    <div class="mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
-                    </div>
-                    <div class=" mb-4">
-                        <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
-                    </div>
+
+                    @if (EntryView.Information.Any())
+                    {
+                        <div class="mb-4">
+                            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforCard Model="EntryView" OnRevoke="OnRevoke" />
+                        </div>
+
+                    }
+
+                    @if (EntryView.Tags.Any())
+                    {
+                        <div class=" mb-4">
+                            <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
+                        </div>
+
+                    }
 
                     @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
                     {
