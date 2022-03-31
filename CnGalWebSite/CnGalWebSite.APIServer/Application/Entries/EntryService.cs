@@ -299,6 +299,68 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             foreach (var item in examine.Information)
             {
+                //预处理
+                //更新部分重要信息缓存
+                if (item.IsDelete == false)
+                {
+                    if (entry.Type == EntryType.Game)
+                    {
+                        if (item.Modifier == "基本信息")
+                        {
+                            //查找是否修改发行时间 对下文不影响 只是更新字段缓存
+                            if (item.DisplayName == "发行时间")
+                            {
+                                if (item.DisplayValue == null)
+                                {
+                                    entry.PubulishTime = null;
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy年M月d日", null);
+                                    }
+                                    catch
+                                    {
+                                        try
+                                        {
+                                            entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy/M/d", null);
+                                        }
+                                        catch
+                                        {
+
+                                        }
+                                    }
+                                }
+                            }
+                            else if (item.DisplayName == "Steam平台Id")
+                            {
+                                if (string.IsNullOrWhiteSpace(item.DisplayValue) == false && string.IsNullOrWhiteSpace(entry.MainPicture))
+                                {
+                                    entry.MainPicture = "https://media.st.dl.pinyuncloud.com/steam/apps/" + item.DisplayValue + "/header.jpg";
+                                }
+                            }
+
+                        }
+                    }
+                }
+                else
+                {
+                    if (entry.Type == EntryType.Game)
+                    {
+                        if (item.Modifier == "基本信息")
+                        {
+                            //查找是否修改发行时间 对下文不影响 只是更新字段缓存
+                            if (item.DisplayName == "发行时间")
+                            {
+                                entry.PubulishTime = null;
+                            }
+                        }
+                    }
+                }
+
+
+
                 var entryInformation = entry.Information.FirstOrDefault(s => s.Modifier == item.Modifier && s.DisplayValue == item.DisplayValue && s.DisplayName == item.DisplayName);
                 if (entryInformation != null)
                 {
@@ -368,64 +430,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     }
                 }
 
-                //更新部分重要信息缓存
-                if (item.IsDelete == false)
-                {
-                    if (entry.Type == EntryType.Game)
-                    {
-                        if (item.Modifier == "基本信息")
-                        {
-                            //查找是否修改发行时间 对下文不影响 只是更新字段缓存
-                            if (item.DisplayName == "发行时间")
-                            {
-                                if (item.DisplayValue == null)
-                                {
-                                    entry.PubulishTime = null;
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy年M月d日", null);
-                                    }
-                                    catch
-                                    {
-                                        try
-                                        {
-                                            entry.PubulishTime = DateTime.ParseExact(item.DisplayValue, "yyyy/M/d", null);
-                                        }
-                                        catch
-                                        {
-
-                                        }
-                                    }
-                                }
-                            }
-                            else if (item.DisplayName == "Steam平台Id")
-                            {
-                                if (string.IsNullOrWhiteSpace(item.DisplayValue) == false && string.IsNullOrWhiteSpace(entry.MainPicture))
-                                {
-                                    entry.MainPicture = "https://media.st.dl.pinyuncloud.com/steam/apps/" + item.DisplayValue + "/header.jpg";
-                                }
-                            }
-
-                        }
-                    }
-                }
-                else
-                {
-                    if (entry.Type == EntryType.Game)
-                    {
-                        if (item.Modifier == "基本信息")
-                        {
-                            //查找是否修改发行时间 对下文不影响 只是更新字段缓存
-                            if (item.DisplayName == "发行时间")
-                            {
-                                entry.PubulishTime = null;
-                            }
-                        }
-                    }
-                }
+                
             }
 
             //更新最后编辑时间
