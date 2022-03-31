@@ -1,20 +1,24 @@
-﻿<div class="row">
-    @foreach (var item in Model.Where(s=>s.IsHidden==false))
+﻿
+<EditGameRecordTip @ref="editGameRecordTip" OnChanged="OnChanged" />
+<GameRecordViewTip @ref="gameRecordViewTip"  IsCurrentUser="IsCurrentUser" OnEdit="OnEdit" OnChanged="OnChanged"/>
+
+<div class="row">
+    @foreach (var item in Model.Where(s => s.IsHidden == false))
     {
         <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mb-3">
-            <GameRecordViewCard Model="item" OnChanged="OnChanged" IsSmallScreen="IsSmallScreen" IsCurrentUser="IsCurrentUser" />
+            <GameRecordViewCard Model="item" OnShow="OnShow" IsCurrentUser="IsCurrentUser" />
         </div>
     }
 </div>
-@if (Model.Any(s => s.IsHidden)&& IsCurrentUser)
+@if (Model.Any(s => s.IsHidden) && IsCurrentUser)
 {
     <div class="mb-3">
-        <TitleCollapseCard Icon="fa-unlink" Title="折叠的项目"  @bind-IsCollapsed="IsCollapsed">
-            <div class="row">
-                @foreach (var item in Model.Where(s=>s.IsHidden))
+        <TitleCollapseCard Icon="fa-unlink" Title="折叠的项目" @bind-IsCollapsed="IsCollapsed">
+            <div class="row mt-3">
+                @foreach (var item in Model.Where(s => s.IsHidden))
                 {
                     <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mb-3">
-                        <GameRecordViewCard Model="item" OnChanged="OnChanged" IsSmallScreen="IsSmallScreen" />
+                        <GameRecordViewCard Model="item" OnShow="OnShow" />
                     </div>
                 }
             </div>
@@ -26,12 +30,14 @@
 @code {
     [Parameter]
     public List<GameRecordViewModel> Model { get; set; }
-    [Parameter]
-    public bool IsSmallScreen { get; set; }
-    [Parameter]
-    public bool IsCollapsed { get; set; } = true;
+
     [Parameter]
     public bool IsCurrentUser { get; set; }
+
+    EditGameRecordTip editGameRecordTip;
+    GameRecordViewTip gameRecordViewTip;
+
+    public bool IsCollapsed { get; set; } = true;
 
     public Task OnChanged()
     {
@@ -39,4 +45,19 @@
         return Task.CompletedTask;
     }
 
+    public async Task OnShow(GameRecordViewModel model)
+    {
+        if (gameRecordViewTip != null)
+        {
+            await gameRecordViewTip.Refresh(true, model);
+        }
+    }
+
+    public async Task OnEdit(GameRecordViewModel model)
+    {
+        if (editGameRecordTip != null)
+        {
+            await editGameRecordTip.Refresh(true, model.GameId, model);
+        }
+    }
 }
