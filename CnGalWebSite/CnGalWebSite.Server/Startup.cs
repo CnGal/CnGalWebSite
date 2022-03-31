@@ -58,6 +58,8 @@ namespace CnGalWebSite.Server
             services.AddScoped(x => new ImagesLargeViewService());
             services.AddMasaBlazor();
 
+            //添加状态检查
+            services.AddHealthChecks();
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
@@ -77,6 +79,9 @@ namespace CnGalWebSite.Server
             //app.UseRequestLocalization(app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>().Value);
 
             app.UseStaticFiles();
+
+            //添加状态检查终结点
+            app.UseHealthChecks("/healthz");
 
             app.UseRouting();
 
