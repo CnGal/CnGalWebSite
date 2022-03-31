@@ -187,6 +187,9 @@ namespace CnGalWebSite.APIServer
                 options.ForwardedHeaders =
                     ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
+
+            //添加状态检查
+            services.AddHealthChecks();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -219,6 +222,8 @@ namespace CnGalWebSite.APIServer
             var option = new RewriteOptions();
             option.AddRedirect("^$", "swagger");
             app.UseRewriter(option);
+            //添加状态检查终结点
+            app.UseHealthChecks("/healthz");
 
             //添加路由中间件
             app.UseRouting();
