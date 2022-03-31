@@ -72,6 +72,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<LotteryPrize> LotteryPrizes { get; set; }
         public DbSet<UserAddress> UserAddresses { get; set; }
         public DbSet<SteamUserInfor> SteamUserInfors { get; set; }
+        public DbSet<SearchCache> SearchCaches { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

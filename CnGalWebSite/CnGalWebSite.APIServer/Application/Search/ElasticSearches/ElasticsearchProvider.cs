@@ -2,7 +2,7 @@
 using Nest;
 using System;
 
-namespace CnGalWebSite.APIServer.Application.ElasticSearches
+namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
 {
     public class ElasticsearchProvider : IElasticsearchProvider
     {

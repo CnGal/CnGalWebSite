@@ -1,9 +1,9 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.BackUpArchives;
-using CnGalWebSite.APIServer.Application.ElasticSearches;
 using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Perfections;
+using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Tables;
 using CnGalWebSite.APIServer.DataReositories;
@@ -27,7 +27,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         private readonly ITableService _tableService;
         private readonly IBackUpArchiveService _backUpArchiveService;
         private readonly IPerfectionService _perfectionService;
-        private readonly IElasticsearchService _elasticsearchService;
+        private readonly ISearchHelper _searchHelper;
         private readonly INewsService _newsService;
         private readonly IExamineService _examineService;
         private readonly ILotteryService _lotteryService;
@@ -35,14 +35,14 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<TimedTask>, string, SortOrder, IEnumerable<TimedTask>>> SortLambdaCacheApplicationUser = new();
 
         public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, ISteamInforService steamInforService, IBackUpArchiveService backUpArchiveService, ITableService tableService,
-            IPerfectionService perfectionService, IElasticsearchService elasticsearchService, INewsService newsService, IExamineService examineService, ILotteryService lotteryService)
+            IPerfectionService perfectionService, ISearchHelper searchHelper, INewsService newsService, IExamineService examineService, ILotteryService lotteryService)
         {
             _timedTaskRepository = timedTaskRepository;
             _steamInforService = steamInforService;
             _backUpArchiveService = backUpArchiveService;
             _tableService = tableService;
             _perfectionService = perfectionService;
-            _elasticsearchService = elasticsearchService;
+            _searchHelper = searchHelper;
             _newsService = newsService;
             _examineService = examineService;
             _lotteryService = lotteryService;
@@ -186,7 +186,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         await _perfectionService.UpdateAllEntryPerfectionsAsync();
                         break;
                     case TimedTaskType.UpdateDataToElasticsearch:
-                        await _elasticsearchService.UpdateDataToElasticsearch(item.LastExecutedTime ?? DateTime.MinValue);
+                        await _searchHelper.UpdateDataToSearchService(item.LastExecutedTime ?? DateTime.MinValue);
                         break;
                     case TimedTaskType.UpdateGameNews:
                         await _newsService.UpdateNewestGameNews();

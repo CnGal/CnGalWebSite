@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.APIServer.Application.ElasticSearches
+namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
 {
     public interface IElasticsearchBaseService<TEntity> where TEntity : class
     {
@@ -57,15 +57,4 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
         Task<Tuple<int, IList<TEntity>>> QueryAsync(int page, int limit, string Text, string sort, SortOrder sortOrder, Func<BoolQueryDescriptor<TEntity>, IBoolQuery> field, QueryType type);
     }
 
-    public enum QueryType
-    {
-        /// <summary>
-        /// 分页
-        /// </summary>
-        Page,
-        /// <summary>
-        /// 无限下滑
-        /// </summary>
-        Index
-    }
 }

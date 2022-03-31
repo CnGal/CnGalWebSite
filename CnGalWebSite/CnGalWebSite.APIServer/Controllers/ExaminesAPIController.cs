@@ -1,6 +1,5 @@
 ﻿using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Comments;
-using CnGalWebSite.APIServer.Application.ElasticSearches;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.ErrorCounts;
 using CnGalWebSite.APIServer.Application.Favorites;
@@ -12,6 +11,7 @@ using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
+using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Votes;
 using CnGalWebSite.APIServer.DataReositories;
@@ -45,63 +45,23 @@ namespace CnGalWebSite.APIServer.Controllers
     public class ExaminesAPIController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<Article, long> _articleRepository;
-        private readonly IRepository<FriendLink, int> _friendLinkRepository;
-        private readonly IRepository<Carousel, int> _carouselRepository;
-        private readonly IRepository<UserFile, int> _userFileRepository;
         private readonly IRepository<Disambig, int> _disambigRepository;
         private readonly IRepository<Message, long> _messageRepository;
         private readonly IRepository<Comment, long> _commentRepository;
-        private readonly IRepository<ThumbsUp, long> _thumbsUpRepository;
-        private readonly IRepository<BackUpArchiveDetail, long> _backUpArchiveDetailRepository;
-        private readonly IRepository<UserOnlineInfor, long> _userOnlineInforRepository;
-        private readonly IRepository<ApplicationUser, string> _userRepository;
-        private readonly IRepository<SignInDay, long> _signInDayRepository;
-        private readonly IRepository<ErrorCount, long> _errorCountRepository;
-        private readonly IRepository<FavoriteFolder, long> _favoriteFolderRepository;
-        private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
-        private readonly IRepository<Rank, long> _rankRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
-        private readonly IRepository<Vote, long> _voteRepository;
-        private readonly IRepository<SteamInfor, long> _steamInforRepository;
-        private readonly IUserService _userService;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
-        private readonly IEntryService _entryService;
-        private readonly IArticleService _articleService;
-        private readonly ICommentService _commentService;
-        private readonly IMessageService _messageService;
-        private readonly IFileService _fileService;
-        private readonly IErrorCountService _errorCountService;
-        private readonly IFavoriteFolderService _favoriteFolderService;
         private readonly IRankService _rankService;
-        private readonly IPeripheryService _peripheryService;
-        private readonly IVoteService _voteService;
-        private readonly IElasticsearchBaseService<Entry> _entryElasticsearchBaseService;
-        private readonly IElasticsearchBaseService<Article> _articleElasticsearchBaseService;
-        private readonly IElasticsearchService _elasticsearchService;
-        private readonly INewsService _newsService;
-        private readonly IRepository<GameNews, long> _gameNewsRepository;
-        private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
-        private readonly IHistoryDataService _historyDataService;
-        private readonly IConfiguration _configuration;
 
 
-        public ExaminesAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
-        IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
-        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, IHistoryDataService historyDataService,
-        IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IElasticsearchService elasticsearchService,
-        IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IElasticsearchBaseService<Article> articleElasticsearchBaseService,
-        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IElasticsearchBaseService<Entry> entryElasticsearchBaseService,
-        IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
-        IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
-        IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository,
-        IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration)
+        public ExaminesAPIController( IRepository<Disambig, int> disambigRepository,IRankService rankService,IRepository<Comment, long> commentRepository,
+        IRepository<Message, long> messageRepository,
+        UserManager<ApplicationUser> userManager, IExamineService examineService, 
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -110,44 +70,11 @@ namespace CnGalWebSite.APIServer.Controllers
             _appHelper = appHelper;
             _articleRepository = articleRepository;
             _examineService = examineService;
-            _roleManager = roleManager;
-            _userService = userService;
-            _entryService = entryService;
-            _articleService = articleService;
-            _friendLinkRepository = friendLinkRepository;
-            _carouselRepository = carouselRepositor;
             _messageRepository = messageRepository;
             _commentRepository = commentRepository;
-            _commentService = commentService;
-            _messageService = messageService;
-            _userRepository = userRepository;
-            _userFileRepository = userFileRepository;
-            _userOnlineInforRepository = userOnlineInforRepository;
-            _thumbsUpRepository = thumbsUpRepository;
             _disambigRepository = disambigRepository;
-            _fileService = fileService;
-            _signInDayRepository = signInDayRepository;
-            _errorCountService = errorCountService;
-            _errorCountRepository = errorCountRepository;
-            _favoriteFolderRepository = favoriteFolderRepository;
-            _favoriteFolderService = favoriteFolderService;
-            _backUpArchiveDetailRepository = backUpArchiveDetailRepository;
-            _favoriteObjectRepository = favoriteObjectRepository;
-            _rankRepository = rankRepository;
             _rankService = rankService;
             _peripheryRepository = peripheryRepository;
-            _peripheryService = peripheryService;
-            _entryElasticsearchBaseService = entryElasticsearchBaseService;
-            _articleElasticsearchBaseService = articleElasticsearchBaseService;
-            _elasticsearchService = elasticsearchService;
-            _newsService = newsService;
-            _gameNewsRepository = gameNewsRepository;
-            _weeklyNewsRepository = weeklyNewsRepository;
-            _historyDataService = historyDataService;
-            _voteService = voteService;
-            _voteRepository = voteRepository;
-            _configuration = configuration;
-            _steamInforRepository = steamInforRepository;
         }
 
 

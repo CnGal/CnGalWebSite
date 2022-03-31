@@ -1,8 +1,10 @@
 ﻿using AspNetCoreRateLimit;
 using CnGalWebSite.APIServer.Application.BackgroundTasks;
-using CnGalWebSite.APIServer.Application.ElasticSearches;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.News;
+using CnGalWebSite.APIServer.Application.Search;
+using CnGalWebSite.APIServer.Application.Search.ElasticSearches;
+using CnGalWebSite.APIServer.Application.Typesense;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Infrastructure;
 using CnGalWebSite.DataModel.Model;
@@ -60,13 +62,14 @@ namespace CnGalWebSite.APIServer
             //添加HTTP请求
             services.AddHttpClient();
             //添加ElasticSearch服务
-            services.AddTransient<IElasticsearchProvider, ElasticsearchProvider>();
             services.AddTransient(typeof(IElasticsearchBaseService<>), typeof(ElasticsearchBaseService<>));
+            //添加搜索服务
+            services.AddScoped<ISearchHelper, TypesenseHelper>();
             //依赖注入仓储
             services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
             //自动注入服务到依赖注入容器
             services.RegisterAssemblyPublicNonGenericClasses()
-               .Where(c => c.Name.EndsWith("Service"))
+               .Where(c => c.Name.EndsWith("Service")|| c.Name.EndsWith("Provider"))
                .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
 
             //注册Swagger生成器，定义一个或多个Swagger文件

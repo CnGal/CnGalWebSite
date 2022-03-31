@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.APIServer.Application.ElasticSearches
+namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
 {
     public class ElasticsearchBaseService<TEntity> : IElasticsearchBaseService<TEntity> where TEntity : class
     {

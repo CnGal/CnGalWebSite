@@ -1,6 +1,4 @@
-﻿
-using CnGalWebSite.APIServer.Application.ElasticSearches;
-using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Home;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.DataReositories;
@@ -25,22 +23,20 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/home/[action]")]
     public class HomeAPIController : ControllerBase
     {
-        private readonly ISearchService _searchService;
+        private readonly ISearchHelper _searchHelper;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IHomeService _homeService;
-        private readonly IElasticsearchService _elasticsearchService;
         private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
 
-        public HomeAPIController(ISearchService searchService, IElasticsearchService elasticsearchService, IAppHelper appHelper, IRepository<Article, long> articleRepository,
+        public HomeAPIController(ISearchHelper searchHelper,  IAppHelper appHelper, IRepository<Article, long> articleRepository,
         IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository)
         {
-            _searchService = searchService;
+            _searchHelper = searchHelper;
             _entryRepository = entryRepository;
             _homeService = homeService;
-            _elasticsearchService = elasticsearchService;
             _examineService = examineService;
             _appHelper = appHelper;
             _examineRepository = examineRepository;
@@ -169,8 +165,8 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var model = new SearchViewModel();
                 var dtos = input.StartIndex == -1 ?
-                    await _elasticsearchService.QueryAsync(input.CurrentPage, input.MaxResultCount, input.FilterText, input.ScreeningConditions, input.Sorting, QueryType.Page) :
-                    await _elasticsearchService.QueryAsync(input.StartIndex, input.MaxResultCount, input.FilterText, input.ScreeningConditions, input.Sorting, QueryType.Index);
+                    await _searchHelper.QueryAsync(input.CurrentPage, input.MaxResultCount, input.FilterText, input.ScreeningConditions, input.Sorting, QueryType.Page) :
+                    await _searchHelper.QueryAsync(input.StartIndex, input.MaxResultCount, input.FilterText, input.ScreeningConditions, input.Sorting, QueryType.Index);
                 dtos.Data = dtos.Data.ToList();
 
                 model.pagedResultDto = dtos;
