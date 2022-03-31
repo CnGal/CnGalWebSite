@@ -2,6 +2,8 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
+<CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip @ref="editGameRecordTip" />
+
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-gamepad-square-outline" Tooltip="游玩记录" OnClick="OnClickEditGameRecored" Class="@Class" />
 
 @code {
@@ -12,30 +14,13 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
+    CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip editGameRecordTip;
 
     public async Task OnClickEditGameRecored()
     {
-        //判断用户是否登录
-        var user = await authenticationStateTask;
-        if (user.User.Identity.IsAuthenticated)
+        if (editGameRecordTip != null)
         {
-            var option = new DialogOption()
-            {
-                Title = "编辑游玩记录"
-            };
-            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip>(new Dictionary<string, object>
-            {
-                [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip.Id)] = Id,
-                [nameof(CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-
-            }).Render();
-            await DialogService.Show(option);
+            await editGameRecordTip.Refresh(true, Id, null);
         }
-        else
-        {
-            NavigationManager.NavigateTo("account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        }
-
-
     }
 }

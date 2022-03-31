@@ -1,59 +1,79 @@
 ﻿@inject ToastService ToastService
-@inject DialogService DialogService
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
-@inject IServiceProvider Provider
+@inject IDataCacheService _dataCacheService
 
-<style>
-    .modal-footer {
-        display: none;
-    }
+<MDialog @bind-Value="Dialog"
+         MaxWidth="550">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            编辑游玩记录
+        </MCardTitle>
+        <MCardText Class="pb-2">
+            你可以在这里记录游玩状态和感想，还可以在个人空间中绑定Steam库存
+        </MCardText>
 
-    .modal-title {
-        font-weight: bolder;
-    }
-</style>
+        <MCardText Class="pb-0">
+            @if (isReady)
+            {
 
-<div>
-    @if (isReady)
-    {
-    <div>
-        <div>
-            <RadioList @bind-Value="Model.Type" Color="@Color.Primary" DisplayText="状态" ShowLabel="true"></RadioList>
-        </div>
-        <div class="mt-3">
-            <Textarea @bind-Value="Model.PlayImpressions" rows="5" DisplayText="感想" ShowLabel="true" />
-        </div>
-        <div class="mt-3">
-            <Checkbox @bind-Value="Model.IsHidden" DisplayText="折叠" ShowAfterLabel="true"></Checkbox>
-        </div>
-    </div>
+                <MTextarea Label="感想" Rows="5" Color="@_dataCacheService.ThemeSetting.Theme"
+                           @bind-Value="Model.PlayImpressions">
 
-    }
-    else
-    {
-        <div style="min-height:200px;">
-            <h3 class="mb-3 text-center">正在加载</h3>
-            <div class="d-flex" style="justify-content: center;">
-                <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
-            </div>
-        </div>
-    }
+                </MTextarea>
+                <MButtonGroup Tile Group Value="(int)Model.Type" ValueChanged="ValueChanged" Color="@_dataCacheService.ThemeSetting.Theme" Class="pb-2">
+                    <MButton Class="m-0" Value="(int)PlayedGameType.WantToPlay">
+                        想玩
+                    </MButton>
+                    <MButton Class="m-0" Value="(int)PlayedGameType.Playing">
+                        正在玩
+                    </MButton>
+                    <MButton Class="m-0" Value="(int)PlayedGameType.Played">
+                        已玩
+                    </MButton>
+                    <MButton Class="m-0" Value="(int)PlayedGameType.Uninterested">
+                        不感兴趣
+                    </MButton>
+                    <MButton Class="m-0" Value="(int)PlayedGameType.UnPlayed">
+                        未玩
+                    </MButton>
+                </MButtonGroup>
+                <MCheckbox @bind-Value="Model.IsHidden"
+                           Label="折叠" Class="m-0"
+                           HideDetails="true"
+                           Color="@_dataCacheService.ThemeSetting.Theme"></MCheckbox>
 
-</div>
 
-<div class="mt-3" style="display: flex; justify-content: flex-end;">
+            }
+            else
+            {
+                <div style="min-height:200px;" class="mt-8">
+                    <h3 class="mb-3 text-center">正在加载</h3>
+                    <div class="d-flex" style="justify-content: center;">
+                        <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
+                    </div>
+                </div>
+            }
+        </MCardText>
 
-    <Button Color="Color.Success" Icon="fa fa-save" class="me-1" OnClick="OnSubmit" IsAsync="true" Text="保存"></Button>
-</div>
-
+        <MCardActions>
+            <MSpacer></MSpacer>
+            <MButton Color="green darken-1"
+                     Text
+                     OnClick="OnSubmit">
+                保存
+            </MButton>
+        </MCardActions>
+    </MCard>
+</MDialog>
 
 @code {
+
     [Parameter]
-    public EventCallback OnClickClose { get; set; }
-    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
     public int Id { get; set; }
-    [Parameter]
+
     public GameRecordViewModel ViewModel { get; set; }
 
     public EditGameRecordModel Model = new EditGameRecordModel();
@@ -62,10 +82,22 @@
     public ErrorHandler ErrorHandler { get; set; }
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+    bool Dialog { get; set; }
 
     bool isReady = false;
 
-    protected override async Task OnInitializedAsync()
+    public Task ValueChanged(StringNumber index)
+    {
+        if(index==null)
+        {
+            return Task.CompletedTask;
+        }
+        Model.Type = (PlayedGameType)index.ToInt32();
+
+        return Task.CompletedTask;
+    }
+
+    protected async Task OnInit()
     {
         try
         {
@@ -94,19 +126,30 @@
             else
             {
                 await ToastService.Success("编辑游玩记录成功", "编辑游玩记录成功");
-                if(ViewModel!=null)
+                if (ViewModel != null)
                 {
                     ViewModel.Type = Model.Type;
                     ViewModel.PlayImpressions = Model.PlayImpressions;
                     ViewModel.IsHidden = Model.IsHidden;
                 }
-
-                await OnClickClose.InvokeAsync();
+                Dialog = false;
+                await OnChanged.InvokeAsync();
             }
         }
         catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "编辑游玩记录失败");
         }
+    }
+
+    public async Task Refresh(bool dialog, int id, GameRecordViewModel viewModel)
+    {
+        Dialog = dialog;
+        Id = id;
+        ViewModel = viewModel;
+
+        await OnInit();
+
+        StateHasChanged();
     }
 }
