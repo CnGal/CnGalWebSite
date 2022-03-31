@@ -230,7 +230,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
 
             var peripheryIds = query.Hits.Where(s => s.Index == _peripheryElasticsearchBaseService.GetIndex()).Select(s => (long)s.Source["id"]).ToList();
 
-            var peripheries = await _peripheryRepository.GetAll().AsNoTracking().Include(s => s.Entries).ThenInclude(s => s.Entry).Where(s => peripheryIds.Contains(s.Id) && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
+            var peripheries = await _peripheryRepository.GetAll().AsNoTracking().Include(s => s.RelatedEntries).Where(s => peripheryIds.Contains(s.Id) && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
 
 
             var result = new PagedResultDto<SearchAloneModel>
