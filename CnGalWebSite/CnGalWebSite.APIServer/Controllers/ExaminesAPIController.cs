@@ -334,8 +334,8 @@ namespace CnGalWebSite.APIServer.Controllers
                         try
                         {
                             entry = await _entryRepository.GetAll()
-                                                       .Include(s => s.Information)
-                                                         .ThenInclude(s => s.Additional)
+                                                       .Include(s => s.Information).ThenInclude(s => s.Additional)
+                                                       .Include(s=>s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
                                                        .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
                             if (entry == null)
                             {

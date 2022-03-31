@@ -521,8 +521,14 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //查找词条
-            var currentEntry = await _entryRepository.GetAll().Include(s => s.Information).ThenInclude(s => s.Additional).FirstOrDefaultAsync(x => x.Id == model.Id);
-            var newEntry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Information).ThenInclude(s => s.Additional).FirstOrDefaultAsync(x => x.Id == model.Id);
+            var currentEntry = await _entryRepository.GetAll()
+                .Include(s => s.Information).ThenInclude(s => s.Additional)
+                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .FirstOrDefaultAsync(x => x.Id == model.Id);
+            var newEntry = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Information).ThenInclude(s => s.Additional)
+                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .FirstOrDefaultAsync(x => x.Id == model.Id);
             if (currentEntry == null)
             {
                 return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
