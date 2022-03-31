@@ -11,9 +11,9 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
-namespace CnGalWebSite.APIServer.Application.ElasticSearches
+namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
 {
-    public class ElasticsearchService : IElasticsearchService
+    public class ElasticsearchHelper : ISearchHelper
     {
         private readonly IElasticClient _elasticClient;
         private readonly IRepository<Entry, int> _entryRepository;
@@ -26,7 +26,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
         private readonly IElasticsearchBaseService<Periphery> _peripheryElasticsearchBaseService;
         private readonly IAppHelper _appHelper;
 
-        public ElasticsearchService(IElasticsearchProvider esClientProvider, IRepository<Entry, int> entryRepository, IElasticsearchBaseService<Entry> entryElasticsearchBaseService,
+        public ElasticsearchHelper(IElasticsearchProvider esClientProvider, IRepository<Entry, int> entryRepository, IElasticsearchBaseService<Entry> entryElasticsearchBaseService,
             IRepository<Tag, int> tagRepository, IRepository<Article, int> articleRepository, IRepository<Periphery, int> peripheryRepository, IElasticsearchBaseService<Tag> tagElasticsearchBaseService,
             IElasticsearchBaseService<Article> articleElasticsearchBaseService, IElasticsearchBaseService<Periphery> peripheryElasticsearchBaseService, IAppHelper appHelper)
         {
@@ -42,7 +42,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
             _appHelper = appHelper;
         }
 
-        public async Task UpdateDataToElasticsearch(DateTime LastUpdateTime)
+        public async Task UpdateDataToSearchService(DateTime LastUpdateTime)
         {
             await UpdateEntryDataToElasticsearch(LastUpdateTime);
             await UpdateArticleDataToElasticsearch(LastUpdateTime);
@@ -113,7 +113,7 @@ namespace CnGalWebSite.APIServer.Application.ElasticSearches
             }
         }
 
-        public async Task DeleteDataOfElasticsearch()
+        public async Task DeleteDataOfSearchService()
         {
             await _peripheryElasticsearchBaseService.RemoveIndex();
             await _articleElasticsearchBaseService.RemoveIndex();

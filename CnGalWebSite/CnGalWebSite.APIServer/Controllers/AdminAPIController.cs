@@ -1,6 +1,5 @@
 ﻿using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Comments;
-using CnGalWebSite.APIServer.Application.ElasticSearches;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.ErrorCounts;
 using CnGalWebSite.APIServer.Application.Favorites;
@@ -13,6 +12,7 @@ using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
+using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Votes;
 using CnGalWebSite.APIServer.DataReositories;
@@ -78,14 +78,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IPeripheryService _peripheryService;
         private readonly IVoteService _voteService;
         private readonly ILotteryService _lotteryService;
-        private readonly IElasticsearchBaseService<Entry> _entryElasticsearchBaseService;
-        private readonly IElasticsearchBaseService<Article> _articleElasticsearchBaseService;
-        private readonly IElasticsearchService _elasticsearchService;
         private readonly INewsService _newsService;
         private readonly IRepository<GameNews, long> _gameNewsRepository;
         private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly IHistoryDataService _historyDataService;
+        private readonly ISearchHelper _searchHelper;
         private readonly IConfiguration _configuration;
         private readonly IRepository<LotteryUser, long> _lotteryUserRepository;
         private readonly IRepository<LotteryAward, long> _lotteryAwardRepository;
@@ -94,16 +92,16 @@ namespace CnGalWebSite.APIServer.Controllers
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
         IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, IHistoryDataService historyDataService,
-        IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IElasticsearchService elasticsearchService,
-        IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IElasticsearchBaseService<Article> articleElasticsearchBaseService,
-        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IElasticsearchBaseService<Entry> entryElasticsearchBaseService,
+        IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, 
+        IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, 
+        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, 
         IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository,
-        IRepository<LotteryAward, long> lotteryAwardRepository,
-         IRepository<LotteryPrize, long> lotteryPrizeRepository)
+        IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper,
+        IRepository<LotteryPrize, long> lotteryPrizeRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -139,9 +137,6 @@ namespace CnGalWebSite.APIServer.Controllers
             _rankService = rankService;
             _peripheryRepository = peripheryRepository;
             _peripheryService = peripheryService;
-            _entryElasticsearchBaseService = entryElasticsearchBaseService;
-            _articleElasticsearchBaseService = articleElasticsearchBaseService;
-            _elasticsearchService = elasticsearchService;
             _newsService = newsService;
             _gameNewsRepository = gameNewsRepository;
             _weeklyNewsRepository = weeklyNewsRepository;
@@ -155,6 +150,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _lotteryUserRepository = lotteryUserRepository;
             _lotteryAwardRepository = lotteryAwardRepository;
             _lotteryPrizeRepository = lotteryPrizeRepository;
+            _searchHelper = searchHelper;
         }
 
         /// <summary>
@@ -809,8 +805,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _elasticsearchService.DeleteDataOfElasticsearch();
-                await _elasticsearchService.UpdateDataToElasticsearch(DateTime.MinValue);
+                await _searchHelper.DeleteDataOfSearchService();
+                await _searchHelper.UpdateDataToSearchService(DateTime.MinValue);
 
                 return new Result { Successful = true };
             }

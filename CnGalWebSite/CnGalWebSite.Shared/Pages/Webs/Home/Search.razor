@@ -221,6 +221,7 @@
 
     private async Task OnTabClick(int index)
     {
+        _dataCacheService.SearchViewModel.pagedResultDto.CurrentPage = 1;
 
         if (index == 0)
         {
@@ -311,6 +312,7 @@
 
     private async Task OnScreen(int index)
     {
+        _dataCacheService.SearchViewModel.pagedResultDto.CurrentPage = 1;
         _dataCacheService.SearchViewModel.pagedResultDto.ScreeningConditions = index switch
         {
             0 => "游戏",
@@ -322,14 +324,15 @@
             6 => "攻略",
             7 => "动态",
             8 => "评测",
-            9 => "文章周边",
+            9 => "周边文章",
             10 => "公告",
             11 => "杂谈",
             12 => "二创",
             13 => "设定集或画册等",
             14 => "原声集",
             15 => "套装",
-            16 => "其他",
+            16 => "其他周边",
+            17 => "标签",
             666 => searchScreenType switch
             {
                 SearchScreenType.All => "全部",
@@ -380,10 +383,6 @@
             var result = await Http.PostAsJsonAsync<GetSearchInput>(ToolHelper.WebApiPath + "api/home/search", new GetSearchInput { CurrentPage = _dataCacheService.SearchViewModel.pagedResultDto.CurrentPage, MaxResultCount = _dataCacheService.SearchViewModel.pagedResultDto.MaxResultCount, Sorting = _dataCacheService.SearchViewModel.pagedResultDto.Sorting ?? "Default", FilterText = _dataCacheService.SearchViewModel.pagedResultDto.FilterText, ScreeningConditions = _dataCacheService.SearchViewModel.pagedResultDto.ScreeningConditions });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             _dataCacheService.SearchViewModel = JsonSerializer.Deserialize<SearchViewModel>(jsonContent, ToolHelper.options);
-            if (_dataCacheService.SearchViewModel.pagedResultDto.Data == null)
-            {
-                _dataCacheService.SearchViewModel.pagedResultDto.Data = new List<SearchAloneModel>();
-            }
 
             if (noRefresh == false)
             {
@@ -396,6 +395,9 @@
         catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "无法获取搜索结果");
+            _dataCacheService.SearchViewModel = new SearchViewModel();
+            isReady = true;
+            StateHasChanged();
         }
     }
 
