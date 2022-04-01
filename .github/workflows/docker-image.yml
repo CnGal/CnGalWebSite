@@ -1,0 +1,23 @@
+name: Docker Image CI
+ 
+on: [push, pull_request] # 触发事件
+ 
+jobs:
+  bt-product-release:
+    if: ${{ github.ref == 'refs/heads/master' }}  # 检测master分支是否有更新
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3 # pull代码到运行服务器上
+    - name: Login to Aliyun Container Registry (ACR)
+      uses: aliyun/acr-login@v1 # 使用阿里云镜像服务action
+      with:
+        login-server: registry.cn-shanghai.aliyuncs.com # 务必正确填写镜像容器服务的登录地址
+        region-id: cn-shanghai # 务必正确填写镜像容器服务的登录地址
+        username: "${{ secrets.REGISTRY_USERNAME }}" # 引用GitHub repo设置的镜像容器服务用户名
+        password: "${{ secrets.REGISTRY_PASSWORD }}" # 引用GitHub repo设置的镜像容器服务密码
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t registry.cn-shanghai.aliyuncs.com/cngal/apiserver:latest .
+        docker push registry.cn-shanghai.aliyuncs.com/cngal/apiserver:latest .
+        docker build -t registry.cn-shanghai.aliyuncs.com/cngal/blazorserver:latest .
+        docker push registry.cn-shanghai.aliyuncs.com/cngal/blazorserver:latest
