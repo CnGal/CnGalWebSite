@@ -38,15 +38,20 @@
                 var qqUrl = "https://jq.qq.com/?_wv=1027&k=q0DBI011";
                 resolvent = $"检查网络是否正常，按下Ctrl + F5 刷新网页缓存，加群 <a href='{qqUrl}'>{qq}</a> 反馈Bug";
             }
-            await ToastService.Show(new ToastOption
+            if(ToastService!=null)
             {
-                Title = message,
-                IsAutoHide = true,
-                Category = ToastCategory.Error,
-                Delay = 20000,
-                ForceDelay = true,
-                Content = $"<div class='mb-2'>报错：{ex.Message}</div><div  class='mb-2'>可能原因：{reason}</div><div>解决方法：{resolvent}</div>",
-            });
+                await ToastService.Show(new ToastOption
+                {
+                    Title = message,
+                    IsAutoHide = true,
+                    Category = ToastCategory.Error,
+                    Delay = 20000,
+                    ForceDelay = true,
+                    Content = $"<div class='mb-2'>报错：{ex.Message}</div><div  class='mb-2'>可能原因：{reason}</div><div>解决方法：{resolvent}</div>",
+                });
+
+            }
+
 
             LastErrorTime = DateTime.Now.ToCstTime();
         }

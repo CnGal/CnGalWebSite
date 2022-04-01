@@ -5,7 +5,7 @@
              x:Class="CnGalWebSite.Maui.MainPage"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
 
-    <b:BlazorWebView HostPage="wwwroot/index.html">
+    <b:BlazorWebView HostPage="wwwroot/index.html" x:Name="blazorWebView">
         <b:BlazorWebView.RootComponents>
             <b:RootComponent Selector="#app" ComponentType="{x:Type local:App}" />
         </b:BlazorWebView.RootComponents>

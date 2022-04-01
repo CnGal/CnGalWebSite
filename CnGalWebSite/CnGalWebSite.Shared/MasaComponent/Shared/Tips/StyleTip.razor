@@ -300,6 +300,10 @@ else
     /// </summary>
     public async void Refresh()
     {
+        if(_dataCacheService.ThemeSetting==null)
+        {
+            return;
+        }
         if (_dataCacheService.ThemeSetting.IsOnMouse && isOnMouse != _dataCacheService.ThemeSetting.IsOnMouse)
         {
             await InitMouse();
