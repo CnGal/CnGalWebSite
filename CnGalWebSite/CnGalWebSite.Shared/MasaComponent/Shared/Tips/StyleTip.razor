@@ -102,14 +102,19 @@ else
     public bool isMasa = true;
     public bool isOnMouse = false;
 
-    public string colorMain = "#F06292";
-    public string colorHover = "#D81B60";
-    public string colorActive = "#880E4F";
+    public string colorMain ;
+    public string colorHover;
+    public string colorActive;
 
     [Parameter]
     public EventCallback<bool> OnStateChanged { get; set; }
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProcColor("green");
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -143,7 +148,7 @@ else
             }
 
             //若为默认主题 则设置主题色
-            if (_dataCacheService.ThemeSetting.Type == ThemeType.Default)
+            if (_dataCacheService.ThemeSetting.Type == ThemeType.Default&& _dataCacheService.ThemeSetting.IsDark==false)
             {
                 _dataCacheService.ThemeSetting.Theme = "green";
             }
@@ -155,9 +160,9 @@ else
 
     }
 
-    public void ProcColor()
+    public void ProcColor(string theme)
     {
-        switch (_dataCacheService.ThemeSetting.Theme)
+        switch (theme)
         {
             case "red":
                 colorMain = "#F44336";
@@ -299,7 +304,7 @@ else
         {
             await InitMouse();
         }
-        ProcColor();
+        ProcColor(_dataCacheService.ThemeSetting.Theme);
 
 
         await OnStateChanged.InvokeAsync(isMasa != _dataCacheService.ThemeSetting.IsMasa);
