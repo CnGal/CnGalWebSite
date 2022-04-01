@@ -31,17 +31,26 @@
     <div class="mt-4">
         @if (isReady)
         {
-            @foreach (var item in _dataCacheService.NewsSummaryCache.Items.Skip((_dataCacheService.NewsSummaryCache.CurrentPage - 1) * _dataCacheService.NewsSummaryCache.MaxCount).Take(_dataCacheService.NewsSummaryCache.MaxCount))
-            {
 
-                <div class="mb-4">
-                    <NewsSummaryAloneViewTip Model="item" />
-
-                </div>
-            }
             if (_dataCacheService.NewsSummaryCache.Items.Count == 0)
             {
                 <NotFoundTip IsNeedLayput="true" />
+            }
+            else
+            {
+                @foreach (var item in _dataCacheService.NewsSummaryCache.Items.Skip((_dataCacheService.NewsSummaryCache.CurrentPage - 1) * _dataCacheService.NewsSummaryCache.MaxCount).Take(_dataCacheService.NewsSummaryCache.MaxCount))
+                {
+
+                    <div class="mb-4">
+                        <NewsSummaryAloneViewTip Model="item" />
+
+                    </div>
+                }
+
+                @if (_dataCacheService.NewsSummaryCache.TotalPages > 1)
+                {
+                    <MPagination Value="@_dataCacheService.NewsSummaryCache.CurrentPage" Class="my-4" Length="@_dataCacheService.NewsSummaryCache.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
+                }
             }
         }
         else
@@ -53,10 +62,7 @@
 
     </div>
 
-    @if (_dataCacheService.NewsSummaryCache.TotalPages > 1)
-    {
-        <MPagination Value="@_dataCacheService.NewsSummaryCache.CurrentPage" Class="my-4" Length="@_dataCacheService.NewsSummaryCache.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
-    }
+
 </div>
 
 

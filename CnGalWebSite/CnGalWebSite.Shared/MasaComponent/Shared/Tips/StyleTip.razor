@@ -134,28 +134,25 @@ else
     /// <returns></returns>
     public async Task LoadTheme()
     {
-        try
+        _dataCacheService.ThemeSetting = await _localStorage.GetItemAsync<ThemeModel>("theme");
+
+        if (_dataCacheService.ThemeSetting == null)
         {
-            var theme = await _localStorage.GetItemAsync<ThemeModel>("theme");
-
-            _dataCacheService.ThemeSetting = theme;
-
-            //将旧版颜色字符串转化为新版
-            if (_dataCacheService.ThemeSetting.Theme != null && _dataCacheService.ThemeSetting.Theme.Contains("color"))
-            {
-                _dataCacheService.ThemeSetting.Theme = "pink lighten-2";
-                await SaveTheme();
-            }
-
-            //若为默认主题 则设置主题色
-            if (_dataCacheService.ThemeSetting.Type == ThemeType.Default&& _dataCacheService.ThemeSetting.IsDark==false)
-            {
-                _dataCacheService.ThemeSetting.Theme = "green";
-            }
-        }
-        catch
-        {
+            _dataCacheService.ThemeSetting = new ThemeModel();
             await SaveTheme();
+        }
+
+        //将旧版颜色字符串转化为新版
+        if (_dataCacheService.ThemeSetting.Theme != null && _dataCacheService.ThemeSetting.Theme.Contains("color"))
+        {
+            _dataCacheService.ThemeSetting.Theme = "pink lighten-2";
+            await SaveTheme();
+        }
+
+        //若为默认主题 则设置主题色
+        if (_dataCacheService.ThemeSetting.Type == ThemeType.Default && _dataCacheService.ThemeSetting.IsDark == false)
+        {
+            _dataCacheService.ThemeSetting.Theme = "green";
         }
 
     }
@@ -300,6 +297,10 @@ else
     /// </summary>
     public async void Refresh()
     {
+        if(_dataCacheService.ThemeSetting==null)
+        {
+            return;
+        }
         if (_dataCacheService.ThemeSetting.IsOnMouse && isOnMouse != _dataCacheService.ThemeSetting.IsOnMouse)
         {
             await InitMouse();

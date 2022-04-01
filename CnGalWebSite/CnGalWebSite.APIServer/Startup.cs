@@ -47,7 +47,7 @@ namespace CnGalWebSite.APIServer
         {
             //添加数据库连接池
             services.AddDbContextPool<AppDbContext>(options =>
-                options.UseMySql(Configuration.GetConnectionString("CnGalDBConnection"), ServerVersion.AutoDetect(Configuration.GetConnectionString("CnGalDBConnection")),
+                options.UseMySql(Configuration["CnGalDBConnection"], ServerVersion.AutoDetect(Configuration["CnGalDBConnection"]),
                     o =>
                     {
                         //全局配置查询拆分模式
