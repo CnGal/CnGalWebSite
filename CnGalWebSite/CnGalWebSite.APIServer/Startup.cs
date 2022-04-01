@@ -192,7 +192,7 @@ namespace CnGalWebSite.APIServer
             });
 
             //添加状态检查
-            services.AddHealthChecks();
+            services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
