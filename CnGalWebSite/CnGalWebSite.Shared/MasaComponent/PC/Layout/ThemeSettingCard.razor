@@ -111,13 +111,14 @@
 
     public async Task ColorValueChanged(StringNumber value)
     {
-        if(value==null)
+        if (value == null)
         {
-            value= colorString = "pink lighten-2";
+            value = colorString = "pink lighten-2";
         }
         colorString = value;
-        _dataCacheService.ThemeSetting.Theme=value?.ToString();
-        if(_dataCacheService.ThemeSetting.Theme == "white")
+        _dataCacheService.ThemeSetting.Theme = value?.ToString();
+
+        if (_dataCacheService.ThemeSetting.Theme == "white")
         {
             _dataCacheService.ThemeSetting.IsDark = true;
         }
@@ -125,6 +126,16 @@
         {
             _dataCacheService.ThemeSetting.IsDark = false;
         }
+
+        if (_dataCacheService.ThemeSetting.Theme == "pink lighten-2")
+        {
+            _dataCacheService.ThemeSetting.Type = ThemeType.Default;
+        }
+        else
+        {
+            _dataCacheService.ThemeSetting.Type = ThemeType.Custom;
+        }
+
         if (CnGalRootTip != null)
         {
             await CnGalRootTip.SaveTheme();

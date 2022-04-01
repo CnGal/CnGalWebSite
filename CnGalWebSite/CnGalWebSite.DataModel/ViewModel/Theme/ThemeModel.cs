@@ -6,6 +6,8 @@
 
         public string Theme { get; set; } = "pink lighten-2";
 
+        public  ThemeType Type { get; set; }
+
         public bool IsOpen { get; set; }
 
         public bool IsFixedHeader { get; set; } = true;
@@ -33,5 +35,11 @@
     {
         Image,
         Text
+    }
+
+    public enum ThemeType
+    {
+        Default,
+        Custom,      
     }
 }
