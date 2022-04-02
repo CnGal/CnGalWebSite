@@ -1,0 +1,20 @@
+﻿
+    <MExpansionPanels>
+      
+        @foreach (var item in Model)
+        {
+            <MExpansionPanel @key="@(Model.IndexOf(item)+1)">
+                <MExpansionPanelHeader>
+                    @item.Title
+                </MExpansionPanelHeader>
+                <MExpansionPanelContent>
+                    
+                </MExpansionPanelContent>
+            </MExpansionPanel>
+        }
+    </MExpansionPanels>
+
+
+@code {
+    public List<DocumentViewModel> Model { get; set; } = new List<DocumentViewModel>();
+}
