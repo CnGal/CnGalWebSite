@@ -86,6 +86,11 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             var entries = await _entryRepository.GetAll().AsNoTracking()
                 .Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
 
+            if(entries.Any()==false)
+            {
+                return;
+            }
+
             var entryIds = entries.Select(s => (long)s.Id).ToList();
 
             var documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 0 && entryIds.Contains(s.OriginalId)).ToListAsync();
@@ -131,6 +136,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             var entries = await _articleRepository.GetAll().AsNoTracking()
                 .Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
 
+            if (entries.Any() == false)
+            {
+                return;
+            }
             var entryIds = entries.Select(s => (long)s.Id).ToList();
 
             var documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 1 && entryIds.Contains(s.OriginalId)).ToListAsync();
@@ -161,7 +170,6 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                 try
                 {
                     await _typesenseClient.DeleteDocument<SearchCache>(_collectionName, item.Id.ToString());
-
                 }
                 catch
                 {
@@ -175,7 +183,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
         {
             var entries = await _peripheryRepository.GetAll().AsNoTracking()
                 .Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
-
+            if (entries.Any() == false)
+            {
+                return;
+            }
             var entryIds = entries.Select(s => (long)s.Id).ToList();
 
             var documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 2 && entryIds.Contains(s.OriginalId)).ToListAsync();
@@ -220,7 +231,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
         {
             var entries = await _tagRepository.GetAll().AsNoTracking()
                 .Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
-
+            if (entries.Any() == false)
+            {
+                return;
+            }
             var entryIds = entries.Select(s => (long)s.Id).ToList();
 
             var documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 3 && entryIds.Contains(s.OriginalId)).ToListAsync();
