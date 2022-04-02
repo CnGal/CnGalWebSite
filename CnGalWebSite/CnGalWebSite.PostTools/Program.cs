@@ -94,7 +94,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             Console.WriteLine("-> 读取图片缓存");
             imageHelper.Load();
 
-            Console.WriteLine("-> 读取已处理的文章");
+            Console.WriteLine("-> 读取已处理的数据");
             postData.Load();
 
             Console.WriteLine("-> 获取现有的词条和文章");
@@ -135,6 +135,8 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         {
             //尝试读取数据文件
             bool isFirst = true;
+            links.Clear();
+
             Console.WriteLine("-> 读取词条");
             while (links.Count == 0)
             {
@@ -439,6 +441,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         static async Task ProcZhihu()
         {
             //尝试读取数据文件
+            links.Clear();
             bool isFirst = true;
             Console.WriteLine("-> 读取链接");
             while (links.Count == 0)
@@ -1063,7 +1066,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             if (string.IsNullOrWhiteSpace(model.Image) == false && model.IsCutImage == false)
             {
                 model.Image = await UploadImageAsync(model.Image, 460, 215);
-                model.IsCutImage = model.Image.Contains("pic.cngal");
+                model.IsCutImage = model.Image.Contains("image.cngal");
                 if (model.IsCutImage)
                 {
                     Console.WriteLine("成功裁剪主图");
