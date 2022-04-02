@@ -17,12 +17,10 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore
     - name: Build API Server
-      run: dotnet build ./CnGalWebSite/CnGalWebSite.APIServer --no-restore
+      run: dotnet build ./CnGalWebSite/CnGalWebSite.APIServer
     - name: Build Blazor Server
-      run: dotnet build ./CnGalWebSite/CnGalWebSite.Server --no-restore
+      run: dotnet build ./CnGalWebSite/CnGalWebSite.Server
     - name: Test API Server
       run: dotnet test ./CnGalWebSite/CnGalWebSite.Server --no-build --verbosity normal
     - name: Test  Blazor Server
