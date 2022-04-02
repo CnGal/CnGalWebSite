@@ -1,6 +1,6 @@
 name: Docker Image CI
  
-on: [push, pull_request] # 触发事件
+on: workflow_dispatch # 手动触发
  
 jobs:
   build-and-push:
