@@ -50,10 +50,14 @@
             </MButton>
 
         }
-        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" StopPropagation OnClick="OnClickSetting">
-            <MIcon Left>mdi-cog</MIcon>
-            主题设置
-        </MButton>
+        @if (ToolHelper.IsMaui == false)
+        {
+            <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" StopPropagation OnClick="OnClickSetting">
+                <MIcon Left>mdi-cog</MIcon>
+                主题设置
+            </MButton>
+
+        }
         <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickLogout">
             <MIcon Left>mdi-logout</MIcon>
             退出登入
