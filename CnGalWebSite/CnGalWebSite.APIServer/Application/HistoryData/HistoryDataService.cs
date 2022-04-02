@@ -8,6 +8,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
+using System.Linq;
+using System;
+using System.Linq.Dynamic.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace CnGalWebSite.APIServer.Application.HistoryData
 {
@@ -21,10 +26,15 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly List<OriginalImageToDrawingBedUrl> _images;
         private readonly IRepository<Entry, int> _entryRepository;
+        private readonly IRepository<Examine, int> _examineRepository;
+        private readonly IRepository<Article, long> _articleRepository;
+        private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
 
-        public HistoryDataService(IHttpClientFactory clientFactory, IConfiguration configuration, IFileService fileService, IWebHostEnvironment webHostEnvironment, IAppHelper appHelper,
-            IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<ApplicationUser, string> userRepository)
+        private readonly string oldImageHost = "pic.cngal.top";
+
+        public HistoryDataService(IHttpClientFactory clientFactory, IConfiguration configuration, IFileService fileService, IWebHostEnvironment webHostEnvironment, IAppHelper appHelper, IRepository<Periphery, long> peripheryRepository,
+        IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<ApplicationUser, string> userRepository, IRepository<Article, long> articleRepository, IRepository<Examine, int> examineRepository)
         {
             _clientFactory = clientFactory;
             _configuration = configuration;
@@ -34,11 +44,134 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
             _entryRepository = entryRepository;
             _examineService = examineService;
             _userRepository = userRepository;
-            //InitImages();
+            _articleRepository = articleRepository;
+            _peripheryRepository = peripheryRepository;
+            _examineRepository = examineRepository;
         }
 
+        public async Task Replace()
+        {
+            await ReplaceEntry();
+            await ReplaceArticle();
+            await ReplacePeriphery();
+            await ReplaceUser();
+            await ReplaceExamine();
+        }
+
+        public async Task ReplaceEntry()
+        {
+            var entries = await _entryRepository.GetAll().Include(s=>s.Pictures)
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false &&
+                (s.Pictures.Any() || s.MainPicture.Contains(oldImageHost) || s.Thumbnail.Contains(oldImageHost) || s.BackgroundPicture.Contains(oldImageHost) || s.SmallBackgroundPicture.Contains(oldImageHost) || s.MainPage.Contains(oldImageHost)))
+                .ToListAsync();
+
+            foreach (var entry in entries)
+            {
+                entry.MainPicture = ReplaceString(entry.MainPicture);
+                entry.Thumbnail = ReplaceString(entry.Thumbnail);
+                entry.BackgroundPicture = ReplaceString(entry.BackgroundPicture);
+                entry.SmallBackgroundPicture = ReplaceString(entry.SmallBackgroundPicture);
+                entry.MainPage = ReplaceString(entry.MainPage);
+
+                foreach (var item in entry.Pictures)
+                {
+                    item.Url = ReplaceString(item.Url);
+                }
+                await _entryRepository.UpdateAsync(entry);
+
+                Console.WriteLine($"[{entries.IndexOf(entry) + 1}]替换完成词条图片[Id:{entry.Id}]");
+            }
+        }
+
+        public async Task ReplaceArticle()
+        {
+            var entries = await _articleRepository.GetAll()
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false &&
+                (s.MainPicture.Contains(oldImageHost)  || s.BackgroundPicture.Contains(oldImageHost) || s.SmallBackgroundPicture.Contains(oldImageHost) || s.MainPage.Contains(oldImageHost)))
+                .ToListAsync();
+
+            foreach (var entry in entries)
+            {
+                entry.MainPicture = ReplaceString(entry.MainPicture);
+                entry.BackgroundPicture = ReplaceString(entry.BackgroundPicture);
+                entry.SmallBackgroundPicture = ReplaceString(entry.SmallBackgroundPicture);
+                entry.MainPage = ReplaceString(entry.MainPage);
+
+                await _articleRepository.UpdateAsync(entry);
+
+                Console.WriteLine($"[{entries.IndexOf(entry) + 1}]替换完成文章图片[Id:{entry.Id}]");
+            }
+        }
+
+        public async Task ReplacePeriphery()
+        {
+            var entries = await _peripheryRepository.GetAll().Include(s => s.Pictures)
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false &&
+                (s.Pictures.Any() || s.MainPicture.Contains(oldImageHost) || s.Thumbnail.Contains(oldImageHost) || s.BackgroundPicture.Contains(oldImageHost) || s.SmallBackgroundPicture.Contains(oldImageHost)))
+                .ToListAsync();
+
+            foreach (var entry in entries)
+            {
+                entry.MainPicture = ReplaceString(entry.MainPicture);
+                entry.Thumbnail = ReplaceString(entry.Thumbnail);
+                entry.BackgroundPicture = ReplaceString(entry.BackgroundPicture);
+                entry.SmallBackgroundPicture = ReplaceString(entry.SmallBackgroundPicture);
+
+                foreach (var item in entry.Pictures)
+                {
+                    item.Url = ReplaceString(item.Url);
+                }
 
 
+                await _peripheryRepository.UpdateAsync(entry);
+
+                Console.WriteLine($"[{entries.IndexOf(entry) + 1}]替换完成周边图片[Id:{entry.Id}]");
+
+            }
+        }
+
+        public async Task ReplaceUser()
+        {
+            var entries = await _userRepository.GetAll()
+                 .Where(s=> s.PhotoPath.Contains(oldImageHost) || s.BackgroundImage.Contains(oldImageHost) || s.SBgImage.Contains(oldImageHost) || s.MBgImage.Contains(oldImageHost) || s.MainPageContext.Contains(oldImageHost))
+                .ToListAsync();
+
+            foreach (var entry in entries)
+            {
+                entry.PhotoPath = ReplaceString(entry.PhotoPath);
+                entry.BackgroundImage = ReplaceString(entry.BackgroundImage);
+                entry.SBgImage = ReplaceString(entry.SBgImage);
+                entry.MBgImage = ReplaceString(entry.MBgImage);
+                entry.MainPageContext = ReplaceString(entry.MainPageContext);
+
+                await _userRepository.UpdateAsync(entry);
+
+                Console.WriteLine($"[{entries.IndexOf(entry) + 1}]替换完成用户图片[Id:{entry.Id}]");
+
+            }
+        }
+
+        public async Task ReplaceExamine()
+        {
+            var entries = await _examineRepository.GetAll()
+                .Where(s => s.Context.Contains(oldImageHost))
+                .ToListAsync();
+
+            foreach (var entry in entries)
+            {
+                entry.Context = ReplaceString(entry.Context);
+
+                await _examineRepository.UpdateAsync(entry);
+
+                Console.WriteLine($"[{entries.IndexOf(entry) + 1}]替换完成审核图片[Id:{entry.Id}]");
+
+            }
+        }
+
+        public string ReplaceString(string str)
+        {
+            return str?.Replace("pic.cngal.top", "image.cngal.org")?.Replace("http://image.cngal.org/", "https://image.cngal.org/");
+        }
     }
     public class Icemic_Data
     {

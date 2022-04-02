@@ -826,7 +826,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _lotteryService.ClearLottery(1);
+                await _historyDataService.Replace();
                 return new Result { Successful = true };
             }
             catch (Exception ex)

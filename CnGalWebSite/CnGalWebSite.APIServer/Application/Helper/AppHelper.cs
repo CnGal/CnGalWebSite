@@ -631,7 +631,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             var newUploadResults = await response.Content.ReadAsStringAsync();
             if (response.StatusCode == System.Net.HttpStatusCode.OK && string.IsNullOrWhiteSpace(newUploadResults) == false && newUploadResults != "Duplicated upload")
             {
-                return newUploadResults;
+                return newUploadResults.Replace("pic.cngal.top","image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
             }
             else
             {

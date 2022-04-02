@@ -137,7 +137,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             if (response.StatusCode == System.Net.HttpStatusCode.OK && string.IsNullOrWhiteSpace(newUploadResults) == false && newUploadResults != "Duplicated upload")
             {
 
-                return newUploadResults;
+                return newUploadResults.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
             }
             else
             {
