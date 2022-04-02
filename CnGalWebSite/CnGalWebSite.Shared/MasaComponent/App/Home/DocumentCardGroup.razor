@@ -1,0 +1,27 @@
+﻿
+<MExpansionPanels @bind-Value="panel">
+
+    @foreach (var item in Model)
+    {
+        <MExpansionPanel @key="@(Model.IndexOf(item))">
+            <MExpansionPanelHeader>
+                <span class="fw-bold">
+                    @item.Title
+                </span>
+            </MExpansionPanelHeader>
+            <MExpansionPanelContent>
+                @if (panel == Model.IndexOf(item))
+                {
+                    <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.MainViewTip Id="item.Id" Outline HiddenTitle />
+                }
+            </MExpansionPanelContent>
+        </MExpansionPanel>
+    }
+</MExpansionPanels>
+
+
+@code {
+    StringNumber panel = 0;
+    [Parameter]
+    public List<DocumentViewModel> Model { get; set; } = new List<DocumentViewModel>();
+}

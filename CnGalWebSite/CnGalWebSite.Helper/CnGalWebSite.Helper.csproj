@@ -12,10 +12,10 @@
     <PackageReference Include="BootstrapBlazor.Chart" Version="6.0.0" />
     <PackageReference Include="Masa.Blazor" Version="0.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.2" />
-    <PackageReference Include="NodaTime" Version="3.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.3" />
+    <PackageReference Include="NodaTime" Version="3.0.10" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.15" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.18" />
   </ItemGroup>
 
   <ItemGroup>

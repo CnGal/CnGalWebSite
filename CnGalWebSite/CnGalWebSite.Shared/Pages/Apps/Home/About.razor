@@ -1,106 +1,55 @@
-﻿
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
 
 <TitleTip Title="关于我们"></TitleTip>
 
+<div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 mb-4 bg-opacity rounded">
+    <CnGalWebSite.Shared.AppComponent.Pages.Home.About.HeadCard/>
+
+</div>
 
 
-<CnGalWebSite.Shared.AppComponent.Pages.Home.About.HeadCard Version="3.0" LastUpdateTime="2022/2/16 18:34"/>
-    <div style="display: flex; flex-direction: row; align-items: center;" class="ms-3 me-3 pt-4 mb-2">
-        <CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine Model="TabItems" />
-    </div>
+<MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded shadow-sm mb-4" CenterActive
+       Color="@_dataCacheService.ThemeSetting.Theme">
+    @foreach (var item in _dataCacheService.DocumentsCatche)
+    {
+        <MTab Value="@_dataCacheService.DocumentsCatche.IndexOf(item)">
+            @item.Title<MIcon>@item.Icon</MIcon>
+        </MTab>
+    }
+</MTabs>
+<MTabsItems @bind-Value="TabIndex">
+    @foreach (var item in _dataCacheService.DocumentsCatche)
+    {
+        <MTabItem Value="@_dataCacheService.DocumentsCatche.IndexOf(item)">
+            <CnGalWebSite.Shared.MasaComponent.App.Home.DocumentCardGroup Model="item.Children" />
+        </MTabItem>
+    }
+</MTabsItems>
 
-        <div class="mt-3 mb-3" style="padding-right: 0;padding-left: 0;">
-            <div class="tab-content" id="@("pills" + randomIndex + "-tabContent")">
-                <div class="@("tab-pane fade" + (defaultIndex == 0 ? " show active " : "") )" id="@("pills" + randomIndex + "-0")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-0-tab")">
-                    <div>
-                        <CnGalWebSite.Shared.AppComponent.Pages.Home.About.BasicInfor/>
-                    </div>
-                </div>
-                <div class="@("tab-pane fade" + (defaultIndex == 1 ? " show active " : "") )" id="@("pills" + randomIndex + "-1")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-1-tab")">
-                    <div>
-                        <CnGalWebSite.Shared.AppComponent.Pages.Home.About.UpdateInfor></CnGalWebSite.Shared.AppComponent.Pages.Home.About.UpdateInfor>
-                    </div>
-                </div>
-                <div class="@("tab-pane fade" + (defaultIndex == 2 ? " show active " : "") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
-                    <div class="pt-2">
-                        <CnGalWebSite.Shared.AppComponent.Pages.Home.About.QuoteInfor></CnGalWebSite.Shared.AppComponent.Pages.Home.About.QuoteInfor>
-                    </div>
-                </div>
-            </div>
-    </div>
 
 @code {
-    [Parameter]
-    public string Id { get; set; }
+    public StringNumber TabIndex { get; set; } = 0;
 
-    private int defaultIndex { get; set; } = 0;
-    [Parameter]
-    public string DefaultIndex
-    {
-        get
-        {
-            return defaultIndex.ToString();
-        }
-        set
-        {
-            try
-            {
-                defaultIndex = int.Parse(value);
-            }
-            catch
-            {
-                defaultIndex = 0;
-            }
-        }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
-    }
-    public int TabIndexNum = 0;
-    public int randomIndex = new Random().Next();
-    bool isReady = false;
-    private CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel TabItems = new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLineModel { Items = new List<CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel>() };
+
     protected override async Task OnInitializedAsync()
     {
 
-        int count = 3;
-        TabItems.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        try
         {
-            DefaultIndex = defaultIndex,
-            Index = 0,
-            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnTabClick(a)),
-            RandomIndex = randomIndex,
-            Text = "详情",
-            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Pivot,
-            ClassNames = $"col-{12 / count} p-0"
-        });
-        TabItems.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+            if (_dataCacheService.DocumentsCatche.Count == 0)
+            {
+                _dataCacheService.DocumentsCatche = await Http.GetFromJsonAsync<List<DocumentViewModel>>(ToolHelper.WebApiPath + "api/home/GetDocuments");
+            }
+        }
+        catch (Exception ex)
         {
-            DefaultIndex = defaultIndex,
-            Index = 1,
-            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnTabClick(a)),
-            RandomIndex = randomIndex,
-            Text = "更新日志",
-            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Pivot,
-            ClassNames = $"col-{12 / count} p-0"
-        });
-        TabItems.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
-        {
-            DefaultIndex = defaultIndex,
-            Index = 2,
-            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnTabClick(a)),
-            RandomIndex = randomIndex,
-            Text = "引用项目",
-            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Pivot,
-            ClassNames = $"col-{12 / count} p-0"
-        });
-
-
-        isReady = true;
-        StateHasChanged();
-    }
-    public Task OnTabClick(int index)
-    {
-
-        TabIndexNum = index;
-        return Task.CompletedTask;
+            ErrorHandler.ProcessError(ex, "获取文档列表失败");
+        }
     }
 }
