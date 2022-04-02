@@ -1,0 +1,27 @@
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    if: ${{ github.ref != 'refs/heads/master' }}  # 主分支下不再检查
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+    - name: Build API Server
+      run: dotnet build ./CnGalWebSite/CnGalWebSite.APIServer
+    - name: Build Blazor Server
+      run: dotnet build ./CnGalWebSite/CnGalWebSite.Server
+    - name: Test API Server
+      run: dotnet test ./CnGalWebSite/CnGalWebSite.Server --no-build --verbosity normal
+    - name: Test  Blazor Server
+      run: dotnet test ./CnGalWebSite/CnGalWebSite.APIServer --no-build --verbosity normal
