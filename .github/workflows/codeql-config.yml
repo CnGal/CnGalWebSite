@@ -1,0 +1,7 @@
+name: "My CodeQL config"
+
+disable-default-queries: true
+
+paths:
+  - ./CnGalWebSite/CnGalWebSite.APIServer
+  - ./CnGalWebSite/CnGalWebSite.Server
