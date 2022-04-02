@@ -170,7 +170,7 @@ namespace CnGalWebSite.APIServer.Application.Files
 
                 if (obj.Successful)
                 {
-                    return obj.Error.Replace("http://local.host/", "https://pic.cngal.top/");
+                    return obj.Error.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
                 }
                 else
                 {
