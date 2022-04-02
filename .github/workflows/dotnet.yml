@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-
+    if: ${{ github.ref != 'refs/heads/master' }}  # 主分支下不再检查
     runs-on: ubuntu-latest
 
     steps:
