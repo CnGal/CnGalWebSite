@@ -4,7 +4,7 @@ on: [push, pull_request] # 触发事件
  
 jobs:
   build-and-push:
-      if: ${{ github.ref == 'refs/heads/master' && github.action_repository == 'CnGal/CnGalWebSite' }}  # 检测master分支是否有更新
+      if: ${{ github.ref == 'refs/heads/master' && github.repository == 'CnGal/CnGalWebSite' }}  # 检测master分支是否有更新
       runs-on: ubuntu-latest
       steps:
         - name: Checkout
