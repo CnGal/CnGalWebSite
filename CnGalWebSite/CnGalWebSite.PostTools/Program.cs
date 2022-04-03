@@ -27,6 +27,8 @@ using ReverseMarkdown.Converters;
 using CnGalWebSite.DataModel.ViewModel;
 using System.Collections.Generic;
 using CnGalWebSite.DataModel.ViewModel.Base;
+using System.Threading.Tasks;
+
 
 namespace CnGalWebSite.PostTools // Note: actual namespace depends on the project name.
 {
@@ -85,7 +87,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         static async Task Proc()
         {
             OutputHelper.Repeat();
-            OutputHelper.WriteCenter("CnGal资料站 投稿工具 v0.4",1.8);
+            OutputHelper.WriteCenter("CnGal资料站 投稿工具 v0.5",1.8);
             OutputHelper.Repeat();
 
             Console.WriteLine("-> 读取配置文件");
@@ -118,7 +120,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 switch (index)
                 {
                     case 1:
-                        await ProcZhihu();
+                        await ProcArticle();
                         break;
                     case 2:
                         await ProcMergeEntry();
@@ -282,6 +284,112 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             Console.ReadKey();
         }
 
+        static async Task ProcArticle()
+        {
+            //尝试读取数据文件
+            links.Clear();
+            bool isFirst = true;
+            Console.WriteLine("-> 读取链接");
+            while (links.Count == 0)
+            {
+                try
+                {
+                    using var fs1 = new FileStream(setting.ArticlesFileName, FileMode.Open, FileAccess.Read);
+                    using var sr1 = new StreamReader(fs1);
+                    while (sr1.EndOfStream == false)
+                    {
+                        var str = await sr1.ReadLineAsync();
+                        if (string.IsNullOrWhiteSpace(str) == false)
+                        {
+                            links.Add(str);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    File.Create(setting.ArticlesFileName).Close();
+                }
+
+                if (isFirst)
+                {
+                    Console.WriteLine($"请在{setting.ArticlesFileName}文件中输入要导入的链接，每行填写一个链接，目前只支持知乎、小黑盒链接");
+                    Console.WriteLine($"例如：");
+                    Console.WriteLine($"https://zhuanlan.zhihu.com/p/480692805");
+                    Console.WriteLine($"https://api.xiaoheihe.cn/maxnews/app/share/detail/2494072");
+                    Console.WriteLine($"按下回车【Enter】确认，按下【Esc】返回");
+                }
+                if (links.Any() == false)
+                {
+                    if(isFirst==false)
+                    {
+                        Console.WriteLine($"请在{setting.ArticlesFileName}文件中输入要导入的链接");
+                    }
+                    var key = Console.ReadKey();
+                    if(key.Key== ConsoleKey.Escape)
+                    {
+                        return;
+                    }
+                }
+
+                isFirst = false;
+            }
+            Console.WriteLine($"-> 已读取{links.Count}条链接");
+
+            //循环读取链接并生成审核模型
+            Console.WriteLine("-> 开始处理链接");
+
+            foreach (var item in links)
+            {
+                var tempArticle = postData.articles.FirstOrDefault(s => s.Url == item);
+                if (tempArticle != null)
+                {
+                    if (tempArticle.PostTime != null)
+                    {
+                        OutputHelper.Write(OutputLevel.Warning, $"-> 链接 {item} 已于 {tempArticle.PostTime} 提交审核[Id:{tempArticle.Id}]");
+                        continue;
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        tempArticle =await GetArticleContext(item);
+                    }
+                    catch (Exception ex)
+                    {
+                        OutputHelper.PressError(ex, "尝试处理链接失败", "请确保链接格式正确");
+                        continue;
+                    }
+
+                    postData.articles.Add(tempArticle);
+                    postData.Save();
+                }
+
+                if (currentData.articles.Any(s => s == tempArticle.Title))
+                {
+                    OutputHelper.Write(OutputLevel.Dager, $"-> 链接 {item} 与现有文章《{tempArticle.Title}》重名，请手动上传");
+                    continue;
+                }
+
+                await imageHelper.CutImage(tempArticle);
+
+                var article = GenerateArticle(tempArticle);
+
+                tempArticle.Id = await SubmitArticle(article);
+                tempArticle.PostTime = DateTime.Now.ToCstTime();
+                postData.Save();
+
+                OutputHelper.Write(OutputLevel.Infor, $"-> 处理完成第 {links.IndexOf(item) + 1} 条链接");
+            }
+
+            //成功
+            OutputHelper.Repeat();
+            Console.WriteLine($"总计处理{links.Count}条链接，感谢您使用本投稿工具");
+            OutputHelper.Repeat();
+            Console.WriteLine("按任意键返回上级菜单");
+            Console.ReadKey();
+        }
+
         static async Task GenerateMergeEntry(MergeEntryModel model)
         {
             //清空
@@ -438,98 +546,6 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
         }
 
-        static async Task ProcZhihu()
-        {
-            //尝试读取数据文件
-            links.Clear();
-            bool isFirst = true;
-            Console.WriteLine("-> 读取链接");
-            while (links.Count == 0)
-            {
-                try
-                {
-                    using var fs1 = new FileStream(setting.ArticlesFileName, FileMode.Open, FileAccess.Read);
-                    using var sr1 = new StreamReader(fs1);
-                    while (sr1.EndOfStream == false)
-                    {
-                        var str = await sr1.ReadLineAsync();
-                        if (string.IsNullOrWhiteSpace(str) == false)
-                        {
-                            links.Add(str);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    File.Create(setting.ArticlesFileName).Close();
-                }
-
-                if (isFirst)
-                {
-                    Console.WriteLine($"请在{setting.ArticlesFileName}文件中输入要导入的链接，每行填写一个链接，目前只支持知乎链接，按下回车【Enter】确认，按下【Esc】返回");
-                }
-                if (links.Any() == false)
-                {
-                    if(isFirst==false)
-                    {
-                        Console.WriteLine($"请在{setting.ArticlesFileName}文件中输入要导入的链接");
-                    }
-                    var key = Console.ReadKey();
-                    if(key.Key== ConsoleKey.Escape)
-                    {
-                        return;
-                    }
-                }
-
-                isFirst = false;
-            }
-            Console.WriteLine($"-> 已读取{links.Count}条链接");
-
-            //循环读取链接并生成审核模型
-            Console.WriteLine("-> 开始处理链接");
-
-            foreach (var item in links)
-            {
-                var zhihuArticle = postData.articles.FirstOrDefault(s => s.Url == item);
-                if (zhihuArticle != null)
-                {
-                    if (zhihuArticle.PostTime != null)
-                    {
-                        OutputHelper.Write(OutputLevel.Warning, $"-> 链接 {item} 已于 {zhihuArticle.PostTime} 提交审核[Id:{zhihuArticle.Id}]");
-                        continue;
-                    }
-                }
-                else
-                {
-                    zhihuArticle = await GetArticleContext(item);
-                    postData.articles.Add(zhihuArticle);
-                    postData.Save();
-                }
-
-                if (currentData.articles.Any(s => s == zhihuArticle.Title))
-                {
-                    OutputHelper.Write(OutputLevel.Dager, $"-> 链接 {item} 与现有文章《{zhihuArticle.Title}》重名，请手动上传");
-                    continue;
-                }
-
-                await imageHelper.CutImage(zhihuArticle);
-
-                var article = GenerateArticle(zhihuArticle);
-
-                zhihuArticle.Id = await SubmitArticle(article);
-                zhihuArticle.PostTime = DateTime.Now.ToCstTime();
-                postData.Save();
-
-                OutputHelper.Write(OutputLevel.Infor, $"-> 处理完成第 {links.IndexOf(item) + 1} 条链接");
-            }
-
-            //成功
-            OutputHelper.Repeat();
-            Console.WriteLine($"总计处理{links.Count}条链接，感谢您使用本投稿工具");
-            OutputHelper.Repeat();
-            Console.WriteLine("按任意键返回上级菜单");
-            Console.ReadKey();
-        }
 
         static async Task<long> SubmitArticle(CreateArticleViewModel model)
         {
@@ -555,7 +571,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
         }
 
-        static CreateArticleViewModel GenerateArticle(ZhiHuArticleModel model)
+        static CreateArticleViewModel GenerateArticle(OutlinkArticleModel model)
         {
             CreateArticleViewModel article = new CreateArticleViewModel
             {
@@ -654,138 +670,240 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             return title.Abbreviate(maxLength).Replace("\n", "").Replace("\r", "").Replace("image", "");
         }
 
-        static async Task<ZhiHuArticleModel> GetArticleContext(string url)
+        static string GetHtml(string url)
         {
+            var article = new OutlinkArticleModel();
+
+            HttpWebRequest request = null;
+            HttpWebResponse response = null;
+            Stream stream = null;
+            StreamReader reader = null;
+            string str = string.Empty;
+            Encoding encoding = Encoding.Default;
+
+            //请求地址
+            request = (HttpWebRequest)WebRequest.Create(url);
+            //随机使用一个useragents
+            var randomNumber = new Random().Next(0, usersagents.Length);
+            request.UserAgent = usersagents[randomNumber];
+            request.Timeout = 30000;
+            request.ServicePoint.Expect100Continue = false;
+            request.KeepAlive = false;
+            response = (HttpWebResponse)request.GetResponse();
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                using (stream = response.GetResponseStream())
+                {
+                    reader = new StreamReader(stream);
+                    str = reader.ReadToEnd();
+                    stream.Close();
+                }
+            }
+
+            return str;
+        }
+
+        static async Task<OutlinkArticleModel> ProcZhiHuArticleFromHtmlAsync(string html)
+        {
+            var article = new OutlinkArticleModel();
+
+
+            HtmlDocument document = new HtmlDocument();
+            document.LoadHtml(html);
+
+            var node = document.GetElementbyId("root");
+            string htmlStr = "";
+            string name = "";
+            string image = null;
+            string author = null;
+            //正文
             try
             {
-                var article = new ZhiHuArticleModel();
-
-                HttpWebRequest request = null;
-                HttpWebResponse response = null;
-                Stream stream = null;
-                StreamReader reader = null;
-                string str = string.Empty;
-                Encoding encoding = Encoding.Default;
-
-                //请求地址
-                request = (HttpWebRequest)WebRequest.Create(url);
-                //随机使用一个useragents
-                var randomNumber =new Random().Next(0, usersagents.Length);
-                request.UserAgent = usersagents[randomNumber];
-                request.Timeout = 30000;
-                request.ServicePoint.Expect100Continue = false;
-                request.KeepAlive = false;
-                response = (HttpWebResponse)request.GetResponse();
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    using (stream = response.GetResponseStream())
-                    {
-                        reader = new StreamReader(stream);
-                        str = reader.ReadToEnd();
-                        stream.Close();
-                    }
-                }
-
-
-                HtmlDocument document = new HtmlDocument();
-                document.LoadHtml(str);
-
-                var node = document.GetElementbyId("root");
-                string htmlStr = "";
-                string name = "";
-                string image = null;
-                string author = null;
-                //正文
-                try
-                {
-                    htmlStr = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes.MaxBy(s=>s.InnerText.Length).LastChild.LastChild.InnerHtml;
-                }
-                catch
-                {
-
-                }
-                //主图
-                try
-                {
-                    var tempNode = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.FirstOrDefault(s => s.Name == "img");
-                    if (tempNode == null)
-                    {
-                        tempNode = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.FirstOrDefault(s => s.OuterHtml.Contains("background-image"));
-                        if(tempNode!=null)
-                        {
-                            image= ToolHelper.MidStrEx(tempNode.OuterHtml, "url(", "?source");
-                        }
-                    }
-                    else
-                    {
-                        image = ToolHelper.MidStrEx(tempNode.OuterHtml, "src=\"", "\"");
-                    }
-                }
-                catch
-                {
-
-                }
-                //标题
-                try
-                {
-                    name = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes[0].FirstChild.InnerText;
-                }
-                catch
-                {
-
-                }
-                //作者
-                try
-                {
-                    author = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes[0].ChildNodes[1].FirstChild.FirstChild.LastChild.FirstChild.InnerText;
-                }
-                catch
-                {
-
-                }
-                //时间
-                try
-                {
-                    var times = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes.Where(s => s.InnerText.Contains("发布于") || s.InnerText.Contains("编辑于")).Select(s => s.InnerText.Replace("发布于 ","").Replace("编辑于 ", ""));
-                    foreach (var item in times)
-                    {
-                        try
-                        {
-                            article.PublishTime = DateTime.ParseExact(item, "yyyy-MM-dd HH:mm", null);
-                            break;
-                        }
-                        catch
-                        {
-
-                        }
-
-                    }
-                }
-                catch
-                {
-
-                }
-
-                var converter = new ReverseMarkdown.Converter();
-
-
-
-                article.MainPage = converter.Convert(htmlStr);
-                article.MainPage = await imageHelper.ProgressImage(article.MainPage);
-                article.Title = name;
-                article.Url = url;
-                article.OriginalAuthor = ToolHelper.MidStrEx(article.MainPage, "原作者：", "\r");
-                if (string.IsNullOrWhiteSpace(article.OriginalAuthor) && author != null)
-                {
-                    article.OriginalAuthor = author;
-                }
-                article.Image = image ?? ToolHelper.GetImageLinks(article.MainPage).FirstOrDefault();
-                return article;
+                htmlStr = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes.MaxBy(s => s.InnerText.Length).LastChild.LastChild.InnerHtml;
             }
-            catch (Exception ex)
+            catch
             {
-                return null;
+
             }
+            //主图
+            try
+            {
+                var tempNode = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.FirstOrDefault(s => s.Name == "img");
+                if (tempNode == null)
+                {
+                    tempNode = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.FirstOrDefault(s => s.OuterHtml.Contains("background-image"));
+                    if (tempNode != null)
+                    {
+                        image = ToolHelper.MidStrEx(tempNode.OuterHtml, "url(", "?source");
+                    }
+                }
+                else
+                {
+                    image = ToolHelper.MidStrEx(tempNode.OuterHtml, "src=\"", "\"");
+                }
+            }
+            catch
+            {
+
+            }
+            //标题
+            try
+            {
+                name = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes[0].FirstChild.InnerText;
+            }
+            catch
+            {
+
+            }
+            //作者
+            try
+            {
+                author = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes[0].ChildNodes[1].FirstChild.FirstChild.LastChild.FirstChild.InnerText;
+            }
+            catch
+            {
+
+            }
+            //时间
+            try
+            {
+                var times = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes.Where(s => s.InnerText.Contains("发布于") || s.InnerText.Contains("编辑于")).Select(s => s.InnerText.Replace("发布于 ", "").Replace("编辑于 ", ""));
+                foreach (var item in times)
+                {
+                    try
+                    {
+                        article.PublishTime = DateTime.ParseExact(item, "yyyy-MM-dd HH:mm", null);
+                        break;
+                    }
+                    catch
+                    {
+
+                    }
+
+                }
+            }
+            catch
+            {
+
+            }
+
+            var converter = new ReverseMarkdown.Converter();
+
+
+
+            article.MainPage = converter.Convert(htmlStr);
+            article.MainPage = await imageHelper.ProgressImage(article.MainPage, OutlinkArticleType.ZhiHu);
+            article.Title = name;
+            article.OriginalAuthor = ToolHelper.MidStrEx(article.MainPage, "原作者：", "\r");
+            if (string.IsNullOrWhiteSpace(article.OriginalAuthor) && author != null)
+            {
+                article.OriginalAuthor = author;
+            }
+            article.Image = image ?? ToolHelper.GetImageLinks(article.MainPage).FirstOrDefault();
+            return article;
+        }
+
+        static async Task<OutlinkArticleModel> ProcXiaoHeiHeArticleFromHtmlAsync(string html)
+        {
+            var article = new OutlinkArticleModel();
+
+
+            HtmlDocument document = new HtmlDocument();
+            document.LoadHtml(html);
+
+            var node = document.DocumentNode.ChildNodes.FirstOrDefault(s=>s.Name=="html").ChildNodes.FirstOrDefault(s => s.Name == "body").ChildNodes.FirstOrDefault(s => s.HasClass("news-container"));
+            string htmlStr = "";
+            string name = "";
+            string image = null;
+            string author = null;
+
+            //主图标题
+            try
+            {
+                var tempnodes = node.ChildNodes.FirstOrDefault(s => s.HasClass("news-head"));
+                name = tempnodes.ChildNodes.FirstOrDefault(s => s.HasClass("news-title-wrap")).FirstChild.InnerText;
+                tempnodes = tempnodes.ChildNodes.FirstOrDefault(s => s.HasClass("mask")).NextSibling;
+                image= ToolHelper.MidStrEx(tempnodes.OuterHtml, "data-original=\"", "?") ;
+            }
+            catch
+            {
+
+            }
+          
+         
+            //作者
+            try
+            {
+                var tempnodes = node.ChildNodes.FirstOrDefault(s=>s.HasClass("news-body")).ChildNodes.FirstOrDefault(s => s.HasClass("author-wrap")).ChildNodes.FirstOrDefault(s=>s.HasClass("user-wrap"));
+
+                article.OriginalAuthor = tempnodes.ChildNodes.FirstOrDefault(s => s.HasClass("user-info")).ChildNodes.FirstOrDefault(s => s.HasClass("user-name")).InnerText;
+                var times = ToolHelper.MidStrEx(tempnodes.ChildNodes.FirstOrDefault(s => s.HasClass("row-2")).ChildNodes.FirstOrDefault(s => s.HasClass("time")).OuterHtml, "data-time=\"", "\"");
+
+                try
+                {
+                    article.PublishTime = ToolHelper.GetDateTimeFrom1970Ticks((long)double.Parse(times));
+                }
+                catch
+                {
+
+                }
+
+            }
+            catch
+            {
+
+            }
+
+            //正文
+            try
+            {
+                node = document.GetElementbyId("post-content");
+                htmlStr = node.InnerHtml.Replace("data-original", "src"); ;
+            }
+            catch
+            {
+
+            }
+
+            var converter = new ReverseMarkdown.Converter();
+
+
+
+            article.MainPage = converter.Convert(htmlStr);
+            article.MainPage = await imageHelper.ProgressImage(article.MainPage, OutlinkArticleType.XiaoHeiHe);
+            article.Title = name;
+            article.OriginalAuthor = ToolHelper.MidStrEx(article.MainPage, "本文作者 @", "**");
+            if (string.IsNullOrWhiteSpace(article.OriginalAuthor) && author != null)
+            {
+                article.OriginalAuthor = author;
+            }
+            article.Image = image ?? ToolHelper.GetImageLinks(article.MainPage).FirstOrDefault();
+            return article;
+        }
+
+
+        static async Task< OutlinkArticleModel> GetArticleContext(string url)
+        {
+            var html = GetHtml(url);
+            OutlinkArticleModel result = null;
+
+            if (url.Contains("zhuanlan.zhihu.com"))
+            {
+                result = await ProcZhiHuArticleFromHtmlAsync(html);
+
+            }
+            else if (url.Contains("api.xiaoheihe.cn"))
+            {
+                result =await ProcXiaoHeiHeArticleFromHtmlAsync(html);
+            }
+            else
+            {
+                throw new Exception("链接格式不正确或不支持该平台");
+            }
+
+            result.Url = url;
+
+            return result;
         }
     }
 
@@ -897,7 +1015,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
     public class PostData
     {
-        public readonly List<ZhiHuArticleModel> articles = new List<ZhiHuArticleModel>();
+        public readonly List<OutlinkArticleModel> articles = new List<OutlinkArticleModel>();
         public readonly List<MergeEntryModel> mergeEntries = new List<MergeEntryModel>();
         private readonly Setting setting;
         private readonly HttpClient client;
@@ -917,7 +1035,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 using (StreamReader file = File.OpenText(path))
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    articles.AddRange((List<ZhiHuArticleModel>)serializer.Deserialize(file, typeof(List<ZhiHuArticleModel>)));
+                    articles.AddRange((List<OutlinkArticleModel>)serializer.Deserialize(file, typeof(List<OutlinkArticleModel>)));
                 }
 
                 path = Path.Combine(setting.TempPath, "MergeEntries.json");
@@ -1061,7 +1179,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
         }
 
-        public async Task CutImage(ZhiHuArticleModel model)
+        public async Task CutImage(OutlinkArticleModel model)
         {
             if (string.IsNullOrWhiteSpace(model.Image) == false && model.IsCutImage == false)
             {
@@ -1078,22 +1196,37 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
         }
 
-        public async Task<string> ProgressImage(string text)
+        public async Task<string> ProgressImage(string text, OutlinkArticleType type)
         {
-
-            var figures = text.Split("</figure>");
-            foreach (var item in figures)
+            if (type == OutlinkArticleType.ZhiHu)
             {
-                var textTemp = item.Split("<figure");
-                if (textTemp.Length > 1)
-                {
-                    var image = ToolHelper.MidStrEx(textTemp[1], "data-original=\"", "\">");
-                    var newImage = await GetImage(image);
 
-                    text = text.Replace("<figure" + ToolHelper.MidStrEx(text, "<figure", "</figure>") + "</figure>", "\n![image](" + newImage + ")\n");
+                var figures = text.Split("</figure>");
+                foreach (var item in figures)
+                {
+                    var textTemp = item.Split("<figure");
+                    if (textTemp.Length > 1)
+                    {
+                        var image = ToolHelper.MidStrEx(textTemp[1], "data-original=\"", "\">");
+                        var newImage = await GetImage(image);
+
+                        text = text.Replace("<figure" + ToolHelper.MidStrEx(text, "<figure", "</figure>") + "</figure>", "\n![image](" + newImage + ")\n");
+                    }
+                }
+
+            }
+            else if (type == OutlinkArticleType.XiaoHeiHe)
+            {
+
+                var images = ToolHelper.GetImageLinks(text);
+                foreach (var temp in images)
+                {
+                    var infor = await GetImage(temp);
+
+                    //替换图片
+                    text = text.Replace(temp, infor);
                 }
             }
-
             return text;
         }
 
@@ -1425,6 +1558,32 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         }
     }
 
+    public class OutlinkArticleModel
+    {
+        public long Id { get; set; }
+
+        public string Title { get; set; }
+
+        public string OriginalAuthor { get; set; }
+
+        public string Url { get; set; }
+
+        public string MainPage { get; set; }
+
+        public string Image { get; set; }
+
+        public bool IsCutImage { get; set; }
+
+        public DateTime PublishTime { get; set; }
+
+        public DateTime? PostTime { get; set; }
+    }
+
+    public enum OutlinkArticleType
+    {
+        ZhiHu,
+        XiaoHeiHe
+    }
 
 }
 
