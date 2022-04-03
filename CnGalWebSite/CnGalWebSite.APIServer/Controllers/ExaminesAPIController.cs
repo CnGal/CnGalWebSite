@@ -172,10 +172,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 return NotFound("生成审核视图出错");
             }
             //获取敏感词列表
-            if (string.IsNullOrWhiteSpace(examine.Context) == false && user != null && await _userManager.IsInRoleAsync(user, "Admin"))
-            {
-                model.SensitiveWords = await _appHelper.GetSensitiveWordsInText(examine.Context);
-            }
+            //if (string.IsNullOrWhiteSpace(examine.Context) == false && user != null && await _userManager.IsInRoleAsync(user, "Admin"))
+            //{
+            //    model.SensitiveWords = await _appHelper.GetSensitiveWordsInText(examine.Context);
+            //}
             return model;
         }
 
