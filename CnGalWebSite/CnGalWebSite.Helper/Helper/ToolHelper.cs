@@ -24,7 +24,7 @@ namespace CnGalWebSite.DataModel.Helper
         //https://v3.cngal.org/
 
 
-        //public const string WebApiPath = "http://localhost:45160/";
+        //public const string WebApiPath = "http://localhost:5000/";
         public const string WebApiPath = "http://172.17.0.1:2001/";
         //public const string WebApiPath = "https://www.cngal.org/";
 
@@ -1086,6 +1086,47 @@ namespace CnGalWebSite.DataModel.Helper
             return informations;
         }
 
+        public static string GetImagePath(string image, string defaultStr, bool mediumImage = false)
+        {
+
+            if (string.IsNullOrWhiteSpace(image) == true)
+            {
+                if (string.IsNullOrWhiteSpace(defaultStr) == true)
+                {
+                    return "";
+                }
+                else
+                {
+                    image = "default/" + defaultStr;
+                    return "https://app.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
+                }
+
+            }
+            else
+            {
+                //判断是否为绝对路径
+                if (image.Contains("http://") || image.Contains("https://") || image.Contains("//"))
+                {
+                    //if(image.Contains("pic.cngal.top"))
+                    //{
+                    //    return image.Replace(".png", ".md.png").Replace(".jpg", ".md.jpg").Replace(".jpeg", ".md.jpeg").Replace(".gif", ".md.gif");
+                    //}
+
+                    if (image.Contains("http://pic.cngal.top"))
+                    {
+                        return image.Replace("http://pic.cngal.top", "https://pic.cngal.top");
+                    }
+
+                    return image;
+                }
+                else
+                {
+                    //http://localhost:51313/
+                    //121.43.54.210
+                    return "https://app.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
+                }
+            }
+        }
 
     }
 

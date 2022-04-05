@@ -2,6 +2,7 @@
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using HtmlAgilityPack;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
@@ -18,12 +19,13 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         private readonly IRepository<SteamInfor, long> _steamInforRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
+        private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<SteamUserInfor, long> _steamUserInforRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
 
-        public SteamInforService(IRepository<SteamInfor, long> steamInforRepository, IRepository<ApplicationUser, string> userRepository,
-            IConfiguration configuration, IRepository<PlayedGame, long> playedGameRepository, IRepository<SteamUserInfor, long> steamUserInforRepository,
+        public SteamInforService(IRepository<SteamInfor, long> steamInforRepository, IRepository<ApplicationUser, string> userRepository, IRepository<Entry, int> entryRepository,
+        IConfiguration configuration, IRepository<PlayedGame, long> playedGameRepository, IRepository<SteamUserInfor, long> steamUserInforRepository,
         IHttpClientFactory clientFactory)
         {
             _steamInforRepository = steamInforRepository;
@@ -32,6 +34,33 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             _playedGameRepository = playedGameRepository;
             _clientFactory = clientFactory;
             _steamUserInforRepository = steamUserInforRepository;
+            _entryRepository = entryRepository;
+        }
+
+        public async Task<SteamInfor> GetSteamInforAsync(int steamId, int entryId = 0)
+        {
+
+            //尝试到数据库中查找信息
+            //没有找到 则尝试更新数据
+            //无法更新则返回错误
+            var steamInfor = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
+            if (steamInfor != null/* && steamInfor.PriceNow != -1 && steamInfor.PriceNow != -2*/)
+            {
+                return steamInfor;
+            }
+
+            if (await _entryRepository.GetAll().AnyAsync(s => s.Id == entryId) == false)
+            {
+                return null;
+            }
+
+            steamInfor = await UpdateSteamInfor(steamId, entryId);
+            if (steamInfor == null)
+            {
+                return null;
+            }
+
+            return steamInfor;
         }
 
         public async Task UpdateAllGameSteamInfor()

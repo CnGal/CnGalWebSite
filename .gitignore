@@ -362,5 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# ÅäÖÃÎÄ¼ş
+# é…ç½®æ–‡ä»¶
 .NewCngalWebSite/NewCngalWebSite.APIServer/appsettings.json
+/CnGalWebSite/CnGalWebSite.APIServer/App_Data/WeChat_OfficialAccount

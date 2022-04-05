@@ -1,9 +1,16 @@
 ﻿@page "/updatelog"
 
-
 @inject IDataCacheService _dataCacheService
+@if (_dataCacheService.IsApp)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Home.About Index="766" />
 
-<CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="766" />
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="766" />
+}
+
 
 @code{
 

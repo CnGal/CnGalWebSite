@@ -44,27 +44,17 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{steamId}/{entryId}")]
         public async Task<ActionResult<SteamInfor>> GetSteamInforAsync(int steamId, int entryId)
         {
-            if (await _entryRepository.GetAll().AnyAsync(s => s.Id == entryId) == false)
-            {
-                return NotFound();
-            }
-            //尝试到数据库中查找信息
-            //没有找到 则尝试更新数据
-            //无法更新则返回错误
-            var steamInfor = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
-            if (steamInfor != null/* && steamInfor.PriceNow != -1 && steamInfor.PriceNow != -2*/)
-            {
-                return steamInfor;
-            }
-            steamInfor = await _steamInforService.UpdateSteamInfor(steamId, entryId);
-            if (steamInfor == null)
-            {
-                return NotFound("无法获取Steam信息");
-            }
-
-            return steamInfor;
+            var model = await _steamInforService.GetSteamInforAsync(steamId, entryId);
+            return (model == null) ? NotFound() : model;
         }
 
+        [AllowAnonymous]
+        [HttpGet("{steamId}")]
+        public async Task<ActionResult<SteamInfor>> GetSteamInforAsync(int steamId)
+        {
+            var model = await _steamInforService.GetSteamInforAsync(steamId);
+            return (model == null) ? NotFound() : model;
+        }
 
 
         /// <summary>

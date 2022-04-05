@@ -27,7 +27,7 @@ namespace Gt3_server_csharp_aspnetcoremvc_bypass.Controllers.Sdk
         private readonly GeetestLibResult libResult;
 
         // 调试开关，是否输出调试日志
-        private const bool IS_DEBUG = true;
+        private const bool IS_DEBUG = false;
 
         private const string API_URL = "http://api.geetest.com";
 

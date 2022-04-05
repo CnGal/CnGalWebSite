@@ -1,6 +1,15 @@
 ﻿@page "/document"
 
-<CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="Id" />
+@inject IDataCacheService _dataCacheService
+@if (_dataCacheService.IsApp)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Home.About Index="Id" />
+
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="Id" />
+}
 
 @code{
     [SupplyParameterFromQuery]
