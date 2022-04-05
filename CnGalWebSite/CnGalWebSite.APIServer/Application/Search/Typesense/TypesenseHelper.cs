@@ -321,6 +321,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                     }
                 }
             }
+            else
+            {
+                sortString = "_text_match";
+            }
 
             sortString=sortString.Replace("id", "originalId");
             if (isAscending == false)

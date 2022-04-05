@@ -118,44 +118,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public string GetImagePath(string image, string defaultStr, bool mediumImage = false)
         {
-
-            if (string.IsNullOrWhiteSpace(image) == true)
-            {
-                if (string.IsNullOrWhiteSpace(defaultStr) == true)
-                {
-                    return "";
-                }
-                else
-                {
-                    image = "default/" + defaultStr;
-                    return "https://app.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
-                }
-
-            }
-            else
-            {
-                //判断是否为绝对路径
-                if (image.Contains("http://") || image.Contains("https://") || image.Contains("//"))
-                {
-                    //if(image.Contains("pic.cngal.top"))
-                    //{
-                    //    return image.Replace(".png", ".md.png").Replace(".jpg", ".md.jpg").Replace(".jpeg", ".md.jpeg").Replace(".gif", ".md.gif");
-                    //}
-
-                    if (image.Contains("http://pic.cngal.top"))
-                    {
-                        return image.Replace("http://pic.cngal.top", "https://pic.cngal.top");
-                    }
-
-                    return image;
-                }
-                else
-                {
-                    //http://localhost:51313/
-                    //121.43.54.210
-                    return "https://app.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
-                }
-            }
+           return ToolHelper.GetImagePath(image, defaultStr, mediumImage);
         }
 
         public string GetStringAbbreviation(string str, int length)

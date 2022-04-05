@@ -1,16 +1,16 @@
 ﻿
-<MExpansionPanels @bind-Value="panel">
+<MExpansionPanels @bind-Value="Index">
 
     @foreach (var item in Model)
     {
-        <MExpansionPanel @key="@(Model.IndexOf(item))">
+        <MExpansionPanel @key="@item.Id">
             <MExpansionPanelHeader>
                 <span class="fw-bold">
                     @item.Title
                 </span>
             </MExpansionPanelHeader>
             <MExpansionPanelContent>
-                @if (panel == Model.IndexOf(item))
+                @if (Index == Model.IndexOf(item))
                 {
                     <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.MainViewTip Id="item.Id" Outline HiddenTitle />
                 }
@@ -21,7 +21,23 @@
 
 
 @code {
-    StringNumber panel = -1;
+    StringNumber Index = -1;
+    [Parameter]
+    public long Id { get; set; } = -1;
     [Parameter]
     public List<DocumentViewModel> Model { get; set; } = new List<DocumentViewModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var model = Model.FirstOrDefault(s => s.Id == Id);
+        if(model==null)
+        {
+            Index = -1;
+        }
+        else
+        {
+            Index = Model.IndexOf(model);
+
+        }
+    }
 }

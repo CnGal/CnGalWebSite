@@ -15,6 +15,7 @@ using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Votes;
+using CnGalWebSite.APIServer.Application.WeiXin;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Helper;
@@ -78,6 +79,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IPeripheryService _peripheryService;
         private readonly IVoteService _voteService;
         private readonly ILotteryService _lotteryService;
+        private readonly IWeiXinService _weiXinService;
         private readonly INewsService _newsService;
         private readonly IRepository<GameNews, long> _gameNewsRepository;
         private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
@@ -92,7 +94,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
         IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, IHistoryDataService historyDataService,
-        IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, 
+        IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, 
         UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, 
         IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
@@ -151,6 +153,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _lotteryAwardRepository = lotteryAwardRepository;
             _lotteryPrizeRepository = lotteryPrizeRepository;
             _searchHelper = searchHelper;
+            _weiXinService= weiXinService;
         }
 
         /// <summary>
@@ -826,7 +829,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _historyDataService.Replace();
+                _weiXinService.CreateMenu();
                 return new Result { Successful = true };
             }
             catch (Exception ex)

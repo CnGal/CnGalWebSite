@@ -357,7 +357,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                     }
                     catch (Exception ex)
                     {
-                        OutputHelper.PressError(ex, "尝试处理链接失败", "请确保链接格式正确");
+                        OutputHelper.PressError(ex, "尝试处理链接失败", "链接格式不正确");
                         continue;
                     }
 
@@ -884,6 +884,9 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
         static async Task< OutlinkArticleModel> GetArticleContext(string url)
         {
+            //替换链接
+            url=url.Replace("https://api.xiaoheihe.cn/v3/bbs/app/api/web/share?link_id=", "https://api.xiaoheihe.cn/maxnews/app/share/detail/").Replace("https://www.xiaoheihe.cn/community/18745/list/", "https://api.xiaoheihe.cn/maxnews/app/share/detail/");
+
             var html = GetHtml(url);
             OutlinkArticleModel result = null;
 

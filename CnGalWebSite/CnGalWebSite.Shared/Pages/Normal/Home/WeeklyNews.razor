@@ -1,5 +1,13 @@
 ﻿@page "/weeklynews"
 
 @inject IDataCacheService _dataCacheService
+@if (_dataCacheService.IsApp)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Home.About Index="@(_dataCacheService.WeeklyNewsOverviewCatche.FirstOrDefault()?.Id??281)" />
 
-<CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="@(_dataCacheService.WeeklyNewsOverviewCatche.FirstOrDefault()?.Id??281)" />
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="@(_dataCacheService.WeeklyNewsOverviewCatche.FirstOrDefault()?.Id??281)" />
+
+}

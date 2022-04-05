@@ -2,8 +2,16 @@
 
 
 @inject IDataCacheService _dataCacheService
+@if (_dataCacheService.IsApp)
+{
+    <CnGalWebSite.Shared.Pages.Apps.Home.About Index="150" />
 
-<CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="150" />
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="150" />
+
+}
 
 @code{
 

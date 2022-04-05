@@ -317,3 +317,6 @@ input.te-image-file-input {
 .layout-drawer:hover {
     background-color: var(--hover-color);
 }
+.toastui-editor-contents {
+    z-index: 4;
+}
