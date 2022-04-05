@@ -103,11 +103,65 @@ namespace CnGalWebSite.APIServer.MessageHandlers
 
                     return defaultResponseMessage;
                 })
+                .Keywords(new string[] { "随机推荐" }, () =>
+                {
+                    defaultResponseMessage.Content =  _weiXinService.GetRandom().GetAwaiter().GetResult();
+
+                    return defaultResponseMessage;
+                })
+                .Keywords(new string[] { "最新动态" }, () =>
+                {
+                    defaultResponseMessage.Content = _weiXinService.GetNewestNews().GetAwaiter().GetResult();
+
+                    return defaultResponseMessage;
+                })
+                .Keywords(new string[] { "近期新作" }, () =>
+                {
+                    defaultResponseMessage.Content = _weiXinService.GetNewestPublishGames().GetAwaiter().GetResult();
+
+                    return defaultResponseMessage;
+                })
+                .Keywords(new string[] { "即将发售" }, () =>
+                {
+                    defaultResponseMessage.Content = _weiXinService.GetNewestUnPublishGames().GetAwaiter().GetResult();
+
+                    return defaultResponseMessage;
+                })
+                .Keywords(new string[] { "最新编辑" }, () =>
+                {
+                    defaultResponseMessage.Content = _weiXinService.GetNewestEditGames().GetAwaiter().GetResult();
+
+                    return defaultResponseMessage;
+                })
+                .Keywords(new string[] { "关于我们", "关于" }, () =>
+                {
+                    var articleResponseMessage = base.CreateResponseMessage<ResponseMessageNews>();
+                    articleResponseMessage.Articles = new System.Collections.Generic.List<Senparc.NeuChar.Entities.Article>
+                    {
+                        new Senparc.NeuChar.Entities.Article
+                        {
+                            PicUrl="https://image.cngal.org/images/2022/02/16/95d8f31d4d94.png",
+                            Description="CnGal是一个非营利性的，立志于收集整理国内制作组创作及中文化的中文Galgame/AVG的介绍、攻略、评测、感想等内容的资料性质的网站。 此外，CnGal官方还会与圈内中文AVG制作组进行友好合作，如免费提供Banner广告位，网站服务器资源等。",
+                            Title="CnGal 中文GalGame资料站",
+                            Url="https://www.cngal.org/about"
+                        }
+                    };
+
+                    return articleResponseMessage;
+                })
+                .Keywords(new string[] { "戳戳看板娘" , "戳戳","看板娘" }, () =>
+                {
+                    defaultResponseMessage.Content = _weiXinService.GetAboutUsage();
+
+                    return defaultResponseMessage;
+                })
+
+
                 //当 Default 使用异步方法时，需要写在最后一个，且 requestMessage.StartHandler() 前需要使用 await 等待异步方法执行；
                 //当 Default 使用同步方法，不一定要在最后一个,并且不需要使用 await
                 .Default(async () =>
                 {
-                    defaultResponseMessage.Content = $"看板娘说她不知道呢，欸嘿嘿~~~";
+                    defaultResponseMessage.Content = $"看板娘不知道哦~ 欸嘿嘿~~~";
                     return defaultResponseMessage;
                 });
 

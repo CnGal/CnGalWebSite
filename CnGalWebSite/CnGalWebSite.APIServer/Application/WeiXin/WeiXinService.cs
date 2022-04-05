@@ -133,10 +133,11 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             sb.AppendLine("抱歉啦，毕竟刚刚从沉睡中醒来，还不是很熟悉这个世界呢");
             sb.AppendLine("不过数据库还是能连接上的，试试下面的指令吧~");
             sb.AppendLine();
+            sb.AppendLine("【随机推荐】【最新动态】【近期新作】【即将发售】【最新编辑】");
             sb.AppendLine("【词条+Id】");
             sb.AppendLine("例如：词条 1");
             sb.AppendLine("【搜索+查找的内容】");
-            sb.AppendLine("例如：搜索 CnGal");
+            sb.Append("例如：搜索 CnGal");
 
             return sb.ToString();
         }
