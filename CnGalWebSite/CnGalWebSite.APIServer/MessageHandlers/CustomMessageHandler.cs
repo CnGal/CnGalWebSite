@@ -103,31 +103,31 @@ namespace CnGalWebSite.APIServer.MessageHandlers
 
                     return defaultResponseMessage;
                 })
-                .Keywords(new string[] { "随机推荐" }, () =>
+                .Keywords(new string[] { "随机推荐","随机","推荐","sj","SJ","tj","TJ" }, () =>
                 {
                     defaultResponseMessage.Content =  _weiXinService.GetRandom().GetAwaiter().GetResult();
 
                     return defaultResponseMessage;
                 })
-                .Keywords(new string[] { "最新动态" }, () =>
+                .Keywords(new string[] { "最新动态","动态","dt","DT" }, () =>
                 {
                     defaultResponseMessage.Content = _weiXinService.GetNewestNews().GetAwaiter().GetResult();
 
                     return defaultResponseMessage;
                 })
-                .Keywords(new string[] { "近期新作" }, () =>
+                .Keywords(new string[] { "近期新作","新作","xz","XZ" }, () =>
                 {
                     defaultResponseMessage.Content = _weiXinService.GetNewestPublishGames().GetAwaiter().GetResult();
 
                     return defaultResponseMessage;
                 })
-                .Keywords(new string[] { "即将发售" }, () =>
+                .Keywords(new string[] { "即将发售","发售","fs","FS" }, () =>
                 {
                     defaultResponseMessage.Content = _weiXinService.GetNewestUnPublishGames().GetAwaiter().GetResult();
 
                     return defaultResponseMessage;
                 })
-                .Keywords(new string[] { "最新编辑" }, () =>
+                .Keywords(new string[] { "最新编辑","编辑","bj","BJ" }, () =>
                 {
                     defaultResponseMessage.Content = _weiXinService.GetNewestEditGames().GetAwaiter().GetResult();
 
