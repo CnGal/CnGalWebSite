@@ -1984,7 +1984,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             //更新数据
             _entryService.UpdateEntryDataAddInfor(entry, examine);
             //保存
-            await _entryRepository.UpdateAsync(entry);
+            entry = await _entryRepository.UpdateAsync(entry);
 
             //更新完善度
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);

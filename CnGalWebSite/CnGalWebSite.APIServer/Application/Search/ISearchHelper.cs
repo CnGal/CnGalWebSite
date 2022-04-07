@@ -8,7 +8,7 @@ namespace CnGalWebSite.APIServer.Application.Search
 {
     public interface ISearchHelper
     {
-        Task UpdateDataToSearchService(DateTime LastUpdateTime);
+        Task UpdateDataToSearchService(DateTime LastUpdateTime, bool updateAll = false);
 
         Task DeleteDataOfSearchService();
 

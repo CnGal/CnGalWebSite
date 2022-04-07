@@ -41,13 +41,13 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             _searchCacheRepository = searchCacheRepository;
         }
 
-        public async Task UpdateDataToSearchService(DateTime LastUpdateTime)
+        public async Task UpdateDataToSearchService(DateTime LastUpdateTime, bool updateAll = false)
         {
             await CreateCollection();
-            await UpdateEntries(LastUpdateTime);
-            await UpdateArticles(LastUpdateTime);
-            await UpdatePeripheries(LastUpdateTime);
-            await UpdateTags(LastUpdateTime);
+            await UpdateEntries(LastUpdateTime, updateAll);
+            await UpdateArticles(LastUpdateTime, updateAll);
+            await UpdatePeripheries(LastUpdateTime, updateAll);
+            await UpdateTags(LastUpdateTime, updateAll);
         }
 
         private async Task CreateCollection()
@@ -81,10 +81,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             }
         }
 
-        private async Task UpdateEntries(DateTime LastUpdateTime)
+        private async Task UpdateEntries(DateTime LastUpdateTime, bool updateAll = false)
         {
             var entries = await _entryRepository.GetAll().AsNoTracking()
-                .Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
+                .Where(s => s.LastEditTime > LastUpdateTime || updateAll).ToListAsync();
 
             if(entries.Any()==false)
             {
@@ -131,10 +131,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             await _searchCacheRepository.DeleteRangeAsync(s => deleted.Contains(s.OriginalId));
         }
 
-        private async Task UpdateArticles(DateTime LastUpdateTime)
+        private async Task UpdateArticles(DateTime LastUpdateTime,bool updateAll = false)
         {
             var entries = await _articleRepository.GetAll().AsNoTracking()
-                .Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
+                .Where(s => s.LastEditTime > LastUpdateTime || updateAll).ToListAsync();
 
             if (entries.Any() == false)
             {
@@ -161,7 +161,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                 }
 
             }
-            var result = await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+            await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
 
             var deleted = await _articleRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => (long)s.Id).ToListAsync();
             documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 1 && deleted.Contains(s.OriginalId)).ToListAsync();
@@ -179,10 +179,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             await _searchCacheRepository.DeleteRangeAsync(s => deleted.Contains(s.OriginalId));
         }
 
-        private async Task UpdatePeripheries(DateTime LastUpdateTime)
+        private async Task UpdatePeripheries(DateTime LastUpdateTime, bool updateAll=false)
         {
             var entries = await _peripheryRepository.GetAll().AsNoTracking()
-                .Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
+                .Where(s => s.LastEditTime > LastUpdateTime || updateAll).ToListAsync();
             if (entries.Any() == false)
             {
                 return;
@@ -227,10 +227,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             await _searchCacheRepository.DeleteRangeAsync(s => deleted.Contains(s.OriginalId));
         }
 
-        private async Task UpdateTags(DateTime LastUpdateTime)
+        private async Task UpdateTags(DateTime LastUpdateTime, bool updateAll = false)
         {
             var entries = await _tagRepository.GetAll().AsNoTracking()
-                .Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
+                .Where(s => s.LastEditTime > LastUpdateTime || updateAll).ToListAsync();
             if (entries.Any() == false)
             {
                 return;
