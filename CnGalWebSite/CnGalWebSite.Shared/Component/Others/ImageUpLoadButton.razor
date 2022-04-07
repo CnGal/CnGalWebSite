@@ -80,7 +80,7 @@
             ErrorHandler.ProcessError(ex, "保存上传文件信息失败");
         }
 
-        await OnUploadedImage.InvokeAsync(url);
+        await OnUploadedImage.InvokeAsync(url.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/"));
 
         return url;
     }

@@ -18,6 +18,7 @@ using CnGalWebSite.APIServer.Application.Votes;
 using CnGalWebSite.APIServer.Application.WeiXin;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
+using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
@@ -29,8 +30,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -809,7 +812,7 @@ namespace CnGalWebSite.APIServer.Controllers
             try
             {
                 await _searchHelper.DeleteDataOfSearchService();
-                await _searchHelper.UpdateDataToSearchService(DateTime.MinValue);
+                await _searchHelper.UpdateDataToSearchService(DateTime.Now, true);
 
                 return new Result { Successful = true };
             }
@@ -829,7 +832,41 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                _weiXinService.CreateMenu();
+                var examines = await _examineRepository.GetAll()
+                  .Include(s => s.Entry).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                  .Where(s => s.ApplicationUserId == _configuration["ExamineAdminId"]
+                      && (s.Operation == Operation.EstablishRelevances)
+                      && (s.ApplyTime.Date.Year == 2022 && s.ApplyTime.Date.Month == 4 && s.ApplyTime.Date.Day == 7)).ToListAsync();
+
+                foreach (var item in examines)
+                {
+                    EntryRelevances entryRelevances = null;
+                    using (TextReader str = new StringReader(item.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        entryRelevances = (EntryRelevances)serializer.Deserialize(str, typeof(EntryRelevances));
+                    }
+
+                    if (entryRelevances.Relevances.Any(s => s.DisplayValue == null))
+                    {
+                        foreach (var temp in entryRelevances.Relevances)
+                        {
+                            temp.IsDelete = !temp.IsDelete;
+                        }
+
+                        await _entryService.UpdateEntryDataRelevances(item.Entry, entryRelevances);
+                        await _entryRepository.UpdateAsync(item.Entry);
+                    }
+                }
+
+
+                foreach (var item in examines)
+                {
+                    await _examineRepository.DeleteAsync(item);
+                }
+
+
+                return new Result { Successful = true };
                 return new Result { Successful = true };
             }
             catch (Exception ex)

@@ -3,6 +3,7 @@ using CnGalWebSite.DataModel.ViewModel.Files;
 using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.DrawingBed.Controllers
 {
@@ -13,12 +14,14 @@ namespace CnGalWebSite.DrawingBed.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly ILogger _logger;
 
-        public FileController(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
+        public FileController(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ILogger logger)
         {
             _clientFactory = clientFactory;
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -26,6 +29,9 @@ namespace CnGalWebSite.DrawingBed.Controllers
         {
             try
             {
+
+                _logger.LogError("开始上传：" + model.Url);
+
                 using var client = _clientFactory.CreateClient();
                 var x = model.X;
                 var y = model.Y;
@@ -98,6 +104,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
 
                 if (string.IsNullOrWhiteSpace(UploadResults))
                 {
+                    _logger.LogError("上传失败：" + model.Url);
                     return new Result { Successful = false, Error = "文件上传失败" };
                 }
                 else

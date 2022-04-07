@@ -76,22 +76,25 @@ else
                     <div class="row">
                         <MTabsItems @bind-Value="TabIndex">
                             <MTabItem Value="1">
+                                @if (Model.IsCurrentUser || string.IsNullOrWhiteSpace(Model.MainPageContext) == false)
+                                {
+                                    <div class="mb-4">
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="个人介绍" Icon="fa fa-fw  fa-home">
+                                            <ChildContent>
+                                                <MarkdownViewTip Text="@Model.MainPageContext" />
+                                            </ChildContent>
+                                            <ButtonContent>
+                                                @if (Model.IsCurrentUser)
+                                                {
+                                                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-pencil " Tooltip="编辑个人介绍" OnClick="EditMainPage" />
 
-                                <div class="mb-4">
-                                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="个人介绍" Icon="fa fa-fw  fa-home">
-                                        <ChildContent>
-                                            <MarkdownViewTip Text="@Model.MainPageContext" />
-                                        </ChildContent>
-                                        <ButtonContent>
-                                            @if (Model.IsCurrentUser)
-                                            {
-                                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-pencil " Tooltip="编辑个人介绍" OnClick="EditMainPage" />
+                                                }
+                                            </ButtonContent>
+                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
-                                            }
-                                        </ButtonContent>
-                                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                                    </div>
+                                }
 
-                                </div>
                                 <div class="row">
                                     <div class="col-12 col-lg-6 mb-4">
                                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="签到概览" Icon="fa fa-fw  fa-calendar-check-o" Class="h-100">

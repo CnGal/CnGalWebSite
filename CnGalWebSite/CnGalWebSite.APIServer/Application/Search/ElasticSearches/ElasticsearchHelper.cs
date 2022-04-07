@@ -42,7 +42,7 @@ namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
             _appHelper = appHelper;
         }
 
-        public async Task UpdateDataToSearchService(DateTime LastUpdateTime)
+        public async Task UpdateDataToSearchService(DateTime LastUpdateTime, bool updateAll = false)
         {
             await UpdateEntryDataToElasticsearch(LastUpdateTime);
             await UpdateArticleDataToElasticsearch(LastUpdateTime);
@@ -50,10 +50,10 @@ namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
             await UpdatePeripheryDataToElasticsearch(LastUpdateTime);
         }
 
-        public async Task UpdateEntryDataToElasticsearch(DateTime LastUpdateTime)
+        public async Task UpdateEntryDataToElasticsearch(DateTime LastUpdateTime, bool updateAll = false)
         {
             var entries = await _entryRepository.GetAll().AsNoTracking()
-                .Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
+                .Where(s => s.LastEditTime > LastUpdateTime||updateAll).ToListAsync();
             if (entries.Count != 0)
             {
                 await _entryElasticsearchBaseService.InsertRangeAsync(entries);
@@ -66,9 +66,9 @@ namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
             }
         }
 
-        public async Task UpdateArticleDataToElasticsearch(DateTime LastUpdateTime)
+        public async Task UpdateArticleDataToElasticsearch(DateTime LastUpdateTime, bool updateAll = false)
         {
-            var entries = await _articleRepository.GetAll().AsNoTracking().Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
+            var entries = await _articleRepository.GetAll().AsNoTracking().Where(s => s.LastEditTime > LastUpdateTime || updateAll).ToListAsync();
             if (entries.Count != 0)
             {
                 await _articleElasticsearchBaseService.InsertRangeAsync(entries);
@@ -82,9 +82,9 @@ namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
             }
         }
 
-        public async Task UpdateTagDataToElasticsearch(DateTime LastUpdateTime)
+        public async Task UpdateTagDataToElasticsearch(DateTime LastUpdateTime, bool updateAll = false)
         {
-            var entries = await _tagRepository.GetAll().AsNoTracking().Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
+            var entries = await _tagRepository.GetAll().AsNoTracking().Where(s => s.LastEditTime > LastUpdateTime || updateAll).ToListAsync();
             if (entries.Count != 0)
             {
                 await _tagElasticsearchBaseService.InsertRangeAsync(entries);
@@ -97,9 +97,9 @@ namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
             }
         }
 
-        public async Task UpdatePeripheryDataToElasticsearch(DateTime LastUpdateTime)
+        public async Task UpdatePeripheryDataToElasticsearch(DateTime LastUpdateTime, bool updateAll = false)
         {
-            var entries = await _peripheryRepository.GetAll().AsNoTracking().Where(s => s.LastEditTime > LastUpdateTime).ToListAsync();
+            var entries = await _peripheryRepository.GetAll().AsNoTracking().Where(s => s.LastEditTime > LastUpdateTime || updateAll).ToListAsync();
             if (entries.Count != 0)
             {
                 await _peripheryElasticsearchBaseService.InsertRangeAsync(entries);
