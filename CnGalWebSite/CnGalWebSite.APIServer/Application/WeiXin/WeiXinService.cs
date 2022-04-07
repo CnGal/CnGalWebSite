@@ -354,7 +354,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 StringBuilder sb = new StringBuilder();
                 foreach (var item in games)
                 {
-                    sb.Append($"【{item.PubulishTime?.ToString("M")}】");
+                    sb.Append($"【{item.PubulishTime?.ToString("M月d日")}】");
                     sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
 
                     sb.AppendLine();
@@ -383,7 +383,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 StringBuilder sb = new StringBuilder();
                 foreach (var item in games)
                 {
-                    sb.Append($"【{item.PubulishTime?.ToString("M")}】");
+                    sb.Append($"【{item.PubulishTime?.ToString("M月d日")}】");
 
                     sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
 

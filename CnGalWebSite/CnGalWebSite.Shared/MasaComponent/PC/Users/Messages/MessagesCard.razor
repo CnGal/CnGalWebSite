@@ -110,14 +110,12 @@
                 //获取文章信息
                 Model = await Http.GetFromJsonAsync<List<CnGalWebSite.DataModel.Model.Message>>(ToolHelper.WebApiPath + "api/space/GetUserMessages");
 
+                Model = Model.OrderByDescending(s => s.PostTime).ToList();
+
                 RelyItems = Model.Where(s => s.Type == MessageType.ArticleReply || s.Type == MessageType.SpaceReply || s.Type == MessageType.CommentReply).ToList();
                 PassedItems = Model.Where(s => s.Type == MessageType.ExaminePassed).ToList();
                 UnPassedItems = Model.Where(s => s.Type == MessageType.ExamineUnPassed).ToList();
 
-                if (UnPassedItems.Any(s => s.IsReaded == false))
-                {
-                    selected = 2;
-                }
                 if (PassedItems.Any(s => s.IsReaded == false))
                 {
                     selected = 1;
@@ -125,6 +123,10 @@
                 if (RelyItems.Any(s => s.IsReaded == false))
                 {
                     selected = 0;
+                }
+                if (UnPassedItems.Any(s => s.IsReaded == false))
+                {
+                    selected = 2;
                 }
 
                 isReady = true;
