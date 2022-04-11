@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BootstrapBlazor" Version="6.2.8" />
+    <PackageReference Include="BootstrapBlazor" Version="6.5.0" />
     <PackageReference Include="BootstrapBlazor.Chart" Version="6.0.0" />
     <PackageReference Include="Masa.Blazor" Version="0.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />

@@ -1424,6 +1424,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
 
         }
+
         public void Save()
         {
             var path = Path.Combine(TempPath, "setting.json");

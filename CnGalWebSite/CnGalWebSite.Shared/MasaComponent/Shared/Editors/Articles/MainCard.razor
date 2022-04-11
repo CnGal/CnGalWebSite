@@ -33,7 +33,7 @@
                 </div>
 
                 <div class="form-group col-12  col-sm-6">
-                    <DateTimePicker TValue="DateTime" Value="@Model.PubishTime" ValueChanged="OnPubishTimeChanged" ViewModel="DatePickerViewModel.DateTime" DisplayText="发布时间" ShowLabel="true"/>
+                    <DateTimePicker TValue="DateTime" Value="@Model.PubishTime" ValueChanged="OnPubishTimeChanged" ViewModel="DatePickerViewMode .DateTime" DisplayText="发布时间" ShowLabel="true"/>
                 </div>
                 <div class="form-group col-12">
                     <BootstrapInput @bind-Value="Model.OriginalLink" />
@@ -50,13 +50,13 @@
                     @if (IsSame)
                     {
                         <div class="form-group col-12  col-sm-6">
-                            <DateTimePicker @bind-Value="@Model.PubishTime" ViewModel="DatePickerViewModel.DateTime" IsDisabled="true" DisplayText="动态发生时间" />
+                            <DateTimePicker @bind-Value="@Model.PubishTime" ViewModel="DatePickerViewMode .DateTime" IsDisabled="true" DisplayText="动态发生时间" />
                         </div>
                     }
                     else
                     {
                         <div class="form-group col-12  col-sm-6">
-                            <DateTimePicker @bind-Value="@Model.RealNewsTime" ViewModel="DatePickerViewModel.DateTime" />
+                            <DateTimePicker @bind-Value="@Model.RealNewsTime" ViewModel="DatePickerViewMode .DateTime" />
                         </div>
                     }
                     <div class="form-group col-12  col-sm-6">

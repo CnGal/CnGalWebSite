@@ -1,0 +1,264 @@
+﻿@inject IAuthService AuthService
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<div>
+
+    <Table TItem="ListRobotReplyAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="120" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableToolbarTemplate>
+            <TableToolbarButton TItem="ListRobotReplyAloneModel" Color="Color.Warning" Icon="fa fa-upload" Text="导入"
+                                OnClickCallback="@(async (IEnumerable<ListRobotReplyAloneModel> e)=> {await OnImportModel(new ImportRobotsModel());})" IsAsync="true" />
+            <TableToolbarButton TItem="ListRobotReplyAloneModel" Color="Color.Success" Icon="fa fa-plus" Text="添加"
+                                OnClickCallback="@(async (IEnumerable<ListRobotReplyAloneModel> e)=> {await OnEditModel(new ListRobotReplyAloneModel());})" IsAsync="true" />
+            <TableToolbarButton TItem="ListRobotReplyAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListRobotReplyAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
+
+        </TableToolbarTemplate>
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
+            <TableColumn @bind-Field="@context.Key" Searchable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+            <TableColumn @bind-Field="@context.Value" Searchable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+            <TableColumn @bind-Field="@context.AfterTime" Sortable="true" Width="90" FormatString="HH:mm:ss" />
+            <TableColumn @bind-Field="@context.BeforeTime" Sortable="true" Width="90" FormatString="HH:mm:ss" />
+            <TableColumn @bind-Field="@context.UpdateTime" Sortable="true" Width="150" FormatString="yyyy-MM-dd HH:mm:ss" />
+
+            <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-pencil" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() =>  OnEditModel( context))" />
+
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" IsShow="context.IsHidden" />
+
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" IsShow="!context.IsHidden" />
+        </RowButtonTemplate>
+    </Table>
+
+</div>
+@code {
+    [NotNull]
+    private Table<ListRobotReplyAloneModel>? TableRows { get; set; }
+    private List<ListRobotReplyAloneModel> SelectedRows { get; set; } = new();
+
+    public ListRobotRepliesViewModel ListModel { get; set; } = new ListRobotRepliesViewModel { RobotReplies = new List<ListRobotReplyAloneModel>() };
+
+    private ListRobotReplyAloneModel searchModel { get; set; } = new ListRobotReplyAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 40, 80, 200, 5000 };
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private async Task<QueryData<ListRobotReplyAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<RobotRepliesPagesInfor>(ToolHelper.WebApiPath + "api/robot/GetRobotReplyList", new RobotRepliesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListRobotReplyAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取自动回复列表");
+            return new QueryData<ListRobotReplyAloneModel>();
+        }
+    }
+
+
+    private async Task OnRowEditIsHiddenClick(long[] ids, bool isHidden, bool showMessage)
+    {
+        string tempString = isHidden == true ? "隐藏" : "显示";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<HiddenRobotModel>(ToolHelper.WebApiPath + "api/robot/HiddenRobotReply", new HiddenRobotModel { Ids = ids, IsHidden = isHidden });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "自动回复失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "自动回复成功", tempString + "自动回复成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "自动回复失败");
+        }
+    }
+
+    private async Task OnHiddenClick(IEnumerable<ListRobotReplyAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改事件运行状态", "请选中自动回复");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), true, false);
+
+        await ToastService.Success("取消暂停自动回复成功", "取消暂停自动回复成功");
+        await TableRows.QueryAsync();
+    }
+
+    private async Task OnUnHiddenClick(IEnumerable<ListRobotReplyAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改自动回复运行状态", "请选中自动回复");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), false, false);
+
+        await ToastService.Success("暂停自动回复成功", "暂停自动回复成功");
+        await TableRows.QueryAsync();
+    }
+
+
+
+    [Inject]
+    [NotNull]
+    private DialogService? DialogService { get; set; }
+
+    public async Task OnEditModel(ListRobotReplyAloneModel item)
+    {
+        var model = Utility.GenerateEditorItems<ListRobotReplyAloneModel>().ToList();
+        model.RemoveAll(s => s.Text == "更新时间");
+        var editors = model.Where(s => s.PropertyType == typeof(DateTime));
+        foreach(var temp in editors)
+        {
+            temp.ComponentParameters = new List<KeyValuePair<string,object>> { new KeyValuePair<string, object>("ViewModel", DatePickerViewMode.DateTime)};
+        }
+
+        var option = new EditDialogOption<ListRobotReplyAloneModel>()
+        {
+            Title = item.Id == 0 ? "添加自动回复" : "编辑自动回复",
+            Model = item,
+            Items = model,
+            OnCloseAsync = () =>
+            {
+                //Trace.Log("关闭按钮被点击");
+                return Task.CompletedTask;
+            },
+            OnEditAsync = async context =>
+            {
+                // Trace.Log("保存按钮被点击");
+                var editModel = (ListRobotReplyAloneModel)context.Model;
+
+                return await EditData(editModel);
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
+    }
+
+    public async Task OnImportModel(ImportRobotsModel item)
+    {
+        var model = Utility.GenerateEditorItems<ImportRobotsModel>().ToList();
+
+        model.First().Rows = 5;
+
+        var option = new EditDialogOption<ImportRobotsModel>()
+        {
+            Title = "导入自动回复列表" ,
+            Model = item,
+            Items = model,
+            OnCloseAsync = () =>
+            {
+                //Trace.Log("关闭按钮被点击");
+                return Task.CompletedTask;
+            },
+            OnEditAsync = async context =>
+            {
+                // Trace.Log("保存按钮被点击");
+                var editModel = (ImportRobotsModel)context.Model;
+
+                return await ImportData(editModel);
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
+    }
+
+    public async Task<bool> ImportData(ImportRobotsModel model)
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<ImportRobotsModel>(ToolHelper.WebApiPath + "api/robot/ImportRobotReplies", model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("导入数据失败", obj.Error);
+                await TableRows.QueryAsync();
+
+                return false;
+            }
+            else
+            {
+
+                await ToastService.Success("导入数据成功", "导入数据成功");
+                await TableRows.QueryAsync();
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "导入数据失败");
+            return false;
+        }
+    }
+
+    public async Task<bool> EditData(ListRobotReplyAloneModel model)
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<ListRobotReplyAloneModel>(ToolHelper.WebApiPath + "api/robot/UpdateRobotReplyData", model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("保存数据失败", obj.Error);
+                return false;
+            }
+            else
+            {
+
+                await ToastService.Success("保存数据成功", "保存数据成功");
+                await TableRows.QueryAsync();
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "保存数据失败");
+            return false;
+        }
+    }
+
+}

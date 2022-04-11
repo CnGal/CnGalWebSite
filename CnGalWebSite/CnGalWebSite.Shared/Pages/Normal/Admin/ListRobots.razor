@@ -1,0 +1,67 @@
+﻿@page "/admin/listrobots"
+@attribute [Authorize(Roles = "Admin")]
+@inject HttpClient Http
+@inject ToastService? ToastService
+
+<TitleTip Title="这里是看板娘哦"></TitleTip>
+
+<div>
+    <div class="  rounded shadow-sm  bg-opacity p-3">
+        <h3 class="fw-bold text-center">这里是看板娘哦</h3>
+        <p class="text-center" style="color: gray;margin-top:20px">
+            <i class="fa fa-gamepad fa-fw "></i>
+            <span class="article-infor-text">@(InforModel.Replies + "条自动回复")</span>&nbsp;&nbsp;&nbsp;
+
+            <i class="fa fa-star fa-fw "></i>
+            <span class="article-infor-text">@(InforModel.Events + "个事件")</span>&nbsp;&nbsp;&nbsp;
+
+            <i class="fa fa-object-group fa-fw "></i>
+            <span class="article-infor-text">@(InforModel.Groups + "个群")</span>
+        </p>
+    </div>
+    <div class="  rounded shadow-sm mt-3 bg-opacity">
+        <Tab>
+            <TabItem Text="自动回复" Icon="fa fa-newspaper-o">
+                <CnGalWebSite.Shared.Component.Admin.Robots.ListRobotReplies />
+            </TabItem>
+            <TabItem Text="事件" Icon="fa fa-newspaper-o">
+                <CnGalWebSite.Shared.Component.Admin.Robots.ListRobotEvents />
+
+            </TabItem>
+            <TabItem Text="变量" Icon="fa fa-newspaper-o">
+                <CnGalWebSite.Shared.Component.Admin.Robots.ListRobotEvents />
+            </TabItem>
+            <TabItem Text="群" Icon="fa fa-newspaper-o">
+                <CnGalWebSite.Shared.Component.Admin.Robots.ListRobotEvents />
+            </TabItem>
+
+
+        </Tab>
+    </div>
+
+</div>
+
+
+@code {
+
+
+    public ListRobotsInforViewModel InforModel { get; set; } = new ListRobotsInforViewModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            InforModel = await Http.GetFromJsonAsync<ListRobotsInforViewModel>(ToolHelper.WebApiPath + "api/robot/listrobots");
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取机器人数据");
+        }
+
+    }
+
+}

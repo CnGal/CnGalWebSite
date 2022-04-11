@@ -397,7 +397,7 @@
                 {
                     Title = "确认通过审核",
                     Content = "该审核包含以下敏感词：" + temp,
-                    IsConfirm = true,
+                    
                     Category = SwalCategory.Error,
                 };
                 var ret = await SwalService.ShowModal(op);
