@@ -320,3 +320,6 @@ input.te-image-file-input {
 .toastui-editor-contents {
     z-index: 4;
 }
+.row {
+    flex: 0!important;
+}

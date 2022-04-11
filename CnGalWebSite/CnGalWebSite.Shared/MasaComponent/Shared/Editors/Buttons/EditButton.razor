@@ -237,7 +237,7 @@
     public async Task OnClosed()
     {
         IsEdit = false;
-        await IsEditChanged.InvokeAsync(IsEdit);
+        //await IsEditChanged.InvokeAsync(IsEdit);
 
         StateHasChanged();
     }
