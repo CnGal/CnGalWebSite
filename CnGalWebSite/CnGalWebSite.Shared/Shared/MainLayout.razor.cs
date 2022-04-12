@@ -212,6 +212,7 @@ namespace CnGalWebSite.Shared.Shared
                               new MenuItem() { Text = "审核", Icon = "fa fa-fw fa-pencil", Url = "/admin/ListExamines" },
                               new MenuItem() { Text = "工具", Icon = "fa fa-fw fa-wrench", Url = "/admin/tools" },
                               new MenuItem() { Text = "备份", Icon = "fa fa-fw fa-cloud-upload", Url = "/admin/listbackuparchives" },
+                              new MenuItem() { Text = "看板娘", Icon = "fa fa-fw fa-heart", Url = "/admin/listrobots" },
                               new MenuItem() { Text = "批量导入", Icon = "fa fa-fw fa-upload", Url = "/admin/importdata" },
                               new MenuItem() { Text = "定时任务", Icon = "fa fa-fw fa-tasks", Url = "/admin/listtimedtasks" },
                               new MenuItem() { Text = "动态采集", Icon = "fa fa-fw fa-newspaper-o", Url = "/admin/listnews" },

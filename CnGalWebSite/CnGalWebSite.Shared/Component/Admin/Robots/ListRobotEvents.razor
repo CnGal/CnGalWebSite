@@ -1,0 +1,197 @@
+﻿@inject IAuthService AuthService
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<div>
+
+    <Table TItem="ListRobotEventAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="120" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableToolbarTemplate>
+            <TableToolbarButton TItem="ListRobotEventAloneModel" Color="Color.Success" Icon="fa fa-plus" Text="添加"
+                                OnClickCallback="@(async (IEnumerable<ListRobotEventAloneModel> e)=> {await OnEditModel(new ListRobotEventAloneModel());})" IsAsync="true" />
+            <TableToolbarButton TItem="ListRobotEventAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListRobotEventAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
+
+        </TableToolbarTemplate>
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
+            <TableColumn @bind-Field="@context.Text" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Time" Sortable="true" Width="90" FormatString="HH:mm:ss" />
+            <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-pencil" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() =>  OnEditModel( context))" />
+
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" IsShow="context.IsHidden" />
+
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" IsShow="!context.IsHidden" />
+        </RowButtonTemplate>
+    </Table>
+
+</div>
+@code {
+    [NotNull]
+    private Table<ListRobotEventAloneModel>? TableRows { get; set; }
+    private List<ListRobotEventAloneModel> SelectedRows { get; set; } = new();
+
+    public ListRobotEventsViewModel ListModel { get; set; } = new ListRobotEventsViewModel { RobotEvents = new List<ListRobotEventAloneModel>() };
+
+    private ListRobotEventAloneModel searchModel { get; set; } = new ListRobotEventAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 40, 80, 200, 5000 };
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private async Task<QueryData<ListRobotEventAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<RobotEventsPagesInfor>(ToolHelper.WebApiPath + "api/robot/GetRobotEventList", new RobotEventsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListRobotEventAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取事件列表");
+            return new QueryData<ListRobotEventAloneModel>();
+        }
+    }
+
+
+    private async Task OnRowEditIsHiddenClick(long[] ids, bool isHidden, bool showMessage)
+    {
+        string tempString = isHidden == true ? "隐藏" : "显示";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<HiddenRobotModel>(ToolHelper.WebApiPath + "api/robot/HiddenRobotEvent", new HiddenRobotModel { Ids = ids, IsHidden = isHidden });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "事件失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "事件成功", tempString + "事件成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "事件失败");
+        }
+    }
+
+    private async Task OnHiddenClick(IEnumerable<ListRobotEventAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改事件运行状态", "请选中事件");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), true, false);
+
+        await ToastService.Success("取消暂停事件成功", "取消暂停事件成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnUnHiddenClick(IEnumerable<ListRobotEventAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改事件运行状态", "请选中事件");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), false, false);
+
+        await ToastService.Success("暂停事件成功", "暂停事件成功");
+        await TableRows.QueryAsync();
+    }
+
+
+
+    [Inject]
+    [NotNull]
+    private DialogService? DialogService { get; set; }
+
+    public async Task OnEditModel(ListRobotEventAloneModel item)
+    {
+        var model = Utility.GenerateEditorItems<ListRobotEventAloneModel>();
+        var editors = model.Where(s => s.PropertyType == typeof(DateTime));
+        foreach (var temp in editors)
+        {
+            temp.ComponentParameters = new List<KeyValuePair<string, object>> { new KeyValuePair<string, object>("ViewMode", DatePickerViewMode.DateTime) };
+        }
+        var option = new EditDialogOption<ListRobotEventAloneModel>()
+        {
+            Title = item.Id == 0 ? "添加事件" : "编辑事件",
+            Model = item,
+            Items = model,
+            OnCloseAsync = () =>
+            {
+                //Trace.Log("关闭按钮被点击");
+                return Task.CompletedTask;
+            },
+            OnEditAsync = async context =>
+            {
+                // Trace.Log("保存按钮被点击");
+                var editModel = (ListRobotEventAloneModel)context.Model;
+
+                return await EditData(editModel);
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
+    }
+
+    public async Task<bool> EditData(ListRobotEventAloneModel model)
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<ListRobotEventAloneModel>(ToolHelper.WebApiPath + "api/robot/UpdateRobotEventData", model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("保存数据失败", obj.Error);
+                return false;
+            }
+            else
+            {
+
+                await ToastService.Success("保存数据成功", "保存数据成功");
+                await TableRows.QueryAsync();
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "保存数据失败");
+            return false;
+        }
+    }
+
+}

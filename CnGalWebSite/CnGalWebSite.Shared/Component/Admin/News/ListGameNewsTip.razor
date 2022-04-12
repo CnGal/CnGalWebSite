@@ -20,12 +20,12 @@
             </TableToolbarTemplate>
             <TableColumns>
                 <TableColumn @bind-Field="@context.Id" Sortable="true" Fixed="true" Width="50" />
-                <TableColumn @bind-Field="@context.State" Sortable="true" Searchable="true"  DefaultSort="true" DefaultSortOrder="SortOrder.Asc" AllowTextWrap="true" Width="50" />
-                <TableColumn @bind-Field="@context.Author" Searchable="true" AllowTextWrap="true" Sortable="true" Width="120" />
-                <TableColumn @bind-Field="@context.Title" Searchable="true" AllowTextWrap="true" Width="200" />
-                <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" AllowTextWrap="true" Width="200" />
+                <TableColumn @bind-Field="@context.State" Sortable="true" Searchable="true"  DefaultSort="true" DefaultSortOrder="SortOrder.Asc" TextWrap="true" Width="50" />
+                <TableColumn @bind-Field="@context.Author" Searchable="true" TextWrap="true" Sortable="true" Width="120" />
+                <TableColumn @bind-Field="@context.Title" Searchable="true" TextWrap="true" Width="200" />
+                <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" TextWrap="true" Width="200" />
 
-                <TableColumn @bind-Field="@context.PublishTime" Sortable="true" AllowTextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
+                <TableColumn @bind-Field="@context.PublishTime" Sortable="true" TextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
             </TableColumns>
             <RowButtonTemplate>
                 <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditGameNews(context.Id))" />

@@ -55,13 +55,13 @@
                     </TableToolbarTemplate>
                     <TableColumns>
                         <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-                        <TableColumn @bind-Field="@context.Name" Searchable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+                        <TableColumn @bind-Field="@context.Name" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
                         <TableColumn @bind-Field="@context.IsPause" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                         <TableColumn @bind-Field="@context.IsRuning" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                         <TableColumn @bind-Field="@context.IsLastFail" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                         <TableColumn @bind-Field="@context.Type" Sortable="true" Width="200" />
-                        <TableColumn @bind-Field="@context.Parameter" Sortable="true" Width="200" AllowTextWrap="true" />
-                        <TableColumn @bind-Field="@context.ExecuteType" AllowTextWrap="true" Width="200" />
+                        <TableColumn @bind-Field="@context.Parameter" Sortable="true" Width="200" TextWrap="true" />
+                        <TableColumn @bind-Field="@context.ExecuteType" TextWrap="true" Width="200" />
 
                         <TableColumn @bind-Field="@context.IntervalTime" Sortable="true" Width="150" />
 

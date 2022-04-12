@@ -81,13 +81,13 @@
                         <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
                         <TableColumn @bind-Field="@context.Type" Searchable="true" Sortable="true" Width="100" />
                         <TableColumn @bind-Field="@context.CommentTime" Sortable="true" Width="200" />
-                        <TableColumn @bind-Field="@context.Text" Searchable="true" AllowTextWrap="true" Width="400" />
+                        <TableColumn @bind-Field="@context.Text" Searchable="true" TextWrap="true" Width="400" />
 
                         <TableColumn @bind-Field="@context.ApplicationUserId" Searchable="true" Sortable="true" Width="300" />
                         <TableColumn @bind-Field="@context.ParentCodeNavigationId" Searchable="true" Sortable="true" Width="110" />
 
                         <TableColumn @bind-Field="@context.EntryId" Searchable="true" Sortable="true" Width="110" />
-                        <TableColumn @bind-Field="@context.ArticleId" Sortable="true" Width="130" AllowTextWrap="true" />
+                        <TableColumn @bind-Field="@context.ArticleId" Sortable="true" Width="130" TextWrap="true" />
                         <TableColumn @bind-Field="@context.UserSpaceCommentManagerId" Sortable="true" Width="160" />
                         <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                     </TableColumns>

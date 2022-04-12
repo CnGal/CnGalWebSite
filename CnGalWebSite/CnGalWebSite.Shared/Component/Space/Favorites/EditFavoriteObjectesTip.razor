@@ -18,8 +18,8 @@
                 </TableToolbarTemplate>
                 <TableColumns>
                     <TableColumn @bind-Field="@context.Name" Width="100" />
-                    <TableColumn @bind-Field="@context.Type" Width="200" AllowTextWrap="true" />
-                    <TableColumn @bind-Field="@context.CreateTime" AllowTextWrap="true" Sortable="true" Width="100" FormatString="yyyy-MM-dd HH:mm" />
+                    <TableColumn @bind-Field="@context.Type" Width="200" TextWrap="true" />
+                    <TableColumn @bind-Field="@context.CreateTime" TextWrap="true" Sortable="true" Width="100" FormatString="yyyy-MM-dd HH:mm" />
                 </TableColumns>
                 <RowButtonTemplate>
                     <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick(context.ObjectId,context.Type,context.Name))" />

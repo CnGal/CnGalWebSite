@@ -49,20 +49,20 @@
                         <TableColumn @bind-Field="@context.Id" Sortable="true" Fixed="true" Width="60" DefaultSortOrder="@SortOrder.Desc" />
                         <TableColumn @bind-Field="@context.Operation" Sortable="true" Searchable="true" Width="200" />
                         <TableColumn @bind-Field="@context.IsPassed" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="120" Lookup="DataSource" />
-                        <TableColumn @bind-Field="@context.PassedTime" Sortable="true" AllowTextWrap="true" Width="180" />
+                        <TableColumn @bind-Field="@context.PassedTime" Sortable="true" TextWrap="true" Width="180" />
 
-                        <TableColumn @bind-Field="@context.ApplyTime" Sortable="true" AllowTextWrap="true" Width="180" />
+                        <TableColumn @bind-Field="@context.ApplyTime" Sortable="true" TextWrap="true" Width="180" />
 
 
                         <TableColumn @bind-Field="@context.UserName" Searchable="true" Sortable="true" Width="300" />
-                        <TableColumn @bind-Field="@context.PassedAdminName" Searchable="true" AllowTextWrap="true" Sortable="true" Width="200" />
+                        <TableColumn @bind-Field="@context.PassedAdminName" Searchable="true" TextWrap="true" Sortable="true" Width="200" />
 
                         <TableColumn @bind-Field="@context.ContributionValue" Sortable="true" Width="110" />
                         <TableColumn @bind-Field="@context.EntryId" Searchable="true" Sortable="true" Width="110" />
 
                         <TableColumn @bind-Field="@context.TagId" Searchable="true" Sortable="true" Width="110" />
                         <TableColumn @bind-Field="@context.ArticleId" Searchable="true" Sortable="true" Width="110" />
-                        <TableColumn @bind-Field="@context.Comments" Sortable="true" AllowTextWrap="true" Searchable="true" Width="350" />
+                        <TableColumn @bind-Field="@context.Comments" Sortable="true" TextWrap="true" Searchable="true" Width="350" />
                     </TableColumns>
                     <RowButtonTemplate>
                         <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.Id))" />

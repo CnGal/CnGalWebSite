@@ -37,9 +37,9 @@
                     </TableToolbarTemplate>
                     <TableColumns>
                         <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="300" />
-                        <TableColumn @bind-Field="@context.UserName" Searchable="true" Sortable="true" Width="200" AllowTextWrap="true" />
-                        <TableColumn @bind-Field="@context.Email" Sortable="true" Searchable="true" Width="200" AllowTextWrap="true" />
-                        <TableColumn @bind-Field="@context.PersonalSignature" Searchable="true" AllowTextWrap="true" Width="400" />
+                        <TableColumn @bind-Field="@context.UserName" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
+                        <TableColumn @bind-Field="@context.Email" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
+                        <TableColumn @bind-Field="@context.PersonalSignature" Searchable="true" TextWrap="true" Width="400" />
 
                         <TableColumn @bind-Field="@context.Birthday" Sortable="true" FormatString="MM-dd" Width="100" />
                         <TableColumn @bind-Field="@context.RegistTime" Sortable="true" Width="160" />
@@ -47,7 +47,7 @@
                         <TableColumn @bind-Field="@context.ContributionValue" Sortable="true" Width="120" />
                         <TableColumn @bind-Field="@context.DisplayIntegral" Sortable="true" Width="110" />
                         <TableColumn @bind-Field="@context.DisplayContributionValue" Sortable="true" Width="110" />
-                        <TableColumn @bind-Field="@context.OnlineTime" Sortable="true" Width="130" AllowTextWrap="true" FormatString="0.00" />
+                        <TableColumn @bind-Field="@context.OnlineTime" Sortable="true" Width="130" TextWrap="true" FormatString="0.00" />
                         <TableColumn @bind-Field="@context.LastOnlineTime" Sortable="true" Width="160" />
                         <TableColumn @bind-Field="@context.UnsealTime" Sortable="true" Width="160" />
                         <TableColumn @bind-Field="@context.CanComment" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />

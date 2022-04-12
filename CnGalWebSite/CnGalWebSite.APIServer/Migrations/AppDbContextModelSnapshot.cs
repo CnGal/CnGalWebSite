@@ -184,7 +184,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "70e83322-fd94-4f39-99a9-b73e9b17133e",
+                            ConcurrencyStamp = "5eada5a9-265e-43f9-9601-d6a1f967c127",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
@@ -1714,6 +1714,72 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.ToTable("RankUsers");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.RobotEvent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RobotEvents");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.RobotGroup", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("GroupId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RobotGroups");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.RobotReply", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("AfterTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("BeforeTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Key")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RobotReplies");
+                });
+
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.SearchCache", b =>
                 {
                     b.Property<long>("SearchCacheId")
@@ -2770,28 +2836,28 @@ namespace CnGalWebSite.APIServer.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            ConcurrencyStamp = "d6e31841-02b1-45f7-861a-44af369d7e97",
+                            ConcurrencyStamp = "9c99563f-940c-4261-b604-c32349386dbf",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e576",
-                            ConcurrencyStamp = "09024617-e9b2-4a4f-bd26-a1a1f335867a",
+                            ConcurrencyStamp = "38d18771-9b12-4105-87dd-3ed2787790be",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e577",
-                            ConcurrencyStamp = "753d558c-8a9e-427f-bd6c-fb360059b30b",
+                            ConcurrencyStamp = "ee1f5f28-595b-4509-928d-8b97c2c7a22f",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e578",
-                            ConcurrencyStamp = "761b65a9-abf8-4743-98dd-e0465cfbf4bb",
+                            ConcurrencyStamp = "21c7dec6-6506-4b3d-b87c-77338078ed4e",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         });

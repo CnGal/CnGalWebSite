@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -54,7 +54,7 @@
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
     <PackageReference Include="BootstrapBlazor.Chart" Version="6.0.0" />
-    <PackageReference Include="BootstrapBlazor.Markdown" Version="6.0.1" />
+    <PackageReference Include="BootstrapBlazor.Markdown" Version="6.0.3" />
     <PackageReference Include="BootstrapBlazor.TableExport" Version="6.0.0" />
     <PackageReference Include="Chronos.Blazor.Cropper" Version="1.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.3" />

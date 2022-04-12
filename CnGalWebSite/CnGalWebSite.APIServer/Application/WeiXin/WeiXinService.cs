@@ -176,17 +176,17 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             return sb.ToString();
         }
 
-        public async Task<string> GetRandom()
+        public async Task<string> GetRandom(bool plainText = false)
         {
             var entryIds = await _entryRepository.GetAll().AsNoTracking()
                 .Where(s => s.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden != true)
                 .Select(s => s.Id).ToListAsync();
 
             var index = new Random().Next(0, entryIds.Count - 1);
-            return await GetEntryInfor(entryIds[index]);
+            return await GetEntryInfor(entryIds[index], plainText);
         }
 
-        public async Task<string> GetEntryInfor(int id)
+        public async Task<string> GetEntryInfor(int id,bool plainText=false)
         {
             var entry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Information)
@@ -246,13 +246,21 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                     {
                         sb.AppendLine($"{steam.RecommendationRate}% 好评（{steam.EvaluationCount}条评测）");
                     }
-                    sb.AppendLine($"<a href=\"https://store.steampowered.com/app/{steamId}\">Steam商店页面</a>");
+                    if(plainText)
+                    {
+                        sb.AppendLine($"https://store.steampowered.com/app/{steamId}");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"<a href=\"https://store.steampowered.com/app/{steamId}\">Steam商店页面</a>");
+
+                    }
 
                     if (entry.EntryRelationFromEntryNavigation.Any(s => s.ToEntryNavigation.Type == EntryType.Role))
                     {
                         sb.AppendLine();
                         sb.Append($"登场角色：");
-                        var roles = entry.EntryRelationFromEntryNavigation.Select(s => s.ToEntryNavigation).ToList();
+                        var roles = entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.Type == EntryType.Role).Select(s => s.ToEntryNavigation).ToList();
                         foreach (var item in roles)
                         {
                             if (roles.IndexOf(item) != 0)

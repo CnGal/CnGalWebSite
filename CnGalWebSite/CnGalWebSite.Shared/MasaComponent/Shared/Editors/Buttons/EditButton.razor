@@ -119,7 +119,8 @@
     {
         var option = new DialogOption()
         {
-            Title = "历史编辑记录"
+            Title = "历史编辑记录",
+            Size= Size.Large
         };
         option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EditRecordListViewTip>(new Dictionary<string, object>
         {
@@ -237,7 +238,7 @@
     public async Task OnClosed()
     {
         IsEdit = false;
-        await IsEditChanged.InvokeAsync(IsEdit);
+        //await IsEditChanged.InvokeAsync(IsEdit);
 
         StateHasChanged();
     }

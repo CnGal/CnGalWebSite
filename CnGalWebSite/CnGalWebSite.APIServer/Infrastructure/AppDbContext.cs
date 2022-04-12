@@ -15,6 +15,8 @@ namespace CnGalWebSite.APIServer.Infrastructure
         {
 
         }
+
+
         public DbSet<Entry> Entries { get; set; }
         public DbSet<Examine> Examines { get; set; }
         public DbSet<Article> Articles { get; set; }
@@ -73,6 +75,9 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<UserAddress> UserAddresses { get; set; }
         public DbSet<SteamUserInfor> SteamUserInfors { get; set; }
         public DbSet<SearchCache> SearchCaches { get; set; }
+        public DbSet<RobotEvent> RobotEvents { get; set; }
+        public DbSet<RobotReply> RobotReplies { get; set; }
+        public DbSet<RobotGroup> RobotGroups { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
