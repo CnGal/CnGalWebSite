@@ -37,10 +37,10 @@
                 <TableColumns>
                     <TableColumn @bind-Field="@context.Id" Searchable="true" Sortable="true" Width="100" />
                     <TableColumn @bind-Field="@context.Name" Searchable="true" Sortable="true" Width="100" />
-                    <TableColumn @bind-Field="@context.BriefIntroduction" Sortable="true" Width="200" AllowTextWrap="true" />
-                    <TableColumn @bind-Field="@context.UserId" Sortable="true" Width="250" AllowTextWrap="true" />
-                    <TableColumn @bind-Field="@context.Count" Searchable="true" AllowTextWrap="true" Width="120" />
-                    <TableColumn @bind-Field="@context.CreateTime" AllowTextWrap="true" Width="100" FormatString="yyyy-MM-dd" />
+                    <TableColumn @bind-Field="@context.BriefIntroduction" Sortable="true" Width="200" TextWrap="true" />
+                    <TableColumn @bind-Field="@context.UserId" Sortable="true" Width="250" TextWrap="true" />
+                    <TableColumn @bind-Field="@context.Count" Searchable="true" TextWrap="true" Width="120" />
+                    <TableColumn @bind-Field="@context.CreateTime" TextWrap="true" Width="100" FormatString="yyyy-MM-dd" />
 
                     <TableColumn @bind-Field="@context.IsDefault" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                 </TableColumns>

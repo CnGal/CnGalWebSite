@@ -23,15 +23,15 @@
                         <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
                         <TableColumn @bind-Field="@context.Type" Searchable="true" Sortable="true" Width="100" />
                         <TableColumn @bind-Field="@context.Title" Sortable="true" Searchable="true" Width="200" />
-                        <TableColumn @bind-Field="@context.Text" Searchable="true" AllowTextWrap="true" Width="300" />
+                        <TableColumn @bind-Field="@context.Text" Searchable="true" TextWrap="true" Width="300" />
 
-                        <TableColumn @bind-Field="@context.PostTime" Sortable="true" AllowTextWrap="true" Width="120" />
-                        <TableColumn @bind-Field="@context.ApplicationUserId" Sortable="true" Searchable="true" AllowTextWrap="true" Width="160" />
-                        <TableColumn @bind-Field="@context.Rank" Sortable="true" Searchable="true" AllowTextWrap="true" Width="100" />
-                        <TableColumn @bind-Field="@context.Link" Sortable="true" Searchable="true" AllowTextWrap="true" Width="200" />
-                        <TableColumn @bind-Field="@context.AdditionalInfor" Sortable="true" Searchable="true" Width="130" AllowTextWrap="true" />
-                        <TableColumn @bind-Field="@context.LinkTitle" Sortable="true" Searchable="true" AllowTextWrap="true" Width="160" />
-                        <TableColumn @bind-Field="@context.Image" Sortable="true" Searchable="true" AllowTextWrap="true" Width="160" />
+                        <TableColumn @bind-Field="@context.PostTime" Sortable="true" TextWrap="true" Width="120" />
+                        <TableColumn @bind-Field="@context.ApplicationUserId" Sortable="true" Searchable="true" TextWrap="true" Width="160" />
+                        <TableColumn @bind-Field="@context.Rank" Sortable="true" Searchable="true" TextWrap="true" Width="100" />
+                        <TableColumn @bind-Field="@context.Link" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
+                        <TableColumn @bind-Field="@context.AdditionalInfor" Sortable="true" Searchable="true" Width="130" TextWrap="true" />
+                        <TableColumn @bind-Field="@context.LinkTitle" Sortable="true" Searchable="true" TextWrap="true" Width="160" />
+                        <TableColumn @bind-Field="@context.Image" Sortable="true" Searchable="true" TextWrap="true" Width="160" />
                         <TableColumn @bind-Field="@context.IsReaded" Sortable="true" Searchable="true" ComponentType="@typeof(Switch)" Width="110" />
                     </TableColumns>
                     <RowButtonTemplate>

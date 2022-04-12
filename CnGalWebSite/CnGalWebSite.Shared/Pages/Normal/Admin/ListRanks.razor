@@ -39,14 +39,14 @@
                     <TableColumns>
                         <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
                         <TableColumn @bind-Field="@context.Name" Searchable="true" Sortable="true" Width="120" />
-                        <TableColumn @bind-Field="@context.Text" Searchable="true" AllowTextWrap="true" Width="120" />
-                        <TableColumn @bind-Field="@context.Priority" Searchable="true" AllowTextWrap="true" Width="120" />
-                        <TableColumn @bind-Field="@context.Count" Searchable="true" AllowTextWrap="true" Width="120" />
+                        <TableColumn @bind-Field="@context.Text" Searchable="true" TextWrap="true" Width="120" />
+                        <TableColumn @bind-Field="@context.Priority" Searchable="true" TextWrap="true" Width="120" />
+                        <TableColumn @bind-Field="@context.Count" Searchable="true" TextWrap="true" Width="120" />
 
-                        <TableColumn @bind-Field="@context.CSS" Sortable="true"  Searchable="true" AllowTextWrap="true" Width="200" />
-                        <TableColumn @bind-Field="@context.Styles" Sortable="true" Searchable="true" AllowTextWrap="true" Width="200" />
-                        <TableColumn @bind-Field="@context.CreateTime" Sortable="true" AllowTextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm"/>
-                        <TableColumn @bind-Field="@context.LastEditTime" Sortable="true" AllowTextWrap="true" Width="150"  FormatString="yyyy-MM-dd HH:mm"/>
+                        <TableColumn @bind-Field="@context.CSS" Sortable="true"  Searchable="true" TextWrap="true" Width="200" />
+                        <TableColumn @bind-Field="@context.Styles" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
+                        <TableColumn @bind-Field="@context.CreateTime" Sortable="true" TextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm"/>
+                        <TableColumn @bind-Field="@context.LastEditTime" Sortable="true" TextWrap="true" Width="150"  FormatString="yyyy-MM-dd HH:mm"/>
                         <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                     </TableColumns>
                     <RowButtonTemplate>

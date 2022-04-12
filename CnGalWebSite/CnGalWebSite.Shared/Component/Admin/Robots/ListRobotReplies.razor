@@ -21,8 +21,8 @@
         </TableToolbarTemplate>
         <TableColumns>
             <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-            <TableColumn @bind-Field="@context.Key" Searchable="true" Sortable="true" Width="200" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.Value" Searchable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+            <TableColumn @bind-Field="@context.Key" Searchable="true" Sortable="true" Width="200" TextWrap="true"  />
+            <TableColumn @bind-Field="@context.Value" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
             <TableColumn @bind-Field="@context.AfterTime" Sortable="true" Width="90" FormatString="HH:mm:ss" />
             <TableColumn @bind-Field="@context.BeforeTime" Sortable="true" Width="90" FormatString="HH:mm:ss" />
             <TableColumn @bind-Field="@context.UpdateTime" Sortable="true" Width="150" FormatString="yyyy-MM-dd HH:mm:ss" />
@@ -32,9 +32,9 @@
         <RowButtonTemplate>
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-pencil" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() =>  OnEditModel( context))" />
 
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" IsShow="context.IsHidden" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" IsShow="context.IsHidden" />
 
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" IsShow="!context.IsHidden" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" IsShow="!context.IsHidden" />
         </RowButtonTemplate>
     </Table>
 
@@ -150,7 +150,7 @@
         var editors = model.Where(s => s.PropertyType == typeof(DateTime));
         foreach(var temp in editors)
         {
-            temp.ComponentParameters = new List<KeyValuePair<string,object>> { new KeyValuePair<string, object>("ViewModel", DatePickerViewMode.DateTime)};
+            temp.ComponentParameters = new List<KeyValuePair<string,object>> { new KeyValuePair<string, object>("ViewMode", DatePickerViewMode.DateTime)};
         }
 
         var option = new EditDialogOption<ListRobotReplyAloneModel>()

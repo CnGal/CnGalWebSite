@@ -20,11 +20,11 @@ else
            ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
            ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
         <TableColumns>
-            <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true" Fixed="true" />
-            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.AnotherNameGroup" Filterable="true" Sortable="true" Searchable="true" Width="200" AllowTextWrap="true" />
+            <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" TextWrap="true" Fixed="true" />
+            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.AnotherNameGroup" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
 
-            <TableColumn @bind-Field="@context.QQgroupGroup" Filterable="true" Sortable="true" Width="200" AllowTextWrap="true" />
+            <TableColumn @bind-Field="@context.QQgroupGroup" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
 
         </TableColumns>
         <RowButtonTemplate>

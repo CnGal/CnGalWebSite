@@ -27,6 +27,7 @@ using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Robots;
 using CnGalWebSite.DataModel.ViewModel.TimedTasks;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -35,6 +36,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Senparc.Weixin.MP.AdvancedAPIs.MerChant;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -162,7 +164,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _robotService = robotService;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<ListRobotsInforViewModel>> ListRobotsAsync()
         {
@@ -183,8 +185,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListRobotEventAloneModel>>> GetRobotEventListAsync(RobotEventsPagesInfor input)
         {
@@ -192,8 +193,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return dtos;
         }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListRobotGroupAloneModel>>> GetRobotGroupListAsync(RobotGroupsPagesInfor input)
         {
@@ -201,8 +201,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return dtos;
         }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListRobotReplyAloneModel>>> GetRobotReplyListAsync(RobotRepliesPagesInfor input)
         {
@@ -210,6 +209,8 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return dtos;
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 
         [HttpPost]
         public async Task<ActionResult<Result>> UpdateRobotEventDataAsync(ListRobotEventAloneModel model)
@@ -258,7 +259,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
-
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> UpdateRobotGroupDataAsync(ListRobotGroupAloneModel model)
         {
@@ -300,6 +301,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 
         [HttpPost]
         public async Task<ActionResult<Result>> UpdateRobotReplyDataAsync(ListRobotReplyAloneModel model)
@@ -359,10 +361,11 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> ImportRobotRepliesAsync(ImportRobotsModel model)
         {
-            if(string.IsNullOrWhiteSpace( model.Value))
+            if (string.IsNullOrWhiteSpace(model.Value))
             {
                 return new Result { Successful = false, Error = "导入内容不能为空" };
             }
@@ -376,15 +379,10 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var errors = 0;
 
-            foreach(var item in replies)
+            foreach (var item in replies)
             {
-                if(await _robotReplyRepository.GetAll().AnyAsync(s=>s.Value==item.LxValue&&s.Key==item.LxKey))
-                {
-                    continue;
-                }
-                try
-                {
-                    if (string.IsNullOrWhiteSpace(item.LxKey))
+                //检查数据合规
+                if (string.IsNullOrWhiteSpace(item.LxKey))
                     {
                         errors++;
                         continue;
@@ -395,13 +393,50 @@ namespace CnGalWebSite.APIServer.Controllers
                         continue;
                     }
 
+                //转换正则表达式
+                if (item.LxType == LxType.Asterisk)
+                {
+                    bool first = item.LxKey.First() == '*';
+                    bool last = item.LxKey.Last() == '*';
+
+                    item.LxKey = item.LxKey.Replace("*", "([\\s\\S]*)");
+
+                    if (first==false)
+                    {
+                        item.LxKey = '^' + item.LxKey;
+                    }
+
+                    if (last == false)
+                    {
+                        item.LxKey = item.LxKey + '$';
+                    }
+                }
+                if(item.LxType== LxType.ExactMatch)
+                {
+                    item.LxKey = '^' + item.LxKey + '$';
+                }
+
+                //转换图片域名
+                item.LxValue = item.LxValue.Replace("http://", "https://");
+
+                if (await _robotReplyRepository.GetAll().AnyAsync(s => s.Value == item.LxValue && s.Key == item.LxKey))
+                {
+                    continue;
+                }
+
+
+                try
+                {
+                    
+
+
                     var time = DateTime.ParseExact(item.Time, "yyyy-MM-dd HH:mm:ss", null);
-                    DateTime afterTime=DateTime.MinValue;
-                    if (item.AfterTime!="-1")
+                    DateTime afterTime = DateTime.MinValue;
+                    if (item.AfterTime != "-1")
                     {
                         afterTime = DateTime.ParseExact(item.AfterTime, "HHmm", null);
                     }
-                    DateTime beforeTime = DateTime.MinValue.AddHours(23).AddMinutes(59);
+                    DateTime beforeTime = DateTime.MinValue.AddHours(23).AddMinutes(59).AddSeconds(59);
                     if (item.BeforeTime != "-1")
                     {
                         beforeTime = DateTime.ParseExact(item.BeforeTime, "HHmm", null);
@@ -437,6 +472,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> ImportRobotEventsAsync(ImportRobotsModel model)
         {
@@ -511,6 +547,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotEventAsync(HiddenRobotModel model)
         {
@@ -518,6 +555,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotGroupAsync(HiddenRobotModel model)
         {
@@ -525,6 +563,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotReplyAsync(HiddenRobotModel model)
         {
@@ -532,7 +571,65 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<RobotReply>>> GetRobotRepliesAsync()
+        {
+            return await _robotReplyRepository.GetAllListAsync();
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<RobotEvent>>> GetRobotEventsAsync()
+        {
+            return await _robotEventRepository.GetAllListAsync();
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<RobotGroup>>> GetRobotGroupsAsync()
+        {
+            return await _robotGroupRepository.GetAllListAsync();
+        }
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<ActionResult<Result>> GetArgValueAsync(GetArgValueModel model)
+        {
+            if (model.Name == "auth")
+            {
+                var user = await _userRepository.GetAll().AsNoTracking()
+                    .Include(s => s.ThirdPartyLoginInfors)
+                    .FirstOrDefaultAsync(s => s.ThirdPartyLoginInfors.Any(s => s.Type == ThirdPartyLoginType.QQ && s.Id.ToString() == model.Infor));
+                if (user == null)
+                {
+                    return new Result { Successful = false, Error = "你还没有绑定 CnGal资料站 账号哦~ （用QQ登入资料站就可以绑定了" };
+                }
 
+                return new Result { Successful = true, Error = (await _userManager.GetRolesAsync(user)).FirstOrDefault() };
+            }
+            else
+            {
+                var value = model.Name switch
+                {
+                    "recommend" => await _weiXinService.GetRandom(true),
+                    _ => ""
+                };
+                value = value.Replace("</a>", "");
 
+                while (true)
+                {
+                    var temp = value.MidStrEx("<a ", ">");
+
+                    if(string.IsNullOrWhiteSpace(temp))
+                    {
+                        break;
+                    }
+
+                    value = value.Replace("<a " + temp + ">", "");
+
+                }
+
+                return new Result { Successful = true, Error = value };
+            }
+
+        }
     }
 }

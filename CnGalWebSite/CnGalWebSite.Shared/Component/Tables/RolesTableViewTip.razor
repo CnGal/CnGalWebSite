@@ -20,24 +20,24 @@ else
            ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
            ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
         <TableColumns>
-            <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true" Fixed="true" />
-            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.GameName" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.CV" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.AnotherNameRole" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.Gender" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.Birthday" Filterable="true" Sortable="true" FormatString="MM-dd" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.Haircolor" Filterable="true" Sortable="true" Searchable="true" Width="100" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.Pupilcolor" Filterable="true" Sortable="true" Searchable="true" Width="100" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.FigureData" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.FigureSubjective" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.ClothesAccessories" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.Character" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.RoleIdentity" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.BloodType" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.RoleHeight" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.RoleAge" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.RoleTaste" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
+            <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" TextWrap="true" Fixed="true" />
+            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.GameName" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.CV" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.AnotherNameRole" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Gender" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Birthday" Filterable="true" Sortable="true" FormatString="MM-dd" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Haircolor" Filterable="true" Sortable="true" Searchable="true" Width="100" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Pupilcolor" Filterable="true" Sortable="true" Searchable="true" Width="100" TextWrap="true" />
+            <TableColumn @bind-Field="@context.FigureData" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.FigureSubjective" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.ClothesAccessories" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Character" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.RoleIdentity" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.BloodType" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.RoleHeight" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.RoleAge" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.RoleTaste" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
         </TableColumns>
         <RowButtonTemplate>
             <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.RealId,context.Name))" />

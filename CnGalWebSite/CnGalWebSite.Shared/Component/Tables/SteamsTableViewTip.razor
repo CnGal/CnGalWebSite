@@ -22,16 +22,16 @@ else
            ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
            ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
         <TableColumns>
-            <TableColumn @bind-Field="@context.EntryId" Filterable="true" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="100" AllowTextWrap="true" Fixed="true" />
-            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.SteamId" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true" />
-            <TableColumn @bind-Field="@context.OriginalPrice" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true" Formatter="PriceFormatter" />
-            <TableColumn @bind-Field="@context.PriceNow" Filterable="true" Sortable="true" Width="100" AllowTextWrap="true" Formatter="PriceFormatter" />
-            <TableColumn @bind-Field="@context.CutNow" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true" Formatter="CutFormatter" />
-            <TableColumn @bind-Field="@context.PriceLowest" Filterable="true" Sortable="true" Width="150" AllowTextWrap="true" Formatter="PriceLowestFormatter" />
-            <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="170" AllowTextWrap="true" Formatter="CutLowestFormatter" />
-            <TableColumn @bind-Field="@context.EvaluationCount" Filterable="true" Sortable="true" Width="170" AllowTextWrap="true"/>
-            <TableColumn @bind-Field="@context.RecommendationRate" Filterable="true" Sortable="true" Width="170" AllowTextWrap="true" Formatter="RecommendationRateFormatter" />
+            <TableColumn @bind-Field="@context.EntryId" Filterable="true" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="100" TextWrap="true" Fixed="true" />
+            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.SteamId" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.OriginalPrice" Filterable="true" Sortable="true" Width="100" TextWrap="true" Formatter="PriceFormatter" />
+            <TableColumn @bind-Field="@context.PriceNow" Filterable="true" Sortable="true" Width="100" TextWrap="true" Formatter="PriceFormatter" />
+            <TableColumn @bind-Field="@context.CutNow" Filterable="true" Sortable="true" Width="150" TextWrap="true" Formatter="CutFormatter" />
+            <TableColumn @bind-Field="@context.PriceLowest" Filterable="true" Sortable="true" Width="150" TextWrap="true" Formatter="PriceLowestFormatter" />
+            <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="CutLowestFormatter" />
+            <TableColumn @bind-Field="@context.EvaluationCount" Filterable="true" Sortable="true" Width="170" TextWrap="true"/>
+            <TableColumn @bind-Field="@context.RecommendationRate" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="RecommendationRateFormatter" />
         </TableColumns>
         <RowButtonTemplate>
             <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.SteamId))" />

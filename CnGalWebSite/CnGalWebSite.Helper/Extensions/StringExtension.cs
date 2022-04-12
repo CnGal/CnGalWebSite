@@ -23,5 +23,34 @@ namespace CnGalWebSite.Helper.Extensions
                 return string.Concat(str.AsSpan(0, (int)(length * 2.5)), "...");
             }
         }
+
+        public static string MidStrEx(this string sourse, string startstr, string endstr)
+        {
+            var result = string.Empty;
+            int startindex, endindex;
+            try
+            {
+                startindex = sourse.IndexOf(startstr);
+                if (startindex == -1)
+                {
+                    return result;
+                }
+
+                var tmpstr = sourse[(startindex + startstr.Length)..];
+                endindex = tmpstr.IndexOf(endstr);
+                if (endindex == -1)
+                {
+                    return result;
+                }
+
+                result = tmpstr.Remove(endindex);
+            }
+            catch
+            {
+                //Log.WriteLog("MidStrEx Err:" + ex.Message);
+            }
+            return result;
+        }
+
     }
 }

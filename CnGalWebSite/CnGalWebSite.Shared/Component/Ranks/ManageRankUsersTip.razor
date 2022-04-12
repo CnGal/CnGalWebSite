@@ -19,7 +19,7 @@
                     </TableToolbarTemplate>
                     <TableColumns>
                         <TableColumn @bind-Field="@context.UserId" Sortable="true"  Fixed="true" Width="300" />
-                        <TableColumn @bind-Field="@context.UserName" Searchable="true" Sortable="true" Width="200" AllowTextWrap="true"/>
+                        <TableColumn @bind-Field="@context.UserName" Searchable="true" Sortable="true" Width="200" TextWrap="true"/>
                         <TableColumn @bind-Field="@context.Time" Sortable="true" Searchable="true" Width="150" FormatString="yyyy-MM-dd HH:mm" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc"/>
                         <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                     </TableColumns>

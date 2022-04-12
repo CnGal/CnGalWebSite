@@ -7,20 +7,19 @@
 
 <div>
 
-    <Table TItem="ListRobotEventAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
+    <Table TItem="ListRobotGroupAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
            ShowExtendButtons="true" ExtendButtonColumnWidth="120" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
            ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
         <TableToolbarTemplate>
-            <TableToolbarButton TItem="ListRobotEventAloneModel" Color="Color.Success" Icon="fa fa-plus" Text="添加"
-                                OnClickCallback="@(async (IEnumerable<ListRobotEventAloneModel> e)=> {await OnEditModel(new ListRobotEventAloneModel());})" IsAsync="true" />
-            <TableToolbarButton TItem="ListRobotEventAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
-            <TableToolbarButton TItem="ListRobotEventAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListRobotGroupAloneModel" Color="Color.Success" Icon="fa fa-plus" Text="添加"
+                                OnClickCallback="@(async (IEnumerable<ListRobotGroupAloneModel> e)=> {await OnEditModel(new ListRobotGroupAloneModel());})" IsAsync="true" />
+            <TableToolbarButton TItem="ListRobotGroupAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListRobotGroupAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
 
         </TableToolbarTemplate>
         <TableColumns>
             <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-            <TableColumn @bind-Field="@context.Text" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Time" Sortable="true" Width="90" FormatString="HH:mm:ss" />
+            <TableColumn @bind-Field="@context.GroupId" Searchable="true" Sortable="true" Width="120"/>
             <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
         </TableColumns>
         <RowButtonTemplate>
@@ -35,12 +34,12 @@
 </div>
 @code {
     [NotNull]
-    private Table<ListRobotEventAloneModel>? TableRows { get; set; }
-    private List<ListRobotEventAloneModel> SelectedRows { get; set; } = new();
+    private Table<ListRobotGroupAloneModel>? TableRows { get; set; }
+    private List<ListRobotGroupAloneModel> SelectedRows { get; set; } = new();
 
-    public ListRobotEventsViewModel ListModel { get; set; } = new ListRobotEventsViewModel { RobotEvents = new List<ListRobotEventAloneModel>() };
+    public ListRobotGroupsViewModel ListModel { get; set; } = new ListRobotGroupsViewModel { RobotGroups = new List<ListRobotGroupAloneModel>() };
 
-    private ListRobotEventAloneModel searchModel { get; set; } = new ListRobotEventAloneModel();
+    private ListRobotGroupAloneModel searchModel { get; set; } = new ListRobotGroupAloneModel();
 
     private IEnumerable<int> PageItems => new int[] { 10, 40, 80, 200, 5000 };
 
@@ -53,32 +52,32 @@
 
     }
 
-    private async Task<QueryData<ListRobotEventAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    private async Task<QueryData<ListRobotGroupAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
     {
         try
         {
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<RobotEventsPagesInfor>(ToolHelper.WebApiPath + "api/robot/GetRobotEventList", new RobotEventsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
+            var result = await Http.PostAsJsonAsync<RobotGroupsPagesInfor>(ToolHelper.WebApiPath + "api/robot/GetRobotGroupList", new RobotGroupsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListRobotEventAloneModel>>(jsonContent, ToolHelper.options);
+            return JsonSerializer.Deserialize<QueryData<ListRobotGroupAloneModel>>(jsonContent, ToolHelper.options);
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "无法获取事件列表");
-            return new QueryData<ListRobotEventAloneModel>();
+            ErrorHandler.ProcessError(ex, "无法获取QQ群列表");
+            return new QueryData<ListRobotGroupAloneModel>();
         }
     }
 
 
     private async Task OnRowEditIsHiddenClick(long[] ids, bool isHidden, bool showMessage)
     {
-        string tempString = isHidden == true ? "隐藏" : "显示";
+        string tempString = isHidden == true ? "取关" : "关注";
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenRobotModel>(ToolHelper.WebApiPath + "api/robot/HiddenRobotEvent", new HiddenRobotModel { Ids = ids, IsHidden = isHidden });
+            var result = await Http.PostAsJsonAsync<HiddenRobotModel>(ToolHelper.WebApiPath + "api/robot/HiddenRobotGroup", new HiddenRobotModel { Ids = ids, IsHidden = isHidden });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
 
@@ -86,28 +85,28 @@
 
             if (obj.Successful == false)
             {
-                await ToastService.Error(tempString + "事件失败", obj.Error);
+                await ToastService.Error(tempString + "QQ群失败", obj.Error);
             }
             else
             {
                 if (showMessage)
                 {
-                    await ToastService.Success(tempString + "事件成功", tempString + "事件成功");
+                    await ToastService.Success(tempString + "QQ群成功", tempString + "QQ群成功");
                     await TableRows.QueryAsync();
                 }
             }
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, tempString + "事件失败");
+            ErrorHandler.ProcessError(ex, tempString + "QQ群失败");
         }
     }
 
-    private async Task OnHiddenClick(IEnumerable<ListRobotEventAloneModel> items)
+    private async Task OnHiddenClick(IEnumerable<ListRobotGroupAloneModel> items)
     {
         if (items.Count() == 0)
         {
-            await ToastService.Information("没有修改事件运行状态", "请选中事件");
+            await ToastService.Information("没有修改QQ群状态", "请选中QQ群");
             return;
         }
 
@@ -116,17 +115,17 @@
         await ToastService.Success("取消暂停事件成功", "取消暂停事件成功");
         await TableRows.QueryAsync();
     }
-    private async Task OnUnHiddenClick(IEnumerable<ListRobotEventAloneModel> items)
+    private async Task OnUnHiddenClick(IEnumerable<ListRobotGroupAloneModel> items)
     {
         if (items.Count() == 0)
         {
-            await ToastService.Information("没有修改事件运行状态", "请选中事件");
+            await ToastService.Information("没有修改QQ群状态", "请选中QQ群");
             return;
         }
 
         await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), false, false);
 
-        await ToastService.Success("暂停事件成功", "暂停事件成功");
+        await ToastService.Success("暂停QQ群成功", "暂停QQ群成功");
         await TableRows.QueryAsync();
     }
 
@@ -136,28 +135,24 @@
     [NotNull]
     private DialogService? DialogService { get; set; }
 
-    public async Task OnEditModel(ListRobotEventAloneModel item)
+    public async Task OnEditModel(ListRobotGroupAloneModel item)
     {
-        var model = Utility.GenerateEditorItems<ListRobotEventAloneModel>();
-        var editors = model.Where(s => s.PropertyType == typeof(DateTime));
-        foreach (var temp in editors)
+        var model = Utility.GenerateEditorItems<ListRobotGroupAloneModel>();
+
+        var option = new EditDialogOption<ListRobotGroupAloneModel>()
         {
-            temp.ComponentParameters = new List<KeyValuePair<string, object>> { new KeyValuePair<string, object>("ViewMode", DatePickerViewMode.DateTime) };
-        }
-        var option = new EditDialogOption<ListRobotEventAloneModel>()
-        {
-            Title = item.Id == 0 ? "添加事件" : "编辑事件",
+            Title = item.Id == 0 ? "添加QQ群" : "编辑QQ群",
             Model = item,
             Items = model,
             OnCloseAsync = () =>
             {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
+            //Trace.Log("关闭按钮被点击");
+            return Task.CompletedTask;
             },
             OnEditAsync = async context =>
             {
-                // Trace.Log("保存按钮被点击");
-                var editModel = (ListRobotEventAloneModel)context.Model;
+            // Trace.Log("保存按钮被点击");
+            var editModel = (ListRobotGroupAloneModel)context.Model;
 
                 return await EditData(editModel);
             }
@@ -166,11 +161,11 @@
         await DialogService.ShowEditDialog(option);
     }
 
-    public async Task<bool> EditData(ListRobotEventAloneModel model)
+    public async Task<bool> EditData(ListRobotGroupAloneModel model)
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<ListRobotEventAloneModel>(ToolHelper.WebApiPath + "api/robot/UpdateRobotEventData", model);
+            var result = await Http.PostAsJsonAsync<ListRobotGroupAloneModel>(ToolHelper.WebApiPath + "api/robot/UpdateRobotGroupData", model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
 

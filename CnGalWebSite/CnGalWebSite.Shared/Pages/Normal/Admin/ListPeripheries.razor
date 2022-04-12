@@ -40,10 +40,10 @@
                     </TableToolbarTemplate>
                     <TableColumns>
                         <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
-                        <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" AllowTextWrap="true" Width="200" />
-                        <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" AllowTextWrap="true" Width="400" />
-                        <TableColumn @bind-Field="@context.Author" Sortable="true" Searchable="true" Width="120" AllowTextWrap="true" />
-                        <TableColumn @bind-Field="@context.Material" Sortable="true" Searchable="true" Width="120" AllowTextWrap="true" />
+                        <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
+                        <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" TextWrap="true" Width="400" />
+                        <TableColumn @bind-Field="@context.Author" Sortable="true" Searchable="true" Width="120" TextWrap="true" />
+                        <TableColumn @bind-Field="@context.Material" Sortable="true" Searchable="true" Width="120" TextWrap="true" />
                         <TableColumn @bind-Field="@context.ReaderCount" Sortable="true" Width="80" />
                         <TableColumn @bind-Field="@context.CollectedCount" Sortable="true" Width="80" />
                         <TableColumn @bind-Field="@context.CommentCount" Sortable="true" Width="80" />
