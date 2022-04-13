@@ -211,7 +211,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-
         [HttpPost]
         public async Task<ActionResult<Result>> UpdateRobotEventDataAsync(ListRobotEventAloneModel model)
         {
@@ -236,6 +235,8 @@ namespace CnGalWebSite.APIServer.Controllers
                         IsHidden = model.IsHidden,
                         Text = model.Text,
                         Time = model.Time,
+                        DelaySecond = model.DelaySecond,
+                        Note = model.Note,
                     };
                 }
             }
@@ -244,6 +245,8 @@ namespace CnGalWebSite.APIServer.Controllers
             robot.Text = model.Text;
             robot.Time = model.Time;
             robot.IsHidden = model.IsHidden;
+            robot.DelaySecond = model.DelaySecond;
+            robot.Note = model.Note;
 
             //保存
             if (model.Id == 0)
@@ -278,12 +281,14 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         IsHidden = model.IsHidden,
                         GroupId = model.GroupId,
+                        Note = model.Note,
                     };
                 }
             }
 
             //修改数据
             robot.GroupId = model.GroupId;
+            robot.Note = model.Note;
             robot.IsHidden = model.IsHidden;
 
             //保存

@@ -73,7 +73,25 @@ namespace CnGalWebSite.RobotClient
 
             if (vaule.Contains("[image="))
             {
-                return new Message[] { new Image(url: vaule.MidStrEx("[image=", "]").Replace("http://image.cngal.org/", "https://image.cngal.org/")) };
+                var imageStr = vaule.MidStrEx("[image=", "]");
+
+                if (string.IsNullOrWhiteSpace(imageStr)==false)
+                {
+                    var text = vaule.Replace("[image=" + imageStr + "]", "");
+                    var messages= new List<Message>
+                                 {
+                                    new Image(url: vaule.MidStrEx("[image=", "]").Replace("http://image.cngal.org/", "https://image.cngal.org/"))
+                                 };
+                    if(string.IsNullOrWhiteSpace(text)==false)
+                    {
+                        messages.Add(new Plain(text));
+                    }
+                    return messages.ToArray();
+                }
+                else
+                {
+                    return null;
+                }
             }
             else if (vaule.Contains("[声音="))
             {

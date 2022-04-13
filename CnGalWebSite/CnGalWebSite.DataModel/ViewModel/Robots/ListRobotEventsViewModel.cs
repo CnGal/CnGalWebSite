@@ -16,8 +16,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Robots
         public long Id { get; set; }
         [Display(Name = "消息")]
         public string Text { get; set; }
+        [Display(Name = "备注")]
+        public string Note { get; set; }
+
         [Display(Name = "定时")]
         public DateTime Time { get; set; }
+        [Display(Name = "有效期间 秒")]
+        public long DelaySecond { get; set; }
+
         [Display(Name = "是否隐藏")]
         public bool IsHidden { get; set; }
     }

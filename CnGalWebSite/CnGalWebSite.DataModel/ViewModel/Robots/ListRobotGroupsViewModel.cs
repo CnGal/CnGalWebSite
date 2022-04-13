@@ -16,6 +16,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Robots
         public long Id { get; set; }
         [Display(Name = "群号")]
         public long GroupId { get; set; }
+        [Display(Name = "备注")]
+        public string Note { get; set; }
+
         [Display(Name = "是否隐藏")]
         public bool IsHidden { get; set; }
     }

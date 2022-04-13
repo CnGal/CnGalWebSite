@@ -113,14 +113,18 @@ namespace CnGalWebSite.APIServer.Application.Robots
             {
                 items = items.Where(item => item.GroupId.ToString()?.Contains(searchModel.GroupId.ToString(), StringComparison.OrdinalIgnoreCase) ?? false);
             }
-
+            if (!string.IsNullOrWhiteSpace(searchModel.Note))
+            {
+                items = items.Where(item => item.Note?.Contains(searchModel.Note, StringComparison.OrdinalIgnoreCase) ?? false);
+            }
 
 
 
             // 处理 SearchText 模糊搜索
             if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                items = items.Where(item => (item.GroupId.ToString()?.Contains(options.SearchText) ?? false));
+                items = items.Where(item => (item.GroupId.ToString()?.Contains(options.SearchText) ?? false)
+                 || (item.Note?.Contains(options.SearchText) ?? false));
             }
 
 
@@ -148,6 +152,7 @@ namespace CnGalWebSite.APIServer.Application.Robots
                 {
                     Id = item.Id,
                     IsHidden = item.IsHidden,
+                    Note = item.Note,
                     GroupId = item.GroupId,
                 });
             }
@@ -169,13 +174,18 @@ namespace CnGalWebSite.APIServer.Application.Robots
             {
                 items = items.Where(item => item.Text?.Contains(searchModel.Text, StringComparison.OrdinalIgnoreCase) ?? false);
             }
+            if (!string.IsNullOrWhiteSpace(searchModel.Note))
+            {
+                items = items.Where(item => item.Note?.Contains(searchModel.Note, StringComparison.OrdinalIgnoreCase) ?? false);
+            }
 
 
 
             // 处理 SearchText 模糊搜索
             if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                items = items.Where(item => (item.Text?.Contains(options.SearchText) ?? false));
+                items = items.Where(item => (item.Text?.Contains(options.SearchText) ?? false)
+                 || (item.Note?.Contains(options.SearchText) ?? false));
             }
 
 
@@ -205,6 +215,8 @@ namespace CnGalWebSite.APIServer.Application.Robots
                     IsHidden = item.IsHidden,
                     Text = item.Text,
                     Time = item.Time,
+                    Note = item.Note,
+                    DelaySecond = item.DelaySecond,
                 });
             }
 
