@@ -12,5 +12,7 @@ namespace CnGalWebSite.DataModel.Model
 
         public bool IsHidden { get; set; }
 
+        public string Note { get; set; }
+
     }
 }

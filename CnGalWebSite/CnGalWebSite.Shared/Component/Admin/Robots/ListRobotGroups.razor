@@ -19,7 +19,8 @@
         </TableToolbarTemplate>
         <TableColumns>
             <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-            <TableColumn @bind-Field="@context.GroupId" Searchable="true" Sortable="true" Width="120"/>
+            <TableColumn @bind-Field="@context.Note" Searchable="true" Sortable="true" Width="120" />
+            <TableColumn @bind-Field="@context.GroupId" Searchable="true" Sortable="true" Width="120" />
             <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
         </TableColumns>
         <RowButtonTemplate>

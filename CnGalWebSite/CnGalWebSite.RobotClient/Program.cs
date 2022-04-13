@@ -114,8 +114,14 @@ c.OnGroupMessageReceive += async (s, e) =>
 
         var text = e.MGetPlainString();
         var sendto = s.group.id;
+        var at = e.FirstOrDefault(s=>s.type == "At");
+        if(at != null)
+        {
+            long atTarget = (at as At).target;
+            text += "[@" + atTarget.ToString() + "]";
+        }
 
-        if(groupX.Groups.Any(s=>s.GroupId==sendto)==false)
+        if (groupX.Groups.Any(s=>s.GroupId==sendto)==false)
         {
             return;
         }
