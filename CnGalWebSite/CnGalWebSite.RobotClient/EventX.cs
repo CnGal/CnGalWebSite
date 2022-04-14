@@ -152,7 +152,7 @@ namespace CnGalWebSite.RobotClient
         {
             var p = new Random().NextDouble();
 
-            var events = Events.Where(s => s.IsHidden == false && s.Type == RobotEventType.PreTime && s.Probability > p);
+            var events = Events.Where(s => s.IsHidden == false && s.Type == RobotEventType.PreTime && s.Probability / 100 > p);
 
             var todos = new List<RobotEvent>();
 
