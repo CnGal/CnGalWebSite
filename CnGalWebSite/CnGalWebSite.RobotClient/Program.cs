@@ -1,5 +1,4 @@
-﻿//这是一个最简.net6版本顶级语句 [仅对于高级开发人员使用]
-using MeowMiraiLib.Msg.Type;
+﻿using MeowMiraiLib.Msg.Type;
 using MeowMiraiLib;
 using CnGalWebSite.RobotClient;
 using CnGalWebSite.Helper.Helper;
@@ -10,7 +9,7 @@ HttpClient httpClient = new HttpClient();
 CacheX cacheX = new CacheX();
 
 OutputHelper.Repeat();
-OutputHelper.WriteCenter("CnGal资料站 看板娘 v3.3.0", 1.8);
+OutputHelper.WriteCenter("CnGal资料站 看板娘 v3.3.2", 1.8);
 OutputHelper.Repeat();
 
 
@@ -89,6 +88,8 @@ t.Elapsed +=async (s, e) =>
     }
 };
 
+long count = 0;
+
 //随机任务计时器
 System.Timers.Timer t2 = new(1000 * 60); //每一分钟查看一次
 t2.Start(); //启动计时器
@@ -108,6 +109,9 @@ t2.Elapsed += async (s, e) =>
             }
         }
     }
+
+    //顺带把计数器清零
+    count = 0;
 };
 
 
@@ -134,7 +138,6 @@ c.OnGroupMessageReceive += async (s, e) =>
 {
     try
     {
-
         //MGetPlainStringSplit() 是一个关于Message类的数组扩展方法,
 
         var text = e.MGetPlainString();
@@ -155,8 +158,15 @@ c.OnGroupMessageReceive += async (s, e) =>
         var result = await messageX.GetAutoReply(text, s);
         if (result != null)
         {
-            var j = result.SendToGroup(sendto, c);
-            Console.WriteLine(j);
+            if (count > 20)
+            {
+                new Message[] { new Plain("冷却中") }.SendToFriend(sendto, c);
+            }
+            else
+            {
+                var j = result.SendToGroup(sendto, c);
+                Console.WriteLine(j);
+            }
         }
     }
     catch (Exception ex)

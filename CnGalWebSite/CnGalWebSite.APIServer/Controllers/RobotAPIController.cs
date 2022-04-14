@@ -248,6 +248,8 @@ namespace CnGalWebSite.APIServer.Controllers
                         Time = model.Time,
                         DelaySecond = model.DelaySecond,
                         Note = model.Note,
+                        Probability = model.Probability,
+                        Type = model.Type,
                     };
                 }
             }
@@ -258,6 +260,8 @@ namespace CnGalWebSite.APIServer.Controllers
             robot.IsHidden = model.IsHidden;
             robot.DelaySecond = model.DelaySecond;
             robot.Note = model.Note;
+            robot.Probability = model.Probability;
+            robot.Type = model.Type;
 
             //保存
             if (model.Id == 0)
