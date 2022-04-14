@@ -398,6 +398,7 @@ namespace CnGalWebSite.APIServer.Controllers
             model.MicrosoftAccountName = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.Microsoft)?.Name;
             model.GiteeAccountName = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.Gitee)?.Name;
             model.QQAccountName = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.QQ)?.Name;
+            var temp = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.QQ);
             model.Ranks = await _rankService.GetUserRankListForEdit(user);
 
             return model;

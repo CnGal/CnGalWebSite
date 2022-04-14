@@ -11,5 +11,7 @@ namespace CnGalWebSite.APIServer.Application.Robots
         Task<QueryData<ListRobotGroupAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListRobotGroupAloneModel searchModel);
 
         Task<QueryData<ListRobotEventAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListRobotEventAloneModel searchModel);
+
+        Task<QueryData<ListRobotFaceAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListRobotFaceAloneModel searchModel);
     }
 }

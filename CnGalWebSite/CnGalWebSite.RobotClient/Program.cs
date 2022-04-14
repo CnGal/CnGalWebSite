@@ -23,7 +23,12 @@ GroupX groupX = new GroupX(settingX.BasicSetting, httpClient);
 groupX.Init();
 
 Console.WriteLine("->读取自动回复");
-ReplyX replyX = new ReplyX(settingX.BasicSetting, httpClient,settingX.MessageArgs);
+ReplyX replyX = new ReplyX(settingX.BasicSetting, httpClient, settingX.MessageArgs);
+replyX.Init();
+
+
+Console.WriteLine("->读取表情");
+FaceX faceX = new FaceX(settingX.BasicSetting, httpClient, settingX.MessageArgs);
 replyX.Init();
 
 Console.WriteLine("->读取事件");
@@ -31,7 +36,7 @@ EventX eventX = new EventX(settingX.BasicSetting, httpClient, settingX.MessageAr
 eventX.Init();
 
 Console.WriteLine("->初始化消息处理模块");
-MessageX messageX = new MessageX(settingX.BasicSetting, httpClient, replyX.Replies,cacheX.ReplyCache, settingX.MessageArgs);
+MessageX messageX = new MessageX(settingX.BasicSetting, httpClient, replyX.Replies,cacheX.ReplyCache, settingX.MessageArgs,faceX.Faces);
 
 ClientX clientX = new ClientX(settingX.BasicSetting);
 
@@ -57,22 +62,42 @@ if (settingX.BasicSetting.IntervalTime > 0)
         await groupX.RefreshAsync();
         await replyX.RefreshAsync();
         await eventX.RefreshAsync();
+        await faceX.RefreshAsync();
     }
 }
 
 c.Connect();
 
-//定时刷新数据定时器
+//定时任务计时器
 System.Timers.Timer t = new(1000 * 60); //每一分钟查看一次
 t.Start(); //启动计时器
 t.Elapsed +=async (s, e) =>
 {
-    var message = eventX.GetCurrentMessage();
+    var message = eventX.GetCurrentTimeEvent();
     if (string.IsNullOrWhiteSpace(message) == false)
     {
-        var replay = await messageX.ReplayArgument(message, null);
+        var result = await messageX.ProcMessageAsync(message, null);
 
-        var result = messageX.StringToMessageArray(replay, null);
+        if (result != null)
+        {
+            foreach (var item in groupX.Groups)
+            {
+                var j = new GroupMessage(item.GroupId, result).Send(c);
+                Console.WriteLine(j);
+            }
+        }
+    }
+};
+
+//随机任务计时器
+System.Timers.Timer t2 = new(1000 * 60); //每一分钟查看一次
+t2.Start(); //启动计时器
+t2.Elapsed += async (s, e) =>
+{
+    var message = eventX.GetProbabilityEvents();
+    if (string.IsNullOrWhiteSpace(message) == false)
+    {
+        var result = await messageX.ProcMessageAsync(message, null);
 
         if (result != null)
         {
@@ -127,7 +152,7 @@ c.OnGroupMessageReceive += async (s, e) =>
         }
 
         //尝试找出所有匹配的回复
-        var result = await messageX.ProcMessage(text, s);
+        var result = await messageX.GetAutoReply(text, s);
         if (result != null)
         {
             var j = result.SendToGroup(sendto, c);

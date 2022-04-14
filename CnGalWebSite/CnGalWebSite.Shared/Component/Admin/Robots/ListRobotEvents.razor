@@ -21,9 +21,11 @@
             <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
             <TableColumn @bind-Field="@context.Note" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
             <TableColumn @bind-Field="@context.Text" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Type" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
 
             <TableColumn @bind-Field="@context.Time" Sortable="true" Width="90" FormatString="HH:mm:ss" />
-            <TableColumn @bind-Field="@context.DelaySecond" Sortable="true" Width="90"/>
+            <TableColumn @bind-Field="@context.DelaySecond" Sortable="true" Width="90" />
+            <TableColumn @bind-Field="@context.Probability" Sortable="true" Width="90" />
             <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
         </TableColumns>
         <RowButtonTemplate>
@@ -110,26 +112,26 @@
     {
         if (items.Count() == 0)
         {
-            await ToastService.Information("没有修改事件运行状态", "请选中事件");
+            await ToastService.Information("没有修改事件状态", "请选中事件");
             return;
         }
 
         await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), true, false);
 
-        await ToastService.Success("取消暂停事件成功", "取消暂停事件成功");
+        await ToastService.Success("隐藏事件成功", "隐藏事件成功");
         await TableRows.QueryAsync();
     }
     private async Task OnUnHiddenClick(IEnumerable<ListRobotEventAloneModel> items)
     {
         if (items.Count() == 0)
         {
-            await ToastService.Information("没有修改事件运行状态", "请选中事件");
+            await ToastService.Information("没有修改事件状态", "请选中事件");
             return;
         }
 
         await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), false, false);
 
-        await ToastService.Success("暂停事件成功", "暂停事件成功");
+        await ToastService.Success("显示事件成功", "显示事件成功");
         await TableRows.QueryAsync();
     }
 

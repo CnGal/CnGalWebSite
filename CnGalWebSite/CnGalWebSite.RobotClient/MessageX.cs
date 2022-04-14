@@ -26,24 +26,21 @@ namespace CnGalWebSite.RobotClient
         private readonly HttpClient _httpClient;
         private readonly List<RobotReply> _replies;
         private readonly List<MessageArg> _messageArgs;
+        private readonly List<RobotFace> _robotFaces;
 
 
-        public MessageX(Setting setting, HttpClient client, List<RobotReply> replies, IDictionary<string, string> cache, List<MessageArg> messageArgs)
+        public MessageX(Setting setting, HttpClient client, List<RobotReply> replies, IDictionary<string, string> cache, List<MessageArg> messageArgs, List<RobotFace> robotFaces)
         {
             _setting = setting;
             _httpClient = client;
             _replies = replies;
             _cache = cache;
             _messageArgs = messageArgs;
+            _robotFaces = robotFaces;
         }
 
-        public async Task<Message[]> ProcMessage(string message, GroupMessageSender sender)
+        public async Task<Message[]> GetAutoReply(string message, GroupMessageSender sender)
         {
-            //var cache = _cache.FirstOrDefault(s => s.Key == message);
-            //if (string.IsNullOrWhiteSpace(cache.Value) == false)
-            //{
-            //    return cache.Value;
-            //}
 
             var now = DateTime.Now.ToCstTime();
             var replies = _replies.Where(s => s.IsHidden == false && now.TimeOfDay <= s.BeforeTime.TimeOfDay && now.TimeOfDay >= s.AfterTime.TimeOfDay && Regex.IsMatch(message, s.Key)).ToList();
@@ -55,16 +52,15 @@ namespace CnGalWebSite.RobotClient
 
             int index = new Random().Next(0, replies.Count);
 
-            var vaule = await ReplayArgument(replies[index].Value, sender);
-
-            //if (string.IsNullOrWhiteSpace(vaule) == false)
-            //{
-            //    _cache.Add(new KeyValuePair<string, string>(message, vaule));
-            //}
-            return StringToMessageArray(vaule, sender);
+            return await ProcMessageAsync(replies[index].Value, sender);
         }
 
-        public Message[] StringToMessageArray(string vaule, GroupMessageSender sender)
+        public async Task<Message[]> ProcMessageAsync(string message, GroupMessageSender sender)
+        {
+            return ProcMessageArray(ProcMessageFace(await ProcMessageArgument(message, sender), sender), sender);
+        }
+
+        public Message[] ProcMessageArray(string vaule, GroupMessageSender sender)
         {
             if (string.IsNullOrWhiteSpace(vaule))
             {
@@ -75,14 +71,14 @@ namespace CnGalWebSite.RobotClient
             {
                 var imageStr = vaule.MidStrEx("[image=", "]");
 
-                if (string.IsNullOrWhiteSpace(imageStr)==false)
+                if (string.IsNullOrWhiteSpace(imageStr) == false)
                 {
                     var text = vaule.Replace("[image=" + imageStr + "]", "");
-                    var messages= new List<Message>
+                    var messages = new List<Message>
                                  {
                                     new Image(url: vaule.MidStrEx("[image=", "]").Replace("http://image.cngal.org/", "https://image.cngal.org/"))
                                  };
-                    if(string.IsNullOrWhiteSpace(text)==false)
+                    if (string.IsNullOrWhiteSpace(text) == false)
                     {
                         messages.Add(new Plain(text));
                     }
@@ -123,62 +119,77 @@ namespace CnGalWebSite.RobotClient
         }
 
 
-        public async Task<string> ReplayArgument(string message, GroupMessageSender sender)
-        {
-            while (true)
-            {
-                var argument = message.MidStrEx("$(", ")");
-
-                if (string.IsNullOrWhiteSpace(argument))
-                {
-                    break;
-                }
-
-                var value = argument switch
-                {
-                    "time" => DateTime.Now.ToCstTime().ToString("HH:mm"),
-                    "qq" => sender.id.ToString(),
-                    "weather" => _messageArgs.FirstOrDefault(s => s.Name == "weather")?.Value,
-                    "sender" => sender.memberName,
-                    "auth" =>await GetArgValue(argument, sender.id.ToString()),
-                    "n" => "\n",
-                    "r" => "\r",
-                    "facelist" => "该功能暂未实装",
-                    _ => await GetArgValue(argument, null)
-                };
-
-                message = message.Replace("$(" + argument + ")", value);
-            }
-
-            return message;
-        }
-
-        public async Task<string> GetArgValue(string name, string infor)
+        public async Task<string> ProcMessageArgument(string message, GroupMessageSender sender)
         {
             try
             {
-                var result = await _httpClient.PostAsJsonAsync<GetArgValueModel>(ToolHelper.WebApiPath + "api/robot/GetArgValue", new GetArgValueModel
+                while (true)
                 {
-                    Infor = infor,
-                    Name = name,
-                });
+                    var argument = message.MidStrEx("$(", ")");
 
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-                //判断结果
-                if (obj.Successful == false)
-                {
-                    throw new ArgError(obj.Error);
+                    if (string.IsNullOrWhiteSpace(argument))
+                    {
+                        break;
+                    }
+
+                    var value = argument switch
+                    {
+                        "time" => DateTime.Now.ToCstTime().ToString("HH:mm"),
+                        "qq" => sender.id.ToString(),
+                        "weather" => _messageArgs.FirstOrDefault(s => s.Name == "weather")?.Value,
+                        "sender" => sender.memberName,
+                        "auth" => await GetArgValue(argument, sender.id.ToString()),
+                        "n" => "\n",
+                        "r" => "\r",
+                        "facelist" => "该功能暂未实装",
+                        _ => await GetArgValue(argument, null)
+                    };
+
+                    message = message.Replace("$(" + argument + ")", value);
                 }
-                else
-                {
-                    return obj.Error;
-                }
+            }
+            catch (ArgError arg)
+            {
+                message = arg.Error;
             }
             catch (Exception ex)
             {
                 OutputHelper.PressError(ex, "获取变量值失败");
                 return "呜呜呜~";
+
+            }
+
+
+            return message;
+        }
+
+        public string ProcMessageFace(string message, GroupMessageSender sender)
+        {
+            foreach (var item in _robotFaces.Where(s => s.IsHidden == false))
+            {
+                message = message.Replace($"[{item.Key}]", item.Value);
+            }
+            return message;
+        }
+
+        public async Task<string> GetArgValue(string name, string infor)
+        {
+            var result = await _httpClient.PostAsJsonAsync<GetArgValueModel>(ToolHelper.WebApiPath + "api/robot/GetArgValue", new GetArgValueModel
+            {
+                Infor = infor,
+                Name = name,
+            });
+
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                throw new ArgError(obj.Error);
+            }
+            else
+            {
+                return obj.Error;
             }
         }
     }

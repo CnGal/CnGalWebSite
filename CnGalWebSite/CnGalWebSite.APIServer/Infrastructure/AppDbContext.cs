@@ -78,6 +78,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<RobotEvent> RobotEvents { get; set; }
         public DbSet<RobotReply> RobotReplies { get; set; }
         public DbSet<RobotGroup> RobotGroups { get; set; }
+        public DbSet<RobotFace> RobotFaces { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

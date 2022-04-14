@@ -13,6 +13,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Robots
         public int Events { get; set; }
         public int Replies { get; set; }
         public int Groups { get; set; }
+        public int Faces { get; set; }
     }
 
     public class ListRobotRepliesViewModel

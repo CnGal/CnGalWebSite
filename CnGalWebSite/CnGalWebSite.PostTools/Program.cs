@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using CnGalWebSite.DataModel.ViewModel.Base;
 using System.Threading.Tasks;
 using CnGalWebSite.Helper.Helper;
+using PuppeteerSharp;
 
 namespace CnGalWebSite.PostTools // Note: actual namespace depends on the project name.
 {
@@ -87,7 +88,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         static async Task Proc()
         {
             OutputHelper.Repeat();
-            OutputHelper.WriteCenter("CnGal资料站 投稿工具 v0.5",1.8);
+            OutputHelper.WriteCenter("CnGal资料站 投稿工具 v0.6", 1.8);
             OutputHelper.Repeat();
 
             Console.WriteLine("-> 读取配置文件");
@@ -315,17 +316,17 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                     Console.WriteLine($"请在{setting.ArticlesFileName}文件中输入要导入的链接，每行填写一个链接，目前只支持知乎、小黑盒链接");
                     Console.WriteLine($"例如：");
                     Console.WriteLine($"https://zhuanlan.zhihu.com/p/480692805");
-                    Console.WriteLine($"https://api.xiaoheihe.cn/maxnews/app/share/detail/2494072");
+                    Console.WriteLine($"https://api.xiaoheihe.cn/v3/bbs/app/api/web/share?link_id=2494072");
                     Console.WriteLine($"按下回车【Enter】确认，按下【Esc】返回");
                 }
                 if (links.Any() == false)
                 {
-                    if(isFirst==false)
+                    if (isFirst == false)
                     {
                         Console.WriteLine($"请在{setting.ArticlesFileName}文件中输入要导入的链接");
                     }
                     var key = Console.ReadKey();
-                    if(key.Key== ConsoleKey.Escape)
+                    if (key.Key == ConsoleKey.Escape)
                     {
                         return;
                     }
@@ -353,7 +354,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 {
                     try
                     {
-                        tempArticle =await GetArticleContext(item);
+                        tempArticle = await GetArticleContext(item);
                     }
                     catch (Exception ex)
                     {
@@ -398,23 +399,23 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             //获取词条
             var subEntry = await client.GetFromJsonAsync<EntryIndexViewModel>(ToolHelper.WebApiPath + "api/entries/GetEntryView/" + model.SubId);
 
-            if(subEntry==null)
+            if (subEntry == null)
             {
                 throw new Exception("无法获取从词条");
             }
-            if(subEntry.Type== EntryType.Game)
+            if (subEntry.Type == EntryType.Game)
             {
                 throw new Exception("目前不支持合并游戏");
             }
 
             //获取从词条关联的各个游戏
-            var reEntryIds= subEntry.Roles.Select(x =>x.Id).ToList();
+            var reEntryIds = subEntry.Roles.Select(x => x.Id).ToList();
             reEntryIds.AddRange(subEntry.ProductionGroups.Select(x => x.Id));//这里是显示名称 极少部分词条可能会有问题
             reEntryIds.AddRange(subEntry.EntryRelevances.Select(x => x.Id));
             reEntryIds.AddRange(subEntry.StaffGames.Select(x => x.Id));
 
             //替换关联信息
-            foreach(var item in reEntryIds)
+            foreach (var item in reEntryIds)
             {
                 var examineModel = await client.GetFromJsonAsync<EditRelevancesViewModel>(ToolHelper.WebApiPath + "api/entries/editrelevances/" + item);
                 ReplaceEntryName(examineModel.Games, model.SubName, model.HostName);
@@ -471,10 +472,10 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
         }
 
-        static void ReplaceEntryName(List<RelevancesModel> list,string oldName,string newName)
+        static void ReplaceEntryName(List<RelevancesModel> list, string oldName, string newName)
         {
             var temp = list.FirstOrDefault(s => s.DisplayName == oldName);
-            if (temp!=null)
+            if (temp != null)
             {
                 temp.DisPlayValue = newName;
             }
@@ -527,12 +528,12 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
             }
             catch
-            { 
+            {
                 var examineModel = await client.GetFromJsonAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/EditMain/" + model.SubId);
                 examineModel.Name = examineModel.DisplayName = "已删除_" + examineModel.Name;
 
 
-                var result= await client.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/EditMain", examineModel);
+                var result = await client.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/EditMain", examineModel);
                 string jsonContent = result.Content.ReadAsStringAsync().Result;
                 Result obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
                 //判断结果
@@ -581,11 +582,11 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                     Name = model.Title,
                     DisplayName = model.Title,
                     MainPicture = model.Image,
-                    PubishTime = model.PublishTime,
+                    PubishTime = model.PublishTime.Year<2000?DateTime.Now.ToCstTime(): model.PublishTime,
                     RealNewsTime = model.PublishTime,
                     OriginalLink = model.Url,
                     BriefIntroduction = GetArticleBriefIntroduction(model.MainPage, 50),
-                    OriginalAuthor=string.IsNullOrWhiteSpace( model.OriginalAuthor)? setting.UserName : model.OriginalAuthor,
+                    OriginalAuthor = string.IsNullOrWhiteSpace(model.OriginalAuthor) ? setting.UserName : model.OriginalAuthor,
                 },
                 MainPage = new EditArticleMainPageViewModel
                 {
@@ -611,7 +612,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
 
             //默认值为评测
-            if(article.Main.Type == ArticleType.Tought)
+            if (article.Main.Type == ArticleType.Tought)
             {
                 article.Main.Type = ArticleType.Evaluation;
             }
@@ -702,6 +703,28 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
             return str;
         }
+
+        static async Task<string> GetHtmlJsAsync(string url)
+        {
+            Console.WriteLine("尝试加载 Headless Chromium");
+            // Download the Chromium revision if it does not already exist
+            await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
+
+            // Create an instance of the browser and configure launch options
+            Browser browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            {
+                Headless = true
+            });
+
+            // Create a new page and go to Bing Maps
+            Page page = await browser.NewPageAsync();
+            await page.GoToAsync(url);
+            Console.WriteLine("等待目标网页加载");
+            await page.WaitForSelectorAsync(".user-bar");
+
+           return await page.GetContentAsync();
+        }
+
 
         static async Task<OutlinkArticleModel> ProcZhiHuArticleFromHtmlAsync(string html)
         {
@@ -811,7 +834,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             HtmlDocument document = new HtmlDocument();
             document.LoadHtml(html);
 
-            var node = document.DocumentNode.ChildNodes.FirstOrDefault(s=>s.Name=="html").ChildNodes.FirstOrDefault(s => s.Name == "body").ChildNodes.FirstOrDefault(s => s.HasClass("news-container"));
+            var node = document.GetElementbyId("app");
             string htmlStr = "";
             string name = "";
             string image = null;
@@ -820,34 +843,18 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             //主图标题
             try
             {
-                var tempnodes = node.ChildNodes.FirstOrDefault(s => s.HasClass("news-head"));
-                name = tempnodes.ChildNodes.FirstOrDefault(s => s.HasClass("news-title-wrap")).FirstChild.InnerText;
-                tempnodes = tempnodes.ChildNodes.FirstOrDefault(s => s.HasClass("mask")).NextSibling;
-                image= ToolHelper.MidStrEx(tempnodes.OuterHtml, "data-original=\"", "?") ;
+                name = node.ChildNodes.FirstOrDefault(s => s.HasClass("article-header")).ChildNodes.FirstOrDefault(s => s.HasClass("title")).InnerText;             
             }
             catch
             {
 
             }
-          
-         
+
+
             //作者
             try
             {
-                var tempnodes = node.ChildNodes.FirstOrDefault(s=>s.HasClass("news-body")).ChildNodes.FirstOrDefault(s => s.HasClass("author-wrap")).ChildNodes.FirstOrDefault(s=>s.HasClass("user-wrap"));
-
-                article.OriginalAuthor = tempnodes.ChildNodes.FirstOrDefault(s => s.HasClass("user-info")).ChildNodes.FirstOrDefault(s => s.HasClass("user-name")).InnerText;
-                var times = ToolHelper.MidStrEx(tempnodes.ChildNodes.FirstOrDefault(s => s.HasClass("row-2")).ChildNodes.FirstOrDefault(s => s.HasClass("time")).OuterHtml, "data-time=\"", "\"");
-
-                try
-                {
-                    article.PublishTime = ToolHelper.GetDateTimeFrom1970Ticks((long)double.Parse(times));
-                }
-                catch
-                {
-
-                }
-
+                article.OriginalAuthor = node.ChildNodes.FirstOrDefault(s => s.HasClass("user-bar")).ChildNodes.FirstOrDefault(s => s.HasClass("row-1")).ChildNodes.FirstOrDefault(s => s.HasClass("info")).ChildNodes.FirstOrDefault(s => s.HasClass("top")).InnerText;
             }
             catch
             {
@@ -857,8 +864,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             //正文
             try
             {
-                node = document.GetElementbyId("post-content");
-                htmlStr = node.InnerHtml.Replace("data-original", "src"); ;
+                htmlStr = node.ChildNodes.FirstOrDefault(s => s.HasClass("article-content")).FirstChild.InnerHtml;
             }
             catch
             {
@@ -866,10 +872,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
 
             var converter = new ReverseMarkdown.Converter();
-
-
-
-            article.MainPage = converter.Convert(htmlStr);
+            article.MainPage = converter.Convert(htmlStr.Replace("data-original=","src="));
             article.MainPage = await imageHelper.ProgressImage(article.MainPage, OutlinkArticleType.XiaoHeiHe);
             article.Title = name;
             article.OriginalAuthor = ToolHelper.MidStrEx(article.MainPage, "本文作者 @", "**");
@@ -882,22 +885,24 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         }
 
 
-        static async Task< OutlinkArticleModel> GetArticleContext(string url)
+        static async Task<OutlinkArticleModel> GetArticleContext(string url)
         {
             //替换链接
-            url=url.Replace("https://api.xiaoheihe.cn/v3/bbs/app/api/web/share?link_id=", "https://api.xiaoheihe.cn/maxnews/app/share/detail/").Replace("https://www.xiaoheihe.cn/community/18745/list/", "https://api.xiaoheihe.cn/maxnews/app/share/detail/");
+            url = url.Replace("https://api.xiaoheihe.cn/maxnews/app/share/detail/", "https://api.xiaoheihe.cn/v3/bbs/app/api/web/share?link_id=");
 
-            var html = GetHtml(url);
             OutlinkArticleModel result = null;
 
             if (url.Contains("zhuanlan.zhihu.com"))
             {
+                var html = GetHtml(url);
+
                 result = await ProcZhiHuArticleFromHtmlAsync(html);
 
             }
             else if (url.Contains("api.xiaoheihe.cn"))
             {
-                result =await ProcXiaoHeiHeArticleFromHtmlAsync(html);
+                var html = await GetHtmlJsAsync(url);
+                result = await ProcXiaoHeiHeArticleFromHtmlAsync(html);
             }
             else
             {
@@ -1224,7 +1229,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 var images = ToolHelper.GetImageLinks(text);
                 foreach (var temp in images)
                 {
-                    var infor = await GetImage(temp);
+                    var infor = await GetImage(temp.Replace("/thumb", ""));
 
                     //替换图片
                     text = text.Replace(temp, infor);
