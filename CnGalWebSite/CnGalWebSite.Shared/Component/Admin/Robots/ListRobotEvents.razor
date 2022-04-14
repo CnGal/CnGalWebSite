@@ -149,8 +149,6 @@
         {
             temp.ComponentParameters = new List<KeyValuePair<string, object>> { new KeyValuePair<string, object>("ViewMode", DatePickerViewMode.DateTime) };
         }
-        var editor = model.FirstOrDefault(s => s.PropertyType == typeof(double));
-        editor.ComponentParameters = new List<KeyValuePair<string, object>> { new KeyValuePair<string, object>("Step", 0.0001) };
 
         var option = new EditDialogOption<ListRobotEventAloneModel>()
         {
