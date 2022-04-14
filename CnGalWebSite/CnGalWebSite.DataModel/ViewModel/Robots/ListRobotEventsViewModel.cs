@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CnGalWebSite.DataModel.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -18,12 +19,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Robots
         public string Text { get; set; }
         [Display(Name = "备注")]
         public string Note { get; set; }
-
+        [Display(Name = "类型")]
+        public RobotEventType Type { get; set; }
         [Display(Name = "定时")]
         public DateTime Time { get; set; }
         [Display(Name = "有效期间 秒")]
         public long DelaySecond { get; set; }
-
+        [Display(Name = "概率")]
+        public double Probability { get; set; }
         [Display(Name = "是否隐藏")]
         public bool IsHidden { get; set; }
     }

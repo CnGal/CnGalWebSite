@@ -26,24 +26,21 @@ namespace CnGalWebSite.RobotClient
         private readonly HttpClient _httpClient;
         private readonly List<RobotReply> _replies;
         private readonly List<MessageArg> _messageArgs;
+        private readonly List<RobotFace> _robotFaces;
 
 
-        public MessageX(Setting setting, HttpClient client, List<RobotReply> replies, IDictionary<string, string> cache, List<MessageArg> messageArgs)
+        public MessageX(Setting setting, HttpClient client, List<RobotReply> replies, IDictionary<string, string> cache, List<MessageArg> messageArgs, List<RobotFace> robotFaces)
         {
             _setting = setting;
             _httpClient = client;
             _replies = replies;
             _cache = cache;
             _messageArgs = messageArgs;
+            _robotFaces = robotFaces;
         }
 
-        public async Task<Message[]> ProcMessage(string message, GroupMessageSender sender)
+        public async Task<Message[]> GetAutoReply(string message, GroupMessageSender sender)
         {
-            //var cache = _cache.FirstOrDefault(s => s.Key == message);
-            //if (string.IsNullOrWhiteSpace(cache.Value) == false)
-            //{
-            //    return cache.Value;
-            //}
 
             var now = DateTime.Now.ToCstTime();
             var replies = _replies.Where(s => s.IsHidden == false && now.TimeOfDay <= s.BeforeTime.TimeOfDay && now.TimeOfDay >= s.AfterTime.TimeOfDay && Regex.IsMatch(message, s.Key)).ToList();
@@ -55,16 +52,15 @@ namespace CnGalWebSite.RobotClient
 
             int index = new Random().Next(0, replies.Count);
 
-            var vaule = await ReplayArgument(replies[index].Value, sender);
-
-            //if (string.IsNullOrWhiteSpace(vaule) == false)
-            //{
-            //    _cache.Add(new KeyValuePair<string, string>(message, vaule));
-            //}
-            return StringToMessageArray(vaule, sender);
+            return await ProcMessageAsync(replies[index].Value, sender);
         }
 
-        public Message[] StringToMessageArray(string vaule, GroupMessageSender sender)
+        public async Task<Message[]> ProcMessageAsync(string message, GroupMessageSender sender)
+        {
+            return ProcMessageArray(ProcMessageFace(await ProcMessageArgument(message, sender), sender), sender);
+        }
+
+        public Message[] ProcMessageArray(string vaule, GroupMessageSender sender)
         {
             if (string.IsNullOrWhiteSpace(vaule))
             {
@@ -123,7 +119,7 @@ namespace CnGalWebSite.RobotClient
         }
 
 
-        public async Task<string> ReplayArgument(string message, GroupMessageSender sender)
+        public async Task<string> ProcMessageArgument(string message, GroupMessageSender sender)
         {
             while (true)
             {
@@ -150,6 +146,15 @@ namespace CnGalWebSite.RobotClient
                 message = message.Replace("$(" + argument + ")", value);
             }
 
+            return message;
+        }
+
+        public string ProcMessageFace(string message, GroupMessageSender sender)
+        {
+            foreach(var item in _robotFaces.Where(s=>s.IsHidden==false))
+            {
+                message = message.Replace($"[{item.Key}]", item.Value);
+            }
             return message;
         }
 

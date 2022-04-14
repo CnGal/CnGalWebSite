@@ -15,6 +15,9 @@
             <i class="fa fa-star fa-fw "></i>
             <span class="article-infor-text">@(InforModel.Events + "个事件")</span>&nbsp;&nbsp;&nbsp;
 
+            <i class="fa fa-star fa-fw "></i>
+            <span class="article-infor-text">@(InforModel.Faces + "个表情")</span>&nbsp;&nbsp;&nbsp;
+
             <i class="fa fa-object-group fa-fw "></i>
             <span class="article-infor-text">@(InforModel.Groups + "个群")</span>
         </p>
@@ -26,6 +29,9 @@
             </TabItem>
             <TabItem Text="事件" Icon="fa fa-coffee">
                 <CnGalWebSite.Shared.Component.Admin.Robots.ListRobotEvents />
+            </TabItem>
+            <TabItem Text="表情" Icon="fa fa-smile-o">
+                <CnGalWebSite.Shared.Component.Admin.Robots.ListRobotFaces />
             </TabItem>
             <TabItem Text="QQ群" Icon="fa fa-qq">
                 <CnGalWebSite.Shared.Component.Admin.Robots.ListRobotGroups />

@@ -113,7 +113,7 @@
 
         await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), true, false);
 
-        await ToastService.Success("取消暂停事件成功", "取消暂停事件成功");
+        await ToastService.Success("隐藏QQ群成功", "隐藏QQ群成功");
         await TableRows.QueryAsync();
     }
     private async Task OnUnHiddenClick(IEnumerable<ListRobotGroupAloneModel> items)
@@ -126,7 +126,7 @@
 
         await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), false, false);
 
-        await ToastService.Success("暂停QQ群成功", "暂停QQ群成功");
+        await ToastService.Success("显示QQ群成功", "显示QQ群成功");
         await TableRows.QueryAsync();
     }
 

@@ -10,6 +10,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using File = System.IO.File;
+using CnGalWebSite.Helper.Extensions;
 
 namespace CnGalWebSite.RobotClient
 {
@@ -94,15 +95,15 @@ namespace CnGalWebSite.RobotClient
                 serializer.Serialize(file, ExecuteInfors);
             }
         }
-        public string GetCurrentMessage()
+        public string GetCurrentTimeEvent()
         {
-            var events = Events.Where(s => s.Time.TimeOfDay < DateTime.Now.ToCstTime().TimeOfDay);
+            var events = Events.Where(s => s.Time.TimeOfDay < DateTime.Now.ToCstTime().TimeOfDay && s.IsHidden == false && s.Type== RobotEventType.FixedTime);
 
             var todos=new List<RobotEvent>();
 
             foreach(var item in events)
             {
-                if(ExecuteInfors.Any(s=>s.LastRunTime.Date>=DateTime.Now.ToCstTime().Date))
+                if (ExecuteInfors.Any(s =>(s.Id==item.Id && s.LastRunTime.Date >= DateTime.Now.ToCstTime().Date) || (s.LastRunTime.Date == DateTime.Now.ToCstTime().Date && s.Note == item.Note)))
                 {
                     continue;
                 }
@@ -115,21 +116,77 @@ namespace CnGalWebSite.RobotClient
                 return null;
             }
 
-            int index = new Random().Next(0, todos.Count);
+            todos.Random();
+
+            RobotEvent currentEvent = null;
+
+            foreach (var item in todos)
+            {
+                //查找同类型的任务
+                var sameCount = events.Where(s => s.Note == item.Note).Count();
+                if (new Random().Next(0, sameCount) == 0)
+                {
+                    currentEvent = item;
+                    break;
+                }
+
+            }
             
             foreach(var item in events)
             {
                 ExecuteInfors.Add(new EventExecuteInfor
                 {
                     Id = item.Id,
+                    Note= item.Note,
                     LastRunTime = DateTime.Now.ToCstTime(),
                 });
             }
 
             SaveExecuteInfors();
 
-            return todos[index].Text;
+            return currentEvent?.Text;
 
+        }
+
+        public string GetProbabilityEvents()
+        {
+            var p = new Random().NextDouble();
+
+            var events = Events.Where(s => s.IsHidden == false && s.Type == RobotEventType.PreTime && s.Probability > p);
+
+            var todos = new List<RobotEvent>();
+
+            foreach (var item in events)
+            {
+                if (ExecuteInfors.Any(s => s.LastRunTime.Date == DateTime.Now.ToCstTime().Date && s.Id == item.Id))
+                {
+                    continue;
+                }
+
+                todos.Add(item);
+            }
+
+            if (todos.Count == 0)
+            {
+                return null;
+            }
+
+
+            todos.Random();
+
+            foreach (var item in events)
+            {
+                ExecuteInfors.Add(new EventExecuteInfor
+                {
+                    Id = item.Id,
+                    Note = item.Note,
+                    LastRunTime = DateTime.Now.ToCstTime(),
+                });
+            }
+
+            SaveExecuteInfors();
+
+            return todos.FirstOrDefault()?.Text;
         }
 
         public async Task RefreshAsync()
@@ -157,6 +214,8 @@ namespace CnGalWebSite.RobotClient
     public class EventExecuteInfor
     {
         public long Id { get; set; }
+
+        public string Note { get; set; }
 
         public DateTime LastRunTime { get; set; }
     }

@@ -99,13 +99,14 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<RobotReply, long> _robotReplyRepository;
         private readonly IRepository<RobotGroup, long> _robotGroupRepository;
         private readonly IRepository<RobotEvent, long> _robotEventRepository;
+        private readonly IRepository<RobotFace, long> _robotFaceRepository;
         private readonly IRobotService _robotService;
 
         public RobotAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
         IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository,  IRankService rankService, IHistoryDataService historyDataService,
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService,
-        IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository,
+        IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<RobotFace, long> robotFaceRepository,
         UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<RobotEvent, long> robotEventRepository,
         IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
@@ -162,6 +163,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _robotGroupRepository = robotGroupRepository;
             _robotReplyRepository = robotReplyRepository;
             _robotService = robotService;
+            _robotFaceRepository = robotFaceRepository;
         }
 
         [AllowAnonymous]
@@ -175,6 +177,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Events = await _robotEventRepository.CountAsync(s => s.IsHidden == false),
                     Groups = await _robotGroupRepository.CountAsync(s => s.IsHidden == false),
                     Replies = await _robotReplyRepository.CountAsync(s => s.IsHidden == false),
+                    Faces=await _robotFaceRepository.CountAsync(s => s.IsHidden == false),
                 };
 
                 return model;
@@ -204,6 +207,14 @@ namespace CnGalWebSite.APIServer.Controllers
         [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListRobotReplyAloneModel>>> GetRobotReplyListAsync(RobotRepliesPagesInfor input)
+        {
+            var dtos = await _robotService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
+        }
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListRobotFaceAloneModel>>> GetRobotFaceListAsync(RobotFacesPagesInfor input)
         {
             var dtos = await _robotService.GetPaginatedResult(input.Options, input.SearchModel);
 
@@ -262,6 +273,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> UpdateRobotGroupDataAsync(ListRobotGroupAloneModel model)
@@ -307,7 +319,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-
         [HttpPost]
         public async Task<ActionResult<Result>> UpdateRobotReplyDataAsync(ListRobotReplyAloneModel model)
         {
@@ -365,6 +376,63 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [HttpPost]
+        public async Task<ActionResult<Result>> UpdateRobotFaceDataAsync(ListRobotFaceAloneModel model)
+        {
+            //检查数据合规性
+            if (string.IsNullOrWhiteSpace(model.Key))
+            {
+                return new Result { Successful = false, Error = $"匹配表达式不能为空" };
+            }
+            if (string.IsNullOrWhiteSpace(model.Value))
+            {
+                return new Result { Successful = false, Error = $"回复不能为空" };
+            }
+
+            //查找
+            var robot = await _robotFaceRepository.FirstOrDefaultAsync(s => s.Id == model.Id);
+            if (robot == null)
+            {
+                if (model.Id != 0)
+                {
+                    return new Result { Successful = false, Error = $"未找到Id：{model.Id}的自动回复" };
+
+                }
+                else
+                {
+                    robot = new RobotFace
+                    {
+                        IsHidden = model.IsHidden,
+                        Key = model.Key,
+                        Value = model.Value,
+                        Note = model.Note,
+                    };
+                }
+            }
+
+            //修改数据
+            robot.Key = model.Key;
+            robot.Value = model.Value;
+            robot.Note = model.Note;
+            robot.IsHidden = model.IsHidden;
+
+            //保存
+            if (model.Id == 0)
+            {
+                await _robotFaceRepository.InsertAsync(robot);
+
+            }
+            else
+            {
+                await _robotFaceRepository.UpdateAsync(robot);
+
+            }
+
+            return new Result { Successful = true };
+        }
+
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
@@ -479,64 +547,42 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<Result>> ImportRobotEventsAsync(ImportRobotsModel model)
+        public async Task<ActionResult<Result>> ImportRobotFacesAsync(ImportRobotsModel model)
         {
             if (string.IsNullOrWhiteSpace(model.Value))
             {
                 return new Result { Successful = false, Error = "导入内容不能为空" };
             }
 
-            List<ImportRobotReplyModel> replies = null;
-            using (TextReader str = new StringReader(model.Value))
-            {
-                var serializer = new JsonSerializer();
-                replies = (List<ImportRobotReplyModel>)serializer.Deserialize(str, typeof(List<ImportRobotReplyModel>));
-            }
-
+            var lines = model.Value.Split('\n');
             var errors = 0;
-
-            foreach (var item in replies)
+            foreach (var item in lines)
             {
-                try
-                {
-                    if (string.IsNullOrWhiteSpace(item.LxKey))
-                    {
-                        errors++;
-                        continue;
-                    }
-                    if (string.IsNullOrWhiteSpace(item.LxValue))
-                    {
-                        errors++;
-                        continue;
-                    }
+                var  temp = item.Replace("[", "").Replace("]", "");
 
-                    var time = DateTime.ParseExact(item.Time, "yyyy-MM-dd HH:mm:ss", null);
-                    DateTime afterTime = DateTime.MinValue;
-                    if (item.AfterTime != "-1")
-                    {
-                        afterTime = DateTime.ParseExact(item.AfterTime, "HHmm", null);
-                    }
-                    DateTime beforeTime = DateTime.MinValue.AddHours(23.9);
-                    if (item.AfterTime != "-1")
-                    {
-                        beforeTime = DateTime.ParseExact(item.BeforeTime, "HHmm", null);
-                    }
+                var key = temp.MidStrEx("'", "'");
 
-                    await _robotReplyRepository.InsertAsync(new RobotReply
-                    {
-                        IsHidden = false,
-                        Key = item.LxKey,
-                        UpdateTime = time,
-                        Value = item.LxValue,
-                        AfterTime = afterTime,
-                        BeforeTime = beforeTime
-                    });
+                temp = temp.Replace($"'{key}'", "");
 
-                }
-                catch (Exception ex)
+                var value = temp.MidStrEx("'", "'").Replace("http://", "https://");
+
+                if(string.IsNullOrWhiteSpace(key)|| string.IsNullOrWhiteSpace(value))
                 {
                     errors++;
+                    continue;
                 }
+
+                if (await _robotFaceRepository.GetAll().AnyAsync(s => s.Value == value && s.Key == key))
+                {
+                    continue;
+                }
+
+
+                await _robotFaceRepository.InsertAsync(new RobotFace
+                {
+                    Key = key,
+                    Value = "[" + value + "]"
+                });
             }
 
 
@@ -547,10 +593,11 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             else
             {
-                return new Result { Successful = false, Error = $"总计{replies.Count}项，失败{errors}项" };
+                return new Result { Successful = false, Error = $"总计{lines.Count()}项，失败{errors}项" };
 
             }
         }
+
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
@@ -560,6 +607,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotGroupAsync(HiddenRobotModel model)
@@ -568,6 +616,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotReplyAsync(HiddenRobotModel model)
@@ -576,6 +625,16 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [HttpPost]
+        public async Task<ActionResult<Result>> HiddenRobotFaceAsync(HiddenRobotModel model)
+        {
+            await _robotFaceRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+
+            return new Result { Successful = true };
+        }
+
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<RobotReply>>> GetRobotRepliesAsync()
@@ -594,6 +653,13 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             return await _robotGroupRepository.GetAllListAsync();
         }
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<RobotFace>>> GetRobotFacesAsync()
+        {
+            return await _robotFaceRepository.GetAllListAsync();
+        }
+
         [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<Result>> GetArgValueAsync(GetArgValueModel model)
