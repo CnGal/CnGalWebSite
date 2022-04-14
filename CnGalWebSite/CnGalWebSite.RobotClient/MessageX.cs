@@ -71,14 +71,14 @@ namespace CnGalWebSite.RobotClient
             {
                 var imageStr = vaule.MidStrEx("[image=", "]");
 
-                if (string.IsNullOrWhiteSpace(imageStr)==false)
+                if (string.IsNullOrWhiteSpace(imageStr) == false)
                 {
                     var text = vaule.Replace("[image=" + imageStr + "]", "");
-                    var messages= new List<Message>
+                    var messages = new List<Message>
                                  {
                                     new Image(url: vaule.MidStrEx("[image=", "]").Replace("http://image.cngal.org/", "https://image.cngal.org/"))
                                  };
-                    if(string.IsNullOrWhiteSpace(text)==false)
+                    if (string.IsNullOrWhiteSpace(text) == false)
                     {
                         messages.Add(new Plain(text));
                     }
@@ -121,37 +121,51 @@ namespace CnGalWebSite.RobotClient
 
         public async Task<string> ProcMessageArgument(string message, GroupMessageSender sender)
         {
-            while (true)
+            try
             {
-                var argument = message.MidStrEx("$(", ")");
-
-                if (string.IsNullOrWhiteSpace(argument))
+                while (true)
                 {
-                    break;
+                    var argument = message.MidStrEx("$(", ")");
+
+                    if (string.IsNullOrWhiteSpace(argument))
+                    {
+                        break;
+                    }
+
+                    var value = argument switch
+                    {
+                        "time" => DateTime.Now.ToCstTime().ToString("HH:mm"),
+                        "qq" => sender.id.ToString(),
+                        "weather" => _messageArgs.FirstOrDefault(s => s.Name == "weather")?.Value,
+                        "sender" => sender.memberName,
+                        "auth" => await GetArgValue(argument, sender.id.ToString()),
+                        "n" => "\n",
+                        "r" => "\r",
+                        "facelist" => "该功能暂未实装",
+                        _ => await GetArgValue(argument, null)
+                    };
+
+                    message = message.Replace("$(" + argument + ")", value);
                 }
-
-                var value = argument switch
-                {
-                    "time" => DateTime.Now.ToCstTime().ToString("HH:mm"),
-                    "qq" => sender.id.ToString(),
-                    "weather" => _messageArgs.FirstOrDefault(s => s.Name == "weather")?.Value,
-                    "sender" => sender.memberName,
-                    "auth" =>await GetArgValue(argument, sender.id.ToString()),
-                    "n" => "\n",
-                    "r" => "\r",
-                    "facelist" => "该功能暂未实装",
-                    _ => await GetArgValue(argument, null)
-                };
-
-                message = message.Replace("$(" + argument + ")", value);
             }
+            catch (ArgError arg)
+            {
+                message = arg.Error;
+            }
+            catch (Exception ex)
+            {
+                OutputHelper.PressError(ex, "获取变量值失败");
+                return "呜呜呜~";
+
+            }
+
 
             return message;
         }
 
         public string ProcMessageFace(string message, GroupMessageSender sender)
         {
-            foreach(var item in _robotFaces.Where(s=>s.IsHidden==false))
+            foreach (var item in _robotFaces.Where(s => s.IsHidden == false))
             {
                 message = message.Replace($"[{item.Key}]", item.Value);
             }
@@ -160,30 +174,22 @@ namespace CnGalWebSite.RobotClient
 
         public async Task<string> GetArgValue(string name, string infor)
         {
-            try
+            var result = await _httpClient.PostAsJsonAsync<GetArgValueModel>(ToolHelper.WebApiPath + "api/robot/GetArgValue", new GetArgValueModel
             {
-                var result = await _httpClient.PostAsJsonAsync<GetArgValueModel>(ToolHelper.WebApiPath + "api/robot/GetArgValue", new GetArgValueModel
-                {
-                    Infor = infor,
-                    Name = name,
-                });
+                Infor = infor,
+                Name = name,
+            });
 
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-                //判断结果
-                if (obj.Successful == false)
-                {
-                    throw new ArgError(obj.Error);
-                }
-                else
-                {
-                    return obj.Error;
-                }
-            }
-            catch (Exception ex)
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
             {
-                OutputHelper.PressError(ex, "获取变量值失败");
-                return "呜呜呜~";
+                throw new ArgError(obj.Error);
+            }
+            else
+            {
+                return obj.Error;
             }
         }
     }

@@ -669,6 +669,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var user = await _userRepository.GetAll().AsNoTracking()
                     .Include(s => s.ThirdPartyLoginInfors)
                     .FirstOrDefaultAsync(s => s.ThirdPartyLoginInfors.Any(s => s.Type == ThirdPartyLoginType.QQ && s.Id.ToString() == model.Infor));
+
                 if (user == null)
                 {
                     return new Result { Successful = false, Error = "你还没有绑定 CnGal资料站 账号哦~ （用QQ登入资料站就可以绑定了" };
