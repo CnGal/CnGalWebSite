@@ -39,25 +39,28 @@ namespace CnGalWebSite.RobotClient
             _robotFaces = robotFaces;
         }
 
-        public async Task<Message[]> GetAutoReply(string message, GroupMessageSender sender)
+        public string GetAutoReply(string message, GroupMessageSender sender)
         {
 
             var now = DateTime.Now.ToCstTime();
-            var replies = _replies.Where(s => s.IsHidden == false && now.TimeOfDay <= s.BeforeTime.TimeOfDay && now.TimeOfDay >= s.AfterTime.TimeOfDay && Regex.IsMatch(message, s.Key)).ToList();
+            var replies = _replies.Where(s => s.IsHidden == false && now.TimeOfDay <= s.BeforeTime.TimeOfDay && now.TimeOfDay >= s.AfterTime.TimeOfDay && Regex.IsMatch(message, s.Key))
+                .GroupBy(s=>s.Priority)
+                .OrderByDescending(s=>s.Key)
+                .ToList();
 
             if (replies.Count == 0)
             {
                 return null;
             }
 
-            int index = new Random().Next(0, replies.Count);
+            int index = new Random().Next(0, replies.FirstOrDefault().Count());
 
-            return await ProcMessageAsync(replies[index].Value, sender);
+            return replies.FirstOrDefault().ToList()[index].Value;
         }
 
-        public async Task<Message[]> ProcMessageAsync(string message, GroupMessageSender sender)
+        public async Task<Message[]> ProcMessageAsync(string reply, string message, GroupMessageSender sender)
         {
-            return ProcMessageArray(ProcMessageFace(await ProcMessageArgument(message, sender), sender), sender);
+            return ProcMessageArray(ProcMessageFace(await ProcMessageArgument(reply, message, sender), sender), sender);
         }
 
         public Message[] ProcMessageArray(string vaule, GroupMessageSender sender)
@@ -67,65 +70,75 @@ namespace CnGalWebSite.RobotClient
                 return null;
             }
 
-            if (vaule.Contains("[image="))
-            {
-                var imageStr = vaule.MidStrEx("[image=", "]");
+            var messages = new List<Message>();
 
-                if (string.IsNullOrWhiteSpace(imageStr) == false)
+            while (true)
+            {
+                if (vaule.Contains("[image="))
                 {
-                    var text = vaule.Replace("[image=" + imageStr + "]", "");
-                    var messages = new List<Message>
-                                 {
-                                    new Image(url: vaule.MidStrEx("[image=", "]").Replace("http://image.cngal.org/", "https://image.cngal.org/"))
-                                 };
-                    if (string.IsNullOrWhiteSpace(text) == false)
+                    var imageStr = vaule.MidStrEx("[image=", "]");
+
+                    if (string.IsNullOrWhiteSpace(imageStr) == false)
                     {
-                        messages.Add(new Plain(text));
+                        vaule = vaule.Replace("[image=" + imageStr + "]", "");
+                        messages.Add(new Image(url: imageStr.Replace("http://image.cngal.org/", "https://image.cngal.org/")));
                     }
-                    return messages.ToArray();
+                }
+                else if (vaule.Contains("[声音="))
+                {
+                    var voiceStr = vaule.MidStrEx("[声音=", "]");
+
+                    if (string.IsNullOrWhiteSpace(voiceStr) == false)
+                    {
+                        vaule = vaule.Replace("[声音=" + voiceStr + "]", "");
+                        messages.Add(new Voice(url: voiceStr.Replace("http://res.cngal.org/", "https://res.cngal.org/")));
+
+                    }
+                }
+
+                else if (vaule.Contains("[@"))
+                {
+                    var idStr = vaule.MidStrEx("[@", "]");
+                    long id = 0;
+                    if (long.TryParse(idStr, out id))
+                    {
+
+                        vaule = vaule.Replace("[@" + idStr + "]", "");
+                        messages.Add(new At(id, idStr));
+                    }
                 }
                 else
                 {
-                    return null;
-                }
-            }
-            else if (vaule.Contains("[声音="))
-            {
-                return new Message[] { new Voice(url: vaule.MidStrEx("[声音=", "]").Replace("http://res.cngal.org/", "https://res.cngal.org/")) };
-            }
-
-            else if (vaule.Contains("[@"))
-            {
-                var idStr = vaule.MidStrEx("[@", "]");
-                long id = 0;
-                if (long.TryParse(idStr, out id))
-                {
-                    return new Message[]
-                                 {
-                                    new At(id,idStr),
-                                    new Plain(vaule.Replace("[@"+idStr+ "]",""))
-                                 };
-                }
-                else
-                {
-                    return new Message[] { new Plain(vaule.Replace("[@" + idStr + "]", "")) };
+                    break;
                 }
 
+
+            }
+
+         
+            if(string.IsNullOrWhiteSpace(vaule)==false)
+            {
+                messages.Add(new Plain(vaule));
+            }
+
+            if(string.IsNullOrWhiteSpace(vaule)&&messages.Count==0)
+            {
+                return null;
             }
             else
             {
-                return new Message[] { new Plain(vaule) };
+                return messages.ToArray();
             }
         }
 
 
-        public async Task<string> ProcMessageArgument(string message, GroupMessageSender sender)
+        public async Task<string> ProcMessageArgument(string reply,string message, GroupMessageSender sender)
         {
             try
             {
                 while (true)
                 {
-                    var argument = message.MidStrEx("$(", ")");
+                    var argument = reply.MidStrEx("$(", ")");
 
                     if (string.IsNullOrWhiteSpace(argument))
                     {
@@ -142,15 +155,17 @@ namespace CnGalWebSite.RobotClient
                         "n" => "\n",
                         "r" => "\r",
                         "facelist" => "该功能暂未实装",
+                        "introduce" => await GetArgValue(argument, message),
+                        "website" => await GetArgValue(argument, message),
                         _ => await GetArgValue(argument, null)
                     };
 
-                    message = message.Replace("$(" + argument + ")", value);
+                    reply = reply.Replace("$(" + argument + ")", value);
                 }
             }
             catch (ArgError arg)
             {
-                message = arg.Error;
+                reply = arg.Error;
             }
             catch (Exception ex)
             {
@@ -159,12 +174,16 @@ namespace CnGalWebSite.RobotClient
 
             }
 
-
-            return message;
+            return reply;
         }
 
         public string ProcMessageFace(string message, GroupMessageSender sender)
         {
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                return null;
+            }
+
             foreach (var item in _robotFaces.Where(s => s.IsHidden == false))
             {
                 message = message.Replace($"[{item.Key}]", item.Value);

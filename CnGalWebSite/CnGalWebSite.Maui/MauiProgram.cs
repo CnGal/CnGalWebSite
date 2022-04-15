@@ -16,7 +16,6 @@ namespace CnGalWebSite.Maui
         {
             var builder = MauiApp.CreateBuilder();
             builder
-                .RegisterBlazorMauiWebView()
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
                 {

@@ -23,6 +23,11 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public DateTime BeforeTime { get; set; }
 
+        /// <summary>
+        /// 优先级
+        /// </summary>
+        public int Priority { get; set; }
+
         public bool IsHidden { get; set; }
 
     }

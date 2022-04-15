@@ -51,6 +51,27 @@ namespace CnGalWebSite.Helper.Extensions
             }
             return result;
         }
+        public static string DeleteHtmlLinks(this string value)
+        {
+            value = value.Replace("</a>", "");
+
+            while (true)
+            {
+                var temp = value.MidStrEx("<a ", ">");
+
+                if (string.IsNullOrWhiteSpace(temp))
+                {
+                    break;
+                }
+
+                value = value.Replace("<a " + temp + ">", "");
+
+            }
+
+            return value;
+        }
+
+
 
     }
 }

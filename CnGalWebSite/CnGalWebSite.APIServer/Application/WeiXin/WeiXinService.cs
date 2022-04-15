@@ -186,7 +186,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             return await GetEntryInfor(entryIds[index], plainText);
         }
 
-        public async Task<string> GetEntryInfor(int id,bool plainText=false)
+        public async Task<string> GetEntryInfor(int id,bool plainText=false, bool showLink = false)
         {
             var entry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Information)
@@ -200,6 +200,12 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             var model = await _appHelper.GetEntryInforTipViewModel(entry);
 
             StringBuilder sb = new StringBuilder();
+
+            if (plainText&&string.IsNullOrWhiteSpace(entry.MainPicture)==false)
+            {
+                sb.AppendLine($"[image={_appHelper.GetImagePath(entry.MainPicture, "app.png")}]");
+            }
+
 
             sb.AppendLine($"{model.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/entries/index/{model.Id}\">{model.Name}</a>");
             if (string.IsNullOrWhiteSpace(model.BriefIntroduction) == false)
@@ -277,7 +283,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
             foreach (var item in model.AddInfors)
             {
-
+                sb.AppendLine();
                 sb.Append($"{item.Modifier}：");
                 foreach (var temp in item.Contents)
                 {
@@ -287,12 +293,72 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                     }
                     sb.Append($"<a href=\"https://www.cngal.org/entries/index/{temp.Id}\">{temp.DisplayName}</a>");
                 }
+
+            }
+
+            if(showLink)
+            {
                 sb.AppendLine();
+                sb.Append($"https://www.cngal.org/entries/index/{entry.Id}");
             }
 
             return sb.ToString();
 
         }
+
+        public async Task<string> GetArticleInfor(int id, bool plainText = false,bool showLink=false)
+        {
+            var article = await _articleRepository.GetAll().AsNoTracking()
+                .Include(s => s.CreateUser)
+                .FirstOrDefaultAsync(s => s.Id == id);
+            if (article == null)
+            {
+                return "呜~~~ 搜索不到欸~";
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            if (plainText && string.IsNullOrWhiteSpace(article.MainPicture) == false)
+            {
+                sb.AppendLine($"[image={_appHelper.GetImagePath(article.MainPicture, "Certificate.png")}]");
+            }
+
+
+            sb.AppendLine($"{article.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/articles/index/{article.Id}\">{article.Name}</a>");
+            if (string.IsNullOrWhiteSpace(article.OriginalAuthor))
+            {
+                sb.AppendLine($"作者：{article.CreateUser.UserName}");
+            }
+            else
+            {
+                sb.AppendLine($"作者：{article.OriginalAuthor}");
+            }
+
+            if (string.IsNullOrWhiteSpace(article.OriginalLink) == false)
+            {
+                sb.AppendLine($"原文链接：{article.OriginalLink}");
+            }
+
+            sb.AppendLine();
+
+            if (string.IsNullOrWhiteSpace(article.BriefIntroduction) == false)
+            {
+                sb.Append($"{article.BriefIntroduction.Abbreviate(plainText?40: 23)}");
+            }
+
+
+
+
+            if (showLink)
+            {
+                sb.AppendLine();
+                sb.Append($"https://www.cngal.org/articles/index/{article.Id}");
+            }
+
+            return sb.ToString();
+
+        }
+
 
         public async Task<string> GetNewestEditGames()
         {

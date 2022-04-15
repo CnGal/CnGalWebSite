@@ -93,6 +93,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<LotteryUser, long> _lotteryUserRepository;
         private readonly IRepository<LotteryAward, long> _lotteryAwardRepository;
         private readonly IRepository<LotteryPrize, long> _lotteryPrizeRepository;
+        private readonly IRepository<RobotReply, long> _robotReplyRepository;
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
@@ -103,7 +104,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
-        IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService,
+        IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository,
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper,
         IRepository<LotteryPrize, long> lotteryPrizeRepository)
@@ -157,6 +158,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _lotteryPrizeRepository = lotteryPrizeRepository;
             _searchHelper = searchHelper;
             _weiXinService= weiXinService;
+            _robotReplyRepository = robotReplyRepository;
         }
 
         /// <summary>
@@ -832,41 +834,13 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var examines = await _examineRepository.GetAll()
-                  .Include(s => s.Entry).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                  .Where(s => s.ApplicationUserId == _configuration["ExamineAdminId"]
-                      && (s.Operation == Operation.EstablishRelevances)
-                      && (s.ApplyTime.Date.Year == 2022 && s.ApplyTime.Date.Month == 4 && s.ApplyTime.Date.Day == 7)).ToListAsync();
-
-                foreach (var item in examines)
+                var replies = await _robotReplyRepository.GetAllListAsync();
+                foreach(var item in replies)
                 {
-                    EntryRelevances entryRelevances = null;
-                    using (TextReader str = new StringReader(item.Context))
-                    {
-                        var serializer = new JsonSerializer();
-                        entryRelevances = (EntryRelevances)serializer.Deserialize(str, typeof(EntryRelevances));
-                    }
-
-                    if (entryRelevances.Relevances.Any(s => s.DisplayValue == null))
-                    {
-                        foreach (var temp in entryRelevances.Relevances)
-                        {
-                            temp.IsDelete = !temp.IsDelete;
-                        }
-
-                        await _entryService.UpdateEntryDataRelevances(item.Entry, entryRelevances);
-                        await _entryRepository.UpdateAsync(item.Entry);
-                    }
+                    item.BeforeTime= item.BeforeTime.AddYears(2022);
+                    item.AfterTime= item.AfterTime.AddYears(2022);
+                    await _robotReplyRepository.UpdateAsync(item);
                 }
-
-
-                foreach (var item in examines)
-                {
-                    await _examineRepository.DeleteAsync(item);
-                }
-
-
-                return new Result { Successful = true };
                 return new Result { Successful = true };
             }
             catch (Exception ex)
