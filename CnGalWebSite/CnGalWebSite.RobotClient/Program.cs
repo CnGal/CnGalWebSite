@@ -37,7 +37,7 @@ eventX.Init();
 Console.WriteLine("->初始化消息处理模块");
 MessageX messageX = new MessageX(settingX.BasicSetting, httpClient, replyX.Replies,cacheX.ReplyCache, settingX.MessageArgs,faceX.Faces);
 
-ClientX clientX = new ClientX(settingX.BasicSetting);
+ClientX clientX = new ClientX(settingX.BasicSetting,messageX,groupX);
 
 try
 {
@@ -75,7 +75,7 @@ t.Elapsed +=async (s, e) =>
     var message = eventX.GetCurrentTimeEvent();
     if (string.IsNullOrWhiteSpace(message) == false)
     {
-        var result = await messageX.ProcMessageAsync(message, null);
+        var result = await messageX.ProcMessageAsync(message,"", null);
 
         if (result != null)
         {
@@ -88,8 +88,6 @@ t.Elapsed +=async (s, e) =>
     }
 };
 
-long count = 0;
-
 //随机任务计时器
 System.Timers.Timer t2 = new(1000 * 60); //每一分钟查看一次
 t2.Start(); //启动计时器
@@ -98,7 +96,7 @@ t2.Elapsed += async (s, e) =>
     var message = eventX.GetProbabilityEvents();
     if (string.IsNullOrWhiteSpace(message) == false)
     {
-        var result = await messageX.ProcMessageAsync(message, null);
+        var result = await messageX.ProcMessageAsync(message,"", null);
 
         if (result != null)
         {
@@ -109,9 +107,6 @@ t2.Elapsed += async (s, e) =>
             }
         }
     }
-
-    //顺带把计数器清零
-    count = 0;
 };
 
 
@@ -138,36 +133,7 @@ c.OnGroupMessageReceive += async (s, e) =>
 {
     try
     {
-        //MGetPlainStringSplit() 是一个关于Message类的数组扩展方法,
-
-        var text = e.MGetPlainString();
-        var sendto = s.group.id;
-        var at = e.FirstOrDefault(s=>s.type == "At");
-        if(at != null)
-        {
-            long atTarget = (at as At).target;
-            text += "[@" + atTarget.ToString() + "]";
-        }
-
-        if (groupX.Groups.Any(s=>s.GroupId==sendto)==false)
-        {
-            return;
-        }
-
-        //尝试找出所有匹配的回复
-        var result = await messageX.GetAutoReply(text, s);
-        if (result != null)
-        {
-            if (count > 20)
-            {
-                new Message[] { new Plain("冷却中") }.SendToFriend(sendto, c);
-            }
-            else
-            {
-                var j = result.SendToGroup(sendto, c);
-                Console.WriteLine(j);
-            }
-        }
+       await clientX.ReplyFromGroupAsync(s, e);
     }
     catch (Exception ex)
     {

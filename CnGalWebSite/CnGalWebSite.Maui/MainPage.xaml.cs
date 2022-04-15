@@ -7,15 +7,12 @@ namespace CnGalWebSite.Maui
     {
         public MainPage()
         {
-
             InitializeComponent();
-
-            blazorWebView.ExternalNavigationStarting +=
-                (sender, externalLinkNavigationEventArgs) =>
+            blazorWebView.UrlLoading +=
+                (sender, urlLoadingEventArgs) =>
                 {
-                    externalLinkNavigationEventArgs.ExternalLinkNavigationPolicy = ExternalLinkNavigationPolicy.InsecureOpenInWebView;
+                    urlLoadingEventArgs.UrlLoadingStrategy = UrlLoadingStrategy.OpenInWebView;
                 };
-
         }
     }
 }

@@ -28,16 +28,18 @@ namespace CnGalWebSite.DataModel.ViewModel.Robots
         public string Key { get; set; }
         [Display(Name = "回复")]
         public string Value { get; set; }
+        [Display(Name = "优先级")]
+        public int Priority { get; set; }
         /// <summary>
         /// 在这个时间之后才回复
         /// </summary>
         [Display(Name = "时间之后")]
-        public DateTime AfterTime { get; set; }
+        public DateTime AfterTime { get; set; } = DateTime.Today;
         /// <summary>
         /// 在这个时间之前才回复
         /// </summary>
         [Display(Name = "时间之前")]
-        public DateTime BeforeTime { get; set; }
+        public DateTime BeforeTime { get; set; } = DateTime.Today.AddHours(23).AddMinutes(59).AddSeconds(59);
 
         [Display(Name = "更新时间")]
         public DateTime UpdateTime { get; set; }

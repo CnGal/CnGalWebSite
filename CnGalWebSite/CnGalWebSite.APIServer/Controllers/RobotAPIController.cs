@@ -41,6 +41,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 
@@ -355,6 +356,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         Value = model.Value,
                         AfterTime=model.AfterTime,
                         BeforeTime=model.BeforeTime,
+                        Priority=model.Priority,
                     };
                 }
             }
@@ -365,6 +367,7 @@ namespace CnGalWebSite.APIServer.Controllers
             robot.IsHidden = model.IsHidden;
             robot.AfterTime = model.AfterTime;
             robot.BeforeTime = model.BeforeTime;
+            robot.Priority = model.Priority;
 
             //保存
             if (model.Id == 0)
@@ -508,12 +511,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
                     var time = DateTime.ParseExact(item.Time, "yyyy-MM-dd HH:mm:ss", null);
-                    DateTime afterTime = DateTime.MinValue;
+                    DateTime afterTime = DateTime.MinValue.AddYears(2022);
                     if (item.AfterTime != "-1")
                     {
                         afterTime = DateTime.ParseExact(item.AfterTime, "HHmm", null);
                     }
-                    DateTime beforeTime = DateTime.MinValue.AddHours(23).AddMinutes(59).AddSeconds(59);
+                    DateTime beforeTime = DateTime.MinValue.AddYears(2022).AddHours(23).AddMinutes(59).AddSeconds(59);
                     if (item.BeforeTime != "-1")
                     {
                         beforeTime = DateTime.ParseExact(item.BeforeTime, "HHmm", null);
@@ -681,6 +684,59 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 return new Result { Successful = true, Error = (await _userManager.GetRolesAsync(user)).FirstOrDefault() };
             }
+            else if (model.Name == "introduce")
+            {
+                var entryName = model.Infor.Replace("看板娘介绍一下", "").Replace("看板娘介绍", "").Trim();
+
+                var result = await _searchHelper.QueryAsync(1, 10, entryName, "词条", null, QueryType.Page);
+
+                var entry = result.Data.FirstOrDefault(s => s.entry != null)?.entry;
+                if (entry == null)
+                {
+                    return new Result { Successful = false, Error = "呜呜呜~~~ 看板娘找不到这个词条" };
+                }
+                else
+                {
+                    if (entry.Name != entryName && entry.DisplayName != entryName)
+                    {
+                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true)).DeleteHtmlLinks() + "\n（看板娘不太确定是不是这个词条哦~" };
+                    }
+                    else
+                    {
+                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true)).DeleteHtmlLinks() };
+                    }
+                }
+            }
+            else if (model.Name == "website")
+            {
+                var urls = Regex.Matches(model.Infor, "http[s]?://(?:(?!http[s]?://)[a-zA-Z]|[0-9]|[$\\-_@.&+/]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+");
+
+                //处理链接
+                foreach(var item in urls.Select(s=>s.ToString().Trim()))
+                {
+                    if(item.Contains("entries"))
+                    {
+                        var idStr = item.Split('/').Last();
+                        int id = 0;
+                        if(int.TryParse(idStr, out id))
+                        {
+                            return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(id,true)).DeleteHtmlLinks() };
+                        }
+                    }
+                    else if (item.Contains("articles"))
+                    {
+                        var idStr = item.Split('/').Last();
+                        int id = 0;
+                        if (int.TryParse(idStr, out id))
+                        {
+                            return new Result { Successful = true, Error = (await _weiXinService.GetArticleInfor(id, true)).DeleteHtmlLinks() };
+                        }
+                    }
+                }
+
+
+                return new Result { Successful = false, Error = null };
+            }
             else
             {
                 var value = model.Name switch
@@ -688,22 +744,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     "recommend" => await _weiXinService.GetRandom(true),
                     _ => ""
                 };
-                value = value.Replace("</a>", "");
 
-                while (true)
-                {
-                    var temp = value.MidStrEx("<a ", ">");
-
-                    if(string.IsNullOrWhiteSpace(temp))
-                    {
-                        break;
-                    }
-
-                    value = value.Replace("<a " + temp + ">", "");
-
-                }
-
-                return new Result { Successful = true, Error = value };
+                return new Result { Successful = true, Error = value.DeleteHtmlLinks() };
             }
 
         }

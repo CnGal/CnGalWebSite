@@ -126,6 +126,14 @@ namespace CnGalWebSite.RobotClient
         /// 数据刷新间隔时间 单位 秒
         /// </summary>
         public long IntervalTime { get; set; } = 60 * 5;
+        /// <summary>
+        /// 每分钟最多回复次数
+        /// </summary>
+        public long TotalLimit { get; set; } = 15;
+        /// <summary>
+        /// 单用户每分钟最多回复次数 （会警告
+        /// </summary>
+        public long SingleLimit { get; set; } = 10;
     }
 
     public class MessageArg
