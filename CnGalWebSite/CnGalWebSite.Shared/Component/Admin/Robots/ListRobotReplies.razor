@@ -14,7 +14,11 @@
             <TableToolbarButton TItem="ListRobotReplyAloneModel" Color="Color.Warning" Icon="fa fa-upload" Text="导入"
                                 OnClickCallback="@(async (IEnumerable<ListRobotReplyAloneModel> e)=> {await OnImportModel(new ImportRobotsModel());})" IsAsync="true" />
             <TableToolbarButton TItem="ListRobotReplyAloneModel" Color="Color.Success" Icon="fa fa-plus" Text="添加"
-                                OnClickCallback="@(async (IEnumerable<ListRobotReplyAloneModel> e)=> {await OnEditModel(new ListRobotReplyAloneModel());})" IsAsync="true" />
+                                OnClickCallback="@(async (IEnumerable<ListRobotReplyAloneModel> e)=> {await OnEditModel(new ListRobotReplyAloneModel
+                                                   {
+                                                       BeforeTime = DateTime.Now.GetTimeOfDayMin(),
+                                                       AfterTime= DateTime.Now.GetTimeOfDayMin()
+                                                   });})" IsAsync="true" />
             <TableToolbarButton TItem="ListRobotReplyAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
             <TableToolbarButton TItem="ListRobotReplyAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
 
