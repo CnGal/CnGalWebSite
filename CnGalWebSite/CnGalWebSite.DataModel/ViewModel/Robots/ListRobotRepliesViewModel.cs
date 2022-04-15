@@ -34,12 +34,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Robots
         /// 在这个时间之后才回复
         /// </summary>
         [Display(Name = "时间之后")]
-        public DateTime AfterTime { get; set; } = DateTime.Today;
+        public DateTime AfterTime { get; set; } 
         /// <summary>
         /// 在这个时间之前才回复
         /// </summary>
         [Display(Name = "时间之前")]
-        public DateTime BeforeTime { get; set; } = DateTime.Today.AddHours(23).AddMinutes(59).AddSeconds(59);
+        public DateTime BeforeTime { get; set; }
 
         [Display(Name = "更新时间")]
         public DateTime UpdateTime { get; set; }

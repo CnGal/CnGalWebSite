@@ -1,13 +1,42 @@
 ﻿@page "/weeklynews"
 
+@inject HttpClient Http
 @inject IDataCacheService _dataCacheService
-@if (_dataCacheService.IsApp)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Home.About Index="@(_dataCacheService.WeeklyNewsOverviewCatche.FirstOrDefault()?.Id??281)" />
 
+@if (isReady)
+{
+    @if (_dataCacheService.IsApp)
+    {
+        <CnGalWebSite.Shared.Pages.Apps.Home.About Index="@(_dataCacheService.WeeklyNewsOverviewCatche.FirstOrDefault()?.Id??281)" />
+
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="@(_dataCacheService.WeeklyNewsOverviewCatche.FirstOrDefault()?.Id??281)" />
+    }
 }
-else
-{
-    <CnGalWebSite.Shared.MasaComponent.PC.Home.Documents.IndexPage Id="@(_dataCacheService.WeeklyNewsOverviewCatche.FirstOrDefault()?.Id??281)" />
 
+@code{
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool isReady;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            if (_dataCacheService.WeeklyNewsOverviewCatche.Count == 0)
+            {
+                _dataCacheService.WeeklyNewsOverviewCatche = await Http.GetFromJsonAsync<List<ArticleInforTipViewModel>>(ToolHelper.WebApiPath + "api/news/GetWeeklyNewsOverview");
+            }
+
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取周报列表失败");
+        }
+    }
 }
