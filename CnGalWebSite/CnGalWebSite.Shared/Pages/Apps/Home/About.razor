@@ -24,7 +24,7 @@
     @foreach (var item in _dataCacheService.DocumentsCatche)
     {
         <MTabItem Value="@_dataCacheService.DocumentsCatche.IndexOf(item)">
-            <CnGalWebSite.Shared.MasaComponent.App.Home.DocumentCardGroup Model="item.Children" Id="Index"/>
+            <CnGalWebSite.Shared.MasaComponent.App.Home.DocumentCardGroup Model="item.Children" Id="Index" />
         </MTabItem>
     }
 </MTabsItems>
@@ -48,6 +48,15 @@
             if (_dataCacheService.DocumentsCatche.Count == 0)
             {
                 _dataCacheService.DocumentsCatche = await Http.GetFromJsonAsync<List<DocumentViewModel>>(ToolHelper.WebApiPath + "api/home/GetDocuments");
+            }
+
+            foreach (var item in _dataCacheService.DocumentsCatche)
+            {
+                if (item.Children.Any(s => s.Id == Index))
+                {
+                    TabIndex = _dataCacheService.DocumentsCatche.IndexOf(item);
+                    break;
+                }
             }
         }
         catch (Exception ex)
