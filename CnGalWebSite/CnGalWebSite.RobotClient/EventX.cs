@@ -97,7 +97,7 @@ namespace CnGalWebSite.RobotClient
         }
         public string GetCurrentTimeEvent()
         {
-            var events = Events.Where(s => s.Time.TimeOfDay < DateTime.Now.ToCstTime().TimeOfDay && s.IsHidden == false && s.Type== RobotEventType.FixedTime);
+            var events = Events.Where(s => s.Time.TimeOfDay < DateTime.Now.ToCstTime().TimeOfDay && s.Time.AddSeconds(s.DelaySecond).TimeOfDay > DateTime.Now.ToCstTime().TimeOfDay && s.IsHidden == false && s.Type== RobotEventType.FixedTime);
 
             var todos=new List<RobotEvent>();
 
@@ -152,7 +152,7 @@ namespace CnGalWebSite.RobotClient
         {
             var p = new Random().NextDouble();
 
-            var events = Events.Where(s => s.IsHidden == false && s.Type == RobotEventType.PreTime && s.Probability / 100 > p);
+            var events = Events.Where(s => s.Time.TimeOfDay < DateTime.Now.ToCstTime().TimeOfDay && s.Time.AddSeconds(s.DelaySecond).TimeOfDay > DateTime.Now.ToCstTime().TimeOfDay && s.IsHidden == false && s.Type == RobotEventType.PreTime && s.Probability / 100 > p);
 
             var todos = new List<RobotEvent>();
 

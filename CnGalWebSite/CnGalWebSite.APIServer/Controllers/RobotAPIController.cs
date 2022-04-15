@@ -712,15 +712,15 @@ namespace CnGalWebSite.APIServer.Controllers
                 var urls = Regex.Matches(model.Infor, "http[s]?://(?:(?!http[s]?://)[a-zA-Z]|[0-9]|[$\\-_@.&+/]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+");
 
                 //处理链接
-                foreach(var item in urls.Select(s=>s.ToString().Trim()))
+                foreach (var item in urls.Select(s => s.ToString().Trim()))
                 {
-                    if(item.Contains("entries"))
+                    if (item.Contains("entries"))
                     {
                         var idStr = item.Split('/').Last();
                         int id = 0;
-                        if(int.TryParse(idStr, out id))
+                        if (int.TryParse(idStr, out id))
                         {
-                            return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(id,true)).DeleteHtmlLinks() };
+                            return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(id, true)).DeleteHtmlLinks() };
                         }
                     }
                     else if (item.Contains("articles"))
@@ -734,8 +734,14 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                 }
 
-
                 return new Result { Successful = false, Error = null };
+
+            }
+            else if (model.Name == "steamdiscount")
+            {
+                var count = await _steamInforRepository.GetAll().Include(s=>s.Entry).CountAsync(s => s.CutNow > 0 && s.Entry.IsHidden == false);
+
+                return new Result { Successful = true, Error = $"今天有{count}款作品打折中：https://www.cngal.org/discount" };
             }
             else
             {

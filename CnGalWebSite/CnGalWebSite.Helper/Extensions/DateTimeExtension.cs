@@ -18,7 +18,7 @@ namespace CnGalWebSite.Helper.Extensions
         /// <returns></returns>
         public static DateTime GetTimeOfDayMin(this DateTime now)
         {
-            return DateTime.ParseExact("2022-2-22 00:00:00", "yyyy-MM-dd HH:mm:ss", null);
+            return DateTime.ParseExact("2022-02-22 00:00:00", "yyyy-MM-dd HH:mm:ss", null);
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace CnGalWebSite.Helper.Extensions
         /// <returns></returns>
         public static DateTime GetTimeOfDayMax(this DateTime now)
         {
-            return DateTime.ParseExact("2022-2-22 23:59:59", "yyyy-MM-dd HH:mm:ss", null);
+            return DateTime.ParseExact("2022-02-22 23:59:59", "yyyy-MM-dd HH:mm:ss", null);
         }
     }
 }

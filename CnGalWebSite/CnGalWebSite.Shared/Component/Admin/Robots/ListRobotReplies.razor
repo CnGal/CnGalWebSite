@@ -16,7 +16,7 @@
             <TableToolbarButton TItem="ListRobotReplyAloneModel" Color="Color.Success" Icon="fa fa-plus" Text="添加"
                                 OnClickCallback="@(async (IEnumerable<ListRobotReplyAloneModel> e)=> {await OnEditModel(new ListRobotReplyAloneModel
                                                    {
-                                                       BeforeTime = DateTime.Now.GetTimeOfDayMin(),
+                                                       BeforeTime = DateTime.Now.GetTimeOfDayMax(),
                                                        AfterTime= DateTime.Now.GetTimeOfDayMin()
                                                    });})" IsAsync="true" />
             <TableToolbarButton TItem="ListRobotReplyAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
