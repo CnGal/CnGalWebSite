@@ -594,9 +594,9 @@ namespace CnGalWebSite.APIServer.Application.News
             var model = "";
             foreach (var item in weeklyNews.News)
             {
-                model += "★ " + item.Author + " - " + item.Title + " ";
+                model += "★ " + item.Author + " - " + item.Title + "\n";
             }
-            model = _appHelper.GetStringAbbreviation(model, 50);
+
             return model;
         }
 

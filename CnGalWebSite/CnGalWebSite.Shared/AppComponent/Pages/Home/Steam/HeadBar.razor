@@ -1,18 +1,7 @@
 ﻿@inject IJSRuntime JS
 @inject NavigationManager NavigationManager
 
-<div class="shadow-sm bg-opacity rounded">
-    <div style="display: flex; height: 45px; flex-direction: row; align-items: center;" class="ms-2 me-2">
-        <div style=" display: flex; flex-direction: column; justify-content: center;" class="me-2" @onclick="OnClickBack">
-            <i class="fa fa-home fa-fw " style=" font-size: 17px;"></i>
-        </div>
-        <div style=" width: 100%; font-size: 16px; text-align: center; margin-right: 30px; " class="text-truncate">
-            @Title
-        </div>
-        <div style=" display: flex; flex-direction: column; justify-content: center;" class="me-2" @onclick="@(()=>NavigationManager.NavigateTo("/home/search"))">
-            <i class="fa fa-search fa-fw " style=" font-size: 17px;"></i>
-        </div>
-    </div>
+<div class="shadow-sm bg-opacity rounded pt-3 pb-1 mb-3">
     <div style="display: flex; flex-direction: row; align-items: center;" class="ms-3 me-3 pt-1 mb-2">
         <CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine Model="ScreenModel" Styles="display: flex;flex-direction: row; overflow-x: auto;flex-wrap: nowrap;width: fit-content;"></CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabLine>
     </div>
