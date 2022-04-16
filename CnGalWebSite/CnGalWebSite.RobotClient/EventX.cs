@@ -123,7 +123,7 @@ namespace CnGalWebSite.RobotClient
             foreach (var item in todos)
             {
                 //查找同类型的任务
-                var sameCount = events.Where(s => s.Note == item.Note).Count();
+                var sameCount = Events.Where(s => s.Note == item.Note).Count();
                 if (new Random().Next(0, sameCount) == 0)
                 {
                     currentEvent = item;

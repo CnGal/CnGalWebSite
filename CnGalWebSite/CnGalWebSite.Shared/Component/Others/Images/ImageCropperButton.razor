@@ -110,7 +110,8 @@
         var option = new DialogOption()
         {
             Title = "裁剪图片",
-            ShowCloseButton = false
+            ShowCloseButton = false,
+            Size= Size.Large
         };
         option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<ImageCropperViewTip>(new Dictionary<string, object>
         {

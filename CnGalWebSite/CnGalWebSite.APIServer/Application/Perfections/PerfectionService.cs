@@ -324,7 +324,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 //查找词条
                 var entry = await _entryRepository.GetAll().AsNoTracking().AsSplitQuery()
                     .Include(s => s.Information).ThenInclude(s => s.Additional)
-                    .Include(s => s.EntryRelationFromEntryNavigation)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
                     .Include(s => s.Articles)
                     .Include(s => s.Pictures)
                     .Include(s => s.Tags)
