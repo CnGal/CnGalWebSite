@@ -112,7 +112,9 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                 }
 
             }
-            await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+            var result =  await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+
+            var errors = result.Where(s => s.Success == false);
 
             var deleted = await _entryRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => (long)s.Id).ToListAsync();
             documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 0 && deleted.Contains(s.OriginalId)).ToListAsync();
@@ -161,7 +163,8 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                 }
 
             }
-            await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+            var result = await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+            var errors = result.Where(s => s.Success == false);
 
             var deleted = await _articleRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => (long)s.Id).ToListAsync();
             documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 1 && deleted.Contains(s.OriginalId)).ToListAsync();
@@ -209,6 +212,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
             }
             var result = await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+            var errors = result.Where(s => s.Success == false);
 
             var deleted = await _peripheryRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => (long)s.Id).ToListAsync();
             documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 2 && deleted.Contains(s.OriginalId)).ToListAsync();

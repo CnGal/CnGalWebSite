@@ -556,13 +556,6 @@ namespace CnGalWebSite.APIServer.Controllers
                 examine.IsPassed = true;
                 examine.ContributionValue = model.ContributionValue;
 
-                _entryRepository.Clear();
-                _articleRepository.Clear();
-                _peripheryRepository.Clear();
-                _tagRepository.Clear();
-                _commentRepository.Clear();
-                _disambigRepository.Clear();
-
                 try
                 {
                     examine = await _examineRepository.UpdateAsync(examine);

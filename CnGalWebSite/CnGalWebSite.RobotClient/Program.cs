@@ -9,7 +9,7 @@ HttpClient httpClient = new HttpClient();
 CacheX cacheX = new CacheX();
 
 OutputHelper.Repeat();
-OutputHelper.WriteCenter("CnGal资料站 看板娘 v3.3.2", 1.8);
+OutputHelper.WriteCenter("CnGal资料站 看板娘 v3.3.4", 1.8);
 OutputHelper.Repeat();
 
 

@@ -3,7 +3,7 @@
 @inject DialogService DialogService
 @inject IDataCacheService _dataCacheService
 
-<MMenu OffsetY CloseOnContentClick="false" Value="IsEdit" ValueChanged="ValueChanged">
+<MMenu OffsetY CloseOnContentClick="false" Value="Menu" ValueChanged="ValueChanged">
     <ActivatorContent Context="m">
         <MTooltip Bottom>
             <ActivatorContent Context="c">
@@ -87,6 +87,8 @@
     [Parameter]
     public string Class { get; set; }
     [Parameter]
+    public bool Menu { get; set; }
+    [Parameter]
     public bool IsEdit { get; set; }
     [Parameter]
     public bool IsHidden { get; set; }
@@ -111,8 +113,11 @@
     protected override async Task OnParametersSetAsync()
     {
         await GetExamineInfor();
-        ProcButtonList();
-        isReady = true;
+        if(Examines.Count!=0)
+        {
+            ProcButtonList();
+            isReady = true;
+        }
     }
 
     public async Task OnClickHistory()
@@ -228,16 +233,22 @@
 
     }
 
+    int count = 0;
     public async Task ValueChanged(bool value)
     {
-        IsEdit = value;
-        await IsEditChanged.InvokeAsync(IsEdit);
+        Menu = value;
+        if(value)
+        {
+            count++;
+            await IsEditChanged.InvokeAsync(count % 2 == 1);
+        }
+        StateHasChanged();
     }
 
 
     public async Task OnClosed()
     {
-        IsEdit = false;
+        Menu = false;
         //await IsEditChanged.InvokeAsync(IsEdit);
 
         StateHasChanged();

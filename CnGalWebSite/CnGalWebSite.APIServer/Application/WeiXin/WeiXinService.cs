@@ -197,7 +197,6 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 return "呜~~~ 搜索不到欸~";
             }
 
-            var model = await _appHelper.GetEntryInforTipViewModel(entry);
 
             StringBuilder sb = new StringBuilder();
 
@@ -206,8 +205,10 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 sb.AppendLine($"[image={_appHelper.GetImagePath(entry.MainPicture, "app.png")}]");
             }
 
+            var model = await _appHelper.GetEntryInforTipViewModel(entry);
 
-            sb.AppendLine($"{model.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/entries/index/{model.Id}\">{model.Name}</a>");
+
+            sb.AppendLine($"{model.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/entries/index/{model.Id}\">{model.DisplayName}</a>");
             if (string.IsNullOrWhiteSpace(model.BriefIntroduction) == false)
             {
                 sb.AppendLine($"{model.BriefIntroduction.Abbreviate(23)}");

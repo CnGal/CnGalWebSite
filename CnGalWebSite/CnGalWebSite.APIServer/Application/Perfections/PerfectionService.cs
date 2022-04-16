@@ -440,9 +440,6 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 }
                 await _perfectionRepository.GetRangeUpdateTable().Where(s => s.Id == perfection.Id).Set(s => s.Grade, b => grade).ExecuteAsync();
 
-                _perfectionRepository.Clear();
-                _perfectionCheckRepository.Clear();
-                _entryRepository.Clear();
 
             }
             catch (Exception)
