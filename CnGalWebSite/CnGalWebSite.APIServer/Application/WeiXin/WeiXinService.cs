@@ -176,14 +176,14 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             return sb.ToString();
         }
 
-        public async Task<string> GetRandom(bool plainText = false)
+        public async Task<string> GetRandom(bool plainText = false, bool showLink = false)
         {
             var entryIds = await _entryRepository.GetAll().AsNoTracking()
                 .Where(s => s.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden != true)
                 .Select(s => s.Id).ToListAsync();
 
             var index = new Random().Next(0, entryIds.Count - 1);
-            return await GetEntryInfor(entryIds[index], plainText);
+            return await GetEntryInfor(entryIds[index], plainText, showLink);
         }
 
         public async Task<string> GetEntryInfor(int id,bool plainText=false, bool showLink = false)

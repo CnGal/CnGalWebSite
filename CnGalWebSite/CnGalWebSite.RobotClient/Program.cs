@@ -75,7 +75,7 @@ t.Elapsed +=async (s, e) =>
     var message = eventX.GetCurrentTimeEvent();
     if (string.IsNullOrWhiteSpace(message) == false)
     {
-        var result = await messageX.ProcMessageAsync(message,"", null);
+        var result = await messageX.ProcMessageAsync(message,"",null, null);
 
         if (result != null)
         {
@@ -96,7 +96,7 @@ t2.Elapsed += async (s, e) =>
     var message = eventX.GetProbabilityEvents();
     if (string.IsNullOrWhiteSpace(message) == false)
     {
-        var result = await messageX.ProcMessageAsync(message,"", null);
+        var result = await messageX.ProcMessageAsync(message,"",null, null);
 
         if (result != null)
         {

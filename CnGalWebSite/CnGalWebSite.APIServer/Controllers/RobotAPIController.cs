@@ -747,7 +747,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var value = model.Name switch
                 {
-                    "recommend" => await _weiXinService.GetRandom(true),
+                    "recommend" => await _weiXinService.GetRandom(true,true),
                     _ => ""
                 };
 

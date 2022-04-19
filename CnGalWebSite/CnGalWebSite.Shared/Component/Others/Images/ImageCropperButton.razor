@@ -13,11 +13,11 @@
             @if (IsMustCropper)
             {
                 <div class="d-ssr">
-                    <label for="@Id" class="btn btn-success mb-3 me-3"><i class="fa fa-fw fa-upload" aria-hidden="true"></i> @Text</label>
+                    <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark green pointer mb-3 me-3"><i class="fa fa-fw fa-upload" aria-hidden="true"></i> @Text</label>
                 </div>
                 <div class="d-wasm">
 
-                    <ButtonUpload TValue="string" Accept="image/gif, image/jpeg, image/jpg, image/png" BrowserButtonIcon="fa fa-fw fa-upload" DefaultFileList="uploadFiles" class=" me-3"
+                    <ButtonUpload TValue="string" Accept="image/gif, image/jpeg, image/jpg, image/png" BrowserButtonIcon="fa fa-fw fa-upload" DefaultFileList="uploadFiles" class="me-3"
                                   OnChange="@OnCardUploadMain" OnDelete="@(fileName => Task.FromResult(true))" BrowserButtonText="@Text" ShowLabel="false"></ButtonUpload>
 
                 </div>
@@ -30,12 +30,12 @@
         else
         {
             <div class="d-ssr">
-                <label for="@Id" class="btn btn-success mb-3 me-3"><i class="fa fa-fw fa-upload" aria-hidden="true"></i> @Text</label>
+                <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark pointer green mb-3 me-3"><i class="fa fa-fw fa-upload" aria-hidden="true"></i> @Text</label>
             </div>
 
             <div class="d-wasm">
 
-                <ButtonUpload TValue="string" Accept="image/gif, image/jpeg, image/jpg, image/png" BrowserButtonIcon="fa fa-fw fa-upload" DefaultFileList="uploadFiles" class=" me-3"
+                <ButtonUpload TValue="string" Accept="image/gif, image/jpeg, image/jpg, image/png" BrowserButtonIcon="fa fa-fw fa-upload" DefaultFileList="uploadFiles" class="me-3"
                               OnChange="@OnCardUploadMain" OnDelete="@(fileName => Task.FromResult(true))" BrowserButtonText="@Text" ShowLabel="false"></ButtonUpload>
 
             </div>
@@ -44,10 +44,7 @@
 
         @if (string.IsNullOrWhiteSpace(ImagePath) == false)
         {
-            <div>
-                <Button Color="Color.Danger" OnClick="OnClean" Icon="fa fa-fw fa-trash" class="mb-3"></Button>
-
-            </div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton OnClick="OnClean" Icon="mdi-trash-can-outline " Class="mb-3" Color="error" Fab/>
         }
 
 
