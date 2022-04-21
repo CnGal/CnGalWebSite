@@ -16,7 +16,7 @@
                 <MIcon>mdi-magnify</MIcon>
             </MButton>
         </MAppBar>
-        <CnGalWebSite.Shared.MasaComponent.App.Admin.NavMenu Drawer="drawer" @ref="navButton" />
+        <CnGalWebSite.Shared.MasaComponent.App.Admin.NavMenu  @ref="navButton" OnRefresh="OnRefreshLayout" />
 
     }
     <MMain>
@@ -26,10 +26,10 @@
                 @if (_dataCacheService.IsApp == false)
                 {
                     <div style=" min-height: 100vh; top: 0px; max-height: calc(100% - 0px);width: 300px; position: fixed; min-width: 300px;" class="me-4 rounded shadow-sm  bg-opacity ">
-                        <div style="display: flex; justify-content: center; " class="mt-6 mb-6">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip />
-                        </div>
-                        <CnGalWebSite.Shared.MasaComponent.PC.Admin.LeftMenu />
+                            <div style="display: flex; justify-content: center; " class="mt-6 mb-6">
+                                <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip OnClick="OnRefreshLayout" Admin/>
+                            </div>
+                            <CnGalWebSite.Shared.MasaComponent.PC.Admin.LeftMenu Style="overflow-y: auto; height: calc(100vh - 85px);" Class="scroll"/>
                     </div>
                     <div style=" margin-left: 317px; margin-bottom: 17px;">
                         <div style=" position: fixed; right: 0; z-index: 3; left: 317px;top:0">
@@ -57,7 +57,7 @@
 </MApp>
 
 @code {
-    bool drawer { get; set; }
+
     CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard homeTitleCard;
     CnGalWebSite.Shared.MasaComponent.PC.Admin.TopBar topBar;
     CnGalWebSite.Shared.MasaComponent.App.Admin.NavMenu navButton;
@@ -85,5 +85,12 @@
         {
             await navButton.SetDrawer(true);
         }
+    }
+
+    public async Task OnRefreshLayout()
+    {
+        NavigationManager.NavigateTo("/");
+        await Task.Delay(1000);
+        await _dataCacheService.RefreshApp.InvokeAsync();
     }
 }
