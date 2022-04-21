@@ -138,11 +138,13 @@ namespace CnGalWebSite.RobotClient
                 return message;
             }
 
-            //var args = message.Split("([\\s\\S]*)").ToList();
-            //for (int i = 0; i < args.Count; i++)
-            //{
-            //    reply = reply.Replace($"[{i + 1}]", args[i].ToString());
-            //}
+            var splits = Regex.Split(message,regex).Where(s=>string.IsNullOrWhiteSpace(s)==false).ToList();
+
+
+            for (int i = 0; i < splits.Count; i++)
+            {
+                reply = reply.Replace($"[{i+1}]", splits[i].ToString());
+            }
 
             return reply;
         }
