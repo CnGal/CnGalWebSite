@@ -17,7 +17,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
         Task<string> GetEntryInfor(int id, bool plainText = false, bool showLink = false);
 
-        Task<string> GetRandom(bool plainText = false);
+        Task<string> GetRandom(bool plainText = false, bool showLink = false);
 
         Task<string> GetSearchResults(string text);
 

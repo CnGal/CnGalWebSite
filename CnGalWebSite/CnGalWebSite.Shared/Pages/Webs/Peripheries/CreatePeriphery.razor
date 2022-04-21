@@ -49,11 +49,11 @@
     private CreatePeripheryViewModel Model { get; set; } = new CreatePeripheryViewModel();
 
     private bool isReady = false;
-    private IEnumerable<string> EntryGameItems { get; set; } = new string[1] { "" };
-    private IEnumerable<string> EntryRoleItems { get; set; } = new string[1] { "" };
-    private IEnumerable<string> EntryGroupItems { get; set; } = new string[1] { "" };
-    private IEnumerable<string> EntryStaffItems { get; set; } = new string[1] { "" };
-    private IEnumerable<string> PeripheryItems { get; set; } = new string[1] { "" };
+    private List<string> EntryGameItems { get; set; } = new List<string>();
+    private List<string> EntryRoleItems { get; set; } = new List<string>();
+    private List<string> EntryGroupItems { get; set; } = new List<string>();
+    private List<string> EntryStaffItems { get; set; } = new List<string>();
+    private List<string> PeripheryItems { get; set; } = new List<string>();
 
     private ImagesListEditorViewTip ImagesListEditorView;
     private bool IsOnlyNeedPublishTime { get; set; } = true;

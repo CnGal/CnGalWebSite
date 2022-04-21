@@ -39,7 +39,7 @@ namespace CnGalWebSite.RobotClient
             _robotFaces = robotFaces;
         }
 
-        public string GetAutoReply(string message, GroupMessageSender sender)
+        public RobotReply GetAutoReply(string message, GroupMessageSender sender)
         {
 
             var now = DateTime.Now.ToCstTime();
@@ -55,12 +55,12 @@ namespace CnGalWebSite.RobotClient
 
             int index = new Random().Next(0, replies.FirstOrDefault().Count());
 
-            return replies.FirstOrDefault().ToList()[index].Value;
+            return replies.FirstOrDefault().ToList()[index];
         }
 
-        public async Task<Message[]> ProcMessageAsync(string reply, string message, GroupMessageSender sender)
+        public async Task<Message[]> ProcMessageAsync(string reply, string message, string regex,GroupMessageSender sender)
         {
-            return ProcMessageArray(ProcMessageFace(await ProcMessageArgument(reply, message, sender), sender), sender);
+            return ProcMessageArray(ProcMessageFace(ProcMessageReplaceInput(await ProcMessageArgument(reply, message, sender),message,regex), sender), sender);
         }
 
         public Message[] ProcMessageArray(string vaule, GroupMessageSender sender)
@@ -131,6 +131,21 @@ namespace CnGalWebSite.RobotClient
             }
         }
 
+        public string ProcMessageReplaceInput(string reply, string message, string regex)
+        {
+            if(string.IsNullOrWhiteSpace(regex))
+            {
+                return message;
+            }
+
+            //var args = message.Split("([\\s\\S]*)").ToList();
+            //for (int i = 0; i < args.Count; i++)
+            //{
+            //    reply = reply.Replace($"[{i + 1}]", args[i].ToString());
+            //}
+
+            return reply;
+        }
 
         public async Task<string> ProcMessageArgument(string reply,string message, GroupMessageSender sender)
         {

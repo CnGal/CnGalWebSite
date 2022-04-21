@@ -13,6 +13,7 @@ using System.Linq;
 using System;
 using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
+using CnGalWebSite.DataModel.Models;
 
 namespace CnGalWebSite.APIServer.Application.HistoryData
 {
@@ -30,10 +31,13 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
+        private readonly IRepository<UserFile, string> _userFileRepository;
 
         private readonly string oldImageHost = "pic.cngal.top";
+        private readonly string oldImageHost2 = "pic.sliots.top";
 
         public HistoryDataService(IHttpClientFactory clientFactory, IConfiguration configuration, IFileService fileService, IWebHostEnvironment webHostEnvironment, IAppHelper appHelper, IRepository<Periphery, long> peripheryRepository,
+            IRepository<UserFile, string> userFileRepository,
         IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<ApplicationUser, string> userRepository, IRepository<Article, long> articleRepository, IRepository<Examine, int> examineRepository)
         {
             _clientFactory = clientFactory;
@@ -47,15 +51,34 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
             _articleRepository = articleRepository;
             _peripheryRepository = peripheryRepository;
             _examineRepository = examineRepository;
+            _userFileRepository = userFileRepository;
         }
 
         public async Task Replace()
         {
-            await ReplaceEntry();
-            await ReplaceArticle();
-            await ReplacePeriphery();
-            await ReplaceUser();
-            await ReplaceExamine();
+            await ReplaceUserFile();
+            //await ReplaceArticle();
+            //await ReplacePeriphery();
+            //await ReplaceUser();
+            //await ReplaceExamine();
+        }
+
+        public async Task ReplaceUserFile()
+        {
+            var files = await _userFileRepository.GetAll()
+                .Where(s => string.IsNullOrWhiteSpace(s.FileName) == false &&
+                ( s.FileName.Contains(oldImageHost)|| s.FileName.Contains(oldImageHost2)))
+                .ToListAsync();
+
+            foreach (var file in files)
+            {
+                file.FileName = ReplaceString(file.FileName);
+
+                await _userFileRepository.UpdateAsync(file);
+
+                Console.WriteLine($"[{files.IndexOf(file) + 1}]替换完成文件图片[Id:{file.Id}]");
+            }
+            //https://pic.sliots.top
         }
 
         public async Task ReplaceEntry()
@@ -81,6 +104,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
 
                 Console.WriteLine($"[{entries.IndexOf(entry) + 1}]替换完成词条图片[Id:{entry.Id}]");
             }
+            //https://pic.sliots.top
         }
 
         public async Task ReplaceArticle()
@@ -170,7 +194,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
 
         public string ReplaceString(string str)
         {
-            return str?.Replace("pic.cngal.top", "image.cngal.org")?.Replace("http://image.cngal.org/", "https://image.cngal.org/");
+            return str?.Replace("pic.sliots.top", "image.cngal.org").Replace("pic.cngal.top", "image.cngal.org")?.Replace("http://image.cngal.org/", "https://image.cngal.org/");
         }
     }
     public class Icemic_Data

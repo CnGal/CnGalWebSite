@@ -2,36 +2,47 @@
 @attribute [Authorize(Roles = "Admin")]
 
 @inject HttpClient Http
-@inject IRoleService _roleService
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 
-<TitleTip></TitleTip>
+<TitleTip Title="图片板块"></TitleTip>
 
-<div class="">
-    <div class="" style="padding-right: 0;padding-left: 0;">
-        <div class="  rounded shadow-sm  bg-opacity p-3 mb-3">
+<div>
+    @*<div class="  rounded shadow-sm  bg-opacity p-3 mb-3">
             <h3 class="fw-bold text-center">图片板块</h3>
             <p class="text-center" style="color: gray;margin-top:20px">
                 <i class="fa fa-image fa-fw "></i>
                 <span class="article-infor-text">@("总计"+InforModel.All + "个图片")</span>&nbsp;&nbsp;&nbsp;
             </p>
-        </div>
-        <div class="  rounded shadow-sm  bg-opacity">
-            <Tab>
-                <TabItem Text="概览" Icon="fa fa-cubes">
-                    <ImageChartListView></ImageChartListView>
-                </TabItem>
-                <TabItem Text="详细信息" Icon="fa fa-image">
-                    <ImageOutlineListView OnClickUrl="OnClickUrl"></ImageOutlineListView>
-                </TabItem>
-            </Tab>
+        </div>*@
 
+    <div class="rounded  shadow-sm bg-opacity mb-4">
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
+               Color="@_dataCacheService.ThemeSetting.Theme">
 
-        </div>
+            <MTab Value="1">
+                信息列表<MIcon>mdi-home</MIcon>
+            </MTab>
+            <MTab Value="2">
+                图库预览<MIcon>mdi-basket-outline </MIcon>
+            </MTab>
+        </MTabs>
     </div>
+    <MTabsItems @bind-Value="TabIndex">
+        <MTabItem Value="1">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <ImageChartListView></ImageChartListView>
+            </div>
+
+        </MTabItem>
+        <MTabItem Value="2">
+            <div class="">
+                <ImageOutlineListView></ImageOutlineListView>
+            </div>
+
+        </MTabItem>
+    </MTabsItems>
 </div>
 
 @code {
@@ -39,6 +50,7 @@
     public ListFilesInforViewModel InforModel { get; set; } = new ListFilesInforViewModel();
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    public StringNumber TabIndex { get; set; } = 1;
 
 
     protected override async Task OnInitializedAsync()
@@ -47,21 +59,10 @@
         {
             InforModel = await Http.GetFromJsonAsync<ListFilesInforViewModel>(ToolHelper.WebApiPath + "api/admin/listfiles");
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "无法获取图片数据");
         }
 
-    }
-    public async void OnClickUrl(NavigateModel model)
-    {
-        try
-        {
-            NavigationManager.NavigateTo(Provider,model.Url, model.Title, model.Icon);
-        }
-        catch
-        {
-            await ToastService.Error("导航失败", "请尝试刷新页面");
-        }
     }
 }

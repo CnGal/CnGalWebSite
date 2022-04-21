@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Helper;
+using MeowMiraiLib.Msg;
 using MeowMiraiLib.Msg.Sender;
 using MeowMiraiLib.Msg.Type;
 using Newtonsoft.Json;
@@ -52,7 +53,7 @@ namespace CnGalWebSite.RobotClient
             //尝试找出所有匹配的回复
             var reply = _messageX.GetAutoReply(message, s);
 
-            var result = await _messageX.ProcMessageAsync(reply, message, s);
+            var result = await _messageX.ProcMessageAsync(reply.Value, message,reply.Key, s);
 
             if (result != null)
             {
@@ -63,7 +64,7 @@ namespace CnGalWebSite.RobotClient
 
                 if (singleCount == _setting.SingleLimit)
                 {
-                    result = await _messageX.ProcMessageAsync($"[黑化微笑][@{s.id}]如果恶意骚扰人家的话，我会请你离开哦…", null, s);
+                    result = await _messageX.ProcMessageAsync($"[黑化微笑][@{s.id}]如果恶意骚扰人家的话，我会请你离开哦…",null, null, s);
                 }
                 else if (singleCount > _setting.SingleLimit)
                 {
@@ -72,7 +73,7 @@ namespace CnGalWebSite.RobotClient
 
                 if (singleCount == _setting.TotalLimit)
                 {
-                    result = await _messageX.ProcMessageAsync($"核心温度过高，正在冷却......", null, s);
+                    result = await _messageX.ProcMessageAsync($"核心温度过高，正在冷却......",null, null, s);
                 }
                 else if (singleCount > _setting.TotalLimit)
                 {
@@ -84,12 +85,11 @@ namespace CnGalWebSite.RobotClient
                     Message = message,
                     PostTime = DateTime.Now.ToCstTime(),
                     QQ = s.id,
-                    Reply = reply
+                    Reply = reply.Value
                 });
 
-                var j = result.SendToGroup(sendto, MiraiClient);
+                var j =await new GroupMessage(sendto, result).SendAsync(MiraiClient);
                 Console.WriteLine(j);
-
             }
         }
     }

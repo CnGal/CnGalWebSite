@@ -51,7 +51,7 @@
     private EditPeripheryRelatedPeripheriesViewModel Model { get; set; } = new EditPeripheryRelatedPeripheriesViewModel();
 
     private bool isReady = false;
-    private IEnumerable<string> PeripheryItems { get; set; } = new string[1] { "" };
+    private List<string> PeripheryItems { get; set; } = new List<string>();
 
     private ImagesListEditorViewTip ImagesListEditorView;
 

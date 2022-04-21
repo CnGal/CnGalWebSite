@@ -1,8 +1,9 @@
-﻿<div class="@Class">
+﻿
+
+<div class="@Class">
     @if (string.IsNullOrWhiteSpace(Title) == false)
     {
-        <h5 class="fw-bold mb-4">@Title</h5>
-
+       <InputRelevanceListTitle Title="@Title"/>
     }
     <div class="row">
         @for (int i = 0; i < Model.Count; i++)
@@ -13,15 +14,14 @@
             </div>
         }
     </div>
-    <Button Color="Color.Primary" IsOutline="true" style="width:100px" @onclick="@(() => OnAddinfor())" Text="添加" Icon="fa fa-plus"></Button>
-
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" OnClick="OnAddinfor" Icon="mdi-plus"/>
 </div>
 
 @code {
     [Parameter]
     public List<RelevancesModel> Model { get; set; }
     [Parameter]
-    public IEnumerable<string> AutoCompleteItems { get; set; }
+    public List<string> AutoCompleteItems { get; set; }
     [Parameter]
     public string Class { get; set; }
 

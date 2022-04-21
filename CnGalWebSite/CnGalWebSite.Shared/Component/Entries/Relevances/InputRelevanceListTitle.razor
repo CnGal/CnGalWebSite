@@ -1,0 +1,14 @@
+﻿@inject IDataCacheService _dataCacheService
+
+
+<MBorder Color="@_dataCacheService.ThemeSetting.Theme" Style="border-radius:0;height:50%;margin: auto 0;">
+    <MCardTitle>@Title</MCardTitle>
+    <MCardSubtitle>@("关联的"+Title)</MCardSubtitle>
+</MBorder>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; }
+
+}

@@ -2,7 +2,7 @@
 @inject ToastService ToastService
 
 <div class="@Class">
-    <h5 class="fw-bold mb-4">相关网站</h5>
+    <InputRelevanceListTitle Title="相关网站" />
     <div class="row">
         @for (int i = 0; i < Model.Count; i++)
         {
@@ -22,9 +22,10 @@
 
                     </div>
                 </div>
-            </div>}
+            </div>
+        }
     </div>
-    <Button Color="Color.Primary" IsOutline="true" style="width:100px" @onclick="@(() => AddOther())" Text="添加" Icon="fa fa-plus"></Button>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" OnClick="AddOther" Icon="mdi-plus" />
 </div>
 
 @code {
@@ -54,12 +55,12 @@
             Items = items,
             OnCloseAsync = () =>
             {
-                //Trace.Log("关闭按钮被点击");
+            //Trace.Log("关闭按钮被点击");
                 return Task.CompletedTask;
             },
             OnEditAsync = async context =>
             {
-                // Trace.Log("保存按钮被点击");
+            // Trace.Log("保存按钮被点击");
                 Model[i] = (SocialPlatform)context.Model;
                 StateHasChanged();
                 await ToastService.Success("修改成功", "成功修改相关网站");
@@ -83,12 +84,12 @@
             Items = items,
             OnCloseAsync = () =>
             {
-                //Trace.Log("关闭按钮被点击");
+            //Trace.Log("关闭按钮被点击");
                 return Task.CompletedTask;
             },
             OnEditAsync = async context =>
             {
-                // Trace.Log("保存按钮被点击");
+            // Trace.Log("保存按钮被点击");
                 Model.Add((SocialPlatform)context.Model);
                 StateHasChanged();
                 await ToastService.Success("添加成功", "成功添加相关网站");

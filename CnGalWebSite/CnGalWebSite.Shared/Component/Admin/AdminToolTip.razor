@@ -1,22 +1,23 @@
-﻿
-    <div class="card h-100  rounded shadow-sm  bg-opacity p-4" style="border:0px">
-        <div style="height:100%">
-            <h2 class="fw-bold h4">@Title</h2>
-            <p class="" style="color: gray;margin-top:20px">
-                @BriefIntroduction
-            </p>
+﻿@inject IDataCacheService _dataCacheService
 
-        </div>
-        <div class="card-footer" style="background-color: transparent; border: 0px; padding: 0px">
-            <Button style="width: 100px" @onclick="OnToolClick" IsAsync="true" Color="Color.Success" IsOutline="true">启动任务</Button>
-        </div>
+<div class="h-100 rounded shadow-sm  bg-opacity pt-4" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+        <MBorder Color="@_dataCacheService.ThemeSetting.Theme">
+            <MCardTitle Class="pt-0">@Title</MCardTitle>
+            <MCardSubtitle Class="pb-0">@BriefIntroduction</MCardSubtitle>
+        </MBorder>
+    </div>
+    <div class="p-4">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="执行" IsAsync="true" OnClick="OnToolClick" Icon="mdi-send" />
     </div>
 
-@code { [Parameter]
-            public EventCallback OnToolClick { get; set; }
+</div>
 
-            [Parameter]
-            public string Title { get; set; }
-            [Parameter]
-            public string BriefIntroduction { get; set; }
-    }
+@code { [Parameter]
+    public EventCallback OnToolClick { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string BriefIntroduction { get; set; }
+}

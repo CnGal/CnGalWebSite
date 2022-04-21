@@ -49,11 +49,11 @@
     private CreateArticleViewModel Model { get; set; } = new CreateArticleViewModel();
 
     private bool isReady = false;
-    private IEnumerable<string> EntryGameItems { get; set; } = new string[1] { "" };
-    private IEnumerable<string> EntryRoleItems { get; set; } = new string[1] { "" };
-    private IEnumerable<string> EntryGroupItems { get; set; } = new string[1] { "" };
-    private IEnumerable<string> EntryStaffItems { get; set; } = new string[1] { "" };
-    private IEnumerable<string> ArticleItems { get; set; } = new string[1] { "" };
+    private List<string> EntryGameItems { get; set; } = new List<string>();
+    private List<string> EntryRoleItems { get; set; } = new List<string>();
+    private List<string> EntryGroupItems { get; set; } = new List<string>();
+    private List<string> EntryStaffItems { get; set; } = new List<string>();
+    private List<string> ArticleItems { get; set; } = new List<string>();
 
     [NotNull]
     private MarkdownEditorTip? markdownEditorTip;

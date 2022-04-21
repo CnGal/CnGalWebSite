@@ -106,7 +106,7 @@
     private IEnumerable<long> Value1 { get; set; }
     bool isReady = false;
 
-    private IEnumerable<string> Items { get; set; } = new string[1] { "" };
+    private List<string> Items { get; set; } = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {

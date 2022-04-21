@@ -6,7 +6,7 @@
 
 <div class="@Class">
     <input id="@up_to_chevereto" type="file" accept="image/*" multiple="multiple" class="up_to_chevereto" />
-    <label for="@up_to_chevereto" id="@up_img_label" class="btn btn-success"><i class="fa fa-cloud-upload" aria-hidden="true"></i> @Text</label>
+    <label for="@up_to_chevereto" id="@up_img_label" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark green pointer"><i class="fa fa-cloud-upload" aria-hidden="true"></i> @Text</label>
 </div>
 
 @code {
@@ -56,7 +56,7 @@
             size = long.Parse(temp[1]);
         }
         catch { }
-
+        url = url.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
         //向用户文件管理添加信息
         try
         {
@@ -80,7 +80,7 @@
             ErrorHandler.ProcessError(ex, "保存上传文件信息失败");
         }
 
-        await OnUploadedImage.InvokeAsync(url.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/"));
+        await OnUploadedImage.InvokeAsync(url);
 
         return url;
     }

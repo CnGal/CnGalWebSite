@@ -65,7 +65,7 @@ if (settingX.BasicSetting.IntervalTime > 0)
     }
 }
 
-c.Connect();
+c.ConnectAsync();
 
 //定时任务计时器
 System.Timers.Timer t = new(1000 * 60); //每一分钟查看一次
@@ -75,13 +75,13 @@ t.Elapsed +=async (s, e) =>
     var message = eventX.GetCurrentTimeEvent();
     if (string.IsNullOrWhiteSpace(message) == false)
     {
-        var result = await messageX.ProcMessageAsync(message,"", null);
+        var result = await messageX.ProcMessageAsync(message,"",null, null);
 
         if (result != null)
         {
             foreach (var item in groupX.Groups)
             {
-                var j = new GroupMessage(item.GroupId, result).Send(c);
+                var j =await new GroupMessage(item.GroupId, result).SendAsync(c);
                 Console.WriteLine(j);
             }
         }
@@ -96,13 +96,13 @@ t2.Elapsed += async (s, e) =>
     var message = eventX.GetProbabilityEvents();
     if (string.IsNullOrWhiteSpace(message) == false)
     {
-        var result = await messageX.ProcMessageAsync(message,"", null);
+        var result = await messageX.ProcMessageAsync(message,"",null, null);
 
         if (result != null)
         {
             foreach (var item in groupX.Groups)
             {
-                var j = new GroupMessage(item.GroupId, result).Send(c);
+                var j =await new GroupMessage(item.GroupId, result).SendAsync(c);
                 Console.WriteLine(j);
             }
         }
