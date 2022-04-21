@@ -23,7 +23,7 @@
         主页
     </MButton>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-    @if (Min == false)
+    @if (Admin == false)
     {
         <CnGalWebSite.Shared.MasaComponent.PC.Layout.SignInButton Model="_dataCacheService.UserInfor" Left />
         @if (ToolHelper.IsMaui == false)
@@ -77,11 +77,13 @@
     [Parameter]
     public string Class { get; set; }
     [Parameter]
-    public bool Min { get; set; }
+    public bool Admin { get; set; }
     [Parameter]
     public EventCallback OnClickSetting { get; set; }
     [Parameter]
     public EventCallback OnClosed { get; set; }
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
 
     public UserInforViewModel Model { get; set; } = new UserInforViewModel();
 
@@ -138,7 +140,17 @@
 
     private async Task OnClickUrl(string url)
     {
-        NavigationManager.NavigateTo(url);
+        if(url=="/" && Admin)
+        {
+            await OnRefresh.InvokeAsync();
+
+        }
+        else
+        {
+            NavigationManager.NavigateTo(url);
+
+        }
+
         await OnClosed.InvokeAsync();
     }
 

@@ -8,12 +8,12 @@
            Dense>
         <AuthorizeView>
             <Authorized>
-                <CnGalWebSite.Shared.MasaComponent.App.Layout.UserButton OnClosed="OnClose" Min />
+                <CnGalWebSite.Shared.MasaComponent.App.Layout.UserButton OnClosed="OnClose" Admin OnRefresh="OnRefresh" />
             </Authorized>
             <NotAuthorized>
                 <CnGalWebSite.Shared.MasaComponent.App.Layout.LoginButton />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/"))">
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnRefresh">
                     <MIcon Left>mdi-home</MIcon>
                     主页
                 </MButton>
@@ -27,6 +27,8 @@
 @code {
     [Parameter]
     public bool Drawer { get; set; }
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
 
     bool isOpen;
 

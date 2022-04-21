@@ -1,15 +1,33 @@
 ﻿
+@if (Admin)
+{
+    <div class="d-flex pointer" href="/" @onclick="@(()=>OnClick.InvokeAsync())">
+        <div style="display: flex; align-items: center;">
+            <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" style="height:35px;width:35px;" alt="logo">
 
-<a class="d-flex" href="/">
-    <div style="display: flex; align-items: center;">
-        <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" style="height:35px;width:35px;" alt="logo">
-
-        <div style="font-size:24px;" class="ms-2 fw-bold d-none d-lg-flex font-color">
-            CnGal资料站
+            <div style="font-size:24px;" class="ms-2 fw-bold font-color">
+                CnGal资料站
+            </div>
         </div>
     </div>
-</a>
+}
+else
+{
+    <a class="d-flex" href="/">
+        <div style="display: flex; align-items: center;">
+            <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png" style="height:35px;width:35px;" alt="logo">
+
+            <div style="font-size:24px;" class="ms-2 fw-bold d-none d-lg-flex font-color">
+                CnGal资料站
+            </div>
+        </div>
+    </a>
+}
+
 
 @code {
-
+    [Parameter]
+    public bool Admin { get; set; }
+    [Parameter]
+    public EventCallback OnClick { get; set; }
 }
