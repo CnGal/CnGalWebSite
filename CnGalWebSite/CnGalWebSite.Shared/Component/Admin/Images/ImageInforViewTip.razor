@@ -1,26 +1,25 @@
-﻿<div class="col-12 col-md-6 col-xl-4 col-xxl-3 col mb-3">
-    <div class="card ps-3 pt-2 pb-2 pe-3 h-100" style="background-color:transparent">
-        <div class="h-100">
-            <div>
-                <img src="@Model.FileName" class="card-img" alt="...">
-            </div>
-            <div class=" mt-2">
-                <p class="text-center" style="font-size: medium; word-break: break-word; ">
-                    @(Model.FileName ?? "")
-                </p>
-            </div>
-            <p class="text-center" style="color: gray;">
-                <i class="fa fa-calendar fa-fw"></i>
-                <span class="article-home-infor-text">@Model.UploadTime.ToString("yyyy-MM-dd HH:mm")&nbsp;&nbsp;&nbsp;</span>
+﻿
+<div class=" rounded shadow-sm  bg-opacity">
+    <MResponsive AspectRatio="16/9D">
+        <MCard Style=" display: contents; " OnClick="ClickImage">
+            <div style="@($"background-image: url({Model.FileName}); border-radius: 0;")" class="image-contain">
 
-                <i class="fa fa-database fa-fw"></i>
-                <span class="article-home-infor-text">@(((double)Model.FileSize/(1024*1024)).ToString("0.00")) MB&nbsp;&nbsp;&nbsp;</span>
+            </div>
+        </MCard>
+    </MResponsive>
+    <span style=" color: gray; display: flex; justify-content: center; align-items: center; flex-wrap: wrap;" class="p-2 pt-3">
+        <i class="fa fa-calendar fa-fw"></i>
+        <span class="article-home-infor-text">@Model.UploadTime.ToString("yyyy-MM-dd HH:mm")&nbsp;&nbsp;&nbsp;</span>
 
-                <i class="fa fa-user fa-fw" @onclick="OnClickUser"></i>
-                <span class="article-home-infor-text" @onclick="OnClickUser">@Model.UserName&nbsp;&nbsp;&nbsp;</span>
-            </p>
-        </div>
-    </div>
+        <i class="fa fa-database fa-fw"></i>
+        <span class="article-home-infor-text">@(((double)Model.FileSize/(1024*1024)).ToString("0.00")) MB&nbsp;&nbsp;&nbsp;</span>
+
+        <a href="@("/space/index/" + Model.UserId)" style="color:gray;">
+            <i class="fa fa-user fa-fw" ></i>
+            <span class="article-home-infor-text">@Model.UserName</span>
+
+        </a>
+    </span>
 </div>
 
 
@@ -28,16 +27,11 @@
     [Parameter]
     public ImageInforTipViewModel Model { get; set; }
     [Parameter]
-    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+    public EventCallback<ImageInforTipViewModel> OnClickImage { get; set; }
 
-    public Task OnClickUser()
+    public async Task ClickImage()
     {
-        OnClickUrl.InvokeAsync(new NavigateModel
-        {
-            Url = "/space/index/" + Model.UserId,
-            Title = Model.UserName,
-            Icon = "fa fa-star-o"
-        });
-        return Task.CompletedTask;
+
+        await OnClickImage.InvokeAsync(Model);
     }
 }

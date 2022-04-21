@@ -1,0 +1,78 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+
+<MList Dense Shaped="@_dataCacheService.IsApp">
+    <MListItemGroup Value="selectedItem" ValueChanged="ValueChanged"
+                    Color="@_dataCacheService.ThemeSetting.Theme">
+        @foreach (var item in items)
+        {
+            <MBorder Value="@(selectedItem == item.Text && _dataCacheService.IsApp==false)" Offset="true" Width="4" Border="Borders.Right" Color="@_dataCacheService.ThemeSetting.Theme">
+                <MListItem Value="@item.Text">
+                    <MListItemIcon>
+                        <MIcon>@item.Icon</MIcon>
+                    </MListItemIcon>
+                    <MListItemContent>
+                        <MListItemTitle>@item.Text</MListItemTitle>
+                    </MListItemContent>
+                </MListItem>
+            </MBorder>
+        }
+    </MListItemGroup>
+</MList>
+
+@code {
+
+    readonly MenuItemModel[] items = new[]
+    {
+        new MenuItemModel { Text = "概览", Icon = "mdi-view-compact" , Url = "/admin/index"},
+        new MenuItemModel { Text = "数据", Icon = "mdi-database" , Url = "/admin/data"},
+        new MenuItemModel { Text = "审核", Icon = "mdi-order-bool-ascending-variant" , Url = "/admin/ListExamines"},
+        new MenuItemModel { Text = "工具", Icon = "mdi-hammer-screwdriver", Url = "/admin/tools" },
+        new MenuItemModel { Text = "备份", Icon = "mdi-cloud-upload", Url = "/admin/listbackuparchives" },
+        new MenuItemModel { Text = "看板娘", Icon = "mdi-robot-love", Url = "/admin/listrobots" },
+        new MenuItemModel { Text = "批量导入", Icon = "mdi-database-import", Url = "/admin/importdata" },
+        new MenuItemModel { Text = "定时任务", Icon = "mdi-calendar-check", Url = "/admin/listtimedtasks" },
+        new MenuItemModel { Text = "动态采集", Icon = "mdi-newspaper-variant", Url = "/admin/listnews"  },
+        new MenuItemModel { Text = "评论", Icon = "mdi-message-reply-text" , Url = "/admin/listcomments"},
+        new MenuItemModel { Text = "消息", Icon = "mdi-forum", Url = "/admin/listmessages" },
+        new MenuItemModel { Text = "用户", Icon = "mdi-account" , Url = "/admin/ListUsers" },
+        new MenuItemModel { Text = "词条", Icon = "mdi-archive", Url = "/admin/ListEntries" },
+        new MenuItemModel { Text = "文章", Icon = "mdi-script-text", Url = "/admin/ListArticles" },
+        new MenuItemModel { Text = "标签", Icon = "mdi-tag", Url = "/admin/ListTags"  },
+        new MenuItemModel { Text = "周边", Icon = "mdi-basket-outline", Url = "/admin/ListPeripheries" },
+        new MenuItemModel { Text = "收藏", Icon = "mdi-heart-multiple", Url = "/admin/ListFavoriteFolders" },
+        new MenuItemModel { Text = "抽奖", Icon = "mdi-gift" , Url = "/admin/ListLotteries"},
+        new MenuItemModel { Text = "投票", Icon = "mdi-vote", Url = "/admin/ListVotes" },
+        new MenuItemModel { Text = "图片", Icon = "mdi-image-multiple" , Url = "/admin/ListImages"},
+        new MenuItemModel { Text = "其他设置", Icon = "mdi-cog", Url = "/admin/ManageHome" },
+    };
+
+    bool offset;
+    StringNumber selectedItem = "概览";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var item = items.FirstOrDefault(s => s.Text == NavigationManager.Uri.Replace(NavigationManager.BaseUri, ""));
+
+        selectedItem = item?.Text ?? "概览";
+    }
+
+    public Task ValueChanged(StringNumber index)
+    {
+        if(index!=null)
+        {
+            selectedItem = index;
+
+            var item = items.FirstOrDefault(s => s.Text == index.ToString());
+            if(item!=null&& string.IsNullOrWhiteSpace(item.Url)==false)
+            {
+                NavigationManager.NavigateTo(item.Url);
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
+
+
+}

@@ -1,0 +1,55 @@
+﻿@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+@inject ToastService ToastService
+
+<MNavigationDrawer @bind-Value="Drawer" App Temporary>
+    <MList Nav Class="mt-4"
+           Dense>
+        <AuthorizeView>
+            <Authorized>
+                <CnGalWebSite.Shared.MasaComponent.App.Layout.UserButton OnClosed="OnClose" Min />
+            </Authorized>
+            <NotAuthorized>
+                <CnGalWebSite.Shared.MasaComponent.App.Layout.LoginButton />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/"))">
+                    <MIcon Left>mdi-home</MIcon>
+                    主页
+                </MButton>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+            </NotAuthorized>
+        </AuthorizeView>
+    </MList>
+    <CnGalWebSite.Shared.MasaComponent.PC.Admin.LeftMenu />
+</MNavigationDrawer>
+
+@code {
+    [Parameter]
+    public bool Drawer { get; set; }
+
+    bool isOpen;
+
+    public Task SetDrawer(bool drawer)
+    {
+        Drawer = drawer;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+    private Task OnClickUrl(string url)
+    {
+        NavigationManager.NavigateTo(url);
+        Drawer = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task OnClose()
+    {
+        Drawer = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+
+}

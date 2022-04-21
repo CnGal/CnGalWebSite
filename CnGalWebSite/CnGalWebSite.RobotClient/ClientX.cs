@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Helper;
+using MeowMiraiLib.Msg;
 using MeowMiraiLib.Msg.Sender;
 using MeowMiraiLib.Msg.Type;
 using Newtonsoft.Json;
@@ -87,9 +88,8 @@ namespace CnGalWebSite.RobotClient
                     Reply = reply.Value
                 });
 
-                var j = result.SendToGroup(sendto, MiraiClient);
+                var j =await new GroupMessage(sendto, result).SendAsync(MiraiClient);
                 Console.WriteLine(j);
-
             }
         }
     }

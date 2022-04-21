@@ -1,0 +1,467 @@
+﻿@inject HttpClient Http
+@inject IRoleService _roleService
+@inject ToastService ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject SwalService SwalService
+
+<TitleTip Title="@Title"></TitleTip>
+
+<style>
+    .row textarea {
+        width: 100%;
+    }
+</style>
+<div class="">
+    <div class="" style="padding-right: 0; padding-left: 0">
+
+        @if (isReady == false)
+        {
+            <div class="row">
+                <div class="col-12 col-md-12 col-lg-12 mb-3">
+
+                    <div class=" rounded shadow-sm  bg-opacity  ps-4 pe-4 pt-3 pb-3">
+                        <div>
+                            <SkeletonParagraph />
+                            <div class="mt-2">
+                            </div>
+                            <SkeletonParagraph />
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-12 col-md-12 col-lg-6 mb-3">
+                    <div class=" rounded shadow-sm  bg-opacity  ps-4 pe-4 pt-3 pb-3">
+                        <div>
+                            <SkeletonParagraph />
+                            <div class="mt-2">
+                            </div>
+                            <SkeletonParagraph />
+                            <div class="mt-2">
+                            </div>
+                            <SkeletonParagraph />
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="col-12 col-md-12 col-lg-6 mb-3">
+                    <div class=" rounded shadow-sm  bg-opacity  ps-4 pe-4 pt-3 pb-3">
+                        <div>
+                            <SkeletonParagraph />
+                            <div class="mt-2">
+                            </div>
+                            <SkeletonParagraph />
+                            <div class="mt-2">
+                            </div>
+                            <SkeletonParagraph />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-12 col-lg-12 mb-3">
+                    <div class=" rounded shadow-sm  bg-opacity  ps-4 pe-4 pt-3 pb-3">
+                        <div>
+                            <SkeletonParagraph />
+                            <div class="mt-2">
+                            </div>
+                            <SkeletonParagraph />
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        }
+        else
+        {
+            @if (Model.prepositionExamineId > 0)
+            {
+                <div class="alert alert-secondary  rounded shadow-sm  rounded mt-4" role="alert">
+                    当前审核拥有一个前置审核，请先<a @onclick="@(() => ExaminePrepositionExamine())" class="alert-link">审核</a>其前置审核
+                </div>
+            }
+            <ExamineViewTip Title="@Title" Model="Model" CustomerTimelineItems="CustomerTimelineItems" OnClickUrl="OnClickUrl"></ExamineViewTip>
+            <AuthorizeView Roles="Admin">
+                @if (Model.isExamined == false && Model.prepositionExamineId <= 0)
+                {
+                    <div class="  rounded shadow-sm bg-opacity ps-4 pe-4 pt-3 pb-3 mt-4 ">
+                        <h5 class="fw-bold">审核</h5>
+
+
+                        <ValidateForm Model="@Model" ValidateAllProperties="true" class="form-group row mt-4">
+                            <div class="form-group col-12  col-sm-6">
+                                <BootstrapInput @bind-Value="Model.ContributionValue" />
+                            </div>
+                            <div class="form-group col-12">
+                                <BootstrapBlazor.Components.Textarea @bind-Value="Model.comments" />
+                            </div>
+                        </ValidateForm>
+
+                        <div>
+                            <Button type="button" Color="Color.Success" style="width: 100px;" @onclick="@(()=>OnExamine(true))" IsAsync="true">通过</Button>
+                            <Button type="button" Color="Color.Danger" style="float: right;width: 100px;" @onclick="@(()=>OnExamine(false))" IsAsync="true">驳回</Button>
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+                }
+            </AuthorizeView>
+        }
+
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    public ExaminedViewModel Model { get; set; } = new ExaminedViewModel();
+    private List<TimelineItem> CustomerTimelineItems = new List<TimelineItem>();
+    private string Title { get; set; }
+
+    private bool isReady = false;
+    private bool isFirst = true;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            //获取审核信息
+            //Model = await Http.GetFromJsonAsync<ExaminedViewModel>(Program.WebApiPath + "api/admin/examined/" + Id);
+            var result = await Http.GetAsync(ToolHelper.WebApiPath + "api/examines/GetExamineView/" + Id);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+
+            //将json数据转为对象
+            dynamic temp = Newtonsoft.Json.Linq.JObject.Parse(jsonContent);
+
+            Model.id = temp.id;
+            Model.editOverview = temp.editOverview;
+            Model.operation = temp.operation;
+            Model.isPassed = temp.isPassed;
+            Model.applyTime = temp.applyTime;
+            Model.comments = temp.comments;
+            Model.note = temp.note;
+            Model.applicationUserId = temp.applicationUserId;
+            Model.applicationUserName = temp.applicationUserName;
+            Model.entryId = temp.entryId;
+            Model.entryName = temp.entryName;
+            Model.beforeText = temp.beforeText;
+            Model.afterText = temp.afterText;
+            Model.beforeModel = temp.beforeModel;
+            Model.afterModel = temp.afterModel;
+            Model.isContinued = temp.isContinued;
+            Model.passedTime = temp.passedTime;
+            Model.isExamined = temp.isExamined;
+            Model.PassedAdminName = temp.passedAdminName;
+            Model.prepositionExamineId = temp.prepositionExamineId;
+            Model.type = temp.type;
+            Model.SensitiveWords = ((Newtonsoft.Json.Linq.JArray)temp.sensitiveWords).ToObject<List<string>>();
+
+            //强制转化类型
+            switch (Model.operation)
+            {
+                case Operation.EstablishMain:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<EntryMain_1_0>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<EntryMain_1_0>();
+                    break;
+                case Operation.EstablishAddInfor:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<InformationsModel>>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JArray)temp.afterModel).ToObject<List<InformationsModel>>();
+                    break;
+                case Operation.EstablishImages:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<EntryPicture>>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JArray)temp.afterModel).ToObject<List<EntryPicture>>();
+                    break;
+                case Operation.EstablishRelevances:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<RelevancesViewModel>>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JArray)temp.afterModel).ToObject<List<RelevancesViewModel>>();
+                    break;
+                case Operation.EstablishTags:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<RelevancesViewModel>>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JArray)temp.afterModel).ToObject<List<RelevancesViewModel>>();
+                    break;
+                case Operation.EstablishMainPage:
+                    // Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<EntryMain>();
+                    // Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<EntryMain>();
+                    break;
+                case Operation.EditArticleMain:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<ArticleMain_1_0>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<ArticleMain_1_0>();
+                    break;
+                case Operation.EditArticleRelevanes:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<RelevancesViewModel>>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JArray)temp.afterModel).ToObject<List<RelevancesViewModel>>();
+                    break;
+                case Operation.EditArticleMainPage:
+                    //  Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<EntryMain>();
+                    //  Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<EntryMain>();
+                    break;
+                case Operation.EditTag:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<TagEdit>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<TagEdit>();
+                    break;
+                case Operation.DisambigMain:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<DisambigMain>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<DisambigMain>();
+                    break;
+                case Operation.DisambigRelevances:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<DisambigAloneModel>>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JArray)temp.afterModel).ToObject<List<DisambigAloneModel>>();
+                    break;
+                case Operation.EditUserMain:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<UserMain>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<UserMain>();
+                    break;
+                case Operation.EditPeripheryMain:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<PeripheryMain_1_0>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<PeripheryMain_1_0>();
+                    break;
+                case Operation.EditPeripheryRelatedEntries:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<RelevancesViewModel>>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JArray)temp.afterModel).ToObject<List<RelevancesViewModel>>();
+                    break;
+                case Operation.EditPeripheryImages:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<EntryPicture>>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JArray)temp.afterModel).ToObject<List<EntryPicture>>();
+                    break;
+                case Operation.EditTagMain:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JObject)temp.beforeModel).ToObject<TagMain_1_0>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JObject)temp.afterModel).ToObject<TagMain_1_0>();
+                    break;
+                case Operation.EditTagChildTags:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<RelevancesViewModel>>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JArray)temp.afterModel).ToObject<List<RelevancesViewModel>>();
+                    break;
+                case Operation.EditTagChildEntries:
+                    Model.beforeModel = ((Newtonsoft.Json.Linq.JArray)temp.beforeModel).ToObject<List<RelevancesViewModel>>();
+                    Model.afterModel = ((Newtonsoft.Json.Linq.JArray)temp.afterModel).ToObject<List<RelevancesViewModel>>();
+                    break;
+            }
+            //开始初始化时间线
+            CustomerTimelineItems.Add(new TimelineItem
+            {
+                Color = Color.Primary,
+                Content = Model.applicationUserName + " 提交审核",
+                Description = Model.applyTime.ToString()
+
+            });
+            var operation = Model.operation;
+            if (operation == Operation.EstablishMain || operation == Operation.EstablishAddInfor || operation == Operation.EstablishImages || operation == Operation.EstablishRelevances || operation == Operation.EstablishTags || operation == Operation.EstablishMainPage)
+            {
+                CustomerTimelineItems.Add(new TimelineItem
+                {
+                    Color = Color.Info,
+                    Content = "等待审核",
+                    Description = "对词条 " + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + " " + Model.operation.GetDisplayName()
+
+                });
+                Title = "词条『" + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + "』";
+            }
+            else if (operation == Operation.EditPeripheryMain || operation == Operation.EditPeripheryImages || operation == Operation.EditPeripheryRelatedEntries)
+            {
+                CustomerTimelineItems.Add(new TimelineItem
+                {
+                    Color = Color.Info,
+                    Content = "等待审核",
+                    Description = "对周边 " + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + " " + Model.operation.GetDisplayName()
+
+                });
+                Title = "周边『" + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + "』";
+            }
+            else if (operation == Operation.EditArticleMain || operation == Operation.EditArticleRelevanes || operation == Operation.EditArticleMainPage)
+            {
+                CustomerTimelineItems.Add(new TimelineItem
+                {
+                    Color = Color.Info,
+                    Content = "等待审核",
+                    Description = "对文章 " + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + " " + Model.operation.GetDisplayName()
+
+                });
+                Title = "文章『" + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + "』";
+            }
+            else if (operation == Operation.UserMainPage || operation == Operation.EditUserMain)
+            {
+                CustomerTimelineItems.Add(new TimelineItem
+                {
+                    Color = Color.Info,
+                    Content = "等待审核",
+                    Description = "对用户 " + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + " " + Model.operation.GetDisplayName()
+
+                });
+                Title = "用户『" + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + "』";
+            }
+            else if (operation == Operation.EditTag || operation == Operation.EditTagMain || operation == Operation.EditTagChildTags || operation == Operation.EditTagChildEntries)
+            {
+                CustomerTimelineItems.Add(new TimelineItem
+                {
+                    Color = Color.Info,
+                    Content = "等待审核",
+                    Description = "对标签 " + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + " " + Model.operation.GetDisplayName()
+
+                });
+                Title = "标签『" + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + "』";
+            }
+            else if (operation == Operation.DisambigMain || operation == Operation.DisambigRelevances)
+            {
+                CustomerTimelineItems.Add(new TimelineItem
+                {
+                    Color = Color.Info,
+                    Content = "等待审核",
+                    Description = "对消歧义页 " + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + " " + Model.operation.GetDisplayName()
+
+                });
+                Title = "消歧义页『" + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + "』";
+            }
+            else if (operation == Operation.PubulishComment)
+            {
+                CustomerTimelineItems.Add(new TimelineItem
+                {
+                    Color = Color.Info,
+                    Content = "等待审核",
+                    Description = Model.operation.GetDisplayName() + " " + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName)
+
+                });
+                Title = "评论『" + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + "』";
+            }
+
+
+            if (Model.isExamined == true)
+            {
+                if (Model.isPassed == true)
+                {
+                    CustomerTimelineItems.Add(new TimelineItem
+                    {
+                        Color = Color.Success,
+                        Content = "『" + Model.PassedAdminName + "』审核通过",
+                        Description = Model.passedTime.ToString()
+
+                    });
+                    Title = Title + "的编辑记录";
+                }
+                else
+                {
+                    CustomerTimelineItems.Add(new TimelineItem
+                    {
+                        Color = Color.Danger,
+                        Content = "『" + Model.PassedAdminName + "』驳回审核",
+                        Description = Model.passedTime.ToString()
+
+                    });
+                    Title = Title + "的审核记录";
+                }
+
+            }
+            else
+            {
+                Title = "审核" + Title;
+            }
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取审核信息失败");
+        }
+    }
+    private async Task OnExamine(bool isPassed)
+    {
+        //上传
+        try
+        {
+            if (Model.SensitiveWords != null && Model.SensitiveWords.Count != 0 && isPassed)
+            {
+                string temp = "";
+                bool isFrist = true;
+                foreach (var item in Model.SensitiveWords)
+                {
+                    if (isFirst)
+                    {
+                        isFirst = false;
+                    }
+                    else
+                    {
+                        temp += ",";
+                    }
+                    temp += item;
+                }
+                //确认
+                var op = new SwalOption()
+                {
+                    Title = "确认通过审核",
+                    Content = "该审核包含以下敏感词：" + temp,
+
+                    Category = SwalCategory.Error,
+                };
+                var ret = await SwalService.ShowModal(op);
+                if (ret == false)
+                {
+                    return;
+                }
+            }
+            var result = await Http.PostAsJsonAsync<ExaminedViewModel>(ToolHelper.WebApiPath + "api/examines/proc", new ExaminedViewModel
+            {
+                id = Model.id,
+                isPassed = isPassed,
+                comments = Model.comments,
+                Integral = Model.Integral,
+                ContributionValue = Model.ContributionValue
+            });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("审核失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("审核成功", "对『" + (string.IsNullOrWhiteSpace(Model.entryName) ? ("Id：" + Model.entryId) : Model.entryName) + "』的审核已完成");
+                //判断是否继续审核
+                if (string.IsNullOrWhiteSpace(Id) == true)
+                {
+                    isReady = false;
+                    isFirst = true;
+                    CustomerTimelineItems = new List<TimelineItem>();
+                    StateHasChanged();
+                    await OnInitializedAsync();
+
+                    return;
+                }
+                else
+                {
+                    NavigationManager.NavigateTo(Provider, "/admin/listexamines", "审核", "fa fa-pencil");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "审核失败");
+        }
+    }
+
+    private async Task ExaminePrepositionExamine()
+    {
+        isReady = false;
+        isFirst = true;
+        CustomerTimelineItems = new List<TimelineItem>();
+        Id = Model.prepositionExamineId.ToString();
+        StateHasChanged();
+        await OnInitializedAsync();
+    }
+
+    public async void OnClickUrl(NavigateModel model)
+    {
+        try
+        {
+            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
+        }
+        catch
+        {
+            await ToastService.Error("导航失败", "请尝试刷新页面");
+        }
+    }
+}

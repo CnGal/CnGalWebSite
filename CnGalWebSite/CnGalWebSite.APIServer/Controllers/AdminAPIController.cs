@@ -834,40 +834,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var examines = await _examineRepository.GetAll()
-                .Include(s => s.Entry).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                .Where(s => s.ApplicationUserId == _configuration["ExamineAdminId"]
-                    && (s.Operation == Operation.EstablishRelevances)
-                    /*&& (s.ApplyTime.Date.Year == 2022 && s.ApplyTime.Date.Month == 4 && s.ApplyTime.Date.Day == 7)*/).ToListAsync();
-
-                foreach (var item in examines)
-                {
-                    EntryRelevances entryRelevances = null;
-                    using (TextReader str = new StringReader(item.Context))
-                    {
-                        var serializer = new JsonSerializer();
-                        entryRelevances = (EntryRelevances)serializer.Deserialize(str, typeof(EntryRelevances));
-                    }
-
-                    if (entryRelevances.Relevances.Any(s => s.DisplayValue == null && s.IsDelete == false))
-                    {
-                        foreach (var temp in entryRelevances.Relevances)
-                        {
-                            temp.IsDelete = !temp.IsDelete;
-                        }
-
-                        await _entryService.UpdateEntryDataRelevances(item.Entry, entryRelevances);
-                        await _entryRepository.UpdateAsync(item.Entry);
-
-
-                        await _examineRepository.DeleteAsync(item);
-
-                        Console.WriteLine($"已处理 - 词条Id:{item.EntryId} - 审核Id:{item.Id}");
-
-                    }
-
-                }
-
+                await _historyDataService.Replace();
 
 
                 return new Result { Successful = true };

@@ -95,6 +95,7 @@ namespace CnGalWebSite.RobotClient
                 serializer.Serialize(file, ExecuteInfors);
             }
         }
+
         public string GetCurrentTimeEvent()
         {
             var events = Events.Where(s => s.Time.TimeOfDay < DateTime.Now.ToCstTime().TimeOfDay && s.Time.AddSeconds(s.DelaySecond).TimeOfDay > DateTime.Now.ToCstTime().TimeOfDay && s.IsHidden == false && s.Type== RobotEventType.FixedTime);
@@ -123,7 +124,7 @@ namespace CnGalWebSite.RobotClient
             foreach (var item in todos)
             {
                 //查找同类型的任务
-                var sameCount = Events.Where(s => s.Note == item.Note).Count();
+                var sameCount = Events.Where(s => s.Note == item.Note && s.Time.TimeOfDay >= DateTime.Now.ToCstTime().TimeOfDay).Count();
                 if (new Random().Next(0, sameCount) == 0)
                 {
                     currentEvent = item;
@@ -152,7 +153,7 @@ namespace CnGalWebSite.RobotClient
         {
             var p = new Random().NextDouble();
 
-            var events = Events.Where(s => s.Time.TimeOfDay < DateTime.Now.ToCstTime().TimeOfDay && s.Time.AddSeconds(s.DelaySecond).TimeOfDay > DateTime.Now.ToCstTime().TimeOfDay && s.IsHidden == false && s.Type == RobotEventType.PreTime && s.Probability / 100 > p);
+            var events = Events.Where(s => s.Time.TimeOfDay < DateTime.Now.ToCstTime().TimeOfDay && s.Time.AddSeconds(s.DelaySecond).TimeOfDay > DateTime.Now.ToCstTime().TimeOfDay && s.IsHidden == false && s.Type == RobotEventType.PreTime/* && s.Probability / 100 > p*/);
 
             var todos = new List<RobotEvent>();
 

@@ -1,7 +1,21 @@
-﻿<div class="ps-3 pe-3 text-truncate-1" style="font-size: large;">@Title</div>
+﻿
+@if (Min)
+{
+    <div class="ps-3 pe-3 text-truncate-1 font-color" style="font-size: large; font-weight: bold; align-self: center;">@Title</div>
+
+}
+else
+{
+    <div class="ps-3 pe-3 text-truncate-1" style="font-size: large;">@Title</div>
+
+}
 
 
 @code {
+    [Parameter]
+
+    public bool Min { get; set; }
+
     private string Title { get; set; }
 
     public Task ChangeTitle(string title)
