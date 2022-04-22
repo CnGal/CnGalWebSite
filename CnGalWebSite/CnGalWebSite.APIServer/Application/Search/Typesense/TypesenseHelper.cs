@@ -2,6 +2,7 @@
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.Search.ElasticSearches;
 using CnGalWebSite.APIServer.Application.Search.Typesense;
+using CnGalWebSite.APIServer.CustomMiddlewares;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Model;
@@ -52,24 +53,24 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
         private async Task CreateCollection()
         {
-            var schema = new Schema(
+            var schema = new MySchema(
               _collectionName,
-              new List<Field>
+              new List<MyField>
               {
-                    new Field("id", FieldType.String, false),
-                    new Field("originalId", FieldType.Int64, false),
-                    new Field("name", FieldType.String, false, true),
-                    new Field("displayName", FieldType.String, false, true),
-                    new Field("anotherName", FieldType.String, false, true),
-                    new Field("briefIntroduction", FieldType.String, false),
-                    new Field("mainPage", FieldType.String, false),
-                    new Field("lastEditTime", FieldType.Int64, false),
-                    new Field("lastEditTime", FieldType.Int64, false),
-                    new Field("pubulishTime", FieldType.Int64, false),
-                    new Field("createTime", FieldType.Int64, false),
-                    new Field("readerCount", FieldType.Int32, false),
-                    new Field("type", FieldType.Int32, false),
-                    new Field("originalType", FieldType.Int32, false),
+                    new MyField("id", FieldType.String, true),
+                    new MyField("originalId", FieldType.Int64, true),
+                    new MyField("name", FieldType.String, true, true),
+                    new MyField("displayName", FieldType.String, true, true),
+                    new MyField("anotherName", FieldType.String, true, true),
+                    new MyField("briefIntroduction", FieldType.String, true,true),
+                    new MyField("mainPage", FieldType.String, true,true),
+                    new MyField("lastEditTime", FieldType.Int64, true,true),
+                    new MyField("lastEditTime", FieldType.Int64, true,true),
+                    new MyField("pubulishTime", FieldType.Int64, true,true),
+                    new MyField("createTime", FieldType.Int64, true,true),
+                    new MyField("readerCount", FieldType.Int32, true,true),
+                    new MyField("type", FieldType.Int32, true,true),
+                    new MyField("originalType", FieldType.Int32, true,true),
               });
             try
             {

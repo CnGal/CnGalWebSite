@@ -5,7 +5,6 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject DialogService DialogService
-<TitleTip></TitleTip>
 
 <div>
         <Table TItem="ListGameNewAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
