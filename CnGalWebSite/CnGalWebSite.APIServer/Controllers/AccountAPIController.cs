@@ -186,6 +186,10 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             if (user == null)
             {
+                user = await _userRepository.FirstOrDefaultAsync(s=>s.PhoneNumber==model.UserName);
+            }
+            if (user == null)
+            {
                 //失败后尝试从历史账户中登入
                 var history = await _appHelper.LoginHistoryUser(model.UserName);
                 if (history != null)
