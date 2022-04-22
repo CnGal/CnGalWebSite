@@ -160,7 +160,7 @@ else
             }
             else
             {
-                <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8") ">
+                <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8  order-2 order-lg-1") ">
 
                     <div>
                         @if (EntryView.Pictures.Count != 0)
@@ -196,7 +196,7 @@ else
 
                 </div>
 
-                <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4") ">
+                <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4 order-1 order-lg-2") ">
                     @if (EntryView.SteamId > 0)
                     {
                         <div class="mb-4">
