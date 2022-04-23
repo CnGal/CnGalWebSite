@@ -11,5 +11,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
         public string Link { get; set; }
 
         public int Priority { get; set; }
+
+        public string Note { get; set; }
     }
 }
