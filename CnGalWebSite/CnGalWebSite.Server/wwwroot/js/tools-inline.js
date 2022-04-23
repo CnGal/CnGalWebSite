@@ -112,11 +112,12 @@ function highlightAllCode() {
     hljs.highlightAll();
 }
 
-var _czc = _czc || [];
-_czc.push(["_setAccount", "1280206141"]);
+//var _czc = _czc || [];
+//_czc.push(["_setAccount", "1280206141"]);
 
 function trackEvent(categotry, action, lable, value, nodeid) {
-    _czc.push(['_trackEvent', categotry, action, lable, value, nodeid]);
+    //_czc.push(['_trackEvent', categotry, action, lable, value, nodeid]);
+    umami.trackEvent(lable,categotry  + ' ' + action);
 }
 var editor;
 function initEditorMd(markdownstring) {
@@ -399,10 +400,10 @@ function shareLink(icon, link, title, desc) {
 }
 
 /*加载友盟js*/
-var cnzz_s_tag = document.createElement('script');
-cnzz_s_tag.type = 'text/javascript';
-cnzz_s_tag.async = true;
-cnzz_s_tag.charset = "utf - 8";
-cnzz_s_tag.src = "https://w.cnzz.com/c.php?id=1280206141&async=1";
-var root_s = document.getElementsByTagName('script')[0];
-root_s.parentNode.insertBefore(cnzz_s_tag, root_s);
+//var cnzz_s_tag = document.createElement('script');
+//cnzz_s_tag.type = 'text/javascript';
+//cnzz_s_tag.async = true;
+//cnzz_s_tag.charset = "utf - 8";
+//cnzz_s_tag.src = "https://w.cnzz.com/c.php?id=1280206141&async=1";
+//var root_s = document.getElementsByTagName('script')[0];
+//root_s.parentNode.insertBefore(cnzz_s_tag, root_s);
