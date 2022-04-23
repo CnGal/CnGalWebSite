@@ -33,7 +33,7 @@
                 <MButton  Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation">
                     @if (string.IsNullOrWhiteSpace(Icon) == false)
                     {
-                        <MIcon>@Icon</MIcon>
+                        <MIcon Left="!string.IsNullOrWhiteSpace(Text)">@Icon</MIcon>
                     }
 
                     @Text
@@ -46,7 +46,7 @@
                         <MButton  Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation">
                             @if (string.IsNullOrWhiteSpace(Icon) == false)
                             {
-                                <MIcon>@Icon</MIcon>
+                                <MIcon Left="!string.IsNullOrWhiteSpace(Text)">@Icon</MIcon>
                             }
 
                             @Text
@@ -97,7 +97,7 @@ else
                 <MButton Color="@_dataCacheService.ThemeSetting.Theme" Dark Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation">
                     @if (string.IsNullOrWhiteSpace(Icon) == false)
                     {
-                        <MIcon>@Icon</MIcon>
+                        <MIcon Left="!string.IsNullOrWhiteSpace(Text)">@Icon</MIcon>
                     }
 
                     @Text
@@ -110,7 +110,7 @@ else
                         <MButton Color="@_dataCacheService.ThemeSetting.Theme" Dark Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation">
                             @if (string.IsNullOrWhiteSpace(Icon) == false)
                             {
-                                <MIcon>@Icon</MIcon>
+                                <MIcon Left="!string.IsNullOrWhiteSpace(Text)">@Icon</MIcon>
                             }
 
                             @Text
@@ -157,7 +157,7 @@ else
                 <MButton Color="@Color" Dark Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation">
                     @if (string.IsNullOrWhiteSpace(Icon) == false)
                     {
-                        <MIcon>@Icon</MIcon>
+                        <MIcon Left="!string.IsNullOrWhiteSpace(Text)">@Icon</MIcon>
                     }
 
                     @Text

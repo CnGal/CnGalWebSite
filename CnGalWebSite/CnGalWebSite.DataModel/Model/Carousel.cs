@@ -8,7 +8,9 @@
 
         public string Link { get; set; }
 
-        public int Priority { get; set; } = 0;
+        public string Note { get; set; }
+
+        public int Priority { get; set; }
 
     }
 }

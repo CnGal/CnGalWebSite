@@ -1,6 +1,6 @@
 ﻿@inject ToastService? ToastService
 
-<ImageUpLoadButton OnUploadedImage="AddImage"></ImageUpLoadButton>
+<ImageUpLoadButton OnUploadedImage="AddImage" Class="mb-4"></ImageUpLoadButton>
 <div class="row">
     @for (int i = 0; i < Images.Count; i++)
     {
@@ -13,7 +13,7 @@
                     </div>
                     <div class=" mt-2">
                         <p class="text-center" style="font-size: medium; word-break: break-word; ">
-                            @(Images[i].Link??"")
+                            @(Images[i].Note??"")
                         </p>
                     </div>
 
