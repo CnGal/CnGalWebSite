@@ -272,6 +272,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                 {
                     Image = _appHelper.GetImagePath(item.Image, ""),
                     Link = item.Link,
+                    Note = item.Note,
                     Priority = item.Priority,
                 });
             }

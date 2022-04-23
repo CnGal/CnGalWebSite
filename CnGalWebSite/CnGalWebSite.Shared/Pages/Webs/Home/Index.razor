@@ -71,7 +71,7 @@
         {
             try
             {
-                await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", item.Link, "1", "click");
+                await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", item.Note ?? item.Link, "1", "click");
             }
             catch (Exception exc)
             {

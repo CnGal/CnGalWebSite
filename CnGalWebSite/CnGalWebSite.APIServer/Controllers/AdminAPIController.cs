@@ -641,6 +641,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     Link = item.Link,
                     Priority = item.Priority,
+                    Note = item.Note,
                     ImagePath = _appHelper.GetImagePath(item.Image, "")
                 });
 
@@ -673,7 +674,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         Image = item.ImagePath == "background.png" ? "" : item.ImagePath,
                         Link = item.Link,
-                        Priority = item.Priority
+                        Priority = item.Priority,
+                        Note = item.Note,
                     });
                 }
             }

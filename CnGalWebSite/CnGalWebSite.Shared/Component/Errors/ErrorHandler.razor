@@ -21,7 +21,7 @@
         //向友盟发送日志
         try
         {
-            await JS.InvokeAsync<string>("trackEvent", "发送错误", message, ex.Message, "1", "look");
+            await JS.InvokeAsync<string>("trackEvent", "抛出异常", message, ex.Message, "1", "look");
         }
         catch (Exception exc)
         {

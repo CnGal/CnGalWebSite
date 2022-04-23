@@ -8,56 +8,39 @@
 @inject NavigationManager NavigationManager
 @inject IAppHelper _appHelper
 
-<TitleTip  Title="编辑友情链接"></TitleTip>
+<TitleTip Title="编辑友情链接"></TitleTip>
 
+<div>
+    @if (isReady == false)
+    {
 
-<div class="">
-    <div class="" style="padding-right: 0; padding-left: 0">
         <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-            <h3 class="text-truncate mb-4 fw-bold">
-                编辑友情链接
-            </h3>
-            <hr />
-            <p>上传要使用图片</p>
-            @if (isReady == false)
-            {
-
-                <div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                </div>
-            }
-            else
-            {
-                <EditFriendLinksListViewTip Images="Model.FriendLinks"></EditFriendLinksListViewTip>
-
-                    <hr class="mt-4" />
-
-                    <div class="form-group row mt-4">
-                        <div class="col-sm-10">
-                            <Button style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
-                        </div>
-                    </div>
-            }
-
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
         </div>
-    </div>
-</div>
+    }
+    else
+    {
+        <div class=" rounded shadow-sm  bg-opacity p-4">
+            <EditFriendLinksListViewTip Images="Model.FriendLinks"></EditFriendLinksListViewTip>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="完成" IsAsync="true" OnClick="OnSubmit" Icon="mdi-check" Color="green" Class="mt-4" />
+        </div>
 
+    }
+</div>
 @code {
-    public int currentPage { get; set; } = 1;
-    public string SearchString { get; set; } = "";
+
     bool isReady = false;
 
     [CascadingParameter]
@@ -79,7 +62,7 @@
             StateHasChanged();
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "无法获取友情链接信息");
         }
@@ -126,10 +109,10 @@
             else
             {
                 await ToastService.Success("编辑友情链接成功", "编辑友情链接成功");
-                NavigationManager.NavigateTo(Provider,"/admin/managehome", "管理主页布局", "fa fa-keyboard-o");
+                NavigationManager.NavigateTo(Provider, "/admin/managehome", "管理主页布局", "fa fa-keyboard-o");
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "编辑友情链接失败");
         }

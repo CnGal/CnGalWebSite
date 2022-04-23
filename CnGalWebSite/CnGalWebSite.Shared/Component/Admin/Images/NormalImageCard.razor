@@ -1,0 +1,35 @@
+﻿<div class="rounded shadow-sm bg-opacity h-100">
+        <img src="@Image" class="w-100">
+
+        <div style="display: flex; flex-direction: column; word-break: break-all; " class="ps-3 pe-3 pt-2 pb-2">
+            @if (string.IsNullOrWhiteSpace(Name) == false)
+            {
+                <span>
+                    <i class="fa fa-image fa-fw font-color"></i>
+                    <a href="@Image" target="_blank">
+                        @Name
+                    </a>
+                </span>
+            }
+
+            @if (string.IsNullOrWhiteSpace(Link) == false)
+            {
+                <span>
+                    <i class="fa fa-link fa-fw font-color"></i>
+                    <a href="@Link" target="_blank">
+                        @Link
+                    </a>
+                </span>
+
+            }
+        </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Image { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public string Link { get; set; }
+}

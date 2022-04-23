@@ -14,8 +14,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         [Display(Name = "链接")]
         [Required(ErrorMessage = "请填写链接")]
         public string Link { get; set; }
+        [Display(Name = "备注")]
+        public string Note { get; set; }
         [Display(Name = "优先级")]
-        public int Priority { get; set; } = 0;
+        public int Priority { get; set; }
 
     }
 }

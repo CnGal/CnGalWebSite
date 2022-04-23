@@ -6,135 +6,103 @@
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 
-<TitleTip Title="杂项板块"></TitleTip>
+<TitleTip Title="其他设置"></TitleTip>
 
-<div class="">
-    <div class="" style="padding-right: 0;padding-left: 0;">
-        <div class="  rounded shadow-sm  bg-opacity p-3 mb-3">
-            <h3 class="fw-bold text-center">杂项板块</h3>
-            <p class="text-center" style="color: gray;margin-top:20px">
-                <i class="fa fa-image fa-fw "></i>
-                <span class="article-infor-text">@(Model.Carousels.Count + "个轮播图")</span>&nbsp;&nbsp;&nbsp;
+<div>
+    <div class="rounded  shadow-sm bg-opacity mb-4">
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
+               Color="@_dataCacheService.ThemeSetting.Theme">
 
-                <i class="fa fa-link fa-fw "></i>
-                <span class="article-infor-text">@(Model.Links.Count + "个友情链接")</span>
+            <MTab Value="1">
+                轮播图<MIcon>mdi-image-area</MIcon>
+            </MTab>
+            <MTab Value="2">
+                友情链接<MIcon>mdi-link</MIcon>
+            </MTab>
+            <MTab Value="3">
+                错误记录<MIcon>mdi-alert-circle</MIcon>
+            </MTab>
+            <MTab Value="4">
+                默认图片<MIcon>mdi-cursor-default</MIcon>
+            </MTab>
 
-            </p>
-        </div>
-        <div class="  rounded shadow-sm  bg-opacity">
-            <Tab>
-                <TabItem Text="轮播图" Icon="fa fa-cubes">
-                    <div>
-                        <Button IsOutline="true" Icon="fa fa-pencil" class="ms-1 mb-2" style="width: 100px" Text="编辑"  @onclick="@(() => ToUrl("admin/EditCarousels"))"></Button>
-                        <div class="row">
-                            @foreach (var item in Model.Carousels)
-                            {
-                                <div class=" col-12 col-md-6 col-lg-6 mt-2 mb-2">
-                                    <div class="card h-100 " style="background-color:transparent">
-                                        <img src="@item.Image" class="card-img" alt="...">
-                                        <div class="card-body">
-                                            <a class="card-text" href="@item.Link" target="_blank">
-                                                @item.Link
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>}
-
-                        </div>
-                    </div>
-                </TabItem>
-                <TabItem Text="友情链接" Icon="fa fa-link">
-                    <div>
-                        <Button IsOutline="true" Icon="fa fa-pencil" class="ms-1 mb-2" style="width: 100px" Text="编辑" @onclick="@(() => ToUrl("admin/EditFriendLinks"))"></Button>
-
-                        <div class="row">
-                            @foreach (var item in Model.Links)
-                            {
-                                <div class=" col-12 col-md-6 col-lg-6 mt-2 mb-2">
-                                    <div class="card h-100" style="background-color:transparent">
-                                        <img src="@item.Image" class="card-img" alt="...">
-                                        <div class="card-body">
-                                            <h5 class="card-title fw-bold">@item.Name</h5>
-                                            <a class="card-text" href="@item.Link" target="_blank">
-                                                @item.Link
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>}
-
-                        </div>
-                    </div>
-                </TabItem>
-                <TabItem Text="错误记录" Icon="fa fa-gavel">
-                  <ErrorCountChartListView></ErrorCountChartListView>
-                </TabItem>
-                <TabItem Text="默认图片" Icon="fa fa-image">
-                    <div>
-                        <div class="row">
-
-                            <div class="col-12 col-md-6 col-lg-4 col-xl-2 mb-4">
-                                <div class="card h-100" style="background-color:transparent">
-                                    <img src="@Model.AppImage" class="card-img-top" alt="..." />
-                                    <div class="card-body">
-                                        <h5 class="card-title fw-bold">默认词条主图</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-4 col-xl-2 mb-4">
-                                <div class="card h-100" style="background-color:transparent">
-                                    <img src="@Model.CertificateImage" class="card-img-top" alt="..." />
-                                    <div class="card-body">
-                                        <h5 class="card-title fw-bold">默认文章主图</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-4 col-xl-2 mb-4">
-                                <div class="card h-100" style="background-color:transparent">
-                                    <img src="@Model.UserImage" class="card-img-top" alt="..." />
-                                    <div class="card-body">
-                                        <h5 class="card-title fw-bold">默认头像</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-4 col-xl-2 mb-4">
-                                <div class="card h-100" style="background-color:transparent">
-                                    <img src="@Model.UserBackgroundImage" class="card-img-top" alt="..." />
-                                    <div class="card-body">
-                                        <h5 class="card-title fw-bold">默认用户背景图</h5>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-12 col-md-6 col-lg-4 col-xl-2 mb-4">
-                                <div class="card h-100" style="background-color:transparent">
-                                    <img src="@Model.BackgroundImage" class="card-img-top" alt="..." />
-                                    <div class="card-body">
-                                        <h5 class="card-title fw-bold">默认网站背景图</h5>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                </TabItem>
-            </Tab>
-
-
-        </div>
+        </MTabs>
     </div>
+    <MTabsItems @bind-Value="TabIndex">
+        <MTabItem Value="1">
+            <div>
+                <div class="rounded shadow-sm bg-opacity p-3 mb-4">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="编辑" OnClick="@(() => ToUrl("admin/EditCarousels"))" Icon="mdi-pencil" />
+
+                </div>
+
+
+                <div class="row">
+                    @foreach (var item in Model.Carousels.OrderByDescending(s=>s.Priority))
+                    {
+                        <div class="col-12 col-lg-6 col-xxl-4 mb-4">
+                            <NormalImageCard Image="@item.Image" Link="@item.Link" Name="@item.Note" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </MTabItem>
+        <MTabItem Value="2">
+            <div>
+                <div class="rounded shadow-sm bg-opacity p-3 mb-4">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="编辑" OnClick="@(() => ToUrl("admin/EditFriendLinks"))" Icon="mdi-pencil" />
+
+                </div>
+
+                <div class="row">
+                    @foreach (var item in Model.Links.OrderByDescending(s => s.Priority))
+                    {
+                        <div class="col-12 col-lg-6 col-xxl-4 mb-4">
+                            <NormalImageCard Image="@item.Image" Link="@item.Link" Name="@item.Name" />
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </MTabItem>
+        <MTabItem Value="3">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <ErrorCountChartListView></ErrorCountChartListView>
+            </div>
+        </MTabItem>
+        <MTabItem Value="4">
+            <div>
+                <div class="row">
+                    <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
+                        <NormalImageCard Image="@Model.AppImage"  Name="词条主图" />
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
+                        <NormalImageCard Image="@Model.CertificateImage" Name="文章主图" />
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
+                        <NormalImageCard Image="@Model.UserImage" Name="头像" />
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
+                        <NormalImageCard Image="@Model.UserBackgroundImage"  Name="用户信息卡片背景图" />
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
+                        <NormalImageCard Image="@Model.BackgroundImage" Name="网站背景图" />
+                    </div>
+                </div>
+            </div>
+        </MTabItem>
+    </MTabsItems>
 </div>
 
 @code {
-    public int currentPage { get; set; } = 1;
-    public string SearchString { get; set; } = "";
-    bool isReady = false;
-    bool isFirst = false;
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    public StringNumber TabIndex { get; set; } = 1;
 
     public ManageHomeViewModel Model { get; set; } = new ManageHomeViewModel
     {
@@ -147,13 +115,10 @@
         try
         {
             Model = await Http.GetFromJsonAsync<ManageHomeViewModel>(ToolHelper.WebApiPath + "api/admin/managehome");
-
-            isFirst = true;
-            isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "无法获取主页信息");
+            ErrorHandler.ProcessError(ex, "无法获取网站主页设置相关信息");
         }
 
     }
