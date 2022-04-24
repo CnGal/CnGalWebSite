@@ -7,28 +7,31 @@
 @inject DialogService DialogService
 
 <div class="">
-        <Table TItem="ListWeeklyNewAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
-               ShowExtendButtons="true" ExtendButtonColumnWidth="130" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-               ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-            <TableToolbarTemplate>
+    <Table TItem="ListWeeklyNewAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="130" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableToolbarTemplate>
 
-            </TableToolbarTemplate>
-            <TableColumns>
-                <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-                <TableColumn @bind-Field="@context.State" Sortable="true" Searchable="true"  DefaultSort="true" DefaultSortOrder="SortOrder.Asc" TextWrap="true" Width="50" />
-                <TableColumn @bind-Field="@context.Title" Searchable="true" TextWrap="true" Width="220" />
-                <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" TextWrap="true" Width="200" />
+        </TableToolbarTemplate>
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
+            <TableColumn @bind-Field="@context.State" Sortable="true" Searchable="true" DefaultSort="true" DefaultSortOrder="SortOrder.Asc" TextWrap="true" Width="50" />
+            <TableColumn @bind-Field="@context.Title" Searchable="true" TextWrap="true" Width="220" />
+            <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" TextWrap="true" Width="200" />
 
-                <TableColumn @bind-Field="@context.CreateTime" Sortable="true" TextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
-                <TableColumn @bind-Field="@context.PublishTime" Sortable="true" TextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
-            </TableColumns>
-            <RowButtonTemplate>
-                <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditWeeklyNews(context.Id))" />
+            <TableColumn @bind-Field="@context.CreateTime" Sortable="true" TextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
+            <TableColumn @bind-Field="@context.PublishTime" Sortable="true" TextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditWeeklyNews(context.Id))" />
 
-                    <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickWithoutRender="@(() => EditArticle(context.ArticleId ))" IsShow="context.ArticleId != 0"/>
-            </RowButtonTemplate>
-        </Table>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickWithoutRender="@(() => EditArticle(context.ArticleId ))" IsShow="context.ArticleId != 0" />
+        </RowButtonTemplate>
+    </Table>
 </div>
+
+<EditWeeklyNewsTip @ref="editWeeklyNewsTip" />
+
 @code {
     [NotNull]
     private Table<ListWeeklyNewAloneModel>? TableRows { get; set; }
@@ -41,6 +44,7 @@
     private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    EditWeeklyNewsTip editWeeklyNewsTip;
 
 
     protected override async Task OnInitializedAsync()
@@ -82,20 +86,10 @@
 
     private async Task EditWeeklyNews(long id)
     {
-        var option = new DialogOption()
+        if (editWeeklyNewsTip != null)
         {
-            Title = "编辑周报",
-            IsScrolling = true,
-            Size = Size.Large,
-            ShowCloseButton = false
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EditWeeklyNewsTip>(new Dictionary<string, object>
-        {
-            [nameof(EditWeeklyNewsTip.Id)] = id,
-            [nameof(EditWeeklyNewsTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => { await option.Dialog.Close(); await TableRows.QueryAsync(); }),
-        }).Render();
-        await DialogService.Show(option);
-
+            await editWeeklyNewsTip.Refresh(true, id);
+        }
     }
 
 }

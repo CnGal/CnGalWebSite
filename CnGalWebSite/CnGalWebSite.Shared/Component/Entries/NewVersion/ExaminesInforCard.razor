@@ -1,62 +1,87 @@
 ﻿@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
 
-<div class="mt-2">
-    <Timeline Items="AlternateTimelineItems" IsAlternate="!((_dataCacheService.IsApp) || (Model.Count < 3))" />
-</div>
 
+
+<MTimeline Class="ms-2 me-2" Dense="_dataCacheService.IsApp||Model.Count<3">
+    @foreach (var item in Model.OrderByDescending(s => s.ApplyTime))
+    {
+        <MTimelineItem Large>
+            <IconContent>
+                <MAvatar Class="pointer" @onclick="@(()=>OnClickUser(item))">
+                    <img src="@item.UserImage" loading="lazy" />
+                </MAvatar>
+            </IconContent>
+            <OppositeContent>
+                <span>@item.ApplyTime.ToString("yyyy-MM-dd HH:mm")</span>
+            </OppositeContent>
+            <ChildContent>
+                <MCard Class="elevation-2" @onclick="@(()=>OnClickExamine(item))">
+                    <MCardText>
+                        @if (Model.IndexOf(item) % 2 == 0 || (_dataCacheService.IsApp || Model.Count < 3))
+                        {
+                            <div class="comment-tx-div">
+                                <div style=" display: flex; flex-wrap: wrap; ">
+                                    @foreach (var item in item.Ranks)
+                                    {
+                                        <RankAloneViewTip Model="item"></RankAloneViewTip>
+                                    }
+                                    <div class="comment-username a-font-color me-2">@item.UserName</div>
+
+                                    <div class="comment-username" style="color:gray;">@item.ApplyTime.ToTimeFromNowString()</div>
+
+                                </div>
+                                <span class="me-2" style=" color: black;">@item.Operation.GetDisplayName()</span>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="comment-tx-div">
+                                <div style=" display: flex; flex-wrap: wrap; justify-content: flex-end;">
+                                    <div class="comment-username" style="color:gray;">@item.ApplyTime.ToTimeFromNowString()</div>
+
+                                    <div class="comment-username a-font-color me-2 ms-2">@item.UserName</div>
+
+                                    @foreach (var item in item.Ranks)
+                                    {
+                                        <RankAloneViewTip Model="item"></RankAloneViewTip>
+                                    }
+                                </div>
+                                <span class="me-2" style=" color: black;text-align: end;">@item.Operation.GetDisplayName()</span>
+
+                            </div>
+                        }
+
+                    </MCardText>
+                </MCard>
+            </ChildContent>
+        </MTimelineItem>
+    }
+</MTimeline>
 @code {
     [Parameter]
     public List<ExaminedNormalListModel> Model { get; set; }
-
-    [Parameter]
-    public bool IsSmallScreen { get; set; }
     [Parameter]
     public EventCallback OnNavClick { get; set; }
 
-    private readonly List<TimelineItem> AlternateTimelineItems = new List<TimelineItem>();
 
     protected override async Task OnInitializedAsync()
     {
-        //初始化动态时间线
-        InitNewsTimeLine();
+
     }
 
-    public Color GetColor(int index)
+    public async Task OnClickUser(ExaminedNormalListModel model)
     {
-        switch (index)
-        {
-            case 0:
-                return Color.Primary;
-            case 1:
-                return Color.Info;
-            case 2:
-                return Color.Success;
-            case 3:
-                return Color.Warning;
-            default:
-                return Color.Danger;
-        }
+
+        NavigationManager.NavigateTo("/space/index/" + model.UserId);
+        await OnNavClick.InvokeAsync();
     }
-
-    public void InitNewsTimeLine()
+    public async Task OnClickExamine(ExaminedNormalListModel model)
     {
-        int next = 0;
-        AlternateTimelineItems.Clear();
 
-        foreach (var item in Model)
-        {
-            AlternateTimelineItems.Add(new TimelineItem
-            {
-                Color = GetColor((next++) % 4),
-                Component = BootstrapDynamicComponent.CreateComponent<ExamineInforAloneTip>(new Dictionary<string, object>
-                {
-                    [nameof(ExamineInforAloneTip.Model)] = item,
-                    [nameof(ExamineInforAloneTip.OnNavClick)] = OnNavClick,
-                    [nameof(ExamineInforAloneTip.IsRight)] = (_dataCacheService.IsApp || Model.Count < 3) ? false : (Model.IndexOf(item) % 2 == 1),
-                    [nameof(ExamineInforAloneTip.LastExamineId)] = Model.Max(s => s.Id),
-                }),
-                Description = item.ApplyTime.ToString("yyyy/M/d HH:mm")
-            });
-        }
+        NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + model.Id);
+
+        await OnNavClick.InvokeAsync();
     }
 }

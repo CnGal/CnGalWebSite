@@ -77,6 +77,11 @@
         </div>
     </ChildContent>
 </MMenu>
+
+@if (ShowExamines)
+{
+    <EditRecordListViewTip Id="Id" Model="Examines" Type="Type" OnClickClose="@(()=> { ShowExamines = false;StateHasChanged(); })" />
+}
 @code {
     [Parameter]
     public ExaminedNormalListModelType Type { get; set; }
@@ -98,6 +103,7 @@
     public EventCallback<bool> IsEditChanged { get; set; }
 
     bool isReady { get; set; }
+    bool ShowExamines { get; set; }
 
     public List<EditButtonLineModel> Items { get; set; } = new List<EditButtonLineModel>();
 
@@ -113,29 +119,18 @@
     protected override async Task OnParametersSetAsync()
     {
         await GetExamineInfor();
-        if(Examines.Count!=0)
+        if (Examines.Count != 0)
         {
             ProcButtonList();
             isReady = true;
         }
     }
 
-    public async Task OnClickHistory()
+    public Task OnClickHistory()
     {
-        var option = new DialogOption()
-        {
-            Title = "历史编辑记录",
-            Size= Size.Large
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EditRecordListViewTip>(new Dictionary<string, object>
-        {
-            [nameof(EditRecordListViewTip.Id)] = Id,
-            [nameof(EditRecordListViewTip.Model)] = Examines,
-            [nameof(EditRecordListViewTip.Type)] = Type,
-            [nameof(EditRecordListViewTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-
-        }).Render();
-        await DialogService.Show(option);
+        ShowExamines = true;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
 
     public void ProcButtonList()
@@ -237,7 +232,7 @@
     public async Task ValueChanged(bool value)
     {
         Menu = value;
-        if(value)
+        if (value)
         {
             count++;
             await IsEditChanged.InvokeAsync(count % 2 == 1);
@@ -246,11 +241,12 @@
     }
 
 
-    public async Task OnClosed()
+    public Task OnClosed()
     {
         Menu = false;
         //await IsEditChanged.InvokeAsync(IsEdit);
 
         StateHasChanged();
+        return Task.CompletedTask;
     }
 }

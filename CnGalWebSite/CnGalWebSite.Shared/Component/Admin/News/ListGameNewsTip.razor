@@ -7,38 +7,42 @@
 @inject DialogService DialogService
 
 <div>
-        <Table TItem="ListGameNewAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
-               ShowExtendButtons="true" ExtendButtonColumnWidth="170" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-               ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-            <TableToolbarTemplate>
-                <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Success" Icon="fa fa-plus" Text="添加自定义动态" OnClickCallback="AddCustomNews" IsAsync="true" />
-                <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Primary" Icon="fa fa-plus" Text="添加微博动态" OnClickCallback="AddWeiboNews" IsAsync="true" />
-                <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Info" Icon="fa fa-map-signs" Text="关注" OnClickCallback="OnUnIgnoredClick" IsAsync="true" />
-                <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnIgnoredClick" IsAsync="true" />
+    <Table TItem="ListGameNewAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="170" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableToolbarTemplate>
+            <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Success" Icon="fa fa-plus" Text="添加自定义动态" OnClickCallback="AddCustomNews" IsAsync="true" />
+            <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Primary" Icon="fa fa-plus" Text="添加微博动态" OnClickCallback="AddWeiboNews" IsAsync="true" />
+            <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Info" Icon="fa fa-map-signs" Text="关注" OnClickCallback="OnUnIgnoredClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListGameNewAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnIgnoredClick" IsAsync="true" />
 
-            </TableToolbarTemplate>
-            <TableColumns>
-                <TableColumn @bind-Field="@context.Id" Sortable="true" Fixed="true" Width="50" />
-                <TableColumn @bind-Field="@context.State" Sortable="true" Searchable="true"  DefaultSort="true" DefaultSortOrder="SortOrder.Asc" TextWrap="true" Width="50" />
-                <TableColumn @bind-Field="@context.Author" Searchable="true" TextWrap="true" Sortable="true" Width="120" />
-                <TableColumn @bind-Field="@context.Title" Searchable="true" TextWrap="true" Width="200" />
-                <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" TextWrap="true" Width="200" />
+        </TableToolbarTemplate>
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable="true" Fixed="true" Width="50" />
+            <TableColumn @bind-Field="@context.State" Sortable="true" Searchable="true" DefaultSort="true" DefaultSortOrder="SortOrder.Asc" TextWrap="true" Width="50" />
+            <TableColumn @bind-Field="@context.Author" Searchable="true" TextWrap="true" Sortable="true" Width="120" />
+            <TableColumn @bind-Field="@context.Title" Searchable="true" TextWrap="true" Width="200" />
+            <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" TextWrap="true" Width="200" />
 
-                <TableColumn @bind-Field="@context.PublishTime" Sortable="true" TextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
-            </TableColumns>
-            <RowButtonTemplate>
-                <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditGameNews(context.Id))" />
+            <TableColumn @bind-Field="@context.PublishTime" Sortable="true" TextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditGameNews(context.Id))" />
 
-                    <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickWithoutRender="@(() => EditArticle(context.ArticleId ))" IsShow="context.ArticleId != 0"/>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickWithoutRender="@(() => EditArticle(context.ArticleId ))" IsShow="context.ArticleId != 0" />
 
 
-                    <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="关注" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsIgnoredClick(new long[] { context.Id }, false, true))" IsShow="context.State == GameNewsState.Ignore"/>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="关注" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsIgnoredClick(new long[] { context.Id }, false, true))" IsShow="context.State == GameNewsState.Ignore" />
 
-                    <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsIgnoredClick(new long[] { context.Id }, true, true))" IsShow="context.State != GameNewsState.Ignore"/>
-                
-            </RowButtonTemplate>
-        </Table>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsIgnoredClick(new long[] { context.Id }, true, true))" IsShow="context.State != GameNewsState.Ignore" />
+
+        </RowButtonTemplate>
+    </Table>
 </div>
+
+<AddCustomNewsTip @ref="addCustomNewsTip" />
+<AddWeiboNewsTip @ref="addWeiboNewsTip" />
+<EditGameNewsTip @ref="editGameNewsTip" />
 @code {
     [NotNull]
     private Table<ListGameNewAloneModel>? TableRows { get; set; }
@@ -52,6 +56,9 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    AddCustomNewsTip addCustomNewsTip;
+    AddWeiboNewsTip addWeiboNewsTip;
+    EditGameNewsTip editGameNewsTip;
 
     protected override async Task OnInitializedAsync()
     {
@@ -93,51 +100,24 @@
     private async Task EditGameNews(long id)
     {
 
-        var option = new DialogOption()
+        if (editGameNewsTip != null)
         {
-            Title = "编辑动态",
-            IsScrolling = true,
-            Size=Size.Large,
-            ShowCloseButton = false
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EditGameNewsTip>(new Dictionary<string, object>
-        {
-            [nameof(EditGameNewsTip.Id)] = id,
-            [nameof(EditGameNewsTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => { await option.Dialog.Close();await TableRows.QueryAsync(); }),
-        }).Render();
-        await DialogService.Show(option);
+            await editGameNewsTip.Refresh(true, id);
+        }
     }
     private async Task AddWeiboNews(IEnumerable<ListGameNewAloneModel> items)
     {
-
-        var option = new DialogOption()
+        if (addWeiboNewsTip != null)
         {
-            Title = "添加微博动态",
-            IsScrolling = true,
-            Size = Size.Large,
-            ShowCloseButton = false
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<AddWeiboNewsTip>(new Dictionary<string, object>
-        {
-            [nameof(AddWeiboNewsTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => { await option.Dialog.Close(); await TableRows.QueryAsync(); }),
-        }).Render();
-        await DialogService.Show(option);
+            await addWeiboNewsTip.Refresh(true, new AddWeiboNewsModel());
+        }
     }
     private async Task AddCustomNews(IEnumerable<ListGameNewAloneModel> items)
     {
-
-        var option = new DialogOption()
+        if (addCustomNewsTip != null)
         {
-            Title = "添加自定义动态",
-            IsScrolling = true,
-            Size = Size.Large,
-            ShowCloseButton = false
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<AddCustomNewsTip>(new Dictionary<string, object>
-        {
-            [nameof(AddCustomNewsTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => { await option.Dialog.Close(); await TableRows.QueryAsync(); }),
-        }).Render();
-        await DialogService.Show(option);
+            await addCustomNewsTip.Refresh(true, new EditGameNewsModel());
+        }
     }
     private async Task OnRowEditIsIgnoredClick(long[] ids, bool isIgnore, bool showMessage)
     {

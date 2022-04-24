@@ -1,0 +1,85 @@
+﻿@inject HttpClient Http
+
+
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="正文" Class="mb-4" Collapable Outline OutlineHead>
+        <div class="row">
+            <div class="col-12 col-sm-6">
+                <ImageCropperButton @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
+            </div>
+        </div>
+
+        <div class="form-group mt-4">
+            <div class="row">
+
+                <div class="form-group col-12">
+                    <BootstrapInput @bind-Value="Model.Title" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12">
+                    <Textarea @bind-Value="Model.BriefIntroduction" rows="5" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12">
+                    <Textarea @bind-Value="Model.MainPage" rows="5" ShowLabel="true" />
+                </div>
+
+            </div>
+        </div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
+        <div class="form-group">
+            <div class="row">
+                <div class="form-group col-12  col-sm-6">
+                    <Select @bind-Value="Model.Type" ShowLabel="true"></Select>
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.NewsType" ShowLabel="true" />
+                </div>
+
+                <div class="form-group col-12  col-sm-6">
+                    <DateTimePicker @bind-Value="@Model.PublishTime" ViewMode="DatePickerViewMode .DateTime" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12">
+                    <BootstrapInput @bind-Value="Model.Link" ShowLabel="true" />
+                </div>
+            </div>
+        </div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="关联信息" Class="mb-4" Collapable Outline OutlineHead>
+        <div class="form-group m-0">
+            <div class="row">
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.Author" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.WeiboId" ShowLabel="true" />
+                </div>
+                <div class="form-group col-12">
+                    <AutoComplete Items="@Items" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.AuthorEntryName" ShowLabel="true" />
+                </div>
+            </div>
+        </div>
+        <hr />
+        <InputRelevancesListTip AutoCompleteItems="@Items" Model="Model.Entries" Title="词条"></InputRelevancesListTip>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</div>
+
+@code {
+    [Parameter]
+    public EditGameNewsModel Model { get; set; }
+
+    private List<string> Items { get; set; } = new List<string>();
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Items = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
+        }
+    }
+}

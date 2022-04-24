@@ -1,28 +1,43 @@
 ﻿@inject ToastService ToastService
 @inject HttpClient Http
 
-<style>
-    .modal-footer {
-        display: none;
-    }
-</style>
+<MDialog Value="Dialog" ValueChanged="ValueChanged"
+         Width="800">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            编辑记录
+        </MCardTitle>
+        <MCardText>
+            点击头像可查看对应用户空间，点击卡片可查看编辑记录详情
+        </MCardText>
 
-<div>
-    @if (isReady)
-    {
-        <CnGalWebSite.Shared.Component.Entries.NewVersion.ExaminesInforCard  Model="Model" OnNavClick="OnNavClick" />
-    }
-    else
-    {
-        <div style="min-height:200px;">
-            <h3 class="mb-3 text-center">正在加载</h3>
-            <div class="d-flex" style="justify-content: center;">
-                <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
+        <Scroll style="max-height:500px" class="ps-4 pe-4">
+            <div>
+                @if (isReady)
+                {
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.ExaminesInforCard Model="Model" OnNavClick="OnClickClose" />
+                }
+                else
+                {
+                    <div style="min-height:200px;">
+                        <h3 class="mb-3 text-center">正在加载</h3>
+                        <div class="d-flex" style="justify-content: center;">
+                            <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
+                        </div>
+                    </div>
+                }
             </div>
-        </div>
-
-    }
-</div>
+        </Scroll>
+        <MCardActions>
+            <MSpacer></MSpacer>
+            <MButton Color="green darken-1"
+                     Text
+                     OnClick="async ()=> { Dialog = false;await OnClickClose.InvokeAsync(); }">
+                关闭
+            </MButton>
+        </MCardActions>
+    </MCard>
+</MDialog>
 
 @code {
     [Parameter]
@@ -45,6 +60,7 @@
     public string Text { get; set; }
     private IEnumerable<long> Value1 { get; set; }
     bool isReady = false;
+    bool Dialog { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,8 +102,11 @@
 
     }
 
-    public async Task OnNavClick()
+    public async Task ValueChanged(bool value)
     {
-        await OnClickClose.InvokeAsync();
+        if (value == false)
+        {
+            await OnClickClose.InvokeAsync();
+        }
     }
 }

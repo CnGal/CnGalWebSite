@@ -342,26 +342,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //走动态的作者初始化流程
             var infor = await _articleService.GetNewsModelAsync(article);
-            var temp = new HomeNewsAloneViewModel
+
+            model.UserInfor = new DataModel.ViewModel.Space.UserInforViewModel
             {
-                ArticleId = article.Id,
-                Text = infor.Title,
-                Time = infor.HappenedTime,
-                Type = infor.NewsType ?? "动态",
-                GroupId = infor.GroupId,
-                Image = infor.Image,
-                Link = infor.Link,
-                Title = infor.GroupName,
-                UserId = infor.UserId,
+                Name = infor.GroupName,
+                PhotoPath = infor.Image
             };
-
-            temp.Link = article.OriginalLink;
-            if (temp.Title == "搬运姬" && string.IsNullOrWhiteSpace(article.OriginalAuthor) == false)
-            {
-                temp.Title = article.OriginalAuthor;
-            }
-
-            model.BackgroundPicture = temp.Image;
 
             return model;
         }
