@@ -45,6 +45,8 @@ namespace CnGalWebSite.RobotClient
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     Replies = (List<RobotReply>)serializer.Deserialize(file, typeof(List<RobotReply>));
+                    file.Close();
+                    file.Dispose();
                 }
             }
             catch
@@ -62,6 +64,8 @@ namespace CnGalWebSite.RobotClient
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, Replies);
+                file.Close();
+                file.Dispose();
             }
         }
 

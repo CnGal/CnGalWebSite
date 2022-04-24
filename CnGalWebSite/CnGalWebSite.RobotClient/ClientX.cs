@@ -53,6 +53,11 @@ namespace CnGalWebSite.RobotClient
             //尝试找出所有匹配的回复
             var reply = _messageX.GetAutoReply(message, s);
 
+            if (reply == null)
+            {
+                return;
+            }
+
             var result = await _messageX.ProcMessageAsync(reply.Value, message,reply.Key, s);
 
             if (result != null)
