@@ -211,7 +211,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             sb.AppendLine($"{model.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/entries/index/{model.Id}\">{model.DisplayName}</a>");
             if (string.IsNullOrWhiteSpace(model.BriefIntroduction) == false)
             {
-                sb.AppendLine($"{model.BriefIntroduction.Abbreviate(23)}");
+                sb.AppendLine($"{model.BriefIntroduction.Abbreviate(plainText?30:23)}");
             }
 
 

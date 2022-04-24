@@ -47,6 +47,8 @@ namespace CnGalWebSite.RobotClient
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     Events = (List<RobotEvent>)serializer.Deserialize(file, typeof(List<RobotEvent>));
+                    file.Close();
+                    file.Dispose();
                 }
             }
             catch
@@ -64,6 +66,8 @@ namespace CnGalWebSite.RobotClient
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, Events);
+                file.Close();
+                file.Dispose();
             }
         }
         public void LoadExecuteInfors()
@@ -76,6 +80,8 @@ namespace CnGalWebSite.RobotClient
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     ExecuteInfors = (List<EventExecuteInfor>)serializer.Deserialize(file, typeof(List<EventExecuteInfor>));
+                    file.Close();
+                    file.Dispose();
                 }
             }
             catch
@@ -93,6 +99,8 @@ namespace CnGalWebSite.RobotClient
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, ExecuteInfors);
+                file.Close();
+               file.Dispose();
             }
         }
 

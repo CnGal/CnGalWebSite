@@ -43,6 +43,8 @@ namespace CnGalWebSite.RobotClient
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     BasicSetting = (Setting)serializer.Deserialize(file, typeof(Setting));
+                    file.Close();
+                    file.Dispose();
                 }
             }
             catch
@@ -62,6 +64,8 @@ namespace CnGalWebSite.RobotClient
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     MessageArgs = (List<MessageArg>)serializer.Deserialize(file, typeof(List<MessageArg>));
+                    file.Close();
+                    file.Dispose();
                 }
             }
             catch
@@ -96,6 +100,8 @@ namespace CnGalWebSite.RobotClient
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, BasicSetting);
+                file.Close();
+                file.Dispose();
             }
         }
 
@@ -107,6 +113,8 @@ namespace CnGalWebSite.RobotClient
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, MessageArgs);
+                file.Close();
+                file.Dispose();
             }
         }
     }
@@ -119,6 +127,7 @@ namespace CnGalWebSite.RobotClient
         public string VerifyKey { get; set; }
 
         public string RootPath { get; set; } = "Data";
+        public string SensitiveWordsPath { get; set; } = "SensitiveWords";
 
         public string QQ { get; set; }
 

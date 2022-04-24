@@ -22,6 +22,7 @@ namespace CnGalWebSite.RobotClient
     public class MessageX
     {
         private readonly Setting _setting;
+        private readonly SensitiveWordX _SensitiveWordX;
         private readonly IDictionary<string, string> _cache;
         private readonly HttpClient _httpClient;
         private readonly List<RobotReply> _replies;
@@ -29,7 +30,7 @@ namespace CnGalWebSite.RobotClient
         private readonly List<RobotFace> _robotFaces;
 
 
-        public MessageX(Setting setting, HttpClient client, List<RobotReply> replies, IDictionary<string, string> cache, List<MessageArg> messageArgs, List<RobotFace> robotFaces)
+        public MessageX(Setting setting, HttpClient client, List<RobotReply> replies, IDictionary<string, string> cache, List<MessageArg> messageArgs, List<RobotFace> robotFaces, SensitiveWordX SensitiveWordX)
         {
             _setting = setting;
             _httpClient = client;
@@ -37,6 +38,7 @@ namespace CnGalWebSite.RobotClient
             _cache = cache;
             _messageArgs = messageArgs;
             _robotFaces = robotFaces;
+            _SensitiveWordX = SensitiveWordX;
         }
 
         public RobotReply GetAutoReply(string message, GroupMessageSender sender)
@@ -60,7 +62,49 @@ namespace CnGalWebSite.RobotClient
 
         public async Task<Message[]> ProcMessageAsync(string reply, string message, string regex,GroupMessageSender sender)
         {
-            return ProcMessageArray(ProcMessageFace(ProcMessageReplaceInput(await ProcMessageArgument(reply, message, sender),message,regex), sender), sender);
+            var args = new List<KeyValuePair<string, string>>();
+            try
+            {
+                await ProcMessageArgument(reply, message, sender, args);
+                ProcMessageReplaceInput(reply, message, regex, args);
+                ProcMessageFace(reply, sender, args);
+
+                //检测敏感词
+                var words = _SensitiveWordX.Check(args.Where(s => s.Key == "sender" || (s.Key.Contains('[') && s.Key.Contains(']'))).Select(s => s.Value).ToList());
+
+                if(words.Count!=0)
+                {
+                    OutputHelper.Write(OutputLevel.Dager, $"对{sender.memberName}({sender.id})的消息回复中包含敏感词\n消息：{message}\n回复：{reply}\n\n参数替换列表：");
+                    foreach(var item in args)
+                    {
+                        OutputHelper.Write(OutputLevel.Dager, $"{item.Key} -> {item.Value}");
+
+                    }
+                    OutputHelper.Write(OutputLevel.Dager, $"\n触发的敏感词：");
+                    foreach (var item in words)
+                    {
+                        OutputHelper.Write(OutputLevel.Dager, $"{item}");
+                    }
+                    return null;
+                }
+
+                //替换参数
+                foreach(var item in args)
+                {
+                    reply = reply.Replace(item.Key, item.Value);
+                }
+            }
+            catch (ArgError arg)
+            {
+                reply = arg.Error;
+            }
+            catch (Exception ex)
+            {
+                OutputHelper.PressError(ex, "获取变量值失败");
+                reply = "呜呜呜~";
+            }
+
+            return ProcMessageArray(reply, sender);
         }
 
         public Message[] ProcMessageArray(string vaule, GroupMessageSender sender)
@@ -131,25 +175,28 @@ namespace CnGalWebSite.RobotClient
             }
         }
 
-        public string ProcMessageReplaceInput(string reply, string message, string regex)
+        public void ProcMessageReplaceInput(string reply, string message, string regex, List<KeyValuePair<string, string>> args)
         {
             if(string.IsNullOrWhiteSpace(regex))
             {
-                return message;
+                return;
             }
+
+
 
             var splits = Regex.Split(message,regex).Where(s=>string.IsNullOrWhiteSpace(s)==false).ToList();
 
 
             for (int i = 0; i < splits.Count; i++)
             {
-                reply = reply.Replace($"[{i+1}]", splits[i].ToString());
+                if (reply.Contains($"[{i + 1}]"))
+                {
+                    args.Add(new KeyValuePair<string, string>($"[{i + 1}]", splits[i].ToString()));
+                }    
             }
-
-            return reply;
         }
 
-        public async Task<string> ProcMessageArgument(string reply,string message, GroupMessageSender sender)
+        public async Task ProcMessageArgument(string reply,string message, GroupMessageSender sender, List<KeyValuePair<string, string>> args)
         {
             try
             {
@@ -178,34 +225,30 @@ namespace CnGalWebSite.RobotClient
                     };
 
                     reply = reply.Replace("$(" + argument + ")", value);
+
+                    args.Add(new KeyValuePair<string, string>("$(" + argument + ")", value));
                 }
             }
             catch (ArgError arg)
             {
                 reply = arg.Error;
             }
-            catch (Exception ex)
-            {
-                OutputHelper.PressError(ex, "获取变量值失败");
-                return "呜呜呜~";
-
-            }
-
-            return reply;
         }
 
-        public string ProcMessageFace(string message, GroupMessageSender sender)
+        public void ProcMessageFace(string reply, GroupMessageSender sender, List<KeyValuePair<string, string>> args)
         {
-            if (string.IsNullOrWhiteSpace(message))
+            if (string.IsNullOrWhiteSpace(reply))
             {
-                return null;
+                return;
             }
 
             foreach (var item in _robotFaces.Where(s => s.IsHidden == false))
             {
-                message = message.Replace($"[{item.Key}]", item.Value);
+                if (reply.Contains($"[{item.Key}]"))
+                {
+                    args.Add(new KeyValuePair<string, string>($"[{item.Key}]", item.Value));
+                }
             }
-            return message;
         }
 
         public async Task<string> GetArgValue(string name, string infor)

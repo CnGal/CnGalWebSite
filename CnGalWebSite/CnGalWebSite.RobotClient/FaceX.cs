@@ -43,6 +43,8 @@ namespace CnGalWebSite.RobotClient
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     Faces = (List<RobotFace>)serializer.Deserialize(file, typeof(List<RobotFace>));
+                    file.Close();
+                    file.Dispose();
                 }
             }
             catch
@@ -60,6 +62,8 @@ namespace CnGalWebSite.RobotClient
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, Faces);
+                file.Close();
+                file.Dispose();
             }
         }
 
