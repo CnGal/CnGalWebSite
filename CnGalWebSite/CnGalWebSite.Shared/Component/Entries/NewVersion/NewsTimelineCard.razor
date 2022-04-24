@@ -5,24 +5,24 @@
 
 @if (Model.RelevancesState == EditState.Preview)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditRelevances/" + Model.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditRelevances/" + Model.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke" />
 }
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="动态" Icon="fa fa-fw fa-newspaper-o">
     <Scroll style="max-height:500px">
         <MTimeline Dense="_dataCatcheService.IsApp||Model.NewsOfEntry.Count<3" Class="ms-2 me-2">
-            @foreach (var item in Model.NewsOfEntry.OrderByDescending(s=>s.HappenedTime))
+            @foreach (var item in Model.NewsOfEntry.OrderByDescending(s => s.HappenedTime))
             {
                 <MTimelineItem Large>
                     <IconContent>
                         <MAvatar Class="pointer" @onclick="@(()=>OnClickImage(item))">
-                            <MImage Src="@item.Image"></MImage>
+                            <img src="@item.Image" />
                         </MAvatar>
                     </IconContent>
                     <OppositeContent>
                         <span>@item.HappenedTime.ToString("yyyy-MM-dd HH:mm")</span>
                     </OppositeContent>
                     <ChildContent>
-                        <MCard Class="elevation-2"  @onclick="@(()=>ViewAt(item))">
+                        <MCard Class="elevation-2" @onclick="@(()=>ViewAt(item))">
                             <MCardTitle Class="fw-bold">
                                 @item.Title
                             </MCardTitle>

@@ -1,64 +1,39 @@
 ﻿@page "/admin/listnews"
 @attribute [Authorize(Roles = "Editor")]
-@inject IAuthService AuthService
 @inject HttpClient Http
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
-@inject NavigationManager NavigationManager
-@inject IJSRuntime JS
+@inject IDataCacheService _dataCacheService
 
 <TitleTip Title="动态版块"></TitleTip>
-
 <div>
-    <div class="  rounded shadow-sm  bg-opacity p-3">
-        <h3 class="fw-bold text-center">动态版块</h3>
-        <p class="text-center" style="color: gray;margin-top:20px">
-            <i class="fa fa-gamepad fa-fw "></i>
-            <span class="article-infor-text">@(InforModel.GameNews + "条动态")</span>&nbsp;&nbsp;&nbsp;
+    <div class="rounded  shadow-sm bg-opacity mb-4">
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
+               Color="@_dataCacheService.ThemeSetting.Theme">
 
-            <i class="fa fa-users fa-fw "></i>
-            <span class="article-infor-text">@(InforModel.WeelyNews + "份周报")</span>
-            @if (IsSmallScreen)
-            {
-                <br />
-            }
-            else
-            {
-                <span>&nbsp; &nbsp; &nbsp;</span>
-            }
-            <i class="fa fa-star fa-fw "></i>
-            <span class="article-infor-text">@("已发布 "+InforModel.PublishedNews + "条动态")</span>&nbsp;&nbsp;&nbsp;
-
-            <i class="fa fa-object-group fa-fw "></i>
-            <span class="article-infor-text">@("已忽略"+InforModel.DeletedNews + "条动态")</span>
-            @if (IsSmallScreen)
-            {
-                <br />
-            }
-            else
-            {
-                <span>&nbsp; &nbsp; &nbsp;</span>
-            }
-
-            <i class="fa fa-codepen fa-fw "></i>
-            <span class="article-infor-text">@("总计"+InforModel.All + "条动态")</span>
-        </p>
+            <MTab Value="1">
+                动态<MIcon>mdi-newspaper-variant</MIcon>
+            </MTab>
+            <MTab Value="2">
+                周报<MIcon>mdi-calendar-range</MIcon>
+            </MTab>
+        </MTabs>
     </div>
-    <div class="  rounded shadow-sm mt-3 bg-opacity">
-        <Tab>
-            <TabItem Text="动态列表" Icon="fa fa-newspaper-o">
+    <MTabsItems @bind-Value="TabIndex">
+        <MTabItem Value="1">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
                 <CnGalWebSite.Shared.Component.Admin.News.ListGameNewsTip />
 
-            </TabItem>
-            <TabItem Text="周报列表" Icon="fa fa-folder-open-o">
+            </div>
+
+        </MTabItem>
+        <MTabItem Value="2">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
                 <CnGalWebSite.Shared.Component.Admin.News.ListWeeklyNewsTip />
 
-            </TabItem>
-        </Tab>
-    </div>
+            </div>
 
+        </MTabItem>
+    </MTabsItems>
 </div>
-
 
 @code {
 
@@ -67,78 +42,19 @@
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    public StringNumber TabIndex { get; set; } = 1;
 
-    #region 获取屏幕大小
-
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime? JSRuntime { get; set; }
-
-
-
-    public bool IsSmallScreen { get; set; }
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; }
-
-
-    private JSInterop<ListNews>? Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            Interop = new JSInterop<ListNews>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
-        }
-
-    }
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 768))
-        {
-            IsSmallScreen = width < 768;
-
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 768 && width < 2000))
-        {
-            IsNormalScreen = width >= 768 && width < 2000;
-
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 2000))
-        {
-            IsLargeScreen = width >= 2000;
-
-            StateHasChanged();
-        }
-    }
-    #endregion
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            InforModel = await Http.GetFromJsonAsync<ListGameNewsInforViewModel>(ToolHelper.WebApiPath + "api/news/listgamenews");
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取动态数据");
-        }
+        //try
+        //{
+        //    InforModel = await Http.GetFromJsonAsync<ListGameNewsInforViewModel>(ToolHelper.WebApiPath + "api/news/listgamenews");
+        //}
+        //catch (Exception ex)
+        //{
+        //    ErrorHandler.ProcessError(ex, "无法获取动态数据");
+        //}
 
     }
 

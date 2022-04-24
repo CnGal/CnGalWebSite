@@ -9,14 +9,6 @@
 <TitleTip Title="图片板块"></TitleTip>
 
 <div>
-    @*<div class="  rounded shadow-sm  bg-opacity p-3 mb-3">
-            <h3 class="fw-bold text-center">图片板块</h3>
-            <p class="text-center" style="color: gray;margin-top:20px">
-                <i class="fa fa-image fa-fw "></i>
-                <span class="article-infor-text">@("总计"+InforModel.All + "个图片")</span>&nbsp;&nbsp;&nbsp;
-            </p>
-        </div>*@
-
     <div class="rounded  shadow-sm bg-opacity mb-4">
         <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
                Color="@_dataCacheService.ThemeSetting.Theme">
@@ -55,14 +47,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            InforModel = await Http.GetFromJsonAsync<ListFilesInforViewModel>(ToolHelper.WebApiPath + "api/admin/listfiles");
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取图片数据");
-        }
+        //try
+        //{
+        //    InforModel = await Http.GetFromJsonAsync<ListFilesInforViewModel>(ToolHelper.WebApiPath + "api/admin/listfiles");
+        //}
+        //catch (Exception ex)
+        //{
+        //    ErrorHandler.ProcessError(ex, "无法获取图片数据");
+        //}
 
     }
 }

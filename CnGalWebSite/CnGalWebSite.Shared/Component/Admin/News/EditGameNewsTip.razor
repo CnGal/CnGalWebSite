@@ -4,85 +4,22 @@
 @inject NavigationManager NavigationManager
 @inject IServiceProvider Provider
 
-<style>
-    .modal-footer {
-        display: none;
-    }
 
-    .modal-title {
-        font-weight: bolder;
-    }
-</style>
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            编辑动态
+        </MCardTitle>
+        <MCardText>
+            如果动态已发布会同步修改对应文章信息，但关联部分除外
+        </MCardText>
 
-<div>
-    <Scroll Height="600px">
-        <div>
+        <Scroll style="max-height:600px;" class="ps-6 pe-6">
             @if (isReady)
             {
-                <div>
-                    <div class="mb-4">
-                        <h5 class="text-truncate fw-bold">正文</h5>
+                <GameNewsEditorCard Model="Model" />
 
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <ImageCropperButton @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
-                            </div>
-                        </div>
-
-                        <div class="form-group mt-4">
-                            <div class="row">
-
-                                <div class="form-group col-12">
-                                    <BootstrapInput @bind-Value="Model.Title" ShowLabel="true" />
-                                </div>
-                                <div class="form-group col-12">
-                                    <Textarea @bind-Value="Model.BriefIntroduction" rows="5" ShowLabel="true" />
-                                </div>
-                                <div class="form-group col-12">
-                                    <Textarea @bind-Value="Model.MainPage" rows="5" ShowLabel="true" />
-                                </div>
-
-                            </div>
-                        </div>
-                        <hr />
-                        <h5 class="text-truncate fw-bold">基本信息</h5>
-                        <div class="form-group mt-4">
-                            <div class="row">
-                                <div class="form-group col-12  col-sm-6">
-                                    <Select @bind-Value="Model.Type" ShowLabel="true"></Select>
-                                </div>
-                                <div class="form-group col-12  col-sm-6">
-                                    <BootstrapInput @bind-Value="Model.NewsType" ShowLabel="true" />
-                                </div>
-
-                                <div class="form-group col-12  col-sm-6">
-                                    <DateTimePicker @bind-Value="@Model.PublishTime" ViewMode="DatePickerViewMode .DateTime" ShowLabel="true" />
-                                </div>
-                                <div class="form-group col-12">
-                                    <BootstrapInput @bind-Value="Model.Link" ShowLabel="true" />
-                                </div>
-                            </div>
-                        </div>
-                        <hr />
-                        <h5 class="text-truncate fw-bold">修正关联作者</h5>
-                        <div class="form-group mt-4">
-                            <div class="row">
-                                <div class="form-group col-12  col-sm-6">
-                                    <BootstrapInput @bind-Value="Model.Author" ShowLabel="true" />
-                                </div>
-                                <div class="form-group col-12  col-sm-6">
-                                    <BootstrapInput @bind-Value="Model.WeiboId" ShowLabel="true" />
-                                </div>
-                                <div class="form-group col-12">
-                                    <AutoComplete Items="@Items" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.AuthorEntryName" ShowLabel="true" />
-                                </div>
-                            </div>
-                        </div>
-                        <hr />
-                        <InputRelevancesListTip AutoCompleteItems="@Items" Model="Model.Entries" Title="关联词条"></InputRelevancesListTip>
-
-                    </div>
-                </div>
             }
             else
             {
@@ -92,57 +29,55 @@
                         <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
                     </div>
                 </div>
-
             }
 
-        </div>
+        </Scroll>
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+            @if (isReady)
+            {
+                @if (Model.State == GameNewsState.Edit)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="预览" IsAsync="true" OnClick="OnPreview" Icon="mdi-view-day" Color="primary" />
+                }
+                else if (Model.State == GameNewsState.Publish && Model.ArticleId != null)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看" IsAsync="true" OnClick="OnLook" Icon="mdi-view-day" Color="primary" />
 
-    </Scroll>
-
-    <div class="mt-3" style="display: flex; justify-content: space-between;">
-        @if (Model.State == GameNewsState.Edit)
-        {
-            <Button Color="Color.Success" Icon="fa fa-file-text-o" @onclick="OnPreview" IsAsync="true" Text="预览"></Button>
-        }
-        else if (Model.State == GameNewsState.Publish&&Model.ArticleId!=null)
-        {
-            <Button Color="Color.Success" Icon="fa fa-file-text-o" @onclick="OnLook" IsAsync="true" Text="查看"></Button>
-
-        }
-
-        <div style="display:flex;">
+                }
+            }
+            <MSpacer></MSpacer>
             @if (Model.State == GameNewsState.Edit)
             {
-                <Button Color="Color.Info" IsOutline="true" Icon="fa fa-paper-plane-o" class="me-1" @onclick="@OnPublish" IsAsync="true" Text="发布"></Button>
-            }
-            <Button Color="Color.Primary" Icon="fa fa-save" class="me-1" @onclick="@OnSave" IsAsync="true" Text="保存"></Button>
-        </div>
-    </div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发布" IsAsync="true" OnClick="OnPublish" Icon="mdi-publish" Color="primary" Class="me-2" />
 
-</div>
+            }
+
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="green" />
+        </MCardActions>
+    </MCard>
+</MDialog>
+<PreviewArticleTip @ref="previewArticleTip" />
 
 @code {
-    [Parameter]
-    public EventCallback OnClickClose { get; set; }
-    [Parameter]
-    public long Id { get; set; }
-    [Parameter]
-    public EditGameNewsModel Model { get; set; } = new EditGameNewsModel();
+
+    private long Id { get; set; }
+
+    private EditGameNewsModel Model { get; set; } = new EditGameNewsModel();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    private IEnumerable<long> Value1 { get; set; }
     bool isReady = false;
+    bool Dialog { get; set; }
 
-    private List<string> Items { get; set; } = new List<string>();
+    PreviewArticleTip previewArticleTip;
 
-    protected override async Task OnInitializedAsync()
+    private async Task Init()
     {
         try
         {
             Model = await Http.GetFromJsonAsync<EditGameNewsModel>(ToolHelper.WebApiPath + "api/news/EditGameNews/" + Id);
-            Items = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList");
 
             isReady = true;
             StateHasChanged();
@@ -202,7 +137,7 @@
             if (result.Successful)
             {
                 await ToastService.Success("发布动态成功", "发布动态成功");
-                await OnClickClose.InvokeAsync();
+                Dialog = false;
             }
             else
             {
@@ -212,8 +147,8 @@
         }
         catch (Exception ex)
         {
-            await ToastService.Error("发布动态失败", "发布动态失败");
-            //ErrorHandler.ProcessError(ex, "发布动态失败");
+            //await ToastService.Error("发布动态失败", "发布动态失败");
+            ErrorHandler.ProcessError(ex, "发布动态失败");
         }
 
     }
@@ -226,32 +161,37 @@
         {
             ArticleViewModel model = await Http.GetFromJsonAsync<ArticleViewModel>(ToolHelper.WebApiPath + "api/news/GetGameNewsPreview/" + Id);
 
-            var option = new DialogOption()
+            if (previewArticleTip != null)
             {
-                Title = "预览动态",
-                Size = Size.Medium,
-                ShowCloseButton = false
-            };
-            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<PreviewArticleTip>(new Dictionary<string, object>
-            {
-                [nameof(PreviewArticleTip.Model)] = model
-            }).Render();
-            await DialogService.Show(option);
+                await previewArticleTip.Refresh(true, model);
+            }
 
         }
         catch (Exception ex)
         {
-            await ToastService.Error("获取编辑动态信息失败", "获取编辑动态信息失败");
-            //ErrorHandler.ProcessError(ex, "获取编辑动态信息失败");
+            //await ToastService.Error("获取动态预览数据失败", "获取动态预览数据失败");
+            ErrorHandler.ProcessError(ex, "获取编辑动态信息失败");
         }
 
     }
 
     private async Task OnLook()
     {
-        await OnClickClose.InvokeAsync();
+        Dialog = false;
         NavigationManager.NavigateTo(Provider, "/articles/index/" + Model.ArticleId, Model.Title, "fa fa-newspaper-o");
 
     }
 
+    public async Task Refresh(bool dialog, long id)
+    {
+        Dialog = dialog;
+        Id = id;
+        isReady = false;
+
+        StateHasChanged();
+
+        await Init();
+
+        StateHasChanged();
+    }
 }

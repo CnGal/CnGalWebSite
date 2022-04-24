@@ -51,92 +51,92 @@
             </div>
         }
 
-    <div class="ps-4 pt-4 pe-4 col">
+        <div class="ps-4 pt-4 pe-4 col">
 
-        @if (ForceSmall)
-        {
-            <div class="@(((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
-                <h1 class="fw-bold h3">@Model.Name</h1>
-            </div>
-        }
-        else
-        {
-            <div class="@("d-md-none-co "+((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
-                <h1 class="fw-bold h3">@Model.Name</h1>
-            </div>
+            @if (ForceSmall)
+            {
+                <div class="@(((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
+                    <h1 class="fw-bold h3">@Model.Name</h1>
+                </div>
+            }
+            else
+            {
+                <div class="@("d-md-none-co "+((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
+                    <h1 class="fw-bold h3">@Model.Name</h1>
+                </div>
 
-            <div class="d-md-flex d-none">
-                <h1 class="fw-bold h3">@Model.Name</h1>
-            </div>
-        }
-        <div class="row">
-            <div class="col-12 col-xl-6">
-                <div class="h4 m-0" style="display: flex; flex-wrap: wrap; ">
+                <div class="d-md-flex d-none">
+                    <h1 class="fw-bold h3">@Model.Name</h1>
+                </div>
+            }
+            <div class="row">
+                <div class="col-12 col-xl-6">
+                    <div class="h4 m-0" style="display: flex; flex-wrap: wrap; ">
 
-                    @if (Model.ProductionGroups.Count > 0)
-                    {
-                        <OutlineButton IsTitile="true" Text="制作组" ColorNum="pr" />
-
-                        @foreach (var temp in Model.ProductionGroups)
+                        @if (Model.ProductionGroups.Count > 0)
                         {
-                            <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
-                                           Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
+                            <OutlineButton IsTitile="true" Text="制作组" ColorNum="pr" />
+
+                            @foreach (var temp in Model.ProductionGroups)
+                            {
+                                <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
+                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
+                            }
                         }
-                    }
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="h4 m-0" style="display: flex; flex-wrap: wrap; ">
+                        @if (Model.Publishers.Count > 0)
+                        {
+                            <OutlineButton IsTitile="true" Text="发行商" ColorNum="pr" />
+
+                            @foreach (var temp in Model.Publishers)
+                            {
+                                <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
+                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
+                            }
+                        }
+                    </div>
                 </div>
             </div>
-            <div class="col-12 col-lg-6">
-                <div class="h4 m-0" style="display: flex; flex-wrap: wrap; ">
-                    @if (Model.Publishers.Count > 0)
-                    {
-                        <OutlineButton IsTitile="true" Text="发行商" ColorNum="pr" />
 
-                        @foreach (var temp in Model.Publishers)
-                        {
-                            <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
-                                           Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
-                        }
-                    }
+            @if (ForceSmall)
+            {
+                <div class="@(((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
+                    <span>
+                        @Model.BriefIntroduction
+                    </span>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="@("d-md-none-co "+((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
+                    <span>
+                        @Model.BriefIntroduction
+                    </span>
+                </div>
+
+                <div class="d-md-flex d-none">
+                    <span class="text-truncate-4">
+                        @Model.BriefIntroduction
+                    </span>
+                </div>
+            }
+
+            @if (HiddenButton == false)
+            {
+                <div class="mt-2" style="display: flex; justify-content: flex-end;">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Entry" Class="me-4" />
+                    @if (Model.Type == EntryType.Game)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.GameRecordButton Id="Model.Id" Class="me-4" />
+                    }
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Entry" Id="Model.Id" ShowPerfection="Model.Type==EntryType.Game" @bind-IsHidden="Model.IsHidden" IsEdit="Model.IsEdit" IsEditChanged="OnPreEdit" />
+
+                </div>
+            }
         </div>
-
-        @if (ForceSmall)
-        {
-            <div class="@(((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
-                <span>
-                    @Model.BriefIntroduction
-                </span>
-            </div>
-        }
-        else
-        {
-            <div class="@("d-md-none-co "+((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
-                <span>
-                    @Model.BriefIntroduction
-                </span>
-            </div>
-
-            <div class="d-md-flex d-none">
-                <span class="text-truncate-4">
-                    @Model.BriefIntroduction
-                </span>
-            </div>
-        }
-
-        @if (HiddenButton == false)
-        {
-            <div class="mt-2" style="display: flex; justify-content: flex-end;">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Entry" Class="me-4" />
-                @if (Model.Type == EntryType.Game)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.GameRecordButton Id="Model.Id" Class="me-4" />
-                }
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Entry" Id="Model.Id" ShowPerfection="Model.Type==EntryType.Game" @bind-IsHidden="Model.IsHidden" IsEdit="Model.IsEdit" IsEditChanged="OnPreEdit" />
-
-            </div>
-        }
-    </div>
 
     </div>
 

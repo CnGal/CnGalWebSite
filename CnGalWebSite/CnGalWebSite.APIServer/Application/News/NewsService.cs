@@ -436,7 +436,7 @@ namespace CnGalWebSite.APIServer.Application.News
             //不能重名
             if (await _articleRepository.CountAsync(s => s.Name == article.Name) > 0)
             {
-                throw new Exception("文章名称名称『" + article.Name + "』重复，请尝试使用显示名称");
+                throw new Exception("文章名称『" + article.Name + "』重复，请尝试使用显示名称");
             }
 
             //添加关联信息
