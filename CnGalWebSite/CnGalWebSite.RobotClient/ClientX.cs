@@ -58,7 +58,23 @@ namespace CnGalWebSite.RobotClient
                 return;
             }
 
-            var result = await _messageX.ProcMessageAsync(reply.Value, message,reply.Key, s);
+            var result = new Message[] { };
+            try
+            {
+                result = await _messageX.ProcMessageAsync(reply.Value, message, reply.Key, s);
+
+            }
+            catch (ArgError ae)
+            {
+                if (_setting.WarningQQGroup > 0)
+                {
+                    //发送警告
+                    var j = await new GroupMessage(_setting.WarningQQGroup, new Message[] { new Plain(ae.Error) }).SendAsync(MiraiClient);
+                    Console.WriteLine(j);
+
+                }
+            }
+
 
             if (result != null)
             {

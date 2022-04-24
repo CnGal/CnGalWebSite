@@ -60,7 +60,7 @@ namespace CnGalWebSite.RobotClient
             return replies.FirstOrDefault().ToList()[index];
         }
 
-        public async Task<Message[]> ProcMessageAsync(string reply, string message, string regex,GroupMessageSender sender)
+        public async Task<Message[]> ProcMessageAsync(string reply, string message, string regex, GroupMessageSender sender)
         {
             var args = new List<KeyValuePair<string, string>>();
             try
@@ -69,30 +69,7 @@ namespace CnGalWebSite.RobotClient
                 ProcMessageReplaceInput(reply, message, regex, args);
                 ProcMessageFace(reply, sender, args);
 
-                //检测敏感词
-                var words = _SensitiveWordX.Check(args.Where(s => s.Key == "sender" || (s.Key.Contains('[') && s.Key.Contains(']'))).Select(s => s.Value).ToList());
 
-                if(words.Count!=0)
-                {
-                    OutputHelper.Write(OutputLevel.Dager, $"对{sender.memberName}({sender.id})的消息回复中包含敏感词\n消息：{message}\n回复：{reply}\n\n参数替换列表：");
-                    foreach(var item in args)
-                    {
-                        OutputHelper.Write(OutputLevel.Dager, $"{item.Key} -> {item.Value}");
-
-                    }
-                    OutputHelper.Write(OutputLevel.Dager, $"\n触发的敏感词：");
-                    foreach (var item in words)
-                    {
-                        OutputHelper.Write(OutputLevel.Dager, $"{item}");
-                    }
-                    return null;
-                }
-
-                //替换参数
-                foreach(var item in args)
-                {
-                    reply = reply.Replace(item.Key, item.Value);
-                }
             }
             catch (ArgError arg)
             {
@@ -103,7 +80,33 @@ namespace CnGalWebSite.RobotClient
                 OutputHelper.PressError(ex, "获取变量值失败");
                 reply = "呜呜呜~";
             }
+            //检测敏感词
+            var words = _SensitiveWordX.Check(args.Where(s => s.Key == "sender" || (s.Key.Contains('[') && s.Key.Contains(']'))).Select(s => s.Value).ToList());
 
+            if (words.Count != 0)
+            {
+                string msg = $"对{sender.memberName}({sender.id})的消息回复中包含敏感词\n消息：{message}\n回复：{reply}\n\n参数替换列表：\n";
+                foreach (var item in args)
+                {
+                    msg += $"{item.Key} -> {item.Value}\n";
+
+                }
+                msg += $"\n触发的敏感词：\n";
+                foreach (var item in words)
+                {
+                    msg += $"{item}\n";
+                }
+
+                OutputHelper.Write(OutputLevel.Dager, msg);
+
+                throw new ArgError(msg);
+            }
+
+            //替换参数
+            foreach (var item in args)
+            {
+                reply = reply.Replace(item.Key, item.Value);
+            }
             return ProcMessageArray(reply, sender);
         }
 
