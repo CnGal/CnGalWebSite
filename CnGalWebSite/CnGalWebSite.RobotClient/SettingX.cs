@@ -127,7 +127,10 @@ namespace CnGalWebSite.RobotClient
         public string VerifyKey { get; set; }
 
         public string RootPath { get; set; } = "Data";
+
         public string SensitiveWordsPath { get; set; } = "SensitiveWords";
+
+        public long WarningQQGroup { get; set; } = 991706063;
 
         public string QQ { get; set; }
 

@@ -85,7 +85,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
         private async Task UpdateEntries(DateTime LastUpdateTime, bool updateAll = false)
         {
             var entries = await _entryRepository.GetAll().AsNoTracking()
-                .Where(s => s.LastEditTime > LastUpdateTime || updateAll).ToListAsync();
+                .Where(s =>( s.LastEditTime > LastUpdateTime || updateAll)&& s.IsHidden ==false&& string.IsNullOrWhiteSpace(s.Name)==false).ToListAsync();
 
             if(entries.Any()==false)
             {
@@ -98,6 +98,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
             foreach (var item in entries)
             {
+                if(item.Name=="闲踏梧桐")
+                {
+
+                }
                 var temp = documents.FirstOrDefault(s => s.OriginalId == item.Id);
                 if (temp == null)
                 {
@@ -113,10 +117,14 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                 }
 
             }
+
             var result =  await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
 
             var errors = result.Where(s => s.Success == false);
-
+            foreach(var item in errors)
+            {
+                Console.WriteLine(item.Error);
+            }
             var deleted = await _entryRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => (long)s.Id).ToListAsync();
             documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 0 && deleted.Contains(s.OriginalId)).ToListAsync();
             foreach (var item in documents)
@@ -131,13 +139,17 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
                 }
             }
-            await _searchCacheRepository.DeleteRangeAsync(s => deleted.Contains(s.OriginalId));
+            if (documents.Count != 0)
+            {
+            await _searchCacheRepository.DeleteRangeAsync(s => s.Type == 0 && deleted.Contains(s.OriginalId));
+
+            }
         }
 
         private async Task UpdateArticles(DateTime LastUpdateTime,bool updateAll = false)
         {
             var entries = await _articleRepository.GetAll().AsNoTracking()
-                .Where(s => s.LastEditTime > LastUpdateTime || updateAll).ToListAsync();
+                .Where(s => (s.LastEditTime > LastUpdateTime || updateAll) && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
 
             if (entries.Any() == false)
             {
@@ -166,7 +178,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             }
             var result = await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
             var errors = result.Where(s => s.Success == false);
-
+            foreach (var item in errors)
+            {
+                Console.WriteLine(item.Error);
+            }
             var deleted = await _articleRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => (long)s.Id).ToListAsync();
             documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 1 && deleted.Contains(s.OriginalId)).ToListAsync();
             foreach (var item in documents)
@@ -180,13 +195,17 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
                 }
             }
-            await _searchCacheRepository.DeleteRangeAsync(s => deleted.Contains(s.OriginalId));
+            if (documents.Count != 0)
+            {
+            await _searchCacheRepository.DeleteRangeAsync(s => s.Type == 1 && deleted.Contains(s.OriginalId));
+
+            }
         }
 
         private async Task UpdatePeripheries(DateTime LastUpdateTime, bool updateAll=false)
         {
             var entries = await _peripheryRepository.GetAll().AsNoTracking()
-                .Where(s => s.LastEditTime > LastUpdateTime || updateAll).ToListAsync();
+                .Where(s => (s.LastEditTime > LastUpdateTime || updateAll) && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
             if (entries.Any() == false)
             {
                 return;
@@ -214,7 +233,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             }
             var result = await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
             var errors = result.Where(s => s.Success == false);
-
+            foreach (var item in errors)
+            {
+                Console.WriteLine(item.Error);
+            }
             var deleted = await _peripheryRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => (long)s.Id).ToListAsync();
             documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 2 && deleted.Contains(s.OriginalId)).ToListAsync();
             foreach (var item in documents)
@@ -229,13 +251,17 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
                 }
             }
-            await _searchCacheRepository.DeleteRangeAsync(s => deleted.Contains(s.OriginalId));
+            if (documents.Count != 0)
+            {
+            await _searchCacheRepository.DeleteRangeAsync(s => s.Type == 2 && deleted.Contains(s.OriginalId));
+
+            }
         }
 
         private async Task UpdateTags(DateTime LastUpdateTime, bool updateAll = false)
         {
             var entries = await _tagRepository.GetAll().AsNoTracking()
-                .Where(s => s.LastEditTime > LastUpdateTime || updateAll).ToListAsync();
+                .Where(s => (s.LastEditTime > LastUpdateTime || updateAll) && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
             if (entries.Any() == false)
             {
                 return;
@@ -243,7 +269,6 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             var entryIds = entries.Select(s => (long)s.Id).ToList();
 
             var documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 3 && entryIds.Contains(s.OriginalId)).ToListAsync();
-
             foreach (var item in entries)
             {
                 var temp = documents.FirstOrDefault(s => s.OriginalId == item.Id);
@@ -261,7 +286,12 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                 }
 
             }
-            await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+            var result= await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+            var errors = result.Where(s => s.Success == false);
+            foreach (var item in errors)
+            {
+                Console.WriteLine(item.Error);
+            }
 
             var deleted = await _tagRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => (long)s.Id).ToListAsync();
             documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 3 && deleted.Contains(s.OriginalId)).ToListAsync();
@@ -277,7 +307,11 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
                 }
             }
-            await _searchCacheRepository.DeleteRangeAsync(s => deleted.Contains(s.OriginalId));
+            if (documents.Count != 0)
+            {
+            await _searchCacheRepository.DeleteRangeAsync(s => s.Type == 3 && deleted.Contains(s.OriginalId));
+
+            }
         }
 
         public async Task DeleteDataOfSearchService()
