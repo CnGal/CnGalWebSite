@@ -70,7 +70,7 @@ namespace CnGalWebSite.DataModel.Model
 
         public void Copy(Periphery model)
         {
-            Id = SearchCacheId.ToString();
+            Id =SearchCacheId.ToString();
             AnotherName = "";
             DisplayName = model.DisplayName ?? "";
             LastEditTime = model.LastEditTime.ToBinary();
