@@ -272,7 +272,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                         {
                             if (roles.IndexOf(item) != 0)
                             {
-                                sb.Append(",");
+                                sb.Append('，');
                             }
                             sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">{item.DisplayName}</a>");
                         }
@@ -290,7 +290,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 {
                     if (item.Contents.IndexOf(temp) != 0)
                     {
-                        sb.Append(",");
+                        sb.Append('，');
                     }
                     sb.Append($"<a href=\"https://www.cngal.org/entries/index/{temp.Id}\">{temp.DisplayName}</a>");
                 }
