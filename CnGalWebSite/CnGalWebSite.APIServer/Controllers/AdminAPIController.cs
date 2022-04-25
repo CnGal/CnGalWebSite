@@ -94,13 +94,14 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<LotteryAward, long> _lotteryAwardRepository;
         private readonly IRepository<LotteryPrize, long> _lotteryPrizeRepository;
         private readonly IRepository<RobotReply, long> _robotReplyRepository;
+        private readonly IRepository<SearchCache, long> _searchCacheRepository;
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
         IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, IHistoryDataService historyDataService,
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, 
-        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, 
+        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
         IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
@@ -159,6 +160,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _searchHelper = searchHelper;
             _weiXinService= weiXinService;
             _robotReplyRepository = robotReplyRepository;
+            _searchCacheRepository= searchCacheRepository;
         }
 
         /// <summary>
@@ -836,7 +838,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _historyDataService.Replace();
+                await _searchCacheRepository.DeleteRangeAsync(s => true);
 
 
                 return new Result { Successful = true };
