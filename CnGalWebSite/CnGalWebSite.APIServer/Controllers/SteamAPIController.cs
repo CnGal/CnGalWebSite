@@ -122,7 +122,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<SteamInforTipViewModel>>> GetAllDiscountSteamGame()
         {
-            var games = await _steamInforRepository.GetAll().Include(s => s.Entry).Where(s => s.CutNow > 0 && s.Entry.IsHidden == false).ToListAsync();
+            var games = await _steamInforRepository.GetAll().Include(s => s.Entry).Where(s => s.CutNow > 0 && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false).ToListAsync();
 
             var model = new List<SteamInforTipViewModel>();
             foreach (var item in games)

@@ -739,7 +739,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             else if (model.Name == "steamdiscount")
             {
-                var count = await _steamInforRepository.GetAll().Include(s=>s.Entry).CountAsync(s => s.CutNow > 0 && s.Entry.IsHidden == false);
+                var count = await _steamInforRepository.GetAll().Include(s=>s.Entry).CountAsync(s => s.CutNow > 0 && s.Entry.IsHidden == false&&string.IsNullOrWhiteSpace( s.Entry.Name)==false);
 
                 return new Result { Successful = true, Error = $"今天有{count}款作品打折中：https://www.cngal.org/discount" };
             }
