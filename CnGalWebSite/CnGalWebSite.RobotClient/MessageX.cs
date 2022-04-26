@@ -68,8 +68,6 @@ namespace CnGalWebSite.RobotClient
                 await ProcMessageArgument(reply, message, sender, args);
                 ProcMessageReplaceInput(reply, message, regex, args);
                 ProcMessageFace(reply, sender, args);
-
-
             }
             catch (ArgError arg)
             {
@@ -80,6 +78,8 @@ namespace CnGalWebSite.RobotClient
                 OutputHelper.PressError(ex, "获取变量值失败");
                 reply = "呜呜呜~";
             }
+
+
             //检测敏感词
             var words = _SensitiveWordX.Check(args.Where(s => s.Key == "sender" || (s.Key.Contains('[') && s.Key.Contains(']'))).Select(s => s.Value).ToList());
 
@@ -201,40 +201,33 @@ namespace CnGalWebSite.RobotClient
 
         public async Task ProcMessageArgument(string reply,string message, GroupMessageSender sender, List<KeyValuePair<string, string>> args)
         {
-            try
+            while (true)
             {
-                while (true)
+                var argument = reply.MidStrEx("$(", ")");
+
+                if (string.IsNullOrWhiteSpace(argument))
                 {
-                    var argument = reply.MidStrEx("$(", ")");
-
-                    if (string.IsNullOrWhiteSpace(argument))
-                    {
-                        break;
-                    }
-
-                    var value = argument switch
-                    {
-                        "time" => DateTime.Now.ToCstTime().ToString("HH:mm"),
-                        "qq" => sender.id.ToString(),
-                        "weather" => _messageArgs.FirstOrDefault(s => s.Name == "weather")?.Value,
-                        "sender" => sender.memberName,
-                        "auth" => await GetArgValue(argument, sender.id.ToString()),
-                        "n" => "\n",
-                        "r" => "\r",
-                        "facelist" => "该功能暂未实装",
-                        "introduce" => await GetArgValue(argument, message),
-                        "website" => await GetArgValue(argument, message),
-                        _ => await GetArgValue(argument, null)
-                    };
-
-                    reply = reply.Replace("$(" + argument + ")", value);
-
-                    args.Add(new KeyValuePair<string, string>("$(" + argument + ")", value));
+                    break;
                 }
-            }
-            catch (ArgError arg)
-            {
-                reply = arg.Error;
+
+                var value = argument switch
+                {
+                    "time" => DateTime.Now.ToCstTime().ToString("HH:mm"),
+                    "qq" => sender.id.ToString(),
+                    "weather" => _messageArgs.FirstOrDefault(s => s.Name == "weather")?.Value,
+                    "sender" => sender.memberName,
+                    "auth" => await GetArgValue(argument, sender.id.ToString()),
+                    "n" => "\n",
+                    "r" => "\r",
+                    "facelist" => "该功能暂未实装",
+                    "introduce" => await GetArgValue(argument, message),
+                    "website" => await GetArgValue(argument, message),
+                    _ => await GetArgValue(argument, null)
+                };
+
+                reply = reply.Replace("$(" + argument + ")", value);
+
+                args.Add(new KeyValuePair<string, string>("$(" + argument + ")", value));
             }
         }
 
