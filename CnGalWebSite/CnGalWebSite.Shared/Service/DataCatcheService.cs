@@ -43,7 +43,14 @@ namespace CnGalWebSite.Shared.Service
         /// 保存主题设置
         /// </summary>
         public EventCallback SavaTheme { get; set; }
-
+        /// <summary>
+        /// 新建标签页
+        /// </summary>
+        public EventCallback<string> OpenNewPage { get; set; }
+        /// <summary>
+        /// 主题更改 仅MAUI下生效
+        /// </summary>
+        public EventCallback<string> ThemeChanged { get; set; }
         /// <summary>
         /// 身份验证成功后获得的标识 有效期一小时
         /// </summary>

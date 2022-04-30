@@ -18,7 +18,7 @@
 		<ApplicationId>com.cngal.maui</ApplicationId>
 
 		<!-- Versions -->
-		<ApplicationVersion>1</ApplicationVersion>
+		<ApplicationVersion>2</ApplicationVersion>
 
 		<!-- Required for C# Hot Reload -->
 		<UseInterpreter Condition="'$(Configuration)' == 'Debug'">True</UseInterpreter>
@@ -51,7 +51,7 @@
 
 	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<!-- Required - WinUI does not yet have buildTransitive for everything -->
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.2" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.3" />
 		<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.1" />
 	</ItemGroup>
 
@@ -65,6 +65,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\logo.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\logo.png">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Resource>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\CnGalWebSite.Shared\CnGalWebSite.Shared.csproj" />
 	</ItemGroup>
 
@@ -72,6 +84,18 @@
       <EmbeddedResource Include="ILLink.Descriptors.xml">
         <LogicalName>ILLink.Descriptors.xml</LogicalName>
       </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiXaml Update="Themes\LightTheme.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </MauiXaml>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-android'">
+      <PackageReference Include="Plugin.CurrentActivity">
+        <Version>2.1.0.4</Version>
+      </PackageReference>
     </ItemGroup>
 
 </Project>

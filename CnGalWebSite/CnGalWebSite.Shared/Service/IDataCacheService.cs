@@ -27,6 +27,10 @@ namespace CnGalWebSite.Shared.Service
 
         EventCallback RefreshApp { get; set; }
 
+        EventCallback<string> OpenNewPage { get; set; }
+
+        EventCallback<string> ThemeChanged { get; set; }
+
         EventCallback SavaTheme { get; set; }
 
         string LoginKey { get; set; }

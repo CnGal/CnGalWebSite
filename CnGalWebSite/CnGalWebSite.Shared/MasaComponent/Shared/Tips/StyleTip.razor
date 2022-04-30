@@ -135,6 +135,7 @@ else
             //刷新
             Refresh();
             StateHasChanged();
+            await _dataCacheService.ThemeChanged.InvokeAsync(colorMain);
         }
     }
 
@@ -319,6 +320,8 @@ else
         if (theme != _dataCacheService.ThemeSetting.Theme || isMasa != _dataCacheService.ThemeSetting.IsMasa || isDark != _dataCacheService.ThemeSetting.IsDark)
         {
             await OnStateChanged.InvokeAsync(isMasa != _dataCacheService.ThemeSetting.IsMasa);
+            await _dataCacheService.ThemeChanged.InvokeAsync(colorMain);
+
             isMasa = _dataCacheService.ThemeSetting.IsMasa;
             theme = _dataCacheService.ThemeSetting.Theme;
             isDark = _dataCacheService.ThemeSetting.IsDark;

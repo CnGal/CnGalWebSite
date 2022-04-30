@@ -2,6 +2,7 @@
 @inject ToastService? ToastService
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
 
 <div class="mb-2">
     <BootstrapBlazor.Components.Carousel Images="@Images" IsFade="true" OnClick="OnClick" class="h-100 rounded shadow-sm"></BootstrapBlazor.Components.Carousel>
@@ -19,21 +20,13 @@
 
 
 
-    #region 新建标签页
-    public async void OpenNewPage(string url)
-    {
-        await JS.InvokeAsync<string>("openNewPage", url);
-    }
-    #endregion
-
-
     protected override async Task OnInitializedAsync()
     {
 
         try
         {
 
-            Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView",true);
+            Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView", true);
 
             //序列化轮播图
             if (Carousels != null)
@@ -55,21 +48,24 @@
     private async Task OnClick(string imageUrl)
     {
         //查找图片对应的Link
-        foreach (var item in Carousels)
-        {
-            if (item.Image == imageUrl)
-            {
-                try
-                {
-                    await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", item.Note??item.Link, "1", "click");
-                }
-                catch (Exception exc)
-                {
 
-                }
-                OpenNewPage(item.Link);
-            }
+        var img = Carousels.FirstOrDefault(s => s.Image == imageUrl);
+        if (img == null)
+        {
+            return;
         }
+
+        try
+        {
+            await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", img.Note ?? img.Link, "1", "click");
+        }
+        catch (Exception exc)
+        {
+
+        }
+
+        await _dataCacheService.OpenNewPage.InvokeAsync(img.Link);
+
     }
 
 }

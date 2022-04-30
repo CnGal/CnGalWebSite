@@ -191,7 +191,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
             foreach (var item in links)
             {
-                Console.WriteLine($"正在处理第 {links.IndexOf(item) + 1} 个词条");
+                Console.WriteLine($"正在合并第 {links.IndexOf(item) + 1} 个词条");
 
                 var tempstr = item.Split("->");
                 if (tempstr.Length != 2)
@@ -205,6 +205,8 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                     SubName = tempstr[0].Trim(),
                     HostName = tempstr[1].Trim(),
                 };
+
+                Console.WriteLine($"-> 将 {tempMergeEntry.SubName}[Id:{tempMergeEntry.SubId}] 合并到 {tempMergeEntry.HostName}[Id:{tempMergeEntry.HostId}]");
 
                 if (string.IsNullOrWhiteSpace(tempMergeEntry.HostName) || string.IsNullOrWhiteSpace(tempMergeEntry.SubName))
                 {
@@ -273,7 +275,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 mergeEntry.PostTime = DateTime.Now.ToCstTime();
                 postData.Save();
 
-                OutputHelper.Write(OutputLevel.Infor, $"-> 处理完成第 {links.IndexOf(item) + 1} 个词条");
+                OutputHelper.Write(OutputLevel.Infor, $"-> 合并完成第 {links.IndexOf(item) + 1} 个词条");
 
             }
 

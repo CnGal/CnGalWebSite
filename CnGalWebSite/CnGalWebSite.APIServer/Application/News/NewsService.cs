@@ -670,7 +670,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 Type = ArticleType.News,
                 RSS = originalRSS,
                 Title = GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 15),
-                BriefIntroduction = GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 50),
+                BriefIntroduction = GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 500),
                 Author = authorString,
                 MainPage = GetMicroblogMainPage(originalRSS.Description, authorString),
                 Link = originalRSS.Link,

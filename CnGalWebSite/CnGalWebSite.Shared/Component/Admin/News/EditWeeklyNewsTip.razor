@@ -59,6 +59,9 @@
                     {
                         <MCheckbox @bind-Value="item.IsSelected" Label="@($"{item.NewsId}. {item.NewsTitle}")" Class="m-0" Color="@_dataCacheService.ThemeSetting.Theme"></MCheckbox>
                     }
+
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="重置" IsAsync="true" OnClick="OnReset" Icon="mdi-refresh" Color="error" />
+
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
             }
@@ -78,23 +81,23 @@
             {
                 @if (Model.State == GameNewsState.Edit)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="预览" IsAsync="true" OnClick="OnPreview" Icon="mdi-view-day" Color="primary" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="预览" IsAsync="true" OnClick="OnPreview" Icon="mdi-view-day" TextStyle/>
                 }
                 else if (Model.State == GameNewsState.Publish && Model.ArticleId != null)
                 {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看" IsAsync="true" OnClick="OnLook" Icon="mdi-view-day" Color="primary" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看" IsAsync="true" OnClick="OnLook" Icon="mdi-view-day"  TextStyle/>
 
                 }
             }
             <MSpacer></MSpacer>
             @if (Model.State == GameNewsState.Edit)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发布" IsAsync="true" OnClick="OnPublish" Icon="mdi-publish" Color="primary" Class="me-2" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发布" IsAsync="true" OnClick="OnPublish" Icon="mdi-publish" Class="me-2" TextStyle/>
 
             }
 
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="green" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="green" TextStyle/>
         </MCardActions>
     </MCard>
 </MDialog>
@@ -102,6 +105,9 @@
 <PreviewArticleTip @ref="previewArticleTip" />
 
 @code {
+    [Parameter]
+    public EventCallback OnRefreshTable { get; set; }
+
     private long Id { get; set; }
 
 
@@ -134,6 +140,15 @@
         }
     }
 
+    public async Task DataChanged()
+    {
+        isReady = false;
+        StateHasChanged();
+        await Init();
+        await OnRefreshTable.InvokeAsync();
+
+    }
+
     public async Task OnSave()
     {
         //上传
@@ -156,9 +171,7 @@
             }
             else
             {
-                isReady = false;
-                StateHasChanged();
-                await OnInitializedAsync();
+                await DataChanged();
                 await ToastService.Success("保存周报数据成功", "保存周报数据成功");
             }
         }
@@ -229,9 +242,7 @@
             var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/ResetWeelyNews/" + Id);
             if (result.Successful)
             {
-                isReady = false;
-                StateHasChanged();
-                await OnInitializedAsync();
+                await DataChanged();
                 await ToastService.Success("重置周报成功", "重置周报成功");
 
             }

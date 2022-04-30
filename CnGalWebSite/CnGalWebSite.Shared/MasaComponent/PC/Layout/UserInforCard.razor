@@ -17,8 +17,7 @@
     <MDivider Class="w-100"></MDivider>
     <div class="w-100">
         <SignInButton Model="Model" />
-        @if (ToolHelper.IsMaui == false)
-        {
+
             <AuthorizeView Roles="Admin">
                 <Authorized>
                     <MButton Text Block Color="success" OnClick="OnClickAdmin">
@@ -28,7 +27,7 @@
                 </Authorized>
             </AuthorizeView>
 
-        }
+
 
         <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickUserSpace">
             <MIcon Left>mdi-star</MIcon>
@@ -50,14 +49,13 @@
             </MButton>
 
         }
-        @if (ToolHelper.IsMaui == false)
-        {
+
             <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" StopPropagation OnClick="OnClickSetting">
                 <MIcon Left>mdi-cog</MIcon>
                 主题设置
             </MButton>
 
-        }
+
         <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickLogout">
             <MIcon Left>mdi-logout</MIcon>
             退出登入

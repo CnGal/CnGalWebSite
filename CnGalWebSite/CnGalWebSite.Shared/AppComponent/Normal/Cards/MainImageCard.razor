@@ -1,7 +1,10 @@
-﻿<a  href="@Model.Url" target="@(string.IsNullOrWhiteSpace(Model.Url)?null:(Model.Url.Contains("http")?"_blank":null))" class="a-font-color">
-    <div class="rounded h-100 shadow-sm  bg-opacity"  style="cursor: pointer ">
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<a @onclick="@(()=>OnClick())" class="a-font-color">
+    <div class="rounded h-100 shadow-sm  bg-opacity" style="cursor: pointer ">
         <div>
-            <img  loading="lazy"  src="@Model.Image" class="card-img-top" style="word-break: break-all;" alt="@Model.Name" />
+            <img loading="lazy" src="@Model.Image" class="card-img-top" style="word-break: break-all;" alt="@Model.Name" />
             @if (Model.ReadCount >= 0 && Model.CommentCount >= 0)
             {
                 <div class="row ms-1" style=" color: white; margin-top: -23px;">
@@ -26,4 +29,17 @@
 @code {
     [Parameter]
     public MainImageCardModel Model { get; set; }
+
+    public async Task OnClick()
+    {
+
+        if (string.IsNullOrWhiteSpace(Model.Url) == false && Model.Url.Contains("http"))
+        {
+            await _dataCacheService.OpenNewPage.InvokeAsync(Model.Url);
+        }
+        else
+        {
+            NavigationManager.NavigateTo(Model.Url);
+        }
+    }
 }

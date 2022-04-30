@@ -133,7 +133,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             }
             else
             {
-                return string.Concat(str.AsSpan(0, (int)(length * 2.5)), "...");
+                return string.Concat(str.AsSpan(0, (int)(length * 2.5)), "......");
             }
         }
 

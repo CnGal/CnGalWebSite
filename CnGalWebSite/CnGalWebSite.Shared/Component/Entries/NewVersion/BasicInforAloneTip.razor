@@ -1,4 +1,7 @@
-﻿@if (string.IsNullOrWhiteSpace(Url))
+﻿@inject IDataCacheService _dataCacheService
+
+
+@if (string.IsNullOrWhiteSpace(Url))
 {
     <span class="@Class">
         <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text
@@ -6,9 +9,20 @@
 }
 else
 {
-    <span class="@Class" style=" word-break: break-all;">
-        <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text<a href="@Url" target="_blank">@Url</a>
-    </span>
+    @if (ToolHelper.IsMaui)
+    {
+        <span class="@Class" style=" word-break: break-all;">
+            <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text<a class="font-color" @onclick="OnClick">@Url</a>
+        </span>
+    }
+    else
+    {
+        <span class="@Class" style=" word-break: break-all;">
+            <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text<a href="@Url" target="_blank">@Url</a>
+        </span>
+
+    }
+
 }
 
 @code {
@@ -20,4 +34,12 @@ else
     public string Url { get; set; }
     [Parameter]
     public string Icon { get; set; }
+
+
+    private async Task OnClick()
+    {
+
+        await _dataCacheService.OpenNewPage.InvokeAsync(Url);
+
+    }
 }

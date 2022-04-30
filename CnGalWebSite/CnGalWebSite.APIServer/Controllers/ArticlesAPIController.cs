@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Application.Dtos;
@@ -12,9 +13,11 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.Helper.Extensions;
 using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,11 +26,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using CnGalWebSite.Helper.Extensions;
-using CnGalWebSite.APIServer.Application.Users;
-using StackExchange.Redis;
-using Microsoft.VisualBasic;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -48,9 +48,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
         private readonly IUserService _userService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public ArticlesAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IUserService userService,
-        IExamineService examineService, IEntryService entryService, IRepository<ApplicationUser, string> userRepository,
+        IExamineService examineService, IEntryService entryService, IRepository<ApplicationUser, string> userRepository, IWebHostEnvironment webHostEnvironment,
         UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
         {
@@ -64,8 +65,9 @@ namespace CnGalWebSite.APIServer.Controllers
             _examineRepository = examineRepository;
             _examineService = examineService;
             _entryService = entryService;
-            _userService= userService;
+            _userService = userService;
             _userRepository = userRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         /// <summary>
@@ -212,7 +214,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
 
-            model.UserInfor =await _userService.GetUserInforViewModel(createUser);
+            model.UserInfor = await _userService.GetUserInforViewModel(createUser);
             model.LastExamineId = article.Examines.Last().Id;
 
             //判断是否有权限编辑
@@ -486,7 +488,7 @@ namespace CnGalWebSite.APIServer.Controllers
             };
             //获取审核记录
             var examines = await _examineRepository.GetAllListAsync(s => s.ArticleId == article.Id && s.ApplicationUserId == user.Id
-              && (s.Operation == Operation.EditArticleMain ) && s.IsPassed == null);
+              && (s.Operation == Operation.EditArticleMain) && s.IsPassed == null);
 
             //第一步 获取主要信息
             var examine = examines.FirstOrDefault(s => s.Operation == Operation.EditArticleMain);
@@ -633,7 +635,7 @@ namespace CnGalWebSite.APIServer.Controllers
             };
             //获取审核记录
             var examines = await _examineRepository.GetAllListAsync(s => s.ArticleId == article.Id && s.ApplicationUserId == user.Id
-              && (s.Operation ==Operation.EditArticleMainPage) && s.IsPassed == null);
+              && (s.Operation == Operation.EditArticleMainPage) && s.IsPassed == null);
 
             //第三步 获取正文
             var examine = examines.FirstOrDefault(s => s.Operation == Operation.EditArticleMainPage);
@@ -677,7 +679,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Error = "该文章的名称与其他文章重复", Successful = false };
                 }
 
-            
+
                 //查找当前文章
                 var currentArticle = await _articleRepository.GetAll()
                     .FirstOrDefaultAsync(s => s.Id == model.Id);
@@ -745,7 +747,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //判断是否为锁定状态
             if (await _examineRepository.GetAll().AnyAsync(s => s.ApplicationUserId != user.Id && s.IsPassed == null && s.ArticleId == Id
-            && ( s.Operation == Operation.EditArticleRelevanes)))
+            && (s.Operation == Operation.EditArticleRelevanes)))
             {
                 return NotFound();
             }
@@ -759,8 +761,8 @@ namespace CnGalWebSite.APIServer.Controllers
             var examines = await _examineRepository.GetAllListAsync(s => s.ArticleId == article.Id && s.ApplicationUserId == user.Id
               && (s.Operation == Operation.EditArticleRelevanes) && s.IsPassed == null);
 
-           
-           var  examine = examines.FirstOrDefault(s => s.Operation == Operation.EditArticleRelevanes);
+
+            var examine = examines.FirstOrDefault(s => s.Operation == Operation.EditArticleRelevanes);
             if (examine != null)
             {
                 await _articleService.UpdateArticleData(article, examine);
@@ -1162,7 +1164,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 "本年" => 365,
                 "本月" => 30,
                 "本周" => 7,
-                _ => 9999,
+                _ => 99999,
             };
             var nowTime = DateTime.Now.ToCstTime();
 
@@ -1210,7 +1212,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.RemoveAll(s => s.GroupName == item.GroupName);
             }
             //查找每一组的微博链接和简介
-            
+
             var userIds = result.Where(s => string.IsNullOrWhiteSpace(s.UserId) == false).Select(s => s.UserId);
             var users = await _userRepository.GetAll().Where(s => userIds.Contains(s.Id)).Select(s => new
             {
@@ -1218,36 +1220,50 @@ namespace CnGalWebSite.APIServer.Controllers
                 s.PersonalSignature
             }).ToListAsync();
 
-            var entryIds = result.Where(s => s.GroupId>0).Select(s => s.GroupId);
+            var entryIds = result.Where(s => s.GroupId > 0).Select(s => s.GroupId);
             var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).Select(s => new
             {
                 s.Id,
                 s.BriefIntroduction,
-                Informations = s.Information.Where(s=>s.Modifier=="相关网站"&&s.DisplayName=="微博")
+                Informations = s.Information.Where(s => s.Modifier == "相关网站" && (s.DisplayName == "微博" || s.DisplayName == "Bilibili"))
             }).ToListAsync();
 
 
             foreach (var item in result)
             {
-                if (item.GroupId!=0)
+                if (item.GroupId != 0)
                 {
                     var temp = entries.FirstOrDefault(s => s.Id == item.GroupId);
-                    if(temp!=null)
+                    if (temp != null)
                     {
                         item.Outlink = temp.Informations.FirstOrDefault()?.DisplayValue;
                         item.BriefIntroduction = temp.BriefIntroduction;
                     }
-                    
+
                 }
-                else if(string.IsNullOrWhiteSpace(item.UserId)==false)
+                else if (string.IsNullOrWhiteSpace(item.UserId) == false)
                 {
-                    var temp =users.FirstOrDefault(s=>s.Id==item.UserId);
-                    if(temp!=null)
+                    var temp = users.FirstOrDefault(s => s.Id == item.UserId);
+                    if (temp != null)
                     {
                         item.BriefIntroduction = temp.PersonalSignature;
                     }
                 }
             }
+
+//            StringBuilder sb = new StringBuilder();
+//            sb.AppendLine("名称,最后发布时间,发布总数,微博链接,B站链接,站内链接");
+//            foreach (var item in result)
+//            {
+//                var weibo = entries.FirstOrDefault(s => s.Id == item.GroupId)?.Informations.FirstOrDefault(s => s.DisplayName == "微博")?.DisplayValue;
+//                var bilibili = entries.FirstOrDefault(s => s.Id == item.GroupId)?.Informations.FirstOrDefault(s => s.DisplayName == "Bilibili")?.DisplayValue;
+//                sb.AppendLine($"{item.GroupName},{item.Articles.Max(s => s.LastEditTime)},{item.Articles.Count},{weibo},{bilibili},{(item.GroupId > 0 ? ($"https://www.cngal.org/entries/index/{item.GroupId}") : ($"https://www.cngal.org/space/index/{item.UserId}"))}");
+//}
+
+//            var str=sb.ToString();
+//            using StreamWriter sw = new StreamWriter(Path.Combine(_webHostEnvironment.WebRootPath, "BackUp", "当前数据", "制作组导出.csv"),false, Encoding.UTF8);//这里写上你要保存的路径
+//            sw.WriteLine(str);//按行写
+//            sw.Close();//关闭
 
             return result;
 
