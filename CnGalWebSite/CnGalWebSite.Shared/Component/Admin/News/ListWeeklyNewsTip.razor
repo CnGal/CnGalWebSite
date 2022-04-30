@@ -8,7 +8,7 @@
 
 <div class="">
     <Table TItem="ListWeeklyNewAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="130" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowExtendButtons="true" ExtendButtonColumnWidth="120" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
            ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
         <TableToolbarTemplate>
 
@@ -25,16 +25,16 @@
         <RowButtonTemplate>
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditWeeklyNews(context.Id))" />
 
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-up" Text="编辑对应文章" IsAsync="true" OnClickWithoutRender="@(() => EditArticle(context.ArticleId ))" IsShow="context.ArticleId != 0" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-up" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => EditArticle(context.ArticleId ))" IsShow="context.ArticleId != 0" />
         </RowButtonTemplate>
     </Table>
 </div>
 
-<EditWeeklyNewsTip @ref="editWeeklyNewsTip" />
+<EditWeeklyNewsTip @ref="editWeeklyNewsTip"  OnRefreshTable="RefreshTable" />
 
 @code {
     [NotNull]
-    private Table<ListWeeklyNewAloneModel>? TableRows { get; set; }
+    private Table<ListWeeklyNewAloneModel> TableRows { get; set; }
     private List<ListWeeklyNewAloneModel> SelectedRows { get; set; } = new();
 
     public ListWeeklyNewsViewModel ListModel { get; set; } = new ListWeeklyNewsViewModel { WeeklyNews = new List<ListWeeklyNewAloneModel>() };
@@ -77,10 +77,13 @@
             return new QueryData<ListWeeklyNewAloneModel>();
         }
     }
-
+    private async Task RefreshTable()
+    {
+        await TableRows.QueryAsync();
+    }
     private Task EditArticle(long id)
     {
-        NavigationManager.NavigateTo(Provider, "/articles/editarticle/" + id, "编辑文章", "fa fa-pencil");
+        NavigationManager.NavigateTo( "/articles/editarticle/" + id);
         return Task.CompletedTask;
     }
 

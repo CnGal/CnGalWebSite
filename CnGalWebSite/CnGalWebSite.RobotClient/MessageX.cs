@@ -1,20 +1,13 @@
 ﻿using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Robots;
 using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.Helper.Helper;
 using MeowMiraiLib.Msg.Sender;
 using MeowMiraiLib.Msg.Type;
-using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Message = MeowMiraiLib.Msg.Type.Message;
 
 namespace CnGalWebSite.RobotClient
@@ -46,8 +39,8 @@ namespace CnGalWebSite.RobotClient
 
             var now = DateTime.Now.ToCstTime();
             var replies = _replies.Where(s => s.IsHidden == false && now.TimeOfDay <= s.BeforeTime.TimeOfDay && now.TimeOfDay >= s.AfterTime.TimeOfDay && Regex.IsMatch(message, s.Key))
-                .GroupBy(s=>s.Priority)
-                .OrderByDescending(s=>s.Key)
+                .GroupBy(s => s.Priority)
+                .OrderByDescending(s => s.Key)
                 .ToList();
 
             if (replies.Count == 0)
@@ -162,13 +155,13 @@ namespace CnGalWebSite.RobotClient
 
             }
 
-         
-            if(string.IsNullOrWhiteSpace(vaule)==false)
+
+            if (string.IsNullOrWhiteSpace(vaule) == false)
             {
                 messages.Add(new Plain(vaule));
             }
 
-            if(string.IsNullOrWhiteSpace(vaule)&&messages.Count==0)
+            if (string.IsNullOrWhiteSpace(vaule) && messages.Count == 0)
             {
                 return null;
             }
@@ -180,14 +173,14 @@ namespace CnGalWebSite.RobotClient
 
         public void ProcMessageReplaceInput(string reply, string message, string regex, List<KeyValuePair<string, string>> args)
         {
-            if(string.IsNullOrWhiteSpace(regex))
+            if (string.IsNullOrWhiteSpace(regex))
             {
                 return;
             }
 
 
 
-            var splits = Regex.Split(message,regex).Where(s=>string.IsNullOrWhiteSpace(s)==false).ToList();
+            var splits = Regex.Split(message, regex).Where(s => string.IsNullOrWhiteSpace(s) == false).ToList();
 
 
             for (int i = 0; i < splits.Count; i++)
@@ -195,11 +188,11 @@ namespace CnGalWebSite.RobotClient
                 if (reply.Contains($"[{i + 1}]"))
                 {
                     args.Add(new KeyValuePair<string, string>($"[{i + 1}]", splits[i].ToString()));
-                }    
+                }
             }
         }
 
-        public async Task ProcMessageArgument(string reply,string message, GroupMessageSender sender, List<KeyValuePair<string, string>> args)
+        public async Task ProcMessageArgument(string reply, string message, GroupMessageSender sender, List<KeyValuePair<string, string>> args)
         {
             while (true)
             {
@@ -245,6 +238,14 @@ namespace CnGalWebSite.RobotClient
                     args.Add(new KeyValuePair<string, string>($"[{item.Key}]", item.Value));
                 }
             }
+
+            for (int i = 1; i < 4; i++)
+            {
+                if (reply.Contains($"[{i}]") && args.Any(s => s.Key == $"[{i}]") == false)
+                {
+                    args.Add(new KeyValuePair<string, string>($"[{i}]", ""));
+                }
+            }
         }
 
         public async Task<string> GetArgValue(string name, string infor)
@@ -270,7 +271,7 @@ namespace CnGalWebSite.RobotClient
     }
 
 
-    public class ArgError:Exception
+    public class ArgError : Exception
     {
         public string Error { get; set; }
 

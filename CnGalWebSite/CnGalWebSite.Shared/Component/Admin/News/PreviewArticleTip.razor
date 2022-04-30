@@ -21,7 +21,7 @@
                     <div style="color:gray;">@Model.PubishTime?.ToTimeFromNowString()</div>
                 </div>
             </div>
-            <CnGalWebSite.Shared.AppComponent.Normal.Texts.MarkdownView Text="@Model.MainPage" />
+            <MarkdownViewTip Text="@Model.MainPage" />
             <CnGalWebSite.Shared.AppComponent.Pages.Articles.ListTagCard Relevances="Model.Relevances" />
 
         </Scroll>

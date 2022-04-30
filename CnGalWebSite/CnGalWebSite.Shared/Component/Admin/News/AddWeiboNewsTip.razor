@@ -33,6 +33,8 @@
     </MCard>
 </MDialog>
 @code {
+    [Parameter]
+    public EventCallback OnRefreshTable { get; set; }
 
     public AddWeiboNewsModel Model { get; set; } = new AddWeiboNewsModel();
 
@@ -71,6 +73,7 @@
             {
 
                 await ToastService.Success("添加微博动态成功", "添加微博动态成功");
+               await OnRefreshTable.InvokeAsync();
                 Dialog = false;
             }
         }

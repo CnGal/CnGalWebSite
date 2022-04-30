@@ -29,6 +29,10 @@
 
 
 @code {
+
+    [Parameter]
+    public EventCallback OnRefreshTable { get; set; }
+
     public EditGameNewsModel Model { get; set; } = new EditGameNewsModel();
 
     [CascadingParameter]
@@ -67,6 +71,8 @@
             {
 
                 await ToastService.Success("添加自定义动态成功", "添加自定义动态成功");
+
+                await OnRefreshTable.InvokeAsync();
                 Dialog = false;
             }
         }
