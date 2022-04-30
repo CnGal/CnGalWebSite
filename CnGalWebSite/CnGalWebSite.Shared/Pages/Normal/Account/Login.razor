@@ -59,7 +59,7 @@
                     <span class="mb-4 d-flex" style="justify-content: center; ">
                         还没有账号？ <a style="float:right" href="/account/register">立即注册</a>
                     </span>
-                    @if (_dataCacheService.IsOnThirdPartyLogin)
+                    @if (_dataCacheService.IsOnThirdPartyLogin && ToolHelper.IsMaui == false)
                     {
                         <ThirdPartyLoginButtonListView ReturnUrl="@ReturnUrl" OnRedirecting="OnRedirecting"></ThirdPartyLoginButtonListView>
                     }

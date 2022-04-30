@@ -1,6 +1,6 @@
-﻿@inject IDataCacheService _dataCatcheService
-@inject IJSRuntime JS
+﻿@inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 
 @if (Model.RelevancesState == EditState.Preview)
@@ -9,7 +9,7 @@
 }
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="动态" Icon="fa fa-fw fa-newspaper-o">
     <Scroll style="max-height:500px">
-        <MTimeline Dense="_dataCatcheService.IsApp||Model.NewsOfEntry.Count<3" Class="ms-2 me-2">
+        <MTimeline Dense="_dataCacheService.IsApp||Model.NewsOfEntry.Count<3" Class="ms-2 me-2">
             @foreach (var item in Model.NewsOfEntry.OrderByDescending(s => s.HappenedTime))
             {
                 <MTimelineItem Large>
@@ -43,15 +43,6 @@
     public EntryIndexViewModel Model { get; set; }
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
-
-    #region 新建标签页
-
-    public async void OpenNewPage(string url)
-    {
-        await JS.InvokeAsync<string>("openNewPage", url);
-    }
-
-    #endregion
 
     public Task OnClickImage(NewsModel item)
     {
@@ -89,7 +80,8 @@
             {
 
             }
-            OpenNewPage(item.Link);
+
+            await _dataCacheService.OpenNewPage.InvokeAsync(item.Link);
 
         }
     }

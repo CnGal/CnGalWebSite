@@ -1,11 +1,10 @@
-﻿@inject ToastService ToastService
-@inject HttpClient Http
+﻿@inject HttpClient Http
 @inject NavigationManager NavigationManager
-@inject IServiceProvider Provider
+@inject IDataCacheService _dataCacheService
 @inject IJSRuntime JS
 
 
-<div @onclick="OnClickNews"  style="cursor:pointer;">
+<div @onclick="OnClickNews" style="cursor:pointer;">
     <div class="@(Model.IsNeedLayout?"rounded shadow-sm p-2 bg-opacity":"")" style="cursor: pointer;display:flex; ">
         <div style="display: flex;align-items: center;">
             <img class="shadow-sm" src="@Model.Image" style="height: 50px;width: 50px;border-radius: 50%;" />
@@ -24,15 +23,9 @@
 @code {
     [Parameter]
     public NewsThumbnailCardModel Model { get; set; }
-    #region 新建标签页
-    public async void OpenNewPage(string url)
-    {
-        await JS.InvokeAsync<string>("openNewPage", url);
-    }
-    #endregion
+
     public async Task OnClickNews()
     {
-
         try
         {
             await JS.InvokeAsync<string>("trackEvent", "动态", "点击", Model.Text, "1", "click");
@@ -44,11 +37,11 @@
 
         if (Model.IsOutLink)
         {
-            OpenNewPage(Model.Url);
+            await _dataCacheService.OpenNewPage.InvokeAsync(Model.Url);
         }
         else
         {
-            NavigationManager.NavigateTo(Provider, Model.Url, Model.Title, "fa fa-newspaper-o");
+            NavigationManager.NavigateTo(Model.Url);
         }
     }
 }

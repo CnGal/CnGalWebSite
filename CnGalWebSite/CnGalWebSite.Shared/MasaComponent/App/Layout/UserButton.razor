@@ -26,8 +26,7 @@
     @if (Admin == false)
     {
         <CnGalWebSite.Shared.MasaComponent.PC.Layout.SignInButton Model="_dataCacheService.UserInfor" Left />
-        @if (ToolHelper.IsMaui == false)
-        {
+
             <AuthorizeView Roles="Admin">
                 <Authorized>
                     <MButton Text Block Color="success" OnClick="@(()=>OnClickUrl("/admin/index"))">
@@ -36,7 +35,7 @@
                     </MButton>
                 </Authorized>
             </AuthorizeView>
-        }
+   
 
         <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSpace">
             <MIcon Left>mdi-star</MIcon>
@@ -56,14 +55,13 @@
         </MButton>
 
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-        @if (ToolHelper.IsMaui == false)
-        {
+
             <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSetting">
                 <MIcon Left>mdi-cog</MIcon>
                 主题设置
             </MButton>
 
-        }
+
         <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/about"))">
             <MIcon Left>mdi-information-outline</MIcon>
             关于我们

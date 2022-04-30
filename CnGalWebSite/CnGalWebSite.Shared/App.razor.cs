@@ -13,7 +13,7 @@ namespace CnGalWebSite.Shared
     /// <summary>
     /// 
     /// </summary>
-    public sealed partial class App : IDisposable
+    public partial class App : IDisposable
     {
 
         private System.Threading.Timer mytimer;
@@ -35,6 +35,10 @@ namespace CnGalWebSite.Shared
             }
 
             _dataCacheService.RefreshApp = EventCallback.Factory.Create(this, async () => await OnRefresh());
+            _dataCacheService.OpenNewPage = EventCallback.Factory.Create(this, (string s) => OpenNewPage(s));
+            _dataCacheService.ThemeChanged = EventCallback.Factory.Create(this, (string s) => ThemeChanged(s));
+
+            //ShowAlert();
         }
 
 
@@ -123,6 +127,25 @@ namespace CnGalWebSite.Shared
             {
                 return false;
             }
+
+        }
+
+        public virtual void ShowAlert()
+        {
+
+        }
+        public virtual async void OpenNewPage(string url)
+        {
+            await JS.InvokeAsync<string>("openNewPage", url);
+        }
+
+        public virtual void Loaded()
+        {
+
+        }
+
+        public virtual void ThemeChanged(string theme)
+        {
 
         }
 
