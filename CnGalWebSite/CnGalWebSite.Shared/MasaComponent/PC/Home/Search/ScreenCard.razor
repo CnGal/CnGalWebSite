@@ -1,0 +1,41 @@
+﻿<div class="rounded shadow-sm p-2 bg-opacity">
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <SortChipsList Model="Model" Color="blue" OnChanged="OnChanged" />
+
+        </div>
+        <div class="col-12 col-lg-6">
+            <TimeChipsList FixedModel="Times" InputData="Model.Times" Color="light-blue" OnChanged="OnChanged" />
+
+        </div>
+        <div class="col-12 col-lg-6">
+            <TypeChipsList FixedModel="EntryTypes" InputData="Model.Types" Color="cyan" OnChanged="OnChanged" />
+
+        </div>
+        <div class="col-12 col-lg-6">
+            <TypeChipsList FixedModel="ArticleTypes" InputData="Model.Types" Color="teal" OnChanged="OnChanged" />
+
+        </div>
+        <div class="col-12 col-lg-6">
+            <TypeChipsList FixedModel="PeripheryTypes" InputData="Model.Types" Color="green" OnChanged="OnChanged" />
+        </div>
+        <div class="col-12 col-lg-6">
+            <TypeChipsList FixedModel="TagTypes" InputData="Model.Types" Color="light-green" OnChanged="OnChanged" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public SearchInputModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    List<SearchType> EntryTypes { get; set; } = SearchInputModel.GetEntryTypes();
+    List<SearchType> ArticleTypes { get; set; } = SearchInputModel.GetArticleTypes();
+    List<SearchType> PeripheryTypes { get; set; } = SearchInputModel.GetPeripheryTypes();
+    List<SearchType> TagTypes { get; set; } = SearchInputModel.GetTagTypes();
+    List<SearchTimeModel> Times { get; set; } = SearchInputModel.GetTimes();
+
+
+}

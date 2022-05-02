@@ -48,7 +48,6 @@
 
         try
         {
-            _dataCacheService.RefreshSearchCatche();
             Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView", true);
 
             Images = Carousels.Select(s => s.Image).ToList();

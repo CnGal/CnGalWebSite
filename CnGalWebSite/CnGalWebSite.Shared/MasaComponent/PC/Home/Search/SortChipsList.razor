@@ -1,0 +1,80 @@
+﻿<div>
+    @foreach (var item in sorts)
+    {
+        <MChip Class="ma-1" OnClick="@(()=>OnClick(item.Key))" Small TextColor="@(item.Key==current?"white":"")"
+               Color="@Color"
+               Outlined="item.Key!=current">
+            @item.Value
+        </MChip>
+    }
+    @if (current != "")
+    {
+        @if (asc)
+        {
+            <MChip Class="ma-1" OnClick="@(()=>OnSwitchSort(false))" Small TextColor="white"
+                   Color="@Color">
+                <MIcon Left Small>
+                    mdi-sort-ascending
+                </MIcon>
+                顺序
+            </MChip>
+        }
+        else
+        {
+            <MChip Class="ma-1" OnClick="@(()=>OnSwitchSort(true))" Small TextColor="white"
+                   Color="@Color">
+                <MIcon Left Small>
+                    mdi-sort-descending
+                </MIcon>
+                逆序
+            </MChip>
+        }
+    }
+
+
+</div>
+
+@code {
+    [Parameter]
+    public SearchInputModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+    [Parameter]
+    public string Color { get; set; }
+
+    bool asc = false;
+    string current = "";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        asc= !Model.Sorting.Contains(" desc");
+        current = Model.Sorting.Replace(" desc", "");
+    }
+
+
+    List<KeyValuePair<string, string>> sorts = new List<KeyValuePair<string, string>>
+{
+        new KeyValuePair<string,string>("","默认排序"),
+        new KeyValuePair<string,string>("LastEditTime","最后编辑时间"),
+        new KeyValuePair<string,string>("PubulishTime","发布时间"),
+        new KeyValuePair<string,string>("CreateTime","创建时间"),
+        new KeyValuePair<string,string>("ReaderCount","热度"),
+    };
+
+    public async Task OnClick(string text)
+    {
+        current = text;
+        Model.Sorting = current + (asc ? "" : " desc");
+
+        await OnChanged.InvokeAsync();
+    }
+
+    public  async Task OnSwitchSort(bool value)
+    {
+        asc = value;
+        Model.Sorting = current + (asc ? "" : " desc");
+
+        await OnChanged.InvokeAsync();
+    }
+
+}

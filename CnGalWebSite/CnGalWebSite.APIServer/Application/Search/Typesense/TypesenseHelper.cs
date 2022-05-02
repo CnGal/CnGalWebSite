@@ -3,14 +3,19 @@ using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.Search.Typesense;
 using CnGalWebSite.APIServer.CustomMiddlewares;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.APIServer.Model;
 using CnGalWebSite.DataModel.Application.Dtos;
+using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Home;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Senparc.CO2NET.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Text;
 using System.Threading.Tasks;
 using Typesense;
 
@@ -63,7 +68,6 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                     new MyField("anotherName", FieldType.String, false, true),
                     new MyField("briefIntroduction", FieldType.String, false),
                     new MyField("mainPage", FieldType.String, false),
-                    new MyField("lastEditTime", FieldType.Int64, false),
                     new MyField("lastEditTime", FieldType.Int64, false),
                     new MyField("pubulishTime", FieldType.Int64, false),
                     new MyField("createTime", FieldType.Int64, false),
@@ -516,6 +520,123 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                 }
             }
 
+
+            return result;
+        }
+
+        public async Task<PagedResultDto<SearchAloneModel>> QueryAsync(SearchInputModel model)
+        {
+            string sortString = "";
+            StringBuilder filterString = new StringBuilder();
+            bool isAscending = model.Sorting.Contains(" desc")?true: false;
+            model.Sorting = model.Sorting.Replace(" desc", "");
+
+            //初始化排序
+            if (string.IsNullOrWhiteSpace(model.Sorting) == false)
+            {
+                
+                    var f = model.Sorting[0].ToString();
+                    sortString = f.ToLower() + model.Sorting[1..^0];
+                
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(model.FilterText))
+                    {
+                        sortString = "lastEditTime";
+                    }
+                    else
+                    {
+                        sortString = "_text_match";
+                    }
+            }
+
+            sortString = sortString.Replace("id", "originalId");
+            if (isAscending == false)
+            {
+                sortString += ":desc";
+            }
+            else
+            {
+                sortString += ":asc";
+            }
+
+            //设置搜索字段
+            var query = new SearchParameters(model.FilterText, "name,displayName,anotherName,briefIntroduction,mainPage");
+            //设置排序
+            if (string.IsNullOrWhiteSpace(sortString) == false)
+            {
+                query.SortBy = sortString;
+            }
+
+            //页数
+            query.PerPage = model.MaxResultCount.ToString();
+            query.Page = model.CurrentPage.ToString();
+
+            //筛选时间
+            if(model.Times.Any())
+            {
+                foreach(var item in model.Times)
+                {
+                    if (filterString.Length != 0)
+                    {
+                        filterString.Append(" && ");
+                    }
+                    filterString.Append($"pubulishTime: [{item.AfterTime.ToBinary()}..{item.BeforeTime.ToBinary()}]");
+                }
+            }
+
+            //筛选类别
+            if (model.Types.Any())
+            {
+                var types =new List<int>();
+
+                foreach (var item in model.Types)
+                {
+                    if (item == SearchType.Entry || item == SearchType.Article || item == SearchType.Periphery || item == SearchType.Tag)
+                    {
+                        types.AddRange(item.ToTypeList());
+                    }
+                    else
+                    {
+                        types.Add((int)item);
+                    }
+                }
+
+                types= types.Distinct().ToList();
+
+                if (types.Count > 0)
+                {
+                    if (filterString.Length != 0)
+                    {
+                        filterString.Append(" && ");
+                    }
+                    filterString.Append($"originalType: [");
+                    foreach(var item in types)
+                    {
+                        filterString.Append(item.ToString());
+
+                        if (types.IndexOf(item) != types.Count - 1)
+                        {
+                            filterString.Append(", ");
+                        }
+                    }
+                    filterString.Append(']');
+                }
+            }
+         
+
+            if (filterString.Length != 0)
+            {
+                query.FilterBy = filterString.ToString();
+            }
+
+            //进行搜索
+            var searchResult = await _typesenseClient.Search<SearchCache>(_collectionName, query);
+
+            var result = await ProcSearchResult(searchResult);
+
+            result.MaxResultCount = model.MaxResultCount;
 
             return result;
         }

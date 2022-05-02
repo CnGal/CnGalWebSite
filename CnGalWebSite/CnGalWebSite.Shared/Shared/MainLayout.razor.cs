@@ -255,7 +255,7 @@ namespace CnGalWebSite.Shared.Shared
 
         public void OnSearch()
         {
-            NavigationManager.NavigateTo("/home/search/全部");
+            NavigationManager.NavigateTo("/search");
         }
 
         public void OnReturnHome()

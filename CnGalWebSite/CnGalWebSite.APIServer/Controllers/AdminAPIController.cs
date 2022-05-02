@@ -18,6 +18,7 @@ using CnGalWebSite.APIServer.Application.Votes;
 using CnGalWebSite.APIServer.Application.WeiXin;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
+using CnGalWebSite.APIServer.Model;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;

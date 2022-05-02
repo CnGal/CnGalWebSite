@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using CnGalWebSite.DataModel.Application.Search.Dtos;
+using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.Helper.Extensions;
 
-namespace CnGalWebSite.DataModel.Model
+namespace CnGalWebSite.APIServer.Model
 {
     public class SearchCache
     {
@@ -44,7 +47,7 @@ namespace CnGalWebSite.DataModel.Model
             LastEditTime = model.LastEditTime.ToBinary();
             Name = model.Name ?? "";
             Type = 0;
-            OriginalType =(int) model.Type;
+            OriginalType =(int) model.Type.ToSearchType();
             OriginalId = model.Id;
             PubulishTime = model.PubulishTime?.ToBinary() ?? 0;
             ReaderCount = model.ReaderCount;
@@ -60,12 +63,13 @@ namespace CnGalWebSite.DataModel.Model
             LastEditTime = model.LastEditTime.ToBinary();
             Name = model.Name ?? "";
             Type = 1;
-            OriginalType = (int)model.Type;
+            OriginalType = (int)model.Type.ToSearchType();
             OriginalId = model.Id;
             ReaderCount = model.ReaderCount;
             BriefIntroduction = model.BriefIntroduction ?? "";
             MainPage = model.MainPage ?? "";
             CreateTime = model.CreateTime.ToBinary();
+            PubulishTime = model.PubishTime.ToBinary();
         }
 
         public void Copy(Periphery model)
@@ -76,7 +80,7 @@ namespace CnGalWebSite.DataModel.Model
             LastEditTime = model.LastEditTime.ToBinary();
             Name = model.Name ?? "";
             Type = 2;
-            OriginalType = (int)model.Type;
+            OriginalType = (int)model.Type.ToSearchType();
             OriginalId = model.Id;
             ReaderCount = model.ReaderCount;
             BriefIntroduction = model.BriefIntroduction ?? "";
@@ -92,6 +96,7 @@ namespace CnGalWebSite.DataModel.Model
             Name = model.Name ?? "";
             Type = 3;
             OriginalId = model.Id;
+            OriginalType = (int)SearchType.Tag;
             ReaderCount = model.ReaderCount;
             BriefIntroduction = model.BriefIntroduction ?? "";
             MainPage ="";

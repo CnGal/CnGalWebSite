@@ -105,13 +105,11 @@ namespace CnGalWebSite.Shared.Service
 
         NewsSummaryCacheModel NewsSummaryCache { get; set; }
 
-        SearchViewModel SearchViewModel { get; set; }
+        IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
 
         DiscountPageHelper DiscountPageCatcheHelper { get; set; }
 
         Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>> GetHomePageListCardMode(string apiUrl, string type, int maxCount, bool isRefresh);
-
-        void RefreshSearchCatche();
 
         void RefreshAllCatche();
 
