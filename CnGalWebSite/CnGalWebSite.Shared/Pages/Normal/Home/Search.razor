@@ -1,19 +1,216 @@
-﻿@page "/home/search/{ScreeningConditions}/{SearchString}/{FilterText}"
-@page "/home/search/{ScreeningConditions}/{SearchString}"
-@page "/home/search/{ScreeningConditions}"
-@page "/home/search"
+﻿@page "/search"
 
+@inject HttpClient Http
+@inject IRoleService _roleService
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@implements IDisposable
+
+<TitleTip Title="搜索"></TitleTip>
+
+<style>
+    .search-view .tab-Badge-color .line {
+        background: transparent;
+        transition: none;
+    }
+
+    .search-view .auto-complete {
+        width: 100%;
+    }
+</style>
+
+<div class="search-view">
+    <div class="shadow-sm bg-opacity rounded p-3 mb-3">
+        <div style=" display: flex; justify-content: center; ">
+            <div style=" display: flex; max-width: 500px; width: 100%; align-items: center;">
+                <MTextField Placeholder="可以搜索哦~" TValue="string" @bind-Value="@InputModel.FilterText" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="搜索" IsAsync OnClick="OnSearchString" Icon="mdi-magnify" Class="ms-4" />
+            </div>
+        </div>
+    </div>
+    <CnGalWebSite.Shared.MasaComponent.PC.Home.Search.ScreenCard OnChanged="()=>OnChanged()" Model="InputModel"/>
+    <div class="mt-3">
+
+        @if (isReady == false)
+        {
+            <div style="height:300px">
+                <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
+            </div>
+        }
+        else
+        {
+            @if (_dataCacheService.IsApp)
+            {
+                <CnGalWebSite.Shared.AppComponent.Pages.Home.Search.ListSearchResult Model="@DataModel.pagedResultDto.Data" />
+            }
+            else
+            {
+                @foreach (var item in DataModel.pagedResultDto.Data)
+                {
+                    <div class="mb-3">
+                        @if (item.entry != null)
+                        {
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.entry" ColorNum="main"></CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip>
+                        }
+                        else if (item.article != null)
+                        {
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item.article"></CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip>
+                        }
+                        else if (item.periphery != null)
+                        {
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip Model="item.periphery"></CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip>
+                        }
+                        else if (item.tag != null)
+                        {
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.TagInforViewTip Model="item.tag"></CnGalWebSite.Shared.Component.Search.NewVersion.TagInforViewTip>
+                        }
+
+                    </div>
+                }
+            }
 
 
-<CnGalWebSite.Shared.Pages.Webs.Home.Search ScreeningConditions="@ScreeningConditions" SearchString="@SearchString" FilterText="@FilterText" />
+            @if (DataModel.pagedResultDto.Data.Count == 0)
+            {
+                <NotFoundSearch IsNeedLayput="true"></NotFoundSearch>
+            }
+            else
+            {
 
-@code{
 
+                @if (DataModel.pagedResultDto.TotalPages > 1)
+                {
+                        <MPagination Value="@DataModel.pagedResultDto.CurrentPage" Class="my-4" Length="@DataModel.pagedResultDto.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" ></MPagination>
+
+                }
+
+            }
+
+        }
+    </div>
+</div>
+
+
+@code {
+    [SupplyParameterFromQuery]
     [Parameter]
-    public string ScreeningConditions { get; set; } = "全部";
+    public string[] Types { get; set; }
+    [SupplyParameterFromQuery]
     [Parameter]
-    public string SearchString { get; set; }
+    public string[] Times { get; set; }
+    [SupplyParameterFromQuery]
     [Parameter]
-    public string FilterText { get; set; }
+    public string Text { get; set; }
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string Sort { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int Page { get; set; }
+
+    SearchInputModel InputModel = new SearchInputModel();
+    SearchViewModel DataModel = new SearchViewModel();
+    bool isReady = false;
+
+    private IEnumerable<int> PageItems => new int[] { 4, 8, 16, 30 };
+
+    private IEnumerable<string> Items { get; set; } = new string[1] { "" };
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            NavigationManager.LocationChanged += LocationChanged;
+            LocationChanged(null, null);
+        }
+    }
+
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (NavigationManager.Uri.Contains("/search"))
+        {
+            try
+            {
+                SearchInputModel.TryParse(Types, Times, Text, Sort, Page, InputModel);
+
+                //请求数据
+                try
+                {
+                    var url = ToolHelper.WebApiPath + "api/home/search" + NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Replace("search", "");
+                    DataModel = await _dataCacheService.SearchViewCatche.GetCatche(url);
+
+                }
+                catch (Exception ex)
+                {
+                    ErrorHandler.ProcessError(ex, "无法获取搜索结果");
+                    DataModel = new SearchViewModel();
+
+                }
+
+                isReady = true;
+                StateHasChanged();
+            }
+            catch
+            {
+
+            }
+        }
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+
+
+    public Task OnChanged(int page = 1)
+    {
+        InputModel.CurrentPage = page;
+        NavigationManager.NavigateTo("/search" + InputModel.ToQueryParameterString());
+
+        return Task.CompletedTask;
+    }
+
+
+    private async Task OnPageClick(int pageIndex)
+    {
+        if (isReady == false ||  DataModel.pagedResultDto.CurrentPage == pageIndex)
+        {
+            return;
+        }
+        await OnChanged(pageIndex);
+    }
+
+
+    private async Task OnSearchString()
+    {
+        await OnChanged();
+    }
+
+
+    private async Task OnSearchString(string text)
+    {
+        InputModel.FilterText = text;
+
+        await OnChanged();
+    }
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        NavigationManager.LocationChanged -= LocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

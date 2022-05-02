@@ -158,26 +158,20 @@ namespace CnGalWebSite.APIServer.Controllers
         /// 搜索
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
-        public async Task<ActionResult<SearchViewModel>> SearchAsync(GetSearchInput input)
+        [HttpGet]
+        public async Task<ActionResult<SearchViewModel>> SearchAsync([FromQuery] string[] Types, [FromQuery] string[] Times, [FromQuery] string Text, [FromQuery] string Sort, [FromQuery] int Page)
         {
             try
             {
-                var model = new SearchViewModel();
-                var dtos = input.StartIndex == -1 ?
-                    await _searchHelper.QueryAsync(input.CurrentPage, input.MaxResultCount, input.FilterText, input.ScreeningConditions, input.Sorting, QueryType.Page) :
-                    await _searchHelper.QueryAsync(input.StartIndex, input.MaxResultCount, input.FilterText, input.ScreeningConditions, input.Sorting, QueryType.Index);
-                dtos.Data = dtos.Data.ToList();
-
-                model.pagedResultDto = dtos;
-
-                return model;
+                return new SearchViewModel
+                {
+                    pagedResultDto = await _searchHelper.QueryAsync(SearchInputModel.Parse(Types, Times, Text, Sort, Page))
+                };
             }
             catch (Exception ex)
             {
                 return NotFound(ex.Message);
             }
-
         }
         /// <summary>
         /// 获取搜索提示

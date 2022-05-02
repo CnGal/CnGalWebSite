@@ -1,0 +1,127 @@
+﻿@inject IDataCacheService _dataCacheService
+
+<div>
+    @foreach (var item in FixedModel)
+    {
+        <MChip Class="ma-1" OnClick="()=>OnClick(item)" Small TextColor="@(InputData.Any(s=>s.IsSame(item))?"white":"")"
+               Color="@Color"
+               Outlined="!InputData.Any(s=>s.IsSame(item))">
+            @item.Note
+        </MChip>
+    }
+
+
+    @if (custom)
+    {
+        <MChip Class="ma-1" OnClick="OnClean" Small TextColor="white"
+               Color="@Color">
+            @(InputData.FirstOrDefault().AfterTime.ToString("yyyy-MM-dd") + " ~ " + InputData.FirstOrDefault().BeforeTime.ToString("yyyy-MM-dd"))
+        </MChip>
+    }
+    else
+    {
+        <MChip Class="ma-1" OnClick="OnAdd" Small TextColor="white"
+               Color="@Color">
+            <MIcon Left Small>
+                mdi-plus
+            </MIcon>
+            自定义时间段
+        </MChip>
+
+
+    }
+</div>
+
+<MDialog @bind-Value="dialog"
+         Persistent
+         MaxWidth="400">
+
+    <MDatePicker @bind-Value="_dates" Locale="zh-CN" Color="@_dataCacheService.ThemeSetting.Theme"
+                 Range Scrollable>
+        <MSpacer></MSpacer>
+        <MButton Text
+                 Color="red"
+                 OnClick="ModalCancel">
+            取消
+        </MButton>
+        <MButton Text
+                 Color="green"
+                 OnClick="ModalOK">
+            确定
+        </MButton>
+    </MDatePicker>
+</MDialog>
+@code {
+    [Parameter]
+    public string Color { get; set; }
+    [Parameter]
+    public List<SearchTimeModel> InputData { get; set; }
+    [Parameter]
+    public List<SearchTimeModel> FixedModel { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    bool custom = false;
+    bool dialog = false;
+    private List<DateOnly> _predates = new List<DateOnly>
+{
+         DateOnly.FromDateTime(DateTime.Now.ToCstTime().AddDays(-10)),
+         DateOnly.FromDateTime(DateTime.Now.ToCstTime()),
+    };
+    private List<DateOnly> _dates = new List<DateOnly>
+{
+         DateOnly.FromDateTime(DateTime.Now.ToCstTime().AddDays(-10)),
+         DateOnly.FromDateTime(DateTime.Now.ToCstTime()),
+    };
+
+    public async Task OnClick(SearchTimeModel model)
+    {
+        if (InputData.Any(s => s.IsSame(model)))
+        {
+            InputData.RemoveAll(s => s.IsSame(model));
+        }
+        else
+        {
+            InputData.Clear();
+            InputData.Add(model);
+        }
+
+        StateHasChanged();
+        await OnChanged.InvokeAsync();
+    }
+
+    public Task OnAdd()
+    {
+        dialog = true;
+        return Task.CompletedTask;
+    }
+
+    public Task OnClean()
+    {
+        custom = false;
+        return Task.CompletedTask;
+    }
+
+
+    public async Task ModalCancel()
+    {
+        dialog = false;
+        _dates = _predates;
+    }
+
+    public async Task ModalOK()
+    {
+        dialog = false;
+        InputData.Clear();
+        InputData.Add(new SearchTimeModel
+        {
+            BeforeTime = _dates[1].ToDateTime(TimeOnly.MinValue),
+            AfterTime = _dates[0].ToDateTime(TimeOnly.MinValue),
+            Note = string.Join(" ~ ", _dates.Select(date => date.ToString("yyyy-MM-dd")))
+        });
+        custom = true;
+
+        StateHasChanged();
+        await OnChanged.InvokeAsync();
+    }
+}

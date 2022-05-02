@@ -211,10 +211,7 @@ namespace CnGalWebSite.Shared.Service
         /// <summary>
         /// 搜索页面缓存
         /// </summary>
-        public SearchViewModel SearchViewModel { get; set; } = new SearchViewModel
-        {
-            pagedResultDto = new PagedResultDto<SearchAloneModel> { Data = new List<SearchAloneModel>(), CurrentPage = 1, TotalCount = 0, MaxResultCount = 8, ScreeningConditions = "全部", Sorting = "Default" }
-        };
+        public IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
 
         private readonly HttpClient _httpClient;
 
@@ -226,6 +223,7 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<PeripheryContrastEditRecordViewModel> peripheryContrastEditRecordViewCatche,
         IPageModelCatche<TagContrastEditRecordViewModel> tagContrastEditRecordViewCatche,
         IPageModelCatche<EntryContrastEditRecordViewModel> entryContrastEditRecordViewCatche,
+        IPageModelCatche<SearchViewModel> searchViewCatche,
         IPageModelCatche<ChartDataSource> chartDataCatche)
         {
             _httpClient = httpClient;
@@ -243,6 +241,7 @@ namespace CnGalWebSite.Shared.Service
             (ChartDataCatche = chartDataCatche).Init("",true);
             HomePageNewsCatche = homePageNewsCatche;
             HomePageCarouselsCatche = homePageCarouselsCatche;
+            SearchViewCatche = searchViewCatche;
         }
 
         public async Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>> GetHomePageListCardMode(string apiUrl, string type, int maxCount, bool isRefresh)
@@ -288,7 +287,6 @@ namespace CnGalWebSite.Shared.Service
         }
         public void RefreshAllCatche()
         {
-            RefreshSearchCatche();
             EntryIndexPageCatche.Clean();
             ArticleIndexPageCatche.Clean();
             PeripheryIndexPageCatche.Clean();
@@ -298,13 +296,6 @@ namespace CnGalWebSite.Shared.Service
             LoginKey = null;
             ThirdPartyLoginTempModel = null;
             UserInfor = new UserInforViewModel { Ranks = new List<RankViewModel>() };
-        }
-        public void RefreshSearchCatche()
-        {
-            SearchViewModel = new SearchViewModel
-            {
-                pagedResultDto = new PagedResultDto<SearchAloneModel> { Data = new List<SearchAloneModel>(), CurrentPage = 1, TotalCount = 0, MaxResultCount = 8, ScreeningConditions = "全部", Sorting = "Default" }
-            };
         }
     }
 }

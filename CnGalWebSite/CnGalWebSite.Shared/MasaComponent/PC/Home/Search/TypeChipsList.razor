@@ -1,0 +1,40 @@
+﻿<div>
+    @foreach (var item in FixedModel)
+    {
+        <MChip Class="ma-1" OnClick="()=>OnClick(item)" Small TextColor="@(InputData.Any(s=>s==item)?"white":"")"
+               Color="@Color"
+               Outlined="!InputData.Any(s=>s==item)">
+            @item.GetDisplayName()
+        </MChip>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public string Color { get; set; }
+    [Parameter]
+    public List<SearchType> InputData { get; set; }
+    [Parameter]
+    public List<SearchType> FixedModel { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    public async Task OnClick(SearchType model)
+    {
+        if (InputData.Any(s => s == model))
+        {
+            InputData.Remove(model);
+        }
+        else
+        {
+            InputData.Add(model);
+        }
+
+
+
+       StateHasChanged();
+      await  OnChanged.InvokeAsync();
+    }
+
+}

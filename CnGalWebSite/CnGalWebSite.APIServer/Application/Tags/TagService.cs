@@ -36,7 +36,7 @@ namespace CnGalWebSite.APIServer.Application.Tags
 
         public Task<BootstrapBlazor.Components.QueryData<ListTagAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListTagAloneModel searchModel)
         {
-            IEnumerable<Tag> items = _tagRepository.GetAll().AsNoTracking();
+            IEnumerable<Tag> items = _tagRepository.GetAll().Where(s=>string.IsNullOrWhiteSpace(s.Name)==false).AsNoTracking();
             // 处理高级搜索
             if (!string.IsNullOrWhiteSpace(searchModel.Name))
             {
