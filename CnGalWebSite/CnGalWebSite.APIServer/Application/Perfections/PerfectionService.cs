@@ -118,7 +118,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 {
                     Id = item.Perfection.EntryId,
                     Name = item.Perfection.Entry.Name,
-
+                    Type=item.CheckType,
                     Grade = item.Grade,
                     VictoryPercentage = item.VictoryPercentage,
                 });
