@@ -14,7 +14,7 @@
             <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
             <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" DefaultSort="true" DefaultSortOrder="SortOrder.Asc" TextWrap="true" Width="200" />
             <TableColumn @bind-Field="@context.Grade" Searchable="true" Sortable Width="80" FormatString="0.0"/>
-            <TableColumn @bind-Field="@context.VictoryPercentage" Sortable Width="14" FormatString="0.0" />
+            <TableColumn @bind-Field="@context.VictoryPercentage" Sortable Width="140" FormatString="0.0" />
         </TableColumns>
         <RowButtonTemplate>
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.Id ))" />
