@@ -1,0 +1,78 @@
+﻿@inject IAuthService AuthService
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject DialogService DialogService
+
+<div class="">
+    <Table TItem="ListPerfectionCheckAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="80" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
+            <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" DefaultSort="true" DefaultSortOrder="SortOrder.Asc" TextWrap="true" Width="200" />
+            <TableColumn @bind-Field="@context.Grade" Searchable="true" Sortable Width="80" FormatString="0.0" />
+            <TableColumn @bind-Field="@context.VictoryPercentage" Sortable Width="120" FormatString="0.0" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.Id ))" />
+        </RowButtonTemplate>
+    </Table>
+</div>
+
+@code {
+    [NotNull]
+    private Table<ListPerfectionCheckAloneModel> TableRows { get; set; }
+    private List<ListPerfectionCheckAloneModel> SelectedRows { get; set; } = new();
+
+    public ListPerfectionChecksViewModel ListModel { get; set; } = new ListPerfectionChecksViewModel { PerfectionChecks = new List<ListPerfectionCheckAloneModel>() };
+
+    private ListPerfectionCheckAloneModel SearchModelUser { get; set; } = new ListPerfectionCheckAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取完善度数据");
+        }
+
+    }
+
+    private async Task<QueryData<ListPerfectionCheckAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<PerfectionChecksPagesInfor>(ToolHelper.WebApiPath + "api/perfections/GetPerfectionCheckList", new PerfectionChecksPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListPerfectionCheckAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取完善度检查列表");
+            return new QueryData<ListPerfectionCheckAloneModel>();
+        }
+    }
+    private async Task RefreshTable()
+    {
+        await TableRows.QueryAsync();
+    }
+    private Task OnLook(int id)
+    {
+        NavigationManager.NavigateTo("/entries/index/" + id);
+        return Task.CompletedTask;
+    }
+}

@@ -1,0 +1,204 @@
+﻿
+@implements IAsyncDisposable
+
+<TitleTip Title="编辑指引"></TitleTip>
+<link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor.Chart/css/bootstrap.blazor.chart.bundle.min.css" media="none" onload="this.media='all'" />
+
+<div class="row">
+    @if (IsLargeScreen)
+    {
+        <div class="col-8 mb-3">
+            <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/perfections/GetEditCountLine")" Stacked></CountLineViewTip>
+        </div>
+        <div class="col-4 mb-3">
+            <RecentlyEditListViewTip></RecentlyEditListViewTip>
+        </div>
+        <div class="col-4 mb-3">
+            <PerfectionLevelRandomListTip Level="PerfectionLevel.Excellent" Title="已完善的词条" TitleIcon="fa fa-battery-full"></PerfectionLevelRandomListTip>
+        </div>
+
+        <div class="col-8 mb-3">
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <PerfectionLevelRandomListTip Level="PerfectionLevel.ToBeImproved" Title="急需完善的词条" TitleIcon="fa fa-battery-empty" IsTransverse="true"></PerfectionLevelRandomListTip>
+                </div>
+                <div class="col-12">
+                    <PerfectionLevelRandomListTip Level="PerfectionLevel.Good" Title="待完善的词条" TitleIcon="fa fa-battery-half" IsTransverse="true"></PerfectionLevelRandomListTip>
+                </div>
+            </div>
+        </div>
+        <div class="col-8 mb-3">
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/perfections/GetStatisticalDataLine")"></CountLineViewTip>
+                </div>
+                <div class="col-12">
+                    <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLevelCountLine")"></CountLineViewTip>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-4 mb-3">
+            <PerfectionOverviewTip></PerfectionOverviewTip>
+        </div>
+        <div class="col-12 mb-3">
+            <div class="row">
+                <div class="col-6">
+                    <PerfectionCheckLevelRandomListTip Level="PerfectionCheckLevel.High" Title="急需处理的项目" TitleIcon="fa fa-hourglass-end"></PerfectionCheckLevelRandomListTip>
+                </div>
+                <div class="col-6">
+                    <PerfectionCheckLevelRandomListTip Level="PerfectionCheckLevel.Middle" Title="待处理的项目" TitleIcon="fa fa-hourglass-half"></PerfectionCheckLevelRandomListTip>
+                </div>
+
+            </div>
+        </div>
+
+    }
+    else if (IsNormalScreen)
+    {
+        <div class="col-12 mb-3">
+            <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/perfections/GetEditCountLine")" Stacked="true"></CountLineViewTip>
+        </div>
+        <div class="col-12 mb-3">
+            <RecentlyEditListViewTip IsTransverse="true"></RecentlyEditListViewTip>
+        </div>
+        <div class="col-12 mb-3">
+            <PerfectionLevelRandomListTip Level="PerfectionLevel.Excellent" Title="已完善的词条" TitleIcon="fa fa-battery-full" IsTransverse="true"></PerfectionLevelRandomListTip>
+        </div>
+        <div class="col-12 mb-3">
+            <PerfectionLevelRandomListTip Level="PerfectionLevel.ToBeImproved" Title="急需完善的词条" TitleIcon="fa fa-battery-empty" IsTransverse="true"></PerfectionLevelRandomListTip>
+        </div>
+        <div class="col-12 mb-3">
+            <PerfectionLevelRandomListTip Level="PerfectionLevel.Good" Title="待完善的词条" TitleIcon="fa fa-battery-half" IsTransverse="true"></PerfectionLevelRandomListTip>
+        </div>
+
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 col-xl-6 mb-3">
+                    <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/perfections/GetStatisticalDataLine")"></CountLineViewTip>
+                </div>
+                <div class="col-12 col-xl-6 mb-3">
+                    <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLevelCountLine")"></CountLineViewTip>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mb-3">
+            <PerfectionOverviewTip IsTransverse="true"></PerfectionOverviewTip>
+        </div>
+        <div class="col-12 mb-3">
+            <div class="row">
+                <div class="col-6">
+                    <PerfectionCheckLevelRandomListTip Level="PerfectionCheckLevel.High" Title="急需处理的项目" TitleIcon="fa fa-hourglass-end"></PerfectionCheckLevelRandomListTip>
+                </div>
+                <div class="col-6">
+                    <PerfectionCheckLevelRandomListTip Level="PerfectionCheckLevel.Middle" Title="待处理的项目" TitleIcon="fa fa-hourglass-half"></PerfectionCheckLevelRandomListTip>
+                </div>
+            </div>
+        </div>
+    }
+    else if (IsSmallScreen)
+    {
+        <div class="col-12 mb-3">
+            <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/perfections/GetEditCountLine")" Stacked="true"></CountLineViewTip>
+        </div>
+        <div class="col-12 mb-3">
+            <RecentlyEditListViewTip></RecentlyEditListViewTip>
+        </div>
+        <div class="col-12 mb-3">
+            <PerfectionLevelRandomListTip Level="PerfectionLevel.Excellent" Title="已完善的词条" TitleIcon="fa fa-battery-full"></PerfectionLevelRandomListTip>
+        </div>
+        <div class="col-12 mb-3">
+            <PerfectionLevelRandomListTip Level="PerfectionLevel.ToBeImproved" Title="急需完善的词条" TitleIcon="fa fa-battery-empty"></PerfectionLevelRandomListTip>
+        </div>
+        <div class="col-12 mb-3">
+            <PerfectionLevelRandomListTip Level="PerfectionLevel.Good" Title="待完善的词条" TitleIcon="fa fa-battery-half"></PerfectionLevelRandomListTip>
+        </div>
+        <div class="col-12 mb-3">
+            <PerfectionOverviewTip></PerfectionOverviewTip>
+        </div>
+        <div class="col-12 mb-3">
+            <PerfectionCheckLevelRandomListTip Level="PerfectionCheckLevel.High" Title="急需处理的项目" TitleIcon="fa fa-hourglass-end"></PerfectionCheckLevelRandomListTip>
+        </div>
+        <div class="col-12 mb-3">
+            <PerfectionCheckLevelRandomListTip Level="PerfectionCheckLevel.Middle" Title="待处理的项目" TitleIcon="fa fa-hourglass-half"></PerfectionCheckLevelRandomListTip>
+        </div>
+
+    }
+
+</div>
+
+@code {
+    public bool IsSmallScreen { get; set; } = true;
+    public bool IsNormalScreen { get; set; }
+    public bool IsLargeScreen { get; set; }
+
+    #region 获取屏幕大小
+
+    /// <summary>
+    /// 获得/设置 IJSRuntime 实例
+    /// </summary>
+    [Inject]
+    [System.Diagnostics.CodeAnalysis.NotNull]
+    public IJSRuntime JSRuntime { get; set; }
+
+    private JSInterop<PerfectionHomeCard> Interop { get; set; }
+    /// <summary>
+    /// OnAfterRenderAsync 方法
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            Interop = new JSInterop<PerfectionHomeCard>(JSRuntime);
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
+        }
+    }
+
+    /// <summary>
+    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
+    /// </summary>
+    /// <returns></returns>
+    [JSInvokable]
+    public void SetCollapsed(int width)
+    {
+        if (IsSmallScreen != (width < 950))
+        {
+            IsSmallScreen = width < 950;
+
+            StateHasChanged();
+        }
+        if (IsNormalScreen != (width >= 950 && width < 1344))
+        {
+            IsNormalScreen = width >= 950 && width < 1344;
+
+            StateHasChanged();
+        }
+        if (IsLargeScreen != (width >= 1344))
+        {
+            IsLargeScreen = width >= 1344;
+            StateHasChanged();
+        }
+    }
+    #endregion
+
+    #region 释放实例
+    private async ValueTask DisposeAsyncCore()
+    {
+        if (Interop != null)
+        {
+            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
+            Interop.Dispose();
+            Interop = null;
+        }
+    }
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore();
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

@@ -96,10 +96,11 @@
         return Task.CompletedTask;
     }
 
-    public Task OnClean()
+    public async Task OnClean()
     {
         custom = false;
-        return Task.CompletedTask;
+        InputData.Clear();
+        await OnChanged.InvokeAsync();
     }
 
 

@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.Model;
+﻿using BootstrapBlazor.Components;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -24,5 +25,9 @@ namespace CnGalWebSite.APIServer.Application.Perfections
         Task UpdatePerfectionOverview();
 
         Task<List<PerfectionCheckViewModel>> GetPerfectionCheckLevelRadomListAsync(PerfectionCheckLevel level);
+
+        Task<QueryData<ListPerfectionAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPerfectionAloneModel searchModel);
+
+        Task<QueryData<ListPerfectionCheckAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPerfectionCheckAloneModel searchModel);
     }
 }
