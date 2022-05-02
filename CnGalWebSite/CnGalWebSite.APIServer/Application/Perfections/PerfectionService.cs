@@ -1,6 +1,8 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+﻿using BootstrapBlazor.Components;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -28,6 +30,109 @@ namespace CnGalWebSite.APIServer.Application.Perfections
             _articleRepository = articleRepository;
             _perfectionOverviewRepository = perfectionOverviewRepository;
         }
+
+        public async Task<QueryData<ListPerfectionAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPerfectionAloneModel searchModel)
+        {
+            IQueryable<Perfection> items = _perfectionRepository.GetAll()
+                .Include(s => s.Entry)
+                .Where(s => s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false&&s.Entry.Type==EntryType.Game)
+                .AsNoTracking();
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Entry != null && item.Entry.Name.Contains(options.SearchText)));
+            }
+
+
+            // 排序
+             var isSorted = false;
+            if (!string.IsNullOrWhiteSpace(options.SortName))
+            {
+
+                items = items.OrderBy(s => s.Id).Sort(options.SortName, (SortOrder)options.SortOrder);
+                isSorted = true;
+            }
+            // 设置记录总数
+            var total = items.Count();
+
+            // 内存分页
+            var itemsReal = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
+
+            //复制数据
+            var resultItems = new List<ListPerfectionAloneModel>();
+            foreach (var item in itemsReal)
+            {
+                resultItems.Add(new ListPerfectionAloneModel
+                {
+                    Id = item.EntryId,
+                    Name = item.Entry.Name,
+
+                    Grade=item.Grade,
+                    VictoryPercentage=item.VictoryPercentage,
+                });
+            }
+
+            return new QueryData<ListPerfectionAloneModel>()
+            {
+                Items = resultItems,
+                TotalCount = total,
+                IsSorted = isSorted,
+                // IsFiltered = isFiltered
+            };
+        }
+
+        public async Task<QueryData<ListPerfectionCheckAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPerfectionCheckAloneModel searchModel)
+        {
+            IQueryable<PerfectionCheck> items = _perfectionCheckRepository.GetAll()
+                .Include(s=>s.Perfection).ThenInclude(s => s.Entry)
+                .Where(s => s.Perfection.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Perfection.Entry.Name) == false && s.Perfection.Entry.Type == EntryType.Game)
+                .AsNoTracking();
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Perfection.Entry != null && item.Perfection.Entry.Name.Contains(options.SearchText)));
+            }
+
+
+            // 排序
+            var isSorted = false;
+            if (!string.IsNullOrWhiteSpace(options.SortName))
+            {
+
+                items = items.OrderBy(s => s.Id).Sort(options.SortName, (SortOrder)options.SortOrder);
+                isSorted = true;
+            }
+            // 设置记录总数
+            var total = items.Count();
+
+            // 内存分页
+            var itemsReal = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
+
+            //复制数据
+            var resultItems = new List<ListPerfectionCheckAloneModel>();
+            foreach (var item in itemsReal)
+            {
+                resultItems.Add(new ListPerfectionCheckAloneModel
+                {
+                    Id = item.Perfection.EntryId,
+                    Name = item.Perfection.Entry.Name,
+
+                    Grade = item.Grade,
+                    VictoryPercentage = item.VictoryPercentage,
+                });
+            }
+
+            return new QueryData<ListPerfectionCheckAloneModel>()
+            {
+                Items = resultItems,
+                TotalCount = total,
+                IsSorted = isSorted,
+                // IsFiltered = isFiltered
+            };
+        }
+
 
         public async Task<List<PerfectionCheckViewModel>> GetEntryPerfectionCheckList(long perfectionId)
         {
@@ -1064,7 +1169,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
         {
             var grades = await _perfectionRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entry)
-                .Where(s => s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false)
+                .Where(s => s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.Type == EntryType.Game)
                 .OrderBy(s => s.Grade).Select(s => s.Grade).ToListAsync();
 
             var model = new PerfectionLevelOverviewModel();

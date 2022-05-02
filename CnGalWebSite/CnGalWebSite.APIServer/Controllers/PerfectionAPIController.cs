@@ -206,5 +206,23 @@ namespace CnGalWebSite.APIServer.Controllers
             return await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => (s.PrepositionExamineId == null || s.PrepositionExamineId == -1) && s.IsPassed == true
             && s.Operation != Operation.UserMainPage && s.Operation != Operation.EditUserMain && s.Operation != Operation.PubulishComment).OrderByDescending(s => s.Id).Take(6), true);
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPerfectionAloneModel>>> GetPerfectionListAsync(PerfectionsPagesInfor input)
+        {
+            var dtos = await _perfectionService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPerfectionCheckAloneModel>>> GetPerfectionCheckListAsync(PerfectionChecksPagesInfor input)
+        {
+            var dtos = await _perfectionService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
+        }
     }
 }
