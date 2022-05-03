@@ -543,6 +543,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                 if (string.IsNullOrWhiteSpace(model.FilterText))
                 {
                     sortString = "lastEditTime";
+                    isAscending = false;
                 }
                 else
                 {
