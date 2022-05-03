@@ -1329,9 +1329,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                             staffGame.AddInfors.Add(new EntryInforTipAddInforModel
                             {
                                 Modifier = "职位",
-                                Contents = inforPositions.Select(s => new StaffNameModel
+                                Contents = tempStaffs.Select(s => new StaffNameModel
                                 {
-                                    DisplayName = s,
+                                    DisplayName = (s.Additional == null || s.Additional.Count == 0) ? s.DisplayName : ((s.Additional.Any(s => s.DisplayName == "职位（官方称呼）" && string.IsNullOrWhiteSpace(s.DisplayValue) == false) && s.Additional.Any(s => s.DisplayName == "子项目" && string.IsNullOrWhiteSpace(s.DisplayValue) == false)) ? s.Additional.FirstOrDefault(s => s.DisplayName == "子项目")?.DisplayValue + " - " + s.Additional.FirstOrDefault(s => s.DisplayName == "职位（官方称呼）")?.DisplayValue : s.DisplayName),
                                     Id = -1
                                 }).ToList()
                             });

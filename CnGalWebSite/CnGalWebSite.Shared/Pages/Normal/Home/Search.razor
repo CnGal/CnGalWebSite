@@ -25,7 +25,7 @@
     <div class="shadow-sm bg-opacity rounded p-3 mb-3">
         <div style=" display: flex; justify-content: center; ">
             <div style=" display: flex; max-width: 500px; width: 100%; align-items: center;">
-                <MTextField Placeholder="可以搜索哦~" TValue="string" @bind-Value="@InputModel.FilterText" Color="@_dataCacheService.ThemeSetting.Theme" OnKeyDown="OnSearchString"></MTextField>
+                <MTextField Placeholder="可以搜索哦~" TValue="string" @bind-Value="@InputModel.FilterText" Color="@_dataCacheService.ThemeSetting.Theme" OnKeyDown="OnKeyDown"></MTextField>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="搜索" IsAsync OnClick="OnSearchString" Icon="mdi-magnify" Class="ms-4" />
             </div>
         </div>
@@ -201,6 +201,14 @@
         InputModel.FilterText = text;
 
         await OnChanged();
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+           await OnSearchString();
+        }
     }
 
     #region 释放实例
