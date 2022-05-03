@@ -10,7 +10,6 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Senparc.CO2NET.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -528,27 +527,27 @@ namespace CnGalWebSite.APIServer.Application.Typesense
         {
             string sortString = "";
             StringBuilder filterString = new StringBuilder();
-            bool isAscending = model.Sorting.Contains(" desc")?true: false;
+            bool isAscending = !model.Sorting.Contains(" desc");
             model.Sorting = model.Sorting.Replace(" desc", "");
 
             //初始化排序
             if (string.IsNullOrWhiteSpace(model.Sorting) == false)
             {
-                
-                    var f = model.Sorting[0].ToString();
-                    sortString = f.ToLower() + model.Sorting[1..^0];
-                
+
+                var f = model.Sorting[0].ToString();
+                sortString = f.ToLower() + model.Sorting[1..^0];
+
             }
             else
             {
                 if (string.IsNullOrWhiteSpace(model.FilterText))
-                    {
-                        sortString = "lastEditTime";
-                    }
-                    else
-                    {
-                        sortString = "_text_match";
-                    }
+                {
+                    sortString = "lastEditTime";
+                }
+                else
+                {
+                    sortString = "_text_match";
+                }
             }
 
             sortString = sortString.Replace("id", "originalId");
@@ -574,9 +573,9 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             query.Page = model.CurrentPage.ToString();
 
             //筛选时间
-            if(model.Times.Any())
+            if (model.Times.Any())
             {
-                foreach(var item in model.Times)
+                foreach (var item in model.Times)
                 {
                     if (filterString.Length != 0)
                     {
@@ -589,7 +588,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             //筛选类别
             if (model.Types.Any())
             {
-                var types =new List<int>();
+                var types = new List<int>();
 
                 foreach (var item in model.Types)
                 {
@@ -603,7 +602,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                     }
                 }
 
-                types= types.Distinct().ToList();
+                types = types.Distinct().ToList();
 
                 if (types.Count > 0)
                 {
@@ -612,7 +611,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                         filterString.Append(" && ");
                     }
                     filterString.Append($"originalType: [");
-                    foreach(var item in types)
+                    foreach (var item in types)
                     {
                         filterString.Append(item.ToString());
 
@@ -624,7 +623,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                     filterString.Append(']');
                 }
             }
-         
+
 
             if (filterString.Length != 0)
             {

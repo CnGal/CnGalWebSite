@@ -47,8 +47,11 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        asc= !Model.Sorting.Contains(" desc");
         current = Model.Sorting.Replace(" desc", "");
+        if(current!="")
+        {
+            asc = !Model.Sorting.Contains(" desc");
+        }
     }
 
 
