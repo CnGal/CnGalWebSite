@@ -1,9 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CnGalWebSite.RobotClient
 {
@@ -39,9 +34,9 @@ namespace CnGalWebSite.RobotClient
             {
                 var path = Path.Combine(BasicSetting.RootPath, "Setting.json");
 
-                using (StreamReader file = File.OpenText(path))
+                using (var file = File.OpenText(path))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     BasicSetting = (Setting)serializer.Deserialize(file, typeof(Setting));
                     file.Close();
                     file.Dispose();
@@ -60,9 +55,9 @@ namespace CnGalWebSite.RobotClient
             {
                 var path = Path.Combine(BasicSetting.RootPath, "MessageArgs.json");
 
-                using (StreamReader file = File.OpenText(path))
+                using (var file = File.OpenText(path))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     MessageArgs = (List<MessageArg>)serializer.Deserialize(file, typeof(List<MessageArg>));
                     file.Close();
                     file.Dispose();
@@ -96,9 +91,9 @@ namespace CnGalWebSite.RobotClient
         {
             var path = Path.Combine(BasicSetting.RootPath, "Setting.json");
 
-            using (StreamWriter file = File.CreateText(path))
+            using (var file = File.CreateText(path))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, BasicSetting);
                 file.Close();
                 file.Dispose();
@@ -109,9 +104,9 @@ namespace CnGalWebSite.RobotClient
         {
             var path = Path.Combine(BasicSetting.RootPath, "MessageArgs.json");
 
-            using (StreamWriter file = File.CreateText(path))
+            using (var file = File.CreateText(path))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, MessageArgs);
                 file.Close();
                 file.Dispose();

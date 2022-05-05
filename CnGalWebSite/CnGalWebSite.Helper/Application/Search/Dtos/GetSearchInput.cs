@@ -1,5 +1,4 @@
 ﻿using CnGalWebSite.DataModel.Application.Dtos;
-using CnGalWebSite.Helper.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
@@ -23,8 +22,8 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
 
         public string ToQueryParameterString()
         {
-            StringBuilder sb = new StringBuilder();
-            List<string> temp = new List<string>();
+            var sb = new StringBuilder();
+            var temp = new List<string>();
 
             if (string.IsNullOrWhiteSpace(FilterText) == false)
             {
@@ -34,12 +33,12 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
             {
                 temp.Add("Sort=" + Sorting);
             }
-            if (CurrentPage!=1)
+            if (CurrentPage != 1)
             {
                 temp.Add("Page=" + CurrentPage);
             }
 
-            if(Types.Count!=0)
+            if (Types.Count != 0)
             {
                 foreach (var item in Types)
                 {
@@ -54,17 +53,17 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
                 }
             }
 
-            if(temp.Count==0)
+            if (temp.Count == 0)
             {
                 return "";
             }
             else
             {
                 sb.Append('?');
-                foreach(var item in temp)
+                foreach (var item in temp)
                 {
                     sb.Append(item);
-                    if(temp.IndexOf(item)!=temp.Count-1)
+                    if (temp.IndexOf(item) != temp.Count - 1)
                     {
                         sb.Append('&');
                     }
@@ -165,7 +164,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
         public static SearchInputModel Parse(string[] Types, string[] Times, string Text, string Sort, int Page)
         {
             var model = new SearchInputModel();
-            if ( TryParse(Types, Times, Text, Sort, Page, model))
+            if (TryParse(Types, Times, Text, Sort, Page, model))
             {
                 return model;
             }
@@ -209,8 +208,8 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
                         }
                     }
                 }
-                model.Sorting = Sort??"";
-                model.CurrentPage = Page==0?1:Page;
+                model.Sorting = Sort ?? "";
+                model.CurrentPage = Page == 0 ? 1 : Page;
                 model.FilterText = Text;
 
                 return true;
@@ -234,7 +233,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
 
         public bool IsSame(SearchTimeModel model)
         {
-            if(AfterTime==model.AfterTime&&BeforeTime==model.BeforeTime)
+            if (AfterTime == model.AfterTime && BeforeTime == model.BeforeTime)
             {
                 return true;
             }
@@ -246,7 +245,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
         public static SearchTimeModel Parse(string Text)
         {
             var model = new SearchTimeModel();
-            if (TryParse( Text, model))
+            if (TryParse(Text, model))
             {
                 return model;
             }

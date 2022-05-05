@@ -1,50 +1,39 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System;
-using System.Net.Http.Headers;
-using System.Net.Http;
-using CnGalWebSite.DataModel.Model;
-using System.Net.Http.Json;
 using CnGalWebSite.DataModel.Helper;
-using System.IO;
-using CnGalWebSite.DataModel.ViewModel.HistoryData;
-using System.Text.Json;
-using CnGalWebSite.DataModel.ViewModel.Entries;
-using CnGalWebSite.DataModel.ViewModel.Files;
-using Newtonsoft.Json;
-using JsonSerializer = Newtonsoft.Json.JsonSerializer;
-using HtmlAgilityPack;
-using System.Xml.Linq;
-using CnGalWebSite.DataModel.ViewModel.Space;
-using CnGalWebSite.DataModel.ViewModel.Articles;
-using CnGalWebSite.Helper.Extensions;
-using Markdig;
-using System.Net;
-using System.Text;
-using System.Security.Policy;
-using CnGalWebSite.DataModel.ViewModel.Accounts;
-using ReverseMarkdown.Converters;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
-using System.Collections.Generic;
+using CnGalWebSite.DataModel.ViewModel.Accounts;
+using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Base;
-using System.Threading.Tasks;
+using CnGalWebSite.DataModel.ViewModel.Files;
+using CnGalWebSite.DataModel.ViewModel.HistoryData;
+using CnGalWebSite.DataModel.ViewModel.Space;
+using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.Helper.Helper;
+using HtmlAgilityPack;
+using Markdig;
 using PuppeteerSharp;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace CnGalWebSite.PostTools // Note: actual namespace depends on the project name.
 {
     internal class Program
     {
         private static readonly HttpClient client = new HttpClient();
-        private static Setting setting = new Setting();
-        private static ImageHelper imageHelper = new ImageHelper(client, setting);
-        private static PostData postData = new PostData(client, setting);
-        private static List<string> links = new List<string>();
-        private static CurrentData currentData = new CurrentData(client, setting);
-        private static AccountHelper accountHelper = new AccountHelper(client, setting);
+        private static readonly Setting setting = new Setting();
+        private static readonly ImageHelper imageHelper = new ImageHelper(client, setting);
+        private static readonly PostData postData = new PostData(client, setting);
+        private static readonly List<string> links = new List<string>();
+        private static readonly CurrentData currentData = new CurrentData(client, setting);
+        private static readonly AccountHelper accountHelper = new AccountHelper(client, setting);
 
         //因为要用到HttpRequest请求页面，所以这里设置了请求的头部信息useragents，可以让服务器以为这是浏览器发起的请求。
-        private readonly static string[] usersagents = new string[] {
+        private static readonly string[] usersagents = new string[] {
             "Mozilla/5.0 (Linux; U; Android 2.3.7; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
             "MQQBrowser/26 Mozilla/5.0 (Linux; U; Android 2.3.7; zh-cn; MB200 Build/GRJ22; CyanogenMod-7) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
             "JUC (Linux; U; 2.3.7; zh-cn; MB200; 320*480) UCWEB7.9.3.103/139/999",
@@ -80,12 +69,12 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             "Mozilla/5.0 (iPad; U; CPU OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5",
          };
 
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             await Proc();
         }
 
-        static async Task Proc()
+        private static async Task Proc()
         {
             OutputHelper.Repeat();
             OutputHelper.WriteCenter("CnGal资料站 投稿工具 v0.6", 1.8);
@@ -111,7 +100,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                 OutputHelper.Repeat();
                 Console.WriteLine("(1) 导入其他平台文章  (2) 合并词条  (3)退出登入");
                 var text = Console.ReadLine();
-                int index = 0;
+                var index = 0;
                 while (int.TryParse(text, out index) == false || index < 1 || index > 3)
                 {
                     Console.WriteLine("请输入1,2或3");
@@ -134,10 +123,10 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
         }
 
-        static async Task ProcMergeEntry()
+        private static async Task ProcMergeEntry()
         {
             //尝试读取数据文件
-            bool isFirst = true;
+            var isFirst = true;
             links.Clear();
 
             Console.WriteLine("-> 读取词条");
@@ -156,7 +145,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     File.Create(setting.MergeEntriesFileName).Close();
                 }
@@ -287,11 +276,11 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             Console.ReadKey();
         }
 
-        static async Task ProcArticle()
+        private static async Task ProcArticle()
         {
             //尝试读取数据文件
             links.Clear();
-            bool isFirst = true;
+            var isFirst = true;
             Console.WriteLine("-> 读取链接");
             while (links.Count == 0)
             {
@@ -308,7 +297,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     File.Create(setting.ArticlesFileName).Close();
                 }
@@ -393,7 +382,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             Console.ReadKey();
         }
 
-        static async Task GenerateMergeEntry(MergeEntryModel model)
+        private static async Task GenerateMergeEntry(MergeEntryModel model)
         {
             //清空
             model.Examines.Clear();
@@ -474,7 +463,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
         }
 
-        static void ReplaceEntryName(List<RelevancesModel> list, string oldName, string newName)
+        private static void ReplaceEntryName(List<RelevancesModel> list, string oldName, string newName)
         {
             var temp = list.FirstOrDefault(s => s.DisplayName == oldName);
             if (temp != null)
@@ -483,7 +472,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
         }
 
-        static async Task GetMergeEntryId(MergeEntryModel model)
+        private static async Task GetMergeEntryId(MergeEntryModel model)
         {
             //获取词条
             model.HostId = await client.GetFromJsonAsync<int>(ToolHelper.WebApiPath + "api/entries/GetId/" + ToolHelper.Base64EncodeName(model.HostName));
@@ -492,11 +481,11 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
         }
 
-        static async Task PostExamine(MergeEntryModel model)
+        private static async Task PostExamine(MergeEntryModel model)
         {
             foreach (var item in model.Examines)
             {
-                HttpResponseMessage result = item.GetType().Name switch
+                var result = item.GetType().Name switch
                 {
                     "EditArticleRelevancesViewModel" => await client.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/editarticlerelevances", item as EditArticleRelevancesViewModel),
                     "EditAddInforViewModel" => await client.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/EditAddInfor", item as EditAddInforViewModel),
@@ -504,8 +493,8 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                     _ => null
                 };
 
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var jsonContent = result.Content.ReadAsStringAsync().Result;
+                var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
                 //判断结果
                 if (obj.Successful == false)
                 {
@@ -514,14 +503,14 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
         }
 
-        static async Task HideSubEntry(MergeEntryModel model)
+        private static async Task HideSubEntry(MergeEntryModel model)
         {
             try
             {
 
                 var result = await client.PostAsJsonAsync<HiddenArticleModel>(ToolHelper.WebApiPath + "api/entries/HiddenEntry", new HiddenArticleModel { Ids = new long[] { model.SubId }, IsHidden = true });
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var jsonContent = result.Content.ReadAsStringAsync().Result;
+                var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
                 //判断结果
                 if (obj.Successful == false)
                 {
@@ -536,8 +525,8 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
 
                 var result = await client.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/EditMain", examineModel);
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var jsonContent = result.Content.ReadAsStringAsync().Result;
+                var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
                 //判断结果
                 if (obj.Successful == false)
                 {
@@ -549,15 +538,14 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
         }
 
-
-        static async Task<long> SubmitArticle(CreateArticleViewModel model)
+        private static async Task<long> SubmitArticle(CreateArticleViewModel model)
         {
             try
             {
 
                 var result = await client.PostAsJsonAsync<CreateArticleViewModel>(ToolHelper.WebApiPath + "api/articles/createarticle", model);
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                Result obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var jsonContent = result.Content.ReadAsStringAsync().Result;
+                var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
                 //判断结果
                 if (obj.Successful == false)
                 {
@@ -574,9 +562,9 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
         }
 
-        static CreateArticleViewModel GenerateArticle(OutlinkArticleModel model)
+        private static CreateArticleViewModel GenerateArticle(OutlinkArticleModel model)
         {
-            CreateArticleViewModel article = new CreateArticleViewModel
+            var article = new CreateArticleViewModel
             {
                 Name = model.Title,
                 Main = new EditArticleMainViewModel
@@ -584,7 +572,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                     Name = model.Title,
                     DisplayName = model.Title,
                     MainPicture = model.Image,
-                    PubishTime = model.PublishTime.Year<2000?DateTime.Now.ToCstTime(): model.PublishTime,
+                    PubishTime = model.PublishTime.Year < 2000 ? DateTime.Now.ToCstTime() : model.PublishTime,
                     RealNewsTime = model.PublishTime,
                     OriginalLink = model.Url,
                     BriefIntroduction = GetArticleBriefIntroduction(model.MainPage, 50),
@@ -645,7 +633,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             return article;
         }
 
-        static string GetArticleBriefIntroduction(string mainPage, int maxLength)
+        private static string GetArticleBriefIntroduction(string mainPage, int maxLength)
         {
             var title = "";
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
@@ -673,7 +661,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             return title.Abbreviate(maxLength).Replace("\n", "").Replace("\r", "").Replace("image", "");
         }
 
-        static string GetHtml(string url)
+        private static string GetHtml(string url)
         {
             var article = new OutlinkArticleModel();
 
@@ -681,8 +669,8 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             HttpWebResponse response = null;
             Stream stream = null;
             StreamReader reader = null;
-            string str = string.Empty;
-            Encoding encoding = Encoding.Default;
+            var str = string.Empty;
+            var encoding = Encoding.Default;
 
             //请求地址
             request = (HttpWebRequest)WebRequest.Create(url);
@@ -706,39 +694,38 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             return str;
         }
 
-        static async Task<string> GetHtmlJsAsync(string url)
+        private static async Task<string> GetHtmlJsAsync(string url)
         {
             Console.WriteLine("尝试加载 Headless Chromium");
             // Download the Chromium revision if it does not already exist
             await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
 
             // Create an instance of the browser and configure launch options
-            Browser browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true
             });
 
             // Create a new page and go to Bing Maps
-            Page page = await browser.NewPageAsync();
+            var page = await browser.NewPageAsync();
             await page.GoToAsync(url);
             Console.WriteLine("等待目标网页加载");
             await page.WaitForSelectorAsync(".user-bar");
 
-           return await page.GetContentAsync();
+            return await page.GetContentAsync();
         }
 
-
-        static async Task<OutlinkArticleModel> ProcZhiHuArticleFromHtmlAsync(string html)
+        private static async Task<OutlinkArticleModel> ProcZhiHuArticleFromHtmlAsync(string html)
         {
             var article = new OutlinkArticleModel();
 
 
-            HtmlDocument document = new HtmlDocument();
+            var document = new HtmlDocument();
             document.LoadHtml(html);
 
             var node = document.GetElementbyId("root");
-            string htmlStr = "";
-            string name = "";
+            var htmlStr = "";
+            var name = "";
             string image = null;
             string author = null;
             //正文
@@ -828,24 +815,24 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             return article;
         }
 
-        static async Task<OutlinkArticleModel> ProcXiaoHeiHeArticleFromHtmlAsync(string html)
+        private static async Task<OutlinkArticleModel> ProcXiaoHeiHeArticleFromHtmlAsync(string html)
         {
             var article = new OutlinkArticleModel();
 
 
-            HtmlDocument document = new HtmlDocument();
+            var document = new HtmlDocument();
             document.LoadHtml(html);
 
             var node = document.GetElementbyId("app");
-            string htmlStr = "";
-            string name = "";
+            var htmlStr = "";
+            var name = "";
             string image = null;
             string author = null;
 
             //主图标题
             try
             {
-                name = node.ChildNodes.FirstOrDefault(s => s.HasClass("article-header")).ChildNodes.FirstOrDefault(s => s.HasClass("title")).InnerText;             
+                name = node.ChildNodes.FirstOrDefault(s => s.HasClass("article-header")).ChildNodes.FirstOrDefault(s => s.HasClass("title")).InnerText;
             }
             catch
             {
@@ -874,7 +861,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             }
 
             var converter = new ReverseMarkdown.Converter();
-            article.MainPage = converter.Convert(htmlStr.Replace("data-original=","src="));
+            article.MainPage = converter.Convert(htmlStr.Replace("data-original=", "src="));
             article.MainPage = await imageHelper.ProgressImage(article.MainPage, OutlinkArticleType.XiaoHeiHe);
             article.Title = name;
             article.OriginalAuthor = ToolHelper.MidStrEx(article.MainPage, "本文作者 @", "**");
@@ -886,8 +873,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             return article;
         }
 
-
-        static async Task<OutlinkArticleModel> GetArticleContext(string url)
+        private static async Task<OutlinkArticleModel> GetArticleContext(string url)
         {
             //替换链接
             url = url.Replace("https://api.xiaoheihe.cn/maxnews/app/share/detail/", "https://api.xiaoheihe.cn/v3/bbs/app/api/web/share?link_id=");
@@ -954,8 +940,8 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
                     try
                     {
                         var result = await client.PostAsJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = token });
-                        string jsonContent = result.Content.ReadAsStringAsync().Result;
-                        LoginResult obj = System.Text.Json.JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
+                        var jsonContent = result.Content.ReadAsStringAsync().Result;
+                        var obj = System.Text.Json.JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
                         //判断结果
                         if (obj.Code == LoginResultCode.OK)
                         {
@@ -1042,17 +1028,17 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             {
                 var path = Path.Combine(setting.TempPath, "articles.json");
 
-                using (StreamReader file = File.OpenText(path))
+                using (var file = File.OpenText(path))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     articles.AddRange((List<OutlinkArticleModel>)serializer.Deserialize(file, typeof(List<OutlinkArticleModel>)));
                 }
 
                 path = Path.Combine(setting.TempPath, "MergeEntries.json");
 
-                using (StreamReader file = File.OpenText(path))
+                using (var file = File.OpenText(path))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     mergeEntries.AddRange((List<MergeEntryModel>)serializer.Deserialize(file, typeof(List<MergeEntryModel>)));
                 }
 
@@ -1067,17 +1053,17 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         {
             var path = Path.Combine(setting.TempPath, "articles.json");
 
-            using (StreamWriter file = File.CreateText(path))
+            using (var file = File.CreateText(path))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, articles);
             }
 
             path = Path.Combine(setting.TempPath, "MergeEntries.json");
 
-            using (StreamWriter file = File.CreateText(path))
+            using (var file = File.CreateText(path))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, mergeEntries);
             }
         }
@@ -1132,9 +1118,9 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             {
                 var path = Path.Combine(setting.TempPath, "images.json");
 
-                using (StreamReader file = File.OpenText(path))
+                using (var file = File.OpenText(path))
                 {
-                    Newtonsoft.Json.JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     images.AddRange((List<OriginalImageToDrawingBedUrl>)serializer.Deserialize(file, typeof(List<OriginalImageToDrawingBedUrl>)));
                 }
             }
@@ -1148,9 +1134,9 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         {
             var path = Path.Combine(setting.TempPath, "images.json");
 
-            using (StreamWriter file = File.CreateText(path))
+            using (var file = File.CreateText(path))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, images);
             }
         }
@@ -1171,7 +1157,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
                 if (obj.Successful)
                 {
-                    var temp= obj.Error.Replace("http://local.host/", "https://pic.cngal.top/");
+                    var temp = obj.Error.Replace("http://local.host/", "https://pic.cngal.top/");
                     Console.WriteLine("上传完成：" + temp);
 
                     return temp;
@@ -1262,7 +1248,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         }
     }
 
-  
+
     public class Setting
     {
         public string Token { get; set; }
@@ -1271,7 +1257,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
 
         public string MergeEntriesFileName { get; set; } = "MergeEntries.txt";
 
-        public string TempPath { get; set; } =  "Data";
+        public string TempPath { get; set; } = "Data";
 
         public string TransferDepositFileAPI { get; set; } = "https://api.cngal.top/";
 
@@ -1291,9 +1277,9 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             {
                 var path = Path.Combine(TempPath, "setting.json");
 
-                using (StreamReader file = File.OpenText(path))
+                using (var file = File.OpenText(path))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     var temp = (Setting)serializer.Deserialize(file, typeof(Setting));
 
                     Token = temp.Token;
@@ -1380,9 +1366,9 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         {
             var path = Path.Combine(TempPath, "setting.json");
 
-            using (StreamWriter file = File.CreateText(path))
+            using (var file = File.CreateText(path))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, this);
             }
         }
@@ -1398,7 +1384,7 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
     public class LevenshteinDistance
     {
 
-        private static LevenshteinDistance _instance = null;
+        private static readonly LevenshteinDistance _instance = null;
         public static LevenshteinDistance Instance
         {
             get
@@ -1421,25 +1407,31 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
         /// <returns></returns>
         public int LowerOfThree(int first, int second, int third)
         {
-            int min = first;
+            var min = first;
             if (second < min)
+            {
                 min = second;
+            }
+
             if (third < min)
+            {
                 min = third;
+            }
+
             return min;
         }
 
         public int Levenshtein_Distance(string str1, string str2)
         {
             int[,] Matrix;
-            int n = str1.Length;
-            int m = str2.Length;
+            var n = str1.Length;
+            var m = str2.Length;
 
-            int temp = 0;
+            var temp = 0;
             char ch1;
             char ch2;
-            int i = 0;
-            int j = 0;
+            var i = 0;
+            var j = 0;
             if (n == 0)
             {
                 return m;
@@ -1507,8 +1499,8 @@ namespace CnGalWebSite.PostTools // Note: actual namespace depends on the projec
             {
                 return 0;
             }
-            int maxLenth = str1.Length > str2.Length ? str1.Length : str2.Length;
-            int val = Levenshtein_Distance(str1, str2);
+            var maxLenth = str1.Length > str2.Length ? str1.Length : str2.Length;
+            var val = Levenshtein_Distance(str1, str2);
             return 1 - (decimal)val / maxLenth;
         }
     }

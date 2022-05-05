@@ -38,7 +38,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _fileManagerRepository = fileManagerRepository;
             _userFileRepository = userFileRepository;
             _fileService = fileService;
-            _userManager= userManager;
+            _userManager = userManager;
         }
 
         private async Task<ActionResult<List<UploadResult>>> PostFileMain(IEnumerable<IFormFile> files, double x = 0, double y = 0, int server = 0)
@@ -51,7 +51,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 total += item.Length;
             }
-            if (total > 500 * 1024 * 1024 && await _userManager.IsInRoleAsync(user, "Editor")==false)
+            if (total > 500 * 1024 * 1024 && await _userManager.IsInRoleAsync(user, "Editor") == false)
             {
                 return new List<UploadResult> { new UploadResult { Uploaded = false, Error = "该用户总文件空间不足" } };
             }

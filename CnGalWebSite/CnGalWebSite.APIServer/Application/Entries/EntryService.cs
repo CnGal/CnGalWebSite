@@ -11,6 +11,7 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -19,9 +20,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Threading.Tasks;
-using CnGalWebSite.Helper.Extensions;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Tag = CnGalWebSite.DataModel.Model.Tag;
 
 namespace CnGalWebSite.APIServer.Application.Entries
@@ -430,7 +430,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     }
                 }
 
-                
+
             }
 
             //更新最后编辑时间
@@ -1750,21 +1750,22 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         public EditMainViewModel GetEditMainViewModel(Entry entry)
         {
-            var model = new EditMainViewModel();
+            var model = new EditMainViewModel
+            {
+                MainPicturePath = _appHelper.GetImagePath(entry.MainPicture, "app.png"),
+                Thumbnail = entry.Thumbnail,
+                MainPicture = entry.MainPicture,
+                BackgroundPicture = entry.BackgroundPicture,
 
-            model.MainPicturePath = _appHelper.GetImagePath(entry.MainPicture, "app.png");
-            model.Thumbnail = entry.Thumbnail;
-            model.MainPicture = entry.MainPicture;
-            model.BackgroundPicture = entry.BackgroundPicture;
+                Name = entry.Name,
+                BriefIntroduction = entry.BriefIntroduction,
+                Type = entry.Type,
+                DisplayName = entry.DisplayName,
+                AnotherName = entry.AnotherName,
+                SmallBackgroundPicture = entry.SmallBackgroundPicture,
 
-            model.Name = entry.Name;
-            model.BriefIntroduction = entry.BriefIntroduction;
-            model.Type = entry.Type;
-            model.DisplayName = entry.DisplayName;
-            model.AnotherName = entry.AnotherName;
-            model.SmallBackgroundPicture = entry.SmallBackgroundPicture;
-
-            model.Id = entry.Id;
+                Id = entry.Id
+            };
 
             return model;
         }
@@ -2358,11 +2359,13 @@ namespace CnGalWebSite.APIServer.Application.Entries
         public EditMainPageViewModel GetEditMainPageViewModel(Entry entry)
         {
 
-            var model = new EditMainPageViewModel();
-            model.Context = entry.MainPage;
-            model.Id = entry.Id;
-            model.Type = entry.Type;
-            model.Name = entry.Name;
+            var model = new EditMainPageViewModel
+            {
+                Context = entry.MainPage,
+                Id = entry.Id,
+                Type = entry.Type,
+                Name = entry.Name
+            };
 
             return model;
 
@@ -2574,7 +2577,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
         }
 
-        public void SetDataFromEditRelevancesViewModel(Entry newEntry, EditRelevancesViewModel model,List< Entry> entries,List<Article> articles)
+        public void SetDataFromEditRelevancesViewModel(Entry newEntry, EditRelevancesViewModel model, List<Entry> entries, List<Article> articles)
         {
             newEntry.Outlinks.Clear();
             newEntry.Articles = articles;
@@ -2600,7 +2603,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             newEntry.MainPage = model.Context;
         }
 
-        public void SetDataFromEditTagsViewModel(Entry newEntry, EditEntryTagViewModel model,List<Tag> tags)
+        public void SetDataFromEditTagsViewModel(Entry newEntry, EditEntryTagViewModel model, List<Tag> tags)
         {
             newEntry.Tags = tags;
         }

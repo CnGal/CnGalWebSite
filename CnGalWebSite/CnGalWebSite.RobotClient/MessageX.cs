@@ -48,7 +48,7 @@ namespace CnGalWebSite.RobotClient
                 return null;
             }
 
-            int index = new Random().Next(0, replies.FirstOrDefault().Count());
+            var index = new Random().Next(0, replies.FirstOrDefault().Count());
 
             return replies.FirstOrDefault().ToList()[index];
         }
@@ -78,7 +78,7 @@ namespace CnGalWebSite.RobotClient
 
             if (words.Count != 0)
             {
-                string msg = $"对{sender.memberName}({sender.id})的消息回复中包含敏感词\n消息：{message}\n回复：{reply}\n\n参数替换列表：\n";
+                var msg = $"对{sender.memberName}({sender.id})的消息回复中包含敏感词\n消息：{message}\n回复：{reply}\n\n参数替换列表：\n";
                 foreach (var item in args)
                 {
                     msg += $"{item.Key} -> {item.Value}\n";
@@ -139,8 +139,7 @@ namespace CnGalWebSite.RobotClient
                 else if (vaule.Contains("[@"))
                 {
                     var idStr = vaule.MidStrEx("[@", "]");
-                    long id = 0;
-                    if (long.TryParse(idStr, out id))
+                    if (long.TryParse(idStr, out var id))
                     {
 
                         vaule = vaule.Replace("[@" + idStr + "]", "");
@@ -183,7 +182,7 @@ namespace CnGalWebSite.RobotClient
             var splits = Regex.Split(message, regex).Where(s => string.IsNullOrWhiteSpace(s) == false).ToList();
 
 
-            for (int i = 0; i < splits.Count; i++)
+            for (var i = 0; i < splits.Count; i++)
             {
                 if (reply.Contains($"[{i + 1}]"))
                 {
@@ -239,7 +238,7 @@ namespace CnGalWebSite.RobotClient
                 }
             }
 
-            for (int i = 1; i < 4; i++)
+            for (var i = 1; i < 4; i++)
             {
                 if (reply.Contains($"[{i}]") && args.Any(s => s.Key == $"[{i}]") == false)
                 {
@@ -256,8 +255,8 @@ namespace CnGalWebSite.RobotClient
                 Name = name,
             });
 
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            var jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {

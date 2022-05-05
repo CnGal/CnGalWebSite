@@ -18,7 +18,6 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Disambig;
 using CnGalWebSite.Helper.Extensions;
-using Markdig;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -1509,7 +1508,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 }
             }
 
-            if(examine.IsPassed==true)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = model.AfterModel;
             }

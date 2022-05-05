@@ -1,7 +1,6 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace CnGalWebSite.DataModel.ViewModel

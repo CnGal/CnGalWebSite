@@ -1,7 +1,7 @@
 ﻿@if (Show)
 {
     <div id="web_bg" style="@($"background-image: url({BigImage})")" class=" d-none d-sm-block"></div>
-    <div id="web_bg" style="@($"background-image: url({SmallImage})")" class=" d-none bg-d-lg-block"></div>
+    <div id="web_bg" style="@($"background-image: url({SmallImage})")" class="d-md-none"></div>
 }
 @code {
     string BigImage = "";

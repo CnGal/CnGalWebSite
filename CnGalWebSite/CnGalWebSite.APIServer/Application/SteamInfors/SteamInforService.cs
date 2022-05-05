@@ -2,7 +2,6 @@
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;

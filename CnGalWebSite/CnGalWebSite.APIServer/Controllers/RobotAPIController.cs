@@ -8,8 +8,6 @@ using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.HistoryData;
 using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.Messages;
-using CnGalWebSite.APIServer.Application.News;
-using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Robots;
@@ -19,24 +17,19 @@ using CnGalWebSite.APIServer.Application.Votes;
 using CnGalWebSite.APIServer.Application.WeiXin;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
-using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ImportModel;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Robots;
-using CnGalWebSite.DataModel.ViewModel.TimedTasks;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Senparc.Weixin.MP.AdvancedAPIs.MerChant;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -105,7 +98,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         public RobotAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
-        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository,  IRankService rankService, IHistoryDataService historyDataService,
+        IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRankService rankService, IHistoryDataService historyDataService,
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<RobotFace, long> robotFaceRepository,
         UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<RobotEvent, long> robotEventRepository,
@@ -113,7 +106,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository, IRobotService robotService,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotGroup, long> robotGroupRepository,
-        IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository,ISearchHelper searchHelper, IRepository<RobotReply, long> robotReplyRepository)
+        IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, ISearchHelper searchHelper, IRepository<RobotReply, long> robotReplyRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -178,7 +171,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Events = await _robotEventRepository.CountAsync(s => s.IsHidden == false),
                     Groups = await _robotGroupRepository.CountAsync(s => s.IsHidden == false),
                     Replies = await _robotReplyRepository.CountAsync(s => s.IsHidden == false),
-                    Faces=await _robotFaceRepository.CountAsync(s => s.IsHidden == false),
+                    Faces = await _robotFaceRepository.CountAsync(s => s.IsHidden == false),
                 };
 
                 return model;
@@ -227,7 +220,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<Result>> UpdateRobotEventDataAsync(ListRobotEventAloneModel model)
         {
             //检查数据合规性
-            if(string.IsNullOrWhiteSpace(model.Text))
+            if (string.IsNullOrWhiteSpace(model.Text))
             {
                 return new Result { Successful = false, Error = $"消息不能为空" };
             }
@@ -352,11 +345,11 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         IsHidden = model.IsHidden,
                         Key = model.Key,
-                        UpdateTime =DateTime.Now.ToCstTime(),
+                        UpdateTime = DateTime.Now.ToCstTime(),
                         Value = model.Value,
-                        AfterTime=model.AfterTime,
-                        BeforeTime=model.BeforeTime,
-                        Priority=model.Priority,
+                        AfterTime = model.AfterTime,
+                        BeforeTime = model.BeforeTime,
+                        Priority = model.Priority,
                     };
                 }
             }
@@ -463,25 +456,25 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 //检查数据合规
                 if (string.IsNullOrWhiteSpace(item.LxKey))
-                    {
-                        errors++;
-                        continue;
-                    }
-                    if (string.IsNullOrWhiteSpace(item.LxValue))
-                    {
-                        errors++;
-                        continue;
-                    }
+                {
+                    errors++;
+                    continue;
+                }
+                if (string.IsNullOrWhiteSpace(item.LxValue))
+                {
+                    errors++;
+                    continue;
+                }
 
                 //转换正则表达式
                 if (item.LxType == LxType.Asterisk)
                 {
-                    bool first = item.LxKey.First() == '*';
-                    bool last = item.LxKey.Last() == '*';
+                    var first = item.LxKey.First() == '*';
+                    var last = item.LxKey.Last() == '*';
 
                     item.LxKey = item.LxKey.Replace("*", "([\\s\\S]*)");
 
-                    if (first==false)
+                    if (first == false)
                     {
                         item.LxKey = '^' + item.LxKey;
                     }
@@ -491,7 +484,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         item.LxKey = item.LxKey + '$';
                     }
                 }
-                if(item.LxType== LxType.ExactMatch)
+                if (item.LxType == LxType.ExactMatch)
                 {
                     item.LxKey = '^' + item.LxKey + '$';
                 }
@@ -507,16 +500,16 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 try
                 {
-                    
+
 
 
                     var time = DateTime.ParseExact(item.Time, "yyyy-MM-dd HH:mm:ss", null);
-                    DateTime afterTime = DateTime.MinValue.AddYears(2022);
+                    var afterTime = DateTime.MinValue.AddYears(2022);
                     if (item.AfterTime != "-1")
                     {
                         afterTime = DateTime.ParseExact(item.AfterTime, "HHmm", null);
                     }
-                    DateTime beforeTime = DateTime.MinValue.AddYears(2022).AddHours(23).AddMinutes(59).AddSeconds(59);
+                    var beforeTime = DateTime.MinValue.AddYears(2022).AddHours(23).AddMinutes(59).AddSeconds(59);
                     if (item.BeforeTime != "-1")
                     {
                         beforeTime = DateTime.ParseExact(item.BeforeTime, "HHmm", null);
@@ -533,7 +526,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     });
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     errors++;
                 }
@@ -565,7 +558,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var errors = 0;
             foreach (var item in lines)
             {
-                var  temp = item.Replace("[", "").Replace("]", "");
+                var temp = item.Replace("[", "").Replace("]", "");
 
                 var key = temp.MidStrEx("'", "'");
 
@@ -573,7 +566,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 var value = temp.MidStrEx("'", "'").Replace("http://", "https://");
 
-                if(string.IsNullOrWhiteSpace(key)|| string.IsNullOrWhiteSpace(value))
+                if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
                 {
                     errors++;
                     continue;
@@ -699,11 +692,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (entry.Name != entryName && entry.DisplayName != entryName)
                     {
-                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true,true)).DeleteHtmlLinks() + "\n（看板娘不太确定是不是这个词条哦~" };
+                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true, true)).DeleteHtmlLinks() + "\n（看板娘不太确定是不是这个词条哦~" };
                     }
                     else
                     {
-                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true,true)).DeleteHtmlLinks() };
+                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true, true)).DeleteHtmlLinks() };
                     }
                 }
             }
@@ -717,8 +710,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     if (item.Contains("entries"))
                     {
                         var idStr = item.Split('/').Last();
-                        int id = 0;
-                        if (int.TryParse(idStr, out id))
+                        if (int.TryParse(idStr, out var id))
                         {
                             return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(id, true)).DeleteHtmlLinks() };
                         }
@@ -726,8 +718,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     else if (item.Contains("articles"))
                     {
                         var idStr = item.Split('/').Last();
-                        int id = 0;
-                        if (int.TryParse(idStr, out id))
+                        if (int.TryParse(idStr, out var id))
                         {
                             return new Result { Successful = true, Error = (await _weiXinService.GetArticleInfor(id, true)).DeleteHtmlLinks() };
                         }
@@ -739,7 +730,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             else if (model.Name == "steamdiscount")
             {
-                var count = await _steamInforRepository.GetAll().Include(s=>s.Entry).CountAsync(s => s.CutNow > 0 && s.Entry.IsHidden == false&&string.IsNullOrWhiteSpace( s.Entry.Name)==false);
+                var count = await _steamInforRepository.GetAll().Include(s => s.Entry).CountAsync(s => s.CutNow > 0 && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false);
 
                 return new Result { Successful = true, Error = $"今天有{count}款作品打折中：https://www.cngal.org/discount" };
             }
@@ -747,7 +738,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var value = model.Name switch
                 {
-                    "recommend" => await _weiXinService.GetRandom(true,true),
+                    "recommend" => await _weiXinService.GetRandom(true, true),
                     _ => ""
                 };
 

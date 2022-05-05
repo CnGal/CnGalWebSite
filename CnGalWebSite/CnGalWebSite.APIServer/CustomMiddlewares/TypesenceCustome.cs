@@ -31,7 +31,10 @@ namespace CnGalWebSite.APIServer.CustomMiddlewares
         public MySchema(string name, IEnumerable<MyField> fields)
         {
             if (string.IsNullOrWhiteSpace(name))
+            {
                 throw new ArgumentNullException();
+            }
+
             Name = name;
             Fields = fields;
         }
@@ -39,7 +42,10 @@ namespace CnGalWebSite.APIServer.CustomMiddlewares
         public MySchema(string name, IEnumerable<MyField> fields, string defaultSortingField)
         {
             if (string.IsNullOrWhiteSpace(name))
+            {
                 throw new ArgumentNullException();
+            }
+
             Name = name;
             Fields = fields;
             DefaultSortingField = defaultSortingField;

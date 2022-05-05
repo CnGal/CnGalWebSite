@@ -118,7 +118,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public string GetImagePath(string image, string defaultStr, bool mediumImage = false)
         {
-           return ToolHelper.GetImagePath(image, defaultStr, mediumImage);
+            return ToolHelper.GetImagePath(image, defaultStr, mediumImage);
         }
 
         public string GetStringAbbreviation(string str, int length)
@@ -594,7 +594,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             var newUploadResults = await response.Content.ReadAsStringAsync();
             if (response.StatusCode == System.Net.HttpStatusCode.OK && string.IsNullOrWhiteSpace(newUploadResults) == false && newUploadResults != "Duplicated upload")
             {
-                return newUploadResults.Replace("pic.cngal.top","image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
+                return newUploadResults.Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
             }
             else
             {
@@ -673,7 +673,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public async Task<bool> IsTagLockedAsync(int tagId, string userId, Operation operation)
         {
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.TagId == tagId && s.ApplicationUserId != userId && s.IsPassed == null && s.Operation == operation)==false)
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.TagId == tagId && s.ApplicationUserId != userId && s.IsPassed == null && s.Operation == operation) == false)
             {
                 return false;
             }

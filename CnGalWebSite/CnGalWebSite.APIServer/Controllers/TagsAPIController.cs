@@ -8,8 +8,8 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
-using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Tags;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CnGalWebSite.Helper.Extensions;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -233,12 +232,12 @@ namespace CnGalWebSite.APIServer.Controllers
                         4 => "mdi-group ",
                         _ => "mdi-tag-multiple-outline"
                     },
-                    Children = item.InverseParentCodeNavigation.Where(s=>string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false)
+                    Children = item.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false)
                     .Select(s => new TagTreeModel
                     {
                         Id = s.Id,
                         Title = s.Name,
-                        Icon=s.InverseParentCodeNavigation.Any()? "mdi-tag-multiple " : "mdi-tag-outline ",
+                        Icon = s.InverseParentCodeNavigation.Any() ? "mdi-tag-multiple " : "mdi-tag-outline ",
                         Children = s.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false)
                         .Select(s => new TagTreeModel
                         {
@@ -342,9 +341,9 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 var newTag = new Tag();
 
-                _tagService.SetDataFromEditTagMainViewModel(newTag, model.Main,parentTag);
-                _tagService.SetDataFromEditTagChildEntriesViewModel(newTag, model.Entries,entries);
-                _tagService.SetDataFromEditTagChildTagsViewModel(newTag, model.Tags,tags);
+                _tagService.SetDataFromEditTagMainViewModel(newTag, model.Main, parentTag);
+                _tagService.SetDataFromEditTagChildEntriesViewModel(newTag, model.Entries, entries);
+                _tagService.SetDataFromEditTagChildTagsViewModel(newTag, model.Tags, tags);
 
                 var tag = new Tag();
                 //获取审核记录
@@ -375,7 +374,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
             //判断是否为锁定状态
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id==id && s.IsPassed == null && (s.Operation == Operation.EditTagMain)))
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id == id && s.IsPassed == null && (s.Operation == Operation.EditTagMain)))
             {
                 return NotFound("当前标签该部分已经被另一名用户编辑，正在等待审核，请等待审核结束后再进行编辑");
             }
@@ -873,7 +872,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var tags = await _tagRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entries)
-                .Where(s => s.Entries.Count > 3&&s.Name!="免费")
+                .Where(s => s.Entries.Count > 3 && s.Name != "免费")
                 .ToListAsync();
 
             var model = new List<RandomTagModel>();
@@ -884,7 +883,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Id = item.Id,
                     Name = item.Name
                 };
-                foreach(var infor  in item.Entries.ToList().Random().Take(12))
+                foreach (var infor in item.Entries.ToList().Random().Take(12))
                 {
                     temp.Entries.Add(await _appHelper.GetEntryInforTipViewModel(infor));
                 }

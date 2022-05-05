@@ -1,8 +1,5 @@
 ﻿using CnGalWebSite.Maui.Platforms.Android.Services;
 using CnGalWebSite.Maui.Services;
-using Microsoft.AspNetCore.Components.WebView;
-using Microsoft.AspNetCore.Components.WebView.Maui;
-using Microsoft.Maui.Platform;
 
 namespace CnGalWebSite.Maui
 {
@@ -37,7 +34,7 @@ namespace CnGalWebSite.Maui
             //    TitleMode = BrowserTitleMode.Show
             //});
 
-            ThemeService themeService = new ThemeService();
+            var themeService = new ThemeService();
             themeService.SetStatusBarColor(Color.FromArgb("#FFFFFF"));
         }
 

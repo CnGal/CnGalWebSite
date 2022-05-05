@@ -952,7 +952,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
         {
             newArticle.MainPage = model.Context;
         }
-        public void SetDataFromEditArticleRelevancesViewModel(Article newArticle, EditArticleRelevancesViewModel model,List<Entry> entries,List<Article> articles)
+        public void SetDataFromEditArticleRelevancesViewModel(Article newArticle, EditArticleRelevancesViewModel model, List<Entry> entries, List<Article> articles)
         {
             newArticle.Outlinks.Clear();
             newArticle.Entries = entries;

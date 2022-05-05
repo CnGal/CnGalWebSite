@@ -1,94 +1,97 @@
-﻿<div class="@Class">
-        <MStepper AltLabels Value="2" Class="rounded shadow-sm bg-opacity">
-            <MStepperHeader>
-                <MStepperStep Step="1" Complete>
+﻿@inject IDataCacheService _dataCacheService
+
+
+<div class="@Class">
+    <MStepper AltLabels Value="2" Class="rounded shadow-sm bg-opacity" Vertical="_dataCacheService.IsApp">
+        <MStepperHeader>
+            <MStepperStep Step="1" Complete>
+                <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
+                    @(Model.UserName + " 提交审核")
+                    <small class="mt-1">@Model.ApplyTime.ToString("yyyy-MM-dd HH:mm:ss")</small>
+
+                </div>
+
+
+            </MStepperStep>
+
+            <MDivider></MDivider>
+            @if (Model.IsPassed == true)
+            {
+                <MStepperStep Step="2" Complete>
                     <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
-                        @(Model.UserName + " 提交审核")
-                        <small class="mt-1">@Model.ApplyTime.ToString("yyyy-MM-dd HH:mm:ss")</small>
+                        @($"『{Model.PassedAdminName}』审核通过")
+                        <small class="mt-1">@("对 "+Model.Type.GetDisplayName() + " " + (string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName) + " " + Model.Operation.GetDisplayName())</small>
 
                     </div>
 
+                </MStepperStep>
+            }
+            else if (Model.IsPassed == false)
+            {
+                <MStepperStep Rules="rules" Step="2">
+                    <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
+
+                        @($"『{Model.PassedAdminName}』驳回审核")
+                        @if (Model.PassedTime != null)
+                        {
+                            <small class="mt-1">@Model.PassedTime?.ToString("yyyy-MM-dd HH:mm:ss")</small>
+
+                        }
+
+                    </div>
+                </MStepperStep>
+            }
+            else
+            {
+                <MStepperStep Step="2">
+                    <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
+                        等待审核
+                        <small class="mt-1">@("对 "+Model.Type.GetDisplayName()+" "+(string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName) + " " + Model.Operation.GetDisplayName())</small>
+
+                    </div>
 
                 </MStepperStep>
-
-                <MDivider></MDivider>
-                @if (Model.IsPassed == true)
-                {
-                    <MStepperStep Step="2" Complete>
-                        <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
-                            @($"『{Model.PassedAdminName}』审核通过")
-                            <small class="mt-1">@("对 "+Model.Type.GetDisplayName() + " " + (string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName) + " " + Model.Operation.GetDisplayName())</small>
-
-                        </div>
-
-                    </MStepperStep>
-                }
-                else if (Model.IsPassed == false)
-                {
-                    <MStepperStep Rules="rules" Step="2">
-                        <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
-
-                            @($"『{Model.PassedAdminName}』驳回审核")
-                            @if (Model.PassedTime != null)
-                            {
-                                <small class="mt-1">@Model.PassedTime?.ToString("yyyy-MM-dd HH:mm:ss")</small>
-
-                            }
-
-                        </div>
-                    </MStepperStep>
-                }
-                else
-                {
-                    <MStepperStep Step="2" >
-                        <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
-                            等待审核
-                            <small class="mt-1">@("对 "+Model.Type.GetDisplayName()+" "+(string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName) + " " + Model.Operation.GetDisplayName())</small>
-
-                        </div>
-
-                    </MStepperStep>
-                }
+            }
 
 
-                <MDivider></MDivider>
-                @if (Model.IsPassed == true)
-                {
-                    <MStepperStep Step="3" Complete>
-                        <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
+            <MDivider></MDivider>
+            @if (Model.IsPassed == true)
+            {
+                <MStepperStep Step="3" Complete>
+                    <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
 
-                            完成编辑
-                            @if (Model.PassedTime != null)
-                            {
-                                <small class="mt-1">@Model.PassedTime?.ToString("yyyy-MM-dd HH:mm:ss")</small>
-
-                            }
-
-                        </div>
-                    </MStepperStep>
-                }
-                else if (Model.IsPassed == false)
-                {
-                    <MStepperStep Step="3">
-                        <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
-
-                            完成编辑
-                            <small class="mt-1">@("对 "+Model.Type.GetDisplayName() + " " + (string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName) + " " + Model.Operation.GetDisplayName())</small>
-
-                        </div>
-                    </MStepperStep>
-                }
-                else
-                {
-                    <MStepperStep Step="3">
                         完成编辑
-                    </MStepperStep>
-                }
+                        @if (Model.PassedTime != null)
+                        {
+                            <small class="mt-1">@Model.PassedTime?.ToString("yyyy-MM-dd HH:mm:ss")</small>
+
+                        }
+
+                    </div>
+                </MStepperStep>
+            }
+            else if (Model.IsPassed == false)
+            {
+                <MStepperStep Step="3">
+                    <div style="word-break: keep-all; text-align: center; display: flex; flex-direction: column;">
+
+                        完成编辑
+                        <small class="mt-1">@("对 "+Model.Type.GetDisplayName() + " " + (string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName) + " " + Model.Operation.GetDisplayName())</small>
+
+                    </div>
+                </MStepperStep>
+            }
+            else
+            {
+                <MStepperStep Step="3">
+                    完成编辑
+                </MStepperStep>
+            }
 
 
-            </MStepperHeader>
-        </MStepper>
-    </div>
+        </MStepperHeader>
+    </MStepper>
+</div>
 
 @code {
     [Parameter]

@@ -1,14 +1,8 @@
 ﻿using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.Helper.Helper;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 using File = System.IO.File;
 
 namespace CnGalWebSite.RobotClient
@@ -41,9 +35,9 @@ namespace CnGalWebSite.RobotClient
             {
                 var path = Path.Combine(_setting.RootPath, "Replies.json");
 
-                using (StreamReader file = File.OpenText(path))
+                using (var file = File.OpenText(path))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     Replies = (List<RobotReply>)serializer.Deserialize(file, typeof(List<RobotReply>));
                     file.Close();
                     file.Dispose();
@@ -60,9 +54,9 @@ namespace CnGalWebSite.RobotClient
         {
             var path = Path.Combine(_setting.RootPath, "Replies.json");
 
-            using (StreamWriter file = File.CreateText(path))
+            using (var file = File.CreateText(path))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, Replies);
                 file.Close();
                 file.Dispose();

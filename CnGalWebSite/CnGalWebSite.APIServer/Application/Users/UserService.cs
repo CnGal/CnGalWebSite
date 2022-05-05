@@ -9,9 +9,6 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Space;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -739,7 +736,7 @@ namespace CnGalWebSite.APIServer.Application.Users
                 Ranks = await _rankService.GetUserRanks(user),
                 Integral = user.DisplayIntegral,
                 EditCount = await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true),
-                ArticleCount = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id&&string.IsNullOrWhiteSpace(s.Name)==false&&s.IsHidden==false),
+                ArticleCount = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false),
                 FavoriteCount = await _favoriteObjectRepository.GetAll().Include(s => s.FavoriteFolder).CountAsync(s => s.FavoriteFolder.ApplicationUserId == user.Id)
             };
             //计算连续签到天数和今天是否签到

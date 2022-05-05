@@ -1,23 +1,20 @@
 ﻿using CnGalWebSite.DataModel.Model;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Xml.Linq;
 
 namespace CnGalWebSite.DataModel.ViewModel.Perfections
 {
     public class ListPerfectionChecksViewModel
     {
         public List<ListPerfectionCheckAloneModel> PerfectionChecks { get; set; } = new List<ListPerfectionCheckAloneModel> { };
-}
+    }
     public class ListPerfectionCheckAloneModel
     {
         [Display(Name = "词条Id")]
         public int Id { get; set; }
         [Display(Name = "唯一名称")]
         public string Name { get; set; }
-        [Display(Name ="检查")]
+        [Display(Name = "检查")]
         public PerfectionCheckType Type { get; set; }
         [Display(Name = "分数")]
         public double Grade { get; set; }

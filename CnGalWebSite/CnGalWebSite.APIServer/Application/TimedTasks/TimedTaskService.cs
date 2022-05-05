@@ -212,7 +212,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                     await _timedTaskRepository.UpdateAsync(item);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _timedTaskRepository.Clear();
                 item = await _timedTaskRepository.FirstOrDefaultAsync(s => s.Id == item.Id);

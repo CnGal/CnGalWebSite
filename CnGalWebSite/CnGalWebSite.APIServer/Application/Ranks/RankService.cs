@@ -1,5 +1,4 @@
 ﻿using BootstrapBlazor.Components;
-using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -26,7 +25,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Rank>, string, SortOrder, IEnumerable<Rank>>> SortLambdaCacheRank = new();
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<RankUser>, string, SortOrder, IEnumerable<RankUser>>> SortLambdaCacheRankUser = new();
 
-        public RankService(IRepository<Rank, int> rankRepository, IRepository<RankUser, int> rankUserRepository,  IRepository<Examine, int> examineRepository,
+        public RankService(IRepository<Rank, int> rankRepository, IRepository<RankUser, int> rankUserRepository, IRepository<Examine, int> examineRepository,
             IRepository<ApplicationUser, string> userRepository)
         {
             _rankUserRepository = rankUserRepository;

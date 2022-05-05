@@ -1,27 +1,13 @@
-﻿using CnGalWebSite.APIServer.Application.Articles;
-using CnGalWebSite.APIServer.Application.Comments;
-using CnGalWebSite.APIServer.Application.Entries;
-using CnGalWebSite.APIServer.Application.ErrorCounts;
-using CnGalWebSite.APIServer.Application.Favorites;
-using CnGalWebSite.APIServer.Application.Files;
-using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Lotteries;
-using CnGalWebSite.APIServer.Application.Messages;
-using CnGalWebSite.APIServer.Application.News;
-using CnGalWebSite.APIServer.Application.Perfections;
-using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
-using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -78,7 +64,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _lotteryAwardRepository = lotteryAwardRepository;
             _lotteryPrizeRepository = lotteryPrizeRepository;
             _lotteryService = lotteryService;
-            _userRepository= userRepository;
+            _userRepository = userRepository;
             _playedGameRepository = playedGameRepository;
         }
 

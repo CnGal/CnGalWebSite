@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CnGalWebSite.Helper.Helper
+﻿namespace CnGalWebSite.Helper.Helper
 {
     public static class OutputHelper
     {
@@ -35,7 +29,7 @@ namespace CnGalWebSite.Helper.Helper
         {
             var space = (count - text.Length * rate) / 2;
 
-            for (int i = 0; i < space; i++)
+            for (var i = 0; i < space; i++)
             {
                 Console.Write(' ');
             }
@@ -45,7 +39,7 @@ namespace CnGalWebSite.Helper.Helper
 
         public static void Repeat(string text = "=", bool lineBreak = true, int count = 50)
         {
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 Console.Write(text);
             }

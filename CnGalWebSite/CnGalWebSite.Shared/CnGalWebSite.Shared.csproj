@@ -70,5 +70,13 @@
     <ProjectReference Include="..\CnGalWebSite.DataModel\CnGalWebSite.DataModel.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Helper\CnGalWebSite.Helper.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="AppComponent\Pages\Entries\" />
+    <Folder Include="AppComponent\Pages\Users\" />
+    <Folder Include="Pages\Apps\Entries\" />
+    <Folder Include="Pages\Apps\Peripheries\" />
+    <Folder Include="Pages\Apps\Space\" />
+  </ItemGroup>
 
 </Project>

@@ -1,6 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Theme;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
@@ -29,7 +28,7 @@ namespace CnGalWebSite.Shared
                 _dataCacheService.IsApp = true;
             }
 
-            if(ToolHelper.IsMaui)
+            if (ToolHelper.IsMaui)
             {
                 _dataCacheService.IsApp = ToolHelper.IsApp;
             }
@@ -53,7 +52,7 @@ namespace CnGalWebSite.Shared
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender &&( OperatingSystem.IsBrowser()||ToolHelper.IsMaui))
+            if (firstRender && (OperatingSystem.IsBrowser() || ToolHelper.IsMaui))
             {
                 try
                 {

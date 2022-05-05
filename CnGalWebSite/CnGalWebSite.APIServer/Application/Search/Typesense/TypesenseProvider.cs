@@ -1,7 +1,6 @@
 ﻿using CnGalWebSite.APIServer.Application.Search.Typesense;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.Generic;
 using Typesense;
 using Typesense.Setup;

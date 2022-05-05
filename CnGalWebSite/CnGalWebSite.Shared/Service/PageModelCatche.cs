@@ -1,11 +1,8 @@
-﻿using BootstrapBlazor.Components;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Security.Policy;
 using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace CnGalWebSite.Shared.Service
 {
@@ -30,7 +27,7 @@ namespace CnGalWebSite.Shared.Service
             _httpClient = httpClient;
         }
 
-        public void Init(string baseUrl,bool useNewtonsoft = false)
+        public void Init(string baseUrl, bool useNewtonsoft = false)
         {
             _baseUrl = baseUrl ?? string.Empty;
             _useNewtonsoft = useNewtonsoft;
@@ -54,15 +51,15 @@ namespace CnGalWebSite.Shared.Service
             {
                 //获取数据
                 TModel temp = null;
-                if(_useNewtonsoft)
+                if (_useNewtonsoft)
                 {
                     var str = await _httpClient.GetStringAsync(_baseUrl + apiUrl);
-                    Newtonsoft.Json.Linq.JObject obj = Newtonsoft.Json.Linq.JObject.Parse(str);
+                    var obj = Newtonsoft.Json.Linq.JObject.Parse(str);
                     temp = obj.ToObject<TModel>();
                 }
                 else
                 {
-                    temp=  await _httpClient.GetFromJsonAsync<TModel>(_baseUrl + apiUrl);
+                    temp = await _httpClient.GetFromJsonAsync<TModel>(_baseUrl + apiUrl);
                 }
 
                 //保存数据

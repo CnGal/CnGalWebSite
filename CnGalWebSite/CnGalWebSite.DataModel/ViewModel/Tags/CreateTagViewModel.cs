@@ -1,12 +1,9 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Base;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace CnGalWebSite.DataModel.ViewModel.Tags
 {
-    public class CreateTagViewModel: BaseEditModel
+    public class CreateTagViewModel : BaseEditModel
     {
         public EditTagMainViewModel Main { get; set; } = new EditTagMainViewModel();
         public EditTagChildEntriesViewModel Entries { get; set; } = new EditTagChildEntriesViewModel();
@@ -26,7 +23,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Tags
             }
             result = Tags.Validate();
             if (!result.Successful)
-{
+            {
                 return result;
             }
 

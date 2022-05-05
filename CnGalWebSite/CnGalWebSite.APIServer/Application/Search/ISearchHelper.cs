@@ -1,7 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.Search.ElasticSearches;
-using CnGalWebSite.DataModel.Application.Dtos;
+﻿using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Application.Search.Dtos;
-using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using System;
 using System.Threading.Tasks;

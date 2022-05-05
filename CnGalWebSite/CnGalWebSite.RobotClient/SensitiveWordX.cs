@@ -1,12 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Helper;
-using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.Helper.Helper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CnGalWebSite.RobotClient
 {
@@ -34,9 +27,9 @@ namespace CnGalWebSite.RobotClient
         {
             try
             {
-                DirectoryInfo root = new DirectoryInfo(_setting.SensitiveWordsPath);
+                var root = new DirectoryInfo(_setting.SensitiveWordsPath);
 
-                foreach(var item in root.GetFiles())
+                foreach (var item in root.GetFiles())
                 {
                     using var fs = new FileStream(Path.Combine(_setting.SensitiveWordsPath, item.FullName), FileMode.Open, FileAccess.Read);
                     using var sr = new StreamReader(fs);
@@ -51,9 +44,9 @@ namespace CnGalWebSite.RobotClient
                     sr.Dispose();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                OutputHelper.PressError(ex, "获取敏感词列表失败","未找到敏感词列表文件或读取文件失败",$"请将敏感词放置在{_setting.SensitiveWordsPath}文件夹下");
+                OutputHelper.PressError(ex, "获取敏感词列表失败", "未找到敏感词列表文件或读取文件失败", $"请将敏感词放置在{_setting.SensitiveWordsPath}文件夹下");
             }
 
         }
@@ -62,7 +55,7 @@ namespace CnGalWebSite.RobotClient
         public List<string> Check(List<string> texts)
         {
             var words = new List<string>();
-            foreach(var item in texts)
+            foreach (var item in texts)
             {
                 words.AddRange(ToolHelper.FindStringListInText(item, SensitiveWords));
             }

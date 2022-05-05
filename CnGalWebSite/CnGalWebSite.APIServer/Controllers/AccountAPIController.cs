@@ -186,7 +186,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             if (user == null)
             {
-                user = await _userRepository.FirstOrDefaultAsync(s=>s.PhoneNumber==model.UserName);
+                user = await _userRepository.FirstOrDefaultAsync(s => s.PhoneNumber == model.UserName);
             }
             if (user == null)
             {

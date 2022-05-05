@@ -1,35 +1,18 @@
-﻿using CnGalWebSite.APIServer.Application.Articles;
-using CnGalWebSite.APIServer.Application.Comments;
-using CnGalWebSite.APIServer.Application.Entries;
-using CnGalWebSite.APIServer.Application.ErrorCounts;
-using CnGalWebSite.APIServer.Application.Favorites;
-using CnGalWebSite.APIServer.Application.Files;
-using CnGalWebSite.APIServer.Application.Helper;
-using CnGalWebSite.APIServer.Application.HistoryData;
-using CnGalWebSite.APIServer.Application.Messages;
-using CnGalWebSite.APIServer.Application.News;
-using CnGalWebSite.APIServer.Application.Perfections;
-using CnGalWebSite.APIServer.Application.Peripheries;
+﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
-using CnGalWebSite.APIServer.Application.Search;
-using CnGalWebSite.APIServer.Application.Users;
-using CnGalWebSite.APIServer.Application.Votes;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -58,9 +41,9 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRankService _rankService;
 
 
-        public ExaminesAPIController( IRepository<Disambig, int> disambigRepository,IRankService rankService,IRepository<Comment, long> commentRepository,
+        public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository,
         IRepository<Message, long> messageRepository,
-        UserManager<ApplicationUser> userManager, IExamineService examineService, 
+        UserManager<ApplicationUser> userManager, IExamineService examineService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository)
         {
             _userManager = userManager;
@@ -235,7 +218,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         {
                             entry = await _entryRepository.GetAll()
                                                        .Include(s => s.Information).ThenInclude(s => s.Additional)
-                                                       .Include(s=>s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                                                       .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                                                        .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
                             if (entry == null)
                             {
@@ -534,7 +517,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     examine = await _examineRepository.UpdateAsync(examine);
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                 }

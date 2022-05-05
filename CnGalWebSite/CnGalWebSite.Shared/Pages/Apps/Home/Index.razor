@@ -48,7 +48,6 @@
 <CnGalWebSite.Shared.AppComponent.Pages.Home.HomeFooter OnTabClick="OnTabClick" DefaultIndex="defaultIndex" RandomIndex="randomIndex" />
 
 @code {
-    public CnGalWebSite.Shared.AppComponent.Pages.Home.HeadBarModel Model = new AppComponent.Pages.Home.HeadBarModel();
 
     private int defaultIndex { get; set; } = 0;
     [Parameter]
@@ -73,59 +72,14 @@
     }
     public int TabIndexNum = 0;
     public int randomIndex = new Random().Next();
-    string userId = "";
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
     bool isReadyTab1 = false;
     bool isReadyTab2 = false;
     bool isReadyTab3 = false;
 
     protected override async Task OnInitializedAsync()
     {
-        var user = await authenticationStateTask;
-        if (user.User.Identity.IsAuthenticated)
-        {
-            foreach (var item in user.User.Claims)
-            {
-                if (item.Type == "image")
-                {
-                    Model.Image = item.Value;
-                }
-                else if (item.Type == "userid")
-                {
-                    userId = item.Value;
-                }
-            }
-            await GetUserUnreadedMessages();
-        }
-        else
-        {
-            if (_dataCacheService.UserInfor != null)
-            {
-                Model.Image = _dataCacheService.UserInfor.PhotoPath;
-                userId = _dataCacheService.UserInfor.Id;
-                await GetUserUnreadedMessages();
-            }
 
-        }
-
-
-    }
-
-    public async Task GetUserUnreadedMessages()
-    {
-        if (string.IsNullOrWhiteSpace(userId) == false)
-        {
-            try
-            {
-                Model.UnreadedMessages = await Http.GetFromJsonAsync<UserUnReadedMessagesModel>(ToolHelper.WebApiPath + "api/space/GetUserUnReadedMessages/" + userId);
-                StateHasChanged();
-            }
-            catch
-            {
-                Model.UnreadedMessages = new UserUnReadedMessagesModel();
-            }
-        }
 
     }
 

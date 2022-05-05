@@ -2,15 +2,12 @@
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Space;
-using CnGalWebSite.Shared.Component.Errors;
-using CnGalWebSite.Shared.Component.Others;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -38,7 +35,7 @@ namespace CnGalWebSite.Shared.Shared
 
         private string image = null;
         private string userId = null;
-        private string userName = null;
+        private readonly string userName = null;
 
         #region 获取屏幕大小
 

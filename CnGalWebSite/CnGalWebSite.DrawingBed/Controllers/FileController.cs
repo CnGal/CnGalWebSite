@@ -3,7 +3,6 @@ using CnGalWebSite.DataModel.ViewModel.Files;
 using Microsoft.AspNetCore.Mvc;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.DrawingBed.Controllers
 {

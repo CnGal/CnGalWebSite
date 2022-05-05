@@ -3,7 +3,7 @@ using CnGalWebSite.DataModel.ViewModel.Base;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Tags
 {
-    public class EditTagMainViewModel: BaseEditModel
+    public class EditTagMainViewModel : BaseEditModel
     {
         [Display(Name = "简介")]
         public string BriefIntroduction { get; set; }
@@ -44,7 +44,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Tags
                 }
             }
 
-            return new Result { Successful=true };
+            return new Result { Successful = true };
         }
     }
 }

@@ -2,12 +2,6 @@
 using MeowMiraiLib.Msg;
 using MeowMiraiLib.Msg.Sender;
 using MeowMiraiLib.Msg.Type;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CnGalWebSite.RobotClient
 {
@@ -38,7 +32,7 @@ namespace CnGalWebSite.RobotClient
             var at = e.FirstOrDefault(s => s.type == "At");
             if (at != null)
             {
-                long atTarget = (at as At).target;
+                var atTarget = (at as At).target;
                 message += "[@" + atTarget.ToString() + "]";
             }
 
@@ -85,7 +79,7 @@ namespace CnGalWebSite.RobotClient
 
                 if (singleCount == _setting.SingleLimit)
                 {
-                    result = await _messageX.ProcMessageAsync($"[黑化微笑][@{s.id}]如果恶意骚扰人家的话，我会请你离开哦…",null, null, s);
+                    result = await _messageX.ProcMessageAsync($"[黑化微笑][@{s.id}]如果恶意骚扰人家的话，我会请你离开哦…", null, null, s);
                 }
                 else if (singleCount > _setting.SingleLimit)
                 {
@@ -94,7 +88,7 @@ namespace CnGalWebSite.RobotClient
 
                 if (singleCount == _setting.TotalLimit)
                 {
-                    result = await _messageX.ProcMessageAsync($"核心温度过高，正在冷却......",null, null, s);
+                    result = await _messageX.ProcMessageAsync($"核心温度过高，正在冷却......", null, null, s);
                 }
                 else if (singleCount > _setting.TotalLimit)
                 {
@@ -109,7 +103,7 @@ namespace CnGalWebSite.RobotClient
                     Reply = reply.Value
                 });
 
-                var j =await new GroupMessage(sendto, result).SendAsync(MiraiClient);
+                var j = await new GroupMessage(sendto, result).SendAsync(MiraiClient);
                 Console.WriteLine(j);
             }
         }

@@ -4,8 +4,6 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.Extensions;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -42,7 +40,7 @@ namespace CnGalWebSite.DataModel.Helper
 
         //临时储存的信息
 
-     
+
 
         public static List<string> GetImageLinks(string context)
         {

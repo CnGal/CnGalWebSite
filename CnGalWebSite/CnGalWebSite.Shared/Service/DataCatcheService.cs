@@ -1,5 +1,4 @@
 ﻿using BootstrapBlazor.Components;
-using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
@@ -186,7 +185,7 @@ namespace CnGalWebSite.Shared.Service
         /// <summary>
         /// 词条主页 角色预览列表
         /// </summary>
-        public List<GameRoleModel> GameRolesCatche { get; set; } = new List<GameRoleModel> ();
+        public List<GameRoleModel> GameRolesCatche { get; set; } = new List<GameRoleModel>();
         /// <summary>
         /// 折扣页面缓存辅助类
         /// </summary>
@@ -238,7 +237,7 @@ namespace CnGalWebSite.Shared.Service
             (ArticleContrastEditRecordViewCatche = articleContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/articles/GetContrastEditRecordViews/");
             (PeripheryContrastEditRecordViewCatche = peripheryContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/peripheries/GetContrastEditRecordViews/");
             (TagContrastEditRecordViewCatche = tagContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/tags/GetContrastEditRecordViews/");
-            (ChartDataCatche = chartDataCatche).Init("",true);
+            (ChartDataCatche = chartDataCatche).Init("", true);
             HomePageNewsCatche = homePageNewsCatche;
             HomePageCarouselsCatche = homePageCarouselsCatche;
             SearchViewCatche = searchViewCatche;
@@ -280,7 +279,7 @@ namespace CnGalWebSite.Shared.Service
                 HomeListCards.Add(new KeyValuePair<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>, string>(items, apiUrl));
                 return items;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new List<AppComponent.Normal.Cards.MainImageCardModel>();
             }

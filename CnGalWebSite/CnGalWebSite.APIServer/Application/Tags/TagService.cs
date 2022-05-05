@@ -4,7 +4,6 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
-using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -36,7 +35,7 @@ namespace CnGalWebSite.APIServer.Application.Tags
 
         public Task<BootstrapBlazor.Components.QueryData<ListTagAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListTagAloneModel searchModel)
         {
-            IEnumerable<Tag> items = _tagRepository.GetAll().Where(s=>string.IsNullOrWhiteSpace(s.Name)==false).AsNoTracking();
+            IEnumerable<Tag> items = _tagRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).AsNoTracking();
             // 处理高级搜索
             if (!string.IsNullOrWhiteSpace(searchModel.Name))
             {
@@ -645,7 +644,7 @@ namespace CnGalWebSite.APIServer.Application.Tags
             return model;
         }
 
-        public void SetDataFromEditTagMainViewModel(Tag newTag, EditTagMainViewModel model,Tag parentTag)
+        public void SetDataFromEditTagMainViewModel(Tag newTag, EditTagMainViewModel model, Tag parentTag)
         {
             newTag.ParentCodeNavigation = parentTag;
 

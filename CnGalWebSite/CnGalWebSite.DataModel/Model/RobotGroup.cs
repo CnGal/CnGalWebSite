@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CnGalWebSite.DataModel.Model
+﻿namespace CnGalWebSite.DataModel.Model
 {
     public class RobotGroup
     {

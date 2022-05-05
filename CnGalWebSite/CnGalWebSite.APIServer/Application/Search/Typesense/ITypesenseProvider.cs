@@ -1,5 +1,4 @@
-﻿using Nest;
-using Typesense;
+﻿using Typesense;
 
 namespace CnGalWebSite.APIServer.Application.Search.Typesense
 {

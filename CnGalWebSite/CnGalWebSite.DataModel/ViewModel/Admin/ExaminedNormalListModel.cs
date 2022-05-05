@@ -37,7 +37,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
     public enum ExaminedNormalListModelType
     {
-        [Display(Name ="词条")]
+        [Display(Name = "词条")]
         Entry,
         [Display(Name = "文章")]
         Article,
