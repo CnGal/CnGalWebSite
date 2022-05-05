@@ -9,6 +9,7 @@ using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Tags;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
@@ -16,6 +17,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Disambig;
+using CnGalWebSite.Helper.Extensions;
 using Markdig;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,18 +30,16 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using Markdown = Markdig.Markdown;
 using Tag = CnGalWebSite.DataModel.Model.Tag;
-using CnGalWebSite.Helper.Extensions;
 
-namespace CnGalWebSite.APIServer.ExamineX
+namespace CnGalWebSite.APIServer.Application.Examines
 {
     public class ExamineService : IExamineService
     {
         private readonly IRepository<Examine, int> _examineRepository;
         private readonly IAppHelper _appHelper;
         private readonly IRepository<Disambig, int> _disambigRepository;
-        private readonly IRepository<DataModel.Model.Tag, int> _tagRepository;
+        private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Comment, long> _commentRepository;
         private readonly IRepository<Entry, int> _entryRepository;
@@ -60,7 +60,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService,
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository,
-        IRepository<Article, long> articleRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService,
+        IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService,
         IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository,
         IConfiguration configuration, UserManager<ApplicationUser> userManager)
         {
@@ -92,14 +92,12 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
                 query = _examineRepository.GetAll().AsNoTracking().Where(s => s.EntryId == entryId && s.IsPassed == true);
             }
-            else if (string.IsNullOrWhiteSpace(userId) == false)
-            {
-                query = _examineRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == userId);
-
-            }
             else
             {
-                query = _examineRepository.GetAll().AsNoTracking();
+                query = string.IsNullOrWhiteSpace(userId) == false
+                    ? _examineRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == userId)
+                    : _examineRepository.GetAll().AsNoTracking();
+
             }
 
             //判断是否是条件筛选
@@ -159,33 +157,19 @@ namespace CnGalWebSite.APIServer.ExamineX
                 }
                 query = query.Where(s => s.ApplicationUser.UserName.Contains(input.FilterText)
                   || s.Context.Contains(input.FilterText)
-                  || (s.Entry != null && s.Entry.Name.Contains(input.FilterText))
-                  || (s.Article != null && s.Article.Name.Contains(input.FilterText))
+                  || s.Entry != null && s.Entry.Name.Contains(input.FilterText)
+                  || s.Article != null && s.Article.Name.Contains(input.FilterText)
                   || s.Operation == operation);
             }
             //统计查询数据的总条数
             var count = query.Count();
             //根据需求进行排序，然后进行分页逻辑的计算
-            if (input.IsVisual)
-            {
-                query = query.OrderBy(input.Sorting).Skip(input.CurrentPage).Take(input.MaxResultCount);
-            }
-            else
-            {
-                query = query.OrderBy(input.Sorting).Skip((input.CurrentPage - 1) * input.MaxResultCount).Take(input.MaxResultCount);
-
-            }
+            query = input.IsVisual
+                ? query.OrderBy(input.Sorting).Skip(input.CurrentPage).Take(input.MaxResultCount)
+                : query.OrderBy(input.Sorting).Skip((input.CurrentPage - 1) * input.MaxResultCount).Take(input.MaxResultCount);
 
             //将结果转换为List集合 加载到内存中
-            List<ExaminedNormalListModel> models = null;
-            if (count != 0)
-            {
-                models = await GetExaminesToNormalListAsync(query, false);
-            }
-            else
-            {
-                models = new List<ExaminedNormalListModel>();
-            }
+            var models = count != 0 ? await GetExaminesToNormalListAsync(query, false) : new List<ExaminedNormalListModel>();
             var dtos = new PagedResultDto<ExaminedNormalListModel>
             {
                 TotalCount = count,
@@ -199,7 +183,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             return dtos;
         }
 
-        public async Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListExamineAloneModel searchModel)
+        public async Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListExamineAloneModel searchModel)
         {
             var items = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
             // 处理高级搜索
@@ -236,11 +220,11 @@ namespace CnGalWebSite.APIServer.ExamineX
             // 处理 SearchText 模糊搜索
             if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                items = items.Where(item => (item.EntryId.ToString().Contains(options.SearchText))
-                             || (item.EntryId.ToString().Contains(options.SearchText))
-                             || (item.ArticleId.ToString().Contains(options.SearchText))
-                             || (item.TagId.ToString().Contains(options.SearchText))
-                             || (item.ApplicationUserId.ToString().Contains(options.SearchText)));
+                items = items.Where(item => item.EntryId.ToString().Contains(options.SearchText)
+                             || item.EntryId.ToString().Contains(options.SearchText)
+                             || item.ArticleId.ToString().Contains(options.SearchText)
+                             || item.TagId.ToString().Contains(options.SearchText)
+                             || item.ApplicationUserId.ToString().Contains(options.SearchText));
             }
 
             // 排序
@@ -292,7 +276,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
 
 
-        public async Task<bool> GetExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetExamineView(ExamineViewModel model, Examine examine)
         {
             return examine.Operation switch
             {
@@ -307,7 +291,6 @@ namespace CnGalWebSite.APIServer.ExamineX
                 Operation.EditArticleMain => await GetEditArticleMainExamineView(model, examine),
                 Operation.EditArticleRelevanes => await GetEditArticleRelevanesExamineView(model, examine),
                 Operation.EditArticleMainPage => await GetEditArticleMainPageExamineView(model, examine),
-                Operation.EditTag => await GetEditTagExamineView(model, examine),
                 Operation.PubulishComment => await GetPubulishCommentExamineView(model, examine),
                 Operation.DisambigMain => await GetDisambigMainExamineView(model, examine),
                 Operation.DisambigRelevances => await GetDisambigRelevancesExamineView(model, examine),
@@ -366,11 +349,11 @@ namespace CnGalWebSite.APIServer.ExamineX
                     Operation = item.Operation,
                     IsPassed = item.IsPassed,
                     UserImage = _appHelper.GetImagePath(item.PhotoPath, "user.png"),
-                    Ranks = isShowRanks ? (await _rankService.GetUserRanks(item.UserId)).Where(s => s.Name != "编辑者").ToList() : new List<DataModel.ViewModel.Ranks.RankViewModel>()
+                    Ranks = isShowRanks ? (await _rankService.GetUserRanks(item.UserId)).Where(s => s.Name != "编辑者").ToList() : new List<DataModel.ViewModel.Ranks.RankViewModel>(),
+                    RelatedId = item.EntryId != null ? item.EntryId.ToString() : item.ArticleId != null ? item.ArticleId.ToString() : item.TagId != null ? item.TagId.ToString() : item.CommentId != null ? item.CommentId.ToString() : item.DisambigId != null ? item.DisambigId.ToString() : item.PeripheryId != null ? item.PeripheryId.ToString() : item.UserId,
+                    Type = item.EntryId != null ? ExaminedNormalListModelType.Entry : item.ArticleId != null ? ExaminedNormalListModelType.Article : item.TagId != null ? ExaminedNormalListModelType.Tag : item.CommentId != null ? ExaminedNormalListModelType.Comment : item.DisambigId != null ? ExaminedNormalListModelType.Disambig : item.PeripheryId != null ? ExaminedNormalListModelType.Periphery : ExaminedNormalListModelType.User,
+                    RelatedName = item.EntryId != null ? item.EntryName : item.ArticleId != null ? item.ArticleName : item.TagId != null ? item.TagName : item.DisambigId != null ? item.DisambigName : item.PeripheryId != null ? item.PeripheryName : item.CommentId != null ? "" : item.UserName
                 };
-                tempModel.RelatedId = item.EntryId != null ? item.EntryId.ToString() : (item.ArticleId != null ? item.ArticleId.ToString() : (item.TagId != null ? item.TagId.ToString() : (item.CommentId != null ? item.CommentId.ToString() : (item.DisambigId != null ? item.DisambigId.ToString() : (item.PeripheryId != null ? item.PeripheryId.ToString() : "")))));
-                tempModel.Type = item.EntryId != null ? ExaminedNormalListModelType.Entry : (item.ArticleId != null ? ExaminedNormalListModelType.Article : (item.TagId != null ? ExaminedNormalListModelType.Tag : (item.CommentId != null ? ExaminedNormalListModelType.Comment : (item.DisambigId != null ? ExaminedNormalListModelType.Disambig : (item.PeripheryId != null ? ExaminedNormalListModelType.Periphery : ExaminedNormalListModelType.User)))));
-                tempModel.RelatedName = item.EntryId != null ? item.EntryName : (item.ArticleId != null ? item.ArticleName : (item.TagId != null ? item.TagName : (item.DisambigId != null ? item.DisambigName : (item.PeripheryId != null ? item.PeripheryName : ""))));
                 result.Add(tempModel);
             }
 
@@ -381,33 +364,112 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         #region 词条
 
-        private EntryMain_1_0 InitExamineViewEntryMain(Entry entry)
+        private ExaminePreDataModel InitExamineViewEntryMain(Entry entry)
         {
-            var entryMainBefore = new EntryMain_1_0
+            var model = new ExaminePreDataModel();
+
+            if (string.IsNullOrWhiteSpace(entry.MainPicture) == false)
             {
-                Name = entry.Name,
-                DisplayName = entry.DisplayName,
-                AnotherName = entry.AnotherName,
-                BriefIntroduction = entry.BriefIntroduction,
-                MainPicture = _appHelper.GetImagePath(entry.MainPicture, "app.png"),
-                Thumbnail = _appHelper.GetImagePath(entry.Thumbnail, "app.png"),
-                BackgroundPicture = _appHelper.GetImagePath(entry.BackgroundPicture, "background.png"),
-                SmallBackgroundPicture = _appHelper.GetImagePath(entry.SmallBackgroundPicture, "background.png"),
-                Type = entry.Type
-            };
-            return entryMainBefore;
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "主图",
+                    Url = _appHelper.GetImagePath(entry.MainPicture, "app.png"),
+                });
+            }
+            if (string.IsNullOrWhiteSpace(entry.Thumbnail) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "缩略图",
+                    Url = _appHelper.GetImagePath(entry.Thumbnail, "app.png"),
+                });
+            }
+            if (string.IsNullOrWhiteSpace(entry.BackgroundPicture) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "大背景图",
+                    Url = _appHelper.GetImagePath(entry.BackgroundPicture, "app.png"),
+                });
+            }
+            if (string.IsNullOrWhiteSpace(entry.SmallBackgroundPicture) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "小背景图",
+                    Url = _appHelper.GetImagePath(entry.SmallBackgroundPicture, "app.png"),
+                });
+            }
+
+            var texts = new List<KeyValueModel>();
+
+            if (string.IsNullOrWhiteSpace(entry.Name) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "唯一名称",
+                    DisplayValue = entry.Name,
+                });
+            }
+            if (string.IsNullOrWhiteSpace(entry.DisplayName) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "显示名称",
+                    DisplayValue = entry.DisplayName,
+                });
+            }
+            if (string.IsNullOrWhiteSpace(entry.AnotherName) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "别称",
+                    DisplayValue = entry.AnotherName,
+                });
+            }
+            if (string.IsNullOrWhiteSpace(entry.BriefIntroduction) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "简介",
+                    DisplayValue = entry.BriefIntroduction,
+                });
+            }
+            texts.Add(new KeyValueModel
+            {
+                DisplayName = "类型",
+                DisplayValue = entry.Type.GetDisplayName(),
+            });
+
+            model.Texts.Add(new InformationsModel
+            {
+                Modifier = "主要信息",
+                Informations = texts
+            });
+
+            return model;
         }
 
-        public async Task<bool> GetEstablishMainExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEstablishMainExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "词条";
+            model.Type = ExaminedNormalListModelType.Entry;
             var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == examine.EntryId);
             if (entry == null)
             {
                 return false;
             }
-            model.EntryId = (int)examine.EntryId;
-            model.EntryName = entry.Name;
+            model.ObjectId = entry.Id;
+            model.ObjectName = entry.Name;
+            model.ObjectBriefIntroduction = entry.BriefIntroduction;
+            if (entry.Type is EntryType.Game or EntryType.ProductionGroup)
+            {
+                model.Image = _appHelper.GetImagePath(entry.MainPicture, "app.png");
+            }
+            else
+            {
+                model.Image = _appHelper.GetImagePath(entry.Thumbnail, "user.png");
+                model.IsThumbnail = true;
+            }
 
             var entryMainBefore = InitExamineViewEntryMain(entry);
 
@@ -433,8 +495,9 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
-        private static List<InformationsModel> InitExamineViewEntryAddinfor(Entry entry)
+        private static ExaminePreDataModel InitExamineViewEntryAddinfor(Entry entry)
         {
+            var model = new ExaminePreDataModel();
             //当前词条的视图模型
             var information = new List<InformationsModel>();
             foreach (var item in entry.Information)
@@ -477,12 +540,16 @@ namespace CnGalWebSite.APIServer.ExamineX
                 }
 
             }
-            return information;
+
+            model.Texts = information;
+
+            return model;
         }
 
-        public async Task<bool> GetEstablishAddInforExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEstablishAddInforExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "词条";
+            model.Type = ExaminedNormalListModelType.Entry;
+
             var entry = await _entryRepository.GetAll()
                    .Include(s => s.Information)
                      .ThenInclude(s => s.Additional)
@@ -491,15 +558,18 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
                 return false;
             }
-            model.EntryId = (int)examine.EntryId;
-            model.EntryName = examine.Entry.Name;
-            //反序列化数据 用Json对比
-            //新建审核数据对象
-            var entryAddInfor = new EntryAddInfor
+            model.ObjectId = entry.Id;
+            model.ObjectName = examine.Entry.Name;
+            model.ObjectBriefIntroduction = entry.BriefIntroduction;
+            if (entry.Type is EntryType.Game or EntryType.ProductionGroup)
             {
-                Information = new List<BasicEntryInformation_>()
-            };
-
+                model.Image = _appHelper.GetImagePath(entry.MainPicture, "app.png");
+            }
+            else
+            {
+                model.Image = _appHelper.GetImagePath(entry.Thumbnail, "user.png");
+                model.IsThumbnail = true;
+            }
             //当前词条的视图模型
             var information = InitExamineViewEntryAddinfor(entry);
 
@@ -526,25 +596,24 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
-        private static List<EntryPicture> InitExamineViewEntryImages(Entry entry)
+        private static ExaminePreDataModel InitExamineViewEntryImages(Entry entry)
         {
-            var pictures = new List<EntryPicture>();
+            var model = new ExaminePreDataModel();
             foreach (var item in entry.Pictures)
             {
-                pictures.Add(new EntryPicture
+                model.Pictures.Add(new PicturesAloneViewModel
                 {
                     Url = item.Url,
-                    Note = item.Note,
-                    Modifier = item.Modifier
+                    Note = item.Note
                 });
             }
 
-            return pictures;
+            return model;
         }
 
-        public async Task<bool> GetEstablishImagesExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEstablishImagesExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "词条";
+            model.Type = ExaminedNormalListModelType.Entry;
             var entry = await _entryRepository.GetAll()
                   .Include(s => s.Pictures)
                   .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
@@ -552,9 +621,18 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
                 return false;
             }
-            model.EntryId = (int)examine.EntryId;
-            model.EntryName = examine.Entry.Name;
-
+            model.ObjectId = entry.Id;
+            model.ObjectName = entry.Name;
+            model.ObjectBriefIntroduction = entry.BriefIntroduction;
+            if (entry.Type is EntryType.Game or EntryType.ProductionGroup)
+            {
+                model.Image = _appHelper.GetImagePath(entry.MainPicture, "app.png");
+            }
+            else
+            {
+                model.Image = _appHelper.GetImagePath(entry.Thumbnail, "user.png");
+                model.IsThumbnail = true;
+            }
             var pictures = InitExamineViewEntryImages(entry);
 
             //添加修改记录 
@@ -579,73 +657,46 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
-        private static List<RelevancesViewModel> InitExamineViewEntryRelevances(Entry entry)
+        private async Task<ExaminePreDataModel> InitExamineViewEntryRelevances(Entry entry)
         {
-            var relevances = new List<RelevancesViewModel>();
-            if (entry.Articles.Count > 0)
-            {
-                var temp = new List<RelevancesKeyValueModel>();
-                relevances.Add(new RelevancesViewModel
-                {
-                    Informations = temp,
-                    Modifier = "文章"
-                });
-                foreach (var item in entry.Articles)
-                {
-                    temp.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.BriefIntroduction,
-                        Link = "/articles/index/" + item.Id
-                    });
-                }
-            }
-            if (entry.EntryRelationFromEntryNavigation.Count > 0)
-            {
+            var model = new ExaminePreDataModel();
 
-                var temp = new List<RelevancesKeyValueModel>();
-                relevances.Add(new RelevancesViewModel
-                {
-                    Informations = temp,
-                    Modifier = "词条"
-                });
-                foreach (var nav in entry.EntryRelationFromEntryNavigation)
-                {
-                    var item = nav.ToEntryNavigation;
-                    temp.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.BriefIntroduction,
-                        Link = "/entries/index/" + item.Id
-                    });
-                }
-            }
-            if (entry.Outlinks.Count > 0)
+            foreach (var item in entry.Articles)
             {
-
-                var temp = new List<RelevancesKeyValueModel>();
-                relevances.Add(new RelevancesViewModel
+                model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    Informations = temp,
-                    Modifier = "外部链接"
+                    article = _appHelper.GetArticleInforTipViewModel(item)
                 });
-                foreach (var item in entry.Outlinks)
-                {
-                    temp.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.Name,
-                        DisplayValue = item.BriefIntroduction,
-                        Link = item.Link
-                    });
-                }
+
             }
 
-            return relevances;
+            foreach (var item in entry.EntryRelationFromEntryNavigation)
+            {
+                model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
+                {
+                    entry = await _appHelper.GetEntryInforTipViewModel(item.ToEntryNavigation)
+                });
+
+            }
+
+            foreach (var item in entry.Outlinks)
+            {
+                model.Outlinks.Add(new RelevancesKeyValueModel
+                {
+                    DisplayName = item.Name,
+                    DisplayValue = item.BriefIntroduction,
+                    Link = item.Link
+                });
+
+            }
+
+
+            return model;
         }
 
-        public async Task<bool> GetEstablishRelevancesExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEstablishRelevancesExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "词条";
+            model.Type = ExaminedNormalListModelType.Entry;
             var entry = await _entryRepository.GetAll()
                     .Include(s => s.Outlinks)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
@@ -657,16 +708,27 @@ namespace CnGalWebSite.APIServer.ExamineX
 
                 return false;
             }
-            model.EntryId = (int)examine.EntryId;
-            model.EntryName = examine.Entry.Name;
+            model.ObjectId = entry.Id;
+            model.ObjectName = entry.Name;
+            model.ObjectBriefIntroduction = entry.BriefIntroduction;
+            if (entry.Type is EntryType.Game or EntryType.ProductionGroup)
+            {
+                model.Image = _appHelper.GetImagePath(entry.MainPicture, "app.png");
+            }
+            else
+            {
+                model.Image = _appHelper.GetImagePath(entry.Thumbnail, "user.png");
+                model.IsThumbnail = true;
+            }
+
             //序列化相关性列表
             //先读取词条信息
-            var relevances = InitExamineViewEntryRelevances(entry);
+            var relevances = await InitExamineViewEntryRelevances(entry);
 
             //添加修改记录 
             await _entryService.UpdateEntryDataAsync(entry, examine);
 
-            var relevances_examine = InitExamineViewEntryRelevances(entry);
+            var relevances_examine = await InitExamineViewEntryRelevances(entry);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -685,62 +747,40 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
-        private static List<RelevancesViewModel> InitExamineViewEntryTags(Entry entry)
+        private ExaminePreDataModel InitExamineViewEntryTags(Entry entry)
         {
-            var relevances = new List<RelevancesViewModel>();
-            var tags = entry.Tags;
-            foreach (var item in tags)
+            var model = new ExaminePreDataModel();
+
+            foreach (var item in entry.Tags)
             {
-                var isAdd = false;
-
-                //遍历信息列表寻找关键词
-                foreach (var infor in relevances)
+                model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    if (infor.Modifier == "标签")
-                    {
-                        //关键词相同则添加
-                        infor.Informations.Add(new RelevancesKeyValueModel
-                        {
-                            DisplayName = item.Name,
-                            DisplayValue = item.BriefIntroduction,
-                            Id = item.Id
-                        });
-                        isAdd = true;
-                        break;
-                    }
-                }
-                if (isAdd == false)
-                {
-                    //没有找到关键词 则新建关键词
-                    var temp = new RelevancesViewModel
-                    {
-                        Modifier = "标签",
-                        Informations = new List<RelevancesKeyValueModel>()
-                    };
-                    temp.Informations.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.Name,
-                        DisplayValue = item.BriefIntroduction,
-                        Id = item.Id
-
-                    });
-                    relevances.Add(temp);
-                }
+                    tag = _appHelper.GetTagInforTipViewModel(item),
+                });
             }
-            return relevances;
+            return model;
         }
 
-        public async Task<bool> GetEstablishTagsExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEstablishTagsExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "词条";
+            model.Type = ExaminedNormalListModelType.Entry;
             var entry = await _entryRepository.GetAll().Include(s => s.Tags).FirstOrDefaultAsync(s => s.Id == examine.EntryId);
             if (entry == null)
             {
                 return false;
             }
-            model.EntryId = (int)examine.EntryId;
-            model.EntryName = entry.Name;
-
+            model.ObjectId = entry.Id;
+            model.ObjectName = entry.Name;
+            model.ObjectBriefIntroduction = entry.BriefIntroduction;
+            if (entry.Type is EntryType.Game or EntryType.ProductionGroup)
+            {
+                model.Image = _appHelper.GetImagePath(entry.MainPicture, "app.png");
+            }
+            else
+            {
+                model.Image = _appHelper.GetImagePath(entry.Thumbnail, "user.png");
+                model.IsThumbnail = true;
+            }
             var tags = InitExamineViewEntryTags(entry);
 
             //添加修改记录 
@@ -766,18 +806,26 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
-        public async Task<bool> GetEstablishMainPageExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEstablishMainPageExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "词条";
+            model.Type = ExaminedNormalListModelType.Entry;
             var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == examine.EntryId);
             if (entry == null)
             {
-
                 return false;
             }
-            model.EntryId = (int)examine.EntryId;
-            model.EntryName = entry.Name;
-
+            model.ObjectId = entry.Id;
+            model.ObjectName = entry.Name;
+            model.ObjectBriefIntroduction = entry.BriefIntroduction;
+            if (entry.Type is EntryType.Game or EntryType.ProductionGroup)
+            {
+                model.Image = _appHelper.GetImagePath(entry.MainPicture, "app.png");
+            }
+            else
+            {
+                model.Image = _appHelper.GetImagePath(entry.Thumbnail, "user.png");
+                model.IsThumbnail = true;
+            }
             var mainpage = entry.MainPage;
 
             await _entryService.UpdateEntryDataAsync(entry, examine);
@@ -790,16 +838,28 @@ namespace CnGalWebSite.APIServer.ExamineX
                 //序列化数据
                 var htmlDiff = new HtmlDiff.HtmlDiff(mainpage_examine ?? "", mainpage ?? "");
                 model.EditOverview = htmlDiff.Build().Replace("\r\n", "<br>");
-                model.BeforeText = _appHelper.MarkdownToHtml(examine.Context);
-                model.AfterText = _appHelper.MarkdownToHtml(mainpage_examine);
+                model.BeforeModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(examine.Context)
+                };
+                model.AfterModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(mainpage_examine)
+                };
             }
             else
             {
                 //序列化数据
                 var htmlDiff = new HtmlDiff.HtmlDiff(mainpage ?? "", mainpage_examine ?? "");
                 model.EditOverview = htmlDiff.Build().Replace("\r\n", "<br>");
-                model.BeforeText = _appHelper.MarkdownToHtml(mainpage);
-                model.AfterText = _appHelper.MarkdownToHtml(examine.Context);
+                model.BeforeModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(mainpage)
+                };
+                model.AfterModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(examine.Context)
+                };
             }
             return true;
         }
@@ -808,37 +868,132 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         #region 文章
 
-        private ArticleMain_1_0 InitExamineViewArticleMain(Article article)
+        private ExaminePreDataModel InitExamineViewArticleMain(Article article)
         {
-            var articleMainBefore = new ArticleMain_1_0
-            {
-                Name = article.Name,
-                BriefIntroduction = article.BriefIntroduction,
-                MainPicture = _appHelper.GetImagePath(article.MainPicture, "app.png"),
-                BackgroundPicture = _appHelper.GetImagePath(article.BackgroundPicture, "app.png"),
-                SmallBackgroundPicture = _appHelper.GetImagePath(article.SmallBackgroundPicture, "app.png"),
-                Type = article.Type,
-                OriginalLink = article.OriginalLink,
-                OriginalAuthor = article.OriginalAuthor,
-                PubishTime = article.PubishTime,
-                DisplayName = article.DisplayName,
-                RealNewsTime = article.RealNewsTime,
-                NewsType = article.NewsType,
-            };
+            var model = new ExaminePreDataModel();
 
-            return articleMainBefore;
+            if (string.IsNullOrWhiteSpace(article.MainPicture) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "主图",
+                    Url = _appHelper.GetImagePath(article.MainPicture, "app.png"),
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(article.BackgroundPicture) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "大背景图",
+                    Url = _appHelper.GetImagePath(article.BackgroundPicture, "app.png"),
+                });
+            }
+            if (string.IsNullOrWhiteSpace(article.SmallBackgroundPicture) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "小背景图",
+                    Url = _appHelper.GetImagePath(article.SmallBackgroundPicture, "app.png"),
+                });
+            }
+
+            var texts = new List<KeyValueModel>();
+
+            if (string.IsNullOrWhiteSpace(article.Name) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "唯一名称",
+                    DisplayValue = article.Name,
+                });
+            }
+            if (string.IsNullOrWhiteSpace(article.DisplayName) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "显示名称",
+                    DisplayValue = article.DisplayName,
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(article.BriefIntroduction) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "简介",
+                    DisplayValue = article.BriefIntroduction,
+                });
+            }
+            texts.Add(new KeyValueModel
+            {
+                DisplayName = "类型",
+                DisplayValue = article.Type.GetDisplayName(),
+            });
+            if (string.IsNullOrWhiteSpace(article.OriginalLink) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "原文链接",
+                    DisplayValue = article.OriginalLink,
+                });
+            }
+            if (string.IsNullOrWhiteSpace(article.OriginalLink) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "原文链接",
+                    DisplayValue = article.OriginalLink,
+                });
+            }
+            if (string.IsNullOrWhiteSpace(article.OriginalAuthor) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "作者",
+                    DisplayValue = article.OriginalAuthor,
+                });
+            }
+
+            texts.Add(new KeyValueModel
+            {
+                DisplayName = "发布时间",
+                DisplayValue = article.PubishTime.ToString("G"),
+            });
+            texts.Add(new KeyValueModel
+            {
+                DisplayName = "真实发生时间",
+                DisplayValue = article.RealNewsTime?.ToString("G") ?? "Null",
+            });
+            if (string.IsNullOrWhiteSpace(article.NewsType) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "动态类型",
+                    DisplayValue = article.NewsType,
+                });
+            }
+            model.Texts.Add(new InformationsModel
+            {
+                Modifier = "主要信息",
+                Informations = texts
+            });
+
+            return model;
         }
 
-        public async Task<bool> GetEditArticleMainExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEditArticleMainExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "文章";
+            model.Type = ExaminedNormalListModelType.Article;
             var article = await _articleRepository.FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
             if (article == null)
             {
                 return false;
             }
-            model.EntryId = article.Id;
-            model.EntryName = article.Name;
+            model.ObjectId = article.Id;
+            model.ObjectName = article.Name;
+            model.ObjectBriefIntroduction = article.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(article.MainPicture, "app.png");
 
             var articleMainBefore = InitExamineViewArticleMain(article);
 
@@ -865,74 +1020,47 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
-        private static List<RelevancesViewModel> InitExamineViewArticleRelevances(Article article)
+        private async Task<ExaminePreDataModel> InitExamineViewArticleRelevances(Article article)
         {
-            var relevances = new List<RelevancesViewModel>();
-            if (article.Entries.Count > 0)
-            {
-                var temp = new List<RelevancesKeyValueModel>();
-                relevances.Add(new RelevancesViewModel
-                {
-                    Informations = temp,
-                    Modifier = "词条"
-                });
-                foreach (var item in article.Entries)
-                {
-                    temp.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.BriefIntroduction,
-                        Link = "/entries/index/" + item.Id
-                    });
-                }
-            }
-            if (article.ArticleRelationFromArticleNavigation.Count > 0)
-            {
+            var model = new ExaminePreDataModel();
 
-                var temp = new List<RelevancesKeyValueModel>();
-                relevances.Add(new RelevancesViewModel
-                {
-                    Informations = temp,
-                    Modifier = "文章"
-                });
-                foreach (var nav in article.ArticleRelationFromArticleNavigation)
-                {
-                    var item = nav.ToArticleNavigation;
-                    temp.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.DisplayName,
-                        DisplayValue = item.BriefIntroduction,
-                        Link = "/articles/index/" + item.Id
-                    });
-                }
-            }
-            if (article.Outlinks.Count > 0)
+            foreach (var item in article.Entries)
             {
-
-                var temp = new List<RelevancesKeyValueModel>();
-                relevances.Add(new RelevancesViewModel
+                model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    Informations = temp,
-                    Modifier = "外部链接"
+                    entry = await _appHelper.GetEntryInforTipViewModel(item)
                 });
-                foreach (var item in article.Outlinks)
-                {
-                    temp.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.Name,
-                        DisplayValue = item.BriefIntroduction,
-                        Link = item.Link
-                    });
-                }
+
             }
 
-            return relevances;
+            foreach (var item in article.ArticleRelationFromArticleNavigation)
+            {
+                model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
+                {
+                    article = _appHelper.GetArticleInforTipViewModel(item.ToArticleNavigation)
+                });
+
+            }
+
+            foreach (var item in article.Outlinks)
+            {
+                model.Outlinks.Add(new RelevancesKeyValueModel
+                {
+                    DisplayName = item.Name,
+                    DisplayValue = item.BriefIntroduction,
+                    Link = item.Link
+                });
+
+            }
+
+
+            return model;
         }
 
 
-        public async Task<bool> GetEditArticleRelevanesExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEditArticleRelevanesExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "文章";
+            model.Type = ExaminedNormalListModelType.Article;
             var article = await _articleRepository.GetAll()
                 .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
                 .Include(s => s.Entries)
@@ -943,16 +1071,20 @@ namespace CnGalWebSite.APIServer.ExamineX
 
                 return false;
             }
-            model.EntryId = article.Id;
-            model.EntryName = article.Name;
+            model.ObjectId = article.Id;
+            model.ObjectName = article.Name;
+            model.ObjectBriefIntroduction = article.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(article.MainPicture, "app.png");
+
+
             //序列化相关性列表
             //先读取词条信息
-            var relevances = InitExamineViewArticleRelevances(article);
+            var relevances = await InitExamineViewArticleRelevances(article);
 
             //添加修改记录 
             await _articleService.UpdateArticleData(article, examine);
 
-            var relevances_examine = InitExamineViewArticleRelevances(article);
+            var relevances_examine = await InitExamineViewArticleRelevances(article);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -973,32 +1105,54 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
-        public async Task<bool> GetEditArticleMainPageExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEditArticleMainPageExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "文章";
+            model.Type = ExaminedNormalListModelType.Article;
             var article = await _articleRepository.FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
             if (article == null)
             {
                 return false;
             }
-            model.EntryId = article.Id;
-            model.EntryName = article.Name;
+            model.ObjectId = article.Id;
+            model.ObjectName = article.Name;
+            model.ObjectBriefIntroduction = article.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(article.MainPicture, "app.png");
+
+
+            var mainpage = article.MainPage;
+
+            await _articleService.UpdateArticleData(article, examine);
+
+            var mainpage_examine = article.MainPage;
+
             //判断是否是等待审核状态
             if (examine.IsPassed != null)
             {
                 //序列化数据
-                var htmlDiff = new HtmlDiff.HtmlDiff(examine.Context ?? "", article.MainPage ?? "");
+                var htmlDiff = new HtmlDiff.HtmlDiff(mainpage_examine ?? "", mainpage ?? "");
                 model.EditOverview = htmlDiff.Build().Replace("\r\n", "<br>");
-                model.BeforeText = _appHelper.MarkdownToHtml(examine.Context);
-                model.AfterText = _appHelper.MarkdownToHtml(article.MainPage);
+                model.BeforeModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(examine.Context)
+                };
+                model.AfterModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(mainpage_examine)
+                };
             }
             else
             {
                 //序列化数据
-                var htmlDiff = new HtmlDiff.HtmlDiff(article.MainPage ?? "", examine.Context ?? "");
+                var htmlDiff = new HtmlDiff.HtmlDiff(mainpage ?? "", mainpage_examine ?? "");
                 model.EditOverview = htmlDiff.Build().Replace("\r\n", "<br>");
-                model.BeforeText = _appHelper.MarkdownToHtml(article.MainPage);
-                model.AfterText = _appHelper.MarkdownToHtml(examine.Context);
+                model.BeforeModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(mainpage)
+                };
+                model.AfterModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(examine.Context)
+                };
             }
 
             return true;
@@ -1006,167 +1160,103 @@ namespace CnGalWebSite.APIServer.ExamineX
         #endregion
 
         #region 标签
-        public async Task<bool> GetEditTagExamineView(Models.ExaminedViewModel model, Examine examine)
+
+        private ExaminePreDataModel InitExamineViewTagMain(Tag tag)
         {
-            model.Type = "标签";
-            var tag = await _tagRepository.GetAll()
-                  .Include(s => s.InverseParentCodeNavigation)
-                  .Include(s => s.ParentCodeNavigation)
-                  .Include(s => s.Entries)
-                  .FirstOrDefaultAsync(s => s.Id == examine.TagId);
-            if (tag == null)
-            {
-                return false;
-            }
-            model.EntryId = (int)examine.TagId;
-            model.EntryName = examine.Tag.Name;
+            var model = new ExaminePreDataModel();
 
-            //读取标签现有信息
-            var tagEditBefore = new TagEdit
+            if (string.IsNullOrWhiteSpace(tag.MainPicture) == false)
             {
-                Name = tag.Name ?? "",
-                ParentTag = tag.ParentCodeNavigation == null ? "" : tag.ParentCodeNavigation.Name ?? "",
-                ChildrenEntries = new List<TagEditAloneModel>(),
-                ChildrenTags = new List<TagEditAloneModel>()
-            };
-            foreach (var item in tag.InverseParentCodeNavigation)
-            {
-                tagEditBefore.ChildrenTags.Add(new TagEditAloneModel
+                model.Pictures.Add(new PicturesAloneViewModel
                 {
-                    Name = item.Name
+                    Note = "主图",
+                    Url = _appHelper.GetImagePath(tag.MainPicture, "app.png"),
                 });
             }
-            foreach (var item in tag.Entries)
+            if (string.IsNullOrWhiteSpace(tag.Thumbnail) == false)
             {
-                tagEditBefore.ChildrenEntries.Add(new TagEditAloneModel
+                model.Pictures.Add(new PicturesAloneViewModel
                 {
-                    Name = item.Name
+                    Note = "缩略图",
+                    Url = _appHelper.GetImagePath(tag.Thumbnail, "app.png"),
+                });
+            }
+            if (string.IsNullOrWhiteSpace(tag.BackgroundPicture) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "大背景图",
+                    Url = _appHelper.GetImagePath(tag.BackgroundPicture, "app.png"),
+                });
+            }
+            if (string.IsNullOrWhiteSpace(tag.SmallBackgroundPicture) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "小背景图",
+                    Url = _appHelper.GetImagePath(tag.SmallBackgroundPicture, "app.png"),
                 });
             }
 
-            //读取标签修改后的信息
-            TagEdit tagEditAfter = null;
-            using (TextReader str = new StringReader(examine.Context))
+            var texts = new List<KeyValueModel>();
+
+            if (string.IsNullOrWhiteSpace(tag.Name) == false)
             {
-                var serializer = new JsonSerializer();
-                tagEditAfter = (TagEdit)serializer.Deserialize(str, typeof(TagEdit));
-            }
-            //创建临时
-            //读取标签现有信息
-            var tagEditTemp = new TagEdit
-            {
-                Name = tag.Name ?? "",
-                ParentTag = tag.ParentCodeNavigation == null ? "" : tag.ParentCodeNavigation.Name ?? "",
-                ChildrenEntries = new List<TagEditAloneModel>(),
-                ChildrenTags = new List<TagEditAloneModel>()
-            };
-            foreach (var item in tag.InverseParentCodeNavigation)
-            {
-                tagEditTemp.ChildrenTags.Add(new TagEditAloneModel
+                texts.Add(new KeyValueModel
                 {
-                    Name = item.Name
+                    DisplayName = "唯一名称",
+                    DisplayValue = tag.Name,
                 });
             }
-            foreach (var item in tag.Entries)
+            if (tag.ParentCodeNavigation != null)
             {
-                tagEditTemp.ChildrenEntries.Add(new TagEditAloneModel
+                texts.Add(new KeyValueModel
                 {
-                    Name = item.Name
+                    DisplayName = "父标签",
+                    DisplayValue = tag.ParentCodeNavigation.Name,
                 });
             }
-            //遍历关联词条对应修改
-            foreach (var item in tagEditAfter.ChildrenEntries)
-            {
-                var isAdd = false;
-                foreach (var infor in tagEditTemp.ChildrenEntries)
-                {
-                    if (infor.Name == item.Name)
-                    {
-                        if (item.IsDelete == true)
-                        {
-                            tagEditTemp.ChildrenEntries.Remove(infor);
 
-                        }
-                        isAdd = true;
-                        break;
-                    }
-                }
-                if (isAdd == false && item.IsDelete == false)
-                {
-                    tagEditTemp.ChildrenEntries.Add(new TagEditAloneModel
-                    {
-                        Name = item.Name
-                    });
-                }
-            }
-            //遍历子标签对应修改
-            foreach (var item in tagEditAfter.ChildrenTags)
+            if (string.IsNullOrWhiteSpace(tag.BriefIntroduction) == false)
             {
-                var isAdd = false;
-                foreach (var infor in tagEditTemp.ChildrenTags)
+                texts.Add(new KeyValueModel
                 {
-                    if (infor.Name == item.Name)
-                    {
-                        if (item.IsDelete == true)
-                        {
-                            tagEditTemp.ChildrenTags.Remove(infor);
-
-                        }
-                        isAdd = true;
-                        break;
-                    }
-                }
-                if (isAdd == false && item.IsDelete == false)
-                {
-                    tagEditTemp.ChildrenTags.Add(new TagEditAloneModel
-                    {
-                        Name = item.Name
-                    });
-                }
+                    DisplayName = "简介",
+                    DisplayValue = tag.BriefIntroduction,
+                });
             }
 
-            //json格式化
-            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
-
-            //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (texts.Count > 0)
             {
-                model.BeforeModel = tagEditTemp;
-                model.AfterModel = tagEditBefore;
+                model.Texts.Add(new InformationsModel
+                {
+                    Modifier = "主要信息",
+                    Informations = texts
+                });
             }
-            else
+            if (tag.ParentCodeNavigation != null)
             {
-                model.BeforeModel = tagEditBefore;
-                model.AfterModel = tagEditTemp;
+                model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
+                {
+                    tag = _appHelper.GetTagInforTipViewModel(tag.ParentCodeNavigation),
+                });
             }
 
-            return true;
-        }
-
-        private TagMain_1_0 InitExamineViewTagMain(Tag tag)
-        {
-            var model = new TagMain_1_0
-            {
-                Name = tag.Name,
-                BriefIntroduction = tag.BriefIntroduction,
-                MainPicture = _appHelper.GetImagePath(tag.MainPicture, "app.png"),
-                Thumbnail = _appHelper.GetImagePath(tag.Thumbnail, "app.png"),
-                BackgroundPicture = _appHelper.GetImagePath(tag.BackgroundPicture, "background.png"),
-                SmallBackgroundPicture = _appHelper.GetImagePath(tag.SmallBackgroundPicture, "background.png"),
-            };
             return model;
         }
 
-        public async Task<bool> GetEditTagMainExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEditTagMainExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "标签";
+            model.Type = ExaminedNormalListModelType.Tag;
             var tag = await _tagRepository.GetAll().Include(s => s.ParentCodeNavigation).FirstOrDefaultAsync(s => s.Id == examine.TagId);
             if (tag == null)
             {
                 return false;
             }
-            model.EntryId = (int)examine.TagId;
-            model.EntryName = tag.Name;
+            model.ObjectId = tag.Id;
+            model.ObjectName = tag.Name;
+            model.ObjectBriefIntroduction = tag.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(tag.MainPicture, "app.png");
 
             var entryMainBefore = InitExamineViewTagMain(tag);
 
@@ -1194,61 +1284,32 @@ namespace CnGalWebSite.APIServer.ExamineX
         }
 
 
-        private static List<RelevancesViewModel> InitExamineViewEditChildTags(Tag tag)
+        private ExaminePreDataModel InitExamineViewEditChildTags(Tag tag)
         {
-            var relevances = new List<RelevancesViewModel>();
-            var tags = tag.InverseParentCodeNavigation;
-            foreach (var item in tags)
+            var model = new ExaminePreDataModel();
+
+            foreach (var item in tag.InverseParentCodeNavigation)
             {
-                var isAdd = false;
-
-                //遍历信息列表寻找关键词
-                foreach (var infor in relevances)
+                model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    if (infor.Modifier == "子标签")
-                    {
-                        //关键词相同则添加
-                        infor.Informations.Add(new RelevancesKeyValueModel
-                        {
-                            DisplayName = item.Name,
-                            DisplayValue = item.BriefIntroduction,
-                            Id = item.Id
-                        });
-                        isAdd = true;
-                        break;
-                    }
-                }
-                if (isAdd == false)
-                {
-                    //没有找到关键词 则新建关键词
-                    var temp = new RelevancesViewModel
-                    {
-                        Modifier = "子标签",
-                        Informations = new List<RelevancesKeyValueModel>()
-                    };
-                    temp.Informations.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.Name,
-                        DisplayValue = item.BriefIntroduction,
-                        Id = item.Id
-
-                    });
-                    relevances.Add(temp);
-                }
+                    tag = _appHelper.GetTagInforTipViewModel(item)
+                });
             }
-            return relevances;
+            return model;
         }
 
-        public async Task<bool> GetEditTagChildTagsExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEditTagChildTagsExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "标签";
+            model.Type = ExaminedNormalListModelType.Tag;
             var tag = await _tagRepository.GetAll().Include(s => s.InverseParentCodeNavigation).FirstOrDefaultAsync(s => s.Id == examine.TagId);
             if (tag == null)
             {
                 return false;
             }
-            model.EntryId = (int)examine.TagId;
-            model.EntryName = tag.Name;
+            model.ObjectId = tag.Id;
+            model.ObjectName = tag.Name;
+            model.ObjectBriefIntroduction = tag.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(tag.MainPicture, "app.png");
 
             //序列化相关性列表
             //先读取词条信息
@@ -1277,70 +1338,41 @@ namespace CnGalWebSite.APIServer.ExamineX
         }
 
 
-        private static List<RelevancesViewModel> InitExamineViewEditChildEntries(Tag tag)
+        private async Task<ExaminePreDataModel> InitExamineViewEditChildEntries(Tag tag)
         {
-            var relevances = new List<RelevancesViewModel>();
-            var entries = tag.Entries;
-            foreach (var item in entries)
+            var model = new ExaminePreDataModel();
+
+            foreach (var item in tag.Entries)
             {
-                var isAdd = false;
-
-                //遍历信息列表寻找关键词
-                foreach (var infor in relevances)
+                model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    if (infor.Modifier == "子词条")
-                    {
-                        //关键词相同则添加
-                        infor.Informations.Add(new RelevancesKeyValueModel
-                        {
-                            DisplayName = item.Name,
-                            DisplayValue = item.BriefIntroduction,
-                            Id = item.Id
-                        });
-                        isAdd = true;
-                        break;
-                    }
-                }
-                if (isAdd == false)
-                {
-                    //没有找到关键词 则新建关键词
-                    var temp = new RelevancesViewModel
-                    {
-                        Modifier = "子词条",
-                        Informations = new List<RelevancesKeyValueModel>()
-                    };
-                    temp.Informations.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.Name,
-                        DisplayValue = item.BriefIntroduction,
-                        Id = item.Id
-
-                    });
-                    relevances.Add(temp);
-                }
+                    entry = await _appHelper.GetEntryInforTipViewModel(item)
+                });
             }
-            return relevances;
+            return model;
         }
 
-        public async Task<bool> GetEditTagChildEntriesExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEditTagChildEntriesExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "标签";
+            model.Type = ExaminedNormalListModelType.Tag;
             var tag = await _tagRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id == examine.TagId);
             if (tag == null)
             {
                 return false;
             }
-            model.EntryId = (int)examine.TagId;
-            model.EntryName = tag.Name;
+            model.ObjectId = tag.Id;
+            model.ObjectName = tag.Name;
+            model.ObjectBriefIntroduction = tag.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(tag.MainPicture, "app.png");
 
             //序列化相关性列表
             //先读取词条信息
-            var relevances = InitExamineViewEditChildEntries(tag);
+            var relevances = await InitExamineViewEditChildEntries(tag);
 
             //添加修改记录 
             await _tagService.UpdateTagDataAsync(tag, examine);
 
-            var relevances_examine = InitExamineViewEditChildEntries(tag);
+            var relevances_examine = await InitExamineViewEditChildEntries(tag);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -1364,16 +1396,17 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         #region 评论
 
-        public async Task<bool> GetPubulishCommentExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetPubulishCommentExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "评论";
+            model.Type = ExaminedNormalListModelType.Comment;
             var comment = await _commentRepository.FirstOrDefaultAsync(s => s.Id == examine.CommentId);
             if (comment == null)
             {
                 return false;
             }
-            model.EntryId = comment.Id;
-            model.EntryName = "";
+            model.ObjectId = comment.Id;
+            model.Image = _appHelper.GetImagePath("", "app.png");
+
             //序列化数据
             CommentText commentText = null;
             using (TextReader str = new StringReader(examine.Context))
@@ -1382,31 +1415,120 @@ namespace CnGalWebSite.APIServer.ExamineX
                 commentText = (CommentText)serializer.Deserialize(str, typeof(CommentText));
             }
 
-            var result = $"评论时间<br>{commentText.CommentTime}<br>";
-            result += $"评论内容<br>\n{commentText.Text}\n<br>";
-            result += $"类型<br>{commentText.Type.GetDisplayName()}<br>";
-            result += $"目标Id<br>{commentText.ObjectId}<br>";
-            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
-            model.EditOverview = Markdown.ToHtml(result, pipeline);
-            model.BeforeModel = commentText;
-            model.AfterModel = commentText;
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
+            model.AfterModel.Texts.Add(new InformationsModel
+            {
+                Modifier = "主要信息",
+                Informations = new List<KeyValueModel>
+                {
+                    new KeyValueModel
+                    {
+                        DisplayName="时间",
+                        DisplayValue=commentText.CommentTime.ToString("G"),
+                    },
+                    new KeyValueModel
+                    {
+                        DisplayName="内容",
+                        DisplayValue=commentText.Text
+                    },
+                    new KeyValueModel
+                    {
+                        DisplayName="类型",
+                        DisplayValue=commentText.Type.GetDisplayName()
+                    },
+                    new KeyValueModel
+                    {
+                        DisplayName="目标Id",
+                        DisplayValue=commentText.ObjectId
+                    },
+                }
+            });
+
+            while (commentText.Type == CommentType.ReplyComment)
+            {
+                var item = await _commentRepository.FirstOrDefaultAsync(s => s.Id.ToString() == commentText.ObjectId);
+                commentText.Type = item.Type;
+                commentText.ObjectId = item.Type switch
+                {
+                    CommentType.ReplyComment => item.ParentCodeNavigation.Id.ToString(),
+                    CommentType.CommentEntries => item.EntryId.ToString(),
+                    CommentType.CommentArticle => item.ArticleId.ToString(),
+                    CommentType.CommentPeriphery => item.PeripheryId.ToString(),
+                    _ => null
+                };
+            }
+
+            if (commentText.Type == CommentType.CommentArticle)
+            {
+                var item = await _articleRepository.FirstOrDefaultAsync(s => s.Id.ToString() == commentText.ObjectId);
+                if (item != null)
+                {
+                    model.AfterModel.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
+                    {
+                        article = _appHelper.GetArticleInforTipViewModel(item)
+                    });
+                    model.ObjectBriefIntroduction = item.BriefIntroduction;
+                    model.Image = _appHelper.GetImagePath(item.MainPicture, "app.png");
+
+                }
+            }
+            else if (commentText.Type == CommentType.CommentEntries)
+            {
+                var item = await _entryRepository.FirstOrDefaultAsync(s => s.Id.ToString() == commentText.ObjectId);
+                if (item != null)
+                {
+                    model.AfterModel.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
+                    {
+                        entry = await _appHelper.GetEntryInforTipViewModel(item)
+                    });
+                    model.ObjectBriefIntroduction = item.BriefIntroduction;
+                    if (item.Type is EntryType.Game or EntryType.ProductionGroup)
+                    {
+                        model.Image = _appHelper.GetImagePath(item.MainPicture, "app.png");
+                    }
+                    else
+                    {
+                        model.Image = _appHelper.GetImagePath(item.Thumbnail, "user.png");
+                        model.IsThumbnail = true;
+                    }
+                }
+            }
+            else if (commentText.Type == CommentType.CommentPeriphery)
+            {
+                var item = await _peripheryRepository.FirstOrDefaultAsync(s => s.Id.ToString() == commentText.ObjectId);
+                if (item != null)
+                {
+                    model.AfterModel.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
+                    {
+                        periphery = _appHelper.GetPeripheryInforTipViewModel(item)
+                    });
+                    model.ObjectBriefIntroduction = item.BriefIntroduction;
+                    model.Image = _appHelper.GetImagePath(item.MainPicture, "app.png");
+                }
+            }
+
+            if(examine.IsPassed==true)
+            {
+                model.BeforeModel = model.AfterModel;
+            }
             return true;
         }
 
         #endregion
 
         #region 消歧义页
-        public async Task<bool> GetDisambigMainExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetDisambigMainExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "消歧义页";
+            model.Type = ExaminedNormalListModelType.Disambig;
             var disambig = await _disambigRepository.FirstOrDefaultAsync(s => s.Id == examine.DisambigId);
             if (disambig == null)
             {
                 return false;
             }
-            model.EntryId = disambig.Id;
-            model.EntryName = disambig.Name;
+            model.ObjectId = disambig.Id;
+            model.ObjectName = disambig.Name;
             //序列化数据
             DisambigMain disambigMain = null;
             using (TextReader str = new StringReader(examine.Context))
@@ -1437,8 +1559,8 @@ namespace CnGalWebSite.APIServer.ExamineX
                 htmlDiff = new HtmlDiff.HtmlDiff(disambigMain.BriefIntroduction ?? "", disambig.BriefIntroduction ?? "");
                 model.EditOverview += "<h5>简介</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
 
-                model.BeforeModel = disambigMain;
-                model.AfterModel = disambigMainBefore;
+                //model.BeforeModel = disambigMain;
+                //model.AfterModel = disambigMainBefore;
             }
             else
             {
@@ -1449,16 +1571,16 @@ namespace CnGalWebSite.APIServer.ExamineX
                 model.EditOverview += "<h5>简介</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
 
 
-                model.AfterModel = disambigMain;
-                model.BeforeModel = disambigMainBefore;
+                //model.AfterModel = disambigMain;
+                //model.BeforeModel = disambigMainBefore;
             }
 
             return true;
         }
 
-        public async Task<bool> GetDisambigRelevancesExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetDisambigRelevancesExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "消歧义页";
+            model.Type = ExaminedNormalListModelType.Disambig;
             var disambig = await _disambigRepository.GetAll()
                  .Include(s => s.Entries).Include(s => s.Articles)
                  .FirstOrDefaultAsync(s => s.Id == examine.DisambigId);
@@ -1467,8 +1589,8 @@ namespace CnGalWebSite.APIServer.ExamineX
 
                 return false;
             }
-            model.EntryId = disambig.Id;
-            model.EntryName = disambig.Name;
+            model.ObjectId = disambig.Id;
+            model.ObjectName = disambig.Name;
             //序列化相关性列表
             //先读取词条信息
             var disambigAloneModels = new List<DisambigAloneModel>();
@@ -1511,7 +1633,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         {
                             if (item.IsDelete == true)
                             {
-                                disambigAloneModels_examine.Remove(infor);
+                                _ = disambigAloneModels_examine.Remove(infor);
 
                             }
                             isAdd = true;
@@ -1529,7 +1651,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         {
                             if (item.IsDelete == true)
                             {
-                                disambigAloneModels_examine.Remove(infor);
+                                _ = disambigAloneModels_examine.Remove(infor);
 
                             }
                             isAdd = true;
@@ -1563,109 +1685,164 @@ namespace CnGalWebSite.APIServer.ExamineX
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
-            //判断是否是等待审核状态
-            if (examine.IsPassed != null)
-            {
-                model.BeforeModel = disambigAloneModels_examine;
-                model.AfterModel = disambigAloneModels;
-            }
-            else
-            {
-                model.BeforeModel = disambigAloneModels;
-                model.AfterModel = disambigAloneModels_examine;
-            }
+            ////判断是否是等待审核状态
+            //if (examine.IsPassed != null)
+            //{
+            //    model.BeforeModel = disambigAloneModels_examine;
+            //    model.AfterModel = disambigAloneModels;
+            //}
+            //else
+            //{
+            //    model.BeforeModel = disambigAloneModels;
+            //    model.AfterModel = disambigAloneModels_examine;
+            //}
 
-            return false;
+            return true;
         }
 
         #endregion
 
         #region 用户
 
-        public bool GetUserMainPageExamineView(Models.ExaminedViewModel model, Examine examine)
+        public bool GetUserMainPageExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "用户";
+            model.Type = ExaminedNormalListModelType.User;
+            //model.ObjectId = examine.ApplicationUser.Id;
+            model.ObjectName = examine.ApplicationUser.UserName;
+            model.ObjectBriefIntroduction = examine.ApplicationUser.PersonalSignature;
+            model.Image = _appHelper.GetImagePath(examine.ApplicationUser.PhotoPath, "user.png");
+            model.IsThumbnail = true;
+
             //判断是否是等待审核状态
             if (examine.IsPassed != null)
             {
                 var htmlDiff = new HtmlDiff.HtmlDiff(examine.Context ?? "", examine.ApplicationUser.MainPageContext ?? "");
                 model.EditOverview = htmlDiff.Build().Replace("\r\n", "<br>");
-                model.BeforeText = _appHelper.MarkdownToHtml(examine.Context);
-                model.AfterText = _appHelper.MarkdownToHtml(examine.ApplicationUser.MainPageContext);
+                model.BeforeModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(examine.Context)
+                };
+                model.AfterModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(examine.ApplicationUser.MainPageContext)
+                };
             }
             else
             {
                 var htmlDiff = new HtmlDiff.HtmlDiff(examine.ApplicationUser.MainPageContext ?? "", examine.Context ?? "");
                 model.EditOverview = htmlDiff.Build().Replace("\r\n", "<br>");
-                model.BeforeText = _appHelper.MarkdownToHtml(examine.ApplicationUser.MainPageContext);
-                model.AfterText = _appHelper.MarkdownToHtml(examine.Context);
+                model.BeforeModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(examine.ApplicationUser.MainPageContext)
+                };
+                model.AfterModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(examine.Context)
+                };
             }
-
-            model.EntryId = 0;
-            model.EntryName = examine.ApplicationUser.UserName;
 
             return true;
         }
 
-        private UserMain InitExamineViewUserMain(ApplicationUser user)
+        private ExaminePreDataModel InitExamineViewUserMain(ApplicationUser user)
         {
-            var userMainBefore = new UserMain
+            var model = new ExaminePreDataModel();
+
+            if (string.IsNullOrWhiteSpace(user.PhotoPath) == false)
             {
-                UserName = user.UserName,
-                PersonalSignature = user.PersonalSignature,
-                PhotoPath = _appHelper.GetImagePath(user.PhotoPath, "user.png"),
-                BackgroundImage = _appHelper.GetImagePath(user.BackgroundImage, "userbackground.jpg"),
-                SBgImage = _appHelper.GetImagePath(user.SBgImage, "background.png"),
-                MBgImage = _appHelper.GetImagePath(user.MBgImage, "background.png")
-            };
-            return userMainBefore;
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "头像",
+                    Url = _appHelper.GetImagePath(user.PhotoPath, "app.png"),
+                });
+            }
+            if (string.IsNullOrWhiteSpace(user.BackgroundImage) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "空间头图",
+                    Url = _appHelper.GetImagePath(user.BackgroundImage, "app.png"),
+                });
+            }
+            if (string.IsNullOrWhiteSpace(user.MBgImage) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "大背景图",
+                    Url = _appHelper.GetImagePath(user.MBgImage, "app.png"),
+                });
+            }
+            if (string.IsNullOrWhiteSpace(user.SBgImage) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "小背景图",
+                    Url = _appHelper.GetImagePath(user.SBgImage, "app.png"),
+                });
+            }
+
+            var texts = new List<KeyValueModel>();
+
+            if (string.IsNullOrWhiteSpace(user.UserName) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "用户名",
+                    DisplayValue = user.UserName,
+                });
+            }
+            if (string.IsNullOrWhiteSpace(user.PersonalSignature) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "个性签名",
+                    DisplayValue = user.PersonalSignature,
+                });
+            }
+
+
+            model.Texts.Add(new InformationsModel
+            {
+                Modifier = "主要信息",
+                Informations = texts
+            });
+
+            return model;
         }
 
-        public async Task<bool> GetEditUserMainExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEditUserMainExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "用户";
-            var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == examine.ApplicationUserId);
-            if (user == null)
-            {
-                return false;
-            }
-            model.EntryId = 0;
-            model.EntryName = examine.ApplicationUser.UserName;
+            model.Type = ExaminedNormalListModelType.User;
+
+            model.ObjectName = examine.ApplicationUser.UserName;
+            model.ObjectBriefIntroduction = examine.ApplicationUser.PersonalSignature;
+            model.Image = _appHelper.GetImagePath(examine.ApplicationUser.PhotoPath, "user.png");
+            model.IsThumbnail = true;
 
             //序列化数据
-            var userMainBefore = InitExamineViewUserMain(user);
+            var userMainBefore = InitExamineViewUserMain(examine.ApplicationUser);
 
             //添加修改记录 
-            await _userService.UpdateUserData(user, examine);
+            await _userService.UpdateUserData(examine.ApplicationUser, examine);
 
             //序列化数据
-            var userMain = InitExamineViewUserMain(user);
+            var userMain = InitExamineViewUserMain(examine.ApplicationUser);
+
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+
 
             //判断是否是等待审核状态
             if (examine.IsPassed != null)
             {
-                var htmlDiff = new HtmlDiff.HtmlDiff(userMain.UserName ?? "", userMainBefore.UserName ?? "");
-                model.EditOverview = "<h5>用户名</h5>" + htmlDiff.Build().Replace("\r\n", "<br>");
-
-                htmlDiff = new HtmlDiff.HtmlDiff(userMain.PersonalSignature ?? "", userMainBefore.PersonalSignature ?? "");
-                model.EditOverview += "<h5>个性签名</h5>" + htmlDiff.Build().Replace("\r\n", "<br>");
-
                 model.BeforeModel = userMain;
                 model.AfterModel = userMainBefore;
             }
             else
             {
-                var htmlDiff = new HtmlDiff.HtmlDiff(userMainBefore.UserName ?? "", userMain.UserName ?? "");
-                model.EditOverview = "<h5>用户名</h5>" + htmlDiff.Build().Replace("\r\n", "<br>");
-
-                htmlDiff = new HtmlDiff.HtmlDiff(userMainBefore.PersonalSignature ?? "", userMain.PersonalSignature ?? "");
-                model.EditOverview += "<h5>个性签名</h5>" + htmlDiff.Build().Replace("\r\n", "<br>");
-
-
-                model.AfterModel = userMain;
                 model.BeforeModel = userMainBefore;
+                model.AfterModel = userMain;
             }
-
             return true;
         }
 
@@ -1673,42 +1850,181 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         #region 周边
 
-        private PeripheryMain_1_0 InitExamineViewPeripheryMain(Periphery periphery)
+        private ExaminePreDataModel InitExamineViewPeripheryMain(Periphery periphery)
         {
-            var model = new PeripheryMain_1_0
+            var model = new ExaminePreDataModel();
+
+            if (string.IsNullOrWhiteSpace(periphery.MainPicture) == false)
             {
-                Name = periphery.Name,
-                DisplayName = periphery.DisplayName,
-                BriefIntroduction = periphery.BriefIntroduction,
-                MainPicture = _appHelper.GetImagePath(periphery.MainPicture, "app.png"),
-                Thumbnail = _appHelper.GetImagePath(periphery.Thumbnail, "app.png"),
-                BackgroundPicture = _appHelper.GetImagePath(periphery.BackgroundPicture, "background.png"),
-                SmallBackgroundPicture = _appHelper.GetImagePath(periphery.SmallBackgroundPicture, "background.png"),
-                Author = periphery.Author,
-                Material = periphery.Material,
-                PageCount = periphery.PageCount,
-                Price = periphery.Price,
-                IndividualParts = periphery.IndividualParts,
-                Brand = periphery.Brand,
-                IsAvailableItem = periphery.IsAvailableItem,
-                IsReprint = periphery.IsReprint,
-                Size = periphery.Size,
-                SongCount = periphery.SongCount,
-                Type = periphery.Type,
-            };
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "主图",
+                    Url = _appHelper.GetImagePath(periphery.MainPicture, "app.png"),
+                });
+            }
+            if (string.IsNullOrWhiteSpace(periphery.Thumbnail) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "缩略图图",
+                    Url = _appHelper.GetImagePath(periphery.MainPicture, "app.png"),
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(periphery.BackgroundPicture) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "大背景图",
+                    Url = _appHelper.GetImagePath(periphery.BackgroundPicture, "app.png"),
+                });
+            }
+            if (string.IsNullOrWhiteSpace(periphery.SmallBackgroundPicture) == false)
+            {
+                model.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Note = "小背景图",
+                    Url = _appHelper.GetImagePath(periphery.SmallBackgroundPicture, "app.png"),
+                });
+            }
+
+            var texts = new List<KeyValueModel>();
+
+            if (string.IsNullOrWhiteSpace(periphery.Name) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "唯一名称",
+                    DisplayValue = periphery.Name,
+                });
+            }
+            if (string.IsNullOrWhiteSpace(periphery.DisplayName) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "显示名称",
+                    DisplayValue = periphery.DisplayName,
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(periphery.BriefIntroduction) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "简介",
+                    DisplayValue = periphery.BriefIntroduction,
+                });
+            }
+            texts.Add(new KeyValueModel
+            {
+                DisplayName = "类型",
+                DisplayValue = periphery.Type.GetDisplayName(),
+            });
+            if (periphery.PageCount > 0)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "页数",
+                    DisplayValue = periphery.PageCount.ToString(),
+                });
+            }
+            if (periphery.SongCount > 0)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "歌曲数",
+                    DisplayValue = periphery.SongCount.ToString(),
+                });
+            }
+            if (string.IsNullOrWhiteSpace(periphery.Material) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "材质",
+                    DisplayValue = periphery.Material,
+                });
+            }
+            if (string.IsNullOrWhiteSpace(periphery.Author) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "作者",
+                    DisplayValue = periphery.Author,
+                });
+            }
+            if (string.IsNullOrWhiteSpace(periphery.Price) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "价格",
+                    DisplayValue = periphery.Price
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(periphery.IndividualParts) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "独立部件数量",
+                    DisplayValue = periphery.IndividualParts
+                });
+            }
+            if (string.IsNullOrWhiteSpace(periphery.Brand) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "品牌",
+                    DisplayValue = periphery.Brand
+                });
+            }
+            if (periphery.IsAvailableItem)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "是否为装饰品",
+                    DisplayValue = "是"
+                });
+            }
+            if (periphery.IsReprint)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "是否再版",
+                    DisplayValue = "是"
+                });
+            }
+            if (string.IsNullOrWhiteSpace(periphery.Size) == false)
+            {
+                texts.Add(new KeyValueModel
+                {
+                    DisplayName = "尺寸",
+                    DisplayValue = periphery.Size
+                });
+            }
+
+            model.Texts.Add(new InformationsModel
+            {
+                Modifier = "主要信息",
+                Informations = texts
+            });
+
             return model;
+
         }
 
-        public async Task<bool> GetEditPeripheryMainExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEditPeripheryMainExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "周边";
+            model.Type = ExaminedNormalListModelType.Periphery;
             var periphery = await _peripheryRepository.FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
             if (periphery == null)
             {
                 return false;
             }
-            model.EntryId = (int)examine.PeripheryId;
-            model.EntryName = periphery.Name;
+            model.ObjectId = periphery.Id;
+            model.ObjectName = periphery.Name;
+            model.ObjectBriefIntroduction = periphery.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(periphery.MainPicture, "app.png");
+
 
             var entryMainBefore = InitExamineViewPeripheryMain(periphery);
 
@@ -1737,32 +2053,34 @@ namespace CnGalWebSite.APIServer.ExamineX
         }
 
 
-        private static List<EntryPicture> InitExamineViewPeripheryImages(Periphery periphery)
+        private static ExaminePreDataModel InitExamineViewPeripheryImages(Periphery periphery)
         {
-            var pictures = new List<EntryPicture>();
+            var model = new ExaminePreDataModel();
             foreach (var item in periphery.Pictures)
             {
-                pictures.Add(new EntryPicture
+                model.Pictures.Add(new PicturesAloneViewModel
                 {
                     Url = item.Url,
-                    Note = item.Note,
-                    Modifier = item.Modifier
+                    Note = item.Note
                 });
             }
 
-            return pictures;
+            return model;
         }
 
-        public async Task<bool> GetEditPeripheryImagesExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEditPeripheryImagesExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "周边";
+            model.Type = ExaminedNormalListModelType.Periphery;
             var periphery = await _peripheryRepository.GetAll().Include(s => s.Pictures).FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
             if (periphery == null)
             {
                 return false;
             }
-            model.EntryId = (int)examine.PeripheryId;
-            model.EntryName = periphery.Name;
+            model.ObjectId = periphery.Id;
+            model.ObjectName = periphery.Name;
+            model.ObjectBriefIntroduction = periphery.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(periphery.MainPicture, "app.png");
+
 
             var pictures = InitExamineViewPeripheryImages(periphery);
 
@@ -1788,76 +2106,44 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
-        private List<RelevancesViewModel> InitExamineViewPeripheryRelatedEntries(Periphery periphery)
+        private async Task<ExaminePreDataModel> InitExamineViewPeripheryRelatedEntries(Periphery periphery)
         {
-            var relevances = new List<RelevancesViewModel>();
-            var entries = periphery.RelatedEntries.Select(s => new
-            {
-                s.Id,
-                s.Name,
-                s.BriefIntroduction
-            })
-                .ToList();
-            foreach (var item in entries)
-            {
-                var isAdd = false;
+            var model = new ExaminePreDataModel();
 
-                //遍历信息列表寻找关键词
-                foreach (var infor in relevances)
+            foreach (var item in periphery.RelatedEntries)
+            {
+                model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    if (infor.Modifier == "词条")
-                    {
-                        //关键词相同则添加
-                        infor.Informations.Add(new RelevancesKeyValueModel
-                        {
-                            DisplayName = item.Name,
-                            DisplayValue = item.BriefIntroduction,
-                            Id = item.Id
-                        });
-                        isAdd = true;
-                        break;
-                    }
-                }
-                if (isAdd == false)
-                {
-                    //没有找到关键词 则新建关键词
-                    var temp = new RelevancesViewModel
-                    {
-                        Modifier = "词条",
-                        Informations = new List<RelevancesKeyValueModel>()
-                    };
-                    temp.Informations.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.Name,
-                        DisplayValue = item.BriefIntroduction,
-                        Id = item.Id
+                    entry = await _appHelper.GetEntryInforTipViewModel(item)
+                });
 
-                    });
-                    relevances.Add(temp);
-                }
             }
-            return relevances;
+
+            return model;
         }
 
-        public async Task<bool> GetEditPeripheryRelatedEntriesExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEditPeripheryRelatedEntriesExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "周边";
+            model.Type = ExaminedNormalListModelType.Periphery;
             var periphery = await _peripheryRepository.GetAll().Include(s => s.RelatedEntries).FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
             if (periphery == null)
             {
                 return false;
             }
-            model.EntryId = (int)examine.PeripheryId;
-            model.EntryName = periphery.Name;
+            model.ObjectId = periphery.Id;
+            model.ObjectName = periphery.Name;
+            model.ObjectBriefIntroduction = periphery.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(periphery.MainPicture, "app.png");
+
 
             //序列化相关性列表
             //先读取词条信息
-            var relevances = InitExamineViewPeripheryRelatedEntries(periphery);
+            var relevances = await InitExamineViewPeripheryRelatedEntries(periphery);
 
             //添加修改记录 
             await _peripheryService.UpdatePeripheryDataAsync(periphery, examine);
 
-            var relevances_examine = InitExamineViewPeripheryRelatedEntries(periphery);
+            var relevances_examine = await InitExamineViewPeripheryRelatedEntries(periphery);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -1876,61 +2162,35 @@ namespace CnGalWebSite.APIServer.ExamineX
             return true;
         }
 
-        private List<RelevancesViewModel> InitExamineViewPeripheryRelatedPeripheries(Periphery periphery)
+        private ExaminePreDataModel InitExamineViewPeripheryRelatedPeripheries(Periphery periphery)
         {
-            var relevances = new List<RelevancesViewModel>();
-            var peripheries = periphery.PeripheryRelationFromPeripheryNavigation.Select(s => s.ToPeripheryNavigation);
-            foreach (var item in peripheries)
+            var model = new ExaminePreDataModel();
+
+            foreach (var item in periphery.PeripheryRelationFromPeripheryNavigation)
             {
-                var isAdd = false;
-
-                //遍历信息列表寻找关键词
-                foreach (var infor in relevances)
+                model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    if (infor.Modifier == "周边")
-                    {
-                        //关键词相同则添加
-                        infor.Informations.Add(new RelevancesKeyValueModel
-                        {
-                            DisplayName = item.Name,
-                            DisplayValue = item.BriefIntroduction,
-                            Id = item.Id
-                        });
-                        isAdd = true;
-                        break;
-                    }
-                }
-                if (isAdd == false)
-                {
-                    //没有找到关键词 则新建关键词
-                    var temp = new RelevancesViewModel
-                    {
-                        Modifier = "周边",
-                        Informations = new List<RelevancesKeyValueModel>()
-                    };
-                    temp.Informations.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.Name,
-                        DisplayValue = item.BriefIntroduction,
-                        Id = item.Id
+                    periphery = _appHelper.GetPeripheryInforTipViewModel(item.ToPeripheryNavigation)
+                });
 
-                    });
-                    relevances.Add(temp);
-                }
             }
-            return relevances;
+
+            return model;
         }
 
-        public async Task<bool> GetEditPeripheryRelatedPeripheriesExamineView(Models.ExaminedViewModel model, Examine examine)
+        public async Task<bool> GetEditPeripheryRelatedPeripheriesExamineView(ExamineViewModel model, Examine examine)
         {
-            model.Type = "周边";
+            model.Type = ExaminedNormalListModelType.Periphery;
             var periphery = await _peripheryRepository.GetAll().Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation).ThenInclude(s => s.PeripheryRelationFromPeripheryNavigation).FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
             if (periphery == null)
             {
                 return false;
             }
-            model.EntryId = (int)examine.PeripheryId;
-            model.EntryName = periphery.Name;
+            model.ObjectId = periphery.Id;
+            model.ObjectName = periphery.Name;
+            model.ObjectBriefIntroduction = periphery.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(periphery.MainPicture, "app.png");
+
 
             //序列化相关性列表
             //先读取词条信息
@@ -1973,7 +2233,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             //更新数据
             _entryService.UpdateEntryDataMain(entry, examine);
             //保存
-            await _entryRepository.UpdateAsync(entry);
+            _ = await _entryRepository.UpdateAsync(entry);
 
             //更新完善度
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
@@ -2075,7 +2335,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             //更新数据
             _entryService.UpdateEntryDataImages(entry, examine);
             //保存
-            await _entryRepository.UpdateAsync(entry);
+            _ = await _entryRepository.UpdateAsync(entry);
 
             //更新完善度
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
@@ -2086,7 +2346,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         {
             //更新数据
             await _entryService.UpdateEntryDataRelevances(entry, examine);
-            await _entryRepository.UpdateAsync(entry);
+            _ = await _entryRepository.UpdateAsync(entry);
 
             //更新完善度
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
@@ -2172,7 +2432,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             //更新数据
             await _entryService.UpdateEntryDataTagsAsync(entry, examine);
 
-            await _entryRepository.UpdateAsync(entry);
+            _ = await _entryRepository.UpdateAsync(entry);
 
             //更新完善度
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
@@ -2184,7 +2444,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             //更新数据
             _entryService.UpdateEntryDataMainPage(entry, examine);
 
-            await _entryRepository.UpdateAsync(entry);
+            _ = await _entryRepository.UpdateAsync(entry);
 
             //更新完善度
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
@@ -2197,13 +2457,13 @@ namespace CnGalWebSite.APIServer.ExamineX
         {
             _articleService.UpdateArticleDataMain(article, examine);
 
-            await _articleRepository.UpdateAsync(article);
+            _ = await _articleRepository.UpdateAsync(article);
         }
 
         public async Task ExamineEditArticleRelevancesAsync(Article article, ArticleRelevances examine)
         {
             await _articleService.UpdateArticleDataRelevances(article, examine);
-            await _articleRepository.UpdateAsync(article);
+            _ = await _articleRepository.UpdateAsync(article);
 
             var admin = new ApplicationUser
             {
@@ -2283,37 +2543,37 @@ namespace CnGalWebSite.APIServer.ExamineX
         {
             _articleService.UpdateArticleDataMainPage(article, examine);
 
-            await _articleRepository.UpdateAsync(article);
+            _ = await _articleRepository.UpdateAsync(article);
         }
         #endregion
 
         #region 标签
-        public async Task ExamineTagAsync(DataModel.Model.Tag tag, TagEdit examine)
+        public async Task ExamineTagAsync(Tag tag, TagEdit examine)
         {
             await _tagService.UpdateTagDataOldAsync(tag, examine);
 
-            await _tagRepository.UpdateAsync(tag);
+            _ = await _tagRepository.UpdateAsync(tag);
         }
 
         public async Task ExamineEditTagMainAsync(Tag tag, ExamineMain examine)
         {
             await _tagService.UpdateTagDataMainAsync(tag, examine);
 
-            await _tagRepository.UpdateAsync(tag);
+            _ = await _tagRepository.UpdateAsync(tag);
         }
 
         public async Task ExamineEditTagChildTagsAsync(Tag tag, TagChildTags examine)
         {
             await _tagService.UpdateTagDataChildTagsAsync(tag, examine);
 
-            await _tagRepository.UpdateAsync(tag);
+            _ = await _tagRepository.UpdateAsync(tag);
         }
 
         public async Task ExamineEditTagChildEntriesAsync(Tag tag, TagChildEntries examine)
         {
             await _tagService.UpdateTagDataChildEntriesAsync(tag, examine);
 
-            await _tagRepository.UpdateAsync(tag);
+            _ = await _tagRepository.UpdateAsync(tag);
         }
         #endregion
 
@@ -2322,7 +2582,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         {
             _disambigService.UpdateDisambigDataMain(disambig, examine);
 
-            await _disambigRepository.UpdateAsync(disambig);
+            _ = await _disambigRepository.UpdateAsync(disambig);
         }
 
         public async Task ExamineEditDisambigRelevancesAsync(Disambig disambig, DisambigRelevances examine)
@@ -2330,7 +2590,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
             await _disambigService.UpdateDisambigDataRelevancesAsync(disambig, examine);
 
-            await _disambigRepository.UpdateAsync(disambig);
+            _ = await _disambigRepository.UpdateAsync(disambig);
         }
         #endregion
 
@@ -2340,13 +2600,13 @@ namespace CnGalWebSite.APIServer.ExamineX
         {
             await _userService.UpdateUserDataMain(user, examine);
 
-            await _userRepository.UpdateAsync(user);
+            _ = await _userRepository.UpdateAsync(user);
         }
         public async Task ExamineEditUserMainPageAsync(ApplicationUser user, string examine)
         {
             await _userService.UpdateUserDataMainPage(user, examine);
 
-            await _userRepository.UpdateAsync(user);
+            _ = await _userRepository.UpdateAsync(user);
         }
 
 
@@ -2359,7 +2619,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             //更新数据
             _peripheryService.UpdatePeripheryDataMain(periphery, examine);
             //保存
-            await _peripheryRepository.UpdateAsync(periphery);
+            _ = await _peripheryRepository.UpdateAsync(periphery);
         }
 
         public async Task ExamineEditPeripheryImagesAsync(Periphery periphery, PeripheryImages examine)
@@ -2367,7 +2627,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             //更新数据
             _peripheryService.UpdatePeripheryDataImages(periphery, examine);
             //保存
-            await _peripheryRepository.UpdateAsync(periphery);
+            _ = await _peripheryRepository.UpdateAsync(periphery);
         }
 
         public async Task ExamineEditPeripheryRelatedEntriesAsync(Periphery periphery, PeripheryRelatedEntries examine)
@@ -2375,7 +2635,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             //更新数据
             await _peripheryService.UpdatePeripheryDataRelatedEntries(periphery, examine);
             //保存
-            await _peripheryRepository.UpdateAsync(periphery);
+            _ = await _peripheryRepository.UpdateAsync(periphery);
 
         }
 
@@ -2384,7 +2644,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             //更新数据
             await _peripheryService.UpdatePeripheryDataRelatedPeripheriesAsync(periphery, examine);
             //保存
-            await _peripheryRepository.UpdateAsync(periphery);
+            _ = await _peripheryRepository.UpdateAsync(periphery);
         }
 
         #endregion
@@ -2412,7 +2672,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     PassedAdminName = user.UserName,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
             }
             else
             {
@@ -2423,7 +2683,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -2439,7 +2699,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         Note = note
                     };
                     //添加到审核列表
-                    await _examineRepository.InsertAsync(examine);
+                    _ = await _examineRepository.InsertAsync(examine);
                 }
             }
         }
@@ -2461,7 +2721,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -2491,7 +2751,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
 
             }
             return true;
@@ -2514,7 +2774,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
             }
             else
             {
@@ -2525,7 +2785,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -2540,7 +2800,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         ApplicationUserId = user.Id,
                     };
                     //添加到审核列表
-                    await _examineRepository.InsertAsync(examine);
+                    _ = await _examineRepository.InsertAsync(examine);
                 }
             }
         }
@@ -2562,7 +2822,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -2592,7 +2852,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
 
             }
             return true;
@@ -2615,7 +2875,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -2645,7 +2905,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
 
             }
             return true;
@@ -2667,7 +2927,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
             }
             else
             {
@@ -2678,7 +2938,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -2693,7 +2953,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         ApplicationUserId = user.Id,
                     };
                     //添加到审核列表
-                    await _examineRepository.InsertAsync(examine);
+                    _ = await _examineRepository.InsertAsync(examine);
                 }
             }
         }
@@ -2716,7 +2976,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -2746,7 +3006,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
 
             }
             return true;
@@ -2768,7 +3028,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
             }
             else
             {
@@ -2779,7 +3039,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -2794,7 +3054,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         ApplicationUserId = user.Id,
                     };
                     //添加到审核列表
-                    await _examineRepository.InsertAsync(examine);
+                    _ = await _examineRepository.InsertAsync(examine);
                 }
             }
         }
@@ -2815,7 +3075,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
             }
             else
             {
@@ -2826,7 +3086,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -2841,7 +3101,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         Note = note
                     };
                     //添加到审核列表
-                    await _examineRepository.InsertAsync(examine);
+                    _ = await _examineRepository.InsertAsync(examine);
                 }
             }
         }
@@ -2863,7 +3123,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -2893,7 +3153,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
 
             }
             return true;
@@ -2915,7 +3175,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
             }
             else
             {
@@ -2926,7 +3186,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -2941,7 +3201,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         ApplicationUserId = user.Id,
                     };
                     //添加到审核列表
-                    await _examineRepository.InsertAsync(examine);
+                    _ = await _examineRepository.InsertAsync(examine);
                 }
             }
         }
@@ -2973,12 +3233,10 @@ namespace CnGalWebSite.APIServer.ExamineX
                 }
                 else
                 {
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, item.Key);
-                        resulte = text.ToString();
-                    }
+                    using TextWriter text = new StringWriter();
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(text, item.Key);
+                    resulte = text.ToString();
                 }
 
                 if (await _userManager.IsInRoleAsync(user, "Editor") == true)
@@ -3007,12 +3265,12 @@ namespace CnGalWebSite.APIServer.ExamineX
                             throw new Exception("不支持的类型");
                     }
 
-                    await UniversalEstablishExaminedAsync(entry, user, true, resulte, item.Value, note);
+                    _ = await UniversalEstablishExaminedAsync(entry, user, true, resulte, item.Value, note);
                     await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, item.Value);
                 }
                 else
                 {
-                    await UniversalEstablishExaminedAsync(entry, user, false, resulte, item.Value, note);
+                    _ = await UniversalEstablishExaminedAsync(entry, user, false, resulte, item.Value, note);
                 }
             }
 
@@ -3044,12 +3302,10 @@ namespace CnGalWebSite.APIServer.ExamineX
                 }
                 else
                 {
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, item.Key);
-                        resulte = text.ToString();
-                    }
+                    using TextWriter text = new StringWriter();
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(text, item.Key);
+                    resulte = text.ToString();
                 }
 
                 if (await _userManager.IsInRoleAsync(user, "Editor") == true)
@@ -3070,12 +3326,12 @@ namespace CnGalWebSite.APIServer.ExamineX
                             throw new Exception("不支持的类型");
                     }
 
-                    await UniversalCreateArticleExaminedAsync(article, user, true, resulte, item.Value, note);
+                    _ = await UniversalCreateArticleExaminedAsync(article, user, true, resulte, item.Value, note);
                     await _appHelper.AddUserContributionValueAsync(user.Id, article.Id, item.Value);
                 }
                 else
                 {
-                    await UniversalCreateArticleExaminedAsync(article, user, false, resulte, item.Value, note);
+                    _ = await UniversalCreateArticleExaminedAsync(article, user, false, resulte, item.Value, note);
                 }
             }
 
@@ -3128,12 +3384,12 @@ namespace CnGalWebSite.APIServer.ExamineX
                             throw new Exception("不支持的类型");
                     }
 
-                    await UniversalCreatePeripheryExaminedAsync(periphery, user, true, resulte, item.Value, note);
+                    _ = await UniversalCreatePeripheryExaminedAsync(periphery, user, true, resulte, item.Value, note);
                     await _appHelper.AddUserContributionValueAsync(user.Id, periphery.Id, item.Value);
                 }
                 else
                 {
-                    await UniversalCreatePeripheryExaminedAsync(periphery, user, false, resulte, item.Value, note);
+                    _ = await UniversalCreatePeripheryExaminedAsync(periphery, user, false, resulte, item.Value, note);
                 }
             }
 
@@ -3183,12 +3439,12 @@ namespace CnGalWebSite.APIServer.ExamineX
                             throw new Exception("不支持的类型");
                     }
 
-                    await UniversalCreateTagExaminedAsync(tag, user, true, resulte, item.Value, note);
+                    _ = await UniversalCreateTagExaminedAsync(tag, user, true, resulte, item.Value, note);
                     await _appHelper.AddUserContributionValueAsync(user.Id, tag.Id, item.Value);
                 }
                 else
                 {
-                    await UniversalCreateTagExaminedAsync(tag, user, false, resulte, item.Value, note);
+                    _ = await UniversalCreateTagExaminedAsync(tag, user, false, resulte, item.Value, note);
                 }
             }
 
@@ -3295,7 +3551,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     }
                     examine.Version = ExamineVersion.V1_1;
                     examine.Context = resulte;
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
             }
         }
@@ -3380,7 +3636,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     }
                     examine.Version = ExamineVersion.V1_1;
                     examine.Context = resulte;
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
             }
         }
@@ -3464,7 +3720,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     }
                     examine.Version = ExamineVersion.V1_1;
                     examine.Context = resulte;
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
             }
         }
@@ -3483,7 +3739,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
                 item.RelatedEntries = item.Entries.Select(s => s.Entry).ToList();
                 item.Entries.Clear();
-                await _peripheryRepository.UpdateAsync(item);
+                _ = await _peripheryRepository.UpdateAsync(item);
             }
         }
         /// <summary>
@@ -3501,7 +3757,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
                 item.RelatedPeripheries = item.Peripheries.Select(s => s.Periphery).ToList();
                 item.Peripheries.Clear();
-                await _entryRepository.UpdateAsync(item);
+                _ = await _entryRepository.UpdateAsync(item);
             }
         }
         /// <summary>
@@ -3579,11 +3835,11 @@ namespace CnGalWebSite.APIServer.ExamineX
                     //保存
                     if (newExamineModel.Items.Count == 0)
                     {
-                        examine.Note += ("\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移文章主要信息编辑记录");
+                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移文章主要信息编辑记录";
                     }
                     examine.Version = ExamineVersion.V1_1;
                     examine.Context = resulte;
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
             }
         }
@@ -3624,7 +3880,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         {
                             Items = ToolHelper.GetEditingRecordFromContrastData(new Entry(), newEntry)
                         };
-                        newExamineModel.Items.RemoveAll(s => s.Key == "PubulishTime");
+                        _ = newExamineModel.Items.RemoveAll(s => s.Key == "PubulishTime");
 
                     }
                     else
@@ -3652,7 +3908,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         {
                             Items = ToolHelper.GetEditingRecordFromContrastData(new Entry(), newEntry)
                         };
-                        newExamineModel.Items.RemoveAll(s => s.Key == "PubulishTime");
+                        _ = newExamineModel.Items.RemoveAll(s => s.Key == "PubulishTime");
 
                     }
 
@@ -3668,11 +3924,11 @@ namespace CnGalWebSite.APIServer.ExamineX
                     //保存
                     if (newExamineModel.Items.Count == 0)
                     {
-                        examine.Note += ("\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移词条主要信息编辑记录");
+                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移词条主要信息编辑记录";
                     }
                     examine.Version = ExamineVersion.V1_1;
                     examine.Context = resulte;
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
             }
         }
@@ -3707,7 +3963,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     //遍历对应复制
                     foreach (var item in oldExamineModel.Relevances)
                     {
-                        if (item.Modifier == "词条" || item.Modifier == "游戏" || item.Modifier == "制作组" || item.Modifier == "STAFF" || item.Modifier == "角色")
+                        if (item.Modifier is "词条" or "游戏" or "制作组" or "STAFF" or "角色")
                         {
                             var newEntry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayName);
                             if (newEntry != null)
@@ -3722,7 +3978,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                             }
 
                         }
-                        else if (item.Modifier == "文章" || item.Modifier == "动态")
+                        else if (item.Modifier is "文章" or "动态")
                         {
                             var newArticle = await _articleRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayName);
                             newExamineModel.Relevances.Add(new ArticleRelevancesAloneModel
@@ -3760,11 +4016,11 @@ namespace CnGalWebSite.APIServer.ExamineX
                     //保存
                     if (newExamineModel.Relevances.Count == 0)
                     {
-                        examine.Note += ("\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移文章关联信息编辑记录");
+                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移文章关联信息编辑记录";
                     }
                     examine.Version = ExamineVersion.V1_1;
                     examine.Context = resulte;
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
             }
         }
@@ -3784,7 +4040,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
                 foreach (var temp in item.Relevances)
                 {
-                    if (temp.Modifier == "词条" || temp.Modifier == "游戏" || temp.Modifier == "制作组" || temp.Modifier == "STAFF" || temp.Modifier == "角色")
+                    if (temp.Modifier is "词条" or "游戏" or "制作组" or "STAFF" or "角色")
                     {
                         var newEntry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == temp.DisplayName);
                         if (newEntry != null)
@@ -3793,7 +4049,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
                         }
                     }
-                    else if (temp.Modifier == "文章" || temp.Modifier == "动态")
+                    else if (temp.Modifier is "文章" or "动态")
                     {
                         var newArticle = await _articleRepository.FirstOrDefaultAsync(s => s.Name == temp.DisplayName);
                         if (newArticle != null)
@@ -3818,7 +4074,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     }
                 }
                 item.Relevances.Clear();
-                await _articleRepository.UpdateAsync(item);
+                _ = await _articleRepository.UpdateAsync(item);
             }
         }
 
@@ -3853,7 +4109,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     //遍历对应复制
                     foreach (var item in oldExamineModel.Relevances)
                     {
-                        if (item.Modifier == "词条" || item.Modifier == "游戏" || item.Modifier == "制作组" || item.Modifier == "STAFF" || item.Modifier == "角色")
+                        if (item.Modifier is "词条" or "游戏" or "制作组" or "STAFF" or "角色")
                         {
                             if (examine.Entry.Type == EntryType.Game && item.Modifier == "STAFF")
                             {
@@ -3872,7 +4128,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                             }
 
                         }
-                        else if (item.Modifier == "文章" || item.Modifier == "动态")
+                        else if (item.Modifier is "文章" or "动态")
                         {
                             var newArticle = await _articleRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayName);
                             if (newArticle != null)
@@ -3913,11 +4169,11 @@ namespace CnGalWebSite.APIServer.ExamineX
                     //保存
                     if (newExamineModel.Relevances.Count == 0)
                     {
-                        examine.Note += ("\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移词条关联信息编辑记录");
+                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移词条关联信息编辑记录";
                     }
                     examine.Version = ExamineVersion.V1_1;
                     examine.Context = resulte;
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
             }
         }
@@ -3937,7 +4193,7 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
                 foreach (var temp in item.Relevances)
                 {
-                    if (temp.Modifier == "词条" || temp.Modifier == "游戏" || temp.Modifier == "制作组" || temp.Modifier == "STAFF" || temp.Modifier == "角色")
+                    if (temp.Modifier is "词条" or "游戏" or "制作组" or "STAFF" or "角色")
                     {
                         if (item.Type == EntryType.Game && temp.Modifier == "STAFF")
                         {
@@ -3956,7 +4212,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                         }
 
                     }
-                    else if (temp.Modifier == "文章" || temp.Modifier == "动态")
+                    else if (temp.Modifier is "文章" or "动态")
                     {
                         var newArticle = await _articleRepository.FirstOrDefaultAsync(s => s.Name == temp.DisplayName);
                         if (newArticle != null)
@@ -3976,7 +4232,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     }
                 }
                 item.Relevances.Clear();
-                await _entryRepository.UpdateAsync(item);
+                _ = await _entryRepository.UpdateAsync(item);
             }
         }
 
@@ -4034,7 +4290,7 @@ namespace CnGalWebSite.APIServer.ExamineX
                     //保存
                     examine.Version = ExamineVersion.V1_1;
                     examine.Context = resulte;
-                    await _examineRepository.UpdateAsync(examine);
+                    _ = await _examineRepository.UpdateAsync(examine);
                 }
             }
         }
@@ -4130,12 +4386,10 @@ namespace CnGalWebSite.APIServer.ExamineX
                 }
                 else
                 {
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, item.Key);
-                        resulte = text.ToString();
-                    }
+                    using TextWriter text = new StringWriter();
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(text, item.Key);
+                    resulte = text.ToString();
                 }
 
                 await UniversalEditExaminedAsync(entry, admin, true, resulte, item.Value, "补全审核记录");
@@ -4162,12 +4416,10 @@ namespace CnGalWebSite.APIServer.ExamineX
                 }
                 else
                 {
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, item.Key);
-                        resulte = text.ToString();
-                    }
+                    using TextWriter text = new StringWriter();
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(text, item.Key);
+                    resulte = text.ToString();
                 }
 
                 await UniversalEditArticleExaminedAsync(article, admin, true, resulte, item.Value, "补全审核记录");
@@ -4233,59 +4485,33 @@ namespace CnGalWebSite.APIServer.ExamineX
             {
                 var entry = model as Entry;
                 var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.EntryId == entry.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
-                if (exammines.Any())
-                {
-                    return await GenerateModelFromExamines(exammines);
-                }
-                else
-                {
-                    throw new Exception("未找到该词条");
-                }
+                return exammines.Any() ? await GenerateModelFromExamines(exammines) : throw new Exception("未找到该词条");
 
             }
             else if (model is Article)
             {
                 var article = model as Article;
                 var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.ArticleId == article.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
-                if (exammines.Any())
-                {
-                    return await GenerateModelFromExamines(exammines);
-                }
-                else
-                {
-                    throw new Exception("未找到该文章");
-                }
+                return exammines.Any() ? await GenerateModelFromExamines(exammines) : throw new Exception("未找到该文章");
 
             }
             else if (model is Tag)
             {
                 var tag = model as Tag;
                 var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.TagId == tag.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
-                if (exammines.Any())
-                {
-                    return await GenerateModelFromExamines(exammines);
-                }
-                else
-                {
-                    return new Tag
+                return exammines.Any()
+                    ? await GenerateModelFromExamines(exammines)
+                    : new Tag
                     {
                         Id = tag.Id
                     };
-                }
 
             }
             else if (model is Periphery)
             {
                 var periphery = model as Periphery;
                 var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.PeripheryId == periphery.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
-                if (exammines.Any())
-                {
-                    return await GenerateModelFromExamines(exammines);
-                }
-                else
-                {
-                    throw new Exception("未找到该周边");
-                }
+                return exammines.Any() ? await GenerateModelFromExamines(exammines) : throw new Exception("未找到该周边");
 
             }
             else

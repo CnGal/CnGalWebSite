@@ -1,0 +1,59 @@
+﻿@inject IJSRuntime JS
+
+<div class="@Class">
+    <div class="rounded shadow-sm bg-opacity rounded p-3">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-file-text-o" Title="概览" Class="mb-4" Collapable Outline OutlineHead>
+            <div>
+                <style>
+                    pre {
+                        overflow: initial !important;
+                    }
+                </style>
+                <div class="markdown-body m-0 p-0" style=" white-space: break-spaces;">
+                    @((MarkupString)Model.EditOverview)
+                </div>
+            </div>
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+        @if (string.IsNullOrWhiteSpace(Model.Comments) == false)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-tags" Title="批注" Class="mb-4" Collapable Outline OutlineHead>
+                <div>
+                    @Model.Comments
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        }
+        @if (string.IsNullOrWhiteSpace(Model.Note) == false)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-sticky-note-o" Title="备注" Class="mb-4" Collapable Outline OutlineHead>
+                <div>
+                    @Model.Note
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        }
+
+
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public ExamineViewModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        try
+        {
+            await JS.InvokeAsync<string>("highlightAllCode");
+        }
+        catch
+        {
+
+        }
+    }
+}

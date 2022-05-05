@@ -3,8 +3,8 @@
 @inject IJSRuntime JS
 
 <MExpansionPanels>
-    <MExpansionPanel @key="0">
-        <MExpansionPanelHeader>
+    <MExpansionPanel @key="0"  Class="bg-opacity">
+        <MExpansionPanelHeader >
             <div class="" style=" display: flex; align-items: center; ">
                 <img src="@Model.GroupImage" style="height:50px;width:50px;border-radius:50%;" />
                 <div class="ms-3" style="font-size: x-large; font-weight: bold;">@Model.GroupName</div>
@@ -38,7 +38,7 @@
 
     @foreach (var item in Model.Articles)
     {
-        <MExpansionPanel @key="@(Model.Articles.IndexOf(item)+1)">
+        <MExpansionPanel @key="@(Model.Articles.IndexOf(item)+1)"   Class="bg-opacity">
             <MExpansionPanelHeader>
                 @(item.DisplayName+" - "+item.LastEditTime.ToTimeFromNowString())
             </MExpansionPanelHeader>

@@ -1,0 +1,11 @@
+﻿<div>
+    @foreach (var item in Model)
+    {
+        <RelevanceOtherTip Model="item" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<RelevancesKeyValueModel> Model { get; set; } = new List<RelevancesKeyValueModel>();
+}

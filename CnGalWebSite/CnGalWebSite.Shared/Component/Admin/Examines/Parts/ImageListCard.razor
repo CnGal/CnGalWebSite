@@ -1,0 +1,38 @@
+﻿@inject ImagesLargeViewService ImagesLargeViewService
+@inject IDataCacheService _dataCatcheService
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-12 col-lg-6 pb-4 pointer" @onclick="()=>OnClickImage(Model.IndexOf(item))">
+            <ImageCard Model="item" />
+        </div>
+
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<PicturesAloneViewModel> Model { get; set; } = new List<PicturesAloneViewModel>();
+
+    public async void OnClickImage(int index)
+    {
+        if (_dataCatcheService.IsApp)
+        {
+            await _dataCatcheService.OpenNewPage.InvokeAsync(Model[index].Url);
+        }
+        else
+        {
+            await ImagesLargeViewService.ViewLargeImages(new ImagesLargeViewModel
+            {
+                Index = index,
+                Pictures = Model.Select(s => new EditImageAloneModel
+                {
+                    Note = s.Note,
+                    Url = s.Url
+                }).ToList()
+            });
+        }
+
+    }
+}

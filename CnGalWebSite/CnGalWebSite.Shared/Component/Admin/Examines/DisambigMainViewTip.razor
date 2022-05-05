@@ -1,11 +1,63 @@
-﻿<div class="row row-cols-1 row-cols-md-3">
-    <ExaminesPartViewImageTip Name="主图" Path="@Model.MainPicture"></ExaminesPartViewImageTip>
-    <ExaminesPartViewImageTip Name="背景图" Path="@Model.BackgroundPicture"></ExaminesPartViewImageTip>
-    <ExaminesPartViewImageTip Name="小背景图" Path="@Model.SmallBackgroundPicture"></ExaminesPartViewImageTip>
-</div>
-<div class="row">
-    <ExaminesPartViewInforTip DispalyName="名称" DispalyValue="@Model.Name"></ExaminesPartViewInforTip>
-    <ExaminesPartViewInforTip DispalyName="简介" DispalyValue="@Model.BriefIntroduction"></ExaminesPartViewInforTip>
-</div>
-@code { [Parameter]
-            public DisambigMain Model { get; set; } = new DisambigMain(); }
+﻿@if (Images.Any())
+{
+    <CnGalWebSite.Shared.Component.Admin.Examines.Parts.ImageListCard Model="Images"/>
+}
+
+
+
+@code {
+    [Parameter]
+    public DisambigMain Model { get; set; } = new DisambigMain();
+
+    public InformationsModel Texts { get; set; } = new InformationsModel();
+    public List<PicturesAloneViewModel> Images { get; set; } = new List<PicturesAloneViewModel>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Texts.Modifier = "主要信息";
+        if (string.IsNullOrWhiteSpace(Model.Name) == false)
+        {
+            Texts.Informations.Add(new KeyValueModel
+            {
+                DisplayName = "名称",
+                DisplayValue = Model.Name
+            });
+        }
+        if (string.IsNullOrWhiteSpace(Model.BriefIntroduction) == false)
+        {
+            Texts.Informations.Add(new KeyValueModel
+            {
+                DisplayName = "简介",
+                DisplayValue = Model.BriefIntroduction
+            });
+        }
+
+
+        if(string.IsNullOrWhiteSpace(Model.MainPicture)==false)
+        {
+            Images.Add(new PicturesAloneViewModel
+            {
+                Note = "主图",
+                Url = Model.MainPicture
+            });
+        }
+        if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) == false)
+        {
+            Images.Add(new PicturesAloneViewModel
+            {
+                Note = "背景图",
+                Url = Model.BackgroundPicture
+            });
+        }
+        if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+        {
+            Images.Add(new PicturesAloneViewModel
+            {
+                Note = "小背景图",
+                Url = Model.SmallBackgroundPicture
+            });
+        }
+
+    }
+}

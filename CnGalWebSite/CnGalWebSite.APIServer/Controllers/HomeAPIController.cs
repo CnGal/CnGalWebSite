@@ -10,6 +10,7 @@ using CnGalWebSite.DataModel.ViewModel.Home;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,8 +31,9 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IHomeService _homeService;
         private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
+        private readonly IHostApplicationLifetime _applicationLifetime;
 
-        public HomeAPIController(ISearchHelper searchHelper,  IAppHelper appHelper, IRepository<Article, long> articleRepository,
+        public HomeAPIController(ISearchHelper searchHelper,  IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime,
         IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository)
         {
             _searchHelper = searchHelper;
@@ -41,6 +43,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _appHelper = appHelper;
             _examineRepository = examineRepository;
             _articleRepository = articleRepository;
+            _applicationLifetime= applicationLifetime;
         }
 
         /// <summary>
@@ -131,29 +134,18 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<CarouselViewModel>>> GetHomeCarouselsViewAsync()
         {
-            return await _homeService.GetHomeCarouselsViewAsync();
-
-        }
-        /// <summary>
-        /// 获取合并后的主页汇总数据
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<HomeViewModel>> GetHomeViewAsync()
-        {
-            var model = new HomeViewModel
+            try
             {
-                NewestGame = await _homeService.GetHomeNewestGameViewAsync(),
-                RecentIssuelGame = await _homeService.GetHomeRecentIssuelGameViewAsync(),
-                RecentEditEntries = await _homeService.GetHomeRecentEditViewAsync(),
-                FriendLinks = await _homeService.GetHomeFriendLinksViewAsync(),
-                Notices = await _homeService.GetHomeNoticesViewAsync(),
-                Articles = await _homeService.GetHomeArticlesViewAsync(),
-                //Carousels = await _homeService.GetHomeCarouselsViewAsync()
-            };
-
-            return model;
+                return await _homeService.GetHomeCarouselsViewAsync();
+            }
+            catch
+            {
+                //轮播图获取不到 代表数据库有问题 重启
+                _applicationLifetime.StopApplication();
+                return NotFound();
+            }
         }
+
         /// <summary>
         /// 搜索
         /// </summary>

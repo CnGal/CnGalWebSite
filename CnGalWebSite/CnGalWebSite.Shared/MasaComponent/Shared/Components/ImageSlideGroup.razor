@@ -1,6 +1,5 @@
 ﻿@inject ImagesLargeViewService ImagesLargeViewService
 @inject IDataCacheService _dataCatcheService
-@inject IJSRuntime JS
 
 
 <div>
@@ -41,20 +40,12 @@
     [Parameter]
     public List<EditImageAloneModel> Model { get; set; }
 
-    #region 新建标签页
-
-    public async void OpenNewPage(string url)
-    {
-        await JS.InvokeAsync<string>("openNewPage", url);
-    }
-
-    #endregion
 
     public async void OnClickImage()
     {
         if (_dataCatcheService.IsApp)
         {
-            OpenNewPage(Model[Index.ToInt32()].Url);
+            await _dataCatcheService.OpenNewPage.InvokeAsync(Model[Index.ToInt32()].Url);
         }
         else
         {

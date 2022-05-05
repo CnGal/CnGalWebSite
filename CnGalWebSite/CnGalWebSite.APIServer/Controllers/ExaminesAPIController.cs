@@ -87,55 +87,31 @@ namespace CnGalWebSite.APIServer.Controllers
         [AllowAnonymous]
         [HttpGet("{id}")]
         [HttpGet]
-        public async Task<ActionResult<Models.ExaminedViewModel>> GetExamineViewAsync(int id = -1)
+        public async Task<ActionResult<ExamineViewModel>> GetExamineViewAsync(long id)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //获取审核单
-            Examine examine = null;
-            var IsContinued = false;
-
-            if (id == -1)
-            {
-                try
-                {
-                    examine = await _examineRepository.GetAll()
-                        .Include(s => s.ApplicationUser)
-                        .FirstOrDefaultAsync(x => x.IsPassed == null);
-                    if (examine == null)
-                    {
-                        return NotFound();
-                    }
-                    IsContinued = true;
-                }
-                catch
-                {
-                    return NotFound();
-                }
-            }
-            else
-            {
+            Examine examine =
                 examine = await _examineRepository.GetAll()
                         .Include(s => s.ApplicationUser)
                         .FirstOrDefaultAsync(x => x.Id == id);
-            }
+
 
             if (examine == null)
             {
                 return NotFound();
             }
             //对应赋值
-            var model = new Models.ExaminedViewModel
+            var model = new ExamineViewModel
             {
                 Id = examine.Id,
-                ApplicationUserId = examine.ApplicationUserId,
+                UserId = examine.ApplicationUserId,
                 ApplyTime = examine.ApplyTime,
                 Operation = examine.Operation,
-                ApplicationUserName = examine.ApplicationUser.UserName,
+                UserName = examine.ApplicationUser.UserName,
                 Comments = examine.Comments,
                 IsPassed = false,
-                IsContinued = IsContinued,
-                IsExamined = false,
                 PassedAdminName = examine.PassedAdminName,
                 Note = examine.Note
             };
@@ -152,13 +128,10 @@ namespace CnGalWebSite.APIServer.Controllers
                     model.PrepositionExamineId = (int)examine.PrepositionExamineId;
                 }
             }
-            //判断是否是等待审核状态
-            if (examine.IsPassed != null)
-            {
-                model.PassedTime = (DateTime)examine.PassedTime;
-                model.IsExamined = true;
-                model.IsPassed = (bool)examine.IsPassed;
-            }
+
+            model.PassedTime = examine.PassedTime;
+            model.IsPassed = examine.IsPassed;
+
             try
             {
                 if (await _examineService.GetExamineView(model, examine) == false)
@@ -941,7 +914,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
 
-            var examinedView = new Models.ExaminedViewModel();
+            var examinedView = new ExamineViewModel();
 
             foreach (var item in examines)
             {

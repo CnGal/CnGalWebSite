@@ -1,26 +1,7 @@
-﻿@foreach (var item in Model)
-{
-    if (isFirst == true)
-    {
-        isFirst = false;
-    }
-    else
-    {
-<hr />
- }
-<h5 class="fw-bold mb-2">@item.Modifier</h5>
-                <div class="row mt-2" style="padding-right: 0; padding-left: 0">
-                    @foreach (var infor in item.Informations)
-                    {
-                        {
-                            string temp = infor.DisplayName + "：" + infor.DisplayValue;
-    <div class="col-12 col-md-12 col-lg-6">
-        <h6 style="word-break: break-all;">@temp</h6>
-    </div>}
-}
-                </div>}
-@code { bool isFirst = false;
+﻿
+@code {
+    bool isFirst = false;
 
     [Parameter]
-
-    public List<InformationsModel> Model { get; set; } = new List<InformationsModel>(); }
+    public List<InformationsModel> Model { get; set; } = new List<InformationsModel>();
+}

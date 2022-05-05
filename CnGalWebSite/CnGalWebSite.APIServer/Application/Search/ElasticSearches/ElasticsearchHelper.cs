@@ -4,6 +4,7 @@ using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Home;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.EntityFrameworkCore;
 using Nest;
 using System;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using SortOrder = Nest.SortOrder;
 
 namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
 {

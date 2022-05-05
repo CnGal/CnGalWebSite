@@ -24,7 +24,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <returns></returns>
         Task<List<ExaminedNormalListModel>> GetExaminesToNormalListAsync(IQueryable<Examine> examines, bool isShowRanks);
 
-        Task<bool> GetExamineView(Models.ExaminedViewModel model, Examine examine);
+        Task<bool> GetExamineView(ExamineViewModel model, Examine examine);
         /// <summary>
         /// 处理 EstablishMain 审核成功后调用更新数据
         /// </summary>

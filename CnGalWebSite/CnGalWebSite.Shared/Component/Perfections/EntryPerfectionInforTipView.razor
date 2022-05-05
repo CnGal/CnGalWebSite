@@ -7,14 +7,14 @@
 @if (isReady)
 {
     <div class="rounded div-shadow bg-opacity p-3 @(IsNormalScreen?" h-100":"mb-3")" @onclick="OnDetails" style="cursor:pointer;">
-        <div  class="a-font-color h-100" style="display:flex;align-items: center;">
+        <div class="a-font-color h-100" style="display:flex;align-items: center;">
             <div style="display: flex;align-items: center;">
                 <div class="swal2-icon m-0 me-1 @("border-"+color)" style="height: 3em; width: 3em; display: flex;align-items: center;">
                     <div class="@("text-"+color)">@Model.Grade.ToString("0.0")</div>
                 </div>
             </div>
-            <div  class="comment-tx-div" style="height: 3.5em;">
-                <div  class="new-row-warp no-margin">
+            <div class="comment-tx-div" style="height: 3.5em;">
+                <div class="new-row-warp no-margin">
                     <div class="@("comment-tag me-2 bg-"+color)">@Model.Level.GetDisplayName()</div>
                     <div class="comment-username me-2">@("超过全站 "+Model.VictoryPercentage.ToString("0.0")+"% 的词条")</div>
                     <div class="comment-username" style="color:gray;">@(Model.LastEditTime.ToTimeFromNowString()+"编辑")</div>
@@ -24,6 +24,7 @@
         </div>
     </div>
 }
+<EntryPerfectionCheckListTip @ref="entryPerfectionCheckListTip"/>
 
 
 @code {
@@ -33,7 +34,7 @@
     [Parameter]
     public bool IsNormalScreen { get; set; }
 
-
+    EntryPerfectionCheckListTip entryPerfectionCheckListTip;
     public PerfectionInforTipViewModel Model { get; set; } = new PerfectionInforTipViewModel();
 
     bool isReady = false;
@@ -51,7 +52,7 @@
             isReady = true;
             StateHasChanged();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取词条完善度信息失败");
         }
@@ -59,17 +60,9 @@
 
     public async Task OnDetails()
     {
-        var option = new DialogOption()
+        if(entryPerfectionCheckListTip!=null)
         {
-            Title = "词条完善度明细",
-            ShowCloseButton = false
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EntryPerfectionCheckListTip>(new Dictionary<string, object>
-        {
-            [nameof(EntryPerfectionCheckListTip.PerfectionId)] = (long)Model.Id,
-            [nameof(EntryPerfectionCheckListTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-            [nameof(EntryPerfectionCheckListTip.OnEditorialGuidelines)] = EventCallback.Factory.Create(this, async () => { await option.Dialog.Close(); NavigationManager.NavigateTo(Provider, "/perfections/home", "编辑指引", "fa-map-signs"); }),
-        }).Render();
-        await DialogService.Show(option);
+            await entryPerfectionCheckListTip.Refresh(true, Model.Id);
+        }
     }
 }

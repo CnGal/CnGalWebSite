@@ -82,7 +82,7 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public bool IsReprint { get; set; }
         /// <summary>
-        /// 是否为可用物品
+        /// 是否为装饰品
         /// </summary>
         public bool IsAvailableItem { get; set; }
         #endregion

@@ -1,4 +1,4 @@
-﻿@page "/home/examined/{id}"
+﻿@page "/home/examines"
 
 <ExamineIndexCard Id="@Id" />
 
@@ -6,9 +6,9 @@
 
 
 @code{
-
+    [SupplyParameterFromQuery]
     [Parameter]
-    public string Id { get; set; }
+    public long Id { get; set; }
 
 }
 
