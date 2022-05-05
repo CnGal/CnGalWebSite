@@ -1,16 +1,10 @@
 ﻿using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.Helper.Helper;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 using File = System.IO.File;
-using CnGalWebSite.Helper.Extensions;
 
 namespace CnGalWebSite.RobotClient
 {
@@ -43,9 +37,9 @@ namespace CnGalWebSite.RobotClient
             {
                 var path = Path.Combine(_setting.RootPath, "Events.json");
 
-                using (StreamReader file = File.OpenText(path))
+                using (var file = File.OpenText(path))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     Events = (List<RobotEvent>)serializer.Deserialize(file, typeof(List<RobotEvent>));
                     file.Close();
                     file.Dispose();
@@ -62,9 +56,9 @@ namespace CnGalWebSite.RobotClient
         {
             var path = Path.Combine(_setting.RootPath, "Events.json");
 
-            using (StreamWriter file = File.CreateText(path))
+            using (var file = File.CreateText(path))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, Events);
                 file.Close();
                 file.Dispose();
@@ -76,9 +70,9 @@ namespace CnGalWebSite.RobotClient
             {
                 var path = Path.Combine(_setting.RootPath, "ExecuteInfors.json");
 
-                using (StreamReader file = File.OpenText(path))
+                using (var file = File.OpenText(path))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     ExecuteInfors = (List<EventExecuteInfor>)serializer.Deserialize(file, typeof(List<EventExecuteInfor>));
                     file.Close();
                     file.Dispose();
@@ -95,24 +89,24 @@ namespace CnGalWebSite.RobotClient
         {
             var path = Path.Combine(_setting.RootPath, "ExecuteInfors.json");
 
-            using (StreamWriter file = File.CreateText(path))
+            using (var file = File.CreateText(path))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, ExecuteInfors);
                 file.Close();
-               file.Dispose();
+                file.Dispose();
             }
         }
 
         public string GetCurrentTimeEvent()
         {
-            var events = Events.Where(s => s.Time.TimeOfDay < DateTime.Now.ToCstTime().TimeOfDay && s.Time.AddSeconds(s.DelaySecond).TimeOfDay > DateTime.Now.ToCstTime().TimeOfDay && s.IsHidden == false && s.Type== RobotEventType.FixedTime);
+            var events = Events.Where(s => s.Time.TimeOfDay < DateTime.Now.ToCstTime().TimeOfDay && s.Time.AddSeconds(s.DelaySecond).TimeOfDay > DateTime.Now.ToCstTime().TimeOfDay && s.IsHidden == false && s.Type == RobotEventType.FixedTime);
 
-            var todos=new List<RobotEvent>();
+            var todos = new List<RobotEvent>();
 
-            foreach(var item in events)
+            foreach (var item in events)
             {
-                if (ExecuteInfors.Any(s =>(s.Id==item.Id && s.LastRunTime.Date >= DateTime.Now.ToCstTime().Date) || (s.LastRunTime.Date == DateTime.Now.ToCstTime().Date && s.Note == item.Note)))
+                if (ExecuteInfors.Any(s => (s.Id == item.Id && s.LastRunTime.Date >= DateTime.Now.ToCstTime().Date) || (s.LastRunTime.Date == DateTime.Now.ToCstTime().Date && s.Note == item.Note)))
                 {
                     continue;
                 }
@@ -120,7 +114,7 @@ namespace CnGalWebSite.RobotClient
                 todos.Add(item);
             }
 
-            if(todos.Count == 0)
+            if (todos.Count == 0)
             {
                 return null;
             }
@@ -140,13 +134,13 @@ namespace CnGalWebSite.RobotClient
                 }
 
             }
-            
-            foreach(var item in events)
+
+            foreach (var item in events)
             {
                 ExecuteInfors.Add(new EventExecuteInfor
                 {
                     Id = item.Id,
-                    Note= item.Note,
+                    Note = item.Note,
                     LastRunTime = DateTime.Now.ToCstTime(),
                 });
             }

@@ -1,8 +1,6 @@
 ﻿
 using CnGalWebSite.Maui.Platforms.Android.Services;
 using CnGalWebSite.Maui.Services;
-using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Localization;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CnGalWebSite.Maui
@@ -10,7 +8,7 @@ namespace CnGalWebSite.Maui
     /// <summary>
     /// 
     /// </summary>
-   public class MyApp : CnGalWebSite.Shared.App
+    public class MyApp : CnGalWebSite.Shared.App
     {
 
         [Inject]
@@ -45,7 +43,7 @@ namespace CnGalWebSite.Maui
         {
             _overviewService.HideLoadingOverview();
 
-            ThemeService themeService = new ThemeService();
+            var themeService = new ThemeService();
             themeService.SetStatusBarColor(Color.FromArgb(theme));
 
 

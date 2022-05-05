@@ -79,7 +79,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var user_ = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
             var user = await _userRepository.GetAll().AsNoTracking().Where(s => s.Id == id)
-                .Include(s=>s.SignInDays)
+                .Include(s => s.SignInDays)
                 .Select(s => new ApplicationUser
                 {
                     SignInDays = s.SignInDays,
@@ -112,7 +112,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     await _userService.UpdateUserData(user, examine1);
                 }
-            }   
+            }
             return await _userService.GetUserInforViewModel(user);
         }
 
@@ -251,11 +251,11 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            var messages= await _messageRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == user.Id).AsNoTracking().ToListAsync();
+            var messages = await _messageRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == user.Id).AsNoTracking().ToListAsync();
 
-            foreach(var item in messages)
+            foreach (var item in messages)
             {
-                item.Image = _appHelper.GetImagePath(item.Image,"user.png");
+                item.Image = _appHelper.GetImagePath(item.Image, "user.png");
             }
 
             return messages;

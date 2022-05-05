@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CnGalWebSite.DataModel.ViewModel.Search
+﻿namespace CnGalWebSite.DataModel.ViewModel.Search
 {
     /// <summary>
     /// 这个作为数据传递给前端 前端判断到底什么有值再显示对应格式

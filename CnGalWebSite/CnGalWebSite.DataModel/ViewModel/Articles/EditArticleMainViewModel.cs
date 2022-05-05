@@ -1,7 +1,6 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Base;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Articles
 {
@@ -41,11 +40,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
 
         public override Result Validate()
         {
-            if (string.IsNullOrWhiteSpace(Name) )
+            if (string.IsNullOrWhiteSpace(Name))
             {
                 return new Result { Error = "请填写唯一名称" };
             }
-            if ( string.IsNullOrWhiteSpace(BriefIntroduction) )
+            if (string.IsNullOrWhiteSpace(BriefIntroduction))
             {
                 return new Result { Error = "请填写简介" };
             }

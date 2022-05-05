@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CnGalWebSite.DataModel.ViewModel.Home
+﻿namespace CnGalWebSite.DataModel.ViewModel.Home
 {
     public class CarouselViewModel
     {

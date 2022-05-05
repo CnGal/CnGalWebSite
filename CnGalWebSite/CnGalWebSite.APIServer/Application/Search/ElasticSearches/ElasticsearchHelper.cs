@@ -3,7 +3,6 @@ using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.EntityFrameworkCore;
 using Nest;
@@ -56,7 +55,7 @@ namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
         public async Task UpdateEntryDataToElasticsearch(DateTime LastUpdateTime, bool updateAll = false)
         {
             var entries = await _entryRepository.GetAll().AsNoTracking()
-                .Where(s => s.LastEditTime > LastUpdateTime||updateAll).ToListAsync();
+                .Where(s => s.LastEditTime > LastUpdateTime || updateAll).ToListAsync();
             if (entries.Count != 0)
             {
                 await _entryElasticsearchBaseService.InsertRangeAsync(entries);

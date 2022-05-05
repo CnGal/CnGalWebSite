@@ -29,7 +29,6 @@ using NETCore.MailKit.Infrastructure.Internal;
 using Senparc.Weixin.AspNet;
 using Senparc.Weixin.Entities;
 using Senparc.Weixin.MP;
-using Senparc.Weixin.MP.Containers;
 using Senparc.Weixin.MP.MessageHandlers.Middleware;
 using Senparc.Weixin.RegisterServices;
 using Swashbuckle.AspNetCore.Filters;
@@ -77,7 +76,7 @@ namespace CnGalWebSite.APIServer
             services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
             //自动注入服务到依赖注入容器
             services.RegisterAssemblyPublicNonGenericClasses()
-               .Where(c => c.Name.EndsWith("Service")|| c.Name.EndsWith("Provider"))
+               .Where(c => c.Name.EndsWith("Service") || c.Name.EndsWith("Provider"))
                .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
 
             //注册Swagger生成器，定义一个或多个Swagger文件
@@ -224,19 +223,19 @@ namespace CnGalWebSite.APIServer
             var registerService = app.UseSenparcWeixin(env,
                 new Senparc.CO2NET.SenparcSetting
                 {
-                    SenparcUnionAgentKey= "#{SenparcUnionAgentKey}#",
-                    Cache_Memcached_Configuration= "#{Cache_Memcached_Configuration}#",
-                    Cache_Redis_Configuration= "#{Cache_Redis_Configuration}#",
-                    DefaultCacheNamespace= "DefaultCache",
-                    IsDebug=true,
+                    SenparcUnionAgentKey = "#{SenparcUnionAgentKey}#",
+                    Cache_Memcached_Configuration = "#{Cache_Memcached_Configuration}#",
+                    Cache_Redis_Configuration = "#{Cache_Redis_Configuration}#",
+                    DefaultCacheNamespace = "DefaultCache",
+                    IsDebug = true,
                 },
                 new SenparcWeixinSetting
                 {
                     WeixinAppId = Configuration["WeixinAppId"],
                     Token = Configuration["WeiXinToken"],
                     EncodingAESKey = Configuration["WeiXinEncodingAESKey"],
-                    WeixinAppSecret= Configuration["WeiXinAppSecret"],
-                    
+                    WeixinAppSecret = Configuration["WeiXinAppSecret"],
+
                 },
                 register => { /* CO2NET 全局配置 */ },
                 (register, weixinSetting) =>

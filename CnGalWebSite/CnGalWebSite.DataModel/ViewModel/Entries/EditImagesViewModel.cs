@@ -1,5 +1,4 @@
-﻿using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Entries;
+﻿using CnGalWebSite.DataModel.ViewModel.Entries;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel

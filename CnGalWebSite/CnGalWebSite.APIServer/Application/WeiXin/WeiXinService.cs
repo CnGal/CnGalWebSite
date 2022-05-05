@@ -1,48 +1,26 @@
 ﻿using CnGalWebSite.APIServer.Application.Articles;
-using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.Models;
-using CnGalWebSite.DataModel.ViewModel;
-using CnGalWebSite.DataModel.ViewModel.Admin;
-using CnGalWebSite.DataModel.ViewModel.Home;
-using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.Helper.Extensions;
-using Gt3_server_csharp_aspnetcoremvc_bypass.Controllers.Sdk;
-using Markdig;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using NETCore.MailKit.Core;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Senparc.Weixin.MP.CommonAPIs;
 using Senparc.Weixin.MP.Entities.Menu;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IdentityModel.Tokens.Jwt;
-using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Net.Http;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.WeiXin
 {
-    public class WeiXinService:IWeiXinService
+    public class WeiXinService : IWeiXinService
     {
         private readonly IConfiguration _configuration;
         private readonly IRepository<Entry, int> _entryRepository;
@@ -60,12 +38,12 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             _articleService = articleService;
             _appHelper = appHelper;
             _steamService = steamService;
-            _searchHelper=searchHelper;
+            _searchHelper = searchHelper;
         }
 
         public void CreateMenu()
         {
-            ButtonGroup bg = new ButtonGroup();
+            var bg = new ButtonGroup();
             //只存在一级菜单
             bg.button.Add(new SingleClickButton()
             {
@@ -125,7 +103,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
         public string GetAboutUsage()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             sb.AppendLine("o((>ω< ))o");
             sb.AppendLine("这里是看板娘哦~~~欸嘿嘿~~~");
@@ -145,16 +123,16 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
         public async Task<string> GetSearchResults(string text)
         {
             var result = await _searchHelper.QueryAsync(1, 6, text, "全部", null, QueryType.Page);
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             if (result.TotalCount == 0)
             {
                 return "呜~~~ 找不到喵~";
             }
 
-            foreach(var item in result.Data)
+            foreach (var item in result.Data)
             {
-                if(item.entry!=null)
+                if (item.entry != null)
                 {
                     sb.AppendLine($"【{item.entry.Type.GetDisplayName()}】 <a href=\"https://www.cngal.org/entries/index/{item.entry.Id}\">{item.entry.DisplayName}</a>");
                 }
@@ -186,7 +164,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             return await GetEntryInfor(entryIds[index], plainText, showLink);
         }
 
-        public async Task<string> GetEntryInfor(int id,bool plainText=false, bool showLink = false)
+        public async Task<string> GetEntryInfor(int id, bool plainText = false, bool showLink = false)
         {
             var entry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Information)
@@ -198,9 +176,9 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             }
 
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-            if (plainText&&string.IsNullOrWhiteSpace(entry.MainPicture)==false)
+            if (plainText && string.IsNullOrWhiteSpace(entry.MainPicture) == false)
             {
                 sb.AppendLine($"[image={_appHelper.GetImagePath(entry.MainPicture, "app.png")}]");
             }
@@ -211,7 +189,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             sb.AppendLine($"{model.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/entries/index/{model.Id}\">{model.DisplayName}</a>");
             if (string.IsNullOrWhiteSpace(model.BriefIntroduction) == false)
             {
-                sb.AppendLine($"{model.BriefIntroduction.Abbreviate(plainText?30:23)}");
+                sb.AppendLine($"{model.BriefIntroduction.Abbreviate(plainText ? 30 : 23)}");
             }
 
 
@@ -219,8 +197,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             {
 
                 var steamIdStr = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "Steam平台Id")?.DisplayValue;
-                int steamId = 0;
-                if (steamIdStr != null && int.TryParse(steamIdStr, out steamId))
+                if (steamIdStr != null && int.TryParse(steamIdStr, out var steamId))
                 {
                     sb.AppendLine();
 
@@ -253,7 +230,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                     {
                         sb.AppendLine($"{steam.RecommendationRate}% 好评（{steam.EvaluationCount}条评测）");
                     }
-                    if(plainText)
+                    if (plainText)
                     {
                         sb.AppendLine($"https://store.steampowered.com/app/{steamId}");
                     }
@@ -297,7 +274,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
             }
 
-            if(showLink)
+            if (showLink)
             {
                 sb.AppendLine();
                 sb.Append($"https://www.cngal.org/entries/index/{entry.Id}");
@@ -307,7 +284,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
         }
 
-        public async Task<string> GetArticleInfor(int id, bool plainText = false,bool showLink=false)
+        public async Task<string> GetArticleInfor(int id, bool plainText = false, bool showLink = false)
         {
             var article = await _articleRepository.GetAll().AsNoTracking()
                 .Include(s => s.CreateUser)
@@ -317,7 +294,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 return "呜~~~ 搜索不到欸~";
             }
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             if (plainText && string.IsNullOrWhiteSpace(article.MainPicture) == false)
             {
@@ -344,7 +321,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
             if (string.IsNullOrWhiteSpace(article.BriefIntroduction) == false)
             {
-                sb.Append($"{article.BriefIntroduction.Abbreviate(plainText?40: 23)}");
+                sb.Append($"{article.BriefIntroduction.Abbreviate(plainText ? 40 : 23)}");
             }
 
 
@@ -376,7 +353,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             var games = await _entryRepository.GetAll().OrderByDescending(s => s.LastEditTime).AsNoTracking()
                 .Where(s => s.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden != true && entryIds.Contains(s.Id) == false).Take(6).ToListAsync();
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             foreach (var item in games)
             {
@@ -398,7 +375,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
               .OrderByDescending(s => s.RealNewsTime).ThenByDescending(s => s.PubishTime)
               .Where(s => s.IsHidden != true && s.Type == ArticleType.News && string.IsNullOrWhiteSpace(s.Name) == false).AsNoTracking().Take(6).ToListAsync();
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             foreach (var item in news)
             {
                 var infor = await _articleService.GetNewsModelAsync(item);
@@ -422,11 +399,11 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 var dateTime = DateTime.Now.ToCstTime();
                 //获取即将发售
                 var games = await _entryRepository.GetAll().AsNoTracking()
-                    .Include(s=>s.Information)
+                    .Include(s => s.Information)
                     .Where(s => s.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden != true && s.PubulishTime <= dateTime)
                     .OrderByDescending(s => s.PubulishTime).Take(6).ToListAsync();
 
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 foreach (var item in games)
                 {
                     sb.Append($"【{item.PubulishTime?.ToString("M月d日")}】");
@@ -437,7 +414,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
                 return sb.ToString();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -455,7 +432,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                     .Where(s => s.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden != true && s.PubulishTime > dateTime)
                     .OrderBy(s => s.PubulishTime).Take(6).ToListAsync();
 
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 foreach (var item in games)
                 {
                     sb.Append($"【{item.PubulishTime?.ToString("M月d日")}】");
@@ -467,7 +444,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
                 return sb.ToString();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }

@@ -1,6 +1,5 @@
 ﻿
 using CnGalWebSite.DataModel.Model;
-using Nest;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

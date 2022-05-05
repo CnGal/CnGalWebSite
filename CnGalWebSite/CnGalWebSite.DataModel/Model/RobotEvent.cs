@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace CnGalWebSite.DataModel.Model
 {
@@ -32,7 +30,7 @@ namespace CnGalWebSite.DataModel.Model
 
     public enum RobotEventType
     {
-        [Display(Name ="固定时间")]
+        [Display(Name = "固定时间")]
         FixedTime,
         [Display(Name = "概率触发")]
         PreTime

@@ -2,7 +2,6 @@
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -33,9 +32,9 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
         public async Task<QueryData<ListPerfectionAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPerfectionAloneModel searchModel)
         {
-            IQueryable<Perfection> items = _perfectionRepository.GetAll()
+            var items = _perfectionRepository.GetAll()
                 .Include(s => s.Entry)
-                .Where(s => s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false&&s.Entry.Type==EntryType.Game)
+                .Where(s => s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.Type == EntryType.Game)
                 .AsNoTracking();
 
             // 处理 SearchText 模糊搜索
@@ -46,7 +45,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
 
             // 排序
-             var isSorted = false;
+            var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
 
@@ -68,8 +67,8 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                     Id = item.EntryId,
                     Name = item.Entry.Name,
 
-                    Grade=item.Grade,
-                    VictoryPercentage=item.VictoryPercentage,
+                    Grade = item.Grade,
+                    VictoryPercentage = item.VictoryPercentage,
                 });
             }
 
@@ -84,8 +83,8 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
         public async Task<QueryData<ListPerfectionCheckAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListPerfectionCheckAloneModel searchModel)
         {
-            IQueryable<PerfectionCheck> items = _perfectionCheckRepository.GetAll()
-                .Include(s=>s.Perfection).ThenInclude(s => s.Entry)
+            var items = _perfectionCheckRepository.GetAll()
+                .Include(s => s.Perfection).ThenInclude(s => s.Entry)
                 .Where(s => s.Perfection.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Perfection.Entry.Name) == false && s.Perfection.Entry.Type == EntryType.Game)
                 .AsNoTracking();
 
@@ -118,7 +117,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 {
                     Id = item.Perfection.EntryId,
                     Name = item.Perfection.Entry.Name,
-                    Type=item.CheckType,
+                    Type = item.CheckType,
                     Grade = item.Grade,
                     VictoryPercentage = item.VictoryPercentage,
                 });
@@ -429,7 +428,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 //查找词条
                 var entry = await _entryRepository.GetAll().AsNoTracking().AsSplitQuery()
                     .Include(s => s.Information).ThenInclude(s => s.Additional)
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.Articles)
                     .Include(s => s.Pictures)
                     .Include(s => s.Tags)

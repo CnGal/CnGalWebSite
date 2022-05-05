@@ -2,12 +2,7 @@
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.Helper.Helper;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CnGalWebSite.RobotClient
 {
@@ -39,9 +34,9 @@ namespace CnGalWebSite.RobotClient
             {
                 var path = Path.Combine(_setting.RootPath, "Faces.json");
 
-                using (StreamReader file = File.OpenText(path))
+                using (var file = File.OpenText(path))
                 {
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     Faces = (List<RobotFace>)serializer.Deserialize(file, typeof(List<RobotFace>));
                     file.Close();
                     file.Dispose();
@@ -58,9 +53,9 @@ namespace CnGalWebSite.RobotClient
         {
             var path = Path.Combine(_setting.RootPath, "Faces.json");
 
-            using (StreamWriter file = File.CreateText(path))
+            using (var file = File.CreateText(path))
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Serialize(file, Faces);
                 file.Close();
                 file.Dispose();

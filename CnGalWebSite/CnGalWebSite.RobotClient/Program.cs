@@ -3,8 +3,8 @@ using CnGalWebSite.RobotClient;
 using MeowMiraiLib.Msg;
 using MeowMiraiLib.Msg.Type;
 
-HttpClient httpClient = new HttpClient();
-CacheX cacheX = new CacheX();
+var httpClient = new HttpClient();
+var cacheX = new CacheX();
 
 while (true)
 {
@@ -16,34 +16,34 @@ while (true)
 
 
         Console.WriteLine("->读取配置文件");
-        SettingX settingX = new SettingX();
+        var settingX = new SettingX();
         settingX.Init();
 
         Console.WriteLine("->读取关注的QQ群");
-        GroupX groupX = new GroupX(settingX.BasicSetting, httpClient);
+        var groupX = new GroupX(settingX.BasicSetting, httpClient);
         groupX.Init();
 
         Console.WriteLine("->读取自动回复");
-        ReplyX replyX = new ReplyX(settingX.BasicSetting, httpClient, settingX.MessageArgs);
+        var replyX = new ReplyX(settingX.BasicSetting, httpClient, settingX.MessageArgs);
         replyX.Init();
 
 
         Console.WriteLine("->读取表情");
-        FaceX faceX = new FaceX(settingX.BasicSetting, httpClient, settingX.MessageArgs);
+        var faceX = new FaceX(settingX.BasicSetting, httpClient, settingX.MessageArgs);
         replyX.Init();
 
         Console.WriteLine("->读取事件");
-        EventX eventX = new EventX(settingX.BasicSetting, httpClient, settingX.MessageArgs);
+        var eventX = new EventX(settingX.BasicSetting, httpClient, settingX.MessageArgs);
         eventX.Init();
 
         Console.WriteLine("->读取敏感词列表");
-        SensitiveWordX sensitiveWordX = new SensitiveWordX(settingX.BasicSetting);
+        var sensitiveWordX = new SensitiveWordX(settingX.BasicSetting);
         await sensitiveWordX.InitAsync();
 
         Console.WriteLine("->初始化消息处理模块");
-        MessageX messageX = new MessageX(settingX.BasicSetting, httpClient, replyX.Replies, cacheX.ReplyCache, settingX.MessageArgs, faceX.Faces, sensitiveWordX);
+        var messageX = new MessageX(settingX.BasicSetting, httpClient, replyX.Replies, cacheX.ReplyCache, settingX.MessageArgs, faceX.Faces, sensitiveWordX);
 
-        ClientX clientX = new ClientX(settingX.BasicSetting, messageX, groupX);
+        var clientX = new ClientX(settingX.BasicSetting, messageX, groupX);
 
         try
         {

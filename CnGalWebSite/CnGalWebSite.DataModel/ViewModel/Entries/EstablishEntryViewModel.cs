@@ -1,11 +1,8 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Entries;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel
 {
-    public class EstablishEntryViewModel: BaseEntryEditModel
+    public class EstablishEntryViewModel : BaseEntryEditModel
     {
         /// <summary>
         /// 主要信息
@@ -35,7 +32,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         public override Result Validate()
         {
             var result = Main.Validate();
-            if(!result.Successful)
+            if (!result.Successful)
             {
                 return result;
             }

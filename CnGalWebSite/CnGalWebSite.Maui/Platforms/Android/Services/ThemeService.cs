@@ -1,12 +1,4 @@
-﻿using Android.OS;
-using Microsoft.Maui.Controls.Compatibility.Platform.Android;
-using Plugin.CurrentActivity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Platform = Microsoft.Maui.ApplicationModel.Platform;
+﻿using Platform = Microsoft.Maui.ApplicationModel.Platform;
 
 namespace CnGalWebSite.Maui.Platforms.Android.Services
 {

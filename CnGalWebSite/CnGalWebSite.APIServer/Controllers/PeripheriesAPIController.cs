@@ -329,8 +329,8 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 _peripheryService.SetDataFromEditPeripheryMainViewModel(newPeriphery, model.Main);
                 _peripheryService.SetDataFromEditPeripheryImagesViewModel(newPeriphery, model.Images);
-                _peripheryService.SetDataFromEditPeripheryRelatedEntriesViewModel(newPeriphery, model.Entries,entries);
-                _peripheryService.SetDataFromEditPeripheryRelatedPerpheriesViewModel(newPeriphery, model.Peripheries,peripheries);
+                _peripheryService.SetDataFromEditPeripheryRelatedEntriesViewModel(newPeriphery, model.Entries, entries);
+                _peripheryService.SetDataFromEditPeripheryRelatedPerpheriesViewModel(newPeriphery, model.Peripheries, peripheries);
 
                 var periphery = new Periphery();
                 //获取审核记录
@@ -367,7 +367,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //判断是否为锁定状态
-            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id == id&&  s.IsPassed == null && (s.Operation == Operation.EditPeripheryMain)))
+            if (await _examineRepository.GetAll().AsNoTracking().AnyAsync(s => s.ApplicationUserId != user.Id && s.Id == id && s.IsPassed == null && (s.Operation == Operation.EditPeripheryMain)))
             {
                 return NotFound();
             }
@@ -892,7 +892,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            var entry = await _entryRepository.GetAll().Include(s => s.RelatedPeripheries).FirstOrDefaultAsync(s => s.Id == id );
+            var entry = await _entryRepository.GetAll().Include(s => s.RelatedPeripheries).FirstOrDefaultAsync(s => s.Id == id);
 
             if (entry == null)
             {

@@ -1,10 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CnGalWebSite.Helper.Extensions
 {
@@ -12,10 +7,10 @@ namespace CnGalWebSite.Helper.Extensions
     {
         public static T ToOriginalType<T>(this SearchType model) where T : Enum
         {
-            
+
             return model switch
             {
-                SearchType.Game => (T) Enum.ToObject(typeof(T),0),
+                SearchType.Game => (T)Enum.ToObject(typeof(T), 0),
                 SearchType.Role => (T)Enum.ToObject(typeof(T), 1),
                 SearchType.ProductionGroup => (T)Enum.ToObject(typeof(T), 2),
                 SearchType.Staff => (T)Enum.ToObject(typeof(T), 3),
@@ -38,12 +33,12 @@ namespace CnGalWebSite.Helper.Extensions
             };
         }
 
-        public static List<int> ToTypeList(this SearchType model) 
+        public static List<int> ToTypeList(this SearchType model)
         {
 
             return model switch
             {
-                SearchType.Entry => Enumerable.Range(1,4).ToList(),
+                SearchType.Entry => Enumerable.Range(1, 4).ToList(),
                 SearchType.Article => Enumerable.Range(6, 9).ToList(),
                 SearchType.Periphery => Enumerable.Range(16, 4).ToList(),
                 SearchType.Tag => Enumerable.Range(20, 1).ToList(),

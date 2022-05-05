@@ -3,17 +3,17 @@ using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.HistoryData;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Linq;
-using System;
-using System.Linq.Dynamic.Core;
-using Microsoft.EntityFrameworkCore;
-using CnGalWebSite.DataModel.Models;
 
 namespace CnGalWebSite.APIServer.Application.HistoryData
 {
@@ -67,7 +67,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
         {
             var files = await _userFileRepository.GetAll()
                 .Where(s => string.IsNullOrWhiteSpace(s.FileName) == false &&
-                ( s.FileName.Contains(oldImageHost)|| s.FileName.Contains(oldImageHost2)))
+                (s.FileName.Contains(oldImageHost) || s.FileName.Contains(oldImageHost2)))
                 .ToListAsync();
 
             foreach (var file in files)
@@ -83,7 +83,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
 
         public async Task ReplaceEntry()
         {
-            var entries = await _entryRepository.GetAll().Include(s=>s.Pictures)
+            var entries = await _entryRepository.GetAll().Include(s => s.Pictures)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false &&
                 (s.Pictures.Any() || s.MainPicture.Contains(oldImageHost) || s.Thumbnail.Contains(oldImageHost) || s.BackgroundPicture.Contains(oldImageHost) || s.SmallBackgroundPicture.Contains(oldImageHost) || s.MainPage.Contains(oldImageHost)))
                 .ToListAsync();
@@ -111,7 +111,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
         {
             var entries = await _articleRepository.GetAll()
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false &&
-                (s.MainPicture.Contains(oldImageHost)  || s.BackgroundPicture.Contains(oldImageHost) || s.SmallBackgroundPicture.Contains(oldImageHost) || s.MainPage.Contains(oldImageHost)))
+                (s.MainPicture.Contains(oldImageHost) || s.BackgroundPicture.Contains(oldImageHost) || s.SmallBackgroundPicture.Contains(oldImageHost) || s.MainPage.Contains(oldImageHost)))
                 .ToListAsync();
 
             foreach (var entry in entries)
@@ -157,7 +157,7 @@ namespace CnGalWebSite.APIServer.Application.HistoryData
         public async Task ReplaceUser()
         {
             var entries = await _userRepository.GetAll()
-                 .Where(s=> s.PhotoPath.Contains(oldImageHost) || s.BackgroundImage.Contains(oldImageHost) || s.SBgImage.Contains(oldImageHost) || s.MBgImage.Contains(oldImageHost) || s.MainPageContext.Contains(oldImageHost))
+                 .Where(s => s.PhotoPath.Contains(oldImageHost) || s.BackgroundImage.Contains(oldImageHost) || s.SBgImage.Contains(oldImageHost) || s.MBgImage.Contains(oldImageHost) || s.MainPageContext.Contains(oldImageHost))
                 .ToListAsync();
 
             foreach (var entry in entries)

@@ -1,17 +1,7 @@
 ﻿using BootstrapBlazor.Components;
-using CnGalWebSite.APIServer.Application.BackUpArchives;
-using CnGalWebSite.APIServer.Application.Lotteries;
-using CnGalWebSite.APIServer.Application.News;
-using CnGalWebSite.APIServer.Application.Perfections;
-using CnGalWebSite.APIServer.Application.Search;
-using CnGalWebSite.APIServer.Application.SteamInfors;
-using CnGalWebSite.APIServer.Application.Tables;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.APIServer.ExamineX;
-using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Robots;
-using CnGalWebSite.DataModel.ViewModel.TimedTasks;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Concurrent;
@@ -113,7 +103,7 @@ namespace CnGalWebSite.APIServer.Application.Robots
         {
             IEnumerable<RobotGroup> items = _robotGroupRepository.GetAll().AsNoTracking();
             // 处理高级搜索
-            if (searchModel.GroupId>0)
+            if (searchModel.GroupId > 0)
             {
                 items = items.Where(item => item.GroupId.ToString()?.Contains(searchModel.GroupId.ToString(), StringComparison.OrdinalIgnoreCase) ?? false);
             }

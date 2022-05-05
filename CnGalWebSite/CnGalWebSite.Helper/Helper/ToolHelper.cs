@@ -4,8 +4,6 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.Extensions;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -25,8 +23,8 @@ namespace CnGalWebSite.DataModel.Helper
 
 
         //public const string WebApiPath = "http://localhost:45160/";
-        public const string WebApiPath = "http://172.17.0.1:2001/";
-        //public const string WebApiPath = "https://www.cngal.org/";
+        //public const string WebApiPath = "http://172.17.0.1:2001/";
+        public const string WebApiPath = "https://www.cngal.org/";
 
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";
 
@@ -42,7 +40,7 @@ namespace CnGalWebSite.DataModel.Helper
 
         //临时储存的信息
 
-     
+
 
         public static List<string> GetImageLinks(string context)
         {

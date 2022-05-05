@@ -33,7 +33,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IAppHelper _appHelper;
         private readonly IHostApplicationLifetime _applicationLifetime;
 
-        public HomeAPIController(ISearchHelper searchHelper,  IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime,
+        public HomeAPIController(ISearchHelper searchHelper, IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime,
         IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository)
         {
             _searchHelper = searchHelper;
@@ -43,7 +43,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _appHelper = appHelper;
             _examineRepository = examineRepository;
             _articleRepository = articleRepository;
-            _applicationLifetime= applicationLifetime;
+            _applicationLifetime = applicationLifetime;
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //更新日志
             var articles = await _articleRepository.GetAll().AsNoTracking()
                 .Where(s => s.Type == ArticleType.Notice && s.Name.Contains("更新") && s.Id != 766)
-                .Select(s => new DocumentViewModel { Id = s.Id, Title = s.DisplayName.Replace("网站","") })
+                .Select(s => new DocumentViewModel { Id = s.Id, Title = s.DisplayName.Replace("网站", "") })
                 .ToListAsync();
             var tempDocument = new DocumentViewModel
             {
@@ -246,7 +246,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             articles = await _articleRepository.GetAll().AsNoTracking()
              .Where(s => s.Type == ArticleType.News && s.Name.Contains("CnGal每周速报"))
-             .Select(s => new DocumentViewModel { Id = s.Id, Title = s.Name.Replace("CnGal每周速报（","").Replace("）","") })
+             .Select(s => new DocumentViewModel { Id = s.Id, Title = s.Name.Replace("CnGal每周速报（", "").Replace("）", "") })
              .ToListAsync();
 
             model.Add(new DocumentViewModel

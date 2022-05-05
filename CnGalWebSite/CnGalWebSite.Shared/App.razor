@@ -56,8 +56,7 @@
         else
         {
 
-            @if (_dataCacheService.ThemeSetting.IsMasa)
-            {
+           
                 <CascadingAuthenticationState>
                     <Router AppAssembly="@typeof(PCLayout).Assembly" PreferExactMatches="@true">
                         <Found Context="routeData">
@@ -79,31 +78,7 @@
                     </Router>
 
                 </CascadingAuthenticationState>
-            }
-            else
-            {
-                <CascadingAuthenticationState>
-                    <Router AppAssembly="@typeof(MainLayout).Assembly" PreferExactMatches="@true">
-                        <Found Context="routeData">
-                            <AuthorizeRouteView RouteData="@routeData"
-                                                DefaultLayout="@typeof(MainLayout)">
-                                <NotAuthorized>
-                                    <NotAuthorizedTipView IsNeedLayput="true"></NotAuthorizedTipView>
-                                </NotAuthorized>
-                                <Authorizing>
-                                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-                                </Authorizing>
-                            </AuthorizeRouteView>
-                        </Found>
-                        <NotFound>
-                            <LayoutView Layout="@typeof(MainLayout)">
-                                <NotFoundError></NotFoundError>
-                            </LayoutView>
-                        </NotFound>
-                    </Router>
-
-                </CascadingAuthenticationState>
-            }
+          
         }
     </CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
 </BootstrapBlazorRoot>

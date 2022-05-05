@@ -1,24 +1,15 @@
-﻿using System;
-using System.IO;
-using Senparc.Weixin.MP.MessageHandlers;
-using Senparc.Weixin.MP.Entities;
-using Senparc.NeuChar.Context;
-using Senparc.NeuChar.Entities;
-using Senparc.Weixin.MP.MessageContexts;
-using Senparc.CO2NET.Utilities;
-using Senparc.NeuChar.Entities.Request;
-using Senparc.NeuChar.Helpers;
-using Senparc.Weixin.MP.AdvancedAPIs;
-using Senparc.Weixin.MP.Entities.Request;
-using Senparc.Weixin.MP;
-using Senparc.Weixin;
-using System.Linq;
-using System.Threading.Tasks;
-using Senparc.CO2NET.Helpers;
-using CnGalWebSite.APIServer.Application.WeiXin;
-using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.APIServer.Application.WeiXin;
 using Microsoft.Extensions.DependencyInjection;
+using Senparc.NeuChar.Entities;
+using Senparc.NeuChar.Entities.Request;
+using Senparc.Weixin;
+using Senparc.Weixin.MP.Entities;
+using Senparc.Weixin.MP.Entities.Request;
+using Senparc.Weixin.MP.MessageContexts;
+using Senparc.Weixin.MP.MessageHandlers;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.MessageHandlers
 {
@@ -29,8 +20,8 @@ namespace CnGalWebSite.APIServer.MessageHandlers
  * DefaultResponseMessage必须在子类中重写，用于返回没有处理过的消息类型（也可以用于默认消息，如帮助信息等）；
  * 其中所有原OnXX的抽象方法已经都改为虚方法，可以不必每个都重写。若不重写，默认返回DefaultResponseMessage方法中的结果。
  */
-        private string appId = Config.SenparcWeixinSetting.MpSetting.WeixinAppId;
-        private string appSecret = Config.SenparcWeixinSetting.MpSetting.WeixinAppSecret;
+        private readonly string appId = Config.SenparcWeixinSetting.MpSetting.WeixinAppId;
+        private readonly string appSecret = Config.SenparcWeixinSetting.MpSetting.WeixinAppSecret;
 
         /// <summary>
         /// 为中间件提供生成当前类的委托
@@ -47,13 +38,13 @@ namespace CnGalWebSite.APIServer.MessageHandlers
         /// <param name="onlyAllowEncryptMessage"></param>
         /// <param name="serviceProvider"></param>
         /// <param name="weiXinService"></param>
-        public CustomMessageHandler(Stream inputStream, PostModel postModel, int maxRecordCount = 0, bool onlyAllowEncryptMessage = false, IServiceProvider serviceProvider = null )
+        public CustomMessageHandler(Stream inputStream, PostModel postModel, int maxRecordCount = 0, bool onlyAllowEncryptMessage = false, IServiceProvider serviceProvider = null)
             : base(inputStream, postModel, maxRecordCount, onlyAllowEncryptMessage, serviceProvider: serviceProvider)
         {
             //这里设置仅用于测试，实际开发可以在外部更全局的地方设置，
             //比如MessageHandler<MessageContext>.GlobalGlobalMessageContext.ExpireMinutes = 3。
             GlobalMessageContext.ExpireMinutes = 3;
-            
+
             OnlyAllowEncryptMessage = true;//是否只允许接收加密消息，默认为 false
 
         }
@@ -76,9 +67,8 @@ namespace CnGalWebSite.APIServer.MessageHandlers
                 //正则表达式
                 .Regex(@"^词条", () =>
                 {
-                    var temp= requestMessage.Content.Replace("词条","").Replace("词条 ", "");
-                    int id = 0;
-                    if (int.TryParse(temp, out id)&&id>0)
+                    var temp = requestMessage.Content.Replace("词条", "").Replace("词条 ", "");
+                    if (int.TryParse(temp, out var id) && id > 0)
                     {
                         defaultResponseMessage.Content = _weiXinService.GetEntryInfor(id).GetAwaiter().GetResult();
                     }
@@ -92,7 +82,7 @@ namespace CnGalWebSite.APIServer.MessageHandlers
                 .Regex(@"^搜索", () =>
                 {
                     var temp = requestMessage.Content.Replace("搜索", "").Replace("搜索 ", "");
-                    if (string.IsNullOrWhiteSpace(temp)==false)
+                    if (string.IsNullOrWhiteSpace(temp) == false)
                     {
                         defaultResponseMessage.Content = _weiXinService.GetSearchResults(temp).GetAwaiter().GetResult();
                     }
@@ -103,36 +93,36 @@ namespace CnGalWebSite.APIServer.MessageHandlers
 
                     return defaultResponseMessage;
                 })
-                .Keywords(new string[] { "随机推荐","随机","推荐","sj","SJ","tj","TJ" }, () =>
-                {
-                    defaultResponseMessage.Content =  _weiXinService.GetRandom().GetAwaiter().GetResult();
+                .Keywords(new string[] { "随机推荐", "随机", "推荐", "sj", "SJ", "tj", "TJ" }, () =>
+                      {
+                          defaultResponseMessage.Content = _weiXinService.GetRandom().GetAwaiter().GetResult();
 
-                    return defaultResponseMessage;
-                })
-                .Keywords(new string[] { "最新动态","动态","dt","DT" }, () =>
-                {
-                    defaultResponseMessage.Content = _weiXinService.GetNewestNews().GetAwaiter().GetResult();
+                          return defaultResponseMessage;
+                      })
+                .Keywords(new string[] { "最新动态", "动态", "dt", "DT" }, () =>
+                   {
+                       defaultResponseMessage.Content = _weiXinService.GetNewestNews().GetAwaiter().GetResult();
 
-                    return defaultResponseMessage;
-                })
-                .Keywords(new string[] { "近期新作","新作","xz","XZ" }, () =>
-                {
-                    defaultResponseMessage.Content = _weiXinService.GetNewestPublishGames().GetAwaiter().GetResult();
+                       return defaultResponseMessage;
+                   })
+                .Keywords(new string[] { "近期新作", "新作", "xz", "XZ" }, () =>
+                   {
+                       defaultResponseMessage.Content = _weiXinService.GetNewestPublishGames().GetAwaiter().GetResult();
 
-                    return defaultResponseMessage;
-                })
-                .Keywords(new string[] { "即将发售","发售","fs","FS" }, () =>
-                {
-                    defaultResponseMessage.Content = _weiXinService.GetNewestUnPublishGames().GetAwaiter().GetResult();
+                       return defaultResponseMessage;
+                   })
+                .Keywords(new string[] { "即将发售", "发售", "fs", "FS" }, () =>
+                   {
+                       defaultResponseMessage.Content = _weiXinService.GetNewestUnPublishGames().GetAwaiter().GetResult();
 
-                    return defaultResponseMessage;
-                })
-                .Keywords(new string[] { "最新编辑","编辑","bj","BJ" }, () =>
-                {
-                    defaultResponseMessage.Content = _weiXinService.GetNewestEditGames().GetAwaiter().GetResult();
+                       return defaultResponseMessage;
+                   })
+                .Keywords(new string[] { "最新编辑", "编辑", "bj", "BJ" }, () =>
+                   {
+                       defaultResponseMessage.Content = _weiXinService.GetNewestEditGames().GetAwaiter().GetResult();
 
-                    return defaultResponseMessage;
-                })
+                       return defaultResponseMessage;
+                   })
                 .Keywords(new string[] { "关于我们", "关于" }, () =>
                 {
                     var articleResponseMessage = base.CreateResponseMessage<ResponseMessageNews>();
@@ -149,7 +139,7 @@ namespace CnGalWebSite.APIServer.MessageHandlers
 
                     return articleResponseMessage;
                 })
-                .Keywords(new string[] { "戳戳看板娘" , "戳戳","看板娘" }, () =>
+                .Keywords(new string[] { "戳戳看板娘", "戳戳", "看板娘" }, () =>
                 {
                     defaultResponseMessage.Content = _weiXinService.GetAboutUsage();
 
@@ -165,7 +155,7 @@ namespace CnGalWebSite.APIServer.MessageHandlers
                     return defaultResponseMessage;
                 });
 
-            return requestHandler.GetResponseMessage() as IResponseMessageBase;
+            return requestHandler.GetResponseMessage();
         }
 
         public override async Task<IResponseMessageBase> DefaultResponseMessageAsync(IRequestMessageBase requestMessage)
@@ -184,7 +174,7 @@ namespace CnGalWebSite.APIServer.MessageHandlers
             * return responseMessage;
             */
 
-            var responseMessage = this.CreateResponseMessage<ResponseMessageText>();
+            var responseMessage = CreateResponseMessage<ResponseMessageText>();
             responseMessage.Content = $"这条消息来自DefaultResponseMessage。\r\n您收到这条消息，表明该公众号没有对【{requestMessage.MsgType}】类型做处理。";
             return responseMessage;
         }
@@ -198,7 +188,7 @@ namespace CnGalWebSite.APIServer.MessageHandlers
              * 如果不重写此方法，遇到未知的请求类型将会抛出异常（v14.8.3 之前的版本就是这么做的）
              */
             var msgType = Senparc.NeuChar.Helpers.MsgTypeHelper.GetRequestMsgTypeString(requestMessage.RequestDocument);
-            var responseMessage = this.CreateResponseMessage<ResponseMessageText>();
+            var responseMessage = CreateResponseMessage<ResponseMessageText>();
             responseMessage.Content = "未知消息类型：" + msgType;
 
             WeixinTrace.SendCustomLog("未知请求消息类型", requestMessage.RequestDocument.ToString());//记录到日志中

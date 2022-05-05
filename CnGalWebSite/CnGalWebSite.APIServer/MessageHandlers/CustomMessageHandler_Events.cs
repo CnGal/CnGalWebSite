@@ -1,16 +1,7 @@
 ﻿using CnGalWebSite.APIServer.Application.WeiXin;
-using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.Model;
 using Microsoft.Extensions.DependencyInjection;
-using Senparc.CO2NET.Extensions;
-using Senparc.CO2NET.Utilities;
-using Senparc.NeuChar.Agents;
 using Senparc.NeuChar.Entities;
-using Senparc.Weixin.MP;
-using Senparc.Weixin.MP.AdvancedAPIs;
 using Senparc.Weixin.MP.Entities;
-using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.MessageHandlers
@@ -56,13 +47,13 @@ namespace CnGalWebSite.APIServer.MessageHandlers
             {
                 reponseMessage.Content = await _weiXinService.GetRandom();
             }
-            else if(requestMessage.EventKey == "Click_Newest_News")
+            else if (requestMessage.EventKey == "Click_Newest_News")
             {
                 reponseMessage.Content = await _weiXinService.GetNewestNews();
             }
             else if (requestMessage.EventKey == "Click_Newest_PubishGame")
             {
-                reponseMessage.Content =await  _weiXinService.GetNewestPublishGames();
+                reponseMessage.Content = await _weiXinService.GetNewestPublishGames();
             }
             else if (requestMessage.EventKey == "Click_Newest_UnPublishGame")
             {

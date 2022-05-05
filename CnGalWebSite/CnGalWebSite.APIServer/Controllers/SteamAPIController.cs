@@ -183,7 +183,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<List<EntryInforTipViewModel>>> GetFreeGamesAsync()
         {
             var tag = await _tagRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Name == "免费");
-            if(tag == null)
+            if (tag == null)
             {
                 return NotFound("未找到免费的标签");
             }

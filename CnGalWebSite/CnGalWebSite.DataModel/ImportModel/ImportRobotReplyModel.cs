@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CnGalWebSite.DataModel.ImportModel
+﻿namespace CnGalWebSite.DataModel.ImportModel
 {
     public class ImportRobotReplyModel
     {

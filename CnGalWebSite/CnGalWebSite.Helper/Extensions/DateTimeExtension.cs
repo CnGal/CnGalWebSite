@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using CnGalWebSite.DataModel.Helper;
-
-namespace CnGalWebSite.Helper.Extensions
+﻿namespace CnGalWebSite.Helper.Extensions
 {
-   static public  class DateTimeExtension
+    public static class DateTimeExtension
     {
         /// <summary>
         /// 获得零时

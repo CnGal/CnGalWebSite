@@ -1,31 +1,17 @@
 ﻿using CnGalWebSite.APIServer.Application.Articles;
-using CnGalWebSite.APIServer.Application.Comments;
-using CnGalWebSite.APIServer.Application.Entries;
-using CnGalWebSite.APIServer.Application.ErrorCounts;
-using CnGalWebSite.APIServer.Application.Favorites;
-using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Helper;
-using CnGalWebSite.APIServer.Application.Messages;
 using CnGalWebSite.APIServer.Application.News;
-using CnGalWebSite.APIServer.Application.Perfections;
-using CnGalWebSite.APIServer.Application.Peripheries;
-using CnGalWebSite.APIServer.Application.Ranks;
-using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
-using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -53,8 +39,8 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<WeiboUserInfor, long> _weiboUserInforRepository;
 
 
-        public NewsAPIController( IRepository<WeiboUserInfor, long> weiboUserInforRepository, UserManager<ApplicationUser> userManager,IArticleService articleService, IUserService userService,INewsService newsService,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper,  IRepository<GameNews, long> gameNewsRepository,
+        public NewsAPIController(IRepository<WeiboUserInfor, long> weiboUserInforRepository, UserManager<ApplicationUser> userManager, IArticleService articleService, IUserService userService, INewsService newsService,
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository,
            IRepository<WeeklyNews, long> weeklyNewsRepository)
         {
             _userManager = userManager;
@@ -626,10 +612,10 @@ namespace CnGalWebSite.APIServer.Controllers
             var weeklyNews = await _weeklyNewsRepository.GetAll().Include(s => s.Article).Where(s => s.State == GameNewsState.Publish).ToListAsync();
 
             var model = new List<ArticleInforTipViewModel>();
-            foreach (var item in weeklyNews.OrderByDescending(s=>s.PublishTime).Take(8))
+            foreach (var item in weeklyNews.OrderByDescending(s => s.PublishTime).Take(8))
             {
                 var temp = _appHelper.GetArticleInforTipViewModel(item.Article);
-                temp.DisplayName= temp.DisplayName.Replace("CnGal每周速报（", "").Replace("）", "");
+                temp.DisplayName = temp.DisplayName.Replace("CnGal每周速报（", "").Replace("）", "");
                 model.Add(temp);
             }
 

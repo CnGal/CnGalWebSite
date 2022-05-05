@@ -1,12 +1,13 @@
 ﻿@inject IJSRuntime JS
+@inject  NavigationManager NavigationManager
 
+<div class="rounded shadow-sm bg-opacity rounded p-3 h-100">
 
-<div class="rounded shadow-sm bg-opacity rounded p-3 h-100 pb-0">
-    <div class="pb-3">
-        <div>
-            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-file-text-o"></i>&nbsp;&nbsp;概览</h2>
-        </div>
-        <div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-file-text-o" Title="概览" Class="mb-4" Outline OutlineHead>
+        <ButtonContent>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab XSmall Icon="mdi-share" Tooltip="查看详细信息" OnClick="@(()=>NavigationManager.NavigateTo("/home/examines?Id="+Model.Id))" StopPropagation/>
+        </ButtonContent>
+        <ChildContent>
             <style>
                 pre {
                     overflow: initial !important;
@@ -15,29 +16,25 @@
             <div class="markdown-body m-0 p-0" style=" white-space: break-spaces; max-height: 420px; overflow: auto;">
                 @((MarkupString)Model.EditOverview)
             </div>
-        </div>
-    </div>
+        </ChildContent>
+       
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     @if (string.IsNullOrWhiteSpace(Model.Comments) == false)
     {
-        <div class="pb-3">
-            <div>
-                <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-tags"></i>&nbsp;&nbsp;批注</h2>
-            </div>
-            <div>
-                @Model.Comments
-            </div>
+        <div>
+            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-fw  fa-tags"></i>&nbsp;&nbsp;批注</h2>
         </div>
-
+        <div>
+            @Model.Comments
+        </div>
     }
     @if (string.IsNullOrWhiteSpace(Model.Note) == false)
     {
-        <div class="pb-3">
-            <div>
-                <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-sticky-note-o"></i>&nbsp;&nbsp;备注</h2>
-            </div>
-            <div>
-                @Model.Note
-            </div>
+        <div>
+            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa  fa-fw fa-sticky-note-o"></i>&nbsp;&nbsp;备注</h2>
+        </div>
+        <div>
+            @Model.Note
         </div>
     }
 

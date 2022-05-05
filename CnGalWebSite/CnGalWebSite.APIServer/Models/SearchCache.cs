@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using CnGalWebSite.DataModel.Application.Search.Dtos;
+﻿using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.Helper.Extensions;
+using System.ComponentModel.DataAnnotations;
 
 namespace CnGalWebSite.APIServer.Model
 {
@@ -42,12 +39,12 @@ namespace CnGalWebSite.APIServer.Model
         public void Copy(Entry model)
         {
             Id = SearchCacheId.ToString();
-            AnotherName = model.AnotherName??"";
+            AnotherName = model.AnotherName ?? "";
             DisplayName = model.DisplayName ?? "";
             LastEditTime = model.LastEditTime.ToBinary();
             Name = model.Name ?? "";
             Type = 0;
-            OriginalType =(int) model.Type.ToSearchType();
+            OriginalType = (int)model.Type.ToSearchType();
             OriginalId = model.Id;
             PubulishTime = model.PubulishTime?.ToBinary() ?? 0;
             ReaderCount = model.ReaderCount;
@@ -74,7 +71,7 @@ namespace CnGalWebSite.APIServer.Model
 
         public void Copy(Periphery model)
         {
-            Id =SearchCacheId.ToString();
+            Id = SearchCacheId.ToString();
             AnotherName = "";
             DisplayName = model.DisplayName ?? "";
             LastEditTime = model.LastEditTime.ToBinary();
@@ -90,8 +87,8 @@ namespace CnGalWebSite.APIServer.Model
         public void Copy(Tag model)
         {
             Id = SearchCacheId.ToString();
-            AnotherName =  "";
-            DisplayName =  "";
+            AnotherName = "";
+            DisplayName = "";
             LastEditTime = model.LastEditTime.ToBinary();
             Name = model.Name ?? "";
             Type = 3;
@@ -99,7 +96,7 @@ namespace CnGalWebSite.APIServer.Model
             OriginalType = (int)SearchType.Tag;
             ReaderCount = model.ReaderCount;
             BriefIntroduction = model.BriefIntroduction ?? "";
-            MainPage ="";
+            MainPage = "";
         }
 
 

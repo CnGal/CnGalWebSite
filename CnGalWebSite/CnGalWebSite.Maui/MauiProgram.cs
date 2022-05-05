@@ -1,13 +1,6 @@
-﻿using Blazored.LocalStorage;
-using CnGalWebSite.DataModel.Application.Examines;
-using CnGalWebSite.DataModel.Application.Helper;
-using CnGalWebSite.DataModel.Application.Roles;
-using CnGalWebSite.DataModel.ViewModel.Files.Images;
-using CnGalWebSite.Maui.Services;
+﻿using CnGalWebSite.Maui.Services;
 using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.WebView.Maui;
 
 namespace CnGalWebSite.Maui
 {

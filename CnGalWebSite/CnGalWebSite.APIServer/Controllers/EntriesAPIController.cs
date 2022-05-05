@@ -9,23 +9,19 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
-using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
-using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Nest;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
@@ -145,7 +141,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //通过Id获取词条 
-            Entry entry= await _entryRepository.GetAll().Include(s => s.Disambig)
+            var entry = await _entryRepository.GetAll().Include(s => s.Disambig)
                     .Include(s => s.Outlinks)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
@@ -153,7 +149,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     .Include(s => s.Articles).ThenInclude(s => s.Entries)
                     .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
                     .AsSplitQuery().FirstOrDefaultAsync(x => x.Id == id);
-          
+
 
             if (entry == null)
             {
@@ -583,7 +579,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return NotFound();
             }
-         
+
             //获取用户的审核信息
             var examine = await _examineService.GetUserEntryActiveExamineAsync(entry.Id, user.Id, Operation.EstablishImages);
             if (examine != null)
@@ -687,7 +683,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return NotFound();
             }
-         
+
             //获取用户的审核信息
             var examine = await _examineService.GetUserEntryActiveExamineAsync(entry.Id, user.Id, Operation.EstablishRelevances);
             if (examine != null)
@@ -770,7 +766,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
             var articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
 
-            _entryService.SetDataFromEditRelevancesViewModel(newEntry, model,entries,articles);
+            _entryService.SetDataFromEditRelevancesViewModel(newEntry, model, entries, articles);
 
             var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
 
@@ -820,7 +816,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return NotFound();
             }
             //获取审核记录
-            
+
             var examine = await _examineService.GetUserEntryActiveExamineAsync(entry.Id, user.Id, Operation.EstablishMainPage);
             if (examine != null)
             {
@@ -979,13 +975,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
 
-                var newEntry=new Entry();
+                var newEntry = new Entry();
                 _entryService.SetDataFromEditAddInforViewModel(newEntry, model.AddInfor);
                 _entryService.SetDataFromEditImagesViewModel(newEntry, model.Images);
                 _entryService.SetDataFromEditMainPageViewModel(newEntry, model.MainPage);
                 _entryService.SetDataFromEditMainViewModel(newEntry, model.Main);
-                _entryService.SetDataFromEditRelevancesViewModel(newEntry, model.Relevances,entries,articles);
-                _entryService.SetDataFromEditTagsViewModel(newEntry, model.Tags,tags);
+                _entryService.SetDataFromEditRelevancesViewModel(newEntry, model.Relevances, entries, articles);
+                _entryService.SetDataFromEditTagsViewModel(newEntry, model.Tags, tags);
 
                 var entry = new Entry();
                 //获取审核记录
@@ -1033,7 +1029,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return NotFound();
             }
-       
+
             //获取用户审核记录
             var examine = await _examineService.GetUserEntryActiveExamineAsync(entry.Id, user.Id, Operation.EstablishTags);
             if (examine != null)
@@ -1357,7 +1353,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{name}")]
         public async Task<ActionResult<int>> GetId(string name)
         {
-            var name_=ToolHelper.Base64DecodeName(name);
+            var name_ = ToolHelper.Base64DecodeName(name);
             return await _entryRepository.GetAll().AsNoTracking().Where(s => s.Name == name_).Select(s => s.Id).FirstOrDefaultAsync();
         }
     }

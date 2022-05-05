@@ -26,7 +26,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -1251,19 +1250,19 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
             }
 
-//            StringBuilder sb = new StringBuilder();
-//            sb.AppendLine("名称,最后发布时间,发布总数,微博链接,B站链接,站内链接");
-//            foreach (var item in result)
-//            {
-//                var weibo = entries.FirstOrDefault(s => s.Id == item.GroupId)?.Informations.FirstOrDefault(s => s.DisplayName == "微博")?.DisplayValue;
-//                var bilibili = entries.FirstOrDefault(s => s.Id == item.GroupId)?.Informations.FirstOrDefault(s => s.DisplayName == "Bilibili")?.DisplayValue;
-//                sb.AppendLine($"{item.GroupName},{item.Articles.Max(s => s.LastEditTime)},{item.Articles.Count},{weibo},{bilibili},{(item.GroupId > 0 ? ($"https://www.cngal.org/entries/index/{item.GroupId}") : ($"https://www.cngal.org/space/index/{item.UserId}"))}");
-//}
+            //            StringBuilder sb = new StringBuilder();
+            //            sb.AppendLine("名称,最后发布时间,发布总数,微博链接,B站链接,站内链接");
+            //            foreach (var item in result)
+            //            {
+            //                var weibo = entries.FirstOrDefault(s => s.Id == item.GroupId)?.Informations.FirstOrDefault(s => s.DisplayName == "微博")?.DisplayValue;
+            //                var bilibili = entries.FirstOrDefault(s => s.Id == item.GroupId)?.Informations.FirstOrDefault(s => s.DisplayName == "Bilibili")?.DisplayValue;
+            //                sb.AppendLine($"{item.GroupName},{item.Articles.Max(s => s.LastEditTime)},{item.Articles.Count},{weibo},{bilibili},{(item.GroupId > 0 ? ($"https://www.cngal.org/entries/index/{item.GroupId}") : ($"https://www.cngal.org/space/index/{item.UserId}"))}");
+            //}
 
-//            var str=sb.ToString();
-//            using StreamWriter sw = new StreamWriter(Path.Combine(_webHostEnvironment.WebRootPath, "BackUp", "当前数据", "制作组导出.csv"),false, Encoding.UTF8);//这里写上你要保存的路径
-//            sw.WriteLine(str);//按行写
-//            sw.Close();//关闭
+            //            var str=sb.ToString();
+            //            using StreamWriter sw = new StreamWriter(Path.Combine(_webHostEnvironment.WebRootPath, "BackUp", "当前数据", "制作组导出.csv"),false, Encoding.UTF8);//这里写上你要保存的路径
+            //            sw.WriteLine(str);//按行写
+            //            sw.Close();//关闭
 
             return result;
 

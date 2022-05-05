@@ -1,11 +1,9 @@
 ﻿using CnGalWebSite.DataModel.ViewModel.Base;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.Articles
 {
-    public class EditArticleRelevancesViewModel: BaseEditModel
+    public class EditArticleRelevancesViewModel : BaseEditModel
     {
 
         public List<RelevancesModel> Roles { get; set; } = new List<RelevancesModel>();

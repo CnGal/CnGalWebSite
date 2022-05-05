@@ -1,6 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using System;
-using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Search
 {
     public class ArticleInforTipViewModel

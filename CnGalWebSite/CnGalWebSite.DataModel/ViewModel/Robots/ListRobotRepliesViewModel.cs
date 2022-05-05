@@ -1,9 +1,6 @@
-﻿using CnGalWebSite.DataModel.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Xml.Linq;
 
 namespace CnGalWebSite.DataModel.ViewModel.Robots
 {
@@ -34,7 +31,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Robots
         /// 在这个时间之后才回复
         /// </summary>
         [Display(Name = "时间之后")]
-        public DateTime AfterTime { get; set; } 
+        public DateTime AfterTime { get; set; }
         /// <summary>
         /// 在这个时间之前才回复
         /// </summary>

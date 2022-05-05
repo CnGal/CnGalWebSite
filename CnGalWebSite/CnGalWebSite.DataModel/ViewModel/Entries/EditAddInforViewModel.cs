@@ -1,12 +1,11 @@
 ﻿using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Base;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel
 {
-    public class EditAddInforViewModel: BaseEntryEditModel
+    public class EditAddInforViewModel : BaseEntryEditModel
     {
 
         [Display(Name = "相关网站")]
@@ -129,7 +128,7 @@ namespace CnGalWebSite.DataModel.ViewModel
                 }
             }
 
-            return new Result { Successful=true };
+            return new Result { Successful = true };
         }
 
     }

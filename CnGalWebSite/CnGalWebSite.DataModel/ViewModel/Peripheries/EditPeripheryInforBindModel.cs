@@ -1,5 +1,4 @@
 ﻿using CnGalWebSite.DataModel.ViewModel.Admin;
-using CnGalWebSite.DataModel.ViewModel.Base;
 using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Peripheries
 {

@@ -7,7 +7,6 @@ using CnGalWebSite.APIServer.Model;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -79,7 +78,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             {
                 var createCollectionResponse = await _typesenseClient.CreateCollection(schema);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -156,7 +155,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             var documents = new List<SearchCache>();
             if (entries.Any())
             {
-                var entryIds = entries.Select(s => (long)s.Id).ToList();
+                var entryIds = entries.Select(s => s.Id).ToList();
 
                 documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 1 && entryIds.Contains(s.OriginalId)).ToListAsync();
 
@@ -191,7 +190,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                 }
             }
 
-            var deleted = await _articleRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => (long)s.Id).ToListAsync();
+            var deleted = await _articleRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => s.Id).ToListAsync();
             documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 1 && deleted.Contains(s.OriginalId)).ToListAsync();
             foreach (var item in documents)
             {
@@ -221,7 +220,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
             if (entries.Any())
             {
-                var entryIds = entries.Select(s => (long)s.Id).ToList();
+                var entryIds = entries.Select(s => s.Id).ToList();
 
                 documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 2 && entryIds.Contains(s.OriginalId)).ToListAsync();
 
@@ -256,7 +255,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                 }
             }
 
-            var deleted = await _peripheryRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => (long)s.Id).ToListAsync();
+            var deleted = await _peripheryRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => s.Id).ToListAsync();
             documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 2 && deleted.Contains(s.OriginalId)).ToListAsync();
             foreach (var item in documents)
             {
@@ -359,9 +358,9 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
         public async Task<PagedResultDto<SearchAloneModel>> QueryAsync(int page, int limit, string text, string screeningConditions, string sort, QueryType type)
         {
-            string sortString = "";
-            string filterString = "";
-            bool isAscending = false;
+            var sortString = "";
+            var filterString = "";
+            var isAscending = false;
 
 
 
@@ -526,9 +525,9 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
         public async Task<PagedResultDto<SearchAloneModel>> QueryAsync(SearchInputModel model)
         {
-            string sortString = "";
-            StringBuilder filterString = new StringBuilder();
-            bool isAscending = !model.Sorting.Contains(" desc");
+            var sortString = "";
+            var filterString = new StringBuilder();
+            var isAscending = !model.Sorting.Contains(" desc");
             model.Sorting = model.Sorting.Replace(" desc", "");
 
             //初始化排序

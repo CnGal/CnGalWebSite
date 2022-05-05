@@ -1,28 +1,16 @@
 ﻿using CnGalWebSite.APIServer.Application.Articles;
-using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Entries;
-using CnGalWebSite.APIServer.Application.ErrorCounts;
-using CnGalWebSite.APIServer.Application.Favorites;
-using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Helper;
-using CnGalWebSite.APIServer.Application.Messages;
-using CnGalWebSite.APIServer.Application.News;
-using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
-using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -52,7 +40,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<VoteOption, long> _voteOptionRepository;
         private readonly IRepository<VoteUser, long> _voteUserRepository;
 
-        public VoteAPIController(IRepository<Vote, long> voteRepository, IRepository<VoteOption, long> voteOptionRepository, IRepository<VoteUser, long> voteUserRepository,   
+        public VoteAPIController(IRepository<Vote, long> voteRepository, IRepository<VoteOption, long> voteOptionRepository, IRepository<VoteUser, long> voteUserRepository,
               IRepository<ApplicationUser, string> userRepository, IEntryService entryService, IArticleService articleService, IRankService rankService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IPeripheryService peripheryService)
         {
