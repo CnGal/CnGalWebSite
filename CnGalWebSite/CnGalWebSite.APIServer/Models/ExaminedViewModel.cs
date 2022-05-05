@@ -1,7 +1,9 @@
 ﻿
 using CnGalWebSite.DataModel.Model;
+using Nest;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace CnGalWebSite.APIServer.Models
 {
@@ -10,6 +12,7 @@ namespace CnGalWebSite.APIServer.Models
         public long Id { get; set; }
 
         public string EditOverview { get; set; }
+
         public Operation Operation { get; set; }
 
         public bool IsPassed { get; set; }
@@ -17,7 +20,7 @@ namespace CnGalWebSite.APIServer.Models
         public string PassedAdminName { get; set; }
 
         public DateTime ApplyTime { get; set; }
-
+        [Display(Name = "批注")]
         public string Comments { get; set; }
 
         public string Note { get; set; }
@@ -48,9 +51,9 @@ namespace CnGalWebSite.APIServer.Models
         public int PrepositionExamineId { get; set; }
 
         public string Type { get; set; }
-
+        [Display(Name = "额外积分")]
         public int Integral { get; set; }
-
+        [Display(Name = "附加贡献值")]
         public int ContributionValue { get; set; }
 
         public List<string> SensitiveWords { get; set; } = new List<string>() { };

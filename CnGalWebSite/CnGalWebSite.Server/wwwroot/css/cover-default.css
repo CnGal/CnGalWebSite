@@ -323,3 +323,9 @@ input.te-image-file-input {
 .m-card__title {
     font-weight: bold;
 }
+code[class*=language-], pre[class*=language-] {
+   text-shadow: 0;
+}
+.theme--dark.m-application code {
+    background-color: transparent;
+}

@@ -1,0 +1,24 @@
+﻿<div class="@("rounded shadow-sm bg-opacity h-100 "+Class)">
+    <img src="@Model.Url" alt="@Model.Note" class="w-100">
+
+    @if (string.IsNullOrWhiteSpace(Model.Note) == false)
+    {<div style="display: flex; flex-direction: column; word-break: break-all; " class="ps-3 pe-3 pt-2 pb-2">
+
+            <span>
+                <i class="fa fa-image fa-fw font-color"></i>
+                <a href="@Model.Url" target="_blank">
+                    @Model.Note
+                </a>
+            </span>
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public PicturesAloneViewModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+}

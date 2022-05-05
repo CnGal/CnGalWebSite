@@ -25,6 +25,7 @@
         </div>
     </div>
 </div>
+<EntryPerfectionCheckListTip @ref="entryPerfectionCheckListTip" />
 
 @code {
     [Parameter]
@@ -33,6 +34,7 @@
     public EventCallback OnClosed { get; set; }
 
     string color = "success";
+    EntryPerfectionCheckListTip entryPerfectionCheckListTip;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -46,17 +48,9 @@
 
     public async Task OnDetails()
     {
-        var option = new DialogOption()
+        if (entryPerfectionCheckListTip != null)
         {
-            Title = "词条完善度明细",
-            ShowCloseButton = false
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<EntryPerfectionCheckListTip>(new Dictionary<string, object>
-        {
-            [nameof(EntryPerfectionCheckListTip.PerfectionId)] = (long)Model.Id,
-            [nameof(EntryPerfectionCheckListTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-            [nameof(EntryPerfectionCheckListTip.OnEditorialGuidelines)] = EventCallback.Factory.Create(this, async () => { await option.Dialog.Close();await OnClosed.InvokeAsync(); NavigationManager.NavigateTo(Provider, "/perfections/home", "编辑指引", "fa-map-signs"); }),
-        }).Render();
-        await DialogService.Show(option);
+            await entryPerfectionCheckListTip.Refresh(true, Model.Id);
+        }
     }
 }

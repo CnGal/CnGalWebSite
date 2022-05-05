@@ -1,0 +1,31 @@
+﻿
+<div class="@Class">
+    @foreach (var item in Model)
+    {
+        <div class="rounded shadow-sm  bg-opacity mb-4 p-3 pb-2">
+            @if (string.IsNullOrWhiteSpace(item.Modifier) == false)
+            {
+                <div class="font-color fw-bold h5 mb-2">@item.Modifier</div>
+            }
+
+            <div class="row">
+                @foreach (var temp in item.Informations)
+                {
+                    <div class="col-12 col-lg-6 pb-1">
+                        <TextPair Model="temp" />
+                    </div>
+                }
+            </div>
+
+        </div>
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public List<InformationsModel> Model { get; set; } = new List<InformationsModel>();
+    [Parameter]
+    public string Class { get; set; }
+
+}

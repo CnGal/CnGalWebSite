@@ -1,5 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
+@inject IHostApplicationLifetime _applicationLifetime
 @using Microsoft.Extensions.Logging
+@using Microsoft.Extensions.Hosting
 
 <ErrorHandler @ref="errorHandler">
     @if (ToolHelper.IsMaui)
@@ -35,6 +37,9 @@
     {
         if (ex is OutOfMemoryException)
         {
+
+            //内存溢出 强制关闭服务端 由于Docker设置 会重启
+            _applicationLifetime.StopApplication();
             throw ex;
         }
         else
@@ -46,7 +51,7 @@
 
     public async Task SaveTheme()
     {
-        if(styleTip!=null)
+        if (styleTip != null)
         {
             await styleTip.SaveTheme();
             styleTip.Refresh();
@@ -55,7 +60,7 @@
 
     public async Task OnStateChanged(bool refreshApp)
     {
-        if(refreshApp)
+        if (refreshApp)
         {
             await _dataCacheService.RefreshApp.InvokeAsync();
         }

@@ -1,5 +1,5 @@
-﻿@page "/admin/examined/{id}"
-@page "/admin/examined"
+﻿@page "/admin/examines"
+
 @attribute [Authorize(Roles = "Admin")]
 
 
@@ -9,9 +9,9 @@
 
 
 @code{
-
+    [SupplyParameterFromQuery]
     [Parameter]
-    public string Id { get; set; }
+    public long Id { get; set; }
 
 }
 

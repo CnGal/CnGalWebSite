@@ -9,99 +9,99 @@
     }
     else
     {
-<hr />
- }
-<h5 class="fw-bold mb-4">@item.Modifier</h5>
-                @if (item.Modifier == "角色"|| item.Modifier == "STAFF")
-                {
-<div class="row mt-2" style="padding-right: 0; padding-left: 0">
-    @foreach (var temp in item.Informations)
+        <hr />
+    }
+    <h5 class="fw-bold mb-4">@item.Modifier</h5>
+    @if (item.Modifier == "角色" || item.Modifier == "STAFF")
     {
-<div class="col-6 col-md-6 col-lg-6"  @onclick="@(()=>OnClickCard(ToolHelper.Base64EncodeName(temp.DisplayName),temp.DisplayName,item.Modifier))"  style="cursor:pointer">
-    <div style="height: 50px;">
-        <img style="float: left;width: 40px;height: 40px;border-radius: 50%;"
-             src="@("//app.cngal.org/_content/CnGalWebSite.Shared/images/default/user.png")" />
-        <div class="h5" style="float: left;margin-top: 8px;margin-left: 10px;">@temp.DisplayName</div>
-    </div>
-</div>}
-
-</div> }
-else if (item.Modifier == "文章")
-{
-<div class="row mt-2" style="padding-right: 0; padding-left: 0">
-    @foreach (var temp in item.Informations)
-    {
-<div class="col-12 col-md-12 col-lg-6">
-    <div>
         <div class="row mt-2" style="padding-right: 0; padding-left: 0">
-            <div class="col-4 col-md-4 col-lg-4">
-                <img class="img-fluid" src="@("//app.cngal.org/_content/CnGalWebSite.Shared/images/default/certificate.png")" />
-            </div>
-            <div class="col-8 col-md-8 col-lg-8 ">
-                <h5 class="text-truncate">@temp.DisplayName</h5>
-                @if (string.IsNullOrWhiteSpace(temp.DisplayValue) == false)
-                {
-<p class="fw-light small">@temp.DisplayValue</p>}
+            @foreach (var temp in item.Informations)
+            {
+                <div class="col-6 col-md-6 col-lg-6" @onclick="@(()=>OnClickCard(ToolHelper.Base64EncodeName(temp.DisplayName),temp.DisplayName,item.Modifier))" style="cursor:pointer">
+                    <div style="height: 50px;">
+                        <img style="float: left;width: 40px;height: 40px;border-radius: 50%;"
+                             src="@("//app.cngal.org/_content/CnGalWebSite.Shared/images/default/user.png")" />
+                        <div class="h5" style="float: left;margin-top: 8px;margin-left: 10px;">@temp.DisplayName</div>
+                    </div>
+                </div>}
 
-            </div>
-        </div>
-    </div>
-
-</div>}
-
-
-</div> }
-                else if (item.Modifier == "词条"|| item.Modifier == "游戏"|| item.Modifier == "制作组")
-                {
-<div class="row mt-2" style="padding-right: 0; padding-left: 0">
-    @foreach (var temp in item.Informations)
+        </div> }
+    else if (item.Modifier == "文章")
     {
-<div class="col-12 col-md-12 col-lg-6"  @onclick="@(()=>OnClickCard(ToolHelper.Base64EncodeName(temp.DisplayName),temp.DisplayName,item.Modifier))"  style="cursor:pointer">
-    <div>
         <div class="row mt-2" style="padding-right: 0; padding-left: 0">
-            <div class="col-4 col-md-4 col-lg-4">
-                <img class="img-fluid" src="@("//app.cngal.org/_content/CnGalWebSite.Shared/images/default/app.png")" />
-            </div>
-            <div class="col-8 col-md-8 col-lg-8 ">
-                <h5 class="text-truncate">@temp.DisplayName</h5>
-                @if (string.IsNullOrWhiteSpace(temp.DisplayValue) == false)
-                {
-<p class="fw-light small">@temp.DisplayValue</p>}
-            </div>
-        </div>
-    </div>
+            @foreach (var temp in item.Informations)
+            {
+                <div class="col-12 col-md-12 col-lg-6">
+                    <div>
+                        <div class="row mt-2" style="padding-right: 0; padding-left: 0">
+                            <div class="col-4 col-md-4 col-lg-4">
+                                <img class="img-fluid" src="@("//app.cngal.org/_content/CnGalWebSite.Shared/images/default/certificate.png")" />
+                            </div>
+                            <div class="col-8 col-md-8 col-lg-8 ">
+                                <h5 class="text-truncate">@temp.DisplayName</h5>
+                                @if (string.IsNullOrWhiteSpace(temp.DisplayValue) == false)
+                                {
+                                    <p class="fw-light small">@temp.DisplayValue</p>}
 
-</div>}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>}
 
 
-</div> }
-else
-{
-<div class="row mt-2" style="padding-right: 0; padding-left: 0">
-    @foreach (var temp in item.Informations)
+        </div> }
+    else if (item.Modifier == "词条" || item.Modifier == "游戏" || item.Modifier == "制作组")
     {
-<div class="col-12 col-md-12 col-lg-6" @onclick="@(()=>OnClickCard(temp.Id.ToString(),temp.DisplayName,item.Modifier))" style="cursor:pointer">
-    <div>
         <div class="row mt-2" style="padding-right: 0; padding-left: 0">
-            <div class="col-4 col-md-4 col-lg-4">
-                <img class="img-fluid" src="@("//app.cngal.org/_content/CnGalWebSite.Shared/images/default/app.png")" />
-            </div>
-            <div class="col-8 col-md-8 col-lg-8 ">
-                <h5 class="text-truncate">@temp.DisplayName</h5>
-                @if (string.IsNullOrWhiteSpace(temp.DisplayValue) == false)
-                {
-<p class="fw-light small">@temp.DisplayValue</p>}
-            </div>
-        </div>
-    </div>
+            @foreach (var temp in item.Informations)
+            {
+                <div class="col-12 col-md-12 col-lg-6" @onclick="@(()=>OnClickCard(ToolHelper.Base64EncodeName(temp.DisplayName),temp.DisplayName,item.Modifier))" style="cursor:pointer">
+                    <div>
+                        <div class="row mt-2" style="padding-right: 0; padding-left: 0">
+                            <div class="col-4 col-md-4 col-lg-4">
+                                <img class="img-fluid" src="@("//app.cngal.org/_content/CnGalWebSite.Shared/images/default/app.png")" />
+                            </div>
+                            <div class="col-8 col-md-8 col-lg-8 ">
+                                <h5 class="text-truncate">@temp.DisplayName</h5>
+                                @if (string.IsNullOrWhiteSpace(temp.DisplayValue) == false)
+                                {
+                                    <p class="fw-light small">@temp.DisplayValue</p>}
+                            </div>
+                        </div>
+                    </div>
 
-</div>}
+                </div>}
+
+
+        </div> }
+    else
+    {
+        <div class="row mt-2" style="padding-right: 0; padding-left: 0">
+            @foreach (var temp in item.Informations)
+            {
+                <div class="col-12 col-md-12 col-lg-6" @onclick="@(()=>OnClickCard(temp.Id.ToString(),temp.DisplayName,item.Modifier))" style="cursor:pointer">
+                    <div>
+                        <div class="row mt-2" style="padding-right: 0; padding-left: 0">
+                            <div class="col-4 col-md-4 col-lg-4">
+                                <img class="img-fluid" src="@("//app.cngal.org/_content/CnGalWebSite.Shared/images/default/app.png")" />
+                            </div>
+                            <div class="col-8 col-md-8 col-lg-8 ">
+                                <h5 class="text-truncate">@temp.DisplayName</h5>
+                                @if (string.IsNullOrWhiteSpace(temp.DisplayValue) == false)
+                                {
+                                    <p class="fw-light small">@temp.DisplayValue</p>}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>}
 
 
 
-</div>break;
+        </div>break;
 
-}}
+    }}
 @code { bool isFirst = false;
     [Parameter]
 
@@ -109,7 +109,7 @@ else
 
     public Task OnClickCard(string id, string name, string modifier)
     {
-        if (id !="0"&&string.IsNullOrWhiteSpace(id)==false && string.IsNullOrWhiteSpace(modifier) == false)
+        if (id != "0" && string.IsNullOrWhiteSpace(id) == false && string.IsNullOrWhiteSpace(modifier) == false)
         {
 
             if (modifier.Contains("词条"))

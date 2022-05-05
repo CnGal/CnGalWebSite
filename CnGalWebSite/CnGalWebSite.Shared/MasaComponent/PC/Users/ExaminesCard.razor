@@ -49,27 +49,32 @@
                     @{ string name = "";}
                     @if (examine.Type == ExaminedNormalListModelType.Entry)
                     {
-                        name = " entries";
+                        name = "entries";
 
                     }
                     else if (examine.Type == ExaminedNormalListModelType.Article)
                     {
-                        name = " articles";
+                        name = "articles";
 
                     }
                     else if (examine.Type == ExaminedNormalListModelType.Tag)
                     {
-                        name = " tags";
+                        name = "tags";
 
                     }
                     else if (examine.Type == ExaminedNormalListModelType.Disambig)
                     {
-                        name = " disambigs";
+                        name = "disambigs";
 
                     }
                     else if (examine.Type == ExaminedNormalListModelType.Periphery)
                     {
-                        name = " peripheries";
+                        name = "peripheries";
+
+                    }
+                    else if (examine.Type == ExaminedNormalListModelType.User)
+                    {
+                        name = "space";
 
                     }
 
@@ -92,7 +97,7 @@
                                 @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName )
                             </TabLink>
                             进行
-                            <TabLink Text="@name" Url="@((examine.IsPassed==true&&examine.Type!= ExaminedNormalListModelType.User&&examine.Type!= ExaminedNormalListModelType.Comment)?("/home/editrecord?ContrastId=" +examine.Id):("/home/examined/"+examine.Id))" Icon="fa fa-pencil">
+                            <TabLink Text="@name" Url="@((examine.IsPassed==true&&examine.Type!= ExaminedNormalListModelType.User&&examine.Type!= ExaminedNormalListModelType.Comment)?("/home/editrecord?ContrastId=" +examine.Id):("/home/examines?Id="+examine.Id))" Icon="fa fa-pencil">
                                 @examine.Operation.GetDisplayName()
                             </TabLink>
                             操作
