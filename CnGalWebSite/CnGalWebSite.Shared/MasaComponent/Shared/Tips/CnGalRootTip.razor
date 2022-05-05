@@ -1,7 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
-@inject IHostApplicationLifetime _applicationLifetime
 @using Microsoft.Extensions.Logging
 @using Microsoft.Extensions.Hosting
+@inject IServiceProvider _serviceProvider
 
 <ErrorHandler @ref="errorHandler">
     @if (ToolHelper.IsMaui)
@@ -39,7 +39,14 @@
         {
 
             //内存溢出 强制关闭服务端 由于Docker设置 会重启
-            _applicationLifetime.StopApplication();
+            if(ToolHelper.IsSSR)
+            {
+                IHostApplicationLifetime _applicationLifetime = (IHostApplicationLifetime)_serviceProvider.GetService(typeof(IHostApplicationLifetime));
+                if(_applicationLifetime!=null)
+                {
+                    _applicationLifetime.StopApplication();
+                }
+            }
             throw ex;
         }
         else
