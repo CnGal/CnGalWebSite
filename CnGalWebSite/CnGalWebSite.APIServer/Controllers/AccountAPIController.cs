@@ -294,7 +294,43 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
         }
+        /// <summary>
+        /// 刷新JWT令牌
+        /// </summary>
+        /// <remarks>
+        /// JWT令牌有效时长为15天
+        /// 建议每次进入应用刷新一次
+        /// </remarks>
+        /// <returns></returns>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost]
+        public async Task<ActionResult<LoginResult>> RefreshJWToken(LoginModel model)
+        {
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            if (user != null)
+            {
+                //判断用户是否被封禁
+                if (user.UnsealTime != null)
+                {
+                    if (user.UnsealTime < DateTime.Now.ToCstTime())
+                    {
+                        user.UnsealTime = null;
+                        await _userManager.UpdateAsync(user);
+                    }
+                    else
+                    {
+                        return new LoginResult { Code = LoginResultCode.UserBanded, ErrorDescribe = "该用户已经被封禁，将在" + (user.UnsealTime?.ToString("D") ?? "") + "后解封" };
+                    }
+                }
 
+                return new LoginResult { Code = LoginResultCode.OK, Token = await _appHelper.GetUserJWTokenAsync(user) };
+            }
+            else
+            {
+                return new LoginResult { Code = LoginResultCode.WrongUserNameOrPassword, ErrorDescribe = "无效的JWT令牌" };
+            }
+
+        }
         /// <summary>
         /// 注册用户验证邮箱
         /// </summary>
