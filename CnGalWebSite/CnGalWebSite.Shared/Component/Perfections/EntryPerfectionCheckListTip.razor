@@ -14,7 +14,7 @@
             <Scroll style="max-height:600px;" class="ps-6 pe-6">
                 @if (isReady)
                 {
-                    <MExpansionPanels @bind-Values="panel" Class="mt-2 mb-2">
+                    <MExpansionPanels @bind-Values="panel" Class="mt-2 mb-2" Multiple>
                         @if (Model.Any(s => s.Level == PerfectionCheckLevel.High))
                         {
                             <MExpansionPanel @key="1">
@@ -86,7 +86,7 @@
 
     public string Text { get; set; }
     bool isReady = false;
-    List<StringNumber> panel = new();
+    List<StringNumber> panel = new List<StringNumber> { 1, 2, 3 };
 
     protected async Task Init()
     {

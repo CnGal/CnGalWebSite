@@ -4,6 +4,7 @@ using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -339,5 +340,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <param name="text"></param>
         /// <returns></returns>
         Task<List<string>> GetSensitiveWordsInText(string text);
+
+        Task<long> GetUserIntegral(string userId, DateTime time);
     }
 }

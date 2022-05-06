@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Electronicute.MeowMiraiLib" Version="4.2.0" />
+    <PackageReference Include="Electronicute.MeowMiraiLib" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

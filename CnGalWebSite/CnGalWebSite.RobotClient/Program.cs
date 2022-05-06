@@ -115,9 +115,6 @@ while (true)
             }
         };
 
-
-
-        //c.ConnectAsync()
         c.OnFriendMessageReceive += (s, e) =>
         {
             //MGetPlainStringSplit() 是一个关于Message类的数组扩展方法,
@@ -147,19 +144,20 @@ while (true)
             }
 
         };
-
+        
         while (true)
         {
             switch (System.Console.ReadLine()) // 控制台操作
             {
                 //.....
             }
+
         }
 
     }
     catch (Exception ex)
     {
-        OutputHelper.PressError(ex);
+        OutputHelper.PressError(ex, "", "异步事件调用异常");
     }
 }
 

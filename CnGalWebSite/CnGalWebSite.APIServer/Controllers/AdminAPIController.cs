@@ -32,7 +32,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -93,16 +95,17 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<LotteryPrize, long> _lotteryPrizeRepository;
         private readonly IRepository<RobotReply, long> _robotReplyRepository;
         private readonly IRepository<SearchCache, long> _searchCacheRepository;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
         IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, IHistoryDataService historyDataService,
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService,
-        IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService,
+        IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IWebHostEnvironment webHostEnvironment,
         UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
         IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
-        IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
+        IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository,
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper,
@@ -159,6 +162,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _weiXinService = weiXinService;
             _robotReplyRepository = robotReplyRepository;
             _searchCacheRepository = searchCacheRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         /// <summary>
@@ -836,8 +840,30 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _searchCacheRepository.DeleteRangeAsync(s => true);
+                var time = new DateTime(2022, 4, 30);
+                var user = await _userRepository.GetAll().Include(s => s.PlayedGames).Where(s => s.LastOnlineTime > time || s.PlayedGames.Any() || s.Examines.Any(s => s.Operation == Operation.PubulishComment))
+                    .Select(s => new
+                    {
+                        s.Id,
+                        Games = s.PlayedGames.Count,
+                        s.UserName,
+                        Comments = s.Examines.Count(s => s.Operation == Operation.PubulishComment && s.IsPassed == true)
+                    })
+                    .ToListAsync();
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("Id,昵称,积分,游戏记录数目,评论数");
+                foreach(var item in user)
+                {
+                    sb.AppendLine($"{item.Id},{item.UserName},{await _appHelper.GetUserIntegral(item.Id, time)},{item.Games},{item.Comments}");
+                }
 
+                using (StreamWriter sw = new StreamWriter(Path.Combine(_webHostEnvironment.WebRootPath,"BackUp", "积分.csv"),false,Encoding.UTF8))
+                {
+
+                    sw.Write(sb);
+
+
+                }
 
                 return new Result { Successful = true };
             }
