@@ -1554,7 +1554,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         {
             //计算积分
             //编辑 词条  标签  消歧义页  评论  发表文章
-            //积分  10    8      2         5     100
+            //积分  10    8      2         5     50
             //
             var signInDaysIntegral = 5;
             var entryIntegral = 50;
@@ -1604,6 +1604,50 @@ namespace CnGalWebSite.APIServer.Application.Helper
             catch (Exception)
             {
 
+            }
+        }
+
+        public async Task<long> GetUserIntegral(string userId,DateTime time)
+        {
+            //计算积分
+            //编辑 词条  标签  消歧义页  评论  发表文章
+            //积分  10    8      2         5     50
+            //
+            var signInDaysIntegral = 5;
+            var entryIntegral = 50;
+
+            var tagIntegral = signInDaysIntegral * 6;
+            var disambigIntegral = signInDaysIntegral * 6;
+            var peripheryIntegral = entryIntegral;
+            var commentIntegral = signInDaysIntegral;
+            var commentLimited = 5;
+            var articleIntegral = entryIntegral;
+
+            try
+            {
+                //编辑
+                var temp_1 = await _examineRepository.GetAll().Where(s=>s.ApplyTime>time).Where(s => s.ApplicationUserId == userId && s.IsPassed == true)
+                 .Select(n => new { Time = n.ApplyTime.Date, n.EntryId, n.TagId, n.ArticleId, n.CommentId, n.DisambigId, n.PeripheryId })
+                 // 分类
+                 .ToListAsync();
+                // 返回汇总样式
+                var temp_2 = temp_1.GroupBy(s => s.Time);
+                var integral_1 = temp_2.Select(s => s.Where(s => s.EntryId != null).GroupBy(s => s.EntryId).Count()).Sum() * entryIntegral
+                                  + temp_2.Select(s => s.Where(s => s.TagId != null).GroupBy(s => s.TagId).Count()).Sum() * tagIntegral
+                                  + temp_2.Select(s => s.Where(s => s.DisambigId != null).GroupBy(s => s.DisambigId).Count()).Sum() * disambigIntegral
+                                  + temp_2.Select(s => s.Where(s => s.PeripheryId != null).GroupBy(s => s.PeripheryId).Count()).Sum() * peripheryIntegral
+                                  + temp_2.Select(s => s.Where(s => s.CommentId != null).GroupBy(s => s.DisambigId)
+                                            .Select(s => s.Count() > commentLimited ? commentLimited : s.Count()).Sum()).Sum() * commentLimited;
+
+
+                //发表文章
+                var integral_2 = await _articleRepository.GetAll().Where(s => s.CreateTime > time).CountAsync(s => s.CreateUserId == userId) * articleIntegral;
+
+                return integral_1 + integral_2;
+            }
+            catch (Exception)
+            {
+                return -1;
             }
         }
 
