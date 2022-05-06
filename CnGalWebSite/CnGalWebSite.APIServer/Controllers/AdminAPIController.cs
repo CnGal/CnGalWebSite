@@ -864,7 +864,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
                 }
-
+                Console.WriteLine(sb);
                 return new Result { Successful = true };
             }
             catch (Exception ex)
