@@ -143,18 +143,20 @@ namespace CnGalWebSite.Shared.Service
             try
             {
                 //调用刷新接口
-                var result = await _httpClient.GetFromJsonAsync<LoginResult>(ToolHelper.WebApiPath + "api/account/RefreshJWToken");
-                if (result.Code == LoginResultCode.OK)
+                var result = await _httpClient.PostAsJsonAsync<LoginModel>(ToolHelper.WebApiPath + "api/account/RefreshJWToken", new LoginModel());
+                var jsonContent = result.Content.ReadAsStringAsync().Result;
+                var obj = JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
+                if (obj.Code == LoginResultCode.OK&&string.IsNullOrWhiteSpace(obj.Token)==false)
                 {
                     if (isRemerber)
                     {
-                        await _localStorage.SetItemAsync("authToken", result.Token);
+                        await _localStorage.SetItemAsync("authToken", obj.Token);
                     }
 
-                    ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(result.Token);
-                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.Token);
+                    ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(obj.Token);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", obj.Token);
 
-                    return result;
+                    return obj;
                 }
                 else
                 {
@@ -162,7 +164,7 @@ namespace CnGalWebSite.Shared.Service
                     await _localStorage.RemoveItemAsync("authToken");
                     ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
                     _httpClient.DefaultRequestHeaders.Authorization = null;
-                    return result;
+                    return obj;
 
                 }
             }

@@ -857,7 +857,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     sb.AppendLine($"{item.Id},{item.UserName},{await _appHelper.GetUserIntegral(item.Id, time)},{item.Games},{item.Comments}");
                 }
 
-                using (StreamWriter sw = new StreamWriter(Path.Combine(_webHostEnvironment.WebRootPath,"BackUp", "积分.csv"),false,Encoding.UTF8))
+                using (StreamWriter sw = new StreamWriter(Path.Combine(_webHostEnvironment.WebRootPath,"images","积分.csv"),false,Encoding.UTF8))
                 {
 
                     sw.Write(sb);
