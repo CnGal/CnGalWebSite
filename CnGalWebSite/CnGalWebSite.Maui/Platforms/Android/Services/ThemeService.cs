@@ -1,4 +1,6 @@
-﻿using Platform = Microsoft.Maui.ApplicationModel.Platform;
+﻿using Android.OS;
+using Microsoft.Maui.Controls.Compatibility.Platform.Android;
+using Platform = Microsoft.Maui.ApplicationModel.Platform;
 
 namespace CnGalWebSite.Maui.Platforms.Android.Services
 {

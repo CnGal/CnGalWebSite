@@ -18,7 +18,7 @@
 		<ApplicationId>com.cngal.maui</ApplicationId>
 
 		<!-- Versions -->
-		<ApplicationVersion>2</ApplicationVersion>
+		<ApplicationVersion>3</ApplicationVersion>
 
 		<!-- Required for C# Hot Reload -->
 		<UseInterpreter Condition="'$(Configuration)' == 'Debug'">True</UseInterpreter>

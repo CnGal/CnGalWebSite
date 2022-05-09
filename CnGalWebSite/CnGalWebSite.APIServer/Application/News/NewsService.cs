@@ -191,7 +191,10 @@ namespace CnGalWebSite.APIServer.Application.News
             });
         }
 
-
+        /// <summary>
+        /// 获取最新动态
+        /// </summary>
+        /// <returns></returns>
         public async Task UpdateNewestGameNews()
         {
             //查找最新的RSS源的时间
@@ -249,6 +252,13 @@ namespace CnGalWebSite.APIServer.Application.News
 
         }
 
+        /// <summary>
+        /// 添加自定义微博动态
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="keyword"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task AddGameMewsFromWeibo(long id, string keyword)
         {
             var item = await _rssHelper.GetOriginalWeibo(id, keyword);
@@ -284,6 +294,10 @@ namespace CnGalWebSite.APIServer.Application.News
             }
         }
 
+        /// <summary>
+        /// 更新所有Staff制作组的微博信息缓存
+        /// </summary>
+        /// <returns></returns>
         public async Task UpdateWeiboUserInforCache()
         {
             //获取所有Staff制作组的名称和微博Id
@@ -341,6 +355,10 @@ namespace CnGalWebSite.APIServer.Application.News
             }
         }
 
+        /// <summary>
+        /// 获取本周周报 不存在则新建
+        /// </summary>
+        /// <returns></returns>
         public async Task<WeeklyNews> GenerateNewestWeeklyNews()
         {
             //查找上一次周报时间
@@ -378,6 +396,11 @@ namespace CnGalWebSite.APIServer.Application.News
             return last;
         }
 
+        /// <summary>
+        /// 发布动态
+        /// </summary>
+        /// <param name="gameNews"></param>
+        /// <returns></returns>
         public async Task PublishNews(GameNews gameNews)
         {
             var article = await GameNewsToArticle(gameNews);
@@ -409,6 +432,12 @@ namespace CnGalWebSite.APIServer.Application.News
             }
         }
 
+        /// <summary>
+        /// 将动态转换成文章
+        /// </summary>
+        /// <param name="gameNews"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<Article> GameNewsToArticle(GameNews gameNews)
         {
             var article = new Article
@@ -453,6 +482,11 @@ namespace CnGalWebSite.APIServer.Application.News
             return article;
         }
 
+        /// <summary>
+        /// 发布周报
+        /// </summary>
+        /// <param name="weeklyNews"></param>
+        /// <returns></returns>
         public async Task PublishWeeklyNews(WeeklyNews weeklyNews)
         {
 
@@ -473,6 +507,12 @@ namespace CnGalWebSite.APIServer.Application.News
             await _weeklyNewsRepository.UpdateAsync(weeklyNews);
         }
 
+        /// <summary>
+        /// 将周报转成文章
+        /// </summary>
+        /// <param name="weeklyNews"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<Article> WeeklyNewsToArticle(WeeklyNews weeklyNews)
         {
             if (string.IsNullOrWhiteSpace(weeklyNews.Title))
@@ -519,6 +559,11 @@ namespace CnGalWebSite.APIServer.Application.News
             return article;
         }
 
+        /// <summary>
+        /// 重置周报
+        /// </summary>
+        /// <param name="weeklyNews"></param>
+        /// <returns></returns>
         public async Task<WeeklyNews> ResetWeeklyNews(WeeklyNews weeklyNews)
         {
             weeklyNews.News.Clear();
@@ -538,6 +583,12 @@ namespace CnGalWebSite.APIServer.Application.News
             return weeklyNews;
         }
 
+        /// <summary>
+        /// 添加微博用户缓存
+        /// </summary>
+        /// <param name="entryName"></param>
+        /// <param name="weiboId"></param>
+        /// <returns></returns>
         public async Task AddWeiboUserInfor(string entryName, long weiboId)
         {
             var user = await _rssHelper.GetWeiboUserInfor(weiboId);
@@ -583,6 +634,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
             await _entryRepository.UpdateAsync(entry);
         }
+
 
         public string GenerateWeeklyNewsTitle(WeeklyNews weeklyNews)
         {
