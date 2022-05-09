@@ -12,6 +12,21 @@ namespace CnGalWebSite.DataModel.ViewModel
         public List<RelevancesModel> articles { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> news { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> others { get; set; } = new List<RelevancesModel>();
+
+        [Display(Name = "2DFan条目Id")]
+        public string _2DFanId { get; set; }
+        [Display(Name = "Bangumi条目Id")]
+        public string BangumiId { get; set; }
+        [Display(Name = "WikiData条目Id")]
+        public string WikiDataId { get; set; }
+        [Display(Name = "VNDB条目Id")]
+        public string VNDBId { get; set; }
+        [Display(Name = "萌娘百科条目名称")]
+        public string MoegirlName { get; set; }
+        [Display(Name = "百度百科条目名称")]
+        public string BaiDuName { get; set; }
+        [Display(Name = "中文维基百科条目名称")]
+        public string ZhWikiPediaName { get; set; }
     }
     public class RelevancesModel
     {

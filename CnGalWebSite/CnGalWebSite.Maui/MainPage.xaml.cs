@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.Maui.Platforms.Android.Services;
 using CnGalWebSite.Maui.Services;
+using Microsoft.AspNetCore.Components.WebView;
 
 namespace CnGalWebSite.Maui
 {

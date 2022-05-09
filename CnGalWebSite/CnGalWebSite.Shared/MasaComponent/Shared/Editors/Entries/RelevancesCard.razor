@@ -23,6 +23,30 @@
     <InputRelevancesListTip AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="制作组"></InputRelevancesListTip>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <InputOtherLinkListTip Model="Model.others" Title="自定义链接"></InputOtherLinkListTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+
+    <ValidateForm Model="@Model" ValidateAllProperties="true">
+        <div class="row">
+            <div class="form-group col-12  col-sm-6">
+                <BootstrapInput @bind-Value="Model.MoegirlName" />
+            </div>
+            <div class="form-group col-12  col-sm-6">
+                <BootstrapInput @bind-Value="Model.VNDBId" />
+            </div>
+            <div class="form-group col-12  col-sm-6">
+                <BootstrapInput @bind-Value="Model.BangumiId" />
+            </div>
+            <div class="form-group col-12  col-sm-6">
+                <BootstrapInput @bind-Value="Model.WikiDataId" />
+            </div>
+            <div class="form-group col-12  col-sm-6">
+                <BootstrapInput @bind-Value="Model.BaiDuName" />
+            </div>
+            <div class="form-group col-12  col-sm-6">
+                <BootstrapInput @bind-Value="Model.ZhWikiPediaName" />
+            </div>
+        </div>
+    </ValidateForm>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 

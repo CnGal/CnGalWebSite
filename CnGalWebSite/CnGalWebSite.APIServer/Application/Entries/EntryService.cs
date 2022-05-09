@@ -22,6 +22,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using Tag = CnGalWebSite.DataModel.Model.Tag;
 
 namespace CnGalWebSite.APIServer.Application.Entries
@@ -2314,12 +2315,40 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
             foreach (var item in entry.Outlinks)
             {
-                others.Add(new RelevancesModel
+                if (item.Link.Contains("moegirl.org"))
                 {
-                    DisplayName = item.Name,
-                    DisPlayValue = item.BriefIntroduction,
-                    Link = item.Link
-                });
+                    model.MoegirlName = item.Link.Replace("https://zh.moegirl.org.cn/", "").Split('/').FirstOrDefault();
+                }
+                else if (item.Link.Contains("vndb.org"))
+                {
+                    model.VNDBId = item.Link.Replace("https://vndb.org/", "").Split('/').FirstOrDefault();
+                }
+                else if (item.Link.Contains("bangumi.tv"))
+                {
+                    model.BangumiId = item.Link.Replace("https://bangumi.tv/subject/", "").Split('/').FirstOrDefault();
+                }
+                else if (item.Link.Contains("wikidata.org"))
+                {
+                    model.WikiDataId = item.Link.Replace("https://www.wikidata.org/wiki/", "").Split('/').FirstOrDefault();
+                }
+                else if (item.Link.Contains("baike.baidu.com"))
+                {
+                    model.BaiDuName = item.Link.Replace("https://baike.baidu.com/item/", "").Split('/').FirstOrDefault();
+                }
+                else if (item.Link.Contains("zh.wikipedia.org"))
+                {
+                    model.ZhWikiPediaName = HttpUtility.UrlDecode(item.Link.Replace("https://zh.wikipedia.org/wiki/", "").Split('/').FirstOrDefault());
+                }
+                else
+                {
+                    others.Add(new RelevancesModel
+                    {
+                        DisplayName = item.Name,
+                        DisPlayValue = item.BriefIntroduction,
+                        Link = item.Link
+                    });
+                }
+
             }
 
             model.Roles = roles;
@@ -2579,6 +2608,59 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         public void SetDataFromEditRelevancesViewModel(Entry newEntry, EditRelevancesViewModel model, List<Entry> entries, List<Article> articles)
         {
+            //加载在关联信息中的网站
+            if (string.IsNullOrWhiteSpace(model.MoegirlName) == false)
+            {
+                model.others.Add(new RelevancesModel
+                {
+                    DisplayName = "萌娘百科",
+                    Link = "https://zh.moegirl.org.cn/" + model.MoegirlName
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(model.VNDBId) == false)
+            {
+                model.others.Add(new RelevancesModel
+                {
+                    DisplayName = "VNDB",
+                    Link = "https://vndb.org/" + model.VNDBId
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(model.BangumiId) == false)
+            {
+                model.others.Add(new RelevancesModel
+                {
+                    DisplayName = "Bangumi",
+                    Link = "https://bangumi.tv/subject/" + model.BangumiId
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(model.WikiDataId) == false)
+            {
+                model.others.Add(new RelevancesModel
+                {
+                    DisplayName = "WikiData",
+                    Link = "https://www.wikidata.org/wiki/" + model.WikiDataId
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.BaiDuName) == false)
+            {
+                model.others.Add(new RelevancesModel
+                {
+                    DisplayName = "百度百科",
+                    Link = "https://baike.baidu.com/item/" + model.BaiDuName
+                });
+            }
+            if (string.IsNullOrWhiteSpace(model.ZhWikiPediaName) == false)
+            {
+                model.others.Add(new RelevancesModel
+                {
+                    DisplayName = "中文维基百科",
+                    Link = "https://zh.wikipedia.org/wiki/" + HttpUtility.UrlDecode(model.ZhWikiPediaName)
+                });
+            }
+            
             newEntry.Outlinks.Clear();
             newEntry.Articles = articles;
             newEntry.EntryRelationFromEntryNavigation = entries.Select(s => new EntryRelation
@@ -2596,6 +2678,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     Link = item.Link,
                 });
             }
+
+
         }
 
         public void SetDataFromEditMainPageViewModel(Entry newEntry, EditMainPageViewModel model)
