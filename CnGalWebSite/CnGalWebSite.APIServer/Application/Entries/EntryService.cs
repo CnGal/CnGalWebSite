@@ -2317,7 +2317,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             {
                 if (item.Link.Contains("moegirl.org"))
                 {
-                    model.MoegirlName = item.Link.Replace("https://zh.moegirl.org.cn/", "").Split('/').FirstOrDefault();
+                    model.MoegirlName = HttpUtility.UrlDecode(item.Link.Replace("https://zh.moegirl.org.cn/", "").Split('/').FirstOrDefault());
                 }
                 else if (item.Link.Contains("vndb.org"))
                 {
@@ -2331,9 +2331,13 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     model.WikiDataId = item.Link.Replace("https://www.wikidata.org/wiki/", "").Split('/').FirstOrDefault();
                 }
+                else if (item.Link.Contains("galge.fun") || item.Link.Contains("www.2dfan.com"))
+                {
+                    model._2DFanId = item.Link.Replace("https://galge.fun/subjects/", "").Replace("https://www.2dfan.com/subjects/", "").Split('/').FirstOrDefault();
+                }
                 else if (item.Link.Contains("baike.baidu.com"))
                 {
-                    model.BaiDuName = item.Link.Replace("https://baike.baidu.com/item/", "").Split('/').FirstOrDefault();
+                    model.BaiDuName = HttpUtility.UrlDecode(item.Link.Replace("https://baike.baidu.com/item/", "").Split('/').FirstOrDefault());
                 }
                 else if (item.Link.Contains("zh.wikipedia.org"))
                 {
@@ -2660,7 +2664,15 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     Link = "https://zh.wikipedia.org/wiki/" + HttpUtility.UrlDecode(model.ZhWikiPediaName)
                 });
             }
-            
+            if (string.IsNullOrWhiteSpace(model._2DFanId) == false)
+            {
+                model.others.Add(new RelevancesModel
+                {
+                    DisplayName = "2DFan",
+                    Link = "https://galge.fun/subjects/" + HttpUtility.UrlDecode(model._2DFanId)
+                });
+            }
+
             newEntry.Outlinks.Clear();
             newEntry.Articles = articles;
             newEntry.EntryRelationFromEntryNavigation = entries.Select(s => new EntryRelation
