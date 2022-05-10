@@ -91,7 +91,7 @@
                 autoSave.Clean();
 
                 await ToastService.Success("编辑文章主页成功", "编辑文章主页成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/articles/index/" + obj.Error, Model.Name, "fa fa-newspaper-o");
+                NavigationManager.NavigateTo("/articles/index/" + Model.Id);
             }
         }
         catch (Exception ex)

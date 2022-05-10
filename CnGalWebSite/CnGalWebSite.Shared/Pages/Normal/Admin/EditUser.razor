@@ -131,7 +131,7 @@
 
                 @if (isReady == true)
                 {
-                    <MarkdownEditorTip Context="@Model.MainPageContext" @ref="markdownEditorTip"></MarkdownEditorTip>
+                    <MarkdownEditorTip @bind-Context="@Model.MainPageContext" @ref="markdownEditorTip"></MarkdownEditorTip>
                 }
 
 
@@ -213,7 +213,6 @@
     {
         try
         {
-            Model.MainPageContext =await markdownEditorTip.GetContext();
             //处理数据
             if (string.IsNullOrWhiteSpace(Model.UserName) || string.IsNullOrWhiteSpace(Model.Email))
             {

@@ -10,20 +10,24 @@
 <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/editor.md/css/editormd.min.css" media="none" onload="this.media='all'" />
 
 <div>
-    <ImagesUploadViewTip images="images" OnUploadedImage="OnUploadImage" Class="mb-3"/>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4">
-            不了解Markdown？可以在这<a href="http://www.markdown.cn/" target="_blank" rel="noreferrer" class="success--text fw-bold">查看语法说明</a>，遇到格式错乱？<a @onclick="SwitchEditor" class="success--text fw-bold">切换编辑器</a>
+
+    <ImagesUploadViewTip images="images" OnUploadedImage="OnUploadImage" Class="mb-3"  @ref="imagesUploadViewTip"/>
+
+    <ImageTransformTip Text="@Context" TextChanged="ImageTransformed" Class="mb-3"/>
+
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4">
+        不了解Markdown？可以在这<a href="http://www.markdown.cn/" target="_blank" rel="noreferrer" class="success--text fw-bold">查看语法说明</a>，遇到格式错乱？<a @onclick="SwitchEditor" class="success--text fw-bold">切换编辑器</a>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     @if (isReady)
     {
-         @if (isOldEditor)
-         {
-                 <Markdown Height="800" MinHeight="300" Placeholder="这是 Markdown" PreviewStyle="PreviewStyle.Tab"
+        @if (isOldEditor)
+        {
+            <Markdown Height="800" MinHeight="300" Placeholder="这是 Markdown" PreviewStyle="PreviewStyle.Tab" 
                       InitialEditType="InitialEditType.Wysiwyg" Value="@Context" ValueChanged="ContextValueChanged" Language="zh-CN"></Markdown>
         }
         else
         {
-             <EditorMdViewTip Context="@Context" @ref="markdownEditorTip" ContextChanged="ContextValueChanged"></EditorMdViewTip>
+            <EditorMdViewTip Context="@Context" @ref="markdownEditorTip" ContextChanged="ContextValueChanged"></EditorMdViewTip>
         }
     }
 
@@ -36,6 +40,7 @@
     public EventCallback<string> ContextChanged { get; set; }
     [NotNull]
     private EditorMdViewTip? markdownEditorTip;
+    ImagesUploadViewTip imagesUploadViewTip;
     bool isReady = false;
     bool isOldEditor;
 
@@ -44,23 +49,28 @@
         if (firstRender && ToolHelper.IsSSR == false)
         {
             isReady = true;
-            //获取主页中原有的图片
-            if (string.IsNullOrWhiteSpace(Context) == false)
-            {
-                var temp = ToolHelper.GetImageLinks(Context);
-
-                images.Clear();
-                foreach (var item in temp)
-                {
-                    images.Add(new ImagesUploadAloneModel
-                    {
-                        ImagePath = item,
-                        Image = item
-                    });
-                }
-            }
+            SetImages();
             StateHasChanged();
         }
+    }
+
+    public void SetImages()
+    {
+        //获取主页中原有的图片
+        if (string.IsNullOrWhiteSpace(Context) == false)
+        {
+            var temp = ToolHelper.GetImageLinks(Context);
+
+            images.Clear();
+            foreach (var item in temp)
+            {
+                images.Add(new ImagesUploadAloneModel
+                {
+                    Image = item
+                });
+            }
+        }
+        StateHasChanged();
     }
 
     public Task SwitchEditor()
@@ -70,15 +80,6 @@
         return Task.CompletedTask;
     }
 
-    public async Task<string> GetContext()
-    {
-
-        Context = await markdownEditorTip.GetContext();
-        await ContextChanged.InvokeAsync(Context);
-
-        return Context;
-    }
-
     public List<ImagesUploadAloneModel> images = new List<ImagesUploadAloneModel>();
 
     public async Task ContextValueChanged(string text)
@@ -86,19 +87,38 @@
         Context = text;
         await ContextChanged.InvokeAsync(Context);
     }
+    public async Task ImageTransformed(string text)
+    {
+        if (isOldEditor)
+        {
+            Context = text;
+            await ContextChanged.InvokeAsync(Context);
+        }
+        else
+        {
+            Context = text;
+            await markdownEditorTip.SetContext(text);
+        }
 
+        SetImages();
+
+
+        if (imagesUploadViewTip!=null)
+        {
+            await imagesUploadViewTip.Refresh();
+        }
+
+    }
     public async Task OnUploadImage(string url)
     {
-
-        Context = await markdownEditorTip.GetContext();
-
-        //更新字符串
-        string temp = ("\n![image](" + url + ")\n");
-        Context += temp;
-
-        await markdownEditorTip.AddContext(temp);
-
-        await ContextChanged.InvokeAsync(Context);
-        StateHasChanged();
+        if(isOldEditor)
+        {
+            Context += ("\n![image](" + url + ")\n");
+            await ContextChanged.InvokeAsync(Context);
+        }
+        else
+        {
+            await markdownEditorTip.InsertContext("\n![image](" + url + ")\n");
+        }
     }
 }

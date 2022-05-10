@@ -120,7 +120,7 @@ function trackEvent(categotry, action, lable, value, nodeid) {
     umami.trackEvent(lable,categotry  + ' ' + action);
 }
 var editor;
-function initEditorMd(markdownstring) {
+function initEditorMd(objRef , markdownstring) {
     $(function () {
         editor = editormd("editor", {
             htmlDecode: true,
@@ -132,7 +132,10 @@ function initEditorMd(markdownstring) {
            // flowChart: true, // 开启流程图支持，默认关闭
             placeholder: "这里是Markdown编辑器，可以点击右侧问号了解语法详情",
             markdown: markdownstring,     // dynamic set Markdown text
-            path: "_content/CnGalWebSite.Shared/editor.md/lib/"  // Autoload modules mode, codemirror, marked... dependents libs path
+            path: "_content/CnGalWebSite.Shared/editor.md/lib/",  // Autoload modules mode, codemirror, marked... dependents libs path
+            onchange: function () {
+                objRef.invokeMethodAsync('OnContextChanged', editor.getMarkdown());
+            }
         });
     });
 }
@@ -140,8 +143,11 @@ function initEditorMd(markdownstring) {
 function getEditorMdContext() {
     return editor.getMarkdown();
 }
-function addEditorMdContext(markdownstring) {
-    editor.appendMarkdown(markdownstring);
+function setEditorMdContext(markdownstring) {
+    editor.setMarkdown(markdownstring);
+}
+function insertEditorMdContext(markdownstring) {
+    editor.insertValue(markdownstring);
 }
 
 function initUploadButton(objRef, up_to_chevereto, up_img_label) {

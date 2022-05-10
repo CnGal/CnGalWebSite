@@ -83,7 +83,7 @@
 
             @if (isReady == true)
             {
-                <MarkdownEditorTip @ref="markdownEditorTip"  Context="@Model.MainPage"></MarkdownEditorTip>
+                <MarkdownEditorTip @ref="markdownEditorTip"  @bind-Context="@Model.MainPage"></MarkdownEditorTip>
             }
 
 
@@ -192,7 +192,6 @@
     {
         try
         {
-            Model.MainPage = await markdownEditorTip.GetContext();
             //处理数据
             if (string.IsNullOrWhiteSpace(Model.Name) || string.IsNullOrWhiteSpace(Model.DisplayName))
             {
