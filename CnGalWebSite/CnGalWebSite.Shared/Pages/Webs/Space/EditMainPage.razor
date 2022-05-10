@@ -46,7 +46,7 @@
             <hr class="mb-4" />
 
 
-            <MarkdownEditorTip Context="@Model.MainPage" @ref="markdownEditorTip"></MarkdownEditorTip>
+            <MarkdownEditorTip @bind-Context="@Model.MainPage"></MarkdownEditorTip>
             <div class="mt-4">
                 <Button class="m-1" style="width: 100px" @onclick="@(()=> OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
             </div>
@@ -63,9 +63,6 @@
     public string Id { get; set; }
     public EditUserMainPageViewModel Model { get; set; } = new EditUserMainPageViewModel();
     bool isReady = false;
-
-    [NotNull]
-    private MarkdownEditorTip? markdownEditorTip;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -90,7 +87,6 @@
         //上传
         try
         {
-            Model.MainPage = await markdownEditorTip.GetContext();
             if (string.IsNullOrWhiteSpace(Model.MainPage))
             {
                 Model.MainPage = "";

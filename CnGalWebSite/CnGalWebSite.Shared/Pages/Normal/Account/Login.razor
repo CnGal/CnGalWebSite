@@ -7,7 +7,7 @@
 @inject ToastService ToastService
 @inject IJSRuntime JS
 @inject HttpClient Http
-@implements IAsyncDisposable
+@implements IDisposable
 @inject IDataCacheService _dataCacheService
 
 @inject WebClientService? ClientService
@@ -103,50 +103,6 @@
     string Validate = "";
     string Seccode = "";
     bool IsInitGeetest = false;
-    #region 获取屏幕大小
-
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime JSRuntime { get; set; }
-
-
-
-    public bool IsSmallScreen { get; set; }
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; }
-
-
-    private JSInterop<Login> Interop { get; set; }
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 768))
-        {
-            IsSmallScreen = width < 768;
-
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 768 && width < 1517))
-        {
-            IsNormalScreen = width >= 768 && width < 1517;
-
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 1517))
-        {
-            IsLargeScreen = width >= 1517;
-            StateHasChanged();
-        }
-    }
-    #endregion
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -155,8 +111,6 @@
 
         if (firstRender)
         {
-            Interop = new JSInterop<Login>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
 
             //判断是否已经登入
             if (await AuthService.IsLogin())
@@ -298,22 +252,12 @@
     }
 
     #region 释放实例
-    private async ValueTask DisposeAsyncCore()
+    public void Dispose()
     {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
         if (objRef != null)
         {
             objRef?.Dispose();
         }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
         GC.SuppressFinalize(this);
     }
     #endregion

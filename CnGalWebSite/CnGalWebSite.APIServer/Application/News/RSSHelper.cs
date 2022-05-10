@@ -65,17 +65,17 @@ namespace CnGalWebSite.APIServer.Application.News
             }
 
             //将图片上传到图床
-            foreach (var item in model)
-            {
-                var images = ToolHelper.GetImageLinks(item.Description);
-                foreach (var temp in images)
-                {
-                    var infor = await _fileService.SaveImageAsync(temp, _configuration["NewsAdminId"]);
+            //foreach (var item in model)
+            //{
+            //    var images = ToolHelper.GetImageLinks(item.Description);
+            //    foreach (var temp in images)
+            //    {
+            //        var infor = await _fileService.SaveImageAsync(temp, _configuration["NewsAdminId"]);
 
-                    //替换图片
-                    item.Description = item.Description.Replace(temp, infor);
-                }
-            }
+            //        //替换图片
+            //        item.Description = item.Description.Replace(temp, infor);
+            //    }
+            //}
 
             return model;
         }
@@ -230,14 +230,14 @@ namespace CnGalWebSite.APIServer.Application.News
 
                 if (weibo.Link.Contains(keyWord))
                 {
-                    var images = ToolHelper.GetImageLinks(weibo.Description);
-                    foreach (var temp in images)
-                    {
-                        var infor = await _fileService.SaveImageAsync(temp, _configuration["NewsAdminId"]);
+                    //var images = ToolHelper.GetImageLinks(weibo.Description);
+                    //foreach (var temp in images)
+                    //{
+                    //    var infor = await _fileService.SaveImageAsync(temp, _configuration["NewsAdminId"]);
 
-                        //替换图片
-                        weibo.Description = weibo.Description.Replace(temp, infor);
-                    }
+                    //    //替换图片
+                    //    weibo.Description = weibo.Description.Replace(temp, infor);
+                    //}
                     return weibo;
                 }
             }

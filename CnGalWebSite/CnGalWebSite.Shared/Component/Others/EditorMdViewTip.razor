@@ -1,11 +1,4 @@
 ﻿@inject IJSRuntime JS
-@inject HttpClient Http
-@inject ExamineService _examineService
-@inject ILocalStorageService _localStorage
-@inject ToastService? ToastService
-@inject IAppHelper _appHelper
-@inject IServiceProvider Provider
-@inject NavigationManager NavigationManager
 @implements IDisposable
 
 <div style="height:800px">
@@ -17,8 +10,9 @@
     public string Context { get; set; }
     [Parameter]
     public EventCallback<string> ContextChanged { get; set; }
+    private DotNetObjectReference<EditorMdViewTip> objRef;
 
-    private System.Threading.Timer mytimer;
+    bool isLoaded = false;
 
     public async Task<string> GetContext()
     {
@@ -28,15 +22,32 @@
         }
         return Context;
     }
-    public async Task AddContext(string context)
+
+    /// <summary>
+    /// 在光标位置插入文本
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public async Task InsertContext(string context)
     {
         if (isLoaded)
         {
-            await JS.InvokeAsync<string>("addEditorMdContext", context);
+            await JS.InvokeAsync<string>("insertEditorMdContext", context);
         }
-        Context += context;
     }
-    bool isLoaded = false;
+
+    /// <summary>
+    /// 设置文本
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public async Task SetContext(string context)
+    {
+        if (isLoaded)
+        {
+            await JS.InvokeAsync<string>("setEditorMdContext", context);
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -44,41 +55,27 @@
         if (firstRender)
         {
             //初始化编辑器
-            await JS.InvokeAsync<string>("initEditorMd", Context);
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeAsync<string>("initEditorMd", objRef, Context);
             isLoaded = true;
-            //启动定时器
-            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 1);
-
         }
     }
-    private async void Send(object o)
+    [JSInvokable]
+    public async Task OnContextChanged(string context)
     {
-        await InvokeAsync(async () =>
-        {
-            try
-            {
-                var context = Context;
-                await GetContext();
-
-                if (context != Context)
-                {
-                    await ContextChanged.InvokeAsync(Context);
-                }
-            }
-            catch
-            {
-
-            }
-        });
-
+        Context = context;
+        await ContextChanged.InvokeAsync(Context);
     }
+
+
+    #region 释放实例
     public void Dispose()
     {
-        if (mytimer != null)
+        if (objRef != null)
         {
-            mytimer.Dispose();
-            mytimer = null;
+            objRef?.Dispose();
         }
         GC.SuppressFinalize(this);
     }
+    #endregion
 }
