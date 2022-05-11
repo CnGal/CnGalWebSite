@@ -6,21 +6,24 @@
     </div>
 </div>
 @code {
-    [Parameter]
-    public string Context { get; set; }
+        [Parameter]
+        public string Context { get; set; }
+    public string _context { get; set; }
+
+
     [Parameter]
     public EventCallback<string> ContextChanged { get; set; }
     private DotNetObjectReference<EditorMdViewTip> objRef;
 
     bool isLoaded = false;
 
-    public async Task<string> GetContext()
+    protected override async Task OnParametersSetAsync()
     {
-        if (isLoaded)
+        if (isLoaded && _context != Context)
         {
-            Context = await JS.InvokeAsync<string>("getEditorMdContext");
+            _context = Context;
+            await JS.InvokeAsync<string>("setEditorMdContext", Context);
         }
-        return Context;
     }
 
     /// <summary>
@@ -36,19 +39,6 @@
         }
     }
 
-    /// <summary>
-    /// 设置文本
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    public async Task SetContext(string context)
-    {
-        if (isLoaded)
-        {
-            await JS.InvokeAsync<string>("setEditorMdContext", context);
-        }
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
@@ -56,15 +46,20 @@
         {
             //初始化编辑器
             objRef = DotNetObjectReference.Create(this);
-            await JS.InvokeAsync<string>("initEditorMd", objRef, Context);
+            await JS.InvokeAsync<string>("initEditorMd", objRef, Context??"");
             isLoaded = true;
         }
     }
+
     [JSInvokable]
     public async Task OnContextChanged(string context)
     {
-        Context = context;
-        await ContextChanged.InvokeAsync(Context);
+        if(Context!=context)
+        {
+            Context = context;
+            await ContextChanged.InvokeAsync(Context);
+
+        }
     }
 
 

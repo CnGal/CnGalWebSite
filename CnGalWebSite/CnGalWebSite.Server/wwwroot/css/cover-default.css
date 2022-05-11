@@ -329,9 +329,9 @@ code[class*=language-], pre[class*=language-] {
 .theme--dark.m-application code {
     background-color: transparent;
 }
-.toastui-editor-popup-add-image .toastui-editor-file-name {
-    display: none;
+.placeholder {
+    background-color: transparent;
 }
-.toastui-editor-popup-add-image .toastui-editor-file-select-button {
-    display: none;
+.toastui-editor-contents {
+    z-index: 4;
 }

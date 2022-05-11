@@ -149,6 +149,16 @@ function setEditorMdContext(markdownstring) {
 function insertEditorMdContext(markdownstring) {
     editor.insertValue(markdownstring);
 }
+function initVditorContext(objRef, domRef) {
+    domRef.Vditor.vditor.options.upload.success = (editor, res) => {
+        objRef.invokeMethodAsync('HandleUploadSuccessAsync', res);
+    };
+    domRef.Vditor.vditor.options.upload.linkToImgFormat = (res) => {
+        objRef.invokeMethodAsync('HandleLinkToImgFormatAsync', res);
+    };
+}
+
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
 function initUploadButton(objRef, up_to_chevereto, up_img_label) {
     jQuery(up_to_chevereto).change(function () {

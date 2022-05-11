@@ -11,23 +11,33 @@
 
 <div>
 
-    <ImagesUploadViewTip images="images" OnUploadedImage="OnUploadImage" Class="mb-3"  @ref="imagesUploadViewTip"/>
+    <ImagesUploadViewTip images="images" OnUploadedImage="OnUploadImage" Class="mb-3" @ref="imagesUploadViewTip">
+        <ImageTransformTip Text="@Context" TextChanged="ImageTransformed" Class="ms-3 mb-3" />
 
-    <ImageTransformTip Text="@Context" TextChanged="ImageTransformed" Class="mb-3"/>
+    </ImagesUploadViewTip>
+
 
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4">
-        不了解Markdown？可以在这<a href="http://www.markdown.cn/" target="_blank" rel="noreferrer" class="success--text fw-bold">查看语法说明</a>，遇到格式错乱？<a @onclick="SwitchEditor" class="success--text fw-bold">切换编辑器</a>
+        不了解Markdown？可以在这<a href="http://www.markdown.cn/" target="_blank" rel="noreferrer" class="success--text fw-bold">查看语法说明</a>
+        ，你也可以选择自己喜欢的编辑器
+        <a @onclick="()=>SwitchEditor(MarkdownEditorVersion.Vditor)" class="success--text fw-bold">Vditor</a>，
+        <a @onclick="()=>SwitchEditor(MarkdownEditorVersion.EditorMd)" class="success--text fw-bold">Editor.md</a>，
+        <a @onclick="()=>SwitchEditor(MarkdownEditorVersion.ToastUIEditor)" class="success--text fw-bold">ToastUI Editor</a>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     @if (isReady)
     {
-        @if (isOldEditor)
+        @if (Version == MarkdownEditorVersion.ToastUIEditor)
         {
-            <Markdown Height="800" MinHeight="300" Placeholder="这是 Markdown" PreviewStyle="PreviewStyle.Tab" 
+            <Markdown Height="800" MinHeight="300" Placeholder="这是 Markdown" PreviewStyle="PreviewStyle.Tab"
                       InitialEditType="InitialEditType.Wysiwyg" Value="@Context" ValueChanged="ContextValueChanged" Language="zh-CN"></Markdown>
+        }
+        else if (Version == MarkdownEditorVersion.EditorMd)
+        {
+            <EditorMdViewTip Context="@Context" @ref="markdownEditorTip" ContextChanged="ContextValueChanged"></EditorMdViewTip>
         }
         else
         {
-            <EditorMdViewTip Context="@Context" @ref="markdownEditorTip" ContextChanged="ContextValueChanged"></EditorMdViewTip>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMarkdown Context="@Context" ContextChanged="ContextValueChanged" @ref="masaMarkdown"/>
         }
     }
 
@@ -38,11 +48,16 @@
     public string Context { get; set; }
     [Parameter]
     public EventCallback<string> ContextChanged { get; set; }
-    [NotNull]
-    private EditorMdViewTip? markdownEditorTip;
+
+    EditorMdViewTip markdownEditorTip;
     ImagesUploadViewTip imagesUploadViewTip;
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMarkdown masaMarkdown;
+
     bool isReady = false;
     bool isOldEditor;
+
+    MarkdownEditorVersion Version;
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -70,13 +85,12 @@
                 });
             }
         }
-        StateHasChanged();
     }
 
-    public Task SwitchEditor()
+    public Task SwitchEditor(MarkdownEditorVersion version)
     {
-        isOldEditor = !isOldEditor;
-
+        Version = version;
+        StateHasChanged();
         return Task.CompletedTask;
     }
 
@@ -89,36 +103,32 @@
     }
     public async Task ImageTransformed(string text)
     {
-        if (isOldEditor)
-        {
-            Context = text;
-            await ContextChanged.InvokeAsync(Context);
-        }
-        else
-        {
-            Context = text;
-            await markdownEditorTip.SetContext(text);
-        }
+
+        Context = text;
+        await ContextChanged.InvokeAsync(Context);
 
         SetImages();
 
-
-        if (imagesUploadViewTip!=null)
-        {
-            await imagesUploadViewTip.Refresh();
-        }
-
+        //if (imagesUploadViewTip != null)
+        //{
+        //    await imagesUploadViewTip.Refresh();
+        //}
     }
+
     public async Task OnUploadImage(string url)
     {
-        if(isOldEditor)
+        if (Version == MarkdownEditorVersion.ToastUIEditor)
         {
-            Context += ("\n![image](" + url + ")\n");
+            Context += ("\n![](" + url + ")\n");
             await ContextChanged.InvokeAsync(Context);
+        }
+        else if (Version == MarkdownEditorVersion.Vditor)
+        {
+            await masaMarkdown.InsertContext("\n![](" + url + ")\n");
         }
         else
         {
-            await markdownEditorTip.InsertContext("\n![image](" + url + ")\n");
+            await markdownEditorTip.InsertContext("\n![](" + url + ")\n");
         }
     }
 }

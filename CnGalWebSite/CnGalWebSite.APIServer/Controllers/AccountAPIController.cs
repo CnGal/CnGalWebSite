@@ -103,8 +103,6 @@ namespace CnGalWebSite.APIServer.Controllers
                     Email = model.Email,
                     PersonalSignature = "哇，这里什么都没有呢",
                     MainPageContext = "### 哇，这里什么都没有呢",
-                    Integral = 0,
-                    ContributionValue = 0,
                     RegistTime = DateTime.Now.ToCstTime(),
                     Birthday = null
                 };

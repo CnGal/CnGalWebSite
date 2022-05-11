@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.Helper.Extensions
+﻿using System.Text.RegularExpressions;
+
+namespace CnGalWebSite.Helper.Extensions
 {
     public static class StringExtension
     {
@@ -45,6 +47,7 @@
             }
             return result;
         }
+
         public static string DeleteHtmlLinks(this string value)
         {
             value = value.Replace("</a>", "");
@@ -65,7 +68,10 @@
             return value;
         }
 
-
+        public static List<string> GetLinks(this string value)
+        {
+            return Regex.Matches(value, "http[s]?://(?:(?!http[s]?://)[a-zA-Z]|[0-9]|[$\\-_@.&+/]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+").Select(s => s.ToString().Trim()).ToList();
+        }
 
     }
 }

@@ -2,14 +2,14 @@
 @inject IDataCacheService _dataCatcheService
 
 <div class="@Class">
-    <ImageUpLoadButton OnUploadedImage="UpLoaded"/>
+
     @if (images.Count != 0)
     {
         <div class="row">
             @foreach (var item in images)
             {
 
-                <div class="col-6 col-lg-4 col-xl-3 mt-3">
+                <div class="col-6 col-lg-4 col-xl-3 mb-3">
                     <div class="rounded shadow-sm bg-opacity h-100 ">
                         <img src="@item.Image" class="w-100 pointer" @onclick="()=>OnClickImage(images.IndexOf(item))">
 
@@ -28,32 +28,39 @@
         </div>
     }
 
+    <div style="display:flex">
+        <ImageUpLoadButton OnUploadedImage="UpLoaded" Class="mb-3"/>
+        @ChildContent
+
+    </div>
 
 </div>
 
 
 @code {
-        [Parameter]
-        public EventCallback<string> OnUploadedImage { get; set; }
-        [Parameter]
-        public string Class { get; set; }
-        [Parameter]
-        public List<ImagesUploadAloneModel> images { get; set; } = new List<ImagesUploadAloneModel>();
+    [Parameter]
+    public EventCallback<string> OnUploadedImage { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public List<ImagesUploadAloneModel> images { get; set; } = new List<ImagesUploadAloneModel>();
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
 
-        public async Task<string> UpLoaded(string url)
+    public async Task<string> UpLoaded(string url)
+    {
+        //添加到数据模型中
+        images.Add(new ImagesUploadAloneModel
         {
-            //添加到数据模型中
-            images.Add(new ImagesUploadAloneModel
-            {
-                Image = url
-            });
+            Image = url
+        });
 
-            await OnUploadedImage.InvokeAsync(url);
+        await OnUploadedImage.InvokeAsync(url);
 
-            StateHasChanged();
+        StateHasChanged();
 
-            return url;
-        }
+        return url;
+    }
     protected override async Task OnInitializedAsync()
     {
 

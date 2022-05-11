@@ -1,0 +1,111 @@
+﻿@inject IJSRuntime JS
+
+
+<MMarkdown Options="_options" Value="@Context" ValueChanged="ValueChanged" @ref="mMarkdown" >
+</MMarkdown>
+
+@code {
+    [Parameter]
+    public string Context { get; set; }
+    [Parameter]
+    public EventCallback<string> ContextChanged { get; set; }
+    private Dictionary<string, object> _options = new Dictionary<string, object>();
+
+    MMarkdown mMarkdown;
+    private DotNetObjectReference<MasaMarkdown> objRef;
+
+
+    protected override async void OnInitialized()
+    {
+        _options.Add("height", 800);
+        _options.Add("minHeight", 800);
+        _options.Add("width", "100%");
+        _options.Add("upload", new
+        {
+            url = ToolHelper.ImageApiPath+"/api/files/VditorUpload",
+            max = 10 * 1024 * 1024,
+            accept = "image/*",
+            multiple = true,
+            linkToImgUrl = ToolHelper.ImageApiPath + "/api/files/linkToImgUrl"
+        });
+
+        base.OnInitialized();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            InitEditor();
+        }
+    }
+
+    public async Task InitEditor()
+    {
+        await Task.Delay(2000);
+        objRef = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("initVditorContext", objRef, mMarkdown.Ref);
+    }
+
+    public async Task ValueChanged(string text)
+    {
+        Context = text;
+        await ContextChanged.InvokeAsync(text);
+    }
+
+    [JSInvokable]
+    public async Task HandleUploadSuccessAsync(string res)
+    {
+        try
+        {
+            var model = JsonSerializer.Deserialize<VditorUploadResult>(res,ToolHelper.options);
+
+            foreach (var item in model.date.succMap)
+            {
+                if (mMarkdown != null)
+                {
+                    await mMarkdown.InsertValueAsync($"\n![]({item.Value})\n");
+                }
+            }
+        }
+        catch
+        {
+
+        }
+
+
+    }
+    [JSInvokable]
+    public async Task HandleLinkToImgFormatAsync(string res)
+    {
+        try
+        {
+            var model = JsonSerializer.Deserialize<LinkToImgModel>(res, ToolHelper.options);
+            if (mMarkdown != null && model.date.url != model.date.originalURL && string.IsNullOrWhiteSpace(model.date.url)==false && string.IsNullOrWhiteSpace(model.date.originalURL)==false)
+            {
+                Context = Context.Replace(model.date.originalURL, model.date.url);
+                await ContextChanged.InvokeAsync(Context);
+            }
+        }
+        catch
+        {
+
+        }
+
+
+    }
+    /// <summary>
+    /// 在光标位置插入文本
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public async Task InsertContext(string context)
+    {
+        if(mMarkdown!=null)
+        {
+            await mMarkdown.InsertValueAsync(context);
+
+        }
+    }
+}

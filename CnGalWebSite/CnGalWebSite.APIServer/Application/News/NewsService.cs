@@ -721,7 +721,7 @@ namespace CnGalWebSite.APIServer.Application.News
             {
                 Type = ArticleType.News,
                 RSS = originalRSS,
-                Title = GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 15),
+                Title = GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 15).Trim().Replace("\n","").Replace("\r", ""),
                 BriefIntroduction = GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 500),
                 Author = authorString,
                 MainPage = GetMicroblogMainPage(originalRSS.Description, authorString),
