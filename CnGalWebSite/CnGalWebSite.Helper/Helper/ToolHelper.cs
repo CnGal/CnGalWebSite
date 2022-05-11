@@ -58,6 +58,10 @@ namespace CnGalWebSite.DataModel.Helper
                     var temp = MidStrEx(linshi[i], "[image](", ")");
                     if (string.IsNullOrWhiteSpace(temp))
                     {
+                        temp = MidStrEx(linshi[i], "[image.png](", ")");
+                    }
+                    if (string.IsNullOrWhiteSpace(temp))
+                    {
                         temp = MidStrEx(linshi[i], "[](", ")");
                     }
                     if (string.IsNullOrWhiteSpace(temp) == false && temp.Contains("data:image") == false)
