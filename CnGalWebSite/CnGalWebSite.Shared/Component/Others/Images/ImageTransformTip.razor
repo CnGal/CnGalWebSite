@@ -1,7 +1,7 @@
 ﻿@inject HttpClient Http
 
 <div class="@Class">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="转存文章中的图片" IsAsync="true" OnClick="OnClick" Icon="mdi-transit-connection-variant " Color="green" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="转存图片并整理格式" IsAsync="true" OnClick="OnClick" Icon="mdi-transit-connection-variant " Color="green" />
 </div>
 
 @code {
@@ -24,7 +24,7 @@
         foreach (var item in oldImages)
         {
 
-            var result = await Http.PostAsJsonAsync("https://api.cngal.top/api/files/TransferDepositFile", new TransferDepositFileModel
+            var result = await Http.PostAsJsonAsync(ToolHelper.ImageApiPath + "/api/files/TransferDepositFile", new TransferDepositFileModel
             {
                 Url = item,
             });
@@ -41,7 +41,7 @@
         sb.Replace("\\[\\]", "[]");
         Text = sb.ToString();
 
-       await TextChanged.InvokeAsync(Text);
+        await TextChanged.InvokeAsync(Text);
     }
 
 }

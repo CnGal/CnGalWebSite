@@ -37,6 +37,7 @@
                           https://static.geetest.com/
                           https://monitor.geetest.com/
                           https://dn-staticdown.qbox.me/
+                          https://cdn.masastack.com/
                           'unsafe-inline'
                           'unsafe-eval'
                           'self';
@@ -50,6 +51,7 @@
                         https://cdn.jsdelivr.net/
                         https://fonts.googleapis.com/
                         https://use.fontawesome.com/
+                        https://cdn.masastack.com/
                         'self'
                         'unsafe-inline';
                font-src https://app.cngal.org/
@@ -64,6 +66,8 @@
                         'self';
                connect-src https://umami.cngal.top/
                         https://pic.cngal.top/
+                        https://cdn.masastack.com/
+                        http://localhost:5098/
                         'self';
                upgrade-insecure-requests;">
 
@@ -71,6 +75,8 @@
     <!--masa blazor css style-->
     <link href="https://app.cngal.org/_content/Masa.Blazor/css/masa-blazor.css" rel="stylesheet" />
     <link href="https://app.cngal.org/_content/Masa.Blazor/css/masa-extend-blazor.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.css" />
+
     <!--icon file,import need to use-->
     <link href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet" />
@@ -141,10 +147,11 @@
     <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/NativeShare.js"></script>
     <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/gt.js"></script>
 
-    <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/bundle-js.min.js"></script>
+    <script src="scripts/bundle-js.js"></script>
 
     <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/highlight.min.js"></script>
     <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/editor-md/1.5.0/editormd.min.js"></script>
+    <script src="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.min.js"></script>
 
     <script async defer data-website-id="5d00ea9a-0bc7-4ea9-bf86-661c5e7cd01e" src="https://umami.cngal.top/umami.js"></script>
 

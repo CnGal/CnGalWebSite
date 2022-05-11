@@ -1,10 +1,32 @@
-﻿namespace CnGalWebSite.Helper.Helper
+﻿using System.Text;
+
+namespace CnGalWebSite.Helper.Helper
 {
     public static class OutputHelper
     {
         public static void PressError(Exception ex, string message = "", string reason = "服务器网络异常", string resolvent = "检查网络是否正常，加群761794704反馈")
         {
-            Write(OutputLevel.Dager, $"> {message}\n> 原因：{reason}\n> 解决方法：{resolvent}\n> 报错：{ex.Message}\n> 调用：\n{ex.StackTrace}");
+            StringBuilder sb=new StringBuilder();
+            if (string.IsNullOrWhiteSpace(message) == false)
+            {
+            sb.AppendLine($"> { message}");
+            }
+            if (string.IsNullOrWhiteSpace(reason) == false)
+            {
+            sb.AppendLine($"> 原因：{reason}");
+
+            }
+            if (string.IsNullOrWhiteSpace(resolvent) == false)
+            {
+            sb.AppendLine($"> 解决方法：{resolvent}");
+
+            }
+
+
+            sb.AppendLine($"> 报错：{ex.Message}");
+            sb.AppendLine($"> 调用：{ex.StackTrace}");
+
+            Write(OutputLevel.Dager, sb.ToString());
         }
 
         public static void Write(OutputLevel level, string text)
