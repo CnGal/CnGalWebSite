@@ -117,7 +117,7 @@ namespace CnGalWebSite.DrawingBed.Services
                 Suffix = temp[^1];
             }
 
-            return Suffix;
+            return Suffix.Length > 4 ? "png" : Suffix;
         }
 
         private string SaveFormFile(IFormFile file)
@@ -227,9 +227,9 @@ namespace CnGalWebSite.DrawingBed.Services
         /// <param name="oldPath"></param>
         /// <param name="newPath"></param>
         /// <param name="proportion"></param>
-        private static string GetPicThumbnail(string path,double proportion)
+        private string GetPicThumbnail(string path,double proportion)
         {
-            var newPath = Path.Combine(path, Guid.NewGuid().ToString() + "." + GetFileSuffixName(path));
+            var newPath = Path.Combine(_tempPath, Guid.NewGuid().ToString() + "." + GetFileSuffixName(path));
             using (var image = Image.Load(path))
             {
                 image.Mutate(x => x
@@ -246,9 +246,9 @@ namespace CnGalWebSite.DrawingBed.Services
         /// <param name="newPath"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        private static string CutImage(string path, double x = 0, double y = 0)
+        private  string CutImage(string path, double x = 0, double y = 0)
         {
-            var newPath = Path.Combine(path, Guid.NewGuid().ToString() + "." + GetFileSuffixName(path));
+            var newPath = Path.Combine(_tempPath, Guid.NewGuid().ToString() + "." + GetFileSuffixName(path));
 
             using (var image = Image.Load(path))
             {
