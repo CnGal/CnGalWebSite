@@ -37,7 +37,9 @@
     <Content Include="..\CnGalWebSite.WebAssembly\wwwroot\css\wasm.css" Link="wwwroot\css\wasm.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\CnGalWebSite.WebAssembly\wwwroot\js\common.js" Link="wwwroot\js\common.js" />
+    <Content Include="..\CnGalWebSite.WebAssembly\wwwroot\js\common.js" Link="wwwroot\js\common.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="C:\Users\Little Fish\.nuget\packages\bootstrapblazor.tableexport\6.0.0\contentFiles\any\net6.0\wwwroot\js\export.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -77,6 +79,10 @@
     <Folder Include="Pages\Apps\Entries\" />
     <Folder Include="Pages\Apps\Peripheries\" />
     <Folder Include="Pages\Apps\Space\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="..\CnGalWebSite.Server\wwwroot\scripts\check.min.js" Link="wwwroot\js\check.min.js" />
   </ItemGroup>
 
 </Project>

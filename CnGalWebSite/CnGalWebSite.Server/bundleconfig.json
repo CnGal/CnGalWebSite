@@ -50,10 +50,15 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/scripts/bundle-js.js",
+    "outputFileName": "wwwroot/scripts/bundle-js.min.js",
     "inputFiles": [
-      "wwwroot/js/mouse.js",
       "wwwroot/js/tools-inline.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/scripts/check.min.js",
+    "inputFiles": [
+      "wwwroot/js/check.js"
     ]
   }
 ]
