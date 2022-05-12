@@ -16,23 +16,19 @@
     <div class="p-3">
         <h1 class="login-h1-text mb-4 text-center">欢迎来到CnGal资料站</h1>
         <div>
-            <div>
-                <MTextField @bind-Value="Model.Email"
-                            Color="@_dataCacheService.ThemeSetting.Theme"
-                            Label="电子邮件"></MTextField>
-            </div>
-            <div>
-                <MTextField Dense Label="用户名" Color="@_dataCacheService.ThemeSetting.Theme"
-                            @bind-Value="Model.Name"></MTextField>
-            </div>
-            <div>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPasswordInput Placeholder="请输入密码" Label="密码"
-                                                                                       @bind-Value="Model.Password" />
-            </div>
-            <div>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPasswordInput Placeholder="请输入密码" Label="确认密码"
-                                                                                       @bind-Value="Model.ConfirmPassword" />
-            </div>
+            <MTextField @bind-Value="Model.Email"
+                        Color="@_dataCacheService.ThemeSetting.Theme"
+                        Label="电子邮件"></MTextField>
+
+            <MTextField Dense Label="用户名" Color="@_dataCacheService.ThemeSetting.Theme"
+                        @bind-Value="Model.Name"></MTextField>
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPasswordInput Placeholder="请输入密码" Label="密码"
+                                                                                   @bind-Value="Model.Password" />
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPasswordInput Placeholder="请输入密码" Label="确认密码"
+                                                                                   @bind-Value="Model.ConfirmPassword" />
+
             <div class="mb-4">
                 <a href="/privacy">CnGal资料站隐私协议</a>
             </div>
@@ -75,6 +71,35 @@
     {
         try
         {
+            //判断输入是否正确
+            if (Model.Password != Model.ConfirmPassword)
+            {
+                await ToastService.Error("注册失败", "两次输入的密码不一致");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(Model.Name))
+            {
+                await ToastService.Error("注册失败", "请输入用户名");
+                return;
+
+            }
+            if (Model.Name.Length > 20)
+            {
+                await ToastService.Error("注册失败", "用户名必须少于20个字符");
+                return;
+
+            }
+            if (string.IsNullOrWhiteSpace(Model.Email))
+            {
+                await ToastService.Error("注册失败", "请输入电子邮件");
+                return;
+
+            }
+            if (System.Text.RegularExpressions.Regex.Match(Model.Email, "^[\\w-]+@[\\w-]+\\.(com|net|org|edu|mil|tv|biz|info)$").Success == false)
+            {
+                await ToastService.Error("注册失败", "输入的电子邮件无效");
+                return;
+            }
             var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode");
 
             objRef = DotNetObjectReference.Create(this);
@@ -89,32 +114,8 @@
         int count = 0;
         while (isSuccess)
         {
-            /*if (count > 5)
-            {
-                isSuccess = false;
-            }*/
             await Task.Delay(500);
             count++;
-        }
-    }
-
-    private async Task<bool> InitGeetest()
-    {
-        //初始化人机验证
-        try
-        {
-            //获取词条信息
-            var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode");
-
-            objRef = DotNetObjectReference.Create(this);
-            await JS.InvokeAsync<string>("initGeetestBindCAPTCHA", objRef, geetestCodeModel.Gt, geetestCodeModel.Challenge, geetestCodeModel.Success);
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "初始化极验人机验证失败");
-            return false;
         }
     }
 
