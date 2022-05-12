@@ -167,7 +167,7 @@ namespace CnGalWebSite.DrawingBed.Services
 
         public string CompressFile(string path)
         {
-            if ((new FileInfo(path)).Length > 1000 * 1024)
+            if ((new FileInfo(path)).Length > 2 * 1024 * 1024)
             {
                 return GetPicThumbnail(path, 0.7);
             }
