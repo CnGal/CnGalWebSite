@@ -1,13 +1,24 @@
 ﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
-<div style="position: fixed; z-index: 4; bottom: 125px; right: 50px; ">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-transfer-up" Tooltip="回到顶部" OnClick="OnClickFly" />
-</div>
+@if (_dataCacheService.IsApp == false)
+{
+    <div style="position: fixed; z-index: 4; bottom: 125px; right: 50px; ">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-transfer-up" Tooltip="回到顶部" OnClick="OnClickFly" />
+    </div>
+}
+
 
 @code {
     public Task OnClickFly()
     {
         NavigationManager.NavigateTo(NavigationManager.Uri, false, true);
+        return Task.CompletedTask;
+    }
+
+    public Task Refresh()
+    {
+        StateHasChanged();
         return Task.CompletedTask;
     }
 }

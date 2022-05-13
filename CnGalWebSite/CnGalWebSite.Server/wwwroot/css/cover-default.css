@@ -277,9 +277,6 @@ input.te-image-file-input {
     padding-bottom: 0;
     padding-top: 0;
 }
-.m-main__wrap {
-    background-color: #f5f6f7;
-}
 .m-application ul, .m-application ol {
     padding-left: 0;
 }
@@ -323,15 +320,21 @@ input.te-image-file-input {
 .m-card__title {
     font-weight: bold;
 }
-code[class*=language-], pre[class*=language-] {
-   text-shadow: 0;
-}
+
 .theme--dark.m-application code {
     background-color: transparent;
+    text-shadow: none;
 }
 .placeholder {
     background-color: transparent;
 }
 .toastui-editor-contents {
     z-index: 4;
+}
+.theme--light.m-application {
+    background-color: transparent;
+}
+
+.m-main__wrap {
+    background-color: transparent;
 }

@@ -90,3 +90,19 @@ if (browserVersion() == 1) {
     t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
     y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
 })(window, document, "clarity", "script", "buu31hy6os");
+
+(function ($) {
+    $.extend({
+        loading: function () {
+            var $loader = $("#loading");
+            if ($loader.length > 0) {
+                $loader.addClass("is-done");
+                var handler = window.setTimeout(function () {
+                    window.clearTimeout(handler);
+                    $loader.remove();
+                    $('body').removeClass('overflow-hidden');
+                }, 300);
+            }
+        },
+    });
+})(jQuery);

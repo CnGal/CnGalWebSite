@@ -1,14 +1,22 @@
-﻿@if (Show)
+﻿@inject IDataCacheService _dataCacheService
+
+
+@if (_dataCacheService.ThemeSetting.IsTransparent && _dataCacheService.ThemeSetting.IsDark == false)
 {
-    <div id="web_bg" style="@($"background-image: url({BigImage})")" class=" d-none d-sm-block"></div>
-    <div id="web_bg" style="@($"background-image: url({SmallImage})")" class="d-md-none"></div>
+    if (string.IsNullOrWhiteSpace(BigImage) == false)
+    {
+        <div id="web_bg" style="@($"background-image: url({BigImage})")" class=" d-none d-sm-block"></div>
+    }
+    @if (string.IsNullOrWhiteSpace(SmallImage) == false)
+    {
+        <div id="web_bg" style="@($"background-image: url({SmallImage})")" class="d-md-none"></div>
+
+    }
 }
+
 @code {
     string BigImage = "";
     string SmallImage = "";
-
-    [Parameter]
-    public bool Show { get; set; }
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -16,12 +24,17 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
         string mimage = null;
         string simage = null;
-        if(authenticationStateTask!=null)
+        if (authenticationStateTask != null)
         {
             var user = await authenticationStateTask;
-            if(user.User.Identity.IsAuthenticated)
+            if (user.User.Identity.IsAuthenticated)
             {
                 foreach (var item in user.User.Claims)
                 {
@@ -37,8 +50,8 @@
 
             }
         }
-        BigImage = mimage ?? "https://app.cngal.org/_content/CnGalWebSite.Shared/images/oppsitebackground.png";
-        SmallImage = simage ?? "https://app.cngal.org/_content/CnGalWebSite.Shared/images/CnGal5thMin.png";
+        BigImage = mimage;
+        SmallImage = simage;
 
         StateHasChanged();
     }

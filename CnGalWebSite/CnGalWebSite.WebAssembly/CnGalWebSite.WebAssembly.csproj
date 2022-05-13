@@ -5,36 +5,7 @@
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <InvariantGlobalization>false</InvariantGlobalization>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="wwwroot\scripts\**" />
-    <Content Remove="wwwroot\scripts\**" />
-    <EmbeddedResource Remove="wwwroot\scripts\**" />
-    <None Remove="wwwroot\scripts\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\bundle-css.css" Link="wwwroot\styles\bundle-css.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\bundle-css.min.css" Link="wwwroot\styles\bundle-css.min.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\cover-default.min.css" Link="wwwroot\styles\cover-default.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\dark-cover.min.css" Link="wwwroot\styles\dark-cover.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\github-markdown.min.css" Link="wwwroot\styles\github-markdown.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\mouse.min.css" Link="wwwroot\styles\mouse.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.2" PrivateAssets="all" />
@@ -55,12 +26,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="wwwroot\icon-512.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\js\common.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\styles\blazor-loading.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

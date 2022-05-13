@@ -21,9 +21,11 @@ body {
 }
 
 .bg-opacity {
-    background-color: #242424;
+    background-color: #242424!important;
 }
-
+.bg-theme {
+    background-color: #242424!important;
+}
 .card {
     border: 1px solid rgba(255,255,255,.125);
 }
@@ -338,12 +340,11 @@ body {
 }
 
 .btn-dark:hover {
-    color:var(--active-color);
-    background-color:   var(--active-color);
-    border-color:  var(--active-color);
+    background-color: var(--hover-color);
+    border-color: var(--hover-color);
 }
 .btn-dark {
-    color:  white;
+    color:  white!important;
     border-color:  var(--active-color);
      background-color: var(--active-color);
 }
@@ -467,11 +468,11 @@ body {
         color: gray;
     }
 .font-color {
-    color:#FFFFFF !important;
+    color: #c9d1d9 !important;
 }
 .a-font-color {
-    color: #FFFFFF !important;
-     transition: all .6s ease;
+    color: #c9d1d9 !important;
+    transition: all .6s ease;
 }
 
     .a-font-color:hover {
@@ -730,4 +731,7 @@ input.form-control{
 .layout.is-page.color6 .layout-header-bar {
     background-color: #262626;
     border-color: #262626;
+}
+.theme--dark.m-application {
+    color: #c9d1d9;
 }

@@ -212,10 +212,8 @@ else
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            if (_dataCatcheService.ThemeSetting.UseTabSet == false)
-            {
-                NavigationManager.LocationChanged += LocationChanged;
-            }
+               NavigationManager.LocationChanged += LocationChanged;
+            
         }
 
     }
@@ -265,28 +263,16 @@ else
                 await overviewCard.SelecteChanged(ExaminesOverview.Examines[index + 1]);
             }
         }
-        if (_dataCatcheService.ThemeSetting.UseTabSet == false)
-        {
+   
             NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + conId + "&CurrentId=" + CurrentId);
-        }
-        else
-        {
-            await OnRefreshContrastView(conId, CurrentId.ToString());
-
-        }
+        
+     
     }
     public async Task CurrentChanged(string curId)
     {
-        if (_dataCatcheService.ThemeSetting.UseTabSet == false)
-        {
+       
             NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + ContrastId + "&CurrentId=" + curId);
-        }
-        else
-        {
-            await OnRefreshContrastView(ContrastId.ToString(), curId);
-
-        }
-
+      
     }
 
     public async Task OnRefreshContrastView(string conId, string curId)
@@ -331,10 +317,9 @@ else
 
     public void  Dispose()
     {
-        if (_dataCatcheService.ThemeSetting.UseTabSet == false)
-        {
-            NavigationManager.LocationChanged -= LocationChanged;
-        }
+        
+        NavigationManager.LocationChanged -= LocationChanged;
+        
         GC.SuppressFinalize(this);
     }
     #endregion

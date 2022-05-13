@@ -51,7 +51,7 @@
         }
 
         var themeMode = _dataCacheService.ThemeSetting.IsDark ? "深色" : "明亮";
-        var bgMode = _dataCacheService.ThemeSetting.IsOnBgImage ? "透明" : "不透明";
+        var bgMode = _dataCacheService.ThemeSetting.IsTransparent ? "透明" : "不透明";
         var color = _dataCacheService.ThemeSetting.Theme switch
         {
             "color1" => "天空蓝",

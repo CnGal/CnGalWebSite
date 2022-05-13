@@ -50,41 +50,28 @@ else
         }
     </style>
 
-    if (_dataCacheService.ThemeSetting.IsOnBgImage)
+    if (_dataCacheService.ThemeSetting.IsTransparent)
     {
         <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/show-background.min.css" />
         <style>
-            .layout.is-page .layout-footer {
-                background-color: transparent !important;
-                box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 50%) !important;
+            .bg-opacity {
+                background-color: rgba(255, 255, 255, 0.7) !important;
             }
+
         </style>
 
     }
     else
     {
         <style>
-                .layout.is-page .layout-side {
-                    background-color: @colorMain !important;
-                }
-
-                .layout.is-page .layout-footer {
-                    background-color: @colorHover !important;
-                }
                 #web_bg {
                     display: none;
                 }
         </style>
     }
 }
-@if (_dataCacheService.ThemeSetting.IsOnMouse)
-{
-    <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/mouse.min.css" />
 
-
-}
-
-@if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
+@if (_dataCacheService.ThemeSetting.IsTransparent && _dataCacheService.ThemeSetting.IsDark == false)
 {
 
 }
@@ -101,7 +88,7 @@ else
 @code {
     public bool isMasa = true;
     public bool isDark = false;
-    public bool isOnMouse = false;
+    public bool isTransparent = true;
 
     public string colorMain ;
     public string colorHover;
@@ -111,6 +98,8 @@ else
 
     [Parameter]
     public EventCallback<bool> OnStateChanged { get; set; }
+    [Parameter]
+    public EventCallback OnTransparentChanged { get; set; }
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
@@ -311,13 +300,10 @@ else
         {
             return;
         }
-        if (_dataCacheService.ThemeSetting.IsOnMouse && isOnMouse != _dataCacheService.ThemeSetting.IsOnMouse)
-        {
-            await InitMouse();
-        }
+
         ProcColor(_dataCacheService.ThemeSetting.Theme);
 
-        if (theme != _dataCacheService.ThemeSetting.Theme || isMasa != _dataCacheService.ThemeSetting.IsMasa || isDark != _dataCacheService.ThemeSetting.IsDark)
+        if (theme != _dataCacheService.ThemeSetting.Theme || isMasa != _dataCacheService.ThemeSetting.IsMasa || isDark != _dataCacheService.ThemeSetting.IsDark || isTransparent != _dataCacheService.ThemeSetting.IsTransparent)
         {
             await OnStateChanged.InvokeAsync(isMasa != _dataCacheService.ThemeSetting.IsMasa);
             await _dataCacheService.ThemeChanged.InvokeAsync(colorMain);
@@ -325,6 +311,7 @@ else
             isMasa = _dataCacheService.ThemeSetting.IsMasa;
             theme = _dataCacheService.ThemeSetting.Theme;
             isDark = _dataCacheService.ThemeSetting.IsDark;
+            isTransparent = _dataCacheService.ThemeSetting.IsTransparent;
         }
 
         StateHasChanged();
