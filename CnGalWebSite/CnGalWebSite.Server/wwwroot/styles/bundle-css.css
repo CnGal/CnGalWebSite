@@ -15,7 +15,10 @@
 }
 
 .bg-opacity {
-    background-color: white;
+    background-color: white!important;
+}
+.bg-theme {
+    background-color: white!important;
 }
 /*用户个人空间Tab*/
 .li-user-space {
@@ -1012,6 +1015,10 @@
     padding-left: 8px;
     padding-right: 8px;
     display: inline-block;
+}
+
+body {
+    background-color: #f5f6f7;
 }
 
 .ContributionCalendar-day {

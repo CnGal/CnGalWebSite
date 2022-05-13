@@ -4,7 +4,7 @@
 
 
 <MApp Dark="_dataCacheService.ThemeSetting.IsDark">
-    <MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:"white")">
+    <MAppBar App Class="shadow-sm  bg-opacity">
         <div style=" word-break: keep-all;" class="ms-4 me-8">
             <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip />
         </div>
@@ -41,7 +41,7 @@
         </MContainer>
     </MMain>
 
-    <MFooter App Padless Absolute Color="@(_dataCacheService.ThemeSetting.IsDark?null:"white")" Height="186">
+    <MFooter App Padless Absolute Class="shadow-sm  bg-opacity" Height="186">
         <CnGalWebSite.Shared.MasaComponent.Shared.Tips.MainFooterTip />
     </MFooter>
 </MApp>

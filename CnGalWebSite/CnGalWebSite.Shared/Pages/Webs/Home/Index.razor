@@ -50,7 +50,17 @@
         {
             Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView", true);
 
-            Images = Carousels.Select(s => s.Image).ToList();
+            Images = Carousels.OrderByDescending(s=>s.Priority).Take(3).Select(s => s.Image).ToList();
+            if(Carousels.Count>=6)
+            {
+                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x) == false).ToList().Random().Take(3).Select(s=>s.Image));
+
+            }
+            else
+            {
+                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x) == false).Select(s=>s.Image));
+            }
+
 
         }
         catch (Exception ex)

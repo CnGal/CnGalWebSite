@@ -1,15 +1,10 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject IJSRuntime JS
 
-@if (_dataCacheService.ThemeSetting.IsOnBgImage && _dataCacheService.ThemeSetting.IsDark == false)
-{
-    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip Show />
-}
-@if (_dataCacheService.IsApp == false)
-{
-    <FloatToolTip />
 
-}
+<CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip @ref="backgroundImageTip"/>
+
+<FloatToolTip @ref="floatToolTip"/>
 
 <CascadingValue Value=this IsFixed="true">
     @ChildContent
@@ -21,6 +16,8 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
+    CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip backgroundImageTip;
+    FloatToolTip floatToolTip;
 
     string UserId = "";
     string UserName = "";
@@ -31,16 +28,12 @@
 
         if (user.User.Identity.IsAuthenticated && UserName != user.User.Identity.Name)
         {
-            var image = "";
+ 
             UserName = user.User.Identity.Name;
 
             foreach (var item in user.User.Claims)
             {
-                if (item.Type == "image")
-                {
-                    image = item.Value;
-                }
-                else if (item.Type == "userid")
+                if (item.Type == "userid")
                 {
                     UserId = item.Value;
                 }
@@ -69,11 +62,20 @@
                 }
 
             }
-
-
-
         }
 
+    }
+
+    public async Task Refresh()
+    {
+        if (backgroundImageTip != null)
+        {
+            await backgroundImageTip.Refresh();
+        }
+        if (floatToolTip != null)
+        {
+            await floatToolTip.Refresh();
+        }
     }
 
 }
