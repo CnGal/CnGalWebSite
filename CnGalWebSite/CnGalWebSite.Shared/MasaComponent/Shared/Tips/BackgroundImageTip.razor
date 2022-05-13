@@ -29,30 +29,47 @@
 
     public async Task Refresh()
     {
-        string mimage = null;
-        string simage = null;
-        if (authenticationStateTask != null)
+        try
         {
-            var user = await authenticationStateTask;
-            if (user.User.Identity.IsAuthenticated)
+            string mimage = null;
+            string simage = null;
+            if (authenticationStateTask != null)
             {
-                foreach (var item in user.User.Claims)
+                var user = await authenticationStateTask;
+                if (user.User.Identity.IsAuthenticated)
                 {
-                    if (item.Type == "mbgimage")
+                    foreach (var item in user.User.Claims)
                     {
-                        mimage = item.Value;
+                        if (item.Type == "mbgimage")
+                        {
+                            mimage = item.Value;
+                        }
+                        else if (item.Type == "sbgimage")
+                        {
+                            simage = item.Value;
+                        }
                     }
-                    else if (item.Type == "sbgimage")
-                    {
-                        simage = item.Value;
-                    }
+
                 }
-
             }
-        }
-        BigImage = mimage;
-        SmallImage = simage;
+            BigImage = mimage ?? "";
+            SmallImage = simage ?? "";
 
-        StateHasChanged();
+            if (BigImage.Contains("default"))
+            {
+                BigImage = "";
+            }
+            if (SmallImage.Contains("default"))
+            {
+                SmallImage = "";
+            }
+
+            StateHasChanged();
+        }
+        catch
+        {
+
+        }
+
     }
 }

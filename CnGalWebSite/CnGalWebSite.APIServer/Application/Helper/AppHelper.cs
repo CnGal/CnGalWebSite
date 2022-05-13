@@ -720,8 +720,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim("image", GetImagePath(user.PhotoPath, "user.png")),
-                new Claim("mbgimage", GetImagePath(user.MBgImage, "background.png")),
-                new Claim("sbgimage", GetImagePath(user.SBgImage, "CnGal5thMin.png")),
+                new Claim("mbgimage", GetImagePath(user.MBgImage, "")),
+                new Claim("sbgimage", GetImagePath(user.SBgImage, "")),
                 new Claim("userid",user.Id, "")
             };
 
