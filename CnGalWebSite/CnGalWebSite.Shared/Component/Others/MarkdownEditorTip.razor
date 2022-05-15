@@ -7,39 +7,15 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
-<link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/editor.md/css/editormd.min.css" media="none" onload="this.media='all'" />
-
 <div>
-
-    <ImagesUploadViewTip images="images" OnUploadedImage="OnUploadImage" Class="mb-3" @ref="imagesUploadViewTip">
-        <ImageTransformTip Text="@Context" TextChanged="ImageTransformed" Class="ms-3 mb-3" />
-
-    </ImagesUploadViewTip>
+    <ImageTransformTip Text="@Context" TextChanged="ContextValueChanged" Class="mb-3" />
 
 
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success" Class="mb-4">
         不了解Markdown？可以在这<a href="http://www.markdown.cn/" target="_blank" rel="noreferrer" class="success--text fw-bold">查看语法说明</a>
-        ，你也可以选择自己喜欢的编辑器
-        <a @onclick="()=>SwitchEditor(MarkdownEditorVersion.Vditor)" class="success--text fw-bold">Vditor</a>，
-        <a @onclick="()=>SwitchEditor(MarkdownEditorVersion.EditorMd)" class="success--text fw-bold">Editor.md</a>，
-        <a @onclick="()=>SwitchEditor(MarkdownEditorVersion.ToastUIEditor)" class="success--text fw-bold">ToastUI Editor</a>
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-    @if (isReady)
-    {
-        @if (Version == MarkdownEditorVersion.ToastUIEditor)
-        {
-            <Markdown Height="800" MinHeight="300" Placeholder="这是 Markdown" PreviewStyle="PreviewStyle.Tab"
-                      InitialEditType="InitialEditType.Wysiwyg" Value="@Context" ValueChanged="ContextValueChanged" Language="zh-CN"></Markdown>
-        }
-        else if (Version == MarkdownEditorVersion.EditorMd)
-        {
-            <EditorMdViewTip Context="@Context" @ref="markdownEditorTip" ContextChanged="ContextValueChanged"></EditorMdViewTip>
-        }
-        else
-        {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMarkdown Context="@Context" ContextChanged="ContextValueChanged" @ref="masaMarkdown"/>
-        }
-    }
+
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMarkdown Context="@Context" ContextChanged="ContextValueChanged" @ref="masaMarkdown" />
 
 </div>
 
@@ -49,86 +25,16 @@
     [Parameter]
     public EventCallback<string> ContextChanged { get; set; }
 
-    EditorMdViewTip markdownEditorTip;
-    ImagesUploadViewTip imagesUploadViewTip;
     CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMarkdown masaMarkdown;
-
-    bool isReady = false;
-    bool isOldEditor;
-
-    MarkdownEditorVersion Version;
-
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && ToolHelper.IsSSR == false)
-        {
-            isReady = true;
-            SetImages();
-            StateHasChanged();
-        }
+
     }
-
-    public void SetImages()
-    {
-        //获取主页中原有的图片
-        if (string.IsNullOrWhiteSpace(Context) == false)
-        {
-            var temp = ToolHelper.GetImageLinks(Context);
-
-            images.Clear();
-            foreach (var item in temp)
-            {
-                images.Add(new ImagesUploadAloneModel
-                {
-                    Image = item
-                });
-            }
-        }
-    }
-
-    public Task SwitchEditor(MarkdownEditorVersion version)
-    {
-        Version = version;
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-
-    public List<ImagesUploadAloneModel> images = new List<ImagesUploadAloneModel>();
 
     public async Task ContextValueChanged(string text)
     {
         Context = text;
         await ContextChanged.InvokeAsync(Context);
-    }
-    public async Task ImageTransformed(string text)
-    {
-
-        Context = text;
-        await ContextChanged.InvokeAsync(Context);
-
-        SetImages();
-
-        //if (imagesUploadViewTip != null)
-        //{
-        //    await imagesUploadViewTip.Refresh();
-        //}
-    }
-
-    public async Task OnUploadImage(string url)
-    {
-        if (Version == MarkdownEditorVersion.ToastUIEditor)
-        {
-            Context += ("\n![](" + url + ")\n");
-            await ContextChanged.InvokeAsync(Context);
-        }
-        else if (Version == MarkdownEditorVersion.Vditor)
-        {
-            await masaMarkdown.InsertContext("\n![](" + url + ")\n");
-        }
-        else
-        {
-            await markdownEditorTip.InsertContext("\n![](" + url + ")\n");
-        }
     }
 }
