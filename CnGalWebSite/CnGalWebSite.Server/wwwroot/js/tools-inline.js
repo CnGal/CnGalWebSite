@@ -43,36 +43,7 @@ function trackEvent(categotry, action, lable, value, nodeid) {
     //_czc.push(['_trackEvent', categotry, action, lable, value, nodeid]);
     umami.trackEvent(lable,categotry  + ' ' + action);
 }
-var editor;
-function initEditorMd(objRef , markdownstring) {
-    $(function () {
-        editor = editormd("editor", {
-            htmlDecode: true,
-            width: "100%",
-            height: "100%",
-            autoFocus: false,
-           // tocm: true, // Using [TOCM]
-           // tex: true, // 开启科学公式TeX语言支持，默认关闭
-           // flowChart: true, // 开启流程图支持，默认关闭
-            placeholder: "这里是Markdown编辑器，可以点击右侧问号了解语法详情",
-            markdown: markdownstring,     // dynamic set Markdown text
-            path: "_content/CnGalWebSite.Shared/editor.md/lib/",  // Autoload modules mode, codemirror, marked... dependents libs path
-            onchange: function () {
-                objRef.invokeMethodAsync('OnContextChanged', editor.getMarkdown());
-            }
-        });
-    });
-}
 
-function getEditorMdContext() {
-    return editor.getMarkdown();
-}
-function setEditorMdContext(markdownstring) {
-    editor.setMarkdown(markdownstring);
-}
-function insertEditorMdContext(markdownstring) {
-    editor.insertValue(markdownstring);
-}
 function initVditorContext(objRef, domRef) {
     domRef.Vditor.vditor.options.upload.success = (editor, res) => {
         objRef.invokeMethodAsync('HandleUploadSuccessAsync', res);
