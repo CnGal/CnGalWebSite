@@ -1657,8 +1657,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         else
                         {
                             entryRelevances.Relevances.Remove(item);
-                            isSame = true;
                         }
+                        isSame = true;
+
                         break;
 
                     }
