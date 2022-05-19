@@ -34,11 +34,11 @@ namespace CnGalWebSite.RobotClient
             _SensitiveWordX = SensitiveWordX;
         }
 
-        public RobotReply GetAutoReply(string message, GroupMessageSender sender)
+        public RobotReply GetAutoReply(string message, RobotReplyRange range)
         {
 
             var now = DateTime.Now.ToCstTime();
-            var replies = _replies.Where(s => s.IsHidden == false && now.TimeOfDay <= s.BeforeTime.TimeOfDay && now.TimeOfDay >= s.AfterTime.TimeOfDay && Regex.IsMatch(message, s.Key))
+            var replies = _replies.Where(s => s.IsHidden == false && (s.Range == RobotReplyRange.All || s.Range == range) && now.TimeOfDay <= s.BeforeTime.TimeOfDay && now.TimeOfDay >= s.AfterTime.TimeOfDay && Regex.IsMatch(message, s.Key))
                 .GroupBy(s => s.Priority)
                 .OrderByDescending(s => s.Key)
                 .ToList();
@@ -53,14 +53,14 @@ namespace CnGalWebSite.RobotClient
             return replies.FirstOrDefault().ToList()[index];
         }
 
-        public async Task<Message[]> ProcMessageAsync(string reply, string message, string regex, GroupMessageSender sender)
+        public async Task<Message[]> ProcMessageAsync(string reply, string message, string regex,long qq,string name)
         {
             var args = new List<KeyValuePair<string, string>>();
             try
             {
-                await ProcMessageArgument(reply, message, sender, args);
+                await ProcMessageArgument(reply, message, qq,name, args);
                 ProcMessageReplaceInput(reply, message, regex, args);
-                ProcMessageFace(reply, sender, args);
+                ProcMessageFace(reply, args);
             }
             catch (ArgError arg)
             {
@@ -78,7 +78,7 @@ namespace CnGalWebSite.RobotClient
 
             if (words.Count != 0)
             {
-                var msg = $"对{sender.memberName}({sender.id})的消息回复中包含敏感词\n消息：{message}\n回复：{reply}\n\n参数替换列表：\n";
+                var msg = $"对{name}({qq})的消息回复中包含敏感词\n消息：{message}\n回复：{reply}\n\n参数替换列表：\n";
                 foreach (var item in args)
                 {
                     msg += $"{item.Key} -> {item.Value}\n";
@@ -100,10 +100,10 @@ namespace CnGalWebSite.RobotClient
             {
                 reply = reply.Replace(item.Key, item.Value);
             }
-            return ProcMessageArray(reply, sender);
+            return ProcMessageArray(reply);
         }
 
-        public Message[] ProcMessageArray(string vaule, GroupMessageSender sender)
+        public Message[] ProcMessageArray(string vaule)
         {
             if (string.IsNullOrWhiteSpace(vaule))
             {
@@ -191,7 +191,7 @@ namespace CnGalWebSite.RobotClient
             }
         }
 
-        public async Task ProcMessageArgument(string reply, string message, GroupMessageSender sender, List<KeyValuePair<string, string>> args)
+        public async Task ProcMessageArgument(string reply, string message, long qq, string name, List<KeyValuePair<string, string>> args)
         {
             while (true)
             {
@@ -205,14 +205,16 @@ namespace CnGalWebSite.RobotClient
                 var value = argument switch
                 {
                     "time" => DateTime.Now.ToCstTime().ToString("HH:mm"),
-                    "qq" => sender.id.ToString(),
+                    "qq" => qq.ToString(),
                     "weather" => _messageArgs.FirstOrDefault(s => s.Name == "weather")?.Value,
-                    "sender" => sender.memberName,
-                    "auth" => await GetArgValue(argument, sender.id.ToString()),
+                    "sender" => name,
+                    "auth" => await GetArgValue(argument, qq.ToString()),
                     "n" => "\n",
                     "r" => "\r",
                     "facelist" => "该功能暂未实装",
                     "introduce" => await GetArgValue(argument, message),
+                    "verifybind" => await GetArgValue(argument, message),
+                    "realbind" => await GetArgValue(argument, message, new Dictionary<string, string> { { "qq", qq.ToString() }, { "code", message } }),
                     "website" => await GetArgValue(argument, message),
                     _ => await GetArgValue(argument, null)
                 };
@@ -223,7 +225,7 @@ namespace CnGalWebSite.RobotClient
             }
         }
 
-        public void ProcMessageFace(string reply, GroupMessageSender sender, List<KeyValuePair<string, string>> args)
+        public void ProcMessageFace(string reply, List<KeyValuePair<string, string>> args)
         {
             if (string.IsNullOrWhiteSpace(reply))
             {
@@ -246,13 +248,17 @@ namespace CnGalWebSite.RobotClient
                 }
             }
         }
-
         public async Task<string> GetArgValue(string name, string infor)
+        {
+            return await GetArgValue(name, infor, new Dictionary<string, string>());
+        }
+        public async Task<string> GetArgValue(string name, string infor,Dictionary<string,string> adds)
         {
             var result = await _httpClient.PostAsJsonAsync<GetArgValueModel>(ToolHelper.WebApiPath + "api/robot/GetArgValue", new GetArgValueModel
             {
                 Infor = infor,
                 Name = name,
+                AdditionalInformations = adds
             });
 
             var jsonContent = result.Content.ReadAsStringAsync().Result;

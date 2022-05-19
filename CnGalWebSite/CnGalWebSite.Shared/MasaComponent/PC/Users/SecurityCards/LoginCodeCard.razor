@@ -1,0 +1,85 @@
+﻿@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="授权" Icon="fa fa-fw  fa-key" Class="h-100">
+    <div style="display: flex; flex-direction: column; justify-content: space-between;">
+        <span>如果将一次性授权码泄露，你的账户可能会被他人恶意控制，请谨慎授权</span>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <div>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClick">
+                    <MIcon Left>mdi-share-all-outline</MIcon>
+                    获取一次性授权码
+                </MButton>
+            </div>
+
+        </div>
+    </div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification @ref="humanMachineVerification" OnVerficated="OnVerficated" />
+<MDialog @bind-Value="Dialog"
+         Width="600">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            一次性授权码
+        </MCardTitle>
+        <MCardText>
+            90分钟内有效，请勿将授权码告知他人
+        </MCardText>
+        <MCardText>
+            <PCopyableText>
+                @oneTimeCodeModel.Code
+            </PCopyableText>
+        </MCardText>
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+            <MSpacer></MSpacer>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="确定" IsAsync="true" OnClick="() => Dialog = false" Icon="mdi-check" Color="green" TextStyle />
+        </MCardActions>
+    </MCard>
+</MDialog>
+@code {
+    [Parameter]
+    public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
+
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification humanMachineVerification;
+    bool Dialog { get; set; }
+    OneTimeCodeModel oneTimeCodeModel;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    public async Task OnClick()
+    {
+        await humanMachineVerification.StartVerification();
+    }
+
+    public async Task OnVerficated(HumanMachineVerificationResult model)
+    {
+        if (model.Success == false)
+        {
+            return;
+        }
+
+        //吓唬用户的 实际上不验证 跳转APP的时候该接口已经滥用了
+        //请求数据
+        try
+        {
+            oneTimeCodeModel = await Http.GetFromJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/GetOneTimeCode");
+            if (string.IsNullOrWhiteSpace(oneTimeCodeModel.Code))
+            {
+                ErrorHandler.ProcessError(new Exception(), "获取一次性授权码失败");
+                return;
+            }
+
+            Dialog = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取一次性授权码失败");
+        }
+
+    }
+}

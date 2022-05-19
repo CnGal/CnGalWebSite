@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace CnGalWebSite.DataModel.Model
 {
@@ -26,7 +27,19 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public int Priority { get; set; }
 
+        public RobotReplyRange Range { get; set; }
+
         public bool IsHidden { get; set; }
 
+    }
+
+    public enum RobotReplyRange
+    {
+        [Display(Name ="全部")]
+        All,
+        [Display(Name = "群聊")]
+        Group,
+        [Display(Name = "私聊")]
+        Friend
     }
 }

@@ -1,0 +1,60 @@
+﻿@inject IJSRuntime JS
+@inject HttpClient Http
+@implements IDisposable
+
+@code {
+    [Parameter]
+    public EventCallback<HumanMachineVerificationResult> OnVerficated { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    private DotNetObjectReference<HumanMachineVerification> objRef;
+
+    public async Task StartVerification()
+    {
+        try
+        {
+            var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode");
+
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeAsync<string>("initGeetestBindCAPTCHA", objRef, geetestCodeModel.Gt, geetestCodeModel.Challenge, geetestCodeModel.Success);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "初始化极验人机验证失败");
+            await OnVerficated.InvokeAsync(new HumanMachineVerificationResult());
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnChecked(string challenge, string validate, string seccode)
+    {
+        await OnVerficated.InvokeAsync(new HumanMachineVerificationResult
+        {
+            Seccode = seccode,
+            Success = true,
+            Challenge = challenge,
+            Validate = validate
+        });
+
+    }
+
+    [JSInvokable]
+    public async Task OnCancel()
+    {
+        await OnVerficated.InvokeAsync(new HumanMachineVerificationResult());
+    }
+
+    #region 释放实例
+    public void Dispose()
+    {
+        if (objRef != null)
+        {
+            objRef?.Dispose();
+        }
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

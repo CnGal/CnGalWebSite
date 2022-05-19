@@ -394,10 +394,9 @@ namespace CnGalWebSite.APIServer.Controllers
             model.Id = user.Id;
             model.IsShowFavorites = user.IsShowFavotites;
             model.IsShowGameRecord = user.IsShowGameRecord;
-            model.GithubAccountName = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.GitHub)?.Name;
-            model.MicrosoftAccountName = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.Microsoft)?.Name;
-            model.GiteeAccountName = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.Gitee)?.Name;
             model.QQAccountName = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.QQ)?.Name;
+            model.GroupQQ = user.GroupQQ == 0 ? "" : ToolHelper.GetxxxString(user.GroupQQ.ToString());
+            model.LastChangePasswordTime = user.LastChangePasswordTime;
             var temp = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.QQ);
             model.Ranks = await _rankService.GetUserRankListForEdit(user);
 
@@ -681,6 +680,32 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             await _userService.AddUserIntegral(model);
+
+            return new Result { Successful = true };
+        }
+
+        /// <summary>
+        /// 解除绑定群聊QQ号
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<Result>> UnBindGroupQQAsync(UnBindGroupQQModel model)
+        {
+            //提前判断是否通过人机验证
+            if (_appHelper.CheckRecaptcha(model.Verification.Challenge, model.Verification.Validate, model.Verification.Seccode) == false)
+            {
+                return BadRequest(new Result { Error = "没有通过人机验证" });
+            }
+
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            if(user == null)
+            {
+                return new Result { Error = "未找到该用户" };
+            }
+
+            user.GroupQQ = 0;
+            await _userRepository.UpdateAsync(user);
 
             return new Result { Successful = true };
         }

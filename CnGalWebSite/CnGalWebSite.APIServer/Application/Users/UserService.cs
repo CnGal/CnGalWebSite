@@ -9,6 +9,8 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Space;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -36,11 +38,12 @@ namespace CnGalWebSite.APIServer.Application.Users
         private readonly IHttpClientFactory _clientFactory;
         private readonly IAppHelper _appHelper;
         private readonly IRankService _rankService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<ApplicationUser>, string, SortOrder, IEnumerable<ApplicationUser>>> SortLambdaCacheApplicationUser = new();
 
-        public UserService(IRepository<ApplicationUser, string> userRepository, IConfiguration configuration, IHttpClientFactory clientFactory, IRepository<ThirdPartyLoginInfor, long> thirdPartyLoginInforRepository,
-            IRepository<Examine, long> examineRepository, IRepository<UserIntegral, string> userIntegralRepository, IAppHelper appHelper, IRankService rankService, IRepository<Article, long> articleRepository, IRepository<FavoriteObject, long> favoriteObjectRepository)
+        public UserService(IRepository<ApplicationUser, string> userRepository, IConfiguration configuration, IHttpClientFactory clientFactory, IRepository<ThirdPartyLoginInfor, long> thirdPartyLoginInforRepository, UserManager<ApplicationUser> userManager,
+        IRepository<Examine, long> examineRepository, IRepository<UserIntegral, string> userIntegralRepository, IAppHelper appHelper, IRankService rankService, IRepository<Article, long> articleRepository, IRepository<FavoriteObject, long> favoriteObjectRepository)
         {
             _userRepository = userRepository;
             _configuration = configuration;
@@ -52,6 +55,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             _rankService = rankService;
             _articleRepository = articleRepository;
             _favoriteObjectRepository = favoriteObjectRepository;
+            _userManager = userManager;
         }
 
         public async Task<PagedResultDto<ApplicationUser>> GetPaginatedResult(GetUserInput input)
@@ -767,5 +771,39 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         }
 
+
+        public async Task<Result> VerifyBindGroupQQ(ApplicationUser user)
+        {
+            //获取短验证码
+            await _appHelper.GetShortTokenAsync(user.Id, user.UserName);
+
+            var result = await _appHelper.SendVerificationEmailAsync(null, user.Email, user.UserName);
+
+            if (result != null)
+            {
+                return new Result { Successful = false, Error = "发送验证码的过程中发生错误，" + result };
+            }
+
+            return new Result { Successful = true };
+        }
+
+        public async Task<Result> RealBindGroupQQAfter(string code, long groupQQ)
+        {
+            var userId = await _appHelper.GetLongTokenAsync(code);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                await _appHelper.AddErrorCount(groupQQ.ToString());
+                return new Result { Successful = false, Error = $"身份验证失败" };
+            }
+            var user  = await _userRepository.FirstOrDefaultAsync(s=>s.Id==userId);
+            if(user == null)
+            {
+                return new Result { Successful = false, Error = $"找不到该用户" };
+            }
+            user.GroupQQ = groupQQ;
+            await _userRepository.UpdateAsync(user);
+
+            return new Result { Successful = true };
+        }
     }
 }

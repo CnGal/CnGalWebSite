@@ -35,7 +35,17 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public string SBgImage { get; set; }
 
-
+        /// <summary>
+        /// 上次修改密码时间
+        /// </summary>
+        public DateTime? LastChangePasswordTime { get; set; }
+        /// <summary>
+        /// 绑定的群聊QQ号
+        /// </summary>
+        public long GroupQQ { get; set; }
+        /// <summary>
+        /// Steam账户
+        /// </summary>
         public string SteamId { get; set; }
         /// <summary>
         /// 附加积分

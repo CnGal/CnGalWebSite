@@ -1,0 +1,78 @@
+﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基本信息" Icon="fa fa-fw fa-info-circle" Collapable Class="@Class">
+    <ValidateForm Model="@Model" ValidateAllProperties="true">
+
+        <div class="row">
+
+            <div class="form-group col-12  col-sm-6">
+                <BootstrapInput @bind-Value="Model.UserName" />
+            </div>
+            <div class="form-group col-12">
+                <BootstrapInput @bind-Value="Model.PersonalSignature" />
+            </div>
+            <div class="form-group col-12  col-sm-6">
+                <DateTimePicker @bind-Value="@Model.Birthday" />
+            </div>
+
+            <div class="form-group col-12  col-sm-6">
+                <BootstrapInput @bind-Value="Model.SteamId" />
+            </div>
+
+            <div class="form-group col-12 col-sm-6">
+                <Switch @bind-Value="Model.CanComment" />
+            </div>
+            <div class="form-group col-12 col-sm-6">
+                <Switch @bind-Value="Model.IsShowGameRecord" />
+            </div>
+
+            <div class="form-group col-12">
+                    <CheckboxList Value="@RanksName" ValueChanged="ValueChanged" TValue="List<string>" ShowBorder="true" Items="@UserRanks" DisplayText="展示的头衔" ShowLabel="true"></CheckboxList>
+            </div>
+
+        </div>
+    </ValidateForm>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
+    [Parameter]
+    public string Class { get; set; }
+    List<SelectedItem> UserRanks { get; set; } = new List<SelectedItem>();
+    private List<string> RanksName { get; set; } = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        foreach (var item in Model.Ranks)
+        {
+
+            UserRanks.Add(new SelectedItem
+            {
+                Text = item.Name,
+                Active = item.IsShow,
+                Value = item.Name
+            });
+            if (item.IsShow)
+            {
+                RanksName.Add(item.Name);
+            }
+        }
+
+    }
+
+    public Task ValueChanged(List<string> values)
+    {
+        RanksName = values;
+        Model.Ranks.Clear();
+        foreach (var item in UserRanks)
+        {
+            Model.Ranks.Add(new UserEditRankIsShow
+            {
+                Name = item.Text,
+                IsShow = RanksName.Any(s => s == item.Text)
+            });
+        }
+
+        return Task.CompletedTask;
+    }
+}
