@@ -1,0 +1,38 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="手机号" Icon="fa fa-fw fa-mobile-phone" Class="h-100">
+    <div style="display: flex; flex-direction: column; justify-content: space-between;">
+        <span>@(string.IsNullOrWhiteSpace(Model.Phone)? "绑定手机号可以提供账户安全性" : ("手机号："+ Model.Phone))</span>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <div>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClick">
+                    <MIcon Left>mdi-share-all-outline</MIcon>
+                    @(string.IsNullOrWhiteSpace(Model.Phone)? "绑定" : "更换绑定")
+                </MButton>
+            </div>
+
+        </div>
+    </div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+
+    [Parameter]
+    public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
+
+    public Task OnClick()
+    {
+        @if (string.IsNullOrWhiteSpace(Model.Phone))
+        {
+            NavigationManager.NavigateTo("/account/AddPhoneNumber/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/account/ChangePhoneNumber/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+
+        }
+        return Task.CompletedTask;
+    }
+}

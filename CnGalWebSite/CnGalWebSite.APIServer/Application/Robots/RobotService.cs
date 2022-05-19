@@ -85,6 +85,7 @@ namespace CnGalWebSite.APIServer.Application.Robots
                     UpdateTime = item.UpdateTime,
                     Value = item.Value,
                     AfterTime = item.AfterTime,
+                    Range = item.Range,
                     Priority = item.Priority,
                     BeforeTime = item.BeforeTime,
                 });

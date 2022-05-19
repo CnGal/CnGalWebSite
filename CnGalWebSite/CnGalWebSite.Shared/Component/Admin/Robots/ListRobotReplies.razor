@@ -27,7 +27,8 @@
             <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
             <TableColumn @bind-Field="@context.Key" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
             <TableColumn @bind-Field="@context.Value" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Priority" Searchable="true" Sortable="true" Width="90"  />
+            <TableColumn @bind-Field="@context.Priority"  Sortable="true" Width="90" />
+            <TableColumn @bind-Field="@context.Range"  Sortable="true" Width="90" />
             <TableColumn @bind-Field="@context.AfterTime" Sortable="true" Width="90" FormatString="HH:mm:ss" />
             <TableColumn @bind-Field="@context.BeforeTime" Sortable="true" Width="90" FormatString="HH:mm:ss" />
             <TableColumn @bind-Field="@context.UpdateTime" Sortable="true" Width="150" FormatString="yyyy-MM-dd HH:mm:ss" />

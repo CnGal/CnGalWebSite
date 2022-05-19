@@ -1,0 +1,29 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="电子邮箱" Icon="fa fa-fw fa-envelope" Class="h-100">
+    <div style="display: flex; flex-direction: column; justify-content: space-between;">
+        <span>电子邮箱：@Model.Email</span>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <div>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClick">
+                    <MIcon Left>mdi-share-all-outline</MIcon>
+                    更换绑定
+                </MButton>
+            </div>
+
+        </div>
+    </div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
+
+    public Task OnClick()
+    {
+        NavigationManager.NavigateTo("/account/ChangeEmail/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        return Task.CompletedTask;
+    }
+}

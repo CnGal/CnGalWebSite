@@ -1,0 +1,30 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="登入QQ号" Icon="fa fa-fw fa-qq" Class="h-100">
+    <div style="display: flex; flex-direction: column; justify-content: space-between;">
+        <span>@(string.IsNullOrWhiteSpace(Model.QQAccountName) ? "绑定后可以使用QQ进行登入" : ("QQ昵称：" + Model.QQAccountName))</span>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <div>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClick">
+                    <MIcon Left>mdi-share-all-outline</MIcon>
+                    @(string.IsNullOrWhiteSpace(Model.QQAccountName) ? "绑定" : "更换绑定")
+                </MButton>
+
+            </div>
+        </div>
+    </div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
+
+    public Task OnClick()
+    {
+        NavigationManager.NavigateTo(ToolHelper.GetThirdPartyLoginUrl(ToolHelper.Base64EncodeUrl(NavigationManager.Uri), ThirdPartyLoginType.QQ));
+
+        return Task.CompletedTask;
+    }
+}

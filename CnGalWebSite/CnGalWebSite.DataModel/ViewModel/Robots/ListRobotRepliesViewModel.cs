@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CnGalWebSite.DataModel.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -27,6 +28,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Robots
         public string Value { get; set; }
         [Display(Name = "优先级")]
         public int Priority { get; set; }
+        [Display(Name = "范围")]
+        public RobotReplyRange Range { get; set; }
         /// <summary>
         /// 在这个时间之后才回复
         /// </summary>

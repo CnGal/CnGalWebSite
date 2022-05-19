@@ -404,6 +404,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 await _appHelper.RemoveErrorCount(user.UserName);
                 await _appHelper.RemoveErrorCount(user.Email);
 
+                //更新最后修改密码日期
+                var now= DateTime.Now.ToCstTime();
+                await _userRepository.GetRangeUpdateTable().Where(s => s.Id==user.Id).Set(s => s.LastChangePasswordTime, b => now).ExecuteAsync();
+
                 return new Result { Successful = true };
             }
             else
@@ -627,6 +631,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     //验证成功 移除关联账号的错误计数器
                     await _appHelper.RemoveErrorCount(user.UserName);
                     await _appHelper.RemoveErrorCount(user.Email);
+                    //更新最后修改密码日期
+                    var now = DateTime.Now.ToCstTime();
+                    await _userRepository.GetRangeUpdateTable().Where(s => s.Id == user.Id).Set(s => s.LastChangePasswordTime, b => now).ExecuteAsync();
 
                     return new Result { Successful = true };
                 }

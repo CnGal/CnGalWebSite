@@ -82,7 +82,7 @@ function browserVersion() {
 browserVersion();
 
 if (browserVersion() == 1) {
-    window.location.href = "/_content/CnGalWebSite.Shared/pages/NotSupported.html";
+    alert("貌似这个网站不支持你的浏览器哦\n你可以选择安装Edge，Chorme，Firefox或其他支持最新Web标准的浏览器，再重新进入\n如果使用的是QQ浏览器或360极速浏览器，请右击网页，选择极速模式，并重新打开标签页\n有任何疑问可以加群 761794704 进行反馈");
 }
 
 (function (c, l, a, r, i, t, y) {

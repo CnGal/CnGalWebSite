@@ -1,7 +1,7 @@
 ﻿using CnGalWebSite.Helper.Helper;
 using CnGalWebSite.RobotClient;
 using MeowMiraiLib.Msg;
-using MeowMiraiLib.Msg.Type;
+using System.Diagnostics;
 
 var httpClient = new HttpClient();
 var cacheX = new CacheX();
@@ -81,7 +81,7 @@ while (true)
             var message = eventX.GetCurrentTimeEvent();
             if (string.IsNullOrWhiteSpace(message) == false)
             {
-                var result = await messageX.ProcMessageAsync(message, "", null, null);
+                var result = await messageX.ProcMessageAsync(message, "", null, 0, null);
 
                 if (result != null)
                 {
@@ -102,7 +102,7 @@ while (true)
             var message = eventX.GetProbabilityEvents();
             if (string.IsNullOrWhiteSpace(message) == false)
             {
-                var result = await messageX.ProcMessageAsync(message, "", null, null);
+                var result = await messageX.ProcMessageAsync(message, "", null, 0, null);
 
                 if (result != null)
                 {
@@ -115,28 +115,25 @@ while (true)
             }
         };
 
-        c.OnFriendMessageReceive += (s, e) =>
-        {
-            //MGetPlainStringSplit() 是一个关于Message类的数组扩展方法,
-            //用于返回信息里的文字部分后按照 Splitor进行分割, splitor默认是空格
-            var sx = e.MGetPlainStringSplit();
-            var sendto = s.id;
-            var (t, j) = sx[0] switch
-            {
-                //使用信息类的扩展发送方法
-                "重复" => new Message[] { new Plain(sx[1]) }.SendToFriend(sendto, c),
-            };
-            Console.WriteLine(j);
+        c.OnFriendMessageReceive += async (s, e) =>
+         {
+             try
+             {
+                 await clientX.ReplyFromFriendAsync(s, e, CnGalWebSite.DataModel.Model.RobotReplyRange.Friend);
+             }
+             catch (Exception ex)
+             {
+                 OutputHelper.PressError(ex);
+             }
 
-        };
-        //c.事件 += (s,e) => { 处理函数 }
+         };
 
 
         c.OnGroupMessageReceive += async (s, e) =>
         {
             try
             {
-                await clientX.ReplyFromGroupAsync(s, e);
+                await clientX.ReplyFromGroupAsync(s, e, CnGalWebSite.DataModel.Model.RobotReplyRange.Group);
             }
             catch (Exception ex)
             {
@@ -144,20 +141,24 @@ while (true)
             }
 
         };
-        
+
         while (true)
         {
             switch (System.Console.ReadLine()) // 控制台操作
             {
                 //.....
             }
-
+            throw new Exception();
         }
 
     }
     catch (Exception ex)
     {
         OutputHelper.PressError(ex, "", "异步事件调用异常");
+        Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+
+        //关闭当前实例
+        Process.GetCurrentProcess().Kill();
     }
 }
 

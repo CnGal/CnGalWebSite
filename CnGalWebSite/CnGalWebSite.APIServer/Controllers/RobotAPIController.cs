@@ -361,6 +361,7 @@ namespace CnGalWebSite.APIServer.Controllers
             robot.AfterTime = model.AfterTime;
             robot.BeforeTime = model.BeforeTime;
             robot.Priority = model.Priority;
+            robot.Range = model.Range;
 
             //保存
             if (model.Id == 0)
@@ -667,15 +668,77 @@ namespace CnGalWebSite.APIServer.Controllers
             if (model.Name == "auth")
             {
                 var user = await _userRepository.GetAll().AsNoTracking()
-                    .Include(s => s.ThirdPartyLoginInfors)
-                    .FirstOrDefaultAsync(s => s.ThirdPartyLoginInfors.Any(s => s.Type == ThirdPartyLoginType.QQ && s.Id.ToString() == model.Infor));
+                    .FirstOrDefaultAsync(s => s.GroupQQ.ToString() == model.Infor);
 
                 if (user == null)
                 {
-                    return new Result { Successful = false, Error = "你还没有绑定 CnGal资料站 账号哦~ （用QQ登入资料站就可以绑定了" };
+                    return new Result { Successful = false, Error = "你还没有绑定账号哦~ \nPS：私聊“绑定账号”试试吧ヾ(•ω•`)o" };
                 }
 
                 return new Result { Successful = true, Error = (await _userManager.GetRolesAsync(user)).FirstOrDefault() };
+            }
+            else if (model.Name == "verifybind")
+            {
+                var username = model.Infor.Replace("绑定", "").Trim();
+                var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.UserName == username);
+                if (user == null)
+                {
+                    user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Email == username);
+                }
+                if (user == null)
+                {
+                    user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.PhoneNumber == username);
+                }
+
+                if (user == null)
+                {
+                    return new Result { Successful = false, Error = "＞﹏＜ 看板娘找不到这个用户欸~" };
+                }
+
+                if ((await _userService.VerifyBindGroupQQ(user)).Successful)
+                {
+                      return new Result { Successful = true, Error = "ヾ(•ω•`)o 看板娘向你的邮箱发了一封验证邮件，告诉看板娘里面的6位验证码吧" };
+                }
+                else
+                {  return new Result { Successful = false, Error = "呜呜呜~~~ 看板娘的邮件被bug吃掉了啦" };             
+                }
+            }
+            else if (model.Name == "realbind")
+            {
+
+                if (string.IsNullOrWhiteSpace(model.Infor))
+                {
+                    return new Result { Successful = false, Error = "欸？" };
+                }
+
+                var qqStr = model.AdditionalInformations["qq"];
+                var code = model.AdditionalInformations["code"];
+
+                long qq = 0;
+                if (long.TryParse(qqStr, out qq) == false)
+                {
+                    return new Result { Successful = false, Error = "呜呜呜~~~ 看板娘看不到你的QQ号呜呜呜~~~" };
+                }
+
+                var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.UserName == model.Infor);
+                if (user == null)
+                {
+                    user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Email == model.Infor);
+                }
+                if (user == null)
+                {
+                    user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.PhoneNumber == model.Infor);
+                }
+
+                if ((await _userService.RealBindGroupQQAfter(code, qq)).Successful )
+                {
+                    return new Result { Successful = true, Error = "o(〃＾▽＾〃)o 成功绑定账号" };
+                }
+                else
+                {
+                    return new Result { Successful = false, Error = "＞﹏＜ 看板娘觉得验证码错了欸" };
+                }
+
             }
             else if (model.Name == "introduce")
             {

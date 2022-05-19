@@ -1,0 +1,72 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@inject ToastService ToastService
+@inject HttpClient Http
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="群聊QQ号" Icon="fa fa-fw fa-qq" Class="h-100">
+    <div style="display: flex; flex-direction: column; justify-content: space-between;">
+        <span>QQ号：@Model.GroupQQ</span>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <div>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClick">
+                    <MIcon Left>mdi-share-all-outline</MIcon>
+                    解除绑定
+                </MButton>
+            </div>
+
+        </div>
+    </div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification @ref="humanMachineVerification" OnVerficated="OnVerficated" />
+
+@code {
+    [Parameter]
+    public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification humanMachineVerification;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    public async Task OnClick()
+    {
+        await humanMachineVerification.StartVerification();
+    }
+
+    public async Task OnVerficated(HumanMachineVerificationResult model)
+    {
+        if (model.Success == false)
+        {
+            return;
+        }
+
+        //请求数据
+        try
+        {
+
+            var result = await Http.PostAsJsonAsync<UnBindGroupQQModel>(ToolHelper.WebApiPath + "api/space/UnBindGroupQQ", new UnBindGroupQQModel
+            {
+                Verification = model
+            });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("解除绑定失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("解除绑定成功", "解除绑定成功");
+                Model.GroupQQ = null;
+               await OnChanged.InvokeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "解除绑定失败");
+        }
+
+    }
+}
