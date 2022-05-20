@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Senparc.Weixin.MP.AdvancedAPIs.MerChant;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -668,7 +669,7 @@ namespace CnGalWebSite.APIServer.Controllers
             if (model.Name == "auth")
             {
                 var user = await _userRepository.GetAll().AsNoTracking()
-                    .FirstOrDefaultAsync(s => s.GroupQQ.ToString() == model.Infor);
+                    .FirstOrDefaultAsync(s => s.GroupQQ == model.SenderId);
 
                 if (user == null)
                 {
@@ -677,68 +678,23 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 return new Result { Successful = true, Error = (await _userManager.GetRolesAsync(user)).FirstOrDefault() };
             }
-            else if (model.Name == "verifybind")
+            else if (model.Name == "bindqq")
             {
-                var username = model.Infor.Replace("绑定", "").Trim();
-                var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.UserName == username);
-                if (user == null)
-                {
-                    user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Email == username);
+                var temps = model.Infor.Split("绑定");
+if (temps.Length <= 1)
+{
+                    return new Result { Successful = true, Error = "" };
                 }
-                if (user == null)
-                {
-                    user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.PhoneNumber == username);
-                }
+             var code=   temps[1].Replace("绑定", "").Trim();
 
-                if (user == null)
-                {
-                    return new Result { Successful = false, Error = "＞﹏＜ 看板娘找不到这个用户欸~" };
-                }
 
-                if ((await _userService.VerifyBindGroupQQ(user)).Successful)
+                if ((await _userService.BindGroupQQ(code,model.SenderId)).Successful)
                 {
-                      return new Result { Successful = true, Error = "ヾ(•ω•`)o 看板娘向你的邮箱发了一封验证邮件，告诉看板娘里面的6位验证码吧" };
+                      return new Result { Successful = true, Error = "o(〃＾▽＾〃)o 成功绑定账号" };
                 }
                 else
-                {  return new Result { Successful = false, Error = "呜呜呜~~~ 看板娘的邮件被bug吃掉了啦" };             
+                {  return new Result { Successful = false, Error = "＞﹏＜ 看板娘觉得身份识别码错了喵~" };             
                 }
-            }
-            else if (model.Name == "realbind")
-            {
-
-                if (string.IsNullOrWhiteSpace(model.Infor))
-                {
-                    return new Result { Successful = false, Error = "欸？" };
-                }
-
-                var qqStr = model.AdditionalInformations["qq"];
-                var code = model.AdditionalInformations["code"];
-
-                long qq = 0;
-                if (long.TryParse(qqStr, out qq) == false)
-                {
-                    return new Result { Successful = false, Error = "呜呜呜~~~ 看板娘看不到你的QQ号呜呜呜~~~" };
-                }
-
-                var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.UserName == model.Infor);
-                if (user == null)
-                {
-                    user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Email == model.Infor);
-                }
-                if (user == null)
-                {
-                    user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.PhoneNumber == model.Infor);
-                }
-
-                if ((await _userService.RealBindGroupQQAfter(code, qq)).Successful )
-                {
-                    return new Result { Successful = true, Error = "o(〃＾▽＾〃)o 成功绑定账号" };
-                }
-                else
-                {
-                    return new Result { Successful = false, Error = "＞﹏＜ 看板娘觉得验证码错了欸" };
-                }
-
             }
             else if (model.Name == "introduce")
             {

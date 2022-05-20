@@ -208,15 +208,10 @@ namespace CnGalWebSite.RobotClient
                     "qq" => qq.ToString(),
                     "weather" => _messageArgs.FirstOrDefault(s => s.Name == "weather")?.Value,
                     "sender" => name,
-                    "auth" => await GetArgValue(argument, qq.ToString()),
                     "n" => "\n",
                     "r" => "\r",
                     "facelist" => "该功能暂未实装",
-                    "introduce" => await GetArgValue(argument, message),
-                    "verifybind" => await GetArgValue(argument, message),
-                    "realbind" => await GetArgValue(argument, message, new Dictionary<string, string> { { "qq", qq.ToString() }, { "code", message } }),
-                    "website" => await GetArgValue(argument, message),
-                    _ => await GetArgValue(argument, null)
+                    _ => await GetArgValue(argument, message,qq)
                 };
 
                 reply = reply.Replace("$(" + argument + ")", value);
@@ -248,17 +243,21 @@ namespace CnGalWebSite.RobotClient
                 }
             }
         }
-        public async Task<string> GetArgValue(string name, string infor)
+
+        public async Task<string> GetArgValue(string name, string infor, long qq)
         {
-            return await GetArgValue(name, infor, new Dictionary<string, string>());
+            return await GetArgValue(name, infor,qq, new Dictionary<string, string>());
         }
-        public async Task<string> GetArgValue(string name, string infor,Dictionary<string,string> adds)
+
+        public async Task<string> GetArgValue(string name, string infor, long qq, Dictionary<string,string> adds)
         {
             var result = await _httpClient.PostAsJsonAsync<GetArgValueModel>(ToolHelper.WebApiPath + "api/robot/GetArgValue", new GetArgValueModel
             {
                 Infor = infor,
                 Name = name,
-                AdditionalInformations = adds
+                AdditionalInformations = adds,
+                SenderId=qq,
+                
             });
 
             var jsonContent = result.Content.ReadAsStringAsync().Result;

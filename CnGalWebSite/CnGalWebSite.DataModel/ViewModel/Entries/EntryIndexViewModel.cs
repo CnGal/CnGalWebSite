@@ -51,6 +51,10 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// </summary>
         public bool IsHidden { get; set; }
         /// <summary>
+        /// 是否隐藏外部链接
+        /// </summary>
+        public bool IsHideOutlink { get; set; }
+        /// <summary>
         /// 是否查看编辑记录状态
         /// </summary>
         public bool IsExamineList { get; set; }

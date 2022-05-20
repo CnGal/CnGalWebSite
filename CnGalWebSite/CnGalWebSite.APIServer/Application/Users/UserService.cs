@@ -772,24 +772,14 @@ namespace CnGalWebSite.APIServer.Application.Users
         }
 
 
-        public async Task<Result> VerifyBindGroupQQ(ApplicationUser user)
+        public async Task<string> GenerateBindGroupQQCode(ApplicationUser user)
         {
-            //获取短验证码
-            await _appHelper.GetShortTokenAsync(user.Id, user.UserName);
-
-            var result = await _appHelper.SendVerificationEmailAsync(null, user.Email, user.UserName);
-
-            if (result != null)
-            {
-                return new Result { Successful = false, Error = "发送验证码的过程中发生错误，" + result };
-            }
-
-            return new Result { Successful = true };
+            return await _appHelper.SetUserLoginKeyAsync(ToolHelper.Base64EncodeString(user.Id),true);
         }
 
-        public async Task<Result> RealBindGroupQQAfter(string code, long groupQQ)
+        public async Task<Result> BindGroupQQ(string code, long groupQQ)
         {
-            var userId = await _appHelper.GetLongTokenAsync(code);
+            var userId = ToolHelper.Base64DecodeString(await _appHelper.GetUserFromLoginKeyAsync(code));
             if (string.IsNullOrWhiteSpace(userId))
             {
                 await _appHelper.AddErrorCount(groupQQ.ToString());

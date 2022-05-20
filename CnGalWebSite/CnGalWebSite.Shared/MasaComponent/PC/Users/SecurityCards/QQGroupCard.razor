@@ -5,35 +5,86 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="群聊QQ号" Icon="fa fa-fw fa-qq" Class="h-100">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
-        <span>QQ号：@Model.GroupQQ</span>
+        @if (string.IsNullOrWhiteSpace(Model.GroupQQ))
+        {
+            <span>绑定QQ号可以向看板娘查询信息，点击绑定获取身份识别码，并在群聊中发送【看板娘，绑定+身份识别码】即可绑定</span>
+        }
+        else
+        {
+            <span>QQ号：@Model.GroupQQ</span>
 
-        <div style="display: flex; justify-content: flex-end;">
+    }
+
+
+    <div style="display: flex; justify-content: flex-end;">
+        <div>
+            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickBind">
+                <MIcon Left>mdi-share-all-outline</MIcon>
+                @(string.IsNullOrWhiteSpace(Model.GroupQQ) ? "绑定" : "更换绑定")
+            </MButton>
+        </div>
+        @if (string.IsNullOrWhiteSpace(Model.GroupQQ) == false)
+        {
             <div>
-                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClick">
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickUnBind">
                     <MIcon Left>mdi-share-all-outline</MIcon>
                     解除绑定
                 </MButton>
             </div>
+        }
 
-        </div>
+
+    </div>
     </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification @ref="humanMachineVerification" OnVerficated="OnVerficated" />
-
+<MDialog @bind-Value="Dialog"
+         Width="600">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            身份识别码
+        </MCardTitle>
+        <MCardText>
+            在群聊中发送【看板娘，绑定+身份识别码】即可绑定，90分钟内有效，仅可使用一次
+        </MCardText>
+        <MCardText>
+            <PCopyableText>
+                @("看板娘，绑定 "+ Code)
+            </PCopyableText>
+        </MCardText>
+        <MCardText>
+            <PCopyableText>
+                @Code
+            </PCopyableText>
+        </MCardText>
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+            <MSpacer></MSpacer>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="确定" IsAsync="true" OnClick="() => Dialog = false" Icon="mdi-check" Color="green" TextStyle />
+        </MCardActions>
+    </MCard>
+</MDialog>
 @code {
     [Parameter]
     public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
     [Parameter]
     public EventCallback OnChanged { get; set; }
+    bool Dialog { get; set; }
 
     CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification humanMachineVerification;
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-    public async Task OnClick()
+    string Code;
+    bool bind;
+    public async Task OnClickUnBind()
     {
+        bind = false;
         await humanMachineVerification.StartVerification();
     }
-
+    public async Task OnClickBind()
+    {
+        bind = true;
+        await humanMachineVerification.StartVerification();
+    }
     public async Task OnVerficated(HumanMachineVerificationResult model)
     {
         if (model.Success == false)
@@ -41,6 +92,18 @@
             return;
         }
 
+        if(bind)
+        {
+            await ProcBind(model);
+        }
+        else
+        {
+            await ProcUnBind(model);
+        }
+
+    }
+    public async Task ProcUnBind(HumanMachineVerificationResult model)
+    {
         //请求数据
         try
         {
@@ -49,7 +112,8 @@
             {
                 Verification = model
             });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
+
+                    string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
@@ -60,13 +124,42 @@
             {
                 await ToastService.Success("解除绑定成功", "解除绑定成功");
                 Model.GroupQQ = null;
-               await OnChanged.InvokeAsync();
+                await OnChanged.InvokeAsync();
             }
         }
         catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "解除绑定失败");
         }
+    }
+    public async Task ProcBind(HumanMachineVerificationResult model)
+    {
+        //请求数据
+        try
+        {
 
+            var result = await Http.PostAsJsonAsync<UnBindGroupQQModel>(ToolHelper.WebApiPath + "api/space/GetBindGroupQQCode", new UnBindGroupQQModel
+            {
+                Verification = model
+            });
+
+
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("获取身份识别码失败", obj.Error);
+            }
+            else
+            {
+                Code = obj.Error;
+                Dialog = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取身份识别码失败");
+        }
     }
 }

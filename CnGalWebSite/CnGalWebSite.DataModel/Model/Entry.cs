@@ -56,7 +56,11 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 是否隐藏
         /// </summary>
-        public bool IsHidden { get; set; } = false;
+        public bool IsHidden { get; set; }
+        /// <summary>
+        /// 是否隐藏外部链接
+        /// </summary>
+        public bool IsHideOutlink { get; set; }
         /// <summary>
         /// 阅读数
         /// </summary>

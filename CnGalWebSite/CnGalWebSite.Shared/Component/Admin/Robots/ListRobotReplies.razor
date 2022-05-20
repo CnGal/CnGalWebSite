@@ -153,8 +153,11 @@
     {
         var model = Utility.GenerateEditorItems<ListRobotReplyAloneModel>().ToList();
         model.RemoveAll(s => s.Text == "更新时间");
+        var textbox = model.Where(s => s.Text == "回复").FirstOrDefault();
+        textbox.Rows = 5;
+
         var editors = model.Where(s => s.PropertyType == typeof(DateTime));
-        foreach(var temp in editors)
+        foreach (var temp in editors)
         {
             temp.ComponentParameters = new List<KeyValuePair<string,object>> { new KeyValuePair<string, object>("ViewMode", DatePickerViewMode.DateTime)};
         }

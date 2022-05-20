@@ -1,0 +1,35 @@
+﻿@page "/space/editdata"
+@attribute [Authorize]
+@inject NavigationManager NavigationManager
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var user = await authenticationStateTask;
+            if (user.User.Identity.IsAuthenticated == false)
+            {
+                NavigationManager.NavigateTo("/account/login" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+                return;
+            }
+            var UserId = "";
+            foreach (var item in user.User.Claims)
+            {
+                if (item.Type == "userid")
+                {
+                    UserId = item.Value;
+                }
+            }
+
+            NavigationManager.NavigateTo("/space/editdata/" + UserId);
+
+
+
+        }
+    }
+}

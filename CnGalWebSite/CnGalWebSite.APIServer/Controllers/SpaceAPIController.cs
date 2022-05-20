@@ -709,5 +709,30 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+
+        /// <summary>
+        /// 生成绑定QQ的身份识别码
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<Result>> GetBindGroupQQCodeAsync(BindGroupQQModel model)
+        {
+            //提前判断是否通过人机验证
+            if (_appHelper.CheckRecaptcha(model.Verification.Challenge, model.Verification.Validate, model.Verification.Seccode) == false)
+            {
+                return BadRequest(new Result { Error = "没有通过人机验证" });
+            }
+
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            if (user == null)
+            {
+                return new Result { Error = "未找到该用户" };
+            }
+
+
+            return new Result { Successful = true, Error = await _userService.GenerateBindGroupQQCode(user) };
+        }
+
     }
 }

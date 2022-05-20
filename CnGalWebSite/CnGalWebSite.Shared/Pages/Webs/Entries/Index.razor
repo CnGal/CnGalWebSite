@@ -62,7 +62,7 @@ else
             @if (_dataCatcheService.IsApp)
             {
                 <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4") ">
-                    @if (EntryView.SteamId > 0)
+                    @if (EntryView.SteamId > 0 && EntryView.IsHideOutlink == false)
                     {
                         <div class="mb-4">
                             <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
@@ -197,7 +197,7 @@ else
                 </div>
 
                 <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4 order-1 order-lg-2") ">
-                    @if (EntryView.SteamId > 0)
+                    @if (EntryView.SteamId > 0&&EntryView.IsHideOutlink==false)
                     {
                         <div class="mb-4">
                             <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
@@ -309,7 +309,7 @@ else
     {
         get
         {
-            return (EntryView.Information.Count == 0 && EntryView.SteamId <= 0 && EntryView.Tags.Count == 0 && EntryView.OtherRelevances.Count == 0 && EntryView.Roles.Count == 0 &&
+            return (EntryView.Information.Count == 0 && (EntryView.SteamId <= 0 || EntryView.IsHideOutlink)&& EntryView.Tags.Count == 0 &&( EntryView.OtherRelevances.Count == 0|| EntryView.IsHideOutlink) && EntryView.Roles.Count == 0 &&
                       ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false) == false && (_dataCatcheService.IsApp == false && EntryView.Staffs.Count > 0) == false);
         }
     }
