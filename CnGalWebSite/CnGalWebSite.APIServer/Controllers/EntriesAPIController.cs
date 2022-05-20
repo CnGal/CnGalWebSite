@@ -1011,6 +1011,13 @@ namespace CnGalWebSite.APIServer.Controllers
             await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
             return new Result { Successful = true };
         }
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        public async Task<ActionResult<Result>> HideEntryOutlinkAsync(HiddenEntryModel model)
+        {
+            await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHideOutlink, b => model.IsHidden).ExecuteAsync();
+            return new Result { Successful = true };
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EditEntryTagViewModel>> EditTags(int Id)

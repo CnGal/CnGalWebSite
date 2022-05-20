@@ -8,6 +8,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Robots
 
         public string Infor { get; set; }
 
+        /// <summary>
+        /// 发动方QQ
+        /// </summary>
+        public long SenderId { get; set; }
+
         public Dictionary<string, string> AdditionalInformations { get; set; } = new Dictionary<string, string>();
 
         public string Token { get; set; }

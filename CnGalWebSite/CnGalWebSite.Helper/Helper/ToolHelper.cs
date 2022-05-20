@@ -193,13 +193,20 @@ namespace CnGalWebSite.DataModel.Helper
 
         public static string Base64EncodeString(string content)
         {
-
+            if(content == null)
+            {
+                return null;
+            }
             var bytes = Encoding.UTF8.GetBytes(content);
             return Convert.ToBase64String(bytes).Replace("+", "-").Replace("/", "_");
         }
 
         public static string Base64DecodeString(string content)
         {
+            if (content == null)
+            {
+                return null;
+            }
             content = content.Replace("-", "+").Replace("_", "/");
             switch (content.Length % 4)
             {

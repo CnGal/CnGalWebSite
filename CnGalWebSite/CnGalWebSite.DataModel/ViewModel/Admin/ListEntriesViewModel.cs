@@ -37,8 +37,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         public string BriefIntroduction { get; set; }
         [Display(Name = "优先级")]
         public int Priority { get; set; }
-        [Display(Name = "是否隐藏")]
+        [Display(Name = "隐藏")]
         public bool IsHidden { get; set; }
+        [Display(Name = "隐藏外链")]
+        public bool IsHideOutlink { get; set; }
         [Display(Name = "可否评论")]
         public bool CanComment { get; set; }
     }

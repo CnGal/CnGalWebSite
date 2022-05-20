@@ -59,8 +59,10 @@
                         <TableToolbarButton TItem="ListEntryAloneModel" Color="Color.Info" Icon="fa fa-arrow-down" Text="降权重" OnClickCallback="OnPriorityDownClick" IsAsync="true" />
                         <TableToolbarButton TItem="ListEntryAloneModel" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
                         <TableToolbarButton TItem="ListEntryAloneModel" Color="Color.Success" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListEntryAloneModel" Color="Color.Info" Icon="fa fa-comments" Text="开启评论" OnClickCallback="OnCanCommentClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListEntryAloneModel" Color="Color.Primary" Icon="fa fa-comments-o" Text="关闭评论" OnClickCallback="OnCanNotCommentClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListEntryAloneModel" Color="Color.Success" Icon="fa fa-map-signs" Text="开外链" OnClickCallback="OnUnHideOutlinkClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListEntryAloneModel" Color="Color.Success" Icon="fa fa-unlink" Text="关外链" OnClickCallback="OnHideOutlinkClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListEntryAloneModel" Color="Color.Info" Icon="fa fa-comments" Text="开评" OnClickCallback="OnCanCommentClick" IsAsync="true" />
+                        <TableToolbarButton TItem="ListEntryAloneModel" Color="Color.Primary" Icon="fa fa-comments-o" Text="关评" OnClickCallback="OnCanNotCommentClick" IsAsync="true" />
 
                     </TableToolbarTemplate>
                     <TableColumns>
@@ -70,15 +72,20 @@
                         <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" TextWrap="true" Width="300" />
 
                         <TableColumn @bind-Field="@context.Priority" Sortable="true" Width="120" />
-                        <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+                        <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="95" />
+                        <TableColumn @bind-Field="@context.IsHideOutlink" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                         <TableColumn @bind-Field="@context.CanComment" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                     </TableColumns>
                     <RowButtonTemplate>
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.Id , context.Name))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new int[] { context.Id },1 , true))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new int[] { context.Id }, - 1 , true))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-unlink" Text="切换显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new int[] { context.Id }, !context.IsHidden, true))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-comments-o" Text="开关评论" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditCanCommentClick(new int[] { context.Id }, !context.CanComment, true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Warning" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.Id , context.Name))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new int[] { context.Id },1 , true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-down" Text="降权" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new int[] { context.Id }, - 1 , true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" IsShow="!context.IsHidden" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new int[] { context.Id }, true, true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-link" Text="显示" IsAsync="true" IsShow="context.IsHidden" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new int[] { context.Id }, false, true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-unlink" Text="关外链" IsAsync="true" IsShow="!context.IsHideOutlink" OnClickWithoutRender="@(() => OnRowEditIsHideOutlinkClick(new int[] { context.Id }, true, true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-link" Text="开外链" IsAsync="true" IsShow="context.IsHideOutlink" OnClickWithoutRender="@(() => OnRowEditIsHideOutlinkClick(new int[] { context.Id }, false, true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-comments-o" Text="开评" IsAsync="true" IsShow="!context.CanComment" OnClickWithoutRender="@(() => OnRowEditCanCommentClick(new int[] { context.Id }, true, true))" />
+                        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-comments-o" Text="关评" IsAsync="true" IsShow="context.CanComment" OnClickWithoutRender="@(() => OnRowEditCanCommentClick(new int[] { context.Id }, false, true))" />
                     </RowButtonTemplate>
                 </Table>
             </div>
@@ -310,6 +317,64 @@
         await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), false, false);
 
         await ToastService.Success("显示词条成功", "显示词条成功");
+        await TableRows.QueryAsync();
+    }
+
+    private async Task OnRowEditIsHideOutlinkClick(int[] ids, bool isHidden, bool showMessage)
+    {
+        string tempString = isHidden == true ? "隐藏" : "显示";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<HiddenEntryModel>(ToolHelper.WebApiPath + "api/entries/HideEntryOutlink", new HiddenEntryModel { Ids = ids, IsHidden = isHidden });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "词条外部链接失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "词条外部链接成功", tempString + "词条外部链接成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "词条外部链接失败");
+        }
+    }
+
+    private async Task OnHideOutlinkClick(IEnumerable<ListEntryAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改词条外部链接显示状态", "请选中词条");
+            return;
+        }
+
+        await OnRowEditIsHideOutlinkClick(items.Select(s => s.Id).ToArray(), true, false);
+
+        await ToastService.Success("隐藏词条外部链接成功", "隐藏词条外部链接成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnUnHideOutlinkClick(IEnumerable<ListEntryAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改词条外部链接显示状态", "请选中词条");
+            return;
+        }
+
+        await OnRowEditIsHideOutlinkClick(items.Select(s => s.Id).ToArray(), false, false);
+
+        await ToastService.Success("显示词条外部链接成功", "显示词条外部链接成功");
         await TableRows.QueryAsync();
     }
 

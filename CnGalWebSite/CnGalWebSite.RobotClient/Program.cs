@@ -11,7 +11,7 @@ while (true)
     try
     {
         OutputHelper.Repeat();
-        OutputHelper.WriteCenter("CnGal资料站 看板娘 v3.3.10", 1.8);
+        OutputHelper.WriteCenter("CnGal资料站 看板娘 v3.3.14", 1.8);
         OutputHelper.Repeat();
 
 
@@ -115,6 +115,20 @@ while (true)
             }
         };
 
+        //c.OnTempMessageReceive+= async (s, e) =>
+        //{
+        //    try
+        //    {
+        //        await clientX.ReplyFromTempAsync(s, e, CnGalWebSite.DataModel.Model.RobotReplyRange.Friend);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        OutputHelper.PressError(ex);
+        //    }
+
+        //};
+
+
         c.OnFriendMessageReceive += async (s, e) =>
          {
              try
@@ -141,24 +155,19 @@ while (true)
             }
 
         };
-
         while (true)
         {
             switch (System.Console.ReadLine()) // 控制台操作
             {
                 //.....
             }
-            throw new Exception();
+        
         }
 
     }
     catch (Exception ex)
     {
         OutputHelper.PressError(ex, "", "异步事件调用异常");
-        Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
-
-        //关闭当前实例
-        Process.GetCurrentProcess().Kill();
     }
 }
 

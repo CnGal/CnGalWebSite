@@ -167,7 +167,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     CanComment = item.CanComment ?? true,
                     BriefIntroduction = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20),
                     Priority = item.Priority,
-                    Type = item.Type
+                    Type = item.Type,
+                    IsHideOutlink = item.IsHideOutlink,
                 });
             }
 
@@ -896,6 +897,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 DisambigName = entry.Disambig?.Name,
                 AnotherName = entry.AnotherName,
                 IsHidden = entry.IsHidden,
+                IsHideOutlink = entry.IsHideOutlink,
             };
 
 

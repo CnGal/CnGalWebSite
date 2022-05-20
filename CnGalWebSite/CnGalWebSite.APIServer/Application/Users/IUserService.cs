@@ -37,9 +37,9 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         Task<UserInforViewModel> GetUserInforViewModel(ApplicationUser user);
 
-        Task<Result> VerifyBindGroupQQ(ApplicationUser user);
+        Task<string> GenerateBindGroupQQCode(ApplicationUser user);
 
-        Task<Result> RealBindGroupQQAfter(string code, long groupQQ);
+        Task<Result> BindGroupQQ(string code, long groupQQ);
 
     }
 }
