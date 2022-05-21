@@ -1,6 +1,6 @@
 ﻿@inject NavigationManager NavigationManager
 
-<a class="d-flex pointer a-font-color" style="align-items: center; flex-direction: column; " href="@("/account/login"+ ToolHelper.Base64EncodeUrl(NavigationManager.Uri))">
+<a class="d-flex pointer a-font-color" style="align-items: center; flex-direction: column; " href="@("/account/login/"+ ToolHelper.Base64EncodeUrl(NavigationManager.Uri))">
     <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/apps/user.png" alt="默认头像" style="width:60px;border-radius:50%;" />
     <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
         <span class="h6 fw-bold">点击头像登录</span>

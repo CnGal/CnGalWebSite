@@ -134,16 +134,19 @@ namespace CnGalWebSite.RobotClient
                 }
 
             }
-
-            foreach (var item in events)
+            if(currentEvent==null)
             {
+                return null;
+            }
+           
+           
                 ExecuteInfors.Add(new EventExecuteInfor
                 {
-                    Id = item.Id,
-                    Note = item.Note,
+                    Id = currentEvent.Id,
+                    Note = currentEvent.Note,
                     LastRunTime = DateTime.Now.ToCstTime(),
                 });
-            }
+            
 
             SaveExecuteInfors();
 
@@ -177,19 +180,16 @@ namespace CnGalWebSite.RobotClient
 
             todos.Random();
 
-            foreach (var item in events)
+            var temp = todos.FirstOrDefault();
+            ExecuteInfors.Add(new EventExecuteInfor
             {
-                ExecuteInfors.Add(new EventExecuteInfor
-                {
-                    Id = item.Id,
-                    Note = item.Note,
-                    LastRunTime = DateTime.Now.ToCstTime(),
-                });
-            }
-
+                Id = temp.Id,
+                Note = temp.Note,
+                LastRunTime = DateTime.Now.ToCstTime(),
+            });
             SaveExecuteInfors();
 
-            return todos.FirstOrDefault()?.Text;
+            return temp.Text;
         }
 
         public async Task RefreshAsync()
