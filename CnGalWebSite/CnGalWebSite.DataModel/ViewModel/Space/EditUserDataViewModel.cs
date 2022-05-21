@@ -9,7 +9,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 {
     public class EditUserDataViewModel : BaseEditModel
     {
-        public string Id { get; set; }
+        public new string Id { get; set; }
 
         [Required(ErrorMessage = "请输入名字"), MaxLength(20, ErrorMessage = "名字的长度不能超过20个字符")]
         [Display(Name = "用户名")]

@@ -21,7 +21,7 @@
     private async void OnClickLogin()
     {
 
-        NavigationManager.NavigateTo("/account/login" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
 
     }
 
