@@ -1,6 +1,6 @@
 ﻿using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
-
+using CnGalWebSite.DataModel.ViewModel.Others;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
@@ -37,6 +37,7 @@ namespace CnGalWebSite.Shared
             _dataCacheService.RefreshApp = EventCallback.Factory.Create(this, async () => await OnRefresh());
             _dataCacheService.OpenNewPage = EventCallback.Factory.Create(this, (string s) => OpenNewPage(s));
             _dataCacheService.ThemeChanged = EventCallback.Factory.Create(this, (string s) => ThemeChanged(s));
+            _dataCacheService.ShareLink = EventCallback.Factory.Create(this, (ShareLinkModel s) => ShareLink(s));
 
             //ShowAlert();
         }
@@ -140,6 +141,11 @@ namespace CnGalWebSite.Shared
         }
 
         public virtual void Loaded()
+        {
+
+        }
+
+        public virtual async void ShareLink(ShareLinkModel mode)
         {
 
         }

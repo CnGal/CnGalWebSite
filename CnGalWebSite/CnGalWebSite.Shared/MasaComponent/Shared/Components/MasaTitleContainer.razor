@@ -1,6 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-@if (_dataCacheService.IsApp)
+@if (Small)
 {
     <div class="@( (OutlineHead?"":"rounded shadow-sm  bg-opacity p-2 ") + Class + (IsCollapsed ? " mb-3" : ""))">
         <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
@@ -104,6 +104,8 @@ else
 
     [Parameter]
     public bool IsCollapsed { get; set; }
+    [Parameter]
+    public bool Small { get; set; }
     [Parameter]
     public EventCallback<bool> IsCollapsedChanged { get; set; }
 

@@ -1,0 +1,29 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-share" Tooltip="分享" Class="@Class" OnClick="OnClickStar" />
+
+
+
+@code {
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Text { get; set; }
+
+
+    private async Task OnClickStar()
+    {
+      await  _dataCacheService.ShareLink.InvokeAsync(new ShareLinkModel
+        {
+            Link = NavigationManager.Uri.Replace(NavigationManager.BaseUri,"https://www.cngal.org"),
+            Text = Text,
+            Title = Title,
+        });
+    }
+}

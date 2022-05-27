@@ -30,9 +30,14 @@
             @if (HiddenButton == false)
             {
                 <div class="mt-2" style="display: flex; justify-content: flex-end;">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Tag" Id="Model.Id" @bind-IsHidden="Model.IsHidden"  @bind-IsEdit="Model.IsEdit"/>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Tag" Id="Model.Id" @bind-IsHidden="@Model.IsHidden" @bind-IsEdit="@Model.IsEdit" />
                 </div>
             }
+            @if (ToolHelper.IsMaui)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ShareButton Title="@("标签 - "+Model.Name)" Class="ms-4" Text="@($"【标签】《{Model.Name}》\n{Model.BriefIntroduction}")" />
+            }
+
         </div>
     </div>
 

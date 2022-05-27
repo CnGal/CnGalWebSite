@@ -28,8 +28,9 @@
     <link rel="stylesheet" href="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.css" />
 
     <!--icon file,import need to use-->
-    <link href="_content/CnGalWebSite.Shared/icons/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet" />
+
 
     <link rel="stylesheet" href="_content/BootstrapBlazor.Chart/css/bootstrap.blazor.chart.bundle.min.css" />
     <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -40,8 +41,17 @@
 
     <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/bundle-css.min.css">
     <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/cover-default.min.css">
-    <link rel="stylesheet" href="_content/CnGalWebSite.Shared/css/wasm.css">
+    <style>
+        .d-wasm {
+            display: none;
+        }
 
+        @media (min-width: 576px) {
+            .d-wasm-sm-block {
+                display: block !important;
+            }
+        }
+    </style>
 </head>
 
 <body class="overflow-hidden">
@@ -83,6 +93,7 @@
     <script src="_content/CnGalWebSite.Shared/js/common.js"></script>
 
     <script src="_content/CnGalWebSite.Shared/js/bundle-js.min.js"></script>
+    <script src="_content/CnGalWebSite.Shared/js/check.min.js"></script>
 
     <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/highlight.min.js"></script>
     <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/editor-md/1.5.0/editormd.min.js"></script>

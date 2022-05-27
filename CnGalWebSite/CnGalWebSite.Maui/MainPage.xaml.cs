@@ -1,4 +1,8 @@
-﻿using CnGalWebSite.Maui.Platforms.Android.Services;
+﻿#if ANDROID
+
+using CnGalWebSite.Maui.Platforms.Android.Services;
+#endif
+
 using CnGalWebSite.Maui.Services;
 using Microsoft.AspNetCore.Components.WebView;
 
@@ -34,9 +38,11 @@ namespace CnGalWebSite.Maui
             //    LaunchMode = BrowserLaunchMode.SystemPreferred,
             //    TitleMode = BrowserTitleMode.Show
             //});
-
+#if ANDROID
             var themeService = new ThemeService();
             themeService.SetStatusBarColor(Color.FromArgb("#FFFFFF"));
+#endif
+
         }
 
         public void HideOverviewGrid()
