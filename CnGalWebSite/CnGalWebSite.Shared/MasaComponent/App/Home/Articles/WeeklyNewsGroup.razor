@@ -1,0 +1,44 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout Title="CnGal每周速报" Icon="fa fa-fw fa-newspaper-o" Class="@Class" MoreUrl="/weeklynews">
+    <div class="row">
+        @foreach (var item in _dataCacheService.WeeklyNewsOverviewCatche.Take(3))
+        {
+            <div class="col-12 col-md-6 mb-3">
+                <CnGalWebSite.Shared.MasaComponent.PC.Articles.Home.WeeklyNewsViewTip Model="item" />
+            </div>
+        }
+    </div>
+</CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout>
+@code {
+
+    [Parameter]
+    public string Class { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+    public async Task Refresh()
+    {
+
+        try
+        {
+            if (_dataCacheService.WeeklyNewsOverviewCatche.Count == 0)
+            {
+                _dataCacheService.WeeklyNewsOverviewCatche = await Http.GetFromJsonAsync<List<ArticleInforTipViewModel>>(ToolHelper.WebApiPath + "api/news/GetWeeklyNewsOverview");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取文章主页周报列表失败");
+        }
+    }
+
+}

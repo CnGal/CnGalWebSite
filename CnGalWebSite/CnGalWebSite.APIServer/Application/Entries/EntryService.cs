@@ -1274,7 +1274,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             var relevanceArticle = new List<ArticleInforTipViewModel>();
             var relevanceOther = new List<RelevancesKeyValueModel>();
 
-            foreach (var item in entry.Articles)
+            foreach (var item in entry.Articles.Where(s=>s.IsHidden==false))
             {
                 if (item.Type == ArticleType.News)
                 {
@@ -1286,7 +1286,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                 }
             }
-            foreach (var nav in entry.EntryRelationFromEntryNavigation)
+            foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
             {
                 var item = nav.ToEntryNavigation;
                 if (item.Type == EntryType.Role)

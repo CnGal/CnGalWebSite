@@ -1,14 +1,16 @@
-﻿<TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.EntryId)" Text="@Model.Name" class="a-font-color">
+﻿@inject IDataCacheService  _dataCacheService
+
+<TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.EntryId)" Text="@Model.Name" class="a-font-color">
         <div class="shadow-sm pointer rounded  bg-opacity h-100">
             <div class="h-100" style="display: flex; flex-direction: column;">
                 <img  loading="lazy"  class="w-100" src="@Model.Image" alt="@Model.Name">
-                <div class="p-3 pb-2 h-100" style=" display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="@(_dataCacheService.IsApp?"p-2 h-100":"p-3 pb-2 h-100")" style=" display: flex; flex-direction: column; justify-content: space-between;">
                     <div style="display: flex; width: 100%;">
                         <div style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-                            <header class="text-truncate-3">
-                                <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                            <header class="@("text-truncate-2 "+(_dataCacheService.IsApp?"mb-1":""))">
+                                <h5 class="fw-bold" style="@(_dataCacheService.IsApp?" display: inline;font-size: large;":" display: inline;")">@Model.Name</h5>
                             </header>
-                            <span class="text-truncate-3">
+                            <span class="text-truncate-3"  style="@(_dataCacheService.IsApp?"color: gray;font-size:small;":"")">
                                 @Model.BriefIntroduction
                             </span>
 

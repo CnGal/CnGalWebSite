@@ -14,20 +14,19 @@
             </div>
         </div>
         <div class="@("tab-pane fade" + (defaultIndex == 1 ? " show active " : "") )" id="@("pills" + randomIndex + "-1")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-1-tab")">
-
             @if (isReadyTab1)
             {
-                <div>
-                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Index />
-                </div>
+                <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.FreeGameGroup Class="mb-3" />
+                <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.DiscountGameGroup Class="mb-3" />
+                <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.GameRoleGroup Class="mb-3" />
+
             }
         </div>
         <div class="@("tab-pane fade" + (defaultIndex == 2 ? " show active " : "") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
             @if (isReadyTab2)
             {
-                <div>
-                    <CnGalWebSite.Shared.AppComponent.Pages.Articles.Home />
-                </div>
+               <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.RandomArticleGroup Class="mb-3"/>
+               <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.WeeklyNewsGroup Class="mb-3"/>
             }
 
         </div>

@@ -130,23 +130,22 @@ namespace CnGalWebSite.RobotClient
                 if (new Random().Next(0, sameCount) == 0)
                 {
                     currentEvent = item;
-                    break;
                 }
 
+                //无论有没有被选择中则写入已执行中
+                ExecuteInfors.Add(new EventExecuteInfor
+                {
+                    Id = item.Id,
+                    Note = item.Note,
+                    LastRunTime = DateTime.Now.ToCstTime(),
+                });
+
             }
-            if(currentEvent==null)
+
+            if (currentEvent == null)
             {
                 return null;
             }
-           
-           
-                ExecuteInfors.Add(new EventExecuteInfor
-                {
-                    Id = currentEvent.Id,
-                    Note = currentEvent.Note,
-                    LastRunTime = DateTime.Now.ToCstTime(),
-                });
-            
 
             SaveExecuteInfors();
 

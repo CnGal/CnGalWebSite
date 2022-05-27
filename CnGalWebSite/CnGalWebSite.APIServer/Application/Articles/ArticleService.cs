@@ -611,7 +611,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             //读取词条信息
             var relevances = new List<RelevancesViewModel>();
 
-            if (article.Entries.Count > 0)
+            if (article.Entries.Any(s => s.IsHidden == false))
             {
                 var temp = new List<RelevancesKeyValueModel>();
                 relevances.Add(new RelevancesViewModel
@@ -619,7 +619,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                     Modifier = "词条",
                     Informations = temp
                 });
-                foreach (var item in article.Entries)
+                foreach (var item in article.Entries.Where(s => s.IsHidden == false))
                 {
                     temp.Add(new RelevancesKeyValueModel
                     {
@@ -629,7 +629,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                     });
                 }
             }
-            if (article.ArticleRelationFromArticleNavigation.Count > 0)
+            if (article.ArticleRelationFromArticleNavigation.Any(s => s.ToArticleNavigation.IsHidden))
             {
                 var temp = new List<RelevancesKeyValueModel>();
                 relevances.Add(new RelevancesViewModel
@@ -637,7 +637,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                     Modifier = "文章",
                     Informations = temp
                 });
-                foreach (var nav in article.ArticleRelationFromArticleNavigation)
+                foreach (var nav in article.ArticleRelationFromArticleNavigation.Where(s => s.ToArticleNavigation.IsHidden == false))
                 {
                     var item = nav.ToArticleNavigation;
                     temp.Add(new RelevancesKeyValueModel

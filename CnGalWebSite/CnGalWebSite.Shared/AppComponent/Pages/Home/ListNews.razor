@@ -1,20 +1,27 @@
-﻿@inject ToastService ToastService
+﻿@inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject IDataCacheService _dataCacheService
 
-<div style="display: flex; flex-direction: column;">
-    <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="最新动态" Url="/articles/news" />
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="fa fa-fw fa-newspaper-o" Class="mb-3" Outline>
+    <ButtonContent>
 
-    <div class="row m-0">
-        @foreach (var item in Items)
-        {
-            <div class="col-12 mb-2 ps-1 pe-1 mt-1">
-                <CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCard Model="@item"></CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCard>
-            </div>
-        }
-    </div>
-</div>
+            <MButton XSmall Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>NavigationManager.NavigateTo("/articles/news"))">
+                <MIcon Left>mdi-share-all-outline  </MIcon>
+                查看更多
+            </MButton>
+    </ButtonContent>
+    <ChildContent>
+        <div class="row">
+            @foreach (var item in Items)
+            {
+                <div class="col-12 col-md-6 mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCard Model="@item"></CnGalWebSite.Shared.AppComponent.Normal.Cards.NewsThumbnailCard>
+                </div>
+            }
+        </div>
+    </ChildContent>
 
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 @code {
     public int ItemNum { get; set; } = 3;
     public bool IsSmallScreen { get; set; } = true;

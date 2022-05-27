@@ -1,18 +1,19 @@
-﻿<NoticeCard/>
+﻿<CnGalWebSite.Shared.MasaComponent.Shared.Cards.NoticeCard Class="rounded shadow-sm p-2 bg-opacity mb-3"/>
+
 <CnGalWebSite.Shared.AppComponent.Pages.Home.ListNews />
 
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeRecentIssuelGameView"
+<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeRecentIssuelGameView" Icon="fa fa-fw fa-send"
                                                          Title="近期新作" Type="entries" Url="/search/?Types=Game&Sort=PubulishTime desc" />
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeNewestGameView"
+<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeNewestGameView" Icon="fa fa-fw  fa-send-o"
                                                          Title="即将发售" Type="entries" Url="/search/?Types=Game&Sort=PubulishTime desc" />
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeRecentEditView"
+<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeRecentEditView" Icon="fa fa-fw  fa-pencil"
                                                          Title="最近编辑" Type="entries" Url="/search/?Types=Game&Sort=LastEditTime desc" />
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeNoticesView"
-                                                         Title="公告" Type="articles" Url="/updatelog" />
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeArticlesView"
+<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeNoticesView" Icon="fa fa-fw  fa-sticky-note-o"
+                                                         Title="公告" Type="articles" Url="/updatelog" /> 
+<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeArticlesView" Icon="fa fa-fw  fa-newspaper-o"
                                                          Title="文章" Type="articles" Url="/articles" />
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeFriendLinksView"
-                                                         Title="友情链接" maxCount="8"/>
+<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeFriendLinksView" Icon="fa fa-fw  fa-star"
+                                                         Title="友情链接" MaxCount="999"/>
 
 
 @code {

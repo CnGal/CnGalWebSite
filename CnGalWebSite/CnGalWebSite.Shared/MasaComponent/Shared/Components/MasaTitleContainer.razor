@@ -1,40 +1,82 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-
-<div class="@( (OutlineHead?"":"rounded shadow-sm  bg-opacity p-3 ") + Class + (IsCollapsed ? " mb-3" : ""))">
-    <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
-        <h2 class="@("fw-bold h5 m-0 " + (string.IsNullOrWhiteSpace(TextColor)?"font-color":TextColor))">
-            <i class="@Icon"></i> &nbsp;&nbsp;@Title
-        </h2>
-        <div>
-            @ButtonContent
-            @if (Collapable)
-            {
-                @if (IsCollapsed)
+@if (_dataCacheService.IsApp)
+{
+    <div class="@( (OutlineHead?"":"rounded shadow-sm  bg-opacity p-2 ") + Class + (IsCollapsed ? " mb-3" : ""))">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+            <h2 class="@("m-0 " + (string.IsNullOrWhiteSpace(TextColor)?"font-color":TextColor))" style="font-size: inherit;">
+                <i class="@Icon"></i> &nbsp;&nbsp;@Title
+            </h2>
+            <div>
+                @ButtonContent
+                @if (Collapable)
                 {
-                    <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-right" Tooltip="展开" OnClick="@(() => OnCollapseChanged(false))" />
+                    @if (IsCollapsed)
+                    {
+                        <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-right" Tooltip="展开" OnClick="@(() => OnCollapseChanged(false))" />
 
-                }
-                else
-                {
-                    <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-down" Tooltip="折叠" OnClick="@(() => OnCollapseChanged(true))" />
+                    }
+                    else
+                    {
+                        <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-down" Tooltip="折叠" OnClick="@(() => OnCollapseChanged(true))" />
 
+                    }
                 }
-            }
+            </div>
         </div>
+        @if (Outline == false)
+        {
+            <div class="@((IsCollapsed ? "d-none " : "d-block") + " mt-2")">
+                @ChildContent
+            </div>
+        }
     </div>
-    @if (Outline == false)
+    @if (Outline)
+    {
+        <div class="@((IsCollapsed ? "d-none " : "d-block") + " mt-2")">
+            @ChildContent
+        </div>
+    }
+
+}
+else
+{
+    <div class="@( (OutlineHead?"":"rounded shadow-sm  bg-opacity p-3 ") + Class + (IsCollapsed ? " mb-3" : ""))">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+            <h2 class="@("fw-bold h5 m-0 " + (string.IsNullOrWhiteSpace(TextColor)?"font-color":TextColor))">
+                <i class="@Icon"></i> &nbsp;&nbsp;@Title
+            </h2>
+            <div>
+                @ButtonContent
+                @if (Collapable)
+                {
+                    @if (IsCollapsed)
+                    {
+                        <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-right" Tooltip="展开" OnClick="@(() => OnCollapseChanged(false))" />
+
+                    }
+                    else
+                    {
+                        <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-down" Tooltip="折叠" OnClick="@(() => OnCollapseChanged(true))" />
+
+                    }
+                }
+            </div>
+        </div>
+        @if (Outline == false)
+        {
+            <div class="@((IsCollapsed ? "d-none " : "d-block") + " mt-3")">
+                @ChildContent
+            </div>
+        }
+    </div>
+    @if (Outline)
     {
         <div class="@((IsCollapsed ? "d-none " : "d-block") + " mt-3")">
             @ChildContent
         </div>
     }
-</div>
-@if (Outline)
-{
-    <div class="@((IsCollapsed ? "d-none " : "d-block") + " mt-3")">
-        @ChildContent
-    </div>
+
 }
 
 @code {

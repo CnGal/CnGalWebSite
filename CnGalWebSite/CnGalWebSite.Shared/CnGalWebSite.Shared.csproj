@@ -52,7 +52,7 @@
     <PackageReference Include="BootstrapBlazor.Chart" Version="6.0.0" />
     <PackageReference Include="BootstrapBlazor.TableExport" Version="6.0.0" />
     <PackageReference Include="Chronos.Blazor.Cropper" Version="1.2.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.5" />
   </ItemGroup>
 
   <ItemGroup>
