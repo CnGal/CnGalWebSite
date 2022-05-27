@@ -2621,7 +2621,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 model.others.Add(new RelevancesModel
                 {
                     DisplayName = "萌娘百科",
-                    Link = "https://zh.moegirl.org.cn/" + model.MoegirlName
+                    Link = "https://zh.moegirl.org.cn/" + HttpUtility.UrlDecode(model.MoegirlName)
                 });
             }
 
@@ -2656,7 +2656,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 model.others.Add(new RelevancesModel
                 {
                     DisplayName = "百度百科",
-                    Link = "https://baike.baidu.com/item/" + model.BaiDuName
+                    Link = "https://baike.baidu.com/item/" + HttpUtility.UrlDecode(model.BaiDuName)
                 });
             }
             if (string.IsNullOrWhiteSpace(model.ZhWikiPediaName) == false)
@@ -2672,7 +2672,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 model.others.Add(new RelevancesModel
                 {
                     DisplayName = "2DFan",
-                    Link = "https://galge.fun/subjects/" + HttpUtility.UrlDecode(model._2DFanId)
+                    Link = "https://galge.fun/subjects/" + model._2DFanId
                 });
             }
 

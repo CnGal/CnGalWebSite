@@ -47,40 +47,19 @@
 
             break;
         case EntryType.ProductionGroup:
-            <ValidateForm Model="@Model" ValidateAllProperties="true">
-                <div class="row">
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.QQgroupGroup" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.WeiboId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.BilibiliId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.AcFunId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.ZhihuId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.AfdianId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.PixivId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.TwitterId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.YouTubeId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.FacebookId" />
-                    </div>
-                </div>
-            </ValidateForm>
+<div class="row">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.QQgroupGroup" Label="QQ群"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.WeiboId" Label="微博平台Id" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.BilibiliId" Label="Bilibili平台Id" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.AcFunId" Label="AcFun平台Id" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.ZhihuId" Label="知乎平台Id" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.AfdianId" Label="@("爱发电平台Id（不包括@）")" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.PixivId" Label="Pixiv平台Id" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.TwitterId" Label="Twitter平台Id" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.YouTubeId" Label="YouTube平台Id" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.FacebookId" Label="Facebook平台Id" />
+
+</div>
             break;
         case EntryType.Role:
             <div class="row">
@@ -130,37 +109,17 @@
             </div>
             break;
         case EntryType.Staff:
-            <ValidateForm Model="@Model" ValidateAllProperties="true">
-                <div class="row">
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.WeiboId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.BilibiliId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.AcFunId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.ZhihuId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.AfdianId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.PixivId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.TwitterId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.YouTubeId" />
-                    </div>
-                    <div class="form-group col-12  col-sm-6">
-                        <BootstrapInput @bind-Value="Model.FacebookId" />
-                    </div>
-                </div>
-            </ValidateForm>
+            <div class="row">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.WeiboId" Label="微博平台Id"/>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.BilibiliId"  Label="Bilibili平台Id"/>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.AcFunId"   Label="AcFun平台Id"/>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.ZhihuId"   Label="知乎平台Id"/>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.AfdianId"  Label="@("爱发电平台Id（不包括@）")" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.PixivId"  Label="Pixiv平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.TwitterId"  Label="Twitter平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.YouTubeId"   Label="YouTube平台Id"/>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.FacebookId"  Label="Facebook平台Id" />
+            </div>
             break;
     }
 

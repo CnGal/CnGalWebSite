@@ -25,33 +25,18 @@
     <InputOtherLinkListTip Model="Model.others" Title="自定义链接"></InputOtherLinkListTip>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <InputRelevanceListTitle Title="外部链接" />
-    <ValidateForm Model="@Model" ValidateAllProperties="true">
+    <ValidateForm Model="@Model">
         <div class="row">
-
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model._2DFanId" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.VNDBId" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.BangumiId" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.WikiDataId" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.MoegirlName" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.ZhWikiPediaName" />
-            </div>
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.BaiDuName" />
-            </div>
-
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model._2DFanId" Label="2DFan条目Id"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.VNDBId"  Label="VNDB条目Id"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.BangumiId"   Label="Bangumi条目Id"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.WikiDataId"   Label="WikiData条目Id"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.MoegirlName"   Label="萌娘百科条目名称"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.ZhWikiPediaName"  Label="中文维基百科条目名称" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.BaiDuName"   Label="百度百科条目名称"/>
         </div>
     </ValidateForm>
+  
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 
