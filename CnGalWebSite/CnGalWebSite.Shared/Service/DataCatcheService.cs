@@ -8,6 +8,7 @@ using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
@@ -50,6 +51,10 @@ namespace CnGalWebSite.Shared.Service
         /// 主题更改 仅MAUI下生效
         /// </summary>
         public EventCallback<string> ThemeChanged { get; set; }
+        /// <summary>
+        /// 分享页面
+        /// </summary>
+        public EventCallback<ShareLinkModel> ShareLink { get; set; }
         /// <summary>
         /// 身份验证成功后获得的标识 有效期一小时
         /// </summary>

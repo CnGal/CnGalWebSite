@@ -7,6 +7,7 @@ using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
@@ -30,6 +31,8 @@ namespace CnGalWebSite.Shared.Service
         EventCallback<string> OpenNewPage { get; set; }
 
         EventCallback<string> ThemeChanged { get; set; }
+
+        EventCallback<ShareLinkModel> ShareLink { get; set; }
 
         EventCallback SavaTheme { get; set; }
 

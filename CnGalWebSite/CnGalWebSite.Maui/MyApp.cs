@@ -1,8 +1,11 @@
-﻿
+﻿#if ANDROID
 using CnGalWebSite.Maui.Platforms.Android.Services;
+#endif
 using CnGalWebSite.Maui.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Maui.ApplicationModel.DataTransfer;
 using System.Diagnostics.CodeAnalysis;
+using CnGalWebSite.DataModel.ViewModel.Others;
 
 namespace CnGalWebSite.Maui
 {
@@ -18,7 +21,6 @@ namespace CnGalWebSite.Maui
         [Inject]
         [NotNull]
         private IOverviewService _overviewService { get; set; }
-
 
         public override void ShowAlert()
         {
@@ -43,11 +45,21 @@ namespace CnGalWebSite.Maui
         public override void ThemeChanged(string theme)
         {
             _overviewService.HideLoadingOverview();
-
+#if ANDROID
             var themeService = new ThemeService();
             themeService.SetStatusBarColor(Color.FromArgb(theme));
+#endif
 
+        }
 
+        public override async void ShareLink(ShareLinkModel model)
+{
+            await Share.RequestAsync(new ShareTextRequest
+            {
+                Uri = model.Link,
+                Text=model.Text,
+                Title = model.Title
+            });
         }
     }
 }
