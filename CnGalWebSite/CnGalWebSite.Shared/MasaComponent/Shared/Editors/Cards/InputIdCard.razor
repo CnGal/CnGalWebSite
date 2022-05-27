@@ -1,0 +1,31 @@
+﻿<div class="@Class">
+    <BootstrapInput Value="Id" ShowLabel="true" DisplayText="@Label" ValueChanged="OnIdChanged" TValue="string"/>
+</div>
+
+@code {
+    [Parameter]
+    public string Class { get; set; } = "form-group col-12  col-sm-6";
+    [Parameter]
+    public string Id { get; set; }
+    [Parameter]
+    public string Label { get; set; }
+    [Parameter]
+    public EventCallback<string> IdChanged { get; set; }
+
+    public async Task OnIdChanged(string id)
+    {
+        if(id.Contains("http"))
+        {
+            id = System.Web.HttpUtility.UrlDecode(id);
+            var temp = id.Split('/');
+            Id = temp.Last().Replace("@","");
+
+        }
+        else
+        {
+            Id = id;
+        }
+
+        await IdChanged.InvokeAsync(Id);
+    }
+}
