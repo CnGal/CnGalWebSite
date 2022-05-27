@@ -1,0 +1,43 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@Title" Icon="@Icon" Outline Class="@Class">
+    <ButtonContent>
+        <MButton Text Block XSmall Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>NavigationManager.NavigateTo(MoreUrl))">
+            <MIcon Left>mdi-share-all-outline</MIcon>
+            查看更多
+        </MButton>
+    </ButtonContent>
+    <ChildContent>
+        <div>
+            @ChildContent
+        </div>
+        @if (string.IsNullOrWhiteSpace(RefreshText)==false)
+        {
+            <div style="display: flex; justify-content: center;" class="pb-3">
+                <div style="max-width:200px;">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="@RefreshText" XSmall Icon="mdi-refresh" IsAsync="true" OnClick="OnClickRefresh" Class="w-100" Rounded Depressed />
+
+                </div>
+            </div>
+        }
+
+    </ChildContent>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public string RefreshText { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Icon { get; set; }
+    [Parameter]
+    public string MoreUrl { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public EventCallback OnClickRefresh { get; set; }
+}

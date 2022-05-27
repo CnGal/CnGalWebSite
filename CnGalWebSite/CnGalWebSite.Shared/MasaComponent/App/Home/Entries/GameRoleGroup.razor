@@ -1,0 +1,55 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout Title="@(Model.Name+" 角色预览")" Icon="fa fa-fw fa-users" Class="@Class" MoreUrl="@("/entries/index/" + Model.Id)" RefreshText="换一个游戏" OnClickRefresh="Refresh">
+    <div class="row">
+        @foreach (var item in Model.Roles)
+        {
+            <div class="col-12 col-md-6 mb-3">
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Home.RoleViewTip Model="item" />
+            </div>
+        }
+
+
+    </div>
+</CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout>
+@code {
+
+    [Parameter]
+    public string Class { get; set; }
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private StringNumber Index { get; set; } = 0;
+    private List<GameRoleModel> Items { get; set; } = new List<GameRoleModel>();
+    GameRoleModel Model = new GameRoleModel();
+    protected override async Task OnInitializedAsync()
+    {
+
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            if (_dataCacheService.GameRolesCatche.Count == 0)
+            {
+                _dataCacheService.GameRolesCatche = await Http.GetFromJsonAsync<List<GameRoleModel>>(ToolHelper.WebApiPath + "api/entries/GetGameRoles");
+            }
+            if (_dataCacheService.GameRolesCatche.Any())
+            {
+                Model = _dataCacheService.GameRolesCatche.Random().FirstOrDefault();
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取词条主页游戏角色列表失败");
+        }
+    }
+
+}

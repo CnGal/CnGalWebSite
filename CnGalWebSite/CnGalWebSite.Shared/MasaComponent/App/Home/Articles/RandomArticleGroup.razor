@@ -1,0 +1,43 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout Title="随机推荐" Icon="fa fa-fw fa-random" Class="@Class" MoreUrl="/search?Types=Article" RefreshText="换一组文章" OnClickRefresh="Refresh">
+    <div class="row">
+        @foreach (var item in _dataCacheService.RandomArticlesCatche.Take(2))
+        {
+            <div class="col-12 col-md-6 mb-3">
+                <CnGalWebSite.Shared.MasaComponent.PC.Articles.Home.WeeklyNewsViewTip Model="item" />
+            </div>
+        }
+    </div>
+</CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout>
+@code {
+    [Parameter]
+    public string Class { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await Refresh();
+    }
+    public async Task Refresh()
+    {
+        try
+        {
+            if (_dataCacheService.RandomArticlesCatche.Count == 0)
+            {
+                _dataCacheService.RandomArticlesCatche = await Http.GetFromJsonAsync<List<ArticleInforTipViewModel>>(ToolHelper.WebApiPath + "api/articles/GetRandomArticles");
+            }
+
+            _dataCacheService.RandomArticlesCatche.Random();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取文章主页随机文章列表失败");
+        }
+    }
+
+}

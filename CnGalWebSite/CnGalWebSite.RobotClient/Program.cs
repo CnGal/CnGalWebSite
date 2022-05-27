@@ -11,7 +11,7 @@ while (true)
     try
     {
         OutputHelper.Repeat();
-        OutputHelper.WriteCenter("CnGal资料站 看板娘 v3.3.16", 1.8);
+        OutputHelper.WriteCenter("CnGal资料站 看板娘 v3.3.18", 1.8);
         OutputHelper.Repeat();
 
 

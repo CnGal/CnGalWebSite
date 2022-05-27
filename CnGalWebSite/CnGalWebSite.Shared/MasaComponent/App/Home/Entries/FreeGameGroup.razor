@@ -1,0 +1,43 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout Title="免费游戏" Icon="fa fa-fw fa-gift" Class="@Class" MoreUrl="/free" RefreshText="换一组免费游戏" OnClickRefresh="Refresh" >
+    <div class="row">
+        @foreach (var item in _dataCacheService.FreeGamesCatche.Take(2))
+        {
+            <div class="col-12 col-md-6 mb-3">
+                <CnGalWebSite.Shared.MasaComponent.PC.Entries.Home.FreeGameViewTip Model="item" />
+            </div>
+        }
+    </div>
+</CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout>
+@code {
+    [Parameter]
+    public string Class { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await Refresh();
+    }
+    public async Task Refresh()
+    {
+        try
+        {
+            if (_dataCacheService.FreeGamesCatche.Count == 0)
+            {
+                _dataCacheService.FreeGamesCatche = await Http.GetFromJsonAsync<List<EntryInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetFreeGames");
+            }
+
+            _dataCacheService.FreeGamesCatche.Random();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取词条主页免费游戏列表失败");
+        }
+    }
+
+}
