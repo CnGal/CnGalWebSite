@@ -1,0 +1,37 @@
+﻿@inject IJSRuntime JS
+
+
+<link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/lottery.min.css">
+
+
+<div class="slotMachine-box">
+    <div class="slotMachine">
+        <div class="slot slot1"><ul id="slot1"><li>0</li></ul></div>
+        <div class="slot slot2"><ul id="slot2"><li>0</li></ul></div>
+        <div class="slot slot3"><ul id="slot3"><li>0</li></ul></div>
+        <div class="slot slot4"><ul id="slot4"><li>0</li></ul></div>
+        <TabLink class="slotMachine-btn" OnClick="()=>OnClickRoll.InvokeAsync()">
+            <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/raffle-btn.png" alt="button">
+        </TabLink>
+    </div>
+    <div id="prize" class="prizeTips"></div>
+    <div id="luckyOne" class="prizeTips"></div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnClickRoll { get; set; }
+
+    public async Task Roll(int index)
+    {
+        try
+        {
+            await JS.InvokeAsync<string>("slotMachineTrigger", index);
+
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+}

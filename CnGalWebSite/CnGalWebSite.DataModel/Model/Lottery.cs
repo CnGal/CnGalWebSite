@@ -158,6 +158,19 @@ namespace CnGalWebSite.DataModel.Model
 
         public string Name { get; set; }
 
+        /// <summary>
+        /// 赞助商
+        /// </summary>
+        public string Sponsor { get; set; }
+        /// <summary>
+        /// 图片
+        /// </summary>
+        public string Image { get; set; }
+        /// <summary>
+        /// 链接 用于展示对于的游戏或贩售地址
+        /// </summary>
+        public string Link { get; set; }
+
         public LotteryAwardType Type { get; set; }
 
         public Lottery Lottery { get; set; }

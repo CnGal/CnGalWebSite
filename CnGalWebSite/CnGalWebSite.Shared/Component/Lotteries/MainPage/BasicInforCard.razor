@@ -1,77 +1,38 @@
-﻿<div style="color:gray;">
-    @if (DateTime.Now.ToCstTime() < Model.BeginTime)
-    {
-        <div>
-            <i class="fa fa-clock-o fa-fw text-primary"></i>
-            <span>未开始</span>
-        </div>
-    }
-    else if (DateTime.Now.ToCstTime() > Model.EndTime)
-    {
-        <div>
-            <i class="fa fa-check-circle fa-fw text-success"></i>
-            <span>已结束</span>
-        </div>
-    }
-    else
-    {
-        <div>
-            <i class="fa fa-check-circle-o fa-fw text-success"></i>
-            <span>正在进行</span>
-        </div>
-    }
-    <div>
-        <i class="fa fa-users fa-fw"></i>
-        <span>@("参与人数："+Model.Count)</span>
-    </div>
-    @if (Model.ConditionType == LotteryConditionType.GameRecord)
-    {
-        <div>
-            <i class="fa fa-filter fa-fw"></i>
-            <span>@("参与条件：至少有一条游玩记录")</span>
-        </div>
-    }
-    @if (Model.Type == LotteryType.Automatic)
-    {
-        <div>
-            <i class="fa fa-calendar-check-o fa-fw"></i>
-            <span>@("开奖时间："+ Model.LotteryTime.ToString("yyyy.M.d HH:mm"))</span>
-        </div>
-    }
-    <div>
-        <i class="fa fa-calendar fa-fw "></i>
-        <span>@(Model.BeginTime.ToString("yyyy.M.d HH:mm")+" - "+ Model.EndTime.ToString("yyyy.M.d HH:mm"))</span>
-    </div>
-
-</div>
-<div>
-    <p class="h5 fw-bold mt-3">
-        <i class="fa fa-gift fa-fw "></i>
-        <span>奖品列表</span>
-    </p>
-    @foreach (var item in Model.Awards)
-    {
-<div class="mt-2 p-2" style="border: 1px solid rgba(0,0,0,.125); border-radius: 5px; ">
-    <div style=" font-size: medium; ">
-        <i class="fa fa-bookmark-o fa-fw "></i>
-        <span>@(item.Name+" "+item.Count + "件")</span>
-
-    </div>
-    <div class="row">
-        @foreach (var temp in item.Users)
-        {
-            
-        <div class="col-12 col-lg-6 mt-2">
-            <UserInforCard  Model="temp" />
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="抽奖信息" Icon="fa fa-fw fa-info-circle" Class="mb-4">
+    <div class="ms-1">
+        <div class="row">
+            @if (DateTime.Now.ToCstTime() < Model.BeginTime)
+            {
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-clock-o" Text="未开始" Class="col-12  text-truncate-1" />
+            }
+            else if (DateTime.Now.ToCstTime() > Model.EndTime)
+            {
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-check-circle" Text="已结束" Class="col-12  text-truncate-1" />
+            }
+            else
+            {
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-check-circle-o" Text="正在进行" Class="col-12  text-truncate-1" />
+            }
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-users" Text="@("参与人数："+Model.Count)" Class="col-12  text-truncate-1" />
+            @if (Model.ConditionType == LotteryConditionType.GameRecord)
+            {
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-filter" Text="参与条件：至少有一条游玩记录" Class="col-12 " />
+            }
+            @if (Model.Type == LotteryType.Automatic)
+            {
+                <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-calendar-o" Text="@("抽奖时间："+ Model.LotteryTime.ToString("yyyy.M.d HH:mm"))" Class="col-12 " />
+            }
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-calendar-check-o" Text="@("开始时间："+ Model.BeginTime.ToString("yyyy.M.d HH:mm"))" Class="col-12 " />
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-calendar-times-o" Text="@("结束时间："+ Model.EndTime.ToString("yyyy.M.d HH:mm"))" Class="col-12 " />
 
         </div>
-        }
+
     </div>
-  
-</div>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+    @code {
+        [Parameter]
+        public LotteryViewModel Model { get; set; }
     }
-</div>
-@code {
-    [Parameter]
-    public LotteryViewModel Model { get; set; }
-}

@@ -4,6 +4,8 @@
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
 
+<InputRelevanceListTitle Title="激活码列表" Text="奖品的激活码，也可用占位符替代"/>
+
 <div class="row">
     @foreach (var item in Prizes)
     {
@@ -39,7 +41,7 @@
     {
         Prizes.Remove(item);
         StateHasChanged();
-        await ToastService.Success("删除成功", "成功删除奖品");
+        await ToastService.Success("删除成功", "成功删除激活码");
     }
     public async Task EditPrize(EditLotteryPrizeModel item)
     {
@@ -51,23 +53,23 @@
 
         var option = new EditDialogOption<EditLotteryPrizeModel>()
         {
-            Title = "编辑奖品",
+            Title = "编辑激活码",
             Model = Prizes[i],
             Items = items,
             Size = Size.Medium,
             OnCloseAsync = () =>
             {
-                //Trace.Log("关闭按钮被点击");
+            //Trace.Log("关闭按钮被点击");
                 return Task.CompletedTask;
             },
             OnEditAsync = async context =>
             {
-                // Trace.Log("保存按钮被点击");
+            // Trace.Log("保存按钮被点击");
                 var item = (EditLotteryPrizeModel)context.Model;
 
                 Prizes[i] = item;
                 StateHasChanged();
-                await ToastService.Success("修改成功", "成功修改奖品");
+                await ToastService.Success("修改成功", "成功修改激活码");
                 return true;
             }
         };
@@ -84,23 +86,23 @@
 
         var option = new EditDialogOption<EditLotteryPrizeModel>()
         {
-            Title = "添加STAFF",
+            Title = "添加激活码",
             Model = model,
             Items = items,
             Size = Size.Medium,
             OnCloseAsync = () =>
             {
-                //Trace.Log("关闭按钮被点击");
+            //Trace.Log("关闭按钮被点击");
                 return Task.CompletedTask;
             },
             OnEditAsync = async context =>
             {
-                // Trace.Log("保存按钮被点击");
+            // Trace.Log("保存按钮被点击");
                 var item = (EditLotteryPrizeModel)context.Model;
 
                 Prizes.Add(item);
                 StateHasChanged();
-                await ToastService.Success("添加成功", "成功添加奖品");
+                await ToastService.Success("添加成功", "成功添加激活码");
                 return true;
             }
         };
@@ -112,14 +114,14 @@
     {
         var option = new DialogOption()
         {
-            Title = "批量导入奖品",
+            Title = "批量导入激活码",
             ShowCloseButton = false
         };
         option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<BatchImportPrizeTip>(new Dictionary<string, object>
         {
             [nameof(BatchImportPrizeTip.OnAdd)] = EventCallback.Factory.Create<List<string>>(this, async (model) => await OnImported(model)),
             [nameof(BatchImportPrizeTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-            [nameof(BatchImportPrizeTip.Title)] = "奖品"
+            [nameof(BatchImportPrizeTip.Title)] = "激活码"
 
         }).Render();
         await DialogService.Show(option);
@@ -128,7 +130,7 @@
     public Task OnImported(List<string> model)
     {
         //检查是否符合要求
-        foreach(var item in model)
+        foreach (var item in model)
         {
             Prizes.Add(new EditLotteryPrizeModel
             {

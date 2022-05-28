@@ -52,13 +52,20 @@
   {
     "outputFileName": "wwwroot/scripts/bundle-js.min.js",
     "inputFiles": [
-      "wwwroot/js/tools-inline.js"
+      "wwwroot/js/tools-inline.js",
+      "wwwroot/js/lottery.js"
     ]
   },
   {
     "outputFileName": "wwwroot/scripts/check.min.js",
     "inputFiles": [
       "wwwroot/js/check.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/styles/lottery.min.css",
+    "inputFiles": [
+      "wwwroot/css/lottery.css"
     ]
   }
 ]

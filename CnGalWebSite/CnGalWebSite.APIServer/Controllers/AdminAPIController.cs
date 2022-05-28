@@ -840,31 +840,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var time = new DateTime(2022, 4, 30);
-                var user = await _userRepository.GetAll().Include(s => s.PlayedGames).Where(s => s.LastOnlineTime > time || s.PlayedGames.Any() || s.Examines.Any(s => s.Operation == Operation.PubulishComment))
-                    .Select(s => new
-                    {
-                        s.Id,
-                        Games = s.PlayedGames.Count,
-                        s.UserName,
-                        Comments = s.Examines.Count(s => s.Operation == Operation.PubulishComment && s.IsPassed == true)
-                    })
-                    .ToListAsync();
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine("Id,昵称,积分,游戏记录数目,评论数");
-                foreach(var item in user)
-                {
-                    sb.AppendLine($"{item.Id},{item.UserName},{await _appHelper.GetUserIntegral(item.Id, time)},{item.Games},{item.Comments}");
-                }
-
-                using (StreamWriter sw = new StreamWriter(Path.Combine(_webHostEnvironment.WebRootPath,"images","积分.csv"),false,Encoding.UTF8))
-                {
-
-                    sw.Write(sb);
-
-
-                }
-                Console.WriteLine(sb);
+                await _lotteryService.ClearLottery(2);
                 return new Result { Successful = true };
             }
             catch (Exception ex)

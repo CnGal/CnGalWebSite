@@ -12,114 +12,117 @@
         font-size: x-large !important;
     }
 </style>
-<div class="lottery-button" style=" display: flex; flex-direction: column; align-items: center; ">
-    @if (isReady)
-    {
-        @if (StateModel == null)
+<div class="rounded shadow-sm  bg-opacity mb-4 p-4">
+    <div class="lottery-button" style=" display: flex; flex-direction: column; align-items: center; ">
+        @if (isReady)
         {
-            @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
-            {
-                <Button IsDisabled="true" Color="Color.Dark" Text="未参与" />
-            }
-            else
-            {
-                <Button Color="Color.Dark" Text="登入后参与抽奖" OnClick="OnLogin" />
-            }
-        }
-        else
-        {
-            @if (StateModel.State == UserLotteryState.NotInvolved)
+            @if (StateModel == null)
             {
                 @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
                 {
-                    <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="未参与" />
+                    <Button IsDisabled="true" Color="Color.Dark" Text="未参与" />
                 }
                 else
                 {
-                    <Button Color="Color.Dark" Text="参与抽奖" IsAsync="true" OnClick="OnParticipateInLottery" />
+                    <Button Color="Color.Dark" Text="登入后参与抽奖" OnClick="OnLogin" />
                 }
             }
-            else if (StateModel.State == UserLotteryState.NoCondition)
+            else
             {
-                <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="未满足条件" />
-            }
-            else if (StateModel.State == UserLotteryState.NotWin)
-            {
-                <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="未中奖" />
+                @if (StateModel.State == UserLotteryState.NotInvolved)
+                {
+                    @if (ViewModel.EndTime < DateTime.Now.ToCstTime())
+                    {
+                        <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="未参与" />
+                    }
+                    else
+                    {
+                        <Button Color="Color.Dark" Text="参与抽奖" IsAsync="true" OnClick="OnParticipateInLottery" />
+                    }
+                }
+                else if (StateModel.State == UserLotteryState.NoCondition)
+                {
+                    <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="未满足条件" />
+                }
+                else if (StateModel.State == UserLotteryState.NotWin)
+                {
+                    <Button IsDisabled="true" Color="Color.Dark" IsAsync="true" Text="未中奖" />
 
-            }
-            else if (StateModel.State == UserLotteryState.WaitingDraw)
-            {
-                <Button IsDisabled="true" Color="Color.Dark" IsAsync="true">
-                    <div style="display: flex; flex-direction: column;">
-                        <span>等待开奖</span>
-                        <span>你的号码：@StateModel.Number</span>
-                    </div>
-                </Button>
-            }
-            else if (StateModel.State == UserLotteryState.Win && StateModel.Award != null)
-            {
-                @if (StateModel.Award.Type == LotteryAwardType.ActivationCode)
+                }
+                else if (StateModel.State == UserLotteryState.WaitingDraw)
+                {
+                    <Button IsDisabled="true" Color="Color.Dark" IsAsync="true">
+                        <div style="display: flex; flex-direction: column;">
+                            <span>等待开奖</span>
+                            <span>你的号码：@StateModel.Number</span>
+                        </div>
+                    </Button>
+                }
+                else if (StateModel.State == UserLotteryState.Win && StateModel.Award != null)
+                {
+                    @if (StateModel.Award.Type == LotteryAwardType.ActivationCode)
+                    {
+                        <Button Color="Color.Dark" OnClick="OnLookPrize">
+                            <div style="display: flex; flex-direction: column;">
+                                <span>恭喜中奖</span>
+                                <span>查看激活码</span>
+                            </div>
+                        </Button>
+                    }
+                    else if (StateModel.Award.Type == LotteryAwardType.Integral)
+                    {
+                        <Button Color="Color.Dark">
+                            <div style="display: flex; flex-direction: column;">
+                                <span>恭喜中奖</span>
+                                <span>已发放积分</span>
+                            </div>
+                        </Button>
+                    }
+                }
+                else if (StateModel.State == UserLotteryState.WaitAddress)
+                {
+                    <Button Color="Color.Dark" OnClick="EditUserAddress">
+                        <div style="display: flex; flex-direction: column;">
+                            <span>恭喜中奖</span>
+                            <span>填写收货地址</span>
+                        </div>
+                    </Button>
+
+                }
+                else if (StateModel.State == UserLotteryState.WaitShipments)
+                {
+                    <Button Color="Color.Dark" OnClick="EditUserAddress">
+                        <div style="display: flex; flex-direction: column;">
+                            <span>恭喜中奖</span>
+                            <span>等待发货</span>
+                        </div>
+                    </Button>
+
+                }
+                else if (StateModel.State == UserLotteryState.Shipped)
                 {
                     <Button Color="Color.Dark" OnClick="OnLookPrize">
                         <div style="display: flex; flex-direction: column;">
                             <span>恭喜中奖</span>
-                            <span>查看激活码</span>
+                            <span>查看单号</span>
                         </div>
                     </Button>
                 }
-                else if (StateModel.Award.Type == LotteryAwardType.Integral)
+                @if (StateModel.Award != null)
                 {
-                    <Button Color="Color.Dark">
-                        <div style="display: flex; flex-direction: column;">
-                            <span>恭喜中奖</span>
-                            <span>已发放积分</span>
-                        </div>
-                    </Button>
+                    <p class="h5 fw-bold mt-3 font-color">
+                        @("已中奖："+StateModel.Award.Name)
+                    </p>
                 }
             }
-            else if (StateModel.State == UserLotteryState.WaitAddress)
-            {
-                <Button Color="Color.Dark" OnClick="EditUserAddress">
-                    <div style="display: flex; flex-direction: column;">
-                        <span>恭喜中奖</span>
-                        <span>填写收货地址</span>
-                    </div>
-                </Button>
 
-            }
-            else if (StateModel.State == UserLotteryState.WaitShipments)
-            {
-                <Button Color="Color.Dark" OnClick="EditUserAddress">
-                    <div style="display: flex; flex-direction: column;">
-                        <span>恭喜中奖</span>
-                        <span>等待发货</span>
-                    </div>
-                </Button>
-
-            }
-            else if (StateModel.State == UserLotteryState.Shipped)
-            {
-                <Button Color="Color.Dark" OnClick="OnLookPrize">
-                    <div style="display: flex; flex-direction: column;">
-                        <span>恭喜中奖</span>
-                        <span>查看单号</span>
-                    </div>
-                </Button>
-            }
-            @if (StateModel.Award != null)
-            {
-                <p class="h5 fw-bold mt-3 font-color">
-                    @("已中奖："+StateModel.Award.Name)
-                </p>
-            }
+        }
+        else
+        {
+            <Button Color="Color.Dark" Icon="fa-spinner fa-spin" />
         }
 
-    }
-    else
-    {
-        <Button Color="Color.Dark" Icon="fa-spinner fa-spin" />
-    }
+    </div>
 
 </div>
 

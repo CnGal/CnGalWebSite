@@ -40,6 +40,19 @@
                     <MIcon Left>mdi-basket-outline</MIcon>
                     创建周边
                 </MButton>
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/lotteries/createlottery"))">
+                            <MIcon Left>mdi-wallet-giftcard </MIcon>
+                            创建抽奖
+                        </MButton>
+                        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/votes/createvote"))">
+                            <MIcon Left>mdi-vote</MIcon>
+                            创建投票
+                        </MButton>
+                    </Authorized>
+                </AuthorizeView>
+              
 
             </div>
         </div>

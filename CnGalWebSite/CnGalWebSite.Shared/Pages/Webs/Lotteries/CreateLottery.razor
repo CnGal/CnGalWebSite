@@ -1,0 +1,105 @@
+﻿
+@inject HttpClient Http
+@inject ExamineService _examineService
+@inject ILocalStorageService _localStorage
+@inject ToastService? ToastService
+@inject IAppHelper _appHelper
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+
+<TitleTip Title="创建抽奖"></TitleTip>
+
+<AutoSaveTip TItem="EditLotteryModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
+<div>
+    @if (isReady == false)
+    {
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+            <div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+            </div>
+        </div>
+    }
+    else
+    {
+
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="创建抽奖" Icon="fa fa-fw  fa-dropbox" Outline>
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainPageCard Model="Model" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.AwardsCard Model="Model" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
+</div>
+@code {
+
+    private EditLotteryModel Model { get; set; } = new EditLotteryModel();
+
+    private bool isReady = false;
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    AutoSaveTip<EditLotteryModel> autoSave { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+        }
+    }
+    private async Task OnSubmit()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/CreateLottery", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+
+                await ToastService.Error("创建抽奖失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("创建抽奖成功", "创建抽奖成功");
+                NavigationManager.NavigateTo(Provider, "/lotteries/index/" + obj.Error, Model.Name, "fa fa-dropbox");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "创建抽奖失败");
+        }
+    }
+
+    private Task DataLoaded(EditLotteryModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+}

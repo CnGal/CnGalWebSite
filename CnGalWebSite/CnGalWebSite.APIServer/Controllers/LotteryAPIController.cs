@@ -73,47 +73,60 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<DrawLotteryDataModel>> GetLotteryDataAsync(long id)
         {
-            var lottery = await _lotteryRepository.GetAll().AsNoTracking()
-               .Include(s => s.Awards).ThenInclude(s => s.WinningUsers)
-               .Include(s => s.Users).ThenInclude(s => s.ApplicationUser)
-               .FirstOrDefaultAsync(s => s.Id == id);
-            var model = new DrawLotteryDataModel
+            try
             {
-                Name = lottery.Name,
-                Id = lottery.Id,
-                NotWinningUsers = lottery.Users.Select(s => new LotteryUserDataModel
+                var lottery = await _lotteryRepository.GetAll().AsNoTracking()
+                            .Include(s => s.Awards).ThenInclude(s => s.WinningUsers)
+                            .Include(s => s.Users).ThenInclude(s => s.ApplicationUser)
+                            .FirstOrDefaultAsync(s => s.Id == id);
+                var model = new DrawLotteryDataModel
                 {
-                    Id = s.ApplicationUserId,
-                    Name = s.ApplicationUser.UserName,
-                    Number = s.Number
-                }).ToList()
-            };
+                    Name = lottery.Name,
+                    Id = lottery.Id,
+                    NotWinningUsers = lottery.Users.Select(s => new LotteryUserDataModel
+                    {
+                        Id = s.ApplicationUserId,
+                        Name = s.ApplicationUser.UserName,
+                        Number = s.Number
+                    }).ToList()
+                };
 
-            foreach (var item in lottery.Awards)
-            {
-                model.Awards.Add(new LotteryAwardDataModel
+                foreach (var item in lottery.Awards)
                 {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Priority = item.Priority,
-                    TotalCount = item.Count,
-                    WinningUsers = model.NotWinningUsers.Where(s => item.WinningUsers.Select(s => s.ApplicationUserId).Contains(s.Id)).ToList()
-                });
-                model.NotWinningUsers.RemoveAll(s => item.WinningUsers.Select(s => s.ApplicationUserId).Contains(s.Id));
-            }
-
-            var users = model.NotWinningUsers;
-
-            foreach (var temp in users)
-            {
-                var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == temp.Id);
-                if (await _userManager.IsInRoleAsync(user, "Admin"))
-                {
-                    model.NotWinningUsers.Remove(temp);
+                    model.Awards.Add(new LotteryAwardDataModel
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Priority = item.Priority,
+                        TotalCount = item.Count,
+                        Sponsor = item.Sponsor,
+                        Image = item.Image,
+                        Link = item.Link,
+                        WinningUsers = model.NotWinningUsers.Where(s => item.WinningUsers.Select(s => s.ApplicationUserId).Contains(s.Id)).ToList()
+                    });
+                    model.NotWinningUsers.RemoveAll(s => item.WinningUsers.Select(s => s.ApplicationUserId).Contains(s.Id));
                 }
+
+                //排除管理员
+                var users = new List<LotteryUserDataModel>();
+
+                foreach (var temp in model.NotWinningUsers)
+                {
+                    var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == temp.Id);
+                    if (await _userManager.IsInRoleAsync(user, "Admin")==false)
+                    {
+                        users.Add(temp);
+                    }
+                }
+                model.NotWinningUsers = users;
+
+                return model;
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
             }
 
-            return model;
         }
 
         [AllowAnonymous]
@@ -171,6 +184,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     Name = item.Name,
                     Priority = item.Priority,
                     Type = item.Type,
+                    Sponsor = item.Sponsor,
+                    Image=_appHelper.GetImagePath(item.Image,"app.png"),
+                    Link = item.Link,
                 };
 
                 foreach (var infor in item.WinningUsers.Select(s => s.ApplicationUser))
@@ -397,6 +413,10 @@ namespace CnGalWebSite.APIServer.Controllers
                     Name = item.Name,
                     Priority = item.Priority,
                     Type = item.Type,
+                    Link = item.Link,
+                    Sponsor=item.Sponsor,
+                    Image = item.Image,
+                    
                 };
                 foreach (var infor in item.Prizes)
                 {
@@ -446,6 +466,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 Thumbnail = lottery.Thumbnail,
                 Type = lottery.Type,
                 ConditionType = lottery.ConditionType,
+                
             };
 
             foreach (var item in lottery.Awards)
@@ -458,6 +479,10 @@ namespace CnGalWebSite.APIServer.Controllers
                     Name = item.Name,
                     Priority = item.Priority,
                     Type = item.Type,
+                    Sponsor = item.Sponsor,
+                    Image = item.Image,
+                    Link = item.Link,
+                    
                 };
                 foreach (var infor in item.Prizes)
                 {
@@ -542,6 +567,10 @@ namespace CnGalWebSite.APIServer.Controllers
                         Name = item.Name,
                         Priority = item.Priority,
                         Type = item.Type,
+                        Sponsor = item.Sponsor,
+                        Link = item.Link,
+                        Image = item.Image,
+                        
                     };
                     foreach (var infor in item.Prizes)
                     {
@@ -563,6 +592,9 @@ namespace CnGalWebSite.APIServer.Controllers
                         temp.Name = item.Name;
                         temp.Priority = item.Priority;
                         temp.Type = item.Type;
+                        temp.Sponsor = item.Sponsor;
+                        temp.Link = item.Link;
+                        temp.Image = item.Image;
 
                         var prizeIds = item.Prizes.Select(s => s.Id).ToList();
                         prizeIds.RemoveAll(s => s == 0);

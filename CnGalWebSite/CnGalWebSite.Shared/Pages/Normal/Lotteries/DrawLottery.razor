@@ -10,44 +10,72 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<div class="container">
+<div>
     @if (isReady)
     {
-    <div class=" rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4" style="display: flex; flex-direction: column;">
-        @if (CurrentAward == null)
-        {
-            if (LastWinningUser != null)
+        <CnGalWebSite.Shared.Component.Lotteries.DrawPage.LotteryAnimationCard @ref="lotteryAnimationCard" OnClickRoll="OnDrawLottery" />
+
+        <div class=" p-4" style=" display: flex; flex-direction: column; align-items: center; font-size: large;">
+
+            @if (CurrentAward == null)
             {
-                <p>上一位中奖用户：@LastWinningUser.Name</p>
+                <span class="fw-bold font-color">抽奖结束</span>
             }
-            @if (LastAward != null)
+            else
             {
-                <p>上一个奖品：@LastAward.Name</p>
+                @if (string.IsNullOrWhiteSpace(CurrentAward.Sponsor) == false)
+                {
+                    <span>
+                        即将抽选由
+                        <strong class="font-color">  @CurrentAward.Sponsor</strong>
+                        提供的
+                        <strong class="font-color">  @CurrentAward.Name</strong>
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        即将抽选
+                        <strong class="font-color">  @CurrentAward.Name</strong>
+                    </span>
+                }
             }
-            <p>抽奖结束</p>
-        }
-        else
-        {
-            <p>当前奖品：@CurrentAward.Name</p>
-            if (LastWinningUser != null)
+
+            @if (LastWinningUser != null)
             {
-                <p>上一位中奖用户：@LastWinningUser.Name</p>
+                if (LastAward != null)
+                {
+                    @if (string.IsNullOrWhiteSpace(LastAward.Sponsor) == false)
+                    {
+                        <span>
+                            恭喜用户
+                            <strong class="font-color">  @LastWinningUser.Name</strong>
+                            获得由
+                            <strong class="font-color">  @LastAward.Sponsor</strong>
+                            提供的
+                            <strong class="font-color">  @LastAward.Name</strong>
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            恭喜用户
+                            <strong class="font-color">  @LastWinningUser.Name</strong>
+                            获得
+                            <strong class="font-color">  @LastAward.Name</strong>
+                        </span>
+                    }
+                }
 
             }
 
-            @if (NextAward != null)
-            {
-                <p>下一个奖品：@NextAward.Name</p>
-            }
-            <Button IsAsync="true" Color="Color.Dark" Text="抽奖" OnClick="OnDrawLottery" />
 
-        }
-    </div>
+        </div>
 
     }
     else
     {
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
+        <div class="  rounded shadow-sm  bg-opacity rounded p-4">
             <div>
                 <SkeletonParagraph />
                 <div class="mt-2">
@@ -71,7 +99,7 @@
 @code {
     [Parameter]
     public string Id { get; set; }
-
+    CnGalWebSite.Shared.Component.Lotteries.DrawPage.LotteryAnimationCard lotteryAnimationCard;
     public DrawLotteryDataModel Model = new DrawLotteryDataModel();
 
     public LotteryAwardDataModel CurrentAward;
@@ -102,9 +130,14 @@
 
     public async Task OnDrawLottery()
     {
+        if(CurrentAward==null)
+        {
+            await ToastService.Error("抽奖失败", "全部奖品已经抽完");
+            return;
+        }
         if (Model.NotWinningUsers.Count == 0)
         {
-            await ToastService.Error("抽奖失败", "没有未被抽取到的用户");
+            await ToastService.Error("抽奖失败", "所有参与的用户都已抽中，但是还有奖品剩余");
             return;
         }
 
@@ -120,6 +153,12 @@
             LotteryId = Model.Id,
             UserId = LastWinningUser.Id
         };
+
+        //展示动画
+        if(lotteryAnimationCard!=null)
+        {
+            await lotteryAnimationCard.Roll(LastWinningUser.Number);
+        }
 
         try
         {
@@ -157,10 +196,9 @@
 
     public async Task GetAward()
     {
-        if (CurrentAward != null)
-        {
+       
             LastAward = CurrentAward;
-        }
+
 
         var awards = Model.Awards.Where(s => s.TotalCount > s.WinningUsers.Count).OrderByDescending(s => s.Priority).ToList();
 
@@ -209,7 +247,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex,  "结束抽奖失败");
+            ErrorHandler.ProcessError(ex, "结束抽奖失败");
         }
     }
 }
