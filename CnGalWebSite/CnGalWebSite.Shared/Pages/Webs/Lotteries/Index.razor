@@ -63,13 +63,28 @@ else
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
             }
+            <div class="row">
+                <div class="col-12 col-lg-9">
 
-            <div class="rounded shadow-sm  bg-opacity mb-4 pb-3">
-                <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
+
+
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.AwardListCard Model="Model.Awards" />
+
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                </div>
+                <div class="col-12 col-lg-3">
+
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.BasicInforCard Model="Model" />
+
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.OptionInforCard ViewModel="Model" />
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.WinningUserListCard Model="Model.Awards"/>
+                </div>
             </div>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
-                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+
         }
     </div>
 }

@@ -22,6 +22,9 @@
     <Content Include="..\CnGalWebSite.Server\wwwroot\styles\Lighting-mode.min.css" Link="wwwroot\css\Lighting-mode.min.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\CnGalWebSite.Server\wwwroot\styles\lottery.min.css" Link="wwwroot\css\lottery.min.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\CnGalWebSite.Server\wwwroot\styles\mouse.min.css" Link="wwwroot\css\mouse.min.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

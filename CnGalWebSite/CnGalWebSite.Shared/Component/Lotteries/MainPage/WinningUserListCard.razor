@@ -1,0 +1,28 @@
+﻿
+
+@if (Model.Any(s => s.Users.Any()))
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="中奖用户" Icon="fa fa-fw fa-users" Class="mb-4" Outline Collapable>
+        @foreach (var item in Model.Where(s => s.Users.Any()))
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@item.Name" Icon="fa fa-fw fa-gift" Class="mb-4" Outline >
+                <div class="row">
+                    @foreach (var infor in item.Users)
+                    {
+                        <div class="col-12 col-md-6 col-lg-12 mb-4">
+                            <UserInforCard Model="infor" />
+                        </div>
+                    }
+
+                </div>
+              
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        }
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+
+@code {
+    [Parameter]
+    public List<LotteryAwardViewModel> Model { get; set; }
+}

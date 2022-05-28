@@ -1,0 +1,118 @@
+﻿@inject ToastService ToastService
+
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+        @if (Model.Id == 0)
+        {
+            <MCardTitle Class="text-h5">
+                创建奖品
+            </MCardTitle>
+        }
+        else
+        {
+            <MCardTitle Class="text-h5">
+                编辑奖品
+            </MCardTitle>
+        }
+
+        @if (Model.Id == 0)
+        {
+            <MCardText>
+                激活码类别的奖品可以先用占位符代替真实的激活码
+            </MCardText>
+        }
+        else
+        {
+            <MCardText>
+                @Model.Name（Id:@Model.Id）
+            </MCardText>
+        }
+
+
+
+    <Scroll style="max-height:600px;" class="ps-6 pe-6">
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="主要信息" Class="mb-4" Collapable Outline OutlineHead>
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <ImageCropperButton @bind-ImagePath="@Model.Image" Type="ImageAspectType.None" IsMustCropper Text="上传预览图"></ImageCropperButton>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12  col-sm-6">
+                        <Select @bind-Value="Model.Type" ShowLabel="true"></Select>
+                    </div>
+                    <div class="form-group col-12  col-sm-6">
+                        <BootstrapInput @bind-Value="Model.Name" ShowLabel="true" />
+                    </div>
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-info-circle" Title="基本信息" Class="mb-4" Collapable Outline OutlineHead>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Count" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Sponsor" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12">
+                            <BootstrapInput @bind-Value="Model.Link" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Integral" ShowLabel="true" />
+                        </div>
+                        <div class="form-group col-12  col-sm-6">
+                            <BootstrapInput @bind-Value="Model.Priority" ShowLabel="true" />
+                        </div>
+
+                    </div>
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+
+    </Scroll>
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+            <MSpacer/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSave" Icon="mdi-check" Color="green" TextStyle />
+        </MCardActions>
+    </MCard>
+</MDialog>
+
+@code {
+    [Parameter]
+    public EventCallback<EditLotteryAwardModel> OnRefreshTable { get; set; }
+
+    private long Id { get; set; }
+
+    private EditLotteryAwardModel Model { get; set; } = new EditLotteryAwardModel();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool Dialog { get; set; }
+
+    public async Task OnSave()
+    {
+        var result = Model.Validate();
+        if(result.Successful)
+        {
+            await OnRefreshTable.InvokeAsync(Model);
+            Dialog = false;
+        }
+        else
+        {
+            await ToastService.Error("某个地方填写有误哦~", result.Error ?? "某个地方填写有误哦~");
+        }
+    }
+
+
+    public async Task Refresh(bool dialog, EditLotteryAwardModel model)
+    {
+        Dialog = dialog;
+        Model = model;
+
+        StateHasChanged();
+    }
+}

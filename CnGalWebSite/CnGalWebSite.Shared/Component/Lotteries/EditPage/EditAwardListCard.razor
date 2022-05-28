@@ -6,8 +6,9 @@
 
 <div class="">
     <div class="mb-3">
-        <Button Color="Color.Primary" IsOutline="true" style="width:100px" @onclick="@(() => AddAward())" Text="添加" Icon="fa fa-plus"></Button>
-        <Button Color="Color.Success" IsOutline="true" class="ms-2" style="width:100px" @onclick="@OnImportClick" Text="导入" Icon="fa fa-upload"></Button>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" IsAsync="true" OnClick="AddAward" Icon="mdi-plus" Color="green" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="导入" IsAsync="true" OnClick="OnImportClick" Icon="mdi-database-import-outline " Color="info" Class="ms-3"/>
+
     </div>
 
     @foreach (var item in Awards)
@@ -16,6 +17,11 @@
             <div class="card p-3 w-100" style="background-color:transparent">
                 <div style="display: flex; justify-content: space-between;">
                     <div class="mt-2">
+                        @if (string.IsNullOrWhiteSpace(item.Image) == false)
+                        {
+                            <img src="@item.Image" alt="@item.Name" style="max-width:200px;" class="mb-3" />
+                        }
+
                         <p class="text-truncate-1">
                             名称： @item.Name
                         </p>
@@ -23,110 +29,71 @@
                             数量： @item.Count
                         </p>
                         <p class="text-truncate-1">
+                            赞助商： @(item.Sponsor??"无")
+                        </p>
+                        <p class="text-truncate-1">
+                            链接： @(item.Link ?? "无")
+                        </p>
+                        <p class="text-truncate-1">
                             类型： @item.Type.GetDisplayName()
                         </p>
                         <p class="text-truncate-1">
                             附加积分： @item.Integral
                         </p>
-                        <p class="text-truncate-1">
+                        <p class="text-truncate-1 mb-1">
                             优先级： @item.Priority
                         </p>
                     </div>
                     <div class="ms-3" style=" display: flex; flex-direction: column; ">
-                        <Button Size="Size.Small" Color="Color.Danger" Icon="fa fa-trash-o" @onclick="@(()=> DeleteAward(item))" Text="删除" style="width:100px;"></Button>
-                        <Button Size="Size.Small" Color="Color.Success" Icon="fa fa-pencil" @onclick="@(()=> EditAward(item))" Text="编辑" style="width:100px;" class="mt-2"></Button>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab IsAsync="true" OnClick="@(()=> DeleteAward(item))" Icon="mdi-trash-can-outline" Color="error" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab IsAsync="true" OnClick="@(()=> EditAward(item))" Icon="mdi-pencil" Color="success" Class="mt-3"/>
                     </div>
                 </div>
-                <div>
-                    <h6 class="fw-bold mb-4">奖品列表</h6>
-                    <EditPrizeLiseCard Prizes="item.Prizes" />
-                </div>
+                @if (item.Type == LotteryAwardType.ActivationCode)
+                {
+                    <div>
+                        <EditPrizeLiseCard Prizes="item.Prizes" />
+                    </div>
+                }
+
             </div>
         </div>
     }
 
 </div>
+<EditAwardCard @ref="editAwardCard" OnRefreshTable="OnRefreshTable"/>
+
 
 @code {
     [Parameter]
     public List<EditLotteryAwardModel> Awards { get; set; }
+    EditAwardCard editAwardCard;
 
     public async Task DeleteAward(EditLotteryAwardModel item)
     {
         Awards.Remove(item);
         StateHasChanged();
-        await ToastService.Success("删除成功", "成功删除奖项");
+        await ToastService.Success("删除成功", "成功删除奖品");
     }
     public async Task EditAward(EditLotteryAwardModel item)
     {
-        int i = Awards.IndexOf(item);
+        await editAwardCard.Refresh(true, item);
+    }
 
-        var items = Utility.GenerateEditorItems<EditLotteryAwardModel>();
-        var editItem = items.First(i => i.GetFieldName() == nameof(EditLotteryAwardModel.Id));
-        editItem.Readonly = true;
-        var temp = items.ToList();
-        temp.RemoveAll(i => i.GetFieldName() == nameof(EditLotteryAwardModel.Prizes));
-        items = temp;
-
-        var option = new EditDialogOption<EditLotteryAwardModel>()
+    public Task OnRefreshTable(EditLotteryAwardModel model)
+    {
+        if(model.Id==0)
         {
-            Title = "编辑奖项",
-            Model = Awards[i],
-            Items = items,
-            
-            OnCloseAsync = () =>
-            {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
-            OnEditAsync = async context =>
-            {
-                // Trace.Log("保存按钮被点击");
-                var item = (EditLotteryAwardModel)context.Model;
+            model.Id = Awards.Any() ? (Awards.Max(s => s.Id) + 1) : 1;
+            Awards.Add(model);
+        }
+        StateHasChanged();
 
-                Awards[i] = item;
-                StateHasChanged();
-                await ToastService.Success("修改成功", "成功修改奖项");
-                return true;
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
+        return Task.CompletedTask;
     }
     public async Task AddAward()
     {
-        EditLotteryAwardModel model = new EditLotteryAwardModel();
-        var items = Utility.GenerateEditorItems<EditLotteryAwardModel>();
-
-        var editItem = items.First(i => i.GetFieldName() == nameof(EditLotteryAwardModel.Id));
-        editItem.Readonly = true;
-        var temp = items.ToList();
-        temp.RemoveAll(i => i.GetFieldName() == nameof(EditLotteryAwardModel.Prizes));
-        items = temp;
-
-        var option = new EditDialogOption<EditLotteryAwardModel>()
-        {
-            Title = "添加STAFF",
-            Model = model,
-            Items = items,
-            OnCloseAsync = () =>
-            {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
-            OnEditAsync = async context =>
-            {
-                // Trace.Log("保存按钮被点击");
-                var item = (EditLotteryAwardModel)context.Model;
-
-                Awards.Add(item);
-                StateHasChanged();
-                await ToastService.Success("添加成功", "成功添加奖品");
-                return true;
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
+        await editAwardCard.Refresh(true, new EditLotteryAwardModel());
     }
 
     public async Task OnImportClick()
@@ -140,7 +107,7 @@
         {
             [nameof(BatchImportPrizeTip.OnAdd)] = EventCallback.Factory.Create<List<string>>(this, async (model) => await OnImported(model)),
             [nameof(BatchImportPrizeTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-            [nameof(BatchImportPrizeTip.Title)] = "奖项"
+            [nameof(BatchImportPrizeTip.Title)] = "奖品"
 
         }).Render();
         await DialogService.Show(option);
