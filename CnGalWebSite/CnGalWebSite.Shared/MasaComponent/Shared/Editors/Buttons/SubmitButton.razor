@@ -1,4 +1,5 @@
 ﻿@inject ToastService ToastService
+@inject IPopupService PopupService
 
 <div class="@Class">
 
@@ -35,7 +36,9 @@
         }
         else
         {
-            await ToastService.Error("某个地方填写有误哦~", result.Error ?? "某个地方填写有误哦~");
+            await PopupService.ToastAsync(result.Error ?? "某个地方填写有误哦~",  AlertTypes.Error);
+
+           // await ToastService.Error("某个地方填写有误哦~", result.Error ?? "某个地方填写有误哦~");
         }
     }
 

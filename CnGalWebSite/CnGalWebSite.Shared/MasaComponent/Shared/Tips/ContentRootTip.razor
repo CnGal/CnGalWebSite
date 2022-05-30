@@ -2,13 +2,17 @@
 @inject IJSRuntime JS
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip @ref="backgroundImageTip"/>
+<CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip @ref="backgroundImageTip" />
 
-<FloatToolTip @ref="floatToolTip"/>
+<FloatToolTip @ref="floatToolTip" />
+<ErrorHandler>
+    <CascadingValue Value=this IsFixed="true">
+        @ChildContent
+    </CascadingValue>
 
-<CascadingValue Value=this IsFixed="true">
-    @ChildContent
-</CascadingValue>
+</ErrorHandler>
+
+
 
 @code {
     [Parameter]
@@ -28,7 +32,7 @@
 
         if (user.User.Identity.IsAuthenticated && UserName != user.User.Identity.Name)
         {
- 
+
             UserName = user.User.Identity.Name;
 
             foreach (var item in user.User.Claims)

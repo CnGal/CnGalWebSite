@@ -74,7 +74,7 @@
 
     private async Task OnClick(string imageUrl)
     {
-
+        throw new Exception();
         var item = Carousels.FirstOrDefault(s => s.Image == imageUrl);
         if (item != null)
         {

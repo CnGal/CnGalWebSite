@@ -21,6 +21,7 @@ using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -54,13 +55,14 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IPerfectionService _perfectionService;
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<ExamineService> _logger;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Examine>, string, SortOrder, IEnumerable<Examine>>> SortLambdaCacheEntry = new();
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService,
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository,
         IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService,
-        IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository,
+        IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger,
         IConfiguration configuration, UserManager<ApplicationUser> userManager)
         {
             _examineRepository = examineRepository;
@@ -82,6 +84,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _peripheryService = peripheryService;
             _configuration = configuration;
             _userManager = userManager;
+            _logger = logger;
         }
 
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "")
@@ -2701,6 +2704,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     _ = await _examineRepository.InsertAsync(examine);
                 }
             }
+
+            //log
+            _logger.LogInformation("{User}({Id})对{Entry}进行{Operation}操作{Admin}", user.UserName, user.Id, entry.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
         }
 
         public async Task<bool> UniversalEstablishExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
