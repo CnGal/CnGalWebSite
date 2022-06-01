@@ -4,31 +4,14 @@
 @inject IServiceProvider _serviceProvider
 @inject ILogger<ErrorHandler> Logger
 @inject IJSRuntime JS
-@inject IPopupService PopupService
 
 
-@if (ToolHelper.IsMaui)
-{
+
+<ErrorLogger OnErrorHandleAsync="OnErrorHandleAsync">
     <CascadingValue Value=this IsFixed="true">
         @ChildContent
     </CascadingValue>
-}
-else
-{
-    <MErrorHandler OnErrorHandleAsync="OnErrorHandleAsync" ShowAlert="false">
-        <ErrorContent>
-            <div>
-                <div>@context.Message</div>
-                <div style="white-space: pre-line;">@context.StackTrace</div>
-            </div>
-        </ErrorContent>
-        <ChildContent>
-            <CascadingValue Value=this IsFixed="true">
-                @ChildContent
-            </CascadingValue>
-        </ChildContent>
-    </MErrorHandler>
-}
+</ErrorLogger>
 
 <PToast @ref="_toast" MaxCount="3">
 </PToast>
@@ -38,10 +21,10 @@ else
     public RenderFragment ChildContent { get; set; }
 
     PToast _toast;
-
+    ErrorLogger errorLogger;
     private DateTime LastErrorTime { get; set; } = DateTime.Now.ToCstTime().AddYears(-1);
 
-    public Task OnErrorHandleAsync(Exception ex)
+    public Task OnErrorHandleAsync(ILogger logger, Exception ex)
     {
         if (ex is OutOfMemoryException)
         {
@@ -66,8 +49,7 @@ else
 
     public async void ProcessError(Exception ex, string message = "", string reason = "服务器网络异常", string resolvent = "")
     {
-        Logger.LogError("Error:ProcessError - Type: {Type} Message: {Message}",
-            ex.GetType(), ex.Message);
+        Logger.LogError(ex,message);
 
 
         //向用户发送通知
@@ -83,13 +65,14 @@ else
             {
 
             }
+
             if (string.IsNullOrWhiteSpace(resolvent))
             {
                 var qq = "761794704";
                 var qqUrl = "https://jq.qq.com/?_wv=1027&k=q0DBI011";
                 resolvent = $"检查网络是否正常，按下Ctrl + F5 刷新网页缓存，加群 {qq} 反馈Bug";
             }
-            if(_toast!=null)
+            if (_toast != null)
             {
                 await _toast.AddToast(new ToastConfig
                 {

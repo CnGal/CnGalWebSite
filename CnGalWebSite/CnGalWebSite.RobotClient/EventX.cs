@@ -106,7 +106,7 @@ namespace CnGalWebSite.RobotClient
 
             foreach (var item in events)
             {
-                if (ExecuteInfors.Any(s => (s.Id == item.Id && s.LastRunTime.Date >= DateTime.Now.ToCstTime().Date) || (s.LastRunTime.Date == DateTime.Now.ToCstTime().Date && s.Note == item.Note)))
+                if (ExecuteInfors.Any(s => (s.Id == item.Id && s.RealExecute && s.LastRunTime.Date >= DateTime.Now.ToCstTime().Date) || (s.LastRunTime.Date == DateTime.Now.ToCstTime().Date && s.Note == item.Note)))
                 {
                     continue;
                 }
@@ -132,19 +132,21 @@ namespace CnGalWebSite.RobotClient
                     currentEvent = item;
                 }
 
-                //无论有没有被选择中则写入已执行中
+                //无论有没有被选择中都写入已执行中
                 ExecuteInfors.Add(new EventExecuteInfor
                 {
                     Id = item.Id,
                     Note = item.Note,
+                    RealExecute = currentEvent != null,
                     LastRunTime = DateTime.Now.ToCstTime(),
                 });
 
-            }
+                //确定任务后结束循环
+                if (currentEvent != null)
+                {
+                    break;
+                }
 
-            if (currentEvent == null)
-            {
-                return null;
             }
 
             SaveExecuteInfors();
@@ -180,12 +182,15 @@ namespace CnGalWebSite.RobotClient
             todos.Random();
 
             var temp = todos.FirstOrDefault();
+
             ExecuteInfors.Add(new EventExecuteInfor
             {
                 Id = temp.Id,
                 Note = temp.Note,
+                RealExecute = true,
                 LastRunTime = DateTime.Now.ToCstTime(),
-            });
+            }) ;
+
             SaveExecuteInfors();
 
             return temp.Text;
@@ -218,6 +223,8 @@ namespace CnGalWebSite.RobotClient
         public long Id { get; set; }
 
         public string Note { get; set; }
+
+        public bool RealExecute { get; set; }
 
         public DateTime LastRunTime { get; set; }
     }

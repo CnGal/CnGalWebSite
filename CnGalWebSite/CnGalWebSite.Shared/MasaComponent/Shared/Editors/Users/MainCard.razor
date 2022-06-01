@@ -1,35 +1,41 @@
-﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基本信息" Icon="fa fa-fw fa-info-circle" Collapable Class="@Class">
-    <ValidateForm Model="@Model" ValidateAllProperties="true">
+﻿@inject IDataCacheService _dataCacheService
 
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基本信息" Icon="fa fa-fw fa-info-circle" Collapable Class="@Class">
+    <MForm>
         <div class="row">
 
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.UserName" />
+            <div class="col-12  col-sm-6">
+                <MTextField @bind-Value="Model.UserName" Label="用户名" Color="@_dataCacheService.ThemeSetting.Theme" />
             </div>
-            <div class="form-group col-12">
-                <BootstrapInput @bind-Value="Model.PersonalSignature" />
+            <div class="col-12">
+                <MTextField @bind-Value="Model.PersonalSignature" Label="个性签名" Color="@_dataCacheService.ThemeSetting.Theme" />
             </div>
-            <div class="form-group col-12  col-sm-6">
-                <DateTimePicker @bind-Value="@Model.Birthday" />
-            </div>
-
-            <div class="form-group col-12  col-sm-6">
-                <BootstrapInput @bind-Value="Model.SteamId" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker @bind-NullableValue="Model.Birthday" Lable="生日" ShowTime="false" Nullable Class="col-12 col-sm-6" />
+            <div class="col-12  col-sm-6">
+                <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）" Color="@_dataCacheService.ThemeSetting.Theme" />
             </div>
 
-            <div class="form-group col-12 col-sm-6">
-                <Switch @bind-Value="Model.CanComment" />
+            <div class="col-12 col-sm-6">
+                <MCheckbox @bind-Value="Model.CanComment" Label="允许游客留言" Color="@_dataCacheService.ThemeSetting.Theme" />
             </div>
-            <div class="form-group col-12 col-sm-6">
-                <Switch @bind-Value="Model.IsShowGameRecord" />
+            <div class="col-12 col-sm-6">
+                <MCheckbox @bind-Value="Model.IsShowGameRecord" Label="在主页展示游玩记录" Color="@_dataCacheService.ThemeSetting.Theme" />
             </div>
+            <div class="col-12">
+                <MCardText Class="p-0">展示的头衔</MCardText>
+                <div style="display:flex;">
 
-            <div class="form-group col-12">
-                    <CheckboxList Value="@RanksName" ValueChanged="ValueChanged" TValue="List<string>" ShowBorder="true" Items="@UserRanks" DisplayText="展示的头衔" ShowLabel="true"></CheckboxList>
+                </div>
+                @foreach (var item in Model.Ranks)
+                {
+                    <MCheckbox @bind-Value="item.IsShow" Label="@item.Name" Color="@_dataCacheService.ThemeSetting.Theme" Class="me-2" />
+
+                }
             </div>
 
         </div>
-    </ValidateForm>
+    </MForm>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
@@ -37,42 +43,10 @@
     public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
     [Parameter]
     public string Class { get; set; }
-    List<SelectedItem> UserRanks { get; set; } = new List<SelectedItem>();
-    private List<string> RanksName { get; set; } = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {
 
-        foreach (var item in Model.Ranks)
-        {
 
-            UserRanks.Add(new SelectedItem
-            {
-                Text = item.Name,
-                Active = item.IsShow,
-                Value = item.Name
-            });
-            if (item.IsShow)
-            {
-                RanksName.Add(item.Name);
-            }
-        }
-
-    }
-
-    public Task ValueChanged(List<string> values)
-    {
-        RanksName = values;
-        Model.Ranks.Clear();
-        foreach (var item in UserRanks)
-        {
-            Model.Ranks.Add(new UserEditRankIsShow
-            {
-                Name = item.Text,
-                IsShow = RanksName.Any(s => s == item.Text)
-            });
-        }
-
-        return Task.CompletedTask;
     }
 }

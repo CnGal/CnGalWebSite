@@ -2706,7 +2706,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
 
             //log
-            _logger.LogInformation("{User}({Id})对{Entry}进行{Operation}操作{Admin}", user.UserName, user.Id, entry.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+            _logger.LogInformation("{User}({Id})对 词条 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, entry.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
         }
 
         public async Task<bool> UniversalEstablishExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
@@ -2759,9 +2759,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 _ = await _examineRepository.InsertAsync(examine);
 
             }
+            //log
+            _logger.LogInformation("{User}({Id})创建词条({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, entry.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
             return true;
         }
-
 
         public async Task UniversalEditArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
@@ -2808,6 +2810,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     _ = await _examineRepository.InsertAsync(examine);
                 }
             }
+            //log
+            _logger.LogInformation("{User}({Id})对 文章 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, article.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
         }
 
         public async Task<bool> UniversalCreateArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
@@ -2860,6 +2865,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 _ = await _examineRepository.InsertAsync(examine);
 
             }
+
+            //log
+            _logger.LogInformation("{User}({Id})创建文章({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, article.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
             return true;
         }
 
@@ -2913,6 +2922,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 _ = await _examineRepository.InsertAsync(examine);
 
             }
+            //log
+            _logger.LogInformation("{User}({Id})创建标签({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, tag.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
             return true;
         }
 
@@ -2961,6 +2973,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     _ = await _examineRepository.InsertAsync(examine);
                 }
             }
+
+            //log
+            _logger.LogInformation("{User}({Id})对 标签 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, tag.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
         }
 
 
@@ -3014,6 +3030,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 _ = await _examineRepository.InsertAsync(examine);
 
             }
+            //log
+            _logger.LogInformation("{User}({Id})创建消歧义页({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, disambig.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
+
             return true;
         }
 
@@ -3062,6 +3082,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     _ = await _examineRepository.InsertAsync(examine);
                 }
             }
+
+            //log
+            _logger.LogInformation("{User}({Id})对 消歧义页 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, disambig.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
         }
 
         public async Task UniversalEditUserExaminedAsync(ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
@@ -3109,6 +3133,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     _ = await _examineRepository.InsertAsync(examine);
                 }
             }
+
+            //log
+            _logger.LogInformation("{User}({Id})对个人资料进行{Operation}操作{Admin}", user.UserName, user.Id,operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
         }
 
         public async Task<bool> UniversalCreatePeripheryExaminedAsync(Periphery periphery, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
@@ -3161,6 +3189,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 _ = await _examineRepository.InsertAsync(examine);
 
             }
+            //log
+            _logger.LogInformation("{User}({Id})创建周边({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, periphery.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
             return true;
         }
 
@@ -3209,6 +3240,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     _ = await _examineRepository.InsertAsync(examine);
                 }
             }
+
+
+            //log
+            _logger.LogInformation("{User}({Id})对 周边 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, periphery.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
         }
 
         #endregion

@@ -3,7 +3,6 @@
 @inject NavigationManager NavigationManager
 
 
-<MApp Dark="_dataCacheService.ThemeSetting.IsDark">
     @if (_dataCacheService.IsApp)
     {
         <MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:_dataCacheService.ThemeSetting.Theme)" Dark Dense>
@@ -54,7 +53,6 @@
 
 
     </MMain>
-</MApp>
 
 @code {
 

@@ -1,12 +1,13 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject IServiceProvider _serviceProvider
 
-
-<CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" OnStateChanged="OnStateChanged" />
-<ImagesLargeViewTip />
+<ErrorHandler>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" OnStateChanged="OnStateChanged" />
+    <ImagesLargeViewTip />
     <CascadingValue Value=this IsFixed="true">
         @ChildContent
     </CascadingValue>
+</ErrorHandler>
 
 
 

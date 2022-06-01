@@ -43,7 +43,7 @@ while (true)
         Console.WriteLine("->初始化消息处理模块");
         var messageX = new MessageX(settingX.BasicSetting, httpClient, replyX.Replies, cacheX.ReplyCache, settingX.MessageArgs, faceX.Faces, sensitiveWordX);
 
-        var clientX = new ClientX(settingX.BasicSetting, messageX, groupX);
+        var clientX = new ClientX(settingX.BasicSetting, messageX, groupX,settingX.MessageArgs);
 
         try
         {

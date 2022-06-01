@@ -10,5 +10,10 @@
 
         public string Note { get; set; }
 
+        /// <summary>
+        /// 只有当消息中含有 参数 Name 的值 时才匹配
+        /// </summary>
+        public bool ForceMatch { get; set; }
+
     }
 }
