@@ -293,6 +293,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         IsHidden = model.IsHidden,
                         GroupId = model.GroupId,
                         Note = model.Note,
+                        ForceMatch = model.ForceMatch,
                     };
                 }
             }
@@ -301,6 +302,7 @@ namespace CnGalWebSite.APIServer.Controllers
             robot.GroupId = model.GroupId;
             robot.Note = model.Note;
             robot.IsHidden = model.IsHidden;
+            robot.ForceMatch = model.ForceMatch;
 
             //保存
             if (model.Id == 0)
@@ -681,19 +683,20 @@ namespace CnGalWebSite.APIServer.Controllers
             else if (model.Name == "bindqq")
             {
                 var temps = model.Infor.Split("绑定");
-if (temps.Length <= 1)
-{
+                if (temps.Length <= 1)
+                {
                     return new Result { Successful = true, Error = "" };
                 }
-             var code=   temps[1].Replace("绑定", "").Trim();
+                var code = temps[1].Replace("绑定", "").Trim();
 
 
-                if ((await _userService.BindGroupQQ(code,model.SenderId)).Successful)
+                if ((await _userService.BindGroupQQ(code, model.SenderId)).Successful)
                 {
-                      return new Result { Successful = true, Error = "o(〃＾▽＾〃)o 成功绑定账号" };
+                    return new Result { Successful = true, Error = "o(〃＾▽＾〃)o 成功绑定账号" };
                 }
                 else
-                {  return new Result { Successful = false, Error = "＞﹏＜ 看板娘觉得身份识别码错了喵~" };             
+                {
+                    return new Result { Successful = false, Error = "＞﹏＜ 看板娘觉得身份识别码错了喵~" };
                 }
             }
             else if (model.Name == "introduce")

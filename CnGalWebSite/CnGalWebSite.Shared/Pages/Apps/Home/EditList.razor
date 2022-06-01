@@ -50,6 +50,23 @@
                     Url="/articles/createarticle"
                 }
             });
+
+            if (user.User.IsInRole("Admin"))
+            {
+                Model.AddRange(new List<AppComponent.Normal.Links.IconTextModel>
+                {
+                    new AppComponent.Normal.Links.IconTextModel
+                    {
+                        Text="创建抽奖",
+                        Url="/lotteries/createlottery"
+                    },
+                      new AppComponent.Normal.Links.IconTextModel
+                    {
+                        Text="发起投票",
+                        Url="/votes/createvote"
+                    }
+                });
+            }
         }
 
     }

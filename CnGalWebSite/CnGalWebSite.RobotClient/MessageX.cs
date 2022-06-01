@@ -251,6 +251,14 @@ namespace CnGalWebSite.RobotClient
 
         public async Task<string> GetArgValue(string name, string infor, long qq, Dictionary<string,string> adds)
         {
+            //优先查找本地
+            var argVaule= _messageArgs.FirstOrDefault(s => s.Name == name);
+            if(argVaule!=null)
+            {
+                return argVaule.Value;
+            }
+
+            //若本地没有 则请求服务器
             var result = await _httpClient.PostAsJsonAsync<GetArgValueModel>(ToolHelper.WebApiPath + "api/robot/GetArgValue", new GetArgValueModel
             {
                 Infor = infor,

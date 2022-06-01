@@ -148,6 +148,7 @@ namespace CnGalWebSite.APIServer.Application.Robots
                     Id = item.Id,
                     IsHidden = item.IsHidden,
                     Note = item.Note,
+                    ForceMatch = item.ForceMatch,
                     GroupId = item.GroupId,
                 });
             }

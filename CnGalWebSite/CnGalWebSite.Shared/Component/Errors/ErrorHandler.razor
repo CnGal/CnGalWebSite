@@ -1,23 +1,55 @@
 ﻿@using Microsoft.Extensions.Logging
+@using Microsoft.Extensions.Hosting
 
-@inject ToastService ToastService
+@inject IServiceProvider _serviceProvider
 @inject ILogger<ErrorHandler> Logger
 @inject IJSRuntime JS
 
-<CascadingValue Value=this>
-    @ChildContent
-</CascadingValue>
+
+
+<ErrorLogger OnErrorHandleAsync="OnErrorHandleAsync">
+    <CascadingValue Value=this IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</ErrorLogger>
+
+<PToast @ref="_toast" MaxCount="3">
+</PToast>
 
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
+    PToast _toast;
+    ErrorLogger errorLogger;
     private DateTime LastErrorTime { get; set; } = DateTime.Now.ToCstTime().AddYears(-1);
+
+    public Task OnErrorHandleAsync(ILogger logger, Exception ex)
+    {
+        if (ex is OutOfMemoryException)
+        {
+
+            //内存溢出 强制关闭服务端 由于Docker设置 会重启
+            if (ToolHelper.IsSSR)
+            {
+                IHostApplicationLifetime _applicationLifetime = (IHostApplicationLifetime)_serviceProvider.GetService(typeof(IHostApplicationLifetime));
+                if (_applicationLifetime != null)
+                {
+                    _applicationLifetime.StopApplication();
+                }
+            }
+            throw ex;
+        }
+        else
+        {
+            ProcessError(ex, "发生未经捕获的异常", "代码里有Bug");
+            return Task.CompletedTask;
+        }
+    }
 
     public async void ProcessError(Exception ex, string message = "", string reason = "服务器网络异常", string resolvent = "")
     {
-        Logger.LogError("Error:ProcessError - Type: {Type} Message: {Message}",
-            ex.GetType(), ex.Message);
+        Logger.LogError(ex,message);
 
 
         //向用户发送通知
@@ -33,26 +65,23 @@
             {
 
             }
+
             if (string.IsNullOrWhiteSpace(resolvent))
             {
                 var qq = "761794704";
                 var qqUrl = "https://jq.qq.com/?_wv=1027&k=q0DBI011";
-                resolvent = $"检查网络是否正常，按下Ctrl + F5 刷新网页缓存，加群 <a href='{qqUrl}'>{qq}</a> 反馈Bug";
+                resolvent = $"检查网络是否正常，按下Ctrl + F5 刷新网页缓存，加群 {qq} 反馈Bug";
             }
-            if(ToastService!=null)
+            if (_toast != null)
             {
-                await ToastService.Show(new ToastOption
+                await _toast.AddToast(new ToastConfig
                 {
+                    Type = AlertTypes.Error,
                     Title = message,
-                    IsAutoHide = true,
-                    Category = ToastCategory.Error,
-                    Delay = 20000,
-                    ForceDelay = true,
-                    Content = $"<div class='mb-2'>报错：{ex.Message}</div><div  class='mb-2'>可能原因：{reason}</div><div>解决方法：{resolvent}</div>",
+                    Duration = 20000,
+                    Content = $"报错：{ex.Message}\n{ex.StackTrace}\n可能原因：{reason}\n解决方法：{resolvent}",
                 });
-
             }
-
 
             LastErrorTime = DateTime.Now.ToCstTime();
         }

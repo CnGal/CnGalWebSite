@@ -3,7 +3,6 @@
 @inject NavigationManager NavigationManager
 
 
-<MApp Dark="_dataCacheService.ThemeSetting.IsDark">
     <MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:_dataCacheService.ThemeSetting.Theme)" Dark Dense>
         <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
 
@@ -28,7 +27,6 @@
 
         </MContainer>
     </MMain>
-</MApp>
 
 @code {
     bool drawer { get; set; }

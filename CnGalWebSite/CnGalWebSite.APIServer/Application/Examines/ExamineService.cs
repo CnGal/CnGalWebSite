@@ -21,6 +21,7 @@ using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -54,13 +55,14 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IPerfectionService _perfectionService;
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<ExamineService> _logger;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Examine>, string, SortOrder, IEnumerable<Examine>>> SortLambdaCacheEntry = new();
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService,
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository,
         IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService,
-        IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository,
+        IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger,
         IConfiguration configuration, UserManager<ApplicationUser> userManager)
         {
             _examineRepository = examineRepository;
@@ -82,6 +84,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _peripheryService = peripheryService;
             _configuration = configuration;
             _userManager = userManager;
+            _logger = logger;
         }
 
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "")
@@ -2701,6 +2704,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     _ = await _examineRepository.InsertAsync(examine);
                 }
             }
+
+            //log
+            _logger.LogInformation("{User}({Id})对 词条 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, entry.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
         }
 
         public async Task<bool> UniversalEstablishExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
@@ -2753,9 +2759,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 _ = await _examineRepository.InsertAsync(examine);
 
             }
+            //log
+            _logger.LogInformation("{User}({Id})创建词条({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, entry.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
             return true;
         }
-
 
         public async Task UniversalEditArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
@@ -2802,6 +2810,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     _ = await _examineRepository.InsertAsync(examine);
                 }
             }
+            //log
+            _logger.LogInformation("{User}({Id})对 文章 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, article.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
         }
 
         public async Task<bool> UniversalCreateArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
@@ -2854,6 +2865,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 _ = await _examineRepository.InsertAsync(examine);
 
             }
+
+            //log
+            _logger.LogInformation("{User}({Id})创建文章({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, article.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
             return true;
         }
 
@@ -2907,6 +2922,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 _ = await _examineRepository.InsertAsync(examine);
 
             }
+            //log
+            _logger.LogInformation("{User}({Id})创建标签({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, tag.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
             return true;
         }
 
@@ -2955,6 +2973,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     _ = await _examineRepository.InsertAsync(examine);
                 }
             }
+
+            //log
+            _logger.LogInformation("{User}({Id})对 标签 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, tag.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
         }
 
 
@@ -3008,6 +3030,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 _ = await _examineRepository.InsertAsync(examine);
 
             }
+            //log
+            _logger.LogInformation("{User}({Id})创建消歧义页({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, disambig.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
+
             return true;
         }
 
@@ -3056,6 +3082,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     _ = await _examineRepository.InsertAsync(examine);
                 }
             }
+
+            //log
+            _logger.LogInformation("{User}({Id})对 消歧义页 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, disambig.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
         }
 
         public async Task UniversalEditUserExaminedAsync(ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
@@ -3103,6 +3133,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     _ = await _examineRepository.InsertAsync(examine);
                 }
             }
+
+            //log
+            _logger.LogInformation("{User}({Id})对个人资料进行{Operation}操作{Admin}", user.UserName, user.Id,operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
         }
 
         public async Task<bool> UniversalCreatePeripheryExaminedAsync(Periphery periphery, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
@@ -3155,6 +3189,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 _ = await _examineRepository.InsertAsync(examine);
 
             }
+            //log
+            _logger.LogInformation("{User}({Id})创建周边({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, periphery.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
             return true;
         }
 
@@ -3203,6 +3240,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     _ = await _examineRepository.InsertAsync(examine);
                 }
             }
+
+
+            //log
+            _logger.LogInformation("{User}({Id})对 周边 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, periphery.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
         }
 
         #endregion
