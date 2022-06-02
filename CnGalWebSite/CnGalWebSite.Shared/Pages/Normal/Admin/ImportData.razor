@@ -1,11 +1,6 @@
 ﻿@page "/admin/importdata"
 @attribute [Authorize(Roles = "Admin")]
 
-@inject HttpClient Http
-@inject IRoleService _roleService
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
-@inject NavigationManager NavigationManager
 
 <TitleTip  Title="批量导入"></TitleTip>
 

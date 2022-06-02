@@ -4,12 +4,30 @@
 @if (_dataCacheService.IsApp == false)
 {
     <div style="position: fixed; z-index: 4; bottom: 125px; right: 50px; ">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-transfer-up" Tooltip="回到顶部" OnClick="OnClickFly" />
+        <div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial Icon="mdi-link" Direction="top" Text="社区交流" Class="mb-4">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-wechat" Tooltip="微信" OnClick="@(()=>OnNav("https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzI5OTgwNDg5MA==&scene=124#wechat_redirect"))"/>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-sina-weibo" Tooltip="微博" OnClick="@(()=>OnNav("https://weibo.com/cngalorg?sudaref=www.cngal.org"))" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-qqchat" Tooltip="QQ" OnClick="@(()=>OnNav("https://jq.qq.com/?_wv=1027&k=mG6qNvyg"))" />
+
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial>
+
+            @*<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial Icon="mdi-toolbox" Direction="left" Text="工具箱">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-archive" Tooltip="合并词条" OnClick="OnClickFly" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-script-text" Tooltip="转载文章" OnClick="OnClickFly" />
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial>*@
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-transfer-up" Tooltip="回到顶部" OnClick="OnClickFly" />
+
+        </div>
+       
     </div>
 }
 
 
 @code {
+    private bool fab;
+
     public Task OnClickFly()
     {
         NavigationManager.NavigateTo(NavigationManager.Uri, false, true);
@@ -20,5 +38,15 @@
     {
         StateHasChanged();
         return Task.CompletedTask;
+    }
+
+    public async Task OnNav(string url)
+    {
+        await _dataCacheService.OpenNewPage.InvokeAsync(url);
+    }
+
+    public string ComputeIcon()
+    {
+        return fab ? "mdi-close" : " mdi-account-circle";
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using CnGalWebSite.DataModel.Application.Examines;
 using CnGalWebSite.DataModel.Application.Helper;
-using CnGalWebSite.DataModel.Application.Roles;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
 using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
@@ -52,7 +51,6 @@ namespace CnGalWebSite.Server
             services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
             services.AddScoped<IDataCacheService, DataCatcheService>();
 
-            services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IAppHelper, AppHelper>();
             services.AddScoped(x => new ExamineService());
             services.AddScoped(x => new ImagesLargeViewService());

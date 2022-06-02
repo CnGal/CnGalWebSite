@@ -1,9 +1,4 @@
 ﻿@inject HttpClient Http
-@inject IRoleService _roleService
-@inject ToastService ToastService
-@inject IServiceProvider Provider
-@inject NavigationManager NavigationManager
-@inject SwalService SwalService
 
 <TitleTip Title="@(Model.Type.GetDisplayName() +" "+(string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName)+(Model.IsPassed==null?" 审核":" 编辑") )"></TitleTip>
 

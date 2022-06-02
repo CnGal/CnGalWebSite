@@ -235,7 +235,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 var random = new Random();
                 var temp = random.Next(0, length - length_1);
 
-                groups = await _entryRepository.GetAll().AsNoTracking()
+                groups = await _entryRepository.GetAll().AsNoTracking().OrderBy(s=>s.Id)
                     .Include(s => s.Perfection)
                     .Where(s => s.Type == EntryType.Game && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false
                           && (level == PerfectionLevel.ToBeImproved ? (s.Perfection.Grade < 60) : (level == PerfectionLevel.Good ? (s.Perfection.Grade >= 60 && s.Perfection.Grade < 80) : (s.Perfection.Grade >= 80))))
@@ -243,7 +243,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
             }
             else
             {
-                groups = await _entryRepository.GetAll().AsNoTracking()
+                groups = await _entryRepository.GetAll().AsNoTracking().OrderBy(s => s.Id)
                     .Include(s => s.Perfection)
                     .Where(s => s.Type == EntryType.Game && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false
                           && (level == PerfectionLevel.ToBeImproved ? (s.Perfection.Grade < 60) : (level == PerfectionLevel.Good ? (s.Perfection.Grade >= 60 && s.Perfection.Grade < 80) : (s.Perfection.Grade >= 80))))
@@ -303,7 +303,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 var random = new Random();
                 var temp = random.Next(0, length - length_1);
 
-                groups = await _perfectionCheckRepository.GetAll().AsNoTracking()
+                groups = await _perfectionCheckRepository.GetAll().AsNoTracking().OrderBy(s => s.Id)
                     .Include(s => s.Perfection).ThenInclude(s => s.Entry)
                     .Where(s => s.Perfection.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Perfection.Entry.Name) == false)
                     .Where
@@ -356,7 +356,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
             }
             else
             {
-                groups = await _perfectionCheckRepository.GetAll().AsNoTracking()
+                groups = await _perfectionCheckRepository.GetAll().AsNoTracking().OrderBy(s => s.Id)
                     .Include(s => s.Perfection).ThenInclude(s => s.Entry)
                     .Where(s => s.Perfection.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Perfection.Entry.Name) == false)
                     .Where
