@@ -6,13 +6,26 @@
             Right
             Direction="@Direction"
             Style="right:0;bottom:0"
-            OpenOnHover>
-    <ActivatorContent>
-        <MButton Color="@_dataCacheService.ThemeSetting.Theme" Dark Small Fab @attributes="@context.Attrs" OnClick="OnClick">
-            <MIcon>
-                @Icon
-            </MIcon>
-        </MButton>
+            >
+    <ActivatorContent Context="m">
+        
+        <MTooltip Bottom>
+            <ActivatorContent Context="c">
+                @{
+                    var attrs = new Dictionary<string, object>();
+                    m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                    c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                }
+                <MButton Color="@_dataCacheService.ThemeSetting.Theme" Dark Small Fab @attributes="@attrs" OnClick="OnClick">
+                    <MIcon>
+                        @Icon
+                    </MIcon>
+                </MButton>
+            </ActivatorContent>
+            <ChildContent>
+                <span>@Text</span>
+            </ChildContent>
+        </MTooltip>
     </ActivatorContent>
     <ChildContent>
        @ChildContent

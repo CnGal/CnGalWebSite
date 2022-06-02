@@ -2,6 +2,9 @@
 using CnGalWebSite.DataModel.Application.Examines;
 using CnGalWebSite.DataModel.Application.Helper;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
+using CnGalWebSite.PublicToolbox.DataRepositories;
+using CnGalWebSite.PublicToolbox.PostTools;
+using CnGalWebSite.Shared.DataRepositories;
 using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
 using Microsoft.AspNetCore.Builder;
@@ -58,6 +61,12 @@ namespace CnGalWebSite.Server
 
             //添加状态检查
             services.AddHealthChecks();
+
+            //添加工具箱
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<IEntryService, EntryService>();
+            //services.AddScoped<IEventBase, EventBase>();
+
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }

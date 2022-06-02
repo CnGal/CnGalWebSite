@@ -1,0 +1,62 @@
+﻿<MSimpleTable Class="mb-4">
+    <thead>
+        <tr>
+            <th class="text-left">
+                状态
+            </th>
+            <th class="text-left">
+                被合并的词条
+            </th>
+            <th class="text-left">
+                合并到的词条
+            </th>
+            <th class="text-left">
+                错误
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr @key="item.SubName">
+                <td>
+                    @if (item.CompleteTaskCount == item.TotalTaskCount)
+                    {
+                        <MIcon Color="green">mdi-check</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="error">mdi-close</MIcon>
+                    }
+
+
+                </td>
+                <td>@item.SubName</td>
+                <td>@item.HostName</td>
+                <td>@item.Error</td>
+            </tr>
+        }
+    </tbody>
+</MSimpleTable>
+
+@if (Model.Any(s => s.CompleteTaskCount != s.TotalTaskCount))
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="重试" Depressed Icon="mdi-refresh" OnClick="OnClickRetry" Class="mb-2" />
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="完成" Depressed Icon="mdi-refresh" OnClick="OnClickRetry" Class="mb-2" />
+}
+
+@code {
+    [Parameter]
+    public List<MergeEntryModel> Model { get; set; }
+    [Parameter]
+    public EventCallback OnRetry { get; set; }
+
+    public async Task OnClickRetry()
+    {
+        Model.RemoveAll(s => s.CompleteTaskCount == s.TotalTaskCount);
+        await OnRetry.InvokeAsync();
+    }
+}

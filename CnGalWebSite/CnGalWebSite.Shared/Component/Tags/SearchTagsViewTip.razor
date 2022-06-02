@@ -17,6 +17,7 @@
                ItemChildren="r=>r.Children"
                Activatable
                OpenOnClick
+               OnActiveUpdate="OnActiveUpdate"
                Color="@_dataCacheService.ThemeSetting.Theme">
         <PrependContent>
             @if (string.IsNullOrWhiteSpace(context.Item.Icon) == false)
@@ -35,6 +36,9 @@
 @code {
     [Parameter]
     public string Class { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnClickItem { get; set; }
 
     private List<string> SearchResult = new List<string>();
     private List<TagTreeModel> Items { get; set; } = new List<TagTreeModel>();
@@ -55,6 +59,21 @@
             await ToastService.Error("无法连接到服务器", "请确保网络正常后联系开发人员");
         }
     }
+
+    public async Task OnActiveUpdate(List<TagTreeModel> model)
+    {
+        var item = model.FirstOrDefault();
+        if(item==null)
+        {
+            return;
+        }
+
+        if (item.Children.Any() == false)
+        {
+            await OnClickItem.InvokeAsync(item.Title);
+        }
+    }
+
     private async Task OnSearch(string text)
     {
         _search = text;

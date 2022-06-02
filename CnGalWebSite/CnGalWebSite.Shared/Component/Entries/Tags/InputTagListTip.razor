@@ -40,6 +40,24 @@
             await ToastService.Error("添加标签失败", "发生了未预料的异常，请联系开发人员");
         }
     }
+    public Task TryAddorDelete(string name)
+    {
+        if(Model.Any(s=>s.DisplayName==name))
+        {
+            Model.RemoveAll(s => s.DisplayName == name);
+        }
+        else
+        {
+            Model.Add(new RelevancesModel
+            {
+                DisplayName = name
+            });
+        }
+
+        StateHasChanged();
+        return Task.CompletedTask;
+
+    }
 
     public async Task OnCreate()
     {
@@ -48,7 +66,7 @@
         {
             Title = "确认跳转标签创建页面",
             Content = "跳转后当前页面数据不会保存，请确保备份编辑数据后跳转",
-            
+
             Category = SwalCategory.Warning,
         };
         var ret = await SwalService.ShowModal(op);

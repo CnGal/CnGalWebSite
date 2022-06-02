@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.PostTools", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.RobotClient", "CnGalWebSite\CnGalWebSite.RobotClient\CnGalWebSite.RobotClient.csproj", "{B09309AB-CBB3-47C2-9BA5-18816A77C719}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.PublicToolbox", "CnGalWebSite\CnGalWebSite.PublicToolbox\CnGalWebSite.PublicToolbox.csproj", "{5DA487BA-909F-4962-9898-9D05BDC52945}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -269,6 +271,26 @@ Global
 		{B09309AB-CBB3-47C2-9BA5-18816A77C719}.Release|x64.Build.0 = Release|Any CPU
 		{B09309AB-CBB3-47C2-9BA5-18816A77C719}.Release|x86.ActiveCfg = Release|Any CPU
 		{B09309AB-CBB3-47C2-9BA5-18816A77C719}.Release|x86.Build.0 = Release|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Debug|ARM.Build.0 = Debug|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Debug|x64.Build.0 = Debug|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Debug|x86.Build.0 = Debug|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|ARM.ActiveCfg = Release|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|ARM.Build.0 = Release|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|ARM64.Build.0 = Release|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|x64.ActiveCfg = Release|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|x64.Build.0 = Release|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|x86.ActiveCfg = Release|Any CPU
+		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

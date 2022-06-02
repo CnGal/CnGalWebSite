@@ -1,4 +1,4 @@
-﻿<h5 class="fw-bold">@Title</h5>
+﻿<InputRelevanceListTitle Title="@Title" />
 <div class="row">
     @for (int i = 0; i < Model.Count; i++)
     {
@@ -8,11 +8,12 @@
         </div>
     }
 </div>
-<Button Color="Color.Primary" IsOutline="true" class="mt-4" style="width:100px" @onclick="@(() => OnAddinfor())" Text="添加" Icon="fa fa-plus"></Button>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加" OnClick="OnAddinfor" Icon="mdi-plus" Color="info" Class="mt-4"/>
+
 
 @code {
     [Parameter]
-    public List<RelevancesModel> Model  { get; set; }
+    public List<RelevancesModel> Model { get; set; }
     [Parameter]
     public IEnumerable<string> AutoCompleteItems { get; set; }
 
