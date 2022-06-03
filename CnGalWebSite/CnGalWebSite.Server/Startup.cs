@@ -1,8 +1,10 @@
 ﻿using Blazored.LocalStorage;
 using CnGalWebSite.DataModel.Application.Examines;
 using CnGalWebSite.DataModel.Application.Helper;
-using CnGalWebSite.DataModel.Application.Roles;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
+using CnGalWebSite.PublicToolbox.DataRepositories;
+using CnGalWebSite.PublicToolbox.PostTools;
+using CnGalWebSite.Shared.DataRepositories;
 using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
 using Microsoft.AspNetCore.Builder;
@@ -52,7 +54,6 @@ namespace CnGalWebSite.Server
             services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
             services.AddScoped<IDataCacheService, DataCatcheService>();
 
-            services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IAppHelper, AppHelper>();
             services.AddScoped(x => new ExamineService());
             services.AddScoped(x => new ImagesLargeViewService());
@@ -60,6 +61,14 @@ namespace CnGalWebSite.Server
 
             //添加状态检查
             services.AddHealthChecks();
+
+            //添加工具箱
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<IEntryService, EntryService>();
+            services.AddScoped<IArticleService, ArticleService>();
+            services.AddScoped<IImageService, ImageService>();
+            //services.AddScoped<IEventBase, EventBase>();
+
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }

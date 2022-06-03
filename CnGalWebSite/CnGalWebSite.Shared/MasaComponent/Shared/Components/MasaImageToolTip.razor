@@ -1,0 +1,22 @@
+﻿@inject IDataCacheService _dataCacheService
+
+<MTooltip Left>
+    <ActivatorContent>
+        <MButton Color="@_dataCacheService.ThemeSetting.Theme" Dark XSmall Fab @attributes="@context.Attrs">
+            <MIcon>
+                @Icon
+            </MIcon>
+        </MButton>
+    </ActivatorContent>
+    <ChildContent>
+        <img src="@Image" class="pt-3 pb-3"/>
+    </ChildContent>
+</MTooltip>
+
+@code {
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Image { get; set; }
+}

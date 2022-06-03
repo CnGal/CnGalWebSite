@@ -2355,7 +2355,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             var admin = new ApplicationUser
             {
-                Id = _configuration["ExamineAdminId"]
+                Id = _configuration["ExamineAdminId"],
+                UserName = "看板娘"
             };
 
             //反向关联 词条
@@ -2469,7 +2470,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             var admin = new ApplicationUser
             {
-                Id = _configuration["ExamineAdminId"]
+                Id = _configuration["ExamineAdminId"],
+                UserName="看板娘"
             };
             //反向关联 文章
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Article))
@@ -2706,7 +2708,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
 
             //log
-            _logger.LogInformation("{User}({Id})对 词条 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, entry.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+            _logger.LogInformation("{User}({Id})对 词条 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, entry.Name,entry.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
         }
 
         public async Task<bool> UniversalEstablishExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
@@ -2811,7 +2813,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 }
             }
             //log
-            _logger.LogInformation("{User}({Id})对 文章 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, article.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+            _logger.LogInformation("{User}({Id})对 文章 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, article.Name,article.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
         }
 
@@ -2975,7 +2977,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
 
             //log
-            _logger.LogInformation("{User}({Id})对 标签 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, tag.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+            _logger.LogInformation("{User}({Id})对 标签 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, tag.Name,tag.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
         }
 
@@ -3084,7 +3086,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
 
             //log
-            _logger.LogInformation("{User}({Id})对 消歧义页 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, disambig.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+            _logger.LogInformation("{User}({Id})对 消歧义页 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, disambig.Name,disambig.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
         }
 
@@ -3243,7 +3245,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
 
             //log
-            _logger.LogInformation("{User}({Id})对 周边 - {Entry} 进行{Operation}操作{Admin}", user.UserName, user.Id, periphery.Name, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+            _logger.LogInformation("{User}({Id})对 周边 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, periphery.Name,periphery.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
         }
 

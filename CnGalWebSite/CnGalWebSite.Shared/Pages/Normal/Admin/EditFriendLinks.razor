@@ -2,11 +2,9 @@
 @attribute [Authorize(Roles = "Admin")]
 
 @inject HttpClient Http
-@inject IRoleService _roleService
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
-@inject IAppHelper _appHelper
 
 <TitleTip Title="编辑友情链接"></TitleTip>
 

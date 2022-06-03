@@ -67,6 +67,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CnGalWebSite.DataModel\CnGalWebSite.DataModel.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Helper\CnGalWebSite.Helper.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.PublicToolbox\CnGalWebSite.PublicToolbox.csproj" />
   </ItemGroup>
   
   <ItemGroup>

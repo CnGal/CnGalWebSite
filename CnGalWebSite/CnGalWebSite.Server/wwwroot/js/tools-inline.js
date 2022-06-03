@@ -1,13 +1,10 @@
 ﻿
 function openNewPage(url) {
     window.open(url, "_blank");
-    /*var windowReference = window.open();
-    $.ajax({
-        url: "url", success: function (result) {
-            windowReference.location = url;
-        }
-    });*/
 }
+
+
+
 function getResponseFromRecaptcha(id) {
     var responseToken = grecaptcha.getResponse(id);
     return responseToken;

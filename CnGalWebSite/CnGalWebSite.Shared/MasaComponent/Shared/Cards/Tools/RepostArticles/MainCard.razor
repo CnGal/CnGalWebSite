@@ -1,0 +1,110 @@
+﻿@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            转载其他平台文章
+        </MCardTitle>
+        <MCardText Class="pb-0">
+            目前只支持知乎专栏文章，小黑盒请使用独立投稿工具
+        </MCardText>
+        <MStepper Value="_step" Vertical Elevation="0" Style="box-shadow: none;" Height="@("auto")">
+            <MStepperStep Step="1" Complete="_step>1" Color="@_dataCacheService.ThemeSetting.Theme">
+                输入要转载的文章链接
+            </MStepperStep>
+            <MStepperContent Step="1">
+                @if (isReady)
+                {
+                    <InputDataCard Model="Model"  OnFinshInput="OnStart" />
+                }
+                else
+                {
+                    <div>
+                        <h3 class="mb-3 text-center">正在加载</h3>
+                        <div class="d-flex" style="justify-content: center;">
+                            <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
+                        </div>
+                    </div>
+                }
+
+            </MStepperContent>
+            <MStepperStep Step="2" Complete="_step>2" Color="@_dataCacheService.ThemeSetting.Theme">
+                正在处理文章
+            </MStepperStep>
+            <MStepperContent Step="2">
+                @if (_step == 2)
+                {
+                    <ProcCard Model="Model" @ref="procCard"  ArticleItems="ArticleItems" EntryGameItems="EntryGameItems"/>
+                }
+            </MStepperContent>
+            <MStepperStep Step="3" Complete="_step>3" Color="@_dataCacheService.ThemeSetting.Theme">
+                文章处理完成
+            </MStepperStep>
+            <MStepperContent Step="3">
+                <ResultCard Model="Model" OnRetry="OnRetry" />
+            </MStepperContent>
+        </MStepper>
+    </MCard>
+</MDialog>
+@code {
+    private int _step = 1;
+    bool Dialog { get; set; }
+
+    public List<RepostArticleModel> Model { get; set; } = new List<RepostArticleModel>();
+    private bool isReady = false;
+    private IEnumerable<string> ArticleItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> EntryGameItems { get; set; } = new string[1] { "" };
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    ProcCard procCard;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            StateHasChanged();
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取所有词条
+            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
+            ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
+
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有词条文章名称失败");
+        }
+    }
+    public async Task OnStart()
+    {
+        _step = 2;
+        StateHasChanged();
+        if (procCard != null)
+        {
+            await procCard.Proc();
+        }
+        _step = 3;
+        StateHasChanged();
+    }
+
+    public async Task OnRetry()
+    {
+        _step = 1;
+        StateHasChanged();
+    }
+
+    public async Task Refresh(bool dialog)
+    {
+        Dialog = dialog;
+
+        StateHasChanged();
+    }
+}
