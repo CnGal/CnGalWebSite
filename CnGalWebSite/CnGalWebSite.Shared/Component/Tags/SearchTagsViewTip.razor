@@ -1,5 +1,4 @@
 ﻿@inject HttpClient Http
-@inject ToastService? ToastService
 @inject IDataCacheService _dataCacheService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="可选标签" Icon="fa fa-fw fa-search" Collapable Class="@Class">
@@ -11,13 +10,15 @@
     <MTreeview Items="Items"
                Search="@_search"
                TItem="TagTreeModel"
-               TKey="long"
-               ItemKey="r=>r.Id"
-               ItemText="r=>r.Title"
-               ItemChildren="r=>r.Children"
+               TKey="string"
+               ItemKey="r => r.Title"
+               ItemText="r => r.Title"
+               ItemChildren="r => r.Children"
                Activatable
-               OpenOnClick
-               OnActiveUpdate="OnActiveUpdate"
+               Selectable
+               SelectedColor="@_dataCacheService.ThemeSetting.Theme"
+               ValueChanged="ValueChanged"
+               Value="selectedItems"
                Color="@_dataCacheService.ThemeSetting.Theme">
         <PrependContent>
             @if (string.IsNullOrWhiteSpace(context.Item.Icon) == false)
@@ -38,7 +39,9 @@
     public string Class { get; set; }
 
     [Parameter]
-    public EventCallback<string> OnClickItem { get; set; }
+    public EventCallback<string> OnInput { get; set; }
+    [Parameter]
+    public List<RelevancesModel> Model { get; set; }
 
     private List<string> SearchResult = new List<string>();
     private List<TagTreeModel> Items { get; set; } = new List<TagTreeModel>();
@@ -46,6 +49,8 @@
     public ErrorHandler ErrorHandler { get; set; }
     private string _search;
 
+    private List<string> lastTags = new List<string>();
+    private List<string> selectedItems = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,25 +58,51 @@
         {
             //获取所有标签
             Items = await Http.GetFromJsonAsync<List<TagTreeModel>>(ToolHelper.WebApiPath + "api/tags/GetTagsTreeView");
+
+            //遍历寻找最后一级的标签
+            foreach (var item in Items)
+            {
+                AddLastTags(item.Children);
+            }
+
+
         }
-        catch
+        catch (Exception ex)
         {
-            await ToastService.Error("无法连接到服务器", "请确保网络正常后联系开发人员");
+            ErrorHandler.ProcessError(ex, "获取树形标签数据失败");
         }
     }
 
-    public async Task OnActiveUpdate(List<TagTreeModel> model)
+    public void AddLastTags(List<TagTreeModel> model)
     {
-        var item = model.FirstOrDefault();
-        if(item==null)
+        foreach(var item in model)
         {
-            return;
+            if(item.Children.Any())
+            {
+                AddLastTags(item.Children);
+            }
+            else
+            {
+                lastTags.Add(item.Title);
+            }
         }
+    }
 
-        if (item.Children.Any() == false)
-        {
-            await OnClickItem.InvokeAsync(item.Title);
-        }
+    public Task Refresh()
+    {
+        selectedItems = Model.Where(s=>string.IsNullOrWhiteSpace(s.DisplayName)==false).Select(s => s.DisplayName).ToList();
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public async Task ValueChanged(List<string> items)
+    {
+        items.RemoveAll(s => lastTags.Contains(s) == false);
+        selectedItems = items;
+
+        Model.RemoveAll(s => items.Contains(s.DisplayName) == false);
+        Model.AddRange(items.Where(s => Model.Select(s => s.DisplayName).Contains(s) == false).Select(s => new RelevancesModel { DisplayName = s }));
+        await OnInput.InvokeAsync();
     }
 
     private async Task OnSearch(string text)

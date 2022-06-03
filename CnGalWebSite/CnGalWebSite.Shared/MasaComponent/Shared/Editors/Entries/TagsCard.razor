@@ -4,10 +4,10 @@
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-tags" Title="标签" Class="mb-4" Collapable>
-    <InputTagListTip AutoCompleteItems="@TagItems" Model="Model.Tags"  @ref="inputTagListTip"/>
+    <InputTagListTip AutoCompleteItems="@TagItems" Model="Model.Tags"  @ref="inputTagListTip" OnInput="OnInputList"/>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
-<SearchTagsViewTip  Class="@Class" OnClickItem="OnClickItem"/>
+<SearchTagsViewTip  Class="@Class" OnInput="OnInputSearch" Model="Model.Tags" @ref="searchTagsViewTip"/>
 
 @code {
     [Parameter]
@@ -17,12 +17,21 @@
     [Parameter]
     public string Class { get; set; }
     InputTagListTip inputTagListTip;
+    SearchTagsViewTip searchTagsViewTip;
 
-    public async Task OnClickItem(string name)
+    public async Task OnInputSearch()
     {
         if (inputTagListTip != null)
         {
-            await inputTagListTip.TryAddorDelete(name);
+            await inputTagListTip.Refresh();
+        }
+    }
+
+    public async Task OnInputList()
+    {
+        if (searchTagsViewTip != null)
+        {
+            await searchTagsViewTip.Refresh();
         }
     }
 }

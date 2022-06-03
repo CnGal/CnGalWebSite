@@ -10,7 +10,7 @@
         {
             int temp = i;
             <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-2">
-                <AutoComplete Items="@AutoCompleteItems" IsLikeMatch="true" IgnoreCase="true" Id="name" @bind-Value="Model[temp].DisplayName" placeholder="标签" />
+                <AutoComplete Items="@AutoCompleteItems" IsLikeMatch="true" IgnoreCase="true" Id="name" Value="@Model[temp].DisplayName" placeholder="标签" OnValueChanged="@((s)=>OnValueChanged(temp,s))"/>
             </div>
         }
     </div>
@@ -27,12 +27,15 @@
     public IEnumerable<string> AutoCompleteItems { get; set; }
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public EventCallback<string> OnInput { get; set; }
 
     private async Task OnAdd()
     {
         try
         {
             Model.Add(new RelevancesModel());
+            await OnInput.InvokeAsync();
             StateHasChanged();
         }
         catch
@@ -40,23 +43,19 @@
             await ToastService.Error("添加标签失败", "发生了未预料的异常，请联系开发人员");
         }
     }
-    public Task TryAddorDelete(string name)
-    {
-        if(Model.Any(s=>s.DisplayName==name))
-        {
-            Model.RemoveAll(s => s.DisplayName == name);
-        }
-        else
-        {
-            Model.Add(new RelevancesModel
-            {
-                DisplayName = name
-            });
-        }
 
+    public Task Refresh()
+    {
         StateHasChanged();
         return Task.CompletedTask;
 
+    }
+
+    public async Task OnValueChanged(int index,string text)
+    {
+        Model[index].DisplayName = text;
+        await OnInput.InvokeAsync();
+        StateHasChanged();
     }
 
     public async Task OnCreate()
