@@ -4,8 +4,6 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip @ref="backgroundImageTip"/>
 
-<FloatToolTip @ref="floatToolTip"/>
-
 <CascadingValue Value=this IsFixed="true">
     @ChildContent
 </CascadingValue>
@@ -17,7 +15,6 @@
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip backgroundImageTip;
-    FloatToolTip floatToolTip;
 
     string UserId = "";
     string UserName = "";
@@ -71,10 +68,6 @@
         if (backgroundImageTip != null)
         {
             await backgroundImageTip.Refresh();
-        }
-        if (floatToolTip != null)
-        {
-            await floatToolTip.Refresh();
         }
     }
 

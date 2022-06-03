@@ -5,10 +5,14 @@
                 状态
             </th>
             <th class="text-left">
-                被合并的词条
+                Id
             </th>
             <th class="text-left">
-                合并到的词条
+                类型
+            </th>
+
+            <th class="text-left">
+                链接
             </th>
             <th class="text-left">
                 错误
@@ -18,7 +22,7 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr @key="item.SubName">
+            <tr @key="item.Url">
                 <td>
                     @if (item.CompleteTaskCount == item.TotalTaskCount)
                     {
@@ -31,8 +35,10 @@
 
 
                 </td>
-                <td>@item.SubName</td>
-                <td>@item.HostName</td>
+                <td>@item.Id</td>
+
+                <td>@item.Type.GetDisplayName()</td>
+                <td>@item.Url</td>
                 <td>@item.Error</td>
             </tr>
         }
@@ -45,7 +51,7 @@
 
 @code {
     [Parameter]
-    public List<MergeEntryModel> Model { get; set; }
+    public List<RepostArticleModel> Model { get; set; }
     [Parameter]
     public EventCallback OnRetry { get; set; }
 

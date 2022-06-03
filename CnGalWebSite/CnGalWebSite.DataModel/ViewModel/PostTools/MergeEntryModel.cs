@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.PostTools
 {
-    public class MergeEntryModel
+    public class MergeEntryModel:ToolTaskBase
     {
         public int HostId { get; set; }
         public string HostName { get; set; }
@@ -17,9 +17,10 @@ namespace CnGalWebSite.DataModel.ViewModel.PostTools
 
         public DateTime? PostTime { get; set; }
 
-        public int TotalTaskCount { get; set; } = 10;
-        public int CompleteTaskCount { get; set; }
+        public MergeEntryModel()
+        {
+            TotalTaskCount = 10;
+        }
 
-        public string Error { get; set; }
     }
 }

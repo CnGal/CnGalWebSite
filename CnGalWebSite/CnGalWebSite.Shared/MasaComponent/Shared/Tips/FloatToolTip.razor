@@ -6,7 +6,7 @@
     <div style="position: fixed; z-index: 4; bottom: 125px; right: 50px; ">
         <div>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial Icon="mdi-link" Direction="top" Text="社区交流" Class="mb-4">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaImageToolTip Icon="mdi-wechat" Image="https://image.cngal.org/images/2022/06/02/76142d8159b0.jpg"/>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaImageToolTip Icon="mdi-wechat" Image="https://image.cngal.org/images/2022/06/02/76142d8159b0.jpg" />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-sina-weibo" Tooltip="微博" OnClick="@(()=>OnNav("https://weibo.com/cngalorg?sudaref=www.cngal.org"))" />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-qqchat" Tooltip="QQ" OnClick="@(()=>OnNav("https://jq.qq.com/?_wv=1027&k=mG6qNvyg"))" />
 
@@ -14,22 +14,23 @@
 
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial Icon="mdi-toolbox" Direction="left" Text="工具箱" Class="mb-4">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-archive" Tooltip="合并词条" OnClick="OnMergeEntries" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-script-text" Tooltip="转载文章" OnClick="OnClickFly" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-script-text" Tooltip="转载文章" OnClick="OnRepostArticles" />
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial>
 
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-transfer-up" Tooltip="回到顶部" OnClick="OnClickFly" />
 
         </div>
-       
+
     </div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard @ref="mergeEntriesCard"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard @ref="mergeEntriesCard" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard @ref="repostArticlesCard" />
 }
 
 
 @code {
     private bool fab;
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard mergeEntriesCard;
-
+    CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard repostArticlesCard;
     public Task OnClickFly()
     {
         NavigationManager.NavigateTo(NavigationManager.Uri, false, true);
@@ -52,12 +53,38 @@
         return fab ? "mdi-close" : " mdi-account-circle";
     }
 
+    public bool Login()
+    {
+        if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor?.Id))
+        {
+            NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+            return false;
+        }
+
+        return true;
+    }
 
     public async Task OnMergeEntries()
     {
-        if(mergeEntriesCard!=null)
+        if(Login()==false)
         {
-          await  mergeEntriesCard.Refresh(true);
+            return;
+        }
+        if (mergeEntriesCard != null)
+        {
+            await mergeEntriesCard.Refresh(true);
+        }
+    }
+
+    public async Task OnRepostArticles()
+    {
+        if (Login() == false)
+        {
+            return;
+        }
+        if (repostArticlesCard != null)
+        {
+            await repostArticlesCard.Refresh(true);
         }
     }
 }

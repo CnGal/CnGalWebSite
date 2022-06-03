@@ -33,26 +33,19 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 
         public async Task ProcMergeEntry(MergeEntryModel model)
         {
-            for(var i=0;i<10;i++)
-            {
-                OnProgressUpdate(OutputLevel.Infor, $"开始将 {model.SubName} 合并到 {model.HostName}");
-               await Task.Delay(5000);
-                model.CompleteTaskCount++;
-            }
-            return;
 
-            OnProgressUpdate(OutputLevel.Infor, $"开始将 {model.SubName} 合并到 {model.HostName}");
+            OnProgressUpdate(model, OutputLevel.Infor, $"开始将<{model.SubName}>合并到<{model.HostName}>");
 
             if (string.IsNullOrWhiteSpace(model.HostName) || string.IsNullOrWhiteSpace(model.SubName))
             {
-                OnProgressUpdate(OutputLevel.Dager, $"词条名称不能为空");
+                OnProgressUpdate(model, OutputLevel.Dager, $"词条名称不能为空");
                 return;
             }
 
             var mergeEntry = _mergeEntryRepository.GetAll().FirstOrDefault(s => s.HostName == model.HostName && s.SubName == model.SubName);
             if (mergeEntry != null && mergeEntry.PostTime != null)
             {
-                OnProgressUpdate(OutputLevel.Warning, $"{model.SubName} -> {model.HostName} 已于 {mergeEntry.PostTime} 提交审核[HostId:{mergeEntry.HostId}][SubId:{mergeEntry.SubId}]");
+                OnProgressUpdate(model, OutputLevel.Dager, $"{model.SubName}({mergeEntry.SubId}) -> {model.HostName}({mergeEntry.HostId}) 已于 {mergeEntry.PostTime} 提交审核");
                 return;
             }
             else
@@ -63,7 +56,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             model.CompleteTaskCount++;
 
 
-            Console.WriteLine("获取词条");
+            OnProgressUpdate(model, OutputLevel.Infor, "获取词条");
             try
             {
                 await GetMergeEntryId(mergeEntry);
@@ -71,14 +64,14 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             catch (Exception ex)
             {
                 _logger.LogError(ex, "{SubName} -> {HostName} 获取词条失败", model.SubName, model.HostName);
-                OnProgressUpdate(OutputLevel.Dager, "获取词条失败");
+                OnProgressUpdate(model, OutputLevel.Dager, "获取词条失败");
                 return;
             }
 
             model.CompleteTaskCount++;
 
 
-            Console.WriteLine("生成审核记录");
+            OnProgressUpdate(model, OutputLevel.Infor, "生成审核记录");
             try
             {
                 await GenerateMergeEntry(mergeEntry);
@@ -86,7 +79,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             catch (Exception ex)
             {
                 _logger.LogError(ex, "{SubName}({SubId}) -> {HostName}({HostId}) 生成审核记录失败", model.SubName, model.SubId, model.HostName, model.HostId);
-                OnProgressUpdate(OutputLevel.Dager, "生成审核记录失败");
+                OnProgressUpdate(model, OutputLevel.Dager, "生成审核记录失败");
 
                 return;
             }
@@ -95,7 +88,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 
             model.CompleteTaskCount++;
 
-            Console.WriteLine("发送审核记录");
+            OnProgressUpdate(model, OutputLevel.Infor, "发送审核记录");
             try
             {
                 await PostExamine(mergeEntry);
@@ -103,14 +96,14 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             catch (Exception ex)
             {
                 _logger.LogError(ex, "{SubName}({SubId}) -> {HostName}({HostId}) 发送审核记录失败", model.SubName, model.SubId, model.HostName, model.HostId);
-                OnProgressUpdate(OutputLevel.Dager, "发送审核记录失败");
+                OnProgressUpdate(model, OutputLevel.Dager, "发送审核记录失败");
                 return;
             }
 
             model.CompleteTaskCount++;
 
 
-            Console.WriteLine("隐藏从词条");
+            OnProgressUpdate(model, OutputLevel.Infor, "隐藏从词条");
             try
             {
                 await HideSubEntry(mergeEntry);
@@ -118,7 +111,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             catch (Exception ex)
             {
                 _logger.LogError(ex, "{SubName}({SubId}) -> {HostName}({HostId}) 递交隐藏从词条申请失败", model.SubName, model.SubId, model.HostName, model.HostId);
-                OnProgressUpdate(OutputLevel.Dager, "递交隐藏从词条申请失败");
+                OnProgressUpdate(model, OutputLevel.Dager, "递交隐藏从词条申请失败");
                 return;
             }
 
@@ -131,12 +124,16 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             model.CompleteTaskCount++;
 
 
-            OnProgressUpdate(OutputLevel.Infor, $"成功将 {model.SubName} 合并到 {model.HostName}");
+            OnProgressUpdate(model, OutputLevel.Infor, $"成功将 {model.SubName} 合并到 {model.HostName}");
 
         }
 
-        protected void OnProgressUpdate(OutputLevel level, string infor)
+        protected void OnProgressUpdate(MergeEntryModel model,OutputLevel level, string infor)
         {
+            if(level == OutputLevel.Dager)
+            {
+                model.Error = infor;
+            }
             ProgressUpdate?.Invoke(new KeyValuePair<OutputLevel, string>(level, infor));
         }
 
@@ -255,7 +252,10 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             model.HostId = await _httpClient.GetFromJsonAsync<int>(ToolHelper.WebApiPath + "api/entries/GetId/" + ToolHelper.Base64EncodeName(model.HostName));
             model.SubId = await _httpClient.GetFromJsonAsync<int>(ToolHelper.WebApiPath + "api/entries/GetId/" + ToolHelper.Base64EncodeName(model.SubName));
 
-
+            if(model.HostId==0||model.SubId==0)
+            {
+                throw new Exception("词条不存在");
+            }
         }
 
         private async Task PostExamine(MergeEntryModel model)
@@ -311,7 +311,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                 }
 
                 _logger.LogWarning("{SubName}({SubId}) -> {HostName}({HostId}) 隐藏从词条失败，可能当前未以管理员角色登入，已尝试递交隐藏请求", model.SubName, model.SubId, model.HostName, model.HostId);
-                OnProgressUpdate(OutputLevel.Dager, "隐藏从词条失败，可能当前未以管理员角色登入，已尝试递交隐藏请求");
+                OnProgressUpdate(model, OutputLevel.Dager, "隐藏从词条失败，可能当前未以管理员角色登入，已尝试递交隐藏请求");
             }
         }
     }

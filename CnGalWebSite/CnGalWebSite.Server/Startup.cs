@@ -65,6 +65,8 @@ namespace CnGalWebSite.Server
             //添加工具箱
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped<IEntryService, EntryService>();
+            services.AddScoped<IArticleService, ArticleService>();
+            services.AddScoped<IImageService, ImageService>();
             //services.AddScoped<IEventBase, EventBase>();
 
 

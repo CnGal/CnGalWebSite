@@ -1,0 +1,122 @@
+﻿@inject IDataCacheService _dataCacheService
+
+@inject IPopupService PopupService
+
+<div class="@Class">
+    <div class="pb-2" style="display: flex; justify-content: center; text-align: center;">
+        目前只支持知乎链接，格式如下<br />
+        https://zhuanlan.zhihu.com/p/480692805
+    </div>
+    <div class="row mb-4">
+        <div class="col-12 col-sm-3 mb-4">
+            <MSelect Value="@model.Type" ValueChanged="ValueChanged" TValue="ArticleType" TItem="KeyValuePair<string, ArticleType>" TItemValue="ArticleType"
+                     Label="类型"
+                     Items="@items"
+                     ItemText="u => u.Key"
+                     ItemValue="u => u.Value"
+                     MenuProps="props => props.OffsetY = true">
+            </MSelect>
+        </div>
+        <div class="col-12 col-sm-9 mb-4">
+            <MTextField Label="链接" @bind-Value="@model.Url" TValue="string"></MTextField>
+        </div>
+        <div class="col-12 mb-2">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="OnAdd" Icon="mdi-plus" />
+        </div>
+    </div>
+    <MSimpleTable Class="mb-4">
+        <thead>
+            <tr>
+                <th class="text-left">
+                    类型
+                </th>
+                <th class="text-left">
+                    链接
+                </th>
+                <th class="text-left">
+                    操作
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr @key="item.Url">
+                    <td>@item.Type.GetDisplayName()</td>
+                    <td>@item.Url</td>
+                    <td>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="删除" TextStyle OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </MSimpleTable>
+
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="下一步" Depressed Icon="mdi-arrow-down-bold-outline" OnClick="OnClickFinshInput" Class="mb-2" />
+</div>
+
+
+@code {
+    [Parameter]
+    public List<RepostArticleModel> Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+
+    public EventCallback OnFinshInput { get; set; }
+    List<KeyValuePair<string, ArticleType>> items = new List<KeyValuePair<string, ArticleType>>();
+    RepostArticleModel model = new RepostArticleModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        items.Clear();
+        for(var i=0;i<9;i++)
+        {
+            items.Add(new KeyValuePair<string, ArticleType>(((ArticleType)i).GetDisplayName(), (ArticleType)i));
+        }
+    }
+
+    public Task  ValueChanged(ArticleType type)
+    {
+        model.Type = type;
+        return Task.CompletedTask;
+    }
+
+    public async Task OnAdd()
+    {
+        if (string.IsNullOrWhiteSpace(model.Url))
+        {
+            await PopupService.ToastAsync("先填写文章链接哦", AlertTypes.Error);
+            return;
+        }
+        if (model.Url.Contains("zhuanlan.zhihu.com")==false)
+        {
+            await PopupService.ToastAsync("链接格式不正确", AlertTypes.Error);
+            return;
+        }
+        if (Model.Any(s => s.Url == model.Url))
+        {
+            await PopupService.ToastAsync("文章链接添加一次就够了哦", AlertTypes.Error);
+            return;
+        }
+
+        Model.Add(model);
+        model = new RepostArticleModel();
+    }
+
+    public Task OnDelete(RepostArticleModel model)
+    {
+        Model.Remove(model);
+        return Task.CompletedTask;
+    }
+
+    public async Task OnClickFinshInput()
+    {
+        if (Model.Count == 0)
+        {
+            await PopupService.ToastAsync("你还没有添加需要转载的文章链接哦", AlertTypes.Error);
+            return;
+        }
+        await OnFinshInput.InvokeAsync();
+    }
+}

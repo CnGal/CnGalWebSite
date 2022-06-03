@@ -1,10 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
+    <PackageReference Include="Markdig" Version="0.30.2" />
+    <PackageReference Include="ReverseMarkdown" Version="3.23.1" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CnGalWebSite.Helper\CnGalWebSite.Helper.csproj" />

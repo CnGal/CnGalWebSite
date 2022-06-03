@@ -5,19 +5,19 @@
          Width="800">
     <MCard>
         <MCardTitle Class="text-h5">
-            合并词条
+            转载其他平台文章
         </MCardTitle>
         <MCardText Class="pb-0">
-            合并时会自动迁移关联信息
+            目前只支持知乎专栏文章，小黑盒请使用独立投稿工具
         </MCardText>
         <MStepper Value="_step" Vertical Elevation="0" Style="box-shadow: none;" Height="@("auto")">
             <MStepperStep Step="1" Complete="_step>1" Color="@_dataCacheService.ThemeSetting.Theme">
-                输入要合并的词条
+                输入要转载的文章链接
             </MStepperStep>
             <MStepperContent Step="1">
                 @if (isReady)
                 {
-                    <InputDataCard Model="Model" EntryItems="EntryItems" OnFinshInput="OnStart"/>
+                    <InputDataCard Model="Model"  OnFinshInput="OnStart" />
                 }
                 else
                 {
@@ -31,19 +31,19 @@
 
             </MStepperContent>
             <MStepperStep Step="2" Complete="_step>2" Color="@_dataCacheService.ThemeSetting.Theme">
-                正在合并词条
+                正在处理文章
             </MStepperStep>
             <MStepperContent Step="2">
                 @if (_step == 2)
                 {
-                    <ProcCard Model="Model" @ref="procCard" />
+                    <ProcCard Model="Model" @ref="procCard"  ArticleItems="ArticleItems" EntryGameItems="EntryGameItems"/>
                 }
             </MStepperContent>
             <MStepperStep Step="3" Complete="_step>3" Color="@_dataCacheService.ThemeSetting.Theme">
-                词条合并完成
+                文章处理完成
             </MStepperStep>
             <MStepperContent Step="3">
-                <ResultCard Model="Model" OnRetry="OnRetry"/>
+                <ResultCard Model="Model" OnRetry="OnRetry" />
             </MStepperContent>
         </MStepper>
     </MCard>
@@ -52,9 +52,10 @@
     private int _step = 1;
     bool Dialog { get; set; }
 
-    public List<MergeEntryModel> Model { get; set; } = new List<MergeEntryModel>();
+    public List<RepostArticleModel> Model { get; set; } = new List<RepostArticleModel>();
     private bool isReady = false;
-    private IEnumerable<string> EntryItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> ArticleItems { get; set; } = new string[1] { "" };
+    private IEnumerable<string> EntryGameItems { get; set; } = new string[1] { "" };
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -71,14 +72,15 @@
         try
         {
             //获取所有词条
-            EntryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList");
+            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
+            ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
 
             isReady = true;
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
+            ErrorHandler.ProcessError(ex, "获取所有词条文章名称失败");
         }
     }
     public async Task OnStart()
