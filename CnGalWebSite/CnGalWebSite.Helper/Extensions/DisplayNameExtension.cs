@@ -19,7 +19,7 @@ namespace CnGalWebSite.Helper.Extensions
             var type = eum.GetType();
             var field = type.GetField(eum.ToString());
             var obj = (DisplayAttribute)field.GetCustomAttribute(typeof(DisplayAttribute));
-            return obj.Name ?? "";
+            return obj?.Name ?? "";
         }
     }
 }

@@ -149,6 +149,10 @@ namespace CnGalWebSite.Shared.Service
         /// 图表缓存
         /// </summary>
         public IPageModelCatche<ChartDataSource> ChartDataCatche { get; set; }
+        /// <summary>
+        /// 图表缓存
+        /// </summary>
+        public IPageModelCatche<LineChartModel> LineChartDataCatche { get; set; }
 
         public List<DocumentViewModel> DocumentsCatche { get; set; } = new List<DocumentViewModel>();
         /// <summary>
@@ -228,7 +232,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<TagContrastEditRecordViewModel> tagContrastEditRecordViewCatche,
         IPageModelCatche<EntryContrastEditRecordViewModel> entryContrastEditRecordViewCatche,
         IPageModelCatche<SearchViewModel> searchViewCatche,
-        IPageModelCatche<ChartDataSource> chartDataCatche)
+        IPageModelCatche<ChartDataSource> chartDataCatche,
+        IPageModelCatche<LineChartModel> lineChartDataCatche)
         {
             _httpClient = httpClient;
             (EntryIndexPageCatche = entryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/entries/GetEntryView/");
@@ -243,6 +248,7 @@ namespace CnGalWebSite.Shared.Service
             (PeripheryContrastEditRecordViewCatche = peripheryContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/peripheries/GetContrastEditRecordViews/");
             (TagContrastEditRecordViewCatche = tagContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/tags/GetContrastEditRecordViews/");
             (ChartDataCatche = chartDataCatche).Init("", true);
+            (LineChartDataCatche = lineChartDataCatche).Init("");
             HomePageNewsCatche = homePageNewsCatche;
             HomePageCarouselsCatche = homePageCarouselsCatche;
             SearchViewCatche = searchViewCatche;

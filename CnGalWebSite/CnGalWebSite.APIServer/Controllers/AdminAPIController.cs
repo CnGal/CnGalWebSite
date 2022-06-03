@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Charts;
 using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.ErrorCounts;
@@ -23,6 +24,7 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -30,6 +32,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -96,6 +99,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<RobotReply, long> _robotReplyRepository;
         private readonly IRepository<SearchCache, long> _searchCacheRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IChartService _chartService;
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
@@ -108,7 +112,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository,
-        IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper,
+        IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService,
         IRepository<LotteryPrize, long> lotteryPrizeRepository)
         {
             _userManager = userManager;
@@ -163,6 +167,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _robotReplyRepository = robotReplyRepository;
             _searchCacheRepository = searchCacheRepository;
             _webHostEnvironment = webHostEnvironment;
+            _chartService = chartService;
         }
 
         /// <summary>
@@ -912,363 +917,20 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
         }
-        /// <summary>
-        /// 图表天数
-        /// </summary>
-        public const int MaxCountLineDay = 30;
 
         /// <summary>
-        /// 获取用户图表
+        /// 获取图表 管理员限定
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<BootstrapBlazor.Components.ChartDataSource>> GetUserCountLineAsync()
+        public async Task<ActionResult<LineChartModel>> GetLineChartAsync([FromQuery] LineChartType type, [FromQuery] long afterTime, [FromQuery] long beforeTime)
         {
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
+            var after = DateTime.FromBinary(afterTime);
+            var before = DateTime.FromBinary(beforeTime);
 
-            //获取数据
-            var registerCounts = await _userRepository.GetAll().Where(s => s.RegistTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.RegistTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var onlineCounts = await _userOnlineInforRepository.GetAll().Where(s => s.Date.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-             // 先进行了时间字段变更为String字段，切只保留到天
-             // 采用拼接的方式
-             .Select(n => new { Time = n.Date.Date })
-             // 分类
-             .GroupBy(n => n.Time)
-             // 返回汇总样式
-             .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-             .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-             .ToListAsync();
-
-
-            var SignIns = await _signInDayRepository.GetAll().Where(s => s.Time.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-             // 先进行了时间字段变更为String字段，切只保留到天
-             // 采用拼接的方式
-             .Select(n => new { Time = n.Time.Date })
-             // 分类
-             .GroupBy(n => n.Time)
-             // 返回汇总样式
-             .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-             .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-             .ToListAsync();
-
-            var temp = _appHelper.GetCountLine(new Dictionary<string, List<CountLineModel>> { ["注册"] = registerCounts, ["在线"] = onlineCounts, ["签到"] = SignIns }, "日期", "数目", "用户");
-            return temp;
-        }
-        /// <summary>
-        /// 获取词条图表
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<BootstrapBlazor.Components.ChartDataSource>> GetEntryCountLineAsync()
-        {
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
-
-            //获取数据
-            var editCounts = await _examineRepository.GetAll().Where(s => (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishMainPage)
-                                                                           && s.IsPassed == true && s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.ApplyTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-            //获取数据
-            var commentCounts = await _commentRepository.GetAll().Where(s => s.Type == CommentType.CommentEntries && s.CommentTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.CommentTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-            //获取数据
-            var favoriteCounts = await _favoriteObjectRepository.GetAll().Where(s => s.Type == FavoriteObjectType.Entry && s.CreateTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.CreateTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var temp = _appHelper.GetCountLine(new Dictionary<string, List<CountLineModel>> { ["编辑"] = editCounts, ["评论"] = commentCounts, ["收藏"] = favoriteCounts }, "日期", "数目", "词条");
-            return temp;
-        }
-
-        /// <summary>
-        /// 获取文章图表
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<BootstrapBlazor.Components.ChartDataSource>> GetArticleCountLineAsync()
-        {
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
-            //获取数据
-            var createCounts = await _articleRepository.GetAll().Where(s => s.CreateTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.CreateTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var editCounts = await _examineRepository.GetAll().Where(s => (s.Operation == Operation.EditArticleMain || s.Operation == Operation.EditArticleRelevanes || s.Operation == Operation.EditArticleMainPage)
-                                                                           && s.IsPassed == true && s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.ApplyTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-            var thumsupCounts = await _thumbsUpRepository.GetAll().Where(s => s.ThumbsUpTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.ThumbsUpTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var commentCounts = await _commentRepository.GetAll().Where(s => s.Type == CommentType.CommentArticle && s.CommentTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-              // 先进行了时间字段变更为String字段，切只保留到天
-              // 采用拼接的方式
-              .Select(n => new { Time = n.CommentTime.Date })
-              // 分类
-              .GroupBy(n => n.Time)
-              // 返回汇总样式
-              .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-              .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-              .ToListAsync();
-
-            var favoriteCounts = await _favoriteObjectRepository.GetAll().Where(s => s.Type == FavoriteObjectType.Article && s.CreateTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.CreateTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var temp = _appHelper.GetCountLine(new Dictionary<string, List<CountLineModel>> { ["发表"] = createCounts, ["编辑"] = editCounts, ["点赞"] = thumsupCounts, ["评论"] = commentCounts, ["收藏"] = favoriteCounts }, "日期", "数目", "文章");
-            return temp;
-        }
-
-        /// <summary>
-        /// 获取标签图表
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<BootstrapBlazor.Components.ChartDataSource>> GetTagCountLineAsync()
-        {
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
-            //获取数据
-            var editCounts = await _examineRepository.GetAll().Where(s => (s.Operation == Operation.EditTag || s.Operation == Operation.EditTagMain || s.Operation == Operation.EditTagChildTags || s.Operation == Operation.EditTagChildEntries)
-                                                                           && s.IsPassed == true && s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.ApplyTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-
-            var temp = _appHelper.GetCountLine(new Dictionary<string, List<CountLineModel>> { ["编辑"] = editCounts }, "日期", "数目", "标签");
-            return temp;
-        }
-
-        /// <summary>
-        /// 获取审核图表
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<BootstrapBlazor.Components.ChartDataSource>> GetExamineCountLineAsync()
-        {
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
-            //获取数据
-            var applyCounts = await _examineRepository.GetAll().Where(s => s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.ApplyTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var passCounts = await _examineRepository.GetAll().Where(s => s.PassedTime != null && s.PassedTime.Value.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.PassedTime.Value.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var temp = _appHelper.GetCountLine(new Dictionary<string, List<CountLineModel>> { ["申请"] = applyCounts, ["处理"] = passCounts }, "日期", "数目", "审核");
-            return temp;
-        }
-
-        /// <summary>
-        /// 获取评论图表
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<BootstrapBlazor.Components.ChartDataSource>> GetCommentCountLineAsync()
-        {
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
-            //获取数据
-            var publishCounts = await _commentRepository.GetAll().Where(s => s.CommentTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.CommentTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var temp = _appHelper.GetCountLine(new Dictionary<string, List<CountLineModel>> { ["发表"] = publishCounts }, "日期", "数目", "评论");
-            return temp;
+            return await _chartService.GetLineChartAsync(type, after, before);
         }
 
 
-        /// <summary>
-        /// 获取评论图表
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<BootstrapBlazor.Components.ChartDataSource>> GetMessageCountLineAsync()
-        {
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
-            //获取数据
-            var postCounts = await _messageRepository.GetAll().Where(s => s.PostTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.PostTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var temp = _appHelper.GetCountLine(new Dictionary<string, List<CountLineModel>> { ["发送"] = postCounts }, "日期", "数目", "消息");
-            return temp;
-        }
-
-        /// <summary>
-        /// 获取文件图表
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<BootstrapBlazor.Components.ChartDataSource>> GetFileCountLineAsync()
-        {
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
-            //获取数据
-            var Counts = await _userFileRepository.GetAll().Where(s => s.UploadTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.UploadTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var Spaces = await _userFileRepository.GetAll().Where(s => s.UploadTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.UploadTime.Date, Space = ((double)n.FileSize) / (1024 * 1024) })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Sum(s => s.Space) })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var temp = _appHelper.GetCountLine(new Dictionary<string, List<CountLineModel>> { ["数目"] = Counts, ["大小 MB"] = Spaces }, "日期", "", "文件");
-            return temp;
-        }
-
-        /// <summary>
-        /// 获取备份图表
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<BootstrapBlazor.Components.ChartDataSource>> GetBackUpArchiveCountLineAsync()
-        {
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
-            //获取数据
-            var success = await _backUpArchiveDetailRepository.GetAll().Where(s => s.IsFail == false && s.BackUpTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.BackUpTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var times = await _backUpArchiveDetailRepository.GetAll().Where(s => s.BackUpTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.BackUpTime.Date, n.TimeUsed })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Average(s => s.TimeUsed) })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var errors = await _backUpArchiveDetailRepository.GetAll().Where(s => s.IsFail == true && s.BackUpTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.BackUpTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var temp = _appHelper.GetCountLine(new Dictionary<string, List<CountLineModel>> { ["成功"] = success, ["错误"] = errors, ["用时 秒"] = times }, "日期", "", "备份");
-            return temp;
-        }
     }
 }
