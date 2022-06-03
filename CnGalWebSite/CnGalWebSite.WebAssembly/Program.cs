@@ -1,9 +1,11 @@
 ﻿using Blazored.LocalStorage;
 using CnGalWebSite.DataModel.Application.Examines;
 using CnGalWebSite.DataModel.Application.Helper;
-using CnGalWebSite.DataModel.Application.Roles;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
+using CnGalWebSite.PublicToolbox.DataRepositories;
+using CnGalWebSite.PublicToolbox.PostTools;
 using CnGalWebSite.Shared;
+using CnGalWebSite.Shared.DataRepositories;
 using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -46,7 +48,6 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.AddAuthorizationCore();
             builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
             builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
             builder.Services.AddScoped<IDataCacheService, DataCatcheService>();
 
@@ -55,6 +56,12 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.AddScoped(x => new ImagesLargeViewService());
 
             builder.Services.AddMasaBlazor();
+
+            //添加工具箱
+            builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            builder.Services.AddScoped<IEntryService, EntryService>();
+            builder.Services.AddScoped<IArticleService, ArticleService>();
+            builder.Services.AddScoped<IImageService, ImageService>();
 
             builder.Services.BuildServiceProvider(validateScopes: false);
 

@@ -86,6 +86,8 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<ChartDataSource> ChartDataCatche { get; set; }
 
+        IPageModelCatche<LineChartModel> LineChartDataCatche { get; set; }
+
         List<DocumentViewModel> DocumentsCatche { get; set; }
 
         List<RandomTagModel> RandomTagsCatche { get; set; }

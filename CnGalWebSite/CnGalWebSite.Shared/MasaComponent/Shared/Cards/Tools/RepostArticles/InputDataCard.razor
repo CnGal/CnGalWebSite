@@ -10,7 +10,7 @@
     <div class="row mb-4">
         <div class="col-12 col-sm-3 mb-4">
             <MSelect Value="@model.Type" ValueChanged="ValueChanged" TValue="ArticleType" TItem="KeyValuePair<string, ArticleType>" TItemValue="ArticleType"
-                     Label="类型"
+                     Label="类型"  Color="@_dataCacheService.ThemeSetting.Theme" ItemColor="@_dataCacheService.ThemeSetting.Theme"
                      Items="@items"
                      ItemText="u => u.Key"
                      ItemValue="u => u.Value"
@@ -99,7 +99,7 @@
             await PopupService.ToastAsync("文章链接添加一次就够了哦", AlertTypes.Error);
             return;
         }
-
+        model.UserName = _dataCacheService.UserInfor.Name;
         Model.Add(model);
         model = new RepostArticleModel();
     }

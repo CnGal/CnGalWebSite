@@ -9,7 +9,7 @@
         </MButton>
     </ButtonContent>
     <ChildContent>
-        <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/perfections/GetEditCountLine")" Stacked Outline HideTitle></CountLineViewTip>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.Edit" AllowExtend="false" Stacked BaseUrl="@(ToolHelper.WebApiPath + "api/perfections/GetEditCountLine")" Outline />
     </ChildContent>
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>

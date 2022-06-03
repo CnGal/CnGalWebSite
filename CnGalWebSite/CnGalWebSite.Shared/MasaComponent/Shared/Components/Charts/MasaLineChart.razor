@@ -1,0 +1,197 @@
+﻿@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+
+<div class="@(Class+(AllowExtend?(isExtend?" col-12":" col-12  col-xl-6"):""))">
+    <div class="@(Outline?" ":"h-100 rounded shadow-sm bg-opacity pt-4") ">
+        <div style="display: flex; justify-content: flex-end; ">
+            <div style="max-width:100px;">
+
+                <MSelect Value="_days" ValueChanged="ValueChanged" TValue="int" TItem="KeyValuePair<string, int>" TItemValue="int" Color="@_dataCacheService.ThemeSetting.Theme"
+                         Items="@items" ItemColor="@_dataCacheService.ThemeSetting.Theme" Class="pe-4 pt-0"
+                         ItemText="u => u.Key"
+                         ItemValue="u => u.Value"
+                         MenuProps="props => props.OffsetY = true">
+                </MSelect>
+            </div>
+            @if (AllowExtend)
+            {
+                <div style="max-width:100px;">
+
+                    <MSelect Value="isExtend" ValueChanged="ExtendValueChanged" TValue="bool" TItem="KeyValuePair<string, bool>" TItemValue="bool" Color="@_dataCacheService.ThemeSetting.Theme"
+                             Items="@extendItems" ItemColor="@_dataCacheService.ThemeSetting.Theme" Class="pe-4 pt-0"
+                             ItemText="u => u.Key"
+                             ItemValue="u => u.Value"
+                             MenuProps="props => props.OffsetY = true">
+                    </MSelect>
+
+
+                </div>
+            }
+        </div>
+
+        <div class="d-flex align-center justify-center">
+            @if (isReady)
+            {
+                <MECharts Option="Model.Options" Width="@("100%")">
+                </MECharts>
+            }
+
+        </div>
+    </div>
+
+</div>
+@code {
+    [Parameter]
+    public LineChartType Type { get; set; }
+    [Parameter]
+    public string BaseUrl { get; set; } = ToolHelper.WebApiPath + "api/admin/GetLineChart";
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public bool Stacked { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
+    [Parameter]
+    public bool HideTitle { get; set; }
+    [Parameter]
+    public bool AllowExtend { get; set; } = true;
+
+    public bool isExtend { get; set; }
+
+    int _days = 30;
+    bool isReady;
+    LineChartModel Model { get; set; } = new LineChartModel();
+    List<KeyValuePair<string, bool>> extendItems = new List<KeyValuePair<string, bool>>
+{
+        new KeyValuePair<string, bool>("收缩",false),
+        new KeyValuePair<string, bool>("扩展",true),
+    };
+
+    List<KeyValuePair<string, int>> items = new List<KeyValuePair<string, int>>
+{
+        new KeyValuePair<string, int>("15天",15),
+        new KeyValuePair<string, int>("1个月",30),
+        new KeyValuePair<string, int>("3个月",90),
+        new KeyValuePair<string, int>("6个月",180),
+        new KeyValuePair<string, int>("1年",356),
+        new KeyValuePair<string, int>("所有",999999),
+    };
+
+    private object _option = new
+    {
+        Title = new
+        {
+            Left = "center",
+            Text = "ECharts 入门示例"
+        },
+        Tooltip = new
+        {
+            Trigger = "axis"
+        },
+        Legend = new
+        {
+            Right = "20px",
+            Data = new[] { "销量", "销量2" }
+        },
+        XAxis = new
+        {
+            Data = new[] { "衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子" }
+        },
+        YAxis = new { },
+        Series = new[]
+    {
+            new
+            {
+                Name= "销量",
+                Type= "line",
+                Smooth= true,
+                Data= new []{ 25.0, 220.0, 362.0, 102.0, 120.0, 220.0 }
+            },
+            new
+            {
+                Name= "销量2",
+                Type= "line",
+                Smooth= true,
+                Data= new []{ 15.0, 120.0, 136.0, 110.0, 110.0, 210.0 }
+            }
+        }
+    };
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await Refresh();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            if(_days>999)
+            {
+                Model.BeforeTime = DateTime.MaxValue;
+                Model.AfterTime = DateTime.MinValue;
+            }
+            else
+            {
+                Model.BeforeTime = DateTime.Now.Date.AddDays(1);
+                Model.AfterTime = Model.BeforeTime.AddDays(-_days);
+            }
+
+
+            Model = await _dataCacheService.LineChartDataCatche.GetCatche(BaseUrl + $"?Type={Type}&AfterTime={Model.AfterTime.ToBinary()}&BeforeTime={Model.BeforeTime.ToBinary()}", true);
+
+            if (Stacked)
+            {
+                foreach (var item in Model.Options.Series)
+                {
+                    item.Type = "bar";
+                    item.Stack = "default";
+                }
+            }
+
+            if (HideTitle)
+            {
+                Model.Options.Title.Text = null;
+            }
+            isReady = false;
+            StateHasChanged();
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, $"获取{Type.GetDisplayName()}图表数据失败");
+        }
+    }
+
+    public async Task ValueChanged(int days)
+    {
+        _days = days;
+        await Refresh();
+    }
+
+    public async Task ExtendValueChanged(bool value)
+    {
+        isExtend = value;
+        isReady = false;
+        StateHasChanged();
+        isReady = true;
+        StateHasChanged();
+    }
+}
+

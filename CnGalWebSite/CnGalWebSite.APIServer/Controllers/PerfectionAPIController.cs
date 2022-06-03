@@ -1,10 +1,12 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Charts;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -28,18 +30,19 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IAppHelper _appHelper;
         private readonly IPerfectionService _perfectionService;
         private readonly IExamineService _examineService;
-
+        private readonly IChartService _chartService;
 
         public PerfectionAPIController(IRepository<Examine, long> examineRepository,
         IAppHelper appHelper,
        IPerfectionService perfectionService, IRepository<PerfectionOverview, long> perfectionOverviewRepository,
-         IExamineService examineService)
+         IExamineService examineService, IChartService chartService)
         {
             _appHelper = appHelper;
             _examineRepository = examineRepository;
             _perfectionService = perfectionService;
             _perfectionOverviewRepository = perfectionOverviewRepository;
             _examineService = examineService;
+            _chartService = chartService;
         }
 
         [AllowAnonymous]
@@ -81,62 +84,16 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<BootstrapBlazor.Components.ChartDataSource>> GetEditCountLineAsync()
+        public async Task<ActionResult<LineChartModel>> GetEditCountLineAsync([FromQuery] LineChartType type, [FromQuery] long afterTime, [FromQuery] long beforeTime)
         {
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
+            if(type!= LineChartType.Edit)
+            {
+                return NotFound("其他类型图表请使用更高权限的接口");
+            }
+            var after = DateTime.FromBinary(afterTime);
+            var before = DateTime.FromBinary(beforeTime);
 
-            //获取数据
-            var entryCounts = await _examineRepository.GetAll().Where(s => (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages
-                                                                            || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishMainPage)
-                                                                           && s.IsPassed == true && s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.ApplyTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-            //获取数据
-            var articleCounts = await _examineRepository.GetAll().Where(s => (s.Operation == Operation.EditArticleMain || s.Operation == Operation.EditArticleMainPage || s.Operation == Operation.EditArticleRelevanes)
-                                                                           && s.IsPassed == true && s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.ApplyTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-            //获取数据
-            var tagCounts = await _examineRepository.GetAll().Where(s => (s.Operation == Operation.EditTag || s.Operation == Operation.EditTagChildEntries || s.Operation == Operation.EditTagChildTags || s.Operation == Operation.EditTagMain)
-                                                                           && s.IsPassed == true && s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.ApplyTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-            //获取数据
-            var peripheryCounts = await _examineRepository.GetAll().Where(s => (s.Operation == Operation.EditPeripheryMain || s.Operation == Operation.EditPeripheryImages || s.Operation == Operation.EditPeripheryRelatedEntries)
-                                                                           && s.IsPassed == true && s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
-               // 先进行了时间字段变更为String字段，切只保留到天
-               // 采用拼接的方式
-               .Select(n => new { Time = n.ApplyTime.Date })
-               // 分类
-               .GroupBy(n => n.Time)
-               // 返回汇总样式
-               .Select(n => new CountLineModel { Time = n.Key, Count = n.Count() })
-               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
-               .ToListAsync();
-
-            var temp = _appHelper.GetCountLine(new Dictionary<string, List<CountLineModel>> { ["词条"] = entryCounts, ["文章"] = articleCounts, ["标签"] = tagCounts, ["周边"] = peripheryCounts }, "日期", "数目", "编辑概览");
-            return temp;
+            return await _chartService.GetLineChartAsync(type, after, before);
         }
 
         /// <summary>

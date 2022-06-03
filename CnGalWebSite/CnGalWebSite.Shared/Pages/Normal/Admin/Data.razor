@@ -5,51 +5,24 @@
 @inject ToastService ToastService
 
 <TitleTip Title="数据概览"></TitleTip>
-    <link rel="stylesheet" href="https://app.cngal.org/_content/BootstrapBlazor.Chart/css/bootstrap.blazor.chart.bundle.min.css"  media="none" onload="this.media='all'"/>
+    <div class="row">
 
-<div class="row">
-    <div class="col-12">
-        <div class="  rounded shadow-sm  bg-opacity p-3 mb-3">
-            <h3 class="fw-bold text-center">数据概览</h3>
-            <p class="text-center" style="color: gray;margin-top:20px">
-                <i class="fa fa-calendar-o fa-fw "></i>
-                <span class="article-infor-text">@DateTime.Now.ToCstTime().ToString("F")</span>
-            </p>
-        </div>
+        @if (IsReady)
+        {
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.User" Class="mb-3" />
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.Entry" Class="mb-3" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.Article" Class="mb-3" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.Tag" Class="mb-3" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.Examine" Class="mb-3" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.Comment" Class="mb-3" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.Message" Class="mb-3" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.File" Class="mb-3" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.BackUpArchive" Class="mb-3" />
+
+        }
     </div>
-
-    @if (IsReady)
-    {
-        <div class="col-12  col-xl-6 pb-3">
-            <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/admin/GetUserCountLine")"></CountLineViewTip>
-        </div>
-        <div class="col-12  col-xl-6 pb-3">
-            <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/admin/GetEntryCountLine")"></CountLineViewTip>
-        </div>
-        <div class="col-12  col-xl-6 pb-3">
-            <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/admin/GetArticleCountLine")"></CountLineViewTip>
-        </div>
-        <div class="col-12  col-xl-6 pb-3">
-            <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/admin/GetTagCountLine")"></CountLineViewTip>
-        </div>
-        <div class="col-12  col-xl-6 pb-3">
-            <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/admin/GetExamineCountLine")"></CountLineViewTip>
-        </div>
-        <div class="col-12  col-xl-6 pb-3">
-            <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/admin/GetCommentCountLine")"></CountLineViewTip>
-        </div>
-        <div class="col-12  col-xl-6 pb-3">
-            <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/admin/GetMessageCountLine")"></CountLineViewTip>
-        </div>
-        <div class="col-12  col-xl-6 pb-3">
-            <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/admin/GetFileCountLine")"></CountLineViewTip>
-        </div>
-        <div class="col-12  col-xl-6 pb-3">
-            <CountLineViewTip Url="@(ToolHelper.WebApiPath + "api/admin/GetBackUpArchiveCountLine")"></CountLineViewTip>
-        </div>
-
-    }
-</div>
 @code {
     bool IsReady = false;
     protected override async Task OnAfterRenderAsync(bool firstRender)

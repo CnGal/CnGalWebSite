@@ -149,6 +149,14 @@
 
     private async Task HandleLogin()
     {
+        if(string.IsNullOrWhiteSpace(Model.Password))
+        {
+
+        }
+        if (string.IsNullOrWhiteSpace(Model.UserName))
+        {
+
+        }
 
         try
         {
