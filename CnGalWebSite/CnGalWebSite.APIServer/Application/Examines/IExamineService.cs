@@ -385,5 +385,29 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// </summary>
         /// <returns></returns>
         Task ExaminesCompletion();
+
+        /// <summary>
+        /// 评论 发表 数据处理完毕后调用该方法 通用
+        /// </summary>
+        /// <param name="comment">评论</param>
+        /// <param name="user">用户</param>
+        /// <param name="isAdmin">是否为管理员</param>
+        /// <param name="examineStr">序列化的审核数据字符串</param>
+        /// <param name="operation">用操作表示部分</param>
+        /// <param name="note">备注</param>
+        /// <returns></returns>
+        Task UniversalCommentExaminedAsync(Comment comment, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
+
+        /// <summary>
+        /// 处理 PublishComment 审核成功后调用更新数据
+        /// </summary>
+        /// <param name="comment">关联评论</param>
+        /// <param name="examine">审核数据模型</param>
+        /// <returns></returns>
+        Task ExaminePublishCommentTextAsync(Comment comment, CommentText examine);
+
+        Task ExamineEditPlayedGameMainAsync(PlayedGame playedGame, PlayedGameMain examine);
+
+        Task UniversalEditPlayedGameExaminedAsync(PlayedGame playedGame, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
     }
 }

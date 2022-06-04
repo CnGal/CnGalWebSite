@@ -1,0 +1,54 @@
+﻿@if (isReady)
+{
+    <div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100")">
+        @if (Model.UserScores.Any() || Model.MyScores.Socres.IsScored)
+        {
+            <div class="d-flex align-center justify-center">
+                @if (isReady)
+                {
+                    <MECharts Option="model" Width="@("100%")">
+                    </MECharts>
+                }
+
+            </div>
+
+        }
+        else
+        {
+            <div>
+                暂无评分
+            </div>
+        }
+    </div>
+}
+
+
+
+
+@code {
+    [Parameter]
+    public bool Outline { get; set; }
+
+    [Parameter]
+    public PlayedGameOverviewModel Model { get; set; }
+
+    EChartsOptionModel model = new EChartsOptionModel();
+    bool isReady;
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Model.UserScores.Any() == false && Model.MyScores.Socres.IsScored == false)
+        {
+            isReady = true;
+            return;
+        }
+
+        model.XAxis.Data.Clear();
+        model.XAxis.Data.AddRange(new List<string> { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" });
+
+        model.Series.Clear();
+
+
+        isReady = true;
+    }
+
+}

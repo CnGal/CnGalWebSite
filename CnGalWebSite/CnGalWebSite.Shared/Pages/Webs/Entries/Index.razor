@@ -170,7 +170,10 @@ else
 
                             </div>
                         }
-
+                        @if (EntryView.Type == EntryType.Game && EntryView.IsScored)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" Large/>
+                        }
                         <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
                         @if (EntryView.NewsOfEntry.Count != 0)
                         {
@@ -197,7 +200,11 @@ else
                 </div>
 
                 <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4 order-1 order-lg-2") ">
-                    @if (EntryView.SteamId > 0&&EntryView.IsHideOutlink==false)
+                    @if (EntryView.Type == EntryType.Game&&EntryView.IsScored==false)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
+                    }
+                    @if (EntryView.SteamId > 0 && EntryView.IsHideOutlink == false)
                     {
                         <div class="mb-4">
                             <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
@@ -402,7 +409,7 @@ else
         {
             Title = "确认撤销编辑",
             Content = "撤销编辑后会删除数据，无法恢复，请谨慎操作",
-            
+
             Category = SwalCategory.Warning,
         };
         var ret = await SwalService.ShowModal(op);

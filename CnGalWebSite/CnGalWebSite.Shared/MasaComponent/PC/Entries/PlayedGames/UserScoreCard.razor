@@ -1,0 +1,80 @@
+﻿@inject IDataCacheService _dataCacheService
+
+<div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100 p-4 ")" style="display: flex; flex-direction: column; justify-content: space-between;" @onclick="OnClick">
+    <div>
+        <div style="display:flex;">
+            <img loading="lazy" class="shadow-sm" src="@Model.User.PhotoPath" style="height: 50px;width: 50px;border-radius: 50%;" />
+            <div class="comment-tx-div">
+                <div class="new-row-warp no-margin">
+                    @foreach (var item in Model.User.Ranks)
+                    {
+                        <RankAloneViewTip Model="item"></RankAloneViewTip>
+                    }
+                </div>
+
+
+                <div class="a-font-color text-truncate-1">@Model.User.Name</div>
+
+            </div>
+        </div>
+
+        @if (Model.Socres.IsScored)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="(int)Model.Socres.TotalSocre" Lable="总评" Class="pt-2" />
+            <div style="color:gray;" class="pb-2">
+                <span>音乐：@Model.Socres.MusicSocre</span>
+                <span>美术：@Model.Socres.PaintSocre</span>
+                <span>剧本：@Model.Socres.ScriptSocre</span>
+                <span>演出：@Model.Socres.ShowSocre</span>
+            </div>
+        }
+
+        @if (string.IsNullOrWhiteSpace(Model.PlayImpressions) == false)
+        {
+            <div class="text-truncate-4">评语：@Model.PlayImpressions</div>
+        }
+    </div>
+    @if (ShowAction)
+    {
+        <div style=" color: gray; display: flex; flex-direction: column; align-items: center;">
+            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnEdit">
+                <MIcon Left>mdi-pencil </MIcon>
+                编辑游玩记录
+            </MButton>
+            @if (IsPublic == false)
+            {
+                <span>
+                    仅自己可见
+                </span>
+            }
+            <div style="color:gray;" class="mt-2">
+                @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")
+            </div>
+        </div>
+    }
+    else
+    {
+        <span style="color:gray;">
+            @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")
+        </span>
+    }
+
+
+</div>
+
+@code {
+    [Parameter]
+    public PlayedGameUserScoreModel Model { get; set; }
+    [Parameter]
+    public EventCallback OnEdit { get; set; }
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public bool Outline { get; set; }
+    [Parameter]
+    public bool ShowAction { get; set; }
+    [Parameter]
+    public bool IsPublic { get; set; }
+
+}

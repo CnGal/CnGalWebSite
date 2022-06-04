@@ -5,6 +5,7 @@ using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.Peripheries;
+using CnGalWebSite.APIServer.Application.PlayedGames;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Tags;
 using CnGalWebSite.APIServer.Application.Users;
@@ -30,6 +31,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using Message = CnGalWebSite.DataModel.Model.Message;
 using Tag = CnGalWebSite.DataModel.Model.Tag;
 
 namespace CnGalWebSite.APIServer.Application.Examines
@@ -45,6 +47,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
+        private readonly IRepository<PlayedGame, string> _playedGameRepository;
         private readonly IEntryService _entryService;
         private readonly IPeripheryService _peripheryService;
         private readonly IArticleService _articleService;
@@ -53,17 +56,21 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IUserService _userService;
         private readonly IRankService _rankService;
         private readonly IPerfectionService _perfectionService;
+        private readonly IPlayedGameService _playedGameService;
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<ExamineService> _logger;
+        private readonly IRepository<Vote, long> _voteRepository;
+        private readonly IRepository<Lottery, long> _lotteryRepository;
+        private readonly IRepository<Message, long> _messageRepository;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Examine>, string, SortOrder, IEnumerable<Examine>>> SortLambdaCacheEntry = new();
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService,
-        IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository,
-        IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService,
+        IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository, IRepository<Message, long> messageRepository,
+        IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService,
         IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger,
-        IConfiguration configuration, UserManager<ApplicationUser> userManager)
+        IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<PlayedGame, string> playedGameRepository, IRepository<Vote, long> voteRepository, IRepository<Lottery, long> lotteryRepository)
         {
             _examineRepository = examineRepository;
             _appHelper = appHelper;
@@ -85,6 +92,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _configuration = configuration;
             _userManager = userManager;
             _logger = logger;
+            _playedGameService = playedGameService;
+            _playedGameRepository = playedGameRepository;
+            _voteRepository = voteRepository;
+            _lotteryRepository = lotteryRepository;
+            _messageRepository = messageRepository;
         }
 
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "")
@@ -303,6 +315,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 Operation.EditTagMain => await GetEditTagMainExamineView(model, examine),
                 Operation.EditTagChildTags => await GetEditTagChildTagsExamineView(model, examine),
                 Operation.EditTagChildEntries => await GetEditTagChildEntriesExamineView(model, examine),
+                Operation.EditPlayedGameMain => await GetEditPlayedGameMainExamineView(model, examine),
                 _ => false,
             };
         }
@@ -327,6 +340,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                               n.CommentId,
                               n.DisambigId,
                               n.PeripheryId,
+                              n.PlayedGameId,
                               TagName = n.Tag == null ? "" : n.Tag.Name,
                               EntryName = n.Entry == null ? "" : n.Entry.Name,
                               ArticleName = n.Article == null ? "" : n.Article.Name,
@@ -352,9 +366,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     IsPassed = item.IsPassed,
                     UserImage = _appHelper.GetImagePath(item.PhotoPath, "user.png"),
                     Ranks = isShowRanks ? (await _rankService.GetUserRanks(item.UserId)).Where(s => s.Name != "编辑者").ToList() : new List<DataModel.ViewModel.Ranks.RankViewModel>(),
-                    RelatedId = item.EntryId != null ? item.EntryId.ToString() : item.ArticleId != null ? item.ArticleId.ToString() : item.TagId != null ? item.TagId.ToString() : item.CommentId != null ? item.CommentId.ToString() : item.DisambigId != null ? item.DisambigId.ToString() : item.PeripheryId != null ? item.PeripheryId.ToString() : item.UserId,
-                    Type = item.EntryId != null ? ExaminedNormalListModelType.Entry : item.ArticleId != null ? ExaminedNormalListModelType.Article : item.TagId != null ? ExaminedNormalListModelType.Tag : item.CommentId != null ? ExaminedNormalListModelType.Comment : item.DisambigId != null ? ExaminedNormalListModelType.Disambig : item.PeripheryId != null ? ExaminedNormalListModelType.Periphery : ExaminedNormalListModelType.User,
-                    RelatedName = item.EntryId != null ? item.EntryName : item.ArticleId != null ? item.ArticleName : item.TagId != null ? item.TagName : item.DisambigId != null ? item.DisambigName : item.PeripheryId != null ? item.PeripheryName : item.CommentId != null ? "" : item.UserName
+                    RelatedId = item.EntryId != null ? item.EntryId.ToString() : item.ArticleId != null ? item.ArticleId.ToString() : item.TagId != null ? item.TagId.ToString() : item.CommentId != null ? item.CommentId.ToString() : item.DisambigId != null ? item.DisambigId.ToString() : item.PeripheryId != null ? item.PeripheryId.ToString() : item.PlayedGameId != null ? item.PlayedGameId.ToString() : item.UserId,
+                    Type = item.EntryId != null ? ExaminedNormalListModelType.Entry : item.ArticleId != null ? ExaminedNormalListModelType.Article : item.TagId != null ? ExaminedNormalListModelType.Tag : item.CommentId != null ? ExaminedNormalListModelType.Comment : item.DisambigId != null ? ExaminedNormalListModelType.Disambig : item.PeripheryId != null ? ExaminedNormalListModelType.Periphery : item.PlayedGameId != null ? ExaminedNormalListModelType.PlayedGame : ExaminedNormalListModelType.User,
+                    RelatedName = item.EntryId != null ? item.EntryName : item.ArticleId != null ? item.ArticleName : item.TagId != null ? item.TagName : item.DisambigId != null ? item.DisambigName : item.PeripheryId != null ? item.PeripheryName : item.CommentId != null ? "" : item.PlayedGameId != null ? "" : item.UserName
                 };
                 result.Add(tempModel);
             }
@@ -1401,7 +1415,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task<bool> GetPubulishCommentExamineView(ExamineViewModel model, Examine examine)
         {
             model.Type = ExaminedNormalListModelType.Comment;
-            var comment = await _commentRepository.FirstOrDefaultAsync(s => s.Id == examine.CommentId);
+            var comment = await _commentRepository.GetAll().AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == examine.CommentId);
             if (comment == null)
             {
                 return false;
@@ -2223,6 +2238,74 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         #endregion
 
+        #region 游玩记录
+
+        public async Task<bool> GetEditPlayedGameMainExamineView(ExamineViewModel model, Examine examine)
+        {
+            model.Type = ExaminedNormalListModelType.PlayedGame;
+            var playedGame = await _playedGameRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entry)
+                .FirstOrDefaultAsync(s => s.Id == examine.PlayedGameId);
+            if (playedGame == null)
+            {
+                return false;
+            }
+            model.ObjectId = playedGame.Id;
+            model.Image = _appHelper.GetImagePath("", "app.png");
+
+            //序列化数据
+            PlayedGameMain playedGameMain = null;
+            using (TextReader str = new StringReader(examine.Context))
+            {
+                var serializer = new JsonSerializer();
+                playedGameMain = (PlayedGameMain)serializer.Deserialize(str, typeof(PlayedGameMain));
+            }
+
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+
+            if (playedGame.Entry != null)
+            {
+                model.AfterModel.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
+                {
+                    entry = await _appHelper.GetEntryInforTipViewModel(playedGame.Entry)
+                });
+                model.ObjectBriefIntroduction = playedGame.Entry.BriefIntroduction;
+
+                model.Image = _appHelper.GetImagePath(playedGame.Entry.MainPicture, "app.png");
+            }
+
+            model.AfterModel.Texts.Add(new InformationsModel
+            {
+                Modifier = "主要信息",
+                Informations = new List<KeyValueModel>
+                {
+                    new KeyValueModel
+                    {
+                        DisplayName="评语",
+                        DisplayValue=playedGameMain.PlayImpressions
+                    },
+                    new KeyValueModel
+                    {
+                        DisplayName="是否公开",
+                        DisplayValue=playedGameMain.ShowPublicly?"是":"否"
+                    },
+                    new KeyValueModel
+                    {
+                        DisplayName="游戏",
+                        DisplayValue=playedGame.Entry.DisplayName
+                    },
+                }
+            });
+
+            if (examine.IsPassed == true)
+            {
+                model.BeforeModel = model.AfterModel;
+            }
+            return true;
+        }
+
+        #endregion
 
 
         #endregion
@@ -2653,7 +2736,246 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         #endregion
 
+        #region 评论
+        public async Task ExaminePublishCommentTextAsync(Comment comment, CommentText examine)
+        {
 
+            //复制基础数据
+            comment.Text = examine.Text;
+            comment.CommentTime = examine.CommentTime;
+            comment.Type = examine.Type;
+            comment.ApplicationUserId = examine.PubulicUserId;
+            comment.Text = examine.Text;
+
+            //查找父对象
+            Article article = null;
+            Entry entry = null;
+            Periphery periphery = null;
+            Vote vote = null;
+            Lottery lottery = null;
+            UserSpaceCommentManager userSpace = null;
+            Comment replyComment = null;
+            ApplicationUser userTemp = null;
+            long tempId = 0;
+            if (examine.Type != CommentType.CommentUser)
+            {
+                tempId = long.Parse(examine.ObjectId);
+            }
+            //判断当前是否能够编辑
+            switch (examine.Type)
+            {
+                case CommentType.CommentArticle:
+                    article = await _articleRepository.GetAll().Include(s => s.CreateUser).FirstOrDefaultAsync(s => s.Id == tempId);
+                    if (article == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentEntries:
+                    entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
+                    if (entry == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentPeriphery:
+                    periphery = await _peripheryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
+                    if (periphery == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentVote:
+                    vote = await _voteRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
+                    if (vote == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentLottery:
+                    lottery = await _lotteryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
+                    if (lottery == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentUser:
+                    userTemp = await _userRepository.GetAll().Include(s => s.UserSpaceCommentManager).FirstOrDefaultAsync(s => s.Id == examine.ObjectId);
+                    if (userTemp == null)
+                    {
+                        //判断是不是本人
+                        if (examine.PubulicUserId != userTemp?.Id)
+                        {
+                            return;
+                        }
+                    }
+                    if (userTemp.UserSpaceCommentManager == null)
+                    {
+                        userTemp.UserSpaceCommentManager = new UserSpaceCommentManager();
+                        userTemp = await _userRepository.UpdateAsync(userTemp);
+                    }
+                    userSpace = userTemp.UserSpaceCommentManager;
+                    break;
+                case CommentType.ReplyComment:
+                    replyComment = await _commentRepository.GetAll().Include(s => s.ApplicationUser).Include(s => s.Article).Include(s => s.Entry).Include(s => s.UserSpaceCommentManager).FirstOrDefaultAsync(s => s.Id == tempId);
+                    if (replyComment == null)
+                    {
+                        return;
+                    }
+                    break;
+                default:
+                    return;
+            }
+
+
+            //关联父对象
+            if (examine.Type != CommentType.CommentUser)
+            {
+                tempId = long.Parse(examine.ObjectId);
+            }
+            switch (comment.Type)
+            {
+                case CommentType.CommentArticle:
+                    comment.ArticleId = tempId;
+                    break;
+                case CommentType.CommentEntries:
+                    comment.EntryId = (int)tempId;
+                    break;
+                case CommentType.CommentPeriphery:
+                    comment.PeripheryId = tempId;
+                    break;
+                case CommentType.CommentVote:
+                    comment.VoteId = tempId;
+                    break;
+                case CommentType.CommentLottery:
+                    comment.LotteryId = tempId;
+                    break;
+                case CommentType.CommentUser:
+                    comment.UserSpaceCommentManager = userSpace;
+                    comment.UserSpaceCommentManagerId = userSpace.Id;
+                    break;
+                case CommentType.ReplyComment:
+                    //同步关联父对象的关联对象
+                    comment.Article = replyComment.Article;
+                    comment.Entry = replyComment.Entry;
+                    comment.UserSpaceCommentManager = replyComment.UserSpaceCommentManager;
+                    comment.ParentCodeNavigation = replyComment;
+                    break;
+            }
+
+
+
+            //保存
+            comment = await _commentRepository.UpdateAsync(comment);
+            //获取发表评论的用户
+            var user = await _userManager.FindByIdAsync(examine.PubulicUserId);
+            //向归属者发送消息
+            Message message = null;
+            switch (examine.Type)
+            {
+                case CommentType.CommentArticle:
+                    if (examine.PubulicUserId == article.CreateUser.Id)
+                    {
+                        break;
+                    }
+                    message = new Message
+                    {
+                        Title = user.UserName,
+                        PostTime = DateTime.Now.ToCstTime(),
+                        Image = user.PhotoPath,
+                        // Rank = "系统",
+                        Text = "在你的文章『" + (article.DisplayName ?? article.Name) + "』下回复了你『\n" + examine.Text + "\n』",
+                        Link = "articles/index/" + article.Id,
+                        LinkTitle = article.Name,
+                        Type = MessageType.ArticleReply,
+                        ApplicationUser = article.CreateUser,
+                        ApplicationUserId = article.CreateUser.Id,
+                        AdditionalInfor = comment.Id.ToString()
+                    };
+                    break;
+                case CommentType.CommentUser:
+                    if (user.Id == userTemp.Id)
+                    {
+                        break;
+                    }
+                    message = new Message
+                    {
+                        Title = user.UserName,
+                        PostTime = DateTime.Now.ToCstTime(),
+                        Image = user.PhotoPath,
+                        // Rank = "系统",
+                        Text = "在你的空间下留言『\n" + examine.Text + "\n』",
+                        Link = "space/index/" + userTemp.Id,
+                        LinkTitle = userTemp.UserName,
+                        Type = MessageType.SpaceReply,
+                        ApplicationUser = userTemp,
+                        ApplicationUserId = userTemp.Id,
+                        AdditionalInfor = comment.Id.ToString()
+                    };
+                    break;
+                case CommentType.ReplyComment:
+                    if (user.Id == replyComment.ApplicationUser.Id)
+                    {
+                        break;
+                    }
+                    message = new Message
+                    {
+                        Title = user.UserName,
+                        PostTime = DateTime.Now.ToCstTime(),
+                        Image = user.PhotoPath,
+                        // Rank = "系统",
+                        Text = "在你的评论『" +_appHelper.GetStringAbbreviation(replyComment.Text, 20) + "』下回复了你『\n" + examine.Text + "\n』",
+                        Type = MessageType.CommentReply,
+                        ApplicationUser = replyComment.ApplicationUser,
+                        ApplicationUserId = replyComment.ApplicationUser.Id,
+                        AdditionalInfor = comment.Id.ToString()
+                    };
+                    break;
+            }
+            if (message != null)
+            {
+                await _messageRepository.InsertAsync(message);
+
+            } //缓存评论数
+            var tempCount = 0;
+            switch (comment.Type)
+            {
+                case CommentType.CommentArticle:
+                    tempCount = await _commentRepository.CountAsync(s => s.ArticleId == tempId);
+                    await _articleRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    break;
+                case CommentType.CommentEntries:
+                    tempCount = await _commentRepository.CountAsync(s => s.EntryId == tempId);
+                    await _entryRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    break;
+                case CommentType.CommentPeriphery:
+                    tempCount = await _commentRepository.CountAsync(s => s.PeripheryId == tempId);
+                    await _peripheryRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    break;
+                case CommentType.CommentVote:
+                    tempCount = await _commentRepository.CountAsync(s => s.VoteId == tempId);
+                    await _voteRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    break;
+                case CommentType.CommentLottery:
+                    tempCount = await _commentRepository.CountAsync(s => s.VoteId == tempId);
+                    await _lotteryRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    break;
+            }
+        }
+        #endregion
+
+        #region 游玩记录
+
+        public async Task ExamineEditPlayedGameMainAsync(PlayedGame playedGame, PlayedGameMain examine)
+        {
+            //更新数据
+            _playedGameService.UpdatePlayedGameDataMain(playedGame, examine);
+            //保存
+            _ = await _playedGameRepository.UpdateAsync(playedGame);
+        }
+
+
+        #endregion
 
         #endregion
 
@@ -3249,6 +3571,94 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         }
 
+        public async Task UniversalCommentExaminedAsync(Comment comment, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        {
+            if (isAdmin)
+            {
+                //添加到审核列表
+                var examine = new Examine
+                {
+                    Operation = operation,
+                    Context = examineStr,
+                    IsPassed = true,
+                    PassedAdminName = user.UserName,
+                    CommentId = comment.Id,
+                    PassedTime = DateTime.Now.ToCstTime(),
+                    ApplyTime = DateTime.Now.ToCstTime(),
+                    ApplicationUserId = user.Id,
+                    ApplicationUser = user,
+                    Note = note
+                };
+                await _examineRepository.InsertAsync(examine);
+            }
+            else
+            {
+                var examine = new Examine
+                {
+                    Operation = operation,
+                    Context = examineStr,
+                    IsPassed = null,
+                    PassedTime = null,
+                    CommentId = comment.Id,
+                    ApplyTime = DateTime.Now.ToCstTime(),
+                    ApplicationUserId = user.Id,
+                    ApplicationUser = user,
+                    Note = note
+                };
+                //添加到审核列表
+                await _examineRepository.InsertAsync(examine);
+            }
+        }
+
+        public async Task UniversalEditPlayedGameExaminedAsync(PlayedGame playedGame, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        {
+            if (isAdmin)
+            {
+                //添加到审核列表
+                var examine = new Examine
+                {
+                    Operation = operation,
+                    Context = examineStr,
+                    IsPassed = true,
+                    PassedAdminName = user.UserName,
+                    PlayedGameId = playedGame.Id,
+                    PassedTime = DateTime.Now.ToCstTime(),
+                    ApplyTime = DateTime.Now.ToCstTime(),
+                    ApplicationUserId = user.Id,
+                    Note = note
+                };
+                await _examineRepository.InsertAsync(examine);
+            }
+            else
+            {
+                //查找是否在之前有审核
+                //获取审核记录
+                var examine = await GetUserPlayedGameActiveExamineAsync(playedGame.Id, user.Id, operation);
+                if (examine != null)
+                {
+                    examine.Context = examineStr;
+                    examine.ApplyTime = DateTime.Now.ToCstTime();
+                    _ = await _examineRepository.UpdateAsync(examine);
+                }
+                else
+                {
+                    examine = new Examine
+                    {
+                        Operation = operation,
+                        Context = examineStr,
+                        IsPassed = null,
+                        PassedTime = null,
+                        PlayedGameId = playedGame.Id,
+                        ApplyTime = DateTime.Now.ToCstTime(),
+                        ApplicationUserId = user.Id,
+                        Note = note
+                    };
+                    //添加到审核列表
+                    _ = await _examineRepository.InsertAsync(examine);
+                }
+            }
+        }
+
         #endregion
 
         #region 创建新模型数据
@@ -3526,6 +3936,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task<Examine> GetUserPeripheryActiveExamineAsync(long peripheryId, string userId, Operation operation)
         {
             return await _examineRepository.FirstOrDefaultAsync(s => s.PeripheryId == peripheryId && s.ApplicationUserId == userId && s.Operation == operation && s.IsPassed == null);
+        }
+        public async Task<Examine> GetUserPlayedGameActiveExamineAsync(long peripheryId, string userId, Operation operation)
+        {
+            return await _examineRepository.FirstOrDefaultAsync(s => s.PlayedGameId == peripheryId && s.ApplicationUserId == userId && s.Operation == operation && s.IsPassed == null);
         }
 
         #endregion

@@ -1,0 +1,48 @@
+﻿@inject IDataCacheService _dataCacheService
+
+<div class="@Class">
+    <div style="display: flex; align-items: center;">
+        <div style=" word-break: keep-all;width:60px ">
+            @($"{Lable}({Value})")
+        </div>
+        <MRating Value="_rating" ValueChanged="OnValueChanged" Length="Length" HalfIncrements Color="@_dataCacheService.ThemeSetting.Theme" BackgroundColor="@_dataCacheService.ThemeSetting.Theme" Large="Large" Style="flex-wrap: wrap; display: flex; "></MRating>
+
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public int Value { get; set; }
+    [Parameter]
+    public int Length { get; set; } = 5;
+    [Parameter]
+    public string Lable { get; set; }
+    [Parameter]
+    public bool Large { get; set; }
+    [Parameter]
+    public bool Disable { get; set; }
+    [Parameter]
+    public EventCallback<int> ValueChanged { get; set; }
+
+    private double _rating = 0;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _rating = Value/2.0;
+    }
+
+    public async Task OnValueChanged(double value)
+    {
+        if(Disable)
+        {
+            return;
+        }
+        _rating = value;
+        await ValueChanged.InvokeAsync((int)(value * 2));
+    }
+}
+
+

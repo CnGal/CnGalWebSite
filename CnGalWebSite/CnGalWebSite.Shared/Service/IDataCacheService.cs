@@ -9,6 +9,7 @@ using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
@@ -87,6 +88,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<ChartDataSource> ChartDataCatche { get; set; }
 
         IPageModelCatche<LineChartModel> LineChartDataCatche { get; set; }
+
+        IPageModelCatche<PlayedGameOverviewModel> PlayedGameOverviewDataCatche { get; set; }
 
         List<DocumentViewModel> DocumentsCatche { get; set; }
 

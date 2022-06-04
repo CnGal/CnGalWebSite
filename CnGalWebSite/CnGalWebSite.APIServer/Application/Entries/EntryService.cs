@@ -13,6 +13,7 @@ using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -35,10 +36,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
         private readonly IRepository<DataModel.Model.Tag, int> _tagRepository;
         private readonly IAppHelper _appHelper;
         private readonly IArticleService _articleService;
+        private readonly IRepository<PlayedGame, long> _playedGameRepository;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Entry>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Entry>>> SortLambdaCacheEntry = new();
 
-        public EntryService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IRepository<Article, int> articleRepository,
+        public EntryService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IRepository<Article, int> articleRepository, IRepository<PlayedGame, long> playedGameRepository,
         IRepository<Examine, long> examineRepository, IArticleService articleService)
         {
             _entryRepository = entryRepository;
@@ -47,6 +49,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
             _examineRepository = examineRepository;
             _articleRepository = articleRepository;
             _articleService = articleService;
+            _playedGameRepository = playedGameRepository;
+
         }
 
         public async Task<PagedResultDto<Entry>> GetPaginatedResult(GetEntryInput input)
@@ -1383,6 +1387,12 @@ namespace CnGalWebSite.APIServer.Application.Entries
             model.NewsOfEntry = newsModel;
 
             model.Staffs = staffInforModel;
+
+            //获取是否评分
+            if(model.Type== EntryType.Game)
+{
+                model.IsScored = await _playedGameRepository.GetAll().AnyAsync(s => s.EntryId == model.Id && s.ShowPublicly && s.MusicSocre != 0 && s.ShowSocre != 0 && s.TotalSocre != 0 && s.PaintSocre != 0 && s.ScriptSocre != 0);
+            }
 
             return model;
         }

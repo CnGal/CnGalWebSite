@@ -78,46 +78,6 @@
         new KeyValuePair<string, int>("所有",999999),
     };
 
-    private object _option = new
-    {
-        Title = new
-        {
-            Left = "center",
-            Text = "ECharts 入门示例"
-        },
-        Tooltip = new
-        {
-            Trigger = "axis"
-        },
-        Legend = new
-        {
-            Right = "20px",
-            Data = new[] { "销量", "销量2" }
-        },
-        XAxis = new
-        {
-            Data = new[] { "衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子" }
-        },
-        YAxis = new { },
-        Series = new[]
-    {
-            new
-            {
-                Name= "销量",
-                Type= "line",
-                Smooth= true,
-                Data= new []{ 25.0, 220.0, 362.0, 102.0, 120.0, 220.0 }
-            },
-            new
-            {
-                Name= "销量2",
-                Type= "line",
-                Smooth= true,
-                Data= new []{ 15.0, 120.0, 136.0, 110.0, 110.0, 210.0 }
-            }
-        }
-    };
-
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 

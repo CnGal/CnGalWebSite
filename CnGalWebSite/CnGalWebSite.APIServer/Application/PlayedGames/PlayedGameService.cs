@@ -1,10 +1,15 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
+using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -76,6 +81,34 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
                 ScreeningConditions = input.ScreeningConditions
             };
             return dtos_;
+        }
+
+        public void UpdatePlayedGameDataMain(PlayedGame playedGame, PlayedGameMain examine)
+        {
+            playedGame.PlayImpressions = examine.PlayImpressions;
+            playedGame.ShowPublicly = examine.ShowPublicly;
+
+            //更新最后编辑时间
+            playedGame.LastEditTime = DateTime.Now.ToCstTime();
+
+        }
+        public  void UpdateArticleData(PlayedGame playedGame, Examine examine)
+        {
+            switch (examine.Operation)
+            {
+               
+                case Operation.EditPlayedGameMain:
+                    PlayedGameMain playedGameMain = null;
+                    using (TextReader str = new StringReader(examine.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        playedGameMain = (PlayedGameMain)serializer.Deserialize(str, typeof(PlayedGameMain));
+                    }
+
+                     UpdatePlayedGameDataMain(playedGame, playedGameMain);
+                    break;
+             
+            }
         }
     }
 }

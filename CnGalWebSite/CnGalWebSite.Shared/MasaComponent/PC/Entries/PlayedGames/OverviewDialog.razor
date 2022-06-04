@@ -1,0 +1,71 @@
+﻿@inject ToastService ToastService
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<MDialog @bind-Value="Dialog"
+         MaxWidth="1200">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            @Model.Game.Name
+        </MCardTitle>
+        <MCardText Class="pb-2">
+            @Model.Game.BriefIntroduction
+        </MCardText>
+        @if (showChart)
+        {
+            <MCardText>
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <TotalScoreCard Model="Model" Outline />
+                    </div>
+                    <div class="col-12 col-lg-6">
+
+                    </div>
+                </div>
+            </MCardText>
+
+        }
+
+        <MCardText>
+            <UserScoreGroup Model="Model" OnEdit="OnEdit" />
+        </MCardText>
+        @if (Model.MyRecordExist == false)
+        {
+            <MCardActions Class="pb-4">
+                <MSpacer></MSpacer>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Icon="@(Model.MyRecordExist? "mdi-pencil" : "mdi-plus")" Text="@(Model.MyRecordExist? "编辑游玩记录" : "添加游玩记录")" OnClick="OnEdit" />
+            </MCardActions>
+        }
+
+    </MCard>
+</MDialog>
+
+
+@code {
+
+    public PlayedGameOverviewModel Model { get; set; }
+
+    bool Dialog { get; set; }
+    bool showChart { get; set; }
+
+    [Parameter]
+    public EventCallback OnEdit { get; set; }
+
+
+    public async Task Refresh(bool dialog, PlayedGameOverviewModel model)
+    {
+        showChart = false;
+        Dialog = dialog;
+        Model = model;
+
+        StateHasChanged();
+
+        await Task.Delay(1);
+        showChart = true;
+
+    StateHasChanged();
+    }
+
+}

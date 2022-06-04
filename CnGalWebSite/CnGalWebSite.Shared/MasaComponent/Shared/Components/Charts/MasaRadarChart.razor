@@ -1,0 +1,22 @@
+﻿@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+<div class="@Class">
+    <div class="d-flex align-center justify-center">
+        <MECharts Option="Model" MaxHeight="MaxHeight" MaxWidth="MaxWidth">
+        </MECharts>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EChartsRadarOptionModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public StringNumber MaxHeight { get; set; }
+    [Parameter]
+    public StringNumber MaxWidth { get; set; }
+
+}
+
