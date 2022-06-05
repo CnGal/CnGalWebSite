@@ -1,10 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
 
-<style>
-    .m-rating .m-icon {
-        padding: 0.1rem;
-    }
-</style>
 
 @if (isReady)
 {
@@ -37,10 +33,21 @@
             <ChildContent>
                 <TotalScoreCard Model="Model" Outline />
                 <div>
-                    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickEditGameRecored">
-                        <MIcon Left> @(Model.IsCurrentUserScoreExist? "mdi-pencil" : "mdi-plus")</MIcon>
-                        @(Model.IsCurrentUserScoreExist? "编辑游玩记录" : "添加游玩记录")
-                    </MButton>
+                   
+                    <AuthorizeView>
+                        <Authorized>
+                            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickEditGameRecored">
+                                <MIcon Left> @(Model.IsCurrentUserScoreExist? "mdi-pencil" : "mdi-plus")</MIcon>
+                                @(Model.IsCurrentUserScoreExist? "编辑游玩记录" : "添加游玩记录")
+                            </MButton>
+                        </Authorized>
+                        <NotAuthorized>
+                            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnLogin">
+                                <MIcon Left>mdi-login</MIcon>
+                                登入后添加游玩记录
+                            </MButton>
+                        </NotAuthorized>
+                    </AuthorizeView>
                 </div>
 
             </ChildContent>
@@ -90,6 +97,12 @@
         {
             ErrorHandler.ProcessError(ex, $"获取评分概览数据失败");
         }
+    }
+
+    public Task OnLogin()
+    {
+        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        return Task.CompletedTask;
     }
 
     public async Task OnClickEditGameRecored()

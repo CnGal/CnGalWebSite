@@ -18,14 +18,18 @@
             {
                 if (ShowBlankAction)
                 {
-                    <div class="p-2" style="min-width: 200px;">
+                    <div class="p-2" style="min-width: 250px;">
                         <div class="rounded shadow-sm  bg-opacity h-100" style=" display: flex; justify-content: center; align-items: center; ">
                             <div class="m-4">
-                                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnEdit">
-                                    <MIcon Left>mdi-plus </MIcon>
-                                    添加游玩记录
-                                </MButton>
-
+                              
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加游玩记录" OnClick="OnEdit" Icon="mdi-plus" TextStyle />
+                                    </Authorized>
+                                    <NotAuthorized>
+                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后添加游玩记录" OnClick="OnLogin" Icon="mdi-login" TextStyle />
+                                    </NotAuthorized>
+                                </AuthorizeView>
 
                             </div>
                         </div>
@@ -70,17 +74,19 @@
                     if (ShowBlankAction)
                     {
                         <MSlideItem>
-                            <MCard Width="200" Class="p-2" Outlined Style="border:0;background-color:transparent"
+                            <MCard Width="250" Class="p-2" Outlined Style="border:0;background-color:transparent"
                                    OnClick="@context.Toggle"
                                    RefBack="@context.Ref">
                                 <div class="rounded shadow-sm  bg-opacity h-100" style=" display: flex; justify-content: center; align-items: center; ">
                                     <div class="m-4">
-                                        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnEdit">
-                                            <MIcon Left>mdi-plus </MIcon>
-                                            添加游玩记录
-                                        </MButton>
-
-
+                                        <AuthorizeView Context="x">
+                                            <Authorized>
+                                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加游玩记录" OnClick="OnEdit" Icon="mdi-plus" TextStyle />
+                                            </Authorized>
+                                            <NotAuthorized>
+                                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后添加游玩记录" OnClick="OnLogin" Icon="mdi-login" TextStyle />
+                                            </NotAuthorized>
+                                        </AuthorizeView>
                                     </div>
                                 </div>
                             </MCard>
@@ -138,6 +144,12 @@
         {
             await userScoreDialog.Refresh(true, model);
         }
+    }
+
+    public  Task OnLogin()
+    {
+        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        return Task.CompletedTask;
     }
 
 }
