@@ -1,0 +1,115 @@
+﻿@page "/7th"
+@page "/Anniversaries"
+@page "/7th/{Type}"
+@page "/Anniversaries/{Type}"
+
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+
+<div class="rounded  shadow-sm bg-opacity mb-4">
+    <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow Class="rounded" CenterActive
+           Color="@_dataCacheService.ThemeSetting.Theme">
+        <MTab Value="1">
+            主页<MIcon>mdi-home</MIcon>
+        </MTab>
+        <MTab Value="2">
+            评选<MIcon>mdi-star</MIcon>
+        </MTab>
+        <MTab Value="3">
+            投票<MIcon>mdi-vote</MIcon>
+        </MTab>
+        <MTab Value="3">
+            抽奖<MIcon>mdi-wallet-giftcard</MIcon>
+        </MTab>
+    </MTabs>
+</div>
+<MTabsItems @bind-Value="index">
+    <MTabItem Value="1">
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.RandomUserScoreGroup/>
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.GameGroup/>
+    </MTabItem>
+    <MTabItem Value="2">
+
+    </MTabItem>
+    <MTabItem Value="3">
+
+    </MTabItem>
+    <MTabItem Value="3">
+
+    </MTabItem>
+</MTabsItems>
+
+
+@code {
+    [Parameter]
+    public string Type { get; set; }
+
+    StringNumber index = 0;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            NavigationManager.LocationChanged += LocationChanged;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        LocationChanged(null, null);
+    }
+
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        index = Type switch
+        {
+            "Home" => 1,
+            "Rating" => 2,
+            "Vote" => 3,
+            "Lottery" => 4,
+            _=>1
+        };
+
+    }
+
+    public async void IndexChanged(StringNumber value)
+    {
+        index = value;
+
+        string baseStr;
+
+        if (NavigationManager.Uri.Contains("7th"))
+        {
+            baseStr = "7th";
+
+
+        }
+        else
+        {
+            baseStr = "Anniversaries";
+
+        }
+
+        NavigationManager.NavigateTo($"/{baseStr}/" + (index.ToInt32() switch
+        {
+            1 => "Home",
+            2 => "Rating",
+            3 => "Vote",
+            4 => "Lottery",
+            _ => ""
+        }));
+
+    }
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        NavigationManager.LocationChanged -= LocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

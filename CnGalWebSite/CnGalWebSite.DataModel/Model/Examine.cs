@@ -59,6 +59,9 @@ namespace CnGalWebSite.DataModel.Model
 
         public long? PeripheryId { get; set; }
         public Periphery Periphery { get; set; }
+
+        public long? PlayedGameId { get; set; }
+        public PlayedGame PlayedGame { get; set; }
         /// <summary>
         /// 前置审核Id
         /// </summary>
@@ -119,5 +122,7 @@ namespace CnGalWebSite.DataModel.Model
         EditTagChildEntries,
         [Display(Name = "编辑周边关联周边")]
         EditPeripheryRelatedPeripheries,
+        [Display(Name = "编辑游玩记录")]
+        EditPlayedGameMain,
     }
 }

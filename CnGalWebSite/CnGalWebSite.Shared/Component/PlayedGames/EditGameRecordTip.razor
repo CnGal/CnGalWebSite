@@ -1,5 +1,4 @@
-﻿@inject ToastService ToastService
-@inject HttpClient Http
+﻿@inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
@@ -10,18 +9,13 @@
             编辑游玩记录
         </MCardTitle>
         <MCardText Class="pb-2">
-            你可以在这里记录游玩状态和感想，还可以在个人空间中绑定Steam库存
+            你可以在这里记录游玩状态和评分，还可以在个人空间中绑定Steam库存
         </MCardText>
 
         <MCardText Class="pb-0">
             @if (isReady)
             {
-
-                <MTextarea Label="感想" Rows="5" Color="@_dataCacheService.ThemeSetting.Theme"
-                           @bind-Value="Model.PlayImpressions">
-
-                </MTextarea>
-                <MButtonGroup Tile Group Value="(int)Model.Type" ValueChanged="ValueChanged" Color="@_dataCacheService.ThemeSetting.Theme" Class="pb-2">
+                <MButtonGroup Tile Group Value="(int)Model.Type" ValueChanged="ValueChanged" Color="@_dataCacheService.ThemeSetting.Theme" Class="pb-2 pt-4" Style=" display: flex; flex-wrap: wrap;">
                     <MButton Class="m-0" Value="(int)PlayedGameType.WantToPlay">
                         想玩
                     </MButton>
@@ -38,12 +32,32 @@
                         未玩
                     </MButton>
                 </MButtonGroup>
-                <MCheckbox @bind-Value="Model.IsHidden"
-                           Label="折叠" Class="m-0"
-                           HideDetails="true"
-                           Color="@_dataCacheService.ThemeSetting.Theme"></MCheckbox>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.MusicSocre" Lable="音乐" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.PaintSocre" Lable="美术" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.ScriptSocre" Lable="剧本" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.ShowSocre" Lable="演出" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.SystemSocre" Lable="程序" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.CVSocre" Lable="配音" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.TotalSocre" Lable="总评" />
 
+                <MTextarea Label="评语" Rows="5" Color="@_dataCacheService.ThemeSetting.Theme"
+                           @bind-Value="Model.PlayImpressions" Counter="true">
 
+                </MTextarea>
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <MCheckbox @bind-Value="Model.ShowPublicly"
+                                   Label="公开" Class="m-0"
+                                   HideDetails="true"
+                                   Color="@_dataCacheService.ThemeSetting.Theme"></MCheckbox>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <MCheckbox @bind-Value="Model.IsHidden"
+                                   Label="不展示在个人主页中" Class="m-0"
+                                   HideDetails="true"
+                                   Color="@_dataCacheService.ThemeSetting.Theme"></MCheckbox>
+                    </div>
+                </div>
             }
             else
             {
@@ -66,13 +80,15 @@
         </MCardActions>
     </MCard>
 </MDialog>
-
+<PToast @ref="_toast" MaxCount="3">
+</PToast>
 @code {
 
     [Parameter]
     public EventCallback OnChanged { get; set; }
 
     public int Id { get; set; }
+    PToast _toast;
 
     public GameRecordViewModel ViewModel { get; set; }
 
@@ -84,11 +100,14 @@
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     bool Dialog { get; set; }
 
+    [CascadingParameter]
+    private CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip CnGalRootTip { get; set; }
+
     bool isReady = false;
 
     public Task ValueChanged(StringNumber index)
     {
-        if(index==null)
+        if (index == null)
         {
             return Task.CompletedTask;
         }
@@ -114,23 +133,76 @@
     {
         try
         {
+            if (Model.ScriptSocre == 0 || Model.MusicSocre == 0 || Model.PaintSocre == 0 || Model.ShowSocre == 0 || Model.TotalSocre == 0 || Model.SystemSocre == 0 || Model.CVSocre == 0)
+            {
+                if (Model.ScriptSocre + Model.MusicSocre + Model.PaintSocre + Model.ShowSocre + Model.TotalSocre + Model.SystemSocre + Model.CVSocre != 0)
+                {
+                    await _toast.AddToast(new ToastConfig
+                    {
+                        Type = AlertTypes.Error,
+                        Title = "请填写所有项目的评分",
+                        Duration = 4000
+                    });
+                    return;
+                }
+            }
+            else
+            {
+
+                if (string.IsNullOrWhiteSpace(Model.PlayImpressions) || Model.PlayImpressions.Length <= 100)
+                {
+                    if (_dataCacheService.ThemeSetting.PlayedGameInforCount >= 0)
+                    {
+
+                        await _toast.AddToast(new ToastConfig
+                        {
+                            Type = AlertTypes.Info,
+                            Title="提示",
+                            Content = $"只有大于100字评语的评分才会记录到总分中哦。当然，不写评语也是OK的。"+(_dataCacheService.ThemeSetting.PlayedGameInforCount>0?$"这个提醒还会再出现{_dataCacheService.ThemeSetting.PlayedGameInforCount}次。" :""),
+                            Duration = 100000
+                        });
+
+                        _dataCacheService.ThemeSetting.PlayedGameInforCount--;
+
+                        if (CnGalRootTip != null)
+                        {
+                            await CnGalRootTip.SaveTheme();
+                        }
+
+                    }
+                }
+            }
+
+
+
+
+
             var result = await Http.PostAsJsonAsync<EditGameRecordModel>(ToolHelper.WebApiPath + "api/playedgame/EditGameRecord", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {
-
-                await ToastService.Error("编辑游玩记录失败", obj.Error);
+                await _toast.AddToast(new ToastConfig
+                {
+                    Type = AlertTypes.Error,
+                    Title = obj.Error ?? "编辑游玩记录失败~",
+                    Duration = 4000
+                });
             }
             else
             {
-                await ToastService.Success("编辑游玩记录成功", "编辑游玩记录成功");
                 if (ViewModel != null)
                 {
                     ViewModel.Type = Model.Type;
                     ViewModel.PlayImpressions = Model.PlayImpressions;
                     ViewModel.IsHidden = Model.IsHidden;
+                    ViewModel.ShowPublicly = Model.IsHidden;
+                    ViewModel.MusicSocre = Model.MusicSocre;
+                    ViewModel.PaintSocre = Model.PaintSocre;
+                    ViewModel.ScriptSocre = Model.ScriptSocre;
+                    ViewModel.ShowSocre = Model.ShowSocre;
+                    ViewModel.TotalSocre = Model.TotalSocre;
                 }
                 Dialog = false;
                 await OnChanged.InvokeAsync();

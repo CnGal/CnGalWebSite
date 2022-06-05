@@ -50,7 +50,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         [Display(Name = "消歧义页")]
         Disambig,
         [Display(Name = "周边")]
-        Periphery
+        Periphery,
+        [Display(Name = "游玩记录")]
+        PlayedGame
     }
 
     public enum ExaminedNormalListPassType

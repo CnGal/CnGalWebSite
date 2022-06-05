@@ -1,0 +1,105 @@
+﻿@if (isReady)
+{
+    <div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100")" style="display: flex; justify-content: center; height: 100%; flex-direction: column; ">
+        @if (Model.UserScores.Any(s => s.Socres.IsScored))
+        {
+            <div class="pb-2">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaRadarChart Model="model" MaxHeight="300" MaxWidth="250" />
+            </div>
+
+        }
+        else
+        {
+            <div class="mb-2" style=" display: flex; justify-content: center;">
+                暂无记录
+            </div>
+        }
+    </div>
+}
+
+
+
+
+@code {
+    [Parameter]
+    public bool Outline { get; set; }
+
+    [Parameter]
+    public PlayedGameOverviewModel Model { get; set; }
+
+    EChartsRadarOptionModel model = new EChartsRadarOptionModel();
+    bool isReady;
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Model.UserScores.Any(s=>s.Socres.IsScored) == false)
+        {
+            isReady = true;
+            return;
+        }
+
+        if (model.Radar.Indicator.Any() == false)
+        {
+            model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+            {
+                Name = "程序"
+            });
+            model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+            {
+                Name = "配音"
+            });
+            model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+            {
+                Name = "剧本"
+            });
+            model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+            {
+                Name = "演出"
+            });
+            model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+            {
+                Name = "美术"
+            });
+
+            model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+            {
+                Name = "音乐"
+            });
+
+            model.Series.Add(new EChartsRadarOptionSery
+            {
+                Name = "评分"
+            });
+        }
+        model.Legend.Data.Clear();
+        model.Legend.Data.Add("所有");
+        model.Legend.Data.Add("过滤后");
+
+        var series = model.Series.First().Data;
+        series.Clear();
+        series.Add(new EChartsRadarOptionSeryData
+        {
+            Name = "所有",
+            Value = new List<double> { Model.GameTotalScores.SystemSocre, Model.GameTotalScores.CVSocre, Model.GameTotalScores.ScriptSocre, Model.GameTotalScores.ShowSocre, Model.GameTotalScores.PaintSocre, Model.GameTotalScores.MusicSocre }
+        });
+        series.Add(new EChartsRadarOptionSeryData
+        {
+            Name = "过滤后",
+            Value = new List<double> { Model.GameReviewsScores.SystemSocre, Model.GameReviewsScores.CVSocre, Model.GameReviewsScores.ScriptSocre, Model.GameReviewsScores.ShowSocre, Model.GameReviewsScores.PaintSocre, Model.GameReviewsScores.MusicSocre }
+        });
+
+
+        var myscores = Model.UserScores.FirstOrDefault(s => s.User.Id == Model.CurrentUserId && s.Socres.IsScored);
+        if (myscores != null)
+        {
+            model.Legend.Data.Add("我的");
+            series.Add(new EChartsRadarOptionSeryData
+            {
+                Name = "我的",
+                Value = new List<double> { myscores.Socres.SystemSocre, myscores.Socres.CVSocre, myscores.Socres.ScriptSocre, myscores.Socres.ShowSocre, myscores.Socres.PaintSocre, myscores.Socres.MusicSocre }
+            });
+        }
+
+        isReady = true;
+    }
+
+}

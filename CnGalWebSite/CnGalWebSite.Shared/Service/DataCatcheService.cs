@@ -2,6 +2,7 @@
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
+using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
@@ -10,6 +11,7 @@ using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
@@ -153,6 +155,10 @@ namespace CnGalWebSite.Shared.Service
         /// 图表缓存
         /// </summary>
         public IPageModelCatche<LineChartModel> LineChartDataCatche { get; set; }
+        /// <summary>
+        /// 图表缓存
+        /// </summary>
+        public IPageModelCatche<PlayedGameOverviewModel> PlayedGameOverviewDataCatche { get; set; }
 
         public List<DocumentViewModel> DocumentsCatche { get; set; } = new List<DocumentViewModel>();
         /// <summary>
@@ -199,6 +205,14 @@ namespace CnGalWebSite.Shared.Service
         /// 折扣页面缓存辅助类
         /// </summary>
         public DiscountPageHelper DiscountPageCatcheHelper { get; set; } = new DiscountPageHelper();
+        /// <summary>
+        /// 可评选游戏缓存
+        /// </summary>
+        public List<JudgableGameViewModel> JudgableGamesCatche { get; set; } = new List<JudgableGameViewModel>();
+        /// <summary>
+        /// 随机用户评分
+        /// </summary>
+        public List<PlayedGameUserScoreRandomModel> RandomUserScoresCatche { get; set; } = new List<PlayedGameUserScoreRandomModel>();
 
         /// <summary>
         /// 评论详情
@@ -233,7 +247,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<EntryContrastEditRecordViewModel> entryContrastEditRecordViewCatche,
         IPageModelCatche<SearchViewModel> searchViewCatche,
         IPageModelCatche<ChartDataSource> chartDataCatche,
-        IPageModelCatche<LineChartModel> lineChartDataCatche)
+        IPageModelCatche<LineChartModel> lineChartDataCatche,
+        IPageModelCatche<PlayedGameOverviewModel> playedGameOverviewDataCatche)
         {
             _httpClient = httpClient;
             (EntryIndexPageCatche = entryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/entries/GetEntryView/");
@@ -247,6 +262,7 @@ namespace CnGalWebSite.Shared.Service
             (ArticleContrastEditRecordViewCatche = articleContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/articles/GetContrastEditRecordViews/");
             (PeripheryContrastEditRecordViewCatche = peripheryContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/peripheries/GetContrastEditRecordViews/");
             (TagContrastEditRecordViewCatche = tagContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/tags/GetContrastEditRecordViews/");
+            (PlayedGameOverviewDataCatche = playedGameOverviewDataCatche).Init(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameOverview/");
             (ChartDataCatche = chartDataCatche).Init("", true);
             (LineChartDataCatche = lineChartDataCatche).Init("");
             HomePageNewsCatche = homePageNewsCatche;

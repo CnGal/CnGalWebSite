@@ -728,7 +728,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             });
         }
 
-        public async Task<UserInforViewModel> GetUserInforViewModel(ApplicationUser user)
+        public async Task<UserInforViewModel> GetUserInforViewModel(ApplicationUser user,bool ignoreAddinfor=false)
         {
             var model = new UserInforViewModel
             {
@@ -738,11 +738,18 @@ namespace CnGalWebSite.APIServer.Application.Users
                 PhotoPath = _appHelper.GetImagePath(user.PhotoPath, "user.png"),
                 BackgroundImage = _appHelper.GetImagePath(user.BackgroundImage, "userbackground.jpg"),
                 Ranks = await _rankService.GetUserRanks(user),
-                Integral = user.DisplayIntegral,
-                EditCount = await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true),
-                ArticleCount = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false),
-                FavoriteCount = await _favoriteObjectRepository.GetAll().Include(s => s.FavoriteFolder).CountAsync(s => s.FavoriteFolder.ApplicationUserId == user.Id)
             };
+
+            if(ignoreAddinfor)
+            {
+                return model;
+            }
+
+            model.Integral = user.DisplayIntegral;
+            model.EditCount = await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true);
+            model.ArticleCount = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false);
+            model.FavoriteCount = await _favoriteObjectRepository.GetAll().Include(s => s.FavoriteFolder).CountAsync(s => s.FavoriteFolder.ApplicationUserId == user.Id);
+
             //计算连续签到天数和今天是否签到
             model.IsSignIn = false;
             model.SignInDays = 0;

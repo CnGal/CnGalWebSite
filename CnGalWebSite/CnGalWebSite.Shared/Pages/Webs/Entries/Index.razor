@@ -20,15 +20,18 @@ else
     <TitleTip></TitleTip>
 }
 
-@{bool isFirst = true;}
-@if (string.IsNullOrWhiteSpace(EntryView.SmallBackgroundPicture) == false)
+@if (_dataCatcheService.ThemeSetting.IsTransparent)
 {
-    <div id="web_bg" style="background-image: url(@EntryView.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
+    @if (string.IsNullOrWhiteSpace(EntryView.SmallBackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@EntryView.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
+    }
+    @if (string.IsNullOrWhiteSpace(EntryView.BackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@EntryView.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
+    }
 }
-@if (string.IsNullOrWhiteSpace(EntryView.BackgroundPicture) == false)
-{
-    <div id="web_bg" style="background-image: url(@EntryView.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
-}
+
 @if (isNotFound)
 {
     int temp = 0;
@@ -56,7 +59,7 @@ else
                 }
 
                 <div>
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" OnPreEdit="OnPreEdit"/>
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="EntryView" OnRevoke="OnRevoke" OnPreEdit="OnPreEdit" />
                 </div>
             </div>
             @if (_dataCatcheService.IsApp)
@@ -82,6 +85,10 @@ else
                             <CnGalWebSite.Shared.Component.Entries.NewVersion.TagsCard Model="EntryView" OnRevoke="OnRevoke" />
                         </div>
 
+                    }
+                    @if (EntryView.Type == EntryType.Game)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
                     }
                 </div>
                 <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8") ">
@@ -170,7 +177,10 @@ else
 
                             </div>
                         }
-
+                        @if (EntryView.Type == EntryType.Game && EntryView.IsScored)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" Large />
+                        }
                         <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
                         @if (EntryView.NewsOfEntry.Count != 0)
                         {
@@ -197,7 +207,11 @@ else
                 </div>
 
                 <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4 order-1 order-lg-2") ">
-                    @if (EntryView.SteamId > 0&&EntryView.IsHideOutlink==false)
+                    @if (EntryView.Type == EntryType.Game && EntryView.IsScored == false)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
+                    }
+                    @if (EntryView.SteamId > 0 && EntryView.IsHideOutlink == false)
                     {
                         <div class="mb-4">
                             <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
@@ -309,7 +323,7 @@ else
     {
         get
         {
-            return (EntryView.Information.Count == 0 && (EntryView.SteamId <= 0 || EntryView.IsHideOutlink)&& EntryView.Tags.Count == 0 &&( EntryView.OtherRelevances.Count == 0|| EntryView.IsHideOutlink) && EntryView.Roles.Count == 0 &&
+            return (EntryView.Information.Count == 0 && (EntryView.SteamId <= 0 || EntryView.IsHideOutlink) && EntryView.Tags.Count == 0 && (EntryView.OtherRelevances.Count == 0 || EntryView.IsHideOutlink) && EntryView.Roles.Count == 0 &&
                       ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false) == false && (_dataCatcheService.IsApp == false && EntryView.Staffs.Count > 0) == false);
         }
     }
@@ -402,7 +416,7 @@ else
         {
             Title = "确认撤销编辑",
             Content = "撤销编辑后会删除数据，无法恢复，请谨慎操作",
-            
+
             Category = SwalCategory.Warning,
         };
         var ret = await SwalService.ShowModal(op);

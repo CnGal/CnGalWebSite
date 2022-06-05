@@ -240,7 +240,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "776554e1-4527-4a8b-af4b-fb314df1aa68",
+                            ConcurrencyStamp = "766b553c-edc8-4957-b111-36bb36763a8b",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
@@ -873,6 +873,9 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<long?>("PeripheryId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("PlayedGameId")
+                        .HasColumnType("bigint");
+
                     b.Property<long?>("PrepositionExamineId")
                         .HasColumnType("bigint");
 
@@ -895,6 +898,8 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("EntryId");
 
                     b.HasIndex("PeripheryId");
+
+                    b.HasIndex("PlayedGameId");
 
                     b.HasIndex("TagId");
 
@@ -1688,6 +1693,12 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<bool>("IsInSteam")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<DateTime>("LastEditTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("MusicSocre")
+                        .HasColumnType("int");
+
                     b.Property<int>("PaintSocre")
                         .HasColumnType("int");
 
@@ -1703,10 +1714,16 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<int>("ScriptSocre")
                         .HasColumnType("int");
 
+                    b.Property<bool>("ShowPublicly")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int>("ShowSocre")
                         .HasColumnType("int");
 
                     b.Property<int>("SystemSocre")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalSocre")
                         .HasColumnType("int");
 
                     b.Property<int>("Type")
@@ -2905,28 +2922,28 @@ namespace CnGalWebSite.APIServer.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            ConcurrencyStamp = "f04420e1-a543-4253-91c8-c79bcdea22ee",
+                            ConcurrencyStamp = "fa23d14d-7353-468f-9468-4467b20684a5",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e576",
-                            ConcurrencyStamp = "0c0dc2be-aab3-4385-aa28-dc2dd7144e95",
+                            ConcurrencyStamp = "af6903fd-d259-44cc-bdd5-cc0e8f0e3753",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e577",
-                            ConcurrencyStamp = "272a1fc3-416e-44f5-a25e-8a72536b1006",
+                            ConcurrencyStamp = "352aaa90-3997-4015-97ca-5904a70225b3",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e578",
-                            ConcurrencyStamp = "1c4de16a-57c7-4375-b551-91bd956550ab",
+                            ConcurrencyStamp = "ba59512b-64ef-4c56-956c-3bfec95f8e98",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         });
@@ -3340,6 +3357,11 @@ namespace CnGalWebSite.APIServer.Migrations
                         .HasForeignKey("PeripheryId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("CnGalWebSite.DataModel.Model.PlayedGame", "PlayedGame")
+                        .WithMany()
+                        .HasForeignKey("PlayedGameId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CnGalWebSite.DataModel.Model.Tag", "Tag")
                         .WithMany()
                         .HasForeignKey("TagId")
@@ -3356,6 +3378,8 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Navigation("Entry");
 
                     b.Navigation("Periphery");
+
+                    b.Navigation("PlayedGame");
 
                     b.Navigation("Tag");
                 });

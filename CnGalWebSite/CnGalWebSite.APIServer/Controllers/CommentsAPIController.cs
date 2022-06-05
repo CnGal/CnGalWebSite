@@ -2,6 +2,7 @@
 using CnGalWebSite.APIServer.Application.Comments.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
@@ -38,11 +39,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly ICommentService _commentService;
+        private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
 
         public CommentsAPIController(UserManager<ApplicationUser> userManager, IRepository<ApplicationUser, string> userRepository, ICommentService commentService,
             IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository,
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository, IExamineService examineService,
         IRepository<Entry, int> entryRepository)
         {
             _entryRepository = entryRepository;
@@ -55,6 +57,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _peripheryRepository = peripheryRepository;
             _voteRepository = voteRepository;
             _lotteryRepository = lotteryRepository;
+            _examineService = examineService;
         }
 
         [AllowAnonymous]
@@ -282,16 +285,16 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
             {
-                await _appHelper.ExaminePublishCommentTextAsync(comment, commentText);
-                await _appHelper.UniversalCommentExaminedAsync(comment, user, true, resulte, Operation.PubulishComment, "");
+                await _examineService.ExaminePublishCommentTextAsync(comment, commentText);
+                await _examineService.UniversalCommentExaminedAsync(comment, user, true, resulte, Operation.PubulishComment, "");
                 await _appHelper.AddUserContributionValueAsync(user.Id, comment.Id, Operation.PubulishComment);
 
             }
             else
             {
-                await _appHelper.UniversalCommentExaminedAsync(comment, user, false, resulte, Operation.PubulishComment, "");
+                await _examineService.UniversalCommentExaminedAsync(comment, user, false, resulte, Operation.PubulishComment, "");
             }
 
             return new Result { Successful = true };

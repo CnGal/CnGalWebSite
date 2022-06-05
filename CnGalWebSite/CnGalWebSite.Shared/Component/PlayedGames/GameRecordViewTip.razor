@@ -7,7 +7,7 @@
 <MDialog @bind-Value="Dialog"
          MaxWidth="440">
     <MCard>
-        <TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.GameId)" Text="@Model.GameName" class="a-font-color" OnClick="OnClose">
+        <TabLink Icon="fa fa-codepen" Text="@Model.GameName" class="a-font-color" OnClick="OnClose">
             <img style="width:100%;" src="@Model.GameImage" alt="@Model.GameName">
         </TabLink>
 
@@ -17,9 +17,28 @@
         <MCardText Class="pb-2">
             @Model.GameBriefIntroduction
         </MCardText>
-        <MCardTitle Class="text-h6">
-            标签
-        </MCardTitle>
+        
+        <MCardText Class="pb-2">
+            @if (Model.IsScored)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.MusicSocre" Lable="音乐" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.PaintSocre" Lable="美术" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.ScriptSocre" Lable="剧本" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.ShowSocre" Lable="演出" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.SystemSocre" Lable="程序" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.CVSocre" Lable="配音" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.TotalSocre" Lable="总评" />
+
+
+            }
+            else
+            {
+                <div class="pb-2">
+                    未评分
+                </div>
+            }
+        </MCardText>
+
         <MCardText Class="pb-2">
             <GameRecordTagCard Model="Model" IsDark="true" />
         </MCardText>
@@ -27,7 +46,7 @@
         @if (IsCurrentUser)
         {
             <MCardTitle Class="text-h6 pt-0">
-                感想
+                评语
             </MCardTitle>
             <MCardText Class="pb-2">
                 @(string.IsNullOrWhiteSpace(Model.PlayImpressions)?"无": Model.PlayImpressions)
@@ -52,9 +71,9 @@
                     编辑
                 </MButton>
             </MCardActions>
-                }
- 
-        </MCard>
+        }
+
+    </MCard>
 </MDialog>
 
 
@@ -78,10 +97,12 @@
         await OnEdit.InvokeAsync(Model);
     }
 
-    public Task OnClose()
+    public async Task OnClose()
     {
         Dialog = false;
-        return Task.CompletedTask;
+        StateHasChanged();
+        await Task.Delay(1);
+        NavigationManager.NavigateTo("/entries/index/" + Model.GameId);
     }
 
 

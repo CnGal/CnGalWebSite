@@ -1,0 +1,152 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+<style>
+    .m-rating .m-icon {
+        padding: 0.1rem;
+    }
+</style>
+<div class="rounded shadow-sm  bg-opacity mb-4">
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-4">
+
+        <div class="ps-4 pe-4" style=" display: flex; max-width: 400px; width: 100%; align-items: center;">
+            <MTextField Placeholder="可以搜索哦~" TValue="string" Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.SearchString" ValueChanged="SearchValueChanged" Color="@_dataCacheService.ThemeSetting.Theme" OnKeyDown="OnKeyDown" Class="pt-0"></MTextField>
+        </div>
+        <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.ThemeSetting.AnniversariesSetting.SortType" ValueChanged="SortValueChanged" TValue="JudgableGamesSortType" Class="pt-0" />
+        </div>
+        <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.ThemeSetting.AnniversariesSetting.DisplayType" ValueChanged="DisplayValueChanged" TValue="JudgableGamesDisplayType" Class="pt-0" />
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    @foreach (var item in Items)
+    {
+        <GameCard Model="item" Class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4" Type="_dataCacheService.ThemeSetting.AnniversariesSetting.DisplayType" OnClick="OnClickMore" />
+    }
+</div>
+@if (Items.Any() == false)
+{
+    <NotFoundJudgableCard GameName="@_dataCacheService.ThemeSetting.AnniversariesSetting.SearchString" />
+}
+
+<CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewDialog ShowNav @ref="overviewDialog" />
+
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    [CascadingParameter]
+    private CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip CnGalRootTip { get; set; }
+
+    List<JudgableGameViewModel> Items = new List<JudgableGameViewModel>();
+
+    CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewDialog overviewDialog;
+    JudgableGameViewModel currentGame;
+    protected override async Task OnInitializedAsync()
+    {
+
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            if (_dataCacheService.JudgableGamesCatche.Count == 0)
+            {
+                _dataCacheService.JudgableGamesCatche = await Http.GetFromJsonAsync<List<JudgableGameViewModel>>(ToolHelper.WebApiPath + "api/anniversaries/GetAllJudgableGames");
+            }
+
+            var searchString = _dataCacheService.ThemeSetting.AnniversariesSetting.SearchString;
+            if (string.IsNullOrWhiteSpace(searchString))
+            {
+                Items = _dataCacheService.JudgableGamesCatche;
+            }
+            else
+            {
+                Items = _dataCacheService.JudgableGamesCatche.Where(s => (s.Name?.Contains(searchString) ?? false) || (string.IsNullOrWhiteSpace(s.Name) == false && (searchString?.Contains(s.Name) ?? false)) ||
+                          (s.BriefIntroduction?.Contains(searchString) ?? false) || (string.IsNullOrWhiteSpace(s.BriefIntroduction) == false && (searchString?.Contains(s.BriefIntroduction) ?? false)))
+                           .ToList();
+            }
+
+
+            Items = _dataCacheService.ThemeSetting.AnniversariesSetting.SortType switch
+            {
+                JudgableGamesSortType.LastScoreTime => Items.OrderByDescending(s => s.LastScoreTime).ToList(),
+                JudgableGamesSortType.PublishTime => Items.OrderByDescending(s => s.PublishTime).ToList(),
+                JudgableGamesSortType.Random => Items.Random(),
+                JudgableGamesSortType.ScoreCount => Items.OrderByDescending(s => s.ScoreCount).ToList(),
+                JudgableGamesSortType.LastEditTime => Items.OrderByDescending(s => s.LastEditTime).ToList(),
+                JudgableGamesSortType.ReadCount => Items.OrderByDescending(s => s.ReaderCount).ToList(),
+                _ => Items
+            };
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取可评选的游戏列表失败");
+        }
+    }
+
+
+    public async Task SortValueChanged(JudgableGamesSortType type)
+    {
+        _dataCacheService.ThemeSetting.AnniversariesSetting.SortType = type;
+        if (CnGalRootTip != null)
+        {
+            await CnGalRootTip.SaveTheme();
+        }
+        await Refresh();
+    }
+    public async Task DisplayValueChanged(JudgableGamesDisplayType type)
+    {
+        _dataCacheService.ThemeSetting.AnniversariesSetting.DisplayType = type;
+        if (CnGalRootTip != null)
+        {
+            await CnGalRootTip.SaveTheme();
+        }
+        await Refresh();
+    }
+
+
+    public async Task SearchValueChanged(string str)
+    {
+        _dataCacheService.ThemeSetting.AnniversariesSetting.SearchString = str;
+        if (CnGalRootTip != null)
+        {
+            await CnGalRootTip.SaveTheme();
+        }
+        await Refresh();
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            await Refresh();
+        }
+    }
+
+    public async Task OnClickMore(JudgableGameViewModel model)
+    {
+        currentGame = model;
+        if (overviewDialog != null)
+        {
+            try
+            {
+                var temp = await _dataCacheService.PlayedGameOverviewDataCatche.GetCatche(model.Id.ToString(), true);
+                await overviewDialog.Refresh(true, temp);
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, $"获取评分概览数据失败");
+            }
+
+
+        }
+    }
+
+}

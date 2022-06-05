@@ -1,0 +1,133 @@
+﻿@inject ToastService ToastService
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+
+<MDialog @bind-Value="Dialog"
+         Width="1200">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            @Model.Game.Name
+        </MCardTitle>
+        <MCardText Class="pb-2">
+            @Model.Game.BriefIntroduction
+        </MCardText>
+        @if (showChart)
+        {
+            @if (_dataCacheService.IsApp)
+            {
+                <MCardText Class="pb-0">
+                    <div class="overflow-x-auto" style="display:flex;">
+
+                        <div class="p-2" style="min-width: 300px;">
+                            <TotalScoreCard Model="Model" Outline />
+                        </div>
+                        <div class="p-2" style="min-width: 300px;">
+                            <ScoreCountChart Model="Model" Outline />
+                        </div>
+                    </div>
+                </MCardText>
+
+
+            }
+            else
+            {
+                <MCardText Class="pb-0">
+                    <div class="row">
+                        <div class="col-12 col-lg-6 mb-4">
+                            <TotalScoreCard Model="Model" Outline />
+                        </div>
+                        <div class="col-12 col-lg-6 mb-4">
+                            <ScoreCountChart Model="Model" Outline />
+                        </div>
+                    </div>
+                </MCardText>
+
+            }
+
+        }
+
+        <MCardText>
+            <UserScoreGroup Model="Model" OnEdit="OnClickEditGameRecored" ShowBlankAction="ShowBlankAction" />
+        </MCardText>
+        <MCardActions Class="pb-4 pe-6 ps-6 pt-6">
+            <MSpacer></MSpacer>
+            @if (ShowBlankAction == false && Model.IsCurrentUserScoreExist == false)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加游玩记录" OnClick="OnClickEditGameRecored" Icon="mdi-plus" TextStyle />
+            }
+            @if (ShowNav)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看词条页面" OnClick="OnNav" Icon="mdi-share-all-outline" TextStyle />
+            }
+        </MCardActions>
+
+    </MCard>
+</MDialog>
+
+<CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip @ref="editGameRecordTip" OnChanged="Changed" />
+
+
+@code {
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+    [Parameter]
+    public bool ShowBlankAction { get; set; }
+    [Parameter]
+    public bool ShowNav{ get; set; }
+
+    public PlayedGameOverviewModel Model { get; set; }
+
+    bool Dialog { get; set; }
+    bool showChart { get; set; }
+
+    CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip editGameRecordTip;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task Refresh(bool dialog, PlayedGameOverviewModel model)
+    {
+        Dialog = dialog;
+        Model = model;
+        StateHasChanged();
+
+        await Task.Delay(500);
+        showChart = true;
+
+        StateHasChanged();
+    }
+
+    public async Task OnClickEditGameRecored()
+    {
+        if (editGameRecordTip != null)
+        {
+            await editGameRecordTip.Refresh(true, Model.Game.Id, null);
+        }
+    }
+
+    public async Task Changed()
+    {
+        _dataCacheService.PlayedGameOverviewDataCatche.Clean(Model.Game.Id.ToString());
+
+        try
+        {
+            Model = await _dataCacheService.PlayedGameOverviewDataCatche.GetCatche(Model.Game.Id.ToString(), true);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, $"获取评分概览数据失败");
+        }
+
+        await OnChanged.InvokeAsync();
+    }
+
+    public async Task OnNav()
+    {
+        Dialog = false;
+        await Task.Delay(1);
+        NavigationManager.NavigateTo("/entries/index/" + Model.Game.Id);
+    }
+}

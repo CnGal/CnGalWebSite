@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.DataModel.ViewModel.Theme
+﻿using CnGalWebSite.DataModel.ViewModel.Anniversaries;
+
+namespace CnGalWebSite.DataModel.ViewModel.Theme
 {
     public class ThemeModel
     {
@@ -14,7 +16,11 @@
 
         public bool IsMasa { get; set; } = true;
 
+        public int PlayedGameInforCount { get; set; } = 3;
+
         public DisplayMode ListDisplayMode { get; set; }
+
+        public AnniversariesSetting AnniversariesSetting { get; set; } = new AnniversariesSetting();
     }
 
     public enum DisplayMode
@@ -27,5 +33,12 @@
     {
         Default,
         Custom,
+    }
+
+    public class AnniversariesSetting
+    {
+        public string SearchString { get; set; }
+        public JudgableGamesSortType SortType { get; set; }
+        public JudgableGamesDisplayType DisplayType { get; set; }
     }
 }

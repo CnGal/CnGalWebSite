@@ -16,14 +16,17 @@ else
 {
     <TitleTip></TitleTip>
 }
+@if (_dataCatcheService.ThemeSetting.IsTransparent)
+{
+    @if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class=" d-none  bg-d-lg-block bgimage-ison"></div>
+    }
+    @if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@Model.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
+    }
 
-@if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
-{
-    <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class=" d-none  bg-d-lg-block bgimage-ison"></div>
-}
-@if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) == false)
-{
-    <div id="web_bg" style="background-image: url(@Model.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
 }
 
 

@@ -1,0 +1,136 @@
+﻿@if (isReady)
+{
+    <div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100")">
+        @if (Model.UserScores.Any(s=>s.Socres.IsScored))
+        {
+           <div style="display: flex; justify-content: flex-end;">
+               <div style="max-width:100px;">
+                   <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="scope" ValueChanged="ScopeValueChanged" TValue="PlayedGameCountScope"  Class="pe-4 pt-0"/>
+               </div>
+               <div style="max-width:100px;">
+                   <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="type" ValueChanged="TypeValueChanged" TValue="PlayedGameScoreType"  Class="pe-4 pt-0"/>
+               </div>
+           </div>
+            <div class="d-flex align-center justify-center">
+                @if (isReady)
+                {
+                    <MECharts Option="model" Width="@("100%")" Height="300">
+                    </MECharts>
+                }
+
+            </div>
+
+        }
+        else
+        {
+            <div>
+                暂无评分
+            </div>
+        }
+    </div>
+}
+
+
+
+
+@code {
+    [Parameter]
+    public bool Outline { get; set; }
+
+    [Parameter]
+    public PlayedGameOverviewModel Model { get; set; }
+
+    EChartsOptionModel model = new EChartsOptionModel();
+
+    bool isReady;
+    PlayedGameScoreType type;
+    PlayedGameCountScope scope;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        if (Model.UserScores.Any(s => s.Socres.IsScored)==false)
+        {
+            isReady = true;
+            return;
+        }
+
+        if(Model.UserScores.Any(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions) && s.PlayImpressions.Length > 100))==false)
+        {
+            isReady = true;
+            return;
+        }
+
+        var data = Model.UserScores.Where(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions) && s.PlayImpressions.Length > 100)).Select(s => type switch
+        {
+            PlayedGameScoreType.Script => s.Socres.ScriptSocre,
+            PlayedGameScoreType.System => s.Socres.SystemSocre,
+            PlayedGameScoreType.CV => s.Socres.CVSocre,
+            PlayedGameScoreType.Total => s.Socres.TotalSocre,
+            PlayedGameScoreType.Music => s.Socres.MusicSocre,
+            PlayedGameScoreType.Paint => s.Socres.PaintSocre,
+            PlayedGameScoreType.Show => s.Socres.ShowSocre,
+            _ => 0
+        });
+
+
+        if (model.XAxis.Data.Any() == false)
+        {
+            model.XAxis.Data.AddRange(new List<string> { "1分", "2分", "3分", "4分", "5分", "6分", "7分", "8分", "9分", "10分" });
+        }
+
+        if(model.Legend.Data.Any()==false)
+        {
+            model.Legend.Data.Add("人数");
+        }
+
+        if (model.Series.Any() == false)
+        {
+            model.Series.Add(new EChartsOptionSery
+            {
+                Name="人数",
+                Stack = "default",
+                Type = "bar"
+            });
+        }
+        var series = model.Series.First().Data;
+        series.Clear();
+
+
+        series.AddRange(new List<double>
+        {
+            data.Count(s=>s==1),
+            data.Count(s=>s==2),
+            data.Count(s=>s==3),
+            data.Count(s=>s==4),
+            data.Count(s=>s==5),
+            data.Count(s=>s==6),
+            data.Count(s=>s==7),
+            data.Count(s=>s==8),
+            data.Count(s=>s==9),
+            data.Count(s=>s==10),
+        });
+
+
+        isReady = true;
+    }
+
+    public Task TypeValueChanged(PlayedGameScoreType _type)
+    {
+        type = _type;
+        Refresh();
+
+        return Task.CompletedTask;
+    }
+    public Task ScopeValueChanged(PlayedGameCountScope _scope)
+    {
+        scope = _scope;
+        Refresh();
+
+        return Task.CompletedTask;
+    }
+}

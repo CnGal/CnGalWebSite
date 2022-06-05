@@ -35,7 +35,7 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         Task AddUserIntegral(AddUserIntegralModel model);
 
-        Task<UserInforViewModel> GetUserInforViewModel(ApplicationUser user);
+        Task<UserInforViewModel> GetUserInforViewModel(ApplicationUser user, bool ignoreAddinfor = false);
 
         Task<string> GenerateBindGroupQQCode(ApplicationUser user);
 

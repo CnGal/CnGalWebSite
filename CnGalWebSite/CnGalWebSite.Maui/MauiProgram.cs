@@ -1,7 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using CnGalWebSite.DataModel.Application.Examines;
 using CnGalWebSite.DataModel.Application.Helper;
-using CnGalWebSite.DataModel.Application.Roles;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
 using CnGalWebSite.Maui.Services;
 using CnGalWebSite.Shared.Provider;
@@ -45,7 +44,6 @@ namespace CnGalWebSite.Maui
             builder.Services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
             builder.Services.AddScoped<IDataCacheService, DataCatcheService>();
 
-            builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped<IAppHelper, AppHelper>();
             builder.Services.AddScoped(x => new ExamineService());
             builder.Services.AddScoped(x => new ImagesLargeViewService());

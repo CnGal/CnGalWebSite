@@ -1,0 +1,116 @@
+﻿@inject IDataCacheService _dataCacheService
+
+<style>
+    .m-rating .m-icon {
+        padding: 0.1rem;
+    }
+</style>
+
+@if (isReady)
+{
+    @if (Large)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="fa fa-fw fa-star" Class="@Class">
+
+            <ButtonContent>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
+                    <MIcon Left>mdi-share-all-outline  </MIcon>
+                    查看详情
+                </MButton>
+            </ButtonContent>
+            <ChildContent>
+                <UserScoreGroup Model="Model" OnEdit="OnClickEditGameRecored" ShowBlankAction ShowChart MaxCount="2" />
+            </ChildContent>
+
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="fa fa-fw fa-star" Class="@Class">
+
+            <ButtonContent>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
+                    <MIcon Left>mdi-share-all-outline  </MIcon>
+                    查看详情
+                </MButton>
+            </ButtonContent>
+            <ChildContent>
+                <TotalScoreCard Model="Model" Outline />
+                <div>
+                    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickEditGameRecored">
+                        <MIcon Left> @(Model.IsCurrentUserScoreExist? "mdi-pencil" : "mdi-plus")</MIcon>
+                        @(Model.IsCurrentUserScoreExist? "编辑游玩记录" : "添加游玩记录")
+                    </MButton>
+                </div>
+
+            </ChildContent>
+
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
+
+
+
+}
+<CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip @ref="editGameRecordTip" OnChanged="OnChanged" />
+<OverviewDialog ShowBlankAction @ref="overviewDialog"/>
+
+
+@code {
+    [Parameter]
+    public PlayedGameOverviewModel Model { get; set; }
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public bool Large { get; set; }
+
+    CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip editGameRecordTip;
+    OverviewDialog overviewDialog;
+
+    bool isReady;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
+        try
+        {
+            Model = await _dataCacheService.PlayedGameOverviewDataCatche.GetCatche(Id.ToString(), true);
+
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, $"获取评分概览数据失败");
+        }
+    }
+
+    public async Task OnClickEditGameRecored()
+    {
+        if (editGameRecordTip != null)
+        {
+            await editGameRecordTip.Refresh(true, Id, null);
+        }
+    }
+
+    public async Task OnChanged()
+    {
+        _dataCacheService.PlayedGameOverviewDataCatche.Clean(Id.ToString());
+        await Refresh();
+    }
+
+    public async Task OnClickMore()
+    {
+        if (overviewDialog != null)
+        {
+            await overviewDialog.Refresh(true, Model);
+        }
+    }
+}

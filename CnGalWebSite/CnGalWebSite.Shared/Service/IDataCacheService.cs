@@ -1,6 +1,7 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
+using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
@@ -9,6 +10,7 @@ using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
@@ -88,6 +90,8 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<LineChartModel> LineChartDataCatche { get; set; }
 
+        IPageModelCatche<PlayedGameOverviewModel> PlayedGameOverviewDataCatche { get; set; }
+
         List<DocumentViewModel> DocumentsCatche { get; set; }
 
         List<RandomTagModel> RandomTagsCatche { get; set; }
@@ -109,6 +113,10 @@ namespace CnGalWebSite.Shared.Service
         List<GameRoleModel> GameRolesCatche { get; set; }
 
         NewsSummaryCacheModel NewsSummaryCache { get; set; }
+
+        List<JudgableGameViewModel> JudgableGamesCatche { get; set; }
+
+        List<PlayedGameUserScoreRandomModel> RandomUserScoresCatche { get; set; }
 
         IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
 

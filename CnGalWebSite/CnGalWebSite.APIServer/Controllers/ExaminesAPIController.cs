@@ -36,6 +36,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Message, long> _messageRepository;
         private readonly IRepository<Comment, long> _commentRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
+        private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
         private readonly IRankService _rankService;
@@ -44,7 +45,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository,
         IRepository<Message, long> messageRepository,
         UserManager<ApplicationUser> userManager, IExamineService examineService,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository)
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -58,6 +59,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _disambigRepository = disambigRepository;
             _rankService = rankService;
             _peripheryRepository = peripheryRepository;
+            _playedGameRepository = playedGameRepository;
         }
 
 
@@ -172,6 +174,7 @@ namespace CnGalWebSite.APIServer.Controllers
             Tag tag = null;
             Disambig disambig = null;
             Periphery periphery = null;
+            PlayedGame playedGame = null;
             //获取当前管理员ID
             var userAdmin = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
@@ -401,7 +404,7 @@ namespace CnGalWebSite.APIServer.Controllers
                             var serializer = new JsonSerializer();
                             commentText = (CommentText)serializer.Deserialize(str, typeof(CommentText));
                         }
-                        await _appHelper.ExaminePublishCommentTextAsync(comment, commentText);
+                        await _examineService.ExaminePublishCommentTextAsync(comment, commentText);
                         break;
                     case Operation.DisambigMain:
                         disambig = await _disambigRepository.FirstOrDefaultAsync(s => s.Id == examine.DisambigId);
@@ -503,6 +506,23 @@ namespace CnGalWebSite.APIServer.Controllers
 
                         await _examineService.ExamineEditPeripheryRelatedPeripheriesAsync(periphery, peripheryRelatedPeripheries);
                         break;
+                    case Operation.EditPlayedGameMain:
+                        playedGame = await _playedGameRepository.GetAll()
+                            .FirstOrDefaultAsync(s => s.Id == examine.PlayedGameId);
+                        if (playedGame == null)
+                        {
+                            return NotFound();
+                        }
+                        //序列化数据
+                        PlayedGameMain playedGameMain = null;
+                        using (TextReader str = new StringReader(examine.Context))
+                        {
+                            var serializer = new JsonSerializer();
+                            playedGameMain = (PlayedGameMain)serializer.Deserialize(str, typeof(PlayedGameMain));
+                        }
+
+                        await _examineService.ExamineEditPlayedGameMainAsync(playedGame, playedGameMain);
+                        break;
                 }
 
                 //修改审核状态
@@ -556,6 +576,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 comment = await _commentRepository.FirstOrDefaultAsync(s => s.Id == examine.CommentId);
                 disambig = await _disambigRepository.FirstOrDefaultAsync(s => s.Id == examine.DisambigId);
                 periphery = await _peripheryRepository.FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
+                playedGame = await _playedGameRepository.FirstOrDefaultAsync(s => s.Id == examine.PlayedGameId);
             }
             //给用户发送通知
             if (article != null)

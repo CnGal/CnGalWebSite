@@ -1,29 +1,30 @@
 ﻿
 <EditGameRecordTip @ref="editGameRecordTip" OnChanged="OnChanged" />
-<GameRecordViewTip @ref="gameRecordViewTip"  IsCurrentUser="IsCurrentUser" OnEdit="OnEdit" OnChanged="OnChanged"/>
+<GameRecordViewTip @ref="gameRecordViewTip" IsCurrentUser="IsCurrentUser" OnEdit="OnEdit" OnChanged="OnChanged" />
 
 <div class="row">
-    @foreach (var item in Model.Where(s => s.IsHidden == false))
+    @foreach (var item in Model.Where(s => s.IsHidden == false && (s.ShowPublicly || IsCurrentUser)))
     {
         <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mb-3">
-            <GameRecordViewCard Model="item" OnShow="OnShow" IsCurrentUser="IsCurrentUser" />
+            <GameRecordViewCard Model="item" OnShow="OnShow" />
         </div>
     }
 </div>
 @if (Model.Any(s => s.IsHidden) && IsCurrentUser)
 {
-    <div class="mb-3">
-        <TitleCollapseCard Icon="fa-unlink" Title="折叠的项目" @bind-IsCollapsed="IsCollapsed">
-            <div class="row mt-3">
-                @foreach (var item in Model.Where(s => s.IsHidden))
-                {
-                    <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mb-3">
-                        <GameRecordViewCard Model="item" OnShow="OnShow" />
-                    </div>
-                }
-            </div>
-        </TitleCollapseCard>
-    </div>
+
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="折叠的项目" Icon="fa fa-fw fa-star" @bind-IsCollapsed="IsCollapsed" Class="mb-3" Collapable>
+
+        <div class="row">
+            @foreach (var item in Model.Where(s => s.IsHidden))
+            {
+                <div class="col-6 col-md-6 col-lg-4 col-xxl-3 mb-3">
+                    <GameRecordViewCard Model="item" OnShow="OnShow" />
+                </div>
+            }
+        </div>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 }
 
 
