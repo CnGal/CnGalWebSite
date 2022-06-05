@@ -55,7 +55,16 @@
             <MSpacer></MSpacer>
             @if (ShowBlankAction == false && Model.IsCurrentUserScoreExist == false)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加游玩记录" OnClick="OnClickEditGameRecored" Icon="mdi-plus" TextStyle />
+                <AuthorizeView>
+                    <Authorized>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="添加游玩记录" OnClick="OnClickEditGameRecored" Icon="mdi-plus" TextStyle />
+
+                    </Authorized>
+                    <NotAuthorized>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后添加游玩记录" OnClick="OnLogin" Icon="mdi-login" TextStyle />
+
+                    </NotAuthorized>
+                </AuthorizeView>
             }
             @if (ShowNav)
             {
@@ -97,6 +106,13 @@
         showChart = true;
 
         StateHasChanged();
+    }
+
+    public async Task OnLogin()
+    {
+        Dialog=false;
+        await Task.Delay(1);
+        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
     }
 
     public async Task OnClickEditGameRecored()
