@@ -38,8 +38,8 @@
                 <TotalScoreCard Model="Model" Outline />
                 <div>
                     <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickEditGameRecored">
-                        <MIcon Left> @(Model.MyRecordExist? "mdi-pencil" : "mdi-plus")</MIcon>
-                        @(Model.MyRecordExist? "编辑游玩记录" : "添加游玩记录")
+                        <MIcon Left> @(Model.IsCurrentUserScoreExist? "mdi-pencil" : "mdi-plus")</MIcon>
+                        @(Model.IsCurrentUserScoreExist? "编辑游玩记录" : "添加游玩记录")
                     </MButton>
                 </div>
 

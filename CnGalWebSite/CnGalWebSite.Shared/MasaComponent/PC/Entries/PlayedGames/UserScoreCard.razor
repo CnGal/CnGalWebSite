@@ -2,7 +2,7 @@
 
 <div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100 p-4 ")" style="display: flex; flex-direction: column; justify-content: space-between;" @onclick="OnClick">
     <div>
-        <div style="display:flex;">
+        <div class="d-flex mb-2">
             <img loading="lazy" class="shadow-sm" src="@Model.User.PhotoPath" style="height: 50px;width: 50px;border-radius: 50%;" />
             <div class="comment-tx-div">
                 <div class="new-row-warp no-margin">
@@ -20,12 +20,9 @@
 
         @if (Model.Socres.IsScored)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="(int)Model.Socres.TotalSocre" Lable="总评" Class="pt-2" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="(int)Model.Socres.TotalSocre" Lable="总评"/>
             <div style="color:gray;" class="pb-2">
-                <span>音乐：@Model.Socres.MusicSocre</span>
-                <span>美术：@Model.Socres.PaintSocre</span>
-                <span>剧本：@Model.Socres.ScriptSocre</span>
-                <span>演出：@Model.Socres.ShowSocre</span>
+                @($"音乐{Model.Socres.MusicSocre}分,美术{Model.Socres.PaintSocre}分,剧本{Model.Socres.ScriptSocre}分,演出{Model.Socres.ShowSocre}分,程序{Model.Socres.SystemSocre}分,配音{Model.Socres.CVSocre}分")
             </div>
         }
 

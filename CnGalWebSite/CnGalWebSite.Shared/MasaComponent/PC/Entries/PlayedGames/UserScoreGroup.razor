@@ -17,12 +17,12 @@
             }
 
 
-            @if (Model.MyRecordExist)
+            @if (Model.IsCurrentUserScoreExist)
             {
                 <MSlideItem>
                     <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"
                            RefBack="@context.Ref">
-                        <UserScoreCard Model="Model.MyScores" OnEdit="OnEdit" ShowAction IsPublic="Model.MyRecordPublic" />
+                        <UserScoreCard Model="Model.UserScores.FirstOrDefault(s=>s.User.Id==Model.CurrentUserId)" OnEdit="OnEdit" ShowAction IsPublic="Model.IsCurrentUserScorePublic" />
                     </MCard>
                 </MSlideItem>
             }
@@ -50,7 +50,7 @@
 
             }
 
-            @foreach (var item in Items.Take(MaxCount))
+            @foreach (var item in Items.Where(s=>s.User.Id!=Model.CurrentUserId).Take(MaxCount))
             {
                 <MSlideItem>
                     <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"

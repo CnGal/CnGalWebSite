@@ -38,7 +38,14 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
         /// </summary>
         public string PlayImpressions { get; set; }
 
-
+        /// <summary>
+        /// 配音
+        /// </summary>
+        public int CVSocre { get; set; }
+        /// <summary>
+        /// 程序
+        /// </summary>
+        public int SystemSocre { get; set; }
         /// <summary>
         /// 演出
         /// </summary>
@@ -65,7 +72,7 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
         /// </summary>
         public bool ShowPublicly { get; set; } = true;
 
-        public bool IsScored => MusicSocre != 0 && ShowSocre != 0 && TotalSocre != 0 && PaintSocre != 0 && ScriptSocre != 0;
+        public bool IsScored => MusicSocre != 0 && ShowSocre != 0 && TotalSocre != 0 && PaintSocre != 0 && ScriptSocre != 0 && CVSocre != 0 && SystemSocre != 0;
 
         public bool IsHidden { get; set; }
     }

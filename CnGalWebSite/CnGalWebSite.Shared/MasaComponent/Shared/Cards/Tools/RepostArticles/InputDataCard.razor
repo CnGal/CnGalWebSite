@@ -9,13 +9,7 @@
     </div>
     <div class="row mb-4">
         <div class="col-12 col-sm-3 mb-4">
-            <MSelect Value="@model.Type" ValueChanged="ValueChanged" TValue="ArticleType" TItem="KeyValuePair<string, ArticleType>" TItemValue="ArticleType"
-                     Label="类型"  Color="@_dataCacheService.ThemeSetting.Theme" ItemColor="@_dataCacheService.ThemeSetting.Theme"
-                     Items="@items"
-                     ItemText="u => u.Key"
-                     ItemValue="u => u.Value"
-                     MenuProps="props => props.OffsetY = true">
-            </MSelect>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="model.Type" TValue="ArticleType" Lable="类型"/>
         </div>
         <div class="col-12 col-sm-9 mb-4">
             <MTextField Label="链接" @bind-Value="@model.Url" TValue="string"></MTextField>

@@ -11,17 +11,16 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 配音
         /// </summary>
-        [Obsolete("该分数弃用")]
         public int CVSocre { get; set; }
+        /// <summary>
+        /// 程序
+        /// </summary>
+        public int SystemSocre { get; set; }
         /// <summary>
         /// 演出
         /// </summary>
         public int ShowSocre { get; set; }
-        /// <summary>
-        /// 系统
-        /// </summary>
-        [Obsolete("该分数弃用")]
-        public int SystemSocre { get; set; }
+
         /// <summary>
         /// 美术
         /// </summary>
@@ -39,7 +38,7 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public int TotalSocre { get; set; }
 
-        public bool IsScored => MusicSocre != 0 && ShowSocre != 0 && TotalSocre != 0 && PaintSocre != 0 && ScriptSocre != 0;
+        public bool IsScored => MusicSocre != 0 && ShowSocre != 0 && TotalSocre != 0 && PaintSocre != 0 && ScriptSocre != 0&& CVSocre != 0&& SystemSocre != 0;
         /// <summary>
         /// 评分时间 创建时间
         /// </summary>

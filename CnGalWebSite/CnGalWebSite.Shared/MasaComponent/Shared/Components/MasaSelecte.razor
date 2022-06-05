@@ -1,0 +1,43 @@
+﻿@typeparam TValue where TValue : Enum
+@inject IDataCacheService _dataCacheService
+
+<MSelect Value="@Value" ValueChanged="ValueChanged" TValue="TValue" TItem="KeyValuePair<string, TValue>" TItemValue="TValue" Class="@Class"
+         Label="@Lable" Color="@_dataCacheService.ThemeSetting.Theme" ItemColor="@_dataCacheService.ThemeSetting.Theme"
+         Items="@items"
+         ItemText="u => u.Key"
+         ItemValue="u => u.Value"
+         MenuProps="props => props.OffsetY = true">
+</MSelect>
+
+@code {
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public string Lable { get; set; }
+
+    [Parameter]
+    public TValue Value { get; set; }
+    [Parameter]
+    public EventCallback<TValue> ValueChanged { get; set; }
+
+    List<KeyValuePair<string, TValue>> items = new List<KeyValuePair<string, TValue>>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        items.Clear();
+
+        System.Array values = System.Enum.GetValues(typeof(TValue));
+        foreach (var value in values)
+        {
+            var item = (TValue)value;
+            items.Add(new KeyValuePair<string, TValue>((item).GetDisplayName(), item));
+        }
+
+    }
+
+    public async Task OnValueChanged(TValue type)
+    {
+        Value = type;
+        await ValueChanged.InvokeAsync(type);
+    }
+}

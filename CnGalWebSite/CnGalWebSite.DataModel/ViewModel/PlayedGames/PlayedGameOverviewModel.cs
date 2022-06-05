@@ -2,6 +2,7 @@
 using CnGalWebSite.DataModel.ViewModel.Space;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
@@ -16,11 +17,12 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
 
         public List<PlayedGameUserScoreModel> UserScores { get; set; } = new List<PlayedGameUserScoreModel>();
 
-        public bool MyRecordExist { get; set; }
-
-        public bool MyRecordPublic { get; set; }
-
-        public PlayedGameUserScoreModel MyScores { get; set; } = new PlayedGameUserScoreModel();
+        /// <summary>
+        /// 当前用户的评分是否公开
+        /// </summary>
+        public bool IsCurrentUserScorePublic { get; set; }
+        public bool IsCurrentUserScoreExist { get; set; }
+        public string CurrentUserId { get; set; }
     }
 
     public class PlayedGameUserScoreModel
@@ -32,10 +34,20 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
 
         public DateTime LastEditTime { get; set; }
 
+
+
     }
 
     public class PlayedGameScoreModel
     {
+        /// <summary>
+        /// 配音
+        /// </summary>
+        public double CVSocre { get; set; }
+        /// <summary>
+        /// 程序
+        /// </summary>
+        public double SystemSocre { get; set; }
         /// <summary>
         /// 演出
         /// </summary>
@@ -57,6 +69,33 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
         /// </summary>
         public double TotalSocre { get; set; }
 
-        public bool IsScored => MusicSocre != 0 && ShowSocre != 0 && TotalSocre != 0 && PaintSocre != 0 && ScriptSocre != 0;
+        public bool IsScored => MusicSocre != 0 && ShowSocre != 0 && TotalSocre != 0 && PaintSocre != 0 && ScriptSocre != 0 && CVSocre != 0 && SystemSocre != 0;
+    }
+
+    public enum PlayedGameScoreType
+    {
+        [Display(Name ="总评")]
+        Total,
+        [Display(Name = "配音")]
+        CV,
+        [Display(Name = "程序")]
+        System,
+        [Display(Name = "演出")]
+        Show,
+        [Display(Name = "美术")]
+        Paint,
+        [Display(Name = "剧本")]
+        Script,
+        [Display(Name = "音乐")]
+        Music,
+
+    }
+
+    public enum PlayedGameCountScope
+    {
+        [Display(Name = "所有")]
+        All,
+        [Display(Name = "过滤后")]
+        Review,
     }
 }

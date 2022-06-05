@@ -1,10 +1,10 @@
 ﻿@if (isReady)
 {
-    <div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100")">
-        @if (Model.UserScores.Any() || Model.MyScores.Socres.IsScored)
+    <div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100")" style="display: flex; justify-content: center; height: 100%; flex-direction: column; ">
+        @if (Model.UserScores.Any(s => s.Socres.IsScored))
         {
             <div>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaRadarChart Model="model" MaxHeight="@("350px")" MaxWidth="@("300px")"/>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaRadarChart Model="model" MaxHeight="@("350px")" MaxWidth="@("300px")" />
             </div>
 
         }
@@ -31,7 +31,7 @@
     bool isReady;
     protected override async Task OnParametersSetAsync()
     {
-        if (Model.UserScores.Any() == false && Model.MyScores.Socres.IsScored == false)
+        if (Model.UserScores.Any(s=>s.Socres.IsScored) == false)
         {
             isReady = true;
             return;
@@ -41,7 +41,11 @@
         {
             model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
             {
-                Name = "总评"
+                Name = "程序"
+            });
+            model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+            {
+                Name = "配音"
             });
             model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
             {
@@ -75,22 +79,23 @@
         series.Add(new EChartsRadarOptionSeryData
         {
             Name = "所有",
-            Value = new List<double> { Model.GameTotalScores.TotalSocre, Model.GameTotalScores.ScriptSocre, Model.GameTotalScores.ShowSocre, Model.GameTotalScores.PaintSocre, Model.GameTotalScores.MusicSocre }
+            Value = new List<double> { Model.GameTotalScores.SystemSocre, Model.GameTotalScores.CVSocre, Model.GameTotalScores.ScriptSocre, Model.GameTotalScores.ShowSocre, Model.GameTotalScores.PaintSocre, Model.GameTotalScores.MusicSocre }
         });
         series.Add(new EChartsRadarOptionSeryData
         {
             Name = "过滤后",
-            Value = new List<double> { Model.GameReviewsScores.TotalSocre, Model.GameReviewsScores.ScriptSocre, Model.GameReviewsScores.ShowSocre, Model.GameReviewsScores.PaintSocre, Model.GameReviewsScores.MusicSocre }
+            Value = new List<double> { Model.GameReviewsScores.SystemSocre, Model.GameReviewsScores.CVSocre, Model.GameReviewsScores.ScriptSocre, Model.GameReviewsScores.ShowSocre, Model.GameReviewsScores.PaintSocre, Model.GameReviewsScores.MusicSocre }
         });
 
 
-        if (Model.MyScores != null && Model.MyScores.Socres.IsScored)
+        var myscores = Model.UserScores.FirstOrDefault(s => s.User.Id == Model.CurrentUserId && s.Socres.IsScored);
+        if (myscores != null)
         {
             model.Legend.Data.Add("我的");
             series.Add(new EChartsRadarOptionSeryData
             {
                 Name = "我的",
-                Value = new List<double> { Model.MyScores.Socres.TotalSocre, Model.MyScores.Socres.ScriptSocre, Model.MyScores.Socres.ShowSocre, Model.MyScores.Socres.PaintSocre, Model.MyScores.Socres.MusicSocre }
+                Value = new List<double> { myscores.Socres.SystemSocre, myscores.Socres.CVSocre, myscores.Socres.ScriptSocre, myscores.Socres.ShowSocre, myscores.Socres.PaintSocre, myscores.Socres.MusicSocre }
             });
         }
 

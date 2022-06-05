@@ -9,39 +9,32 @@
     <MCard>
 
         <MCardText Class="pt-6">
-            <div>
-                <a href="@("/space/index/"+@Model.User.Id)" style="display:flex;">
-                    <img loading="lazy" class="shadow-sm" src="@Model.User.PhotoPath" style="height: 50px;width: 50px;border-radius: 50%;" />
-                    <div class="comment-tx-div">
-                        <div class="new-row-warp no-margin">
-                            @foreach (var item in Model.User.Ranks)
-                            {
-                                <RankAloneViewTip Model="item"></RankAloneViewTip>
-                            }
-                        </div>
 
-
-                        <div class="a-font-color text-truncate-1">@Model.User.Name</div>
-
+            <a href="@("/space/index/"+@Model.User.Id)" class="d-flex mb-2">
+                <img loading="lazy" class="shadow-sm" src="@Model.User.PhotoPath" style="height: 50px;width: 50px;border-radius: 50%;" />
+                <div class="comment-tx-div">
+                    <div class="new-row-warp no-margin">
+                        @foreach (var item in Model.User.Ranks)
+                        {
+                            <RankAloneViewTip Model="item"></RankAloneViewTip>
+                        }
                     </div>
-                </a>
+                    <div class="a-font-color text-truncate-1">@Model.User.Name</div>
+                </div>
+            </a>
 
-                @if (Model.Socres.IsScored)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="(int)Model.Socres.TotalSocre" Lable="总评" Class="pt-2" />
-                    <div class="pb-2">
-                        <span>音乐：@Model.Socres.MusicSocre</span>
-                        <span>美术：@Model.Socres.PaintSocre</span>
-                        <span>剧本：@Model.Socres.ScriptSocre</span>
-                        <span>演出：@Model.Socres.ShowSocre</span>
-                    </div>
-                }
+            @if (Model.Socres.IsScored)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="(int)Model.Socres.TotalSocre" Lable="总评" />
+                <div style="color:gray;" class="pb-2">
+                    @($"音乐{Model.Socres.MusicSocre}分，美术{Model.Socres.PaintSocre}分，剧本{Model.Socres.ScriptSocre}分，演出{Model.Socres.ShowSocre}分，程序{Model.Socres.SystemSocre}分，配音{Model.Socres.CVSocre}分")
+                </div>
+            }
 
-                @if (string.IsNullOrWhiteSpace(Model.PlayImpressions) == false)
-                {
-                    <div>评语：@Model.PlayImpressions</div>
-                }
-            </div>
+            @if (string.IsNullOrWhiteSpace(Model.PlayImpressions) == false)
+            {
+                <div style="word-break: break-all;">评语：@Model.PlayImpressions</div>
+            }
         </MCardText>
         <MCardText>
             @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")

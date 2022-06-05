@@ -83,6 +83,10 @@ else
                         </div>
 
                     }
+                    @if (EntryView.Type == EntryType.Game)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
+                    }
                 </div>
                 <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8") ">
 

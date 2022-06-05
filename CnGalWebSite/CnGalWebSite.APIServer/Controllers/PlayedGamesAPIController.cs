@@ -106,6 +106,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     MusicSocre = game.MusicSocre,
                     PaintSocre = game.PaintSocre,
                     TotalSocre = game.TotalSocre,
+                    SystemSocre = game.SystemSocre,
+                    CVSocre = game.CVSocre,
                 };
             }
         }
@@ -145,7 +147,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     ShowSocre = model.ShowSocre,
                     MusicSocre = model.MusicSocre,
                     PaintSocre=model.PaintSocre,
-                    TotalSocre=model.TotalSocre,             
+                    TotalSocre=model.TotalSocre,
+                    SystemSocre=model.SystemSocre,
+                    CVSocre=model.CVSocre,
                 });
 
             }
@@ -157,6 +161,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 game.ShowSocre = model.ShowSocre;
                 game.MusicSocre = model.MusicSocre;
                 game.PaintSocre = model.PaintSocre;
+                game.SystemSocre = model.SystemSocre;
+                game.CVSocre = model.CVSocre;
                 game.TotalSocre = model.TotalSocre;
                 game.LastEditTime = DateTime.Now.ToCstTime();
 
@@ -177,6 +183,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 game.PlayImpressions = model.PlayImpressions;
 
                 game = await _playedGameRepository.UpdateAsync(game);
+
+                //删除待审核记录
+                await _examineRepository.DeleteRangeAsync(s => s.PlayedGameId == game.Id && s.ApplicationUserId == user.Id && s.IsPassed == null && s.Operation == Operation.EditPlayedGameMain);
+
 
                 return new Result { Successful = true };
             }
@@ -248,6 +258,16 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //获取词条
             var games = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.Entry).Where(s => s.ApplicationUserId == id).ToListAsync();
+            var gameIds = games.Select(s => s.Id).ToList();
+            //提前加载预览
+            //获取审核记录
+            var examines = await _examineRepository.GetAllListAsync(s => s.PlayedGameId!=null&& gameIds.Contains(s.PlayedGameId.Value) && s.ApplicationUserId == user.Id
+              && (s.Operation == Operation.EditPlayedGameMain) && s.IsPassed == null);
+
+            foreach(var item in examines)
+            {
+                _playedGameService.UpdateArticleData(games.FirstOrDefault(s => s.Id == item.PlayedGameId.Value), item);
+            }
 
             var model = new List<GameRecordViewModel>();
 
@@ -270,6 +290,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     PaintSocre = item.PaintSocre,
                     TotalSocre = item.TotalSocre,
                     ShowPublicly = item.ShowPublicly,
+                    SystemSocre = item.SystemSocre,
+                    CVSocre = item.CVSocre,
                 });
             }
 
@@ -321,6 +343,8 @@ namespace CnGalWebSite.APIServer.Controllers
                         MusicSocre = s.MusicSocre,
                         PaintSocre = s.PaintSocre,
                         TotalSocre = s.TotalSocre,
+                        SystemSocre = s.SystemSocre,
+                        CVSocre = s.CVSocre,
 
                     },
                     LastEditTime = s.LastEditTime,
@@ -329,21 +353,27 @@ namespace CnGalWebSite.APIServer.Controllers
                 }).ToList(),
             };
 
-            if (model.UserScores.Count != 0)
+
+            var alls = model.UserScores.Where(s => s.Socres.IsScored);
+            if (alls.Any())
             {
-                model.GameTotalScores.ScriptSocre = model.UserScores.Average(s => s.Socres.ScriptSocre);
-                model.GameTotalScores.ShowSocre = model.UserScores.Average(s => s.Socres.ShowSocre);
-                model.GameTotalScores.MusicSocre = model.UserScores.Average(s => s.Socres.MusicSocre);
-                model.GameTotalScores.PaintSocre = model.UserScores.Average(s => s.Socres.PaintSocre);
-                model.GameTotalScores.TotalSocre = model.UserScores.Average(s => s.Socres.TotalSocre);
+                model.GameTotalScores.ScriptSocre = alls.Average(s => s.Socres.ScriptSocre);
+                model.GameTotalScores.ShowSocre = alls.Average(s => s.Socres.ShowSocre);
+                model.GameTotalScores.MusicSocre = alls.Average(s => s.Socres.MusicSocre);
+                model.GameTotalScores.PaintSocre = alls.Average(s => s.Socres.PaintSocre);
+                model.GameTotalScores.SystemSocre = alls.Average(s => s.Socres.SystemSocre);
+                model.GameTotalScores.CVSocre = alls.Average(s => s.Socres.CVSocre);
+                model.GameTotalScores.TotalSocre = alls.Average(s => s.Socres.TotalSocre);
             }
-            var reviews = model.UserScores.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > 50);
+            var reviews = alls.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > 100);
             if (reviews.Any())
             {
                 model.GameReviewsScores.ScriptSocre = reviews.Average(s => s.Socres.ScriptSocre);
                 model.GameReviewsScores.ShowSocre = reviews.Average(s => s.Socres.ShowSocre);
                 model.GameReviewsScores.MusicSocre = reviews.Average(s => s.Socres.MusicSocre);
                 model.GameReviewsScores.PaintSocre = reviews.Average(s => s.Socres.PaintSocre);
+                model.GameReviewsScores.SystemSocre = reviews.Average(s => s.Socres.SystemSocre);
+                model.GameReviewsScores.CVSocre = reviews.Average(s => s.Socres.CVSocre);
                 model.GameReviewsScores.TotalSocre = reviews.Average(s => s.Socres.TotalSocre);
             }
 
@@ -358,7 +388,7 @@ namespace CnGalWebSite.APIServer.Controllers
             if (userScore != null)
             {
                 //获取审核记录
-                var examines = await _examineRepository.GetAll().Include(s => s.PlayedGame).Where(s => s.PlayedGame.EntryId == entry.Id && s.ApplicationUserId == user.Id
+                var examines = await _examineRepository.GetAll().Include(s => s.PlayedGame).Where(s => s.PlayedGameId==userScore.Id  && s.ApplicationUserId == user.Id
                   && (s.Operation == Operation.EditPlayedGameMain) && s.IsPassed == null).ToListAsync();
 
                 var examine = examines.FirstOrDefault(s => s.Operation == Operation.EditPlayedGameMain);
@@ -367,25 +397,14 @@ namespace CnGalWebSite.APIServer.Controllers
                     _playedGameService.UpdateArticleData(userScore, examine);
                 }
 
-                model.MyScores = new PlayedGameUserScoreModel
-                {
-                    Socres = new PlayedGameScoreModel
-                    {
-                        ScriptSocre = userScore.ScriptSocre,
-                        ShowSocre = userScore.ShowSocre,
-                        MusicSocre = userScore.MusicSocre,
-                        PaintSocre = userScore.PaintSocre,
-                        TotalSocre = userScore.TotalSocre,
-                    },
-                    LastEditTime = userScore.LastEditTime,
-                    PlayImpressions = userScore.PlayImpressions,
-                    User = await _userService.GetUserInforViewModel(user, true)
+                var current= model.UserScores.FirstOrDefault(s => s.User.Id == user.Id);
 
-                };
+                current.PlayImpressions = userScore.PlayImpressions;
+                model.IsCurrentUserScorePublic = userScore.ShowPublicly;
 
-                model.UserScores.RemoveAll(s => s.User.Id == user.Id);
-                model.MyRecordPublic = userScore.ShowPublicly;
-                model.MyRecordExist = true;
+                model.CurrentUserId = user.Id;
+                model.IsCurrentUserScoreExist = true;
+
             }
 
             return model;
