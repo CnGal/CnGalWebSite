@@ -30,6 +30,16 @@
     [Parameter]
     public EventCallback<string> OnInput { get; set; }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await OnInput.InvokeAsync();
+        }
+    }
+
     private async Task OnAdd()
     {
         try
@@ -51,7 +61,7 @@
 
     }
 
-    public async Task OnValueChanged(int index,string text)
+    public async Task OnValueChanged(int index, string text)
     {
         Model[index].DisplayName = text;
         await OnInput.InvokeAsync();

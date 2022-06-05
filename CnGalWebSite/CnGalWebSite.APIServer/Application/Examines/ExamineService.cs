@@ -2375,6 +2375,37 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
                             }
                         }
+                        else if (item.Modifier == "基本信息" && item.DisplayName == "制作组" && string.IsNullOrWhiteSpace(item.DisplayValue) == false)
+                        {
+                            var temp = await _entryRepository.GetAll()
+                                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                                 .FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
+
+                            if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
+                            {
+                                //补全审核记录
+                                //创建审核数据模型
+                                var examinedModel = new EntryRelevances();
+
+                                examinedModel.Relevances.Add(new EntryRelevancesAloneModel
+                                {
+                                    DisplayName = entry.Id.ToString(),
+                                    DisplayValue = entry.Name,
+                                    IsDelete = false,
+                                    Type = RelevancesType.Entry,
+                                });
+                                var resulte = "";
+                                using (TextWriter text = new StringWriter())
+                                {
+                                    var serializer = new JsonSerializer();
+                                    serializer.Serialize(text, examinedModel);
+                                    resulte = text.ToString();
+                                }
+
+                                await ExamineEstablishRelevancesAsync(temp, examinedModel);
+                                await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
+                            }
+                        }
                     }
                     else if (entry.Type == EntryType.Role)
                     {
