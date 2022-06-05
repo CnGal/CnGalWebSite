@@ -100,6 +100,9 @@
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     bool Dialog { get; set; }
 
+    [CascadingParameter]
+    private CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip CnGalRootTip { get; set; }
+
     bool isReady = false;
 
     public Task ValueChanged(StringNumber index)
@@ -148,18 +151,23 @@
 
                 if (string.IsNullOrWhiteSpace(Model.PlayImpressions) || Model.PlayImpressions.Length <= 100)
                 {
-                    if (_dataCacheService.ThemeSetting.PlayedGameInforCount > 0)
+                    if (_dataCacheService.ThemeSetting.PlayedGameInforCount >= 0)
                     {
 
                         await _toast.AddToast(new ToastConfig
                         {
                             Type = AlertTypes.Info,
                             Title="提示",
-                            Content = $"只有大于100字评语的评分才会记录到总分中哦。当然，不写评语也是OK的。这个提醒还会再出现{_dataCacheService.ThemeSetting.PlayedGameInforCount}次。",
+                            Content = $"只有大于100字评语的评分才会记录到总分中哦。当然，不写评语也是OK的。"+(_dataCacheService.ThemeSetting.PlayedGameInforCount>0?$"这个提醒还会再出现{_dataCacheService.ThemeSetting.PlayedGameInforCount}次。" :""),
                             Duration = 100000
                         });
 
                         _dataCacheService.ThemeSetting.PlayedGameInforCount--;
+
+                        if (CnGalRootTip != null)
+                        {
+                            await CnGalRootTip.SaveTheme();
+                        }
 
                     }
                 }

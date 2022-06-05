@@ -355,7 +355,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
             var alls = model.UserScores.Where(s => s.Socres.IsScored);
-            if (alls.Any())
+            if (alls!=null&&alls.Any())
             {
                 model.GameTotalScores.ScriptSocre = alls.Average(s => s.Socres.ScriptSocre);
                 model.GameTotalScores.ShowSocre = alls.Average(s => s.Socres.ShowSocre);
@@ -366,7 +366,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.GameTotalScores.TotalSocre = alls.Average(s => s.Socres.TotalSocre);
             }
             var reviews = alls.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > 100);
-            if (reviews.Any())
+            if (reviews != null&& reviews.Any())
             {
                 model.GameReviewsScores.ScriptSocre = reviews.Average(s => s.Socres.ScriptSocre);
                 model.GameReviewsScores.ShowSocre = reviews.Average(s => s.Socres.ShowSocre);

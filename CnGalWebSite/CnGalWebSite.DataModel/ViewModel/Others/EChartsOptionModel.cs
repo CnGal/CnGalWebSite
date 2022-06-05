@@ -87,7 +87,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
     public class EChartsRadarOptionLegend
     {
         public string Type { get; set; } = "scroll";
-        public int Bottom { get; set; } = 10;
+        public int Bottom { get; set; } = 0;
         public List<string> Data { get; set; } = new List<string>();
     }
 }

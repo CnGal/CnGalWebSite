@@ -6,7 +6,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Search
     {
         public long Id { get; set; }
 
-        public ArticleType? Type { get; set; } = null;
+        public ArticleType Type { get; set; }
 
         public string Name { get; set; }
 

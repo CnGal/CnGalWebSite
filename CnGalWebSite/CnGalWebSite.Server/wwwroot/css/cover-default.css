@@ -341,3 +341,6 @@ input.te-image-file-input {
 .m-toast-detail {
     white-space: pre-line;
 }
+.m-rating .m-icon {
+    padding: 0.1rem;
+}

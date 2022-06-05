@@ -9,7 +9,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Search
         [Display(Name = "Id")]
         public int Id { get; set; }
         [Display(Name = "类型")]
-        public EntryType? Type { get; set; } = null;
+        public EntryType Type { get; set; }
         [Display(Name = "唯一名称")]
         public string Name { get; set; }
         [Display(Name = "显示名称")]

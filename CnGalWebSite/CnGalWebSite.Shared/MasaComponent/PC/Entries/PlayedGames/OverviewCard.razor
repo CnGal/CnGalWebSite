@@ -52,7 +52,7 @@
 
 }
 <CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip @ref="editGameRecordTip" OnChanged="OnChanged" />
-<OverviewDialog @ref="overviewDialog" OnEdit="OnClickEditGameRecored" />
+<OverviewDialog ShowBlankAction @ref="overviewDialog"/>
 
 
 @code {
@@ -74,10 +74,10 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        await Refrsh();
+        await Refresh();
     }
 
-    public async Task Refrsh()
+    public async Task Refresh()
     {
         try
         {
@@ -103,7 +103,7 @@
     public async Task OnChanged()
     {
         _dataCacheService.PlayedGameOverviewDataCatche.Clean(Id.ToString());
-        await Refrsh();
+        await Refresh();
     }
 
     public async Task OnClickMore()

@@ -2,6 +2,7 @@
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
+using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
@@ -204,6 +205,14 @@ namespace CnGalWebSite.Shared.Service
         /// 折扣页面缓存辅助类
         /// </summary>
         public DiscountPageHelper DiscountPageCatcheHelper { get; set; } = new DiscountPageHelper();
+        /// <summary>
+        /// 可评选游戏缓存
+        /// </summary>
+        public List<JudgableGameViewModel> JudgableGamesCatche { get; set; } = new List<JudgableGameViewModel>();
+        /// <summary>
+        /// 随机用户评分
+        /// </summary>
+        public List<PlayedGameUserScoreRandomModel> RandomUserScoresCatche { get; set; } = new List<PlayedGameUserScoreRandomModel>();
 
         /// <summary>
         /// 评论详情

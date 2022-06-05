@@ -1,0 +1,18 @@
+﻿
+<div class="rounded shadow-sm  p-4 bg-opacity rounded" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+    <div style="width: 100%;">
+        <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;margin-left: 15%;margin-right: 15%;">
+        <h4 class="text-center mt-4" style=" font-weight: 600;">
+            这个游戏会没有被收录哦......<br />
+            不过你可以在这里<TabLink Text="创建游戏" Url="@(string.IsNullOrWhiteSpace(GameName) ?"/entries/establishentry":"/entries/establishentry?Name="+GameName)" Icon="fa fa-pencil-square" class="alert-link">创建</TabLink><br />
+            或者，你也可以<a class="alert-link">请求收录</a>
+        </h4>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsNeedLayput { get; set; }
+    [Parameter]
+    public string GameName { get; set; }
+}

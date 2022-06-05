@@ -17,15 +17,18 @@ else
 {
     <TitleTip></TitleTip>
 }
+@if (_dataCatcheService.ThemeSetting.IsTransparent)
+{
+    @if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class=" d-none  bg-d-lg-block bgimage-ison"></div>
+    }
+    @if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@Model.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
+    }
+}
 
-@if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
-{
-    <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class=" d-none  bg-d-lg-block bgimage-ison"></div>
-}
-@if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) == false)
-{
-    <div id="web_bg" style="background-image: url(@Model.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
-}
 
 @if (isNotFound == true)
 {
@@ -64,7 +67,7 @@ else
             }
 
             <div class="  rounded shadow-sm  bg-opacity mb-3">
-                <PeripheryMainInforTip Model="Model"/>
+                <PeripheryMainInforTip Model="Model" />
                 <div>
                     <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Periphery" Id="Model.Id" />
                 </div>
@@ -80,7 +83,7 @@ else
             @if (Model.Pictures.Count != 0)
             {
                 <div class="mb-3">
-                    <PeripheryImagesViewTip Model="Model" OnRevoke="OnRevoke"/>
+                    <PeripheryImagesViewTip Model="Model" OnRevoke="OnRevoke" />
                 </div>
             }
             <div class="">
@@ -213,7 +216,7 @@ else
         {
             Title = "确认撤销编辑",
             Content = "撤销编辑后会删除数据，无法恢复，请谨慎操作",
-            
+
             Category = SwalCategory.Warning,
         };
         var ret = await SwalService.ShowModal(op);

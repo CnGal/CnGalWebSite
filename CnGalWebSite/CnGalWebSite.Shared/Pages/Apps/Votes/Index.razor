@@ -15,10 +15,16 @@ else
 {
     <TitleTip></TitleTip>
 }
-@if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+
+@if (_dataCatcheService.ThemeSetting.IsTransparent)
 {
-    <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
+    @if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
+    }
 }
+
+
 <CnGalWebSite.Shared.AppComponent.Pages.Votes.HeadBar Title="@Model.DisplayName" IsShadow="true" />
 <div style="margin-top: 45px; width: 100%;margin-bottom:65px; " @onclick="@(() => voteFooter.UnRelyComment())">
     @if (isReady)

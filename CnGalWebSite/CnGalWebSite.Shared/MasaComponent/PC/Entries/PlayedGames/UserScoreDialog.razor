@@ -36,9 +36,25 @@
                 <div style="word-break: break-all;">评语：@Model.PlayImpressions</div>
             }
         </MCardText>
-        <MCardText>
+
+        @if (string.IsNullOrWhiteSpace(gameName) == false)
+        {
+            <MCardText Class="pb-2">
+                @($"《{gameName}》")
+            </MCardText>
+        }
+        <MCardText Class="@(gameId!=0?"pb-0":"")">
             @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")
         </MCardText>
+
+        @if (gameId!=0)
+        {
+            <MCardActions>
+                <MSpacer></MSpacer>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看词条页面" OnClick="OnNav" Icon="mdi-share-all-outline" TextStyle />
+            </MCardActions>
+        }
+
     </MCard>
 </MDialog>
 
@@ -49,14 +65,24 @@
 
     bool Dialog { get; set; }
 
+    int gameId = 0;
+    string gameName;
 
-
-
-    public Task Refresh(bool dialog, PlayedGameUserScoreModel model)
+    public Task Refresh(bool dialog, PlayedGameUserScoreModel model,string _gameName=null,int _gameId=0)
     {
+        gameId = _gameId;
+        gameName = _gameName;
         Dialog = dialog;
         Model = model;
         StateHasChanged();
         return Task.CompletedTask;
+    }
+
+
+    public async Task OnNav()
+    {
+        Dialog = false;
+        await Task.Delay(1);
+        NavigationManager.NavigateTo("/entries/index/" + gameId);
     }
 }

@@ -1,6 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-<div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100 p-4 ")" style="display: flex; flex-direction: column; justify-content: space-between;" @onclick="OnClick">
+<div class="@((Outline?"":" rounded bg-opacity h-100 p-4 ")+(Clickable?"div-shadow":"shadow-sm"))" style="display: flex; flex-direction: column; justify-content: space-between;" @onclick="OnClick">
     <div>
         <div class="d-flex mb-2">
             <img loading="lazy" class="shadow-sm" src="@Model.User.PhotoPath" style="height: 50px;width: 50px;border-radius: 50%;" />
@@ -20,7 +20,7 @@
 
         @if (Model.Socres.IsScored)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="(int)Model.Socres.TotalSocre" Lable="总评"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="(int)Model.Socres.TotalSocre" Lable="总评" />
             <div style="color:gray;" class="pb-2">
                 @($"音乐{Model.Socres.MusicSocre}分,美术{Model.Socres.PaintSocre}分,剧本{Model.Socres.ScriptSocre}分,演出{Model.Socres.ShowSocre}分,程序{Model.Socres.SystemSocre}分,配音{Model.Socres.CVSocre}分")
             </div>
@@ -44,6 +44,12 @@
                     仅自己可见
                 </span>
             }
+            @if (string.IsNullOrWhiteSpace(GameName) == false)
+            {
+                <div style="color:gray;" class="mt-2 pb-2">
+                    @($"《{GameName}》")
+                </div>
+            }
             <div style="color:gray;" class="mt-2">
                 @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")
             </div>
@@ -51,9 +57,15 @@
     }
     else
     {
-        <span style="color:gray;">
+        @if (string.IsNullOrWhiteSpace(GameName) == false)
+        {
+            <div style="color:gray;" class="mt-4">
+                @($"《{GameName}》")
+            </div>
+        }
+        <div style="color:gray;" class="mt-4">
             @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")
-        </span>
+        </div>
     }
 
 
@@ -66,6 +78,10 @@
     public EventCallback OnEdit { get; set; }
     [Parameter]
     public EventCallback OnClick { get; set; }
+    [Parameter]
+    public string GameName { get; set; }
+    [Parameter]
+    public bool Clickable { get; set; }
 
     [Parameter]
     public bool Outline { get; set; }

@@ -1,0 +1,72 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="随机评价" Icon="fa fa-fw fa-random" Class="mb-4" Outline>
+
+    <ButtonContent>
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
+            <MIcon Left>mdi-refresh  </MIcon>
+            换一批
+        </MButton>
+    </ButtonContent>
+    <ChildContent>
+        <div class="row">
+            @foreach (var item in _dataCacheService.RandomUserScoresCatche)
+            {
+                <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
+                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.UserScoreCard Model="item" GameName="@item.GameName"  Clickable OnClick="@(()=>OnClickUser(item))"/>
+                </div>
+            }
+        </div>
+    </ChildContent>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+<CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.UserScoreDialog @ref="userScoreDialog" />
+@code {
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.UserScoreDialog userScoreDialog;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await Refresh();
+    }
+
+
+    public async Task Refresh()
+    {
+        try
+        {
+            if (_dataCacheService.RandomUserScoresCatche.Count == 0)
+            {
+                _dataCacheService.RandomUserScoresCatche = await Http.GetFromJsonAsync<List<PlayedGameUserScoreRandomModel>>(ToolHelper.WebApiPath + "api/anniversaries/GetRandomUserScores");
+            }
+            _dataCacheService.RandomUserScoresCatche.Random();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取随机用户评分列表失败");
+        }
+    }
+
+    public Task OnClickMore()
+    {
+        _dataCacheService.RandomUserScoresCatche.Random();
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+
+    public async Task OnClickUser(PlayedGameUserScoreRandomModel model)
+    {
+        if (userScoreDialog != null)
+        {
+            await userScoreDialog.Refresh(true, model, model.GameName, model.GameId);
+        }
+    }
+}

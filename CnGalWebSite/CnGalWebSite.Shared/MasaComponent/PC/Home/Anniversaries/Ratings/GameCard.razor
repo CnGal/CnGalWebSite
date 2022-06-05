@@ -1,0 +1,137 @@
+﻿@inject IDataCacheService _dataCacheService
+
+    @if (Type == JudgableGamesDisplayType.LargeCard)
+    {
+        <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4" @onclick="@(()=>OnClick.InvokeAsync(Model))">
+            <div class="div-shadow rounded bg-opacity aticle-home-layout h-100" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="">
+                    <div class="">
+                        <img class="img-fluid" src="@Model.MainImage" alt="@Model.Name">
+                    </div>
+                    <div class="p-3">
+                        <header class="text-truncate-2">
+                            <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                        </header>
+                        <div class="text-truncate-4">
+                            @Model.BriefIntroduction
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+    else if (Type == JudgableGamesDisplayType.SmallCard)
+    {
+        @if (_dataCacheService.IsApp)
+        {
+
+            <div class="col-6 col-md-4 col-lg-3 col-xxl-2  mb-4" @onclick="@(()=>OnClick.InvokeAsync(Model))">
+                <div class="rounded h-100 div-shadow  bg-opacity" style="cursor: pointer ">
+                    <div>
+                        <img loading="lazy" src="@Model.MainImage" class="card-img-top" style="word-break: break-all;" alt="@Model.Name" />
+
+                        <div class="row ms-1" style=" color: white; margin-top: -23px;">
+                            <div class="col-6">
+                                <i class="fa fa-eye fa-fw "></i>
+                                <span class="article-infor-text">@Model.ReaderCount</span>
+                            </div>
+                            <div class="col-6">
+                                <i class="fa fa-star fa-fw "></i>
+                                <span class="article-infor-text">@Model.ScoreCount</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-2" style="padding: 0px; padding: 0px; padding-top: 0.5rem; padding-left: 0.4rem; padding-right: 0.4rem;">
+                        <span style="font-size: 15px;" class="home-card-name-text">@Model.Name</span>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-6 col-md-4 col-lg-3 col-xxl-2  mb-4" @onclick="@(()=>OnClick.InvokeAsync(Model))">
+                <div class=" h-100 rounded h-100 div-shadow  bg-opacity">
+                    <img loading="lazy" src="@Model.MainImage" class="card-img-top" alt="@Model.Name" />
+                    <div class="p-2">
+                        <span class="home-card-name-text">@Model.Name</span>
+
+                        <div class="row" style="color:gray">
+                            <div class="col-6">
+                                <i class="fa fa-eye fa-fw "></i>
+                                <span class="article-infor-text">@Model.ReaderCount</span>
+                            </div>
+                            <div class="col-6">
+                                <i class="fa fa-star fa-fw "></i>
+                                <span class="article-infor-text">@Model.ScoreCount</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+
+    }
+    else
+    {
+        @if (_dataCacheService.IsApp)
+        {
+            <div class="col-12  mb-4" @onclick="@(()=>OnClick.InvokeAsync(Model))">
+                <div class="div-shadow rounded  bg-opacity h-100">
+                    <div style="display: flex; align-items: center;">
+                        <div>
+                            <img loading="lazy" style=" width: 160px; " src="@Model.MainImage">
+                        </div>
+                        <div class="ms-2 me-2 w-100">
+                            <span class="text-truncate-1">
+                                <span class="fw-bold" style=" display: inline;">@Model.DisplayName</span>
+                            </span>
+                            <span class="text-truncate-2">
+                                @Model.BriefIntroduction
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        }
+        else
+        {
+            <div class="col-12  mb-4" @onclick="@(()=>OnClick.InvokeAsync(Model))">
+
+                <div class="div-shadow rounded  bg-opacity h-100">
+
+                    <div class="" style="display:flex;">
+                        <div class="">
+                            <img loading="lazy" style=" width: 250px; " src="@Model.MainImage">
+                        </div>
+                        <div class="p-3" style=" width: 100%;">
+                            <header class="text-truncate-1">
+                                <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                            </header>
+                            <span class="text-truncate-2">
+                                @Model.BriefIntroduction
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    }
+
+
+@code {
+    [Parameter]
+    public EventCallback<JudgableGameViewModel> OnClick { get; set; }
+    [Parameter]
+    public JudgableGameViewModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public JudgableGamesDisplayType Type { get; set; }
+}

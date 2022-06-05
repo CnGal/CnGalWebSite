@@ -3,8 +3,8 @@
     <div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100")" style="display: flex; justify-content: center; height: 100%; flex-direction: column; ">
         @if (Model.UserScores.Any(s => s.Socres.IsScored))
         {
-            <div>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaRadarChart Model="model" MaxHeight="@("350px")" MaxWidth="@("300px")" />
+            <div class="pb-2">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaRadarChart Model="model" MaxHeight="300" MaxWidth="250" />
             </div>
 
         }

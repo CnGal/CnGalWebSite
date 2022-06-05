@@ -33,10 +33,13 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
         public string PlayImpressions { get; set; }
 
         public DateTime LastEditTime { get; set; }
-
-
-
     }
+    public class PlayedGameUserScoreRandomModel: PlayedGameUserScoreModel
+    {
+        public string GameName { get; set; }
+        public int GameId { get; set; }
+    }
+
 
     public class PlayedGameScoreModel
     {

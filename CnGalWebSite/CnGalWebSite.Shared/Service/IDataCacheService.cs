@@ -1,6 +1,7 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
+using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
@@ -112,6 +113,10 @@ namespace CnGalWebSite.Shared.Service
         List<GameRoleModel> GameRolesCatche { get; set; }
 
         NewsSummaryCacheModel NewsSummaryCache { get; set; }
+
+        List<JudgableGameViewModel> JudgableGamesCatche { get; set; }
+
+        List<PlayedGameUserScoreRandomModel> RandomUserScoresCatche { get; set; }
 
         IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
 

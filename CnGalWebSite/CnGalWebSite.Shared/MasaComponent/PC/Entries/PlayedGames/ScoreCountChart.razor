@@ -5,16 +5,16 @@
         {
            <div style="display: flex; justify-content: flex-end;">
                <div style="max-width:100px;">
-                   <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="scope" ValueChanged="ScopeValueChanged" TValue="PlayedGameCountScope" Lable="范围" Class="pe-4 pt-0"/>
+                   <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="scope" ValueChanged="ScopeValueChanged" TValue="PlayedGameCountScope"  Class="pe-4 pt-0"/>
                </div>
                <div style="max-width:100px;">
-                   <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="type" ValueChanged="TypeValueChanged" TValue="PlayedGameScoreType" Lable="类型" Class="pe-4 pt-0"/>
+                   <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="type" ValueChanged="TypeValueChanged" TValue="PlayedGameScoreType"  Class="pe-4 pt-0"/>
                </div>
            </div>
             <div class="d-flex align-center justify-center">
                 @if (isReady)
                 {
-                    <MECharts Option="model" Width="@("100%")">
+                    <MECharts Option="model" Width="@("100%")" Height="300">
                     </MECharts>
                 }
 
@@ -54,6 +54,12 @@
     public void Refresh()
     {
         if (Model.UserScores.Any(s => s.Socres.IsScored)==false)
+        {
+            isReady = true;
+            return;
+        }
+
+        if(Model.UserScores.Any(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions) && s.PlayImpressions.Length > 100))==false)
         {
             isReady = true;
             return;

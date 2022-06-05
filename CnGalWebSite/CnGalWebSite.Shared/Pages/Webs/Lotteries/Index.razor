@@ -17,13 +17,18 @@ else
     <TitleTip></TitleTip>
 }
 
-@if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+@if (_dataCatcheService.ThemeSetting.IsTransparent)
 {
-    <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class=" d-none  bg-d-lg-block bgimage-ison"></div>
-}
-@if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) == false)
-{
-    <div id="web_bg" style="background-image: url(@Model.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
+
+    @if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class=" d-none  bg-d-lg-block bgimage-ison"></div>
+    }
+    @if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@Model.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
+    }
+
 }
 
 
@@ -80,7 +85,7 @@ else
                     <CnGalWebSite.Shared.Component.Lotteries.MainPage.BasicInforCard Model="Model" />
 
                     <CnGalWebSite.Shared.Component.Lotteries.MainPage.OptionInforCard ViewModel="Model" />
-                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.WinningUserListCard Model="Model.Awards"/>
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.WinningUserListCard Model="Model.Awards" />
                 </div>
             </div>
 
