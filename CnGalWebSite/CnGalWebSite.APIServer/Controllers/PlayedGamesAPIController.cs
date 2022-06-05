@@ -398,6 +398,28 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
 
                 var current= model.UserScores.FirstOrDefault(s => s.User.Id == user.Id);
+                if(current==null)
+                {
+                    current = new PlayedGameUserScoreModel
+                    {
+                        Socres = new PlayedGameScoreModel
+                        {
+                            ScriptSocre = userScore.ScriptSocre,
+                            ShowSocre = userScore.ShowSocre,
+                            MusicSocre = userScore.MusicSocre,
+                            PaintSocre = userScore.PaintSocre,
+                            TotalSocre = userScore.TotalSocre,
+                            SystemSocre = userScore.SystemSocre,
+                            CVSocre = userScore.CVSocre,
+
+                        },
+                        LastEditTime = userScore.LastEditTime,
+                        PlayImpressions = userScore.PlayImpressions,
+                        User = await _userService.GetUserInforViewModel(user, true)
+                    };
+                    model.UserScores.Add(current);
+                }
+
 
                 current.PlayImpressions = userScore.PlayImpressions;
                 model.IsCurrentUserScorePublic = userScore.ShowPublicly;
