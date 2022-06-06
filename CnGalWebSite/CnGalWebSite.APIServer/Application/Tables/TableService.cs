@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+﻿using CnGalWebSite.APIServer.Application.PlayedGames;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +20,9 @@ namespace CnGalWebSite.APIServer.Application.Tables
         private readonly IRepository<StaffInforTableModel, long> _staffInforTableModelRepository;
         private readonly IRepository<RoleInforTableModel, long> _roleInforTableModelRepository;
         private readonly IRepository<SteamInforTableModel, long> _steamInforTableModelRepository;
+        private readonly IPlayedGameService _playedGameService;
 
-
-        public TableService(IRepository<BasicInforTableModel, long> basicInforTableModelRepository, IRepository<Entry, int> entryRepository,
+        public TableService(IRepository<BasicInforTableModel, long> basicInforTableModelRepository, IRepository<Entry, int> entryRepository, IPlayedGameService playedGameService,
         IRepository<GroupInforTableModel, long> groupInforTableModelRepository, IRepository<MakerInforTableModel, long> makerInforTableModelRepository,
         IRepository<StaffInforTableModel, long> staffInforTableModelRepository, IRepository<RoleInforTableModel, long> roleInforTableModelRepository,
         IRepository<SteamInforTableModel, long> steamInforTableModelRepository, IRepository<SteamInfor, long> steamInforRepository)
@@ -34,6 +35,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             _roleInforTableModelRepository = roleInforTableModelRepository;
             _steamInforTableModelRepository = steamInforTableModelRepository;
             _steamInforRepository = steamInforRepository;
+            _playedGameService = playedGameService;
         }
 
         public async Task UpdateBasicInforListAsync()
@@ -698,6 +700,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             await UpdateRoleInforListAsync();
             await UpdateStaffInforListAsync();
             await UpdateSteamInforListAsync();
+            await _playedGameService.UpdateAllGameScore();
         }
     }
 }

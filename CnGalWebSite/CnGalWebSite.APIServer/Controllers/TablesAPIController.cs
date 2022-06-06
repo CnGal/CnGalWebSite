@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+﻿using CnGalWebSite.APIServer.Application.PlayedGames;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.AspNetCore.Authorization;
@@ -23,8 +24,9 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<RoleInforTableModel, long> _roleInforTableModelRepository;
         private readonly IRepository<SteamInforTableModel, long> _steamInforTableModelRepository;
         private readonly IRepository<MakerInforTableModel, long> _makerInforTableModelRepository;
+        private readonly IRepository<GameScoreTableModel, long> _gameScoreTableRepository;
 
-        public TablesAPIController(IRepository<BasicInforTableModel, long> basicInforTableModelRepository,
+        public TablesAPIController(IRepository<BasicInforTableModel, long> basicInforTableModelRepository, IRepository<GameScoreTableModel, long> gameScoreTableRepository,
         IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository, IRepository<GroupInforTableModel, long> groupInforTableModelRepository,
             IRepository<StaffInforTableModel, long> staffInforTableModelRepository, IRepository<RoleInforTableModel, long> roleInforTableModelRepository, IRepository<SteamInforTableModel, long> steamInforTableModelRepository,
            IRepository<MakerInforTableModel, long> makerInforTableModelRepository)
@@ -37,7 +39,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _staffInforTableModelRepository = staffInforTableModelRepository;
             _roleInforTableModelRepository = roleInforTableModelRepository;
             _steamInforTableModelRepository = steamInforTableModelRepository;
-            _makerInforTableModelRepository = makerInforTableModelRepository;
+            _makerInforTableModelRepository=makerInforTableModelRepository;
+            _gameScoreTableRepository = gameScoreTableRepository;
         }
 
         [HttpGet]
@@ -131,6 +134,20 @@ namespace CnGalWebSite.APIServer.Controllers
             if (result != null)
             {
                 model.SteamInfors = result;
+            }
+
+            return model;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<GameScoreListViewModel>> GetGameScoreListAsync()
+        {
+            var model = new GameScoreListViewModel();
+
+            var result = await _gameScoreTableRepository.GetAll().AsNoTracking().ToListAsync();
+            if (result != null)
+            {
+                model.GameScores = result;
             }
 
             return model;

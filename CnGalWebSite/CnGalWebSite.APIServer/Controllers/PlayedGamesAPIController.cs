@@ -93,7 +93,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var examine = examines.FirstOrDefault(s => s.Operation == Operation.EditPlayedGameMain);
                 if (examine != null)
                 {
-                    _playedGameService.UpdateArticleData(game, examine);
+                    _playedGameService.UpdatePlayedGameData(game, examine);
                 }
                 return new EditGameRecordModel
                 {
@@ -281,7 +281,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             foreach(var item in examines)
             {
-                _playedGameService.UpdateArticleData(games.FirstOrDefault(s => s.Id == item.PlayedGameId.Value), item);
+                _playedGameService.UpdatePlayedGameData(games.FirstOrDefault(s => s.Id == item.PlayedGameId.Value), item);
             }
 
             var model = new List<GameRecordViewModel>();
@@ -368,30 +368,26 @@ namespace CnGalWebSite.APIServer.Controllers
                 }).ToList(),
             };
 
-
-            var alls = model.UserScores.Where(s => s.Socres.IsScored);
-            if (alls!=null&&alls.Any())
+            var gameScores = await _playedGameService.GetGameScores(entry.Id);
+            if(gameScores!=null)
             {
-                model.GameTotalScores.ScriptSocre = alls.Average(s => s.Socres.ScriptSocre);
-                model.GameTotalScores.ShowSocre = alls.Average(s => s.Socres.ShowSocre);
-                model.GameTotalScores.MusicSocre = alls.Average(s => s.Socres.MusicSocre);
-                model.GameTotalScores.PaintSocre = alls.Average(s => s.Socres.PaintSocre);
-                model.GameTotalScores.SystemSocre = alls.Average(s => s.Socres.SystemSocre);
-                model.GameTotalScores.CVSocre = alls.Average(s => s.Socres.CVSocre);
-                model.GameTotalScores.TotalSocre = alls.Average(s => s.Socres.TotalSocre);
-            }
-            var reviews = alls.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > 100);
-            if (reviews != null&& reviews.Any())
-            {
-                model.GameReviewsScores.ScriptSocre = reviews.Average(s => s.Socres.ScriptSocre);
-                model.GameReviewsScores.ShowSocre = reviews.Average(s => s.Socres.ShowSocre);
-                model.GameReviewsScores.MusicSocre = reviews.Average(s => s.Socres.MusicSocre);
-                model.GameReviewsScores.PaintSocre = reviews.Average(s => s.Socres.PaintSocre);
-                model.GameReviewsScores.SystemSocre = reviews.Average(s => s.Socres.SystemSocre);
-                model.GameReviewsScores.CVSocre = reviews.Average(s => s.Socres.CVSocre);
-                model.GameReviewsScores.TotalSocre = reviews.Average(s => s.Socres.TotalSocre);
-            }
+                model.GameTotalScores.ScriptSocre = gameScores.AllScriptSocre;
+                model.GameTotalScores.TotalSocre = gameScores.AllTotalSocre;
+                model.GameTotalScores.ShowSocre = gameScores.AllShowSocre;
+                model.GameTotalScores.MusicSocre = gameScores.AllMusicSocre;
+                model.GameTotalScores.PaintSocre = gameScores.AllPaintSocre;
+                model.GameTotalScores.SystemSocre = gameScores.AllSystemSocre;
+                model.GameTotalScores.CVSocre = gameScores.AllCVSocre;
 
+                model.GameReviewsScores.ScriptSocre = gameScores.FilterScriptSocre;
+                model.GameReviewsScores.TotalSocre = gameScores.FilterTotalSocre;
+                model.GameReviewsScores.ShowSocre = gameScores.FilterShowSocre;
+                model.GameReviewsScores.MusicSocre = gameScores.FilterMusicSocre;
+                model.GameReviewsScores.PaintSocre = gameScores.FilterPaintSocre;
+                model.GameReviewsScores.SystemSocre = gameScores.FilterSystemSocre;
+                model.GameReviewsScores.CVSocre = gameScores.FilterCVSocre;
+            }
+         
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
             if (user==null)
@@ -409,7 +405,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var examine = examines.FirstOrDefault(s => s.Operation == Operation.EditPlayedGameMain);
                 if (examine != null)
                 {
-                    _playedGameService.UpdateArticleData(userScore, examine);
+                    _playedGameService.UpdatePlayedGameData(userScore, examine);
                 }
 
                 var current= model.UserScores.FirstOrDefault(s => s.User.Id == user.Id);

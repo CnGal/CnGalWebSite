@@ -15,7 +15,7 @@
             <div>
                 @if (isReady)
                 {
-                    <CnGalWebSite.Shared.Component.Entries.NewVersion.ExaminesInforCard Model="Model" OnNavClick="OnClickClose" />
+                    <CnGalWebSite.Shared.Component.Entries.NewVersion.ExaminesInforCard Model="Model" OnNavClick="OnNavClick" />
                 }
                 else
                 {
@@ -108,5 +108,12 @@
         {
             await OnClickClose.InvokeAsync();
         }
+    }
+
+    public async Task OnNavClick()
+    {
+        Dialog = false;
+        await Task.Delay(1);
+       await OnClickClose.InvokeAsync();
     }
 }

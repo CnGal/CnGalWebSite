@@ -16,7 +16,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Robots
 
         [Display(Name = "备注")]
         public string Note { get; set; }
-        [Display(Name = "强制匹配")]
+        [Display(Name = "需要匹配")]
         public bool ForceMatch { get; set; }
         [Display(Name = "是否隐藏")]
         public bool IsHidden { get; set; }

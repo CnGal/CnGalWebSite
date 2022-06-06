@@ -1,6 +1,7 @@
 ﻿@inject HttpClient Http
-@inject ToastService? ToastService
-@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
 
 @if (!isReady)
 {
@@ -30,11 +31,11 @@ else
             <TableColumn @bind-Field="@context.CutNow" Filterable="true" Sortable="true" Width="150" TextWrap="true" Formatter="CutFormatter" />
             <TableColumn @bind-Field="@context.PriceLowest" Filterable="true" Sortable="true" Width="150" TextWrap="true" Formatter="PriceLowestFormatter" />
             <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="CutLowestFormatter" />
-            <TableColumn @bind-Field="@context.EvaluationCount" Filterable="true" Sortable="true" Width="170" TextWrap="true"/>
+            <TableColumn @bind-Field="@context.EvaluationCount" Filterable="true" Sortable="true" Width="170" TextWrap="true" />
             <TableColumn @bind-Field="@context.RecommendationRate" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="RecommendationRateFormatter" />
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.SteamId))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.SteamId))" />
         </RowButtonTemplate>
 
     </Table>
@@ -60,17 +61,10 @@ else
     {
         try
         {
-            await OpenNewPage("https://store.steampowered.com/app/" + id);
+            await _dataCacheService.OpenNewPage.InvokeAsync("https://store.steampowered.com/app/" + id);
         }
         catch { }
     }
-    #region 新建标签页
-
-    public async Task OpenNewPage(string url)
-    {
-        await JS.InvokeAsync<string>("openNewPage", url);
-    }
-    #endregion
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,14 +80,14 @@ else
         }
     }
 
-    public async Task< string> PriceFormatter(object price)
+    public async Task<string> PriceFormatter(object price)
     {
-        string res= ((double)(int)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)price).Value/100).ToString("0.00");
-        if(res=="-0.01")
+        string res = ((double)(int)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)price).Value / 100).ToString("0.00");
+        if (res == "-0.01")
         {
             res = "未发售";
         }
-        else if(res == "-0.02")
+        else if (res == "-0.02")
         {
             res = "已下架";
         }
@@ -151,16 +145,16 @@ else
         {
             res = "无";
         }
-     
+
 
         return res;
     }
     public async Task<string> LowestTimeFormatter(object cut)
     {
         DateTime res = (DateTime)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)cut).Value;
-        if (res==DateTime.MinValue||res.Year==1970)
+        if (res == DateTime.MinValue || res.Year == 1970)
         {
-            return  "未记录";
+            return "未记录";
         }
         else
         {
@@ -204,7 +198,7 @@ else
         {
             // 外部未进行排序，内部自动进行排序处理
             var invoker = SortLambdaCacheSteam.GetOrAdd(typeof(SteamInforTableModel), key => LambdaExtensions.GetSortLambda<SteamInforTableModel>().Compile());
-            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
             isSorted = true;
         }
 

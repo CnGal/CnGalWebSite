@@ -1,5 +1,7 @@
 ﻿@inject HttpClient Http
 @inject ToastService? ToastService
+@inject NavigationManager NavigationManager
+
 @if (!isReady)
 {
     <SkeletonParagraph />
@@ -28,7 +30,7 @@ else
 
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.RealId,context.Name))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.RealId))" />
         </RowButtonTemplate>
 
     </Table>
@@ -52,14 +54,11 @@ else
     [Parameter]
     public EventCallback<NavigateModel> OnClickUrl { get; set; }
 
-    public async Task OnLook(long id, string name)
+    public Task OnLook(long id)
     {
-        await OnClickUrl.InvokeAsync(new NavigateModel
-        {
-            Url = "/entries/index/" + id,
-            Title = name,
-            Icon = "fa fa-link"
-        });
+        NavigationManager.NavigateTo("/entries/index/" + id);
+        return Task.CompletedTask;
+
     }
 
     protected override async Task OnInitializedAsync()
@@ -125,7 +124,7 @@ else
         {
             // 外部未进行排序，内部自动进行排序处理
             var invoker = SortLambdaCacheGroup.GetOrAdd(typeof(GroupInforTableModel), key => LambdaExtensions.GetSortLambda<GroupInforTableModel>().Compile());
-            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
             isSorted = true;
         }
 

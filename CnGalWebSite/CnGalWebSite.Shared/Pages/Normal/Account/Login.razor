@@ -151,11 +151,13 @@
     {
         if(string.IsNullOrWhiteSpace(Model.Password))
         {
-
+           await ToastService.Error("请输入密码", "请输入密码");
+            return;
         }
         if (string.IsNullOrWhiteSpace(Model.UserName))
         {
-
+           await ToastService.Error("请输入用户名", "请输入户名");
+            return;
         }
 
         try

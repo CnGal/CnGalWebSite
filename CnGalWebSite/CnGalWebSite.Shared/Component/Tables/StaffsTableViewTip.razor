@@ -1,5 +1,6 @@
 ﻿@inject HttpClient Http
-@inject ToastService? ToastService
+@inject NavigationManager NavigationManager
+
 @if (!isReady)
 {
     <SkeletonParagraph />
@@ -127,7 +128,7 @@ else
         {
             // 外部未进行排序，内部自动进行排序处理
             var invoker = SortLambdaCacheStaff.GetOrAdd(typeof(StaffInforTableModel), key => LambdaExtensions.GetSortLambda<StaffInforTableModel>().Compile());
-            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
             isSorted = true;
         }
 
