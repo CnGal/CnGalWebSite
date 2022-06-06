@@ -73,15 +73,15 @@
 
     public async Task OnClickUser(ExaminedNormalListModel model)
     {
+        await OnNavClick.InvokeAsync();
 
         NavigationManager.NavigateTo("/space/index/" + model.UserId);
-        await OnNavClick.InvokeAsync();
     }
     public async Task OnClickExamine(ExaminedNormalListModel model)
     {
+        await OnNavClick.InvokeAsync();
 
         NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + model.Id);
 
-        await OnNavClick.InvokeAsync();
     }
 }

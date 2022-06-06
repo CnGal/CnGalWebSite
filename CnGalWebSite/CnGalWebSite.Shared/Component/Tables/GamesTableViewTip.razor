@@ -1,8 +1,10 @@
 ﻿@inject HttpClient Http
 @inject ToastService? ToastService
+@inject NavigationManager NavigationManager
+
 @if (!isReady)
 {
-<SkeletonParagraph />
+    <SkeletonParagraph />
     <div class="mt-2">
     </div>
     <SkeletonParagraph />
@@ -15,32 +17,32 @@
 }
 else
 {
-<Table TItem="BasicInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
-       OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelBasic" ShowSearch="true" ShowLoading="true"
-       ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
-       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
-    <TableColumns>
-        <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" TextWrap="true" Fixed="true" />
-        <TableColumn @bind-Field="@context.IssueTime" FormatString="yyyy-MM-dd" Sortable="true" DefaultSort="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.ProductionGroup" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
+    <Table TItem="BasicInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
+           OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelBasic" ShowSearch="true" ShowLoading="true"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
+        <TableColumns>
+            <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" TextWrap="true" Fixed="true" />
+            <TableColumn @bind-Field="@context.IssueTime" FormatString="yyyy-MM-dd" Sortable="true" DefaultSort="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.ProductionGroup" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
 
-        <TableColumn @bind-Field="@context.Original" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.GamePlatforms" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.Engine" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.Publisher" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.GameNickname" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.Tags" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.IssueMethod" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.OfficialWebsite" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.SteamId" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.QQgroupGame" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-    </TableColumns>
-    <RowButtonTemplate>
-        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.RealId, context.Name))" />
-    </RowButtonTemplate>
+            <TableColumn @bind-Field="@context.Original" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.GamePlatforms" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Engine" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Publisher" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.GameNickname" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Tags" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.IssueMethod" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.OfficialWebsite" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.SteamId" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.QQgroupGame" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.RealId))" />
+        </RowButtonTemplate>
 
-</Table>
+    </Table>
 }
 
 @code {
@@ -63,7 +65,7 @@ else
             ModelBasic = await Http.GetFromJsonAsync<BasicInforListViewModel>(ToolHelper.WebApiPath + "api/tables/GetBasicInforList");
             isReady = true;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "无法获取基础信息汇总表格");
         }
@@ -71,14 +73,11 @@ else
     [Parameter]
     public EventCallback<NavigateModel> OnClickUrl { get; set; }
 
-    public async Task OnLook(long id, string name)
+    public Task OnLook(long id)
     {
-        await OnClickUrl.InvokeAsync(new NavigateModel
-        {
-            Url = "/entries/index/" + id,
-            Title = name,
-            Icon = "fa fa-link"
-        });
+        NavigationManager.NavigateTo("/entries/index/" + id);
+        return Task.CompletedTask;
+
     }
     private Task<QueryData<BasicInforTableModel>> OnQueryBasicAsync(QueryPageOptions options)
     {
@@ -137,7 +136,7 @@ else
         {
             // 外部未进行排序，内部自动进行排序处理
             var invoker = SortLambdaCacheBasic.GetOrAdd(typeof(BasicInforTableModel), key => LambdaExtensions.GetSortLambda<BasicInforTableModel>().Compile());
-            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
             isSorted = true;
         }
 

@@ -1,11 +1,15 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+﻿using BootstrapBlazor.Components;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.EntityFrameworkCore;
+using Nest;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,68 +23,112 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
     public class PlayedGameService : IPlayedGameService
     {
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
+        private readonly IRepository<Entry, int> _entryRepository;
+        private readonly IRepository<GameScoreTableModel, long> _gameScoreTableRepository;
         private readonly IAppHelper _appHelper;
 
-        public PlayedGameService(IAppHelper appHelper, IRepository<PlayedGame, long> playedGameRepository)
+        public PlayedGameService(IAppHelper appHelper, IRepository<PlayedGame, long> playedGameRepository, IRepository<GameScoreTableModel, long> gameScoreTableRepository,
+            IRepository<Entry, int> entryRepository)
         {
             _playedGameRepository = playedGameRepository;
             _appHelper = appHelper;
+            _gameScoreTableRepository = gameScoreTableRepository;
+            _entryRepository = entryRepository;
         }
 
-        public async Task<PagedResultDto<EntryInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input)
+        public async Task<QueryData<ListPlayedGameAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListPlayedGameAloneModel searchModel)
         {
-            var query = _playedGameRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == input.FilterText);
+            var items = _playedGameRepository.GetAll()
+                .Include(s => s.ApplicationUser)
+                .Include(s => s.Entry).AsNoTracking();
 
-            //统计查询数据的总条数
-            var count = query.Count(s => s.EntryId != 0);
-            //根据需求进行排序，然后进行分页逻辑的计算
-            //这个特殊方法中当前页数解释为起始位
-            query = query.OrderBy(input.Sorting).Skip(input.CurrentPage).Take(input.MaxResultCount);
-
-            //将结果转换为List集合 加载到内存中
-            List<Entry> models = null;
-            if (count != 0)
+            // 处理高级搜索
+            if (searchModel.GameId != 0)
             {
-                models = await query.AsNoTracking().Include(s => s.Entry).Where(s => s.EntryId != 0).Select(s => s.Entry).ToListAsync();
-            }
-            else
-            {
-                models = new List<Entry>();
+                items = items.Where(item => item.EntryId.ToString().Contains(searchModel.GameId.ToString(), StringComparison.OrdinalIgnoreCase));
             }
 
-            var dtos = new List<EntryInforTipViewModel>();
-            foreach (var item in models)
+            if (!string.IsNullOrWhiteSpace(searchModel.UserId))
             {
-                if (item == null)
-                {
-                    continue;
-                }
+                items = items.Where(item => item.ApplicationUserId.Contains(searchModel.UserId, StringComparison.OrdinalIgnoreCase));
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.UserName))
+            {
+                items = items.Where(item => item.ApplicationUser.UserName.Contains(searchModel.UserName, StringComparison.OrdinalIgnoreCase));
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.GameName))
+            {
+                items = items.Where(item => item.Entry.Name.Contains(searchModel.GameName, StringComparison.OrdinalIgnoreCase));
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.PlayImpressions))
+            {
+                items = items.Where(item => item.PlayImpressions.Contains(searchModel.PlayImpressions, StringComparison.OrdinalIgnoreCase));
+            }
+            if (searchModel.Type != null)
+            {
+                items = items.Where(item => item.Type == searchModel.Type);
+            }
 
-                dtos.Add(new EntryInforTipViewModel
+
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => item.EntryId.ToString().Contains(options.SearchText)
+                             || item.ApplicationUserId.Contains(options.SearchText)
+                             || item.PlayImpressions.Contains(options.SearchText));
+            }
+
+            // 排序
+            var isSorted = false;
+            if (!string.IsNullOrWhiteSpace(options.SortName))
+            {
+
+                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+                isSorted = true;
+            }
+
+            // 设置记录总数
+            var total = items.Count();
+
+            // 内存分页
+            var itemsReal = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
+
+            //复制数据
+            var resultItems = new List<ListPlayedGameAloneModel>();
+            foreach (var item in itemsReal)
+            {
+                resultItems.Add(new ListPlayedGameAloneModel
                 {
                     Id = item.Id,
-                    Name = item.Name,
-                    Type = item.Type,
-                    DisplayName = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName,
-                    MainImage = _appHelper.GetImagePath(item.MainPicture, "app.png"),
-                    BriefIntroduction = item.BriefIntroduction,
+                    ScriptSocre = item.ScriptSocre,
+                    ShowPublicly = item.ShowPublicly,
+                    ShowSocre = item.ShowSocre,
+                    SystemSocre = item.SystemSocre,
+                    CVSocre = item.CVSocre,
+                    IsInSteam = item.IsInSteam,
+                    MusicSocre = item.MusicSocre,
+                    PaintSocre = item.PaintSocre,
+                    TotalSocre = item.TotalSocre,
+                    IsHidden = item.IsHidden,
                     LastEditTime = item.LastEditTime,
-                    ReaderCount = item.ReaderCount,
-                    CommentCount = item.CommentCount
+                    PlayDuration = item.PlayDuration,
+                    PlayImpressions = item.PlayImpressions,
+                    Type = item.Type,
+                    GameId = item.EntryId ?? 0,
+                    GameName = item.Entry?.Name,
+                    UserName = item.ApplicationUser?.UserName,
+                    UserId = item.ApplicationUserId
                 });
-
             }
-            var dtos_ = new PagedResultDto<EntryInforTipViewModel>
+
+            return new QueryData<ListPlayedGameAloneModel>()
             {
-                TotalCount = count,
-                CurrentPage = input.CurrentPage,
-                MaxResultCount = input.MaxResultCount,
-                Data = dtos,
-                FilterText = input.FilterText,
-                Sorting = input.Sorting,
-                ScreeningConditions = input.ScreeningConditions
+                Items = resultItems,
+                TotalCount = total,
+                IsSorted = isSorted,
+                // IsFiltered = isFiltered
             };
-            return dtos_;
         }
 
         public void UpdatePlayedGameDataMain(PlayedGame playedGame, PlayedGameMain examine)
@@ -92,11 +140,11 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
             playedGame.LastEditTime = DateTime.Now.ToCstTime();
 
         }
-        public  void UpdateArticleData(PlayedGame playedGame, Examine examine)
+        public void UpdatePlayedGameData(PlayedGame playedGame, Examine examine)
         {
             switch (examine.Operation)
             {
-               
+
                 case Operation.EditPlayedGameMain:
                     PlayedGameMain playedGameMain = null;
                     using (TextReader str = new StringReader(examine.Context))
@@ -105,10 +153,170 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
                         playedGameMain = (PlayedGameMain)serializer.Deserialize(str, typeof(PlayedGameMain));
                     }
 
-                     UpdatePlayedGameDataMain(playedGame, playedGameMain);
+                    UpdatePlayedGameDataMain(playedGame, playedGameMain);
                     break;
-             
+
             }
+        }
+
+        public async Task<GameScoreTableModel> GetGameScores(int id)
+        {
+            return await _gameScoreTableRepository.FirstOrDefaultAsync(s => s.GameId == id);
+        }
+
+        public async Task UpdateAllGameScore()
+        {
+            var globalAllScores = await _playedGameRepository.GetAll().AsNoTracking()
+                .Where(s => s.ShowPublicly)
+                 .Where(s => s.CVSocre != 0 && s.ShowSocre != 0 && s.SystemSocre != 0 && s.MusicSocre != 0 && s.PaintSocre != 0 && s.TotalSocre != 0 && s.ScriptSocre != 0)
+                .ToListAsync();
+
+            var globalFilterScores = globalAllScores.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > 100);
+
+            var games = await _entryRepository.GetAll().AsNoTracking()
+                .Where(s => s.PlayedGames.Any(s => s.ShowPublicly && s.CVSocre != 0 && s.ShowSocre != 0 && s.SystemSocre != 0 && s.MusicSocre != 0 && s.PaintSocre != 0 && s.TotalSocre != 0 && s.ScriptSocre != 0))
+                .Select(s => new
+                {
+                    s.DisplayName,
+                    s.Id
+                })
+                .ToListAsync();
+
+            foreach(var item in games)
+            {
+                await UpdateGameScore(item.Id, item.DisplayName, globalAllScores, globalFilterScores);
+            }
+        }
+
+        /// <summary>
+        /// 更新游戏评分
+        /// </summary>
+        /// <param name="id">游戏id</param>
+        /// <param name="name">游戏名</param>
+        /// <param name="globalAllScores">所有用户评分</param>
+        /// <param name="globalFilterScores">所有过滤后的用户评分</param>
+        /// <returns></returns>
+        public async Task UpdateGameScore(int id, string name, IEnumerable<PlayedGame> globalAllScores, IEnumerable<PlayedGame> globalFilterScores)
+        {
+            //获取当前游戏的所有玩家评分
+            var scores = globalAllScores.Where(s => s.EntryId == id);
+
+            //获取当前评分缓存
+            var model = await _gameScoreTableRepository.FirstOrDefaultAsync(s => s.GameId == id);
+            if (model == null)
+            {
+                model = await _gameScoreTableRepository.InsertAsync(new GameScoreTableModel
+                {
+                    GameId = id,
+                });
+            }
+            model.GameName = name;
+
+            if (scores.Any() == false)
+            {
+                await _gameScoreTableRepository.DeleteAsync(model);
+            }
+
+            //依次计算
+            model.AllCVSocre = CalculateScore(scores.Select(s => s.CVSocre), globalAllScores.Select(s => s.CVSocre));
+            model.AllShowSocre = CalculateScore(scores.Select(s => s.ShowSocre), globalAllScores.Select(s => s.ShowSocre));
+            model.AllSystemSocre = CalculateScore(scores.Select(s => s.SystemSocre), globalAllScores.Select(s => s.SystemSocre));
+            model.AllMusicSocre = CalculateScore(scores.Select(s => s.MusicSocre), globalAllScores.Select(s => s.MusicSocre));
+            model.AllPaintSocre = CalculateScore(scores.Select(s => s.PaintSocre), globalAllScores.Select(s => s.PaintSocre));
+            model.AllTotalSocre = CalculateScore(scores.Select(s => s.TotalSocre), globalAllScores.Select(s => s.TotalSocre));
+            model.AllScriptSocre = CalculateScore(scores.Select(s => s.ScriptSocre), globalAllScores.Select(s => s.ScriptSocre));
+
+            var filterScores = scores.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > 100);
+            if (filterScores != null && filterScores.Any() && globalFilterScores != null && globalFilterScores.Any())
+            {
+                //依次计算
+                model.FilterCVSocre = CalculateScore(filterScores.Select(s => s.CVSocre), globalFilterScores.Select(s => s.CVSocre));
+                model.FilterShowSocre = CalculateScore(filterScores.Select(s => s.ShowSocre), globalFilterScores.Select(s => s.ShowSocre));
+                model.FilterSystemSocre = CalculateScore(filterScores.Select(s => s.SystemSocre), globalFilterScores.Select(s => s.SystemSocre));
+                model.FilterMusicSocre = CalculateScore(filterScores.Select(s => s.MusicSocre), globalFilterScores.Select(s => s.MusicSocre));
+                model.FilterPaintSocre = CalculateScore(filterScores.Select(s => s.PaintSocre), globalFilterScores.Select(s => s.PaintSocre));
+                model.FilterTotalSocre = CalculateScore(filterScores.Select(s => s.TotalSocre), globalFilterScores.Select(s => s.TotalSocre));
+                model.FilterScriptSocre = CalculateScore(filterScores.Select(s => s.ScriptSocre), globalFilterScores.Select(s => s.ScriptSocre));
+
+            }
+
+            await _gameScoreTableRepository.UpdateAsync(model);
+
+        }
+
+        /// <summary>
+        /// 计算评分
+        /// </summary>
+        /// <param name="scores">当前游戏的评分</param>
+        /// <param name="allScores">所有评分</param>
+        /// <returns></returns>
+        public double CalculateScore(IEnumerable<int> scores, IEnumerable<int> allScores)
+        {
+            var g = GetDistribution(allScores);
+            var s = GetDistribution(scores);
+
+            return CalculateScoreByDirichletDistribution(g, s);
+        }
+
+        /// <summary>
+        /// 获取评分的 n维分布
+        /// </summary>
+        /// <remarks>
+        /// 如果我们允许用户评分为n档，那么，每一个用户的打分可以格式化为一个n维的0-1向量，这样，每一部电影的评分分布实际上为一个多元分布
+        /// </remarks>
+        /// <param name="scores">分数</param>
+        /// <param name="n">n档 不包括0</param>
+        /// <returns></returns>
+        public double[] GetDistribution(IEnumerable<int> scores,int n=10)
+        {
+            var d = new double[n];
+
+            for (int i = 0; i < n; i++)
+            {
+                d[i] = (double)scores.Count(s => s == i + 1) / scores.Count();
+            }
+
+            return d;
+        }
+
+        /// <summary>
+        /// 使用 Dirichlet分布 计算分数
+        /// </summary>
+        /// <remarks>
+        /// 1. 预估先验分布D(α1,α2,...,αn),可以采用领域知识，也可以直接用全局分布替代;
+        /// 2. 计算每一产品的多元分布M(β1, β2,..., βn);
+        /// 3. 用多元分布修正先验分布为D(α1+β1, α2+β2,..., αn+βn);
+        /// 4. 计算分布D(α1+β1, α2+β2,..., αn+βn)的均值为(m^1，m^2,..., m^n);
+        /// 5. 利用步骤4中得到的均值，采用加权平均的方法求取最终得分。
+        /// 参考资料 http://xinsong.github.io/2014/10/13/rank_products/
+        /// </remarks>
+        /// <param name="globalDistribution">先验分布</param>
+        /// <param name="singleMultivariateDistribution">多元分布</param>
+        /// <returns></returns>
+        public double CalculateScoreByDirichletDistribution(double[] globalDistribution, double[] singleMultivariateDistribution)
+        {
+            var n = globalDistribution.Length;
+
+            double[] d = new double[n];
+            double sum = 0;
+
+            for (int i = 0; i < n; i++)
+            {
+                //修正先验分布
+                d[i] = globalDistribution[i] + singleMultivariateDistribution[i];
+                //求和
+                sum += d[i];
+            }
+
+            double score = 0;
+
+            for (int i = 0; i < n; i++)
+            {
+                //计算分布D的均值 加权平均
+                score += d[i] *  (i + 1) / sum;
+            }
+
+            return score;
         }
     }
 }

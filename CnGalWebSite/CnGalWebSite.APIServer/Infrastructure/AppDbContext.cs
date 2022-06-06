@@ -80,6 +80,8 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<RobotReply> RobotReplies { get; set; }
         public DbSet<RobotGroup> RobotGroups { get; set; }
         public DbSet<RobotFace> RobotFaces { get; set; }
+        public DbSet<GameScoreTableModel> GameScores { get; set; }
+        public DbSet<OperationRecord> OperationRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -111,6 +113,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<Vote>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Lottery>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Disambig>().HasIndex(g => g.Name).IsUnique();
+            modelBuilder.Entity<GameScoreTableModel>().HasIndex(g => g.GameId).IsUnique();
 
             //设定默认值
             modelBuilder.Entity<Article>().Property(b => b.CanComment).HasDefaultValue(true);

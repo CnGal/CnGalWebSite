@@ -1,54 +1,96 @@
 ﻿@inject HttpClient Http
 @inject ToastService? ToastService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 
 <TitleTip Title="资料站数据汇总"></TitleTip>
 
 <div class="">
-    <div class="  rounded shadow-sm  bg-opacity pt-4 pb-1 mb-3">
+    <div class="  rounded shadow-sm  bg-opacity pt-4 pb-3 mb-3">
         <div>
             <h2 class="fw-bold text-center">资料站数据汇总</h2>
-            <p class="text-center" style="color: gray;margin-top:20px">
+            <div class="text-center" style="color: gray;">
                 <i class="fa fa-codepen fa-fw "></i>
                 <span class="article-infor-text">@("总计"+Model.EntriesCount + "个词条")</span>&nbsp;&nbsp;&nbsp;
 
                 <i class="fa fa-newspaper-o fa-fw "></i>
                 <span class="article-infor-text">@("总计"+Model.ArticlesCount + "篇文章")</span>&nbsp;&nbsp;&nbsp;
 
-                    <br class="d-flex d-md-none "/>
+                <br class="d-flex d-md-none " />
                 <i class="fa fa-calendar-check-o fa-fw "></i>
                 <span class="article-infor-text">@("最后编辑于"+Model.LastEditTime?.ToString("F")??"1202年2月30日")</span>
-            </p>
+            </div>
         </div>
     </div>
-    <div class="  rounded shadow-sm  bg-opacity  mb-3">
-        <Tab>
-            <TabItem Text="游戏" Icon="fa fa-gamepad">
-                <GamesTableViewTip OnClickUrl="OnClickUrl"></GamesTableViewTip>
-            </TabItem>
-            <TabItem Text="制作组" Icon="fa fa-object-group">
-                <GroupsTableViewTip OnClickUrl="OnClickUrl"></GroupsTableViewTip>
-            </TabItem>
-            <TabItem Text="STAFF" Icon="fa fa-star">
-                <StaffsTableViewTip></StaffsTableViewTip>
-            </TabItem>
-            <TabItem Text="制作人" Icon="fa fa-magic">
-                <MakersTableViewTip OnClickUrl="OnClickUrl"></MakersTableViewTip>
-            </TabItem>
-            <TabItem Text="角色" Icon="fa fa-group">
-                <RolesTableViewTip OnClickUrl="OnClickUrl"></RolesTableViewTip>
-            </TabItem>
-            <TabItem Text="游戏价格" Icon="fa fa-money">
-                <SteamsTableViewTip></SteamsTableViewTip>
-            </TabItem>
-        </Tab>
-    </div>
+    <div class="rounded  shadow-sm bg-opacity mb-4">
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
+               Color="@_dataCacheService.ThemeSetting.Theme">
 
+            <MTab Value="1">
+                游戏<MIcon>mdi-gamepad-square</MIcon>
+            </MTab>
+            <MTab Value="2">
+                制作组<MIcon>mdi-account-multiple </MIcon>
+            </MTab>
+            <MTab Value="3">
+                STAFF<MIcon>mdi-magic-staff</MIcon>
+            </MTab>
+            <MTab Value="4">
+                制作人<MIcon>mdi-coffee-maker-outline</MIcon>
+            </MTab>
+            <MTab Value="5">
+                角色<MIcon>mdi-clover </MIcon>
+            </MTab>
+            <MTab Value="6">
+                游戏价格<MIcon>mdi-currency-usd </MIcon>
+            </MTab>
+            <MTab Value="7">
+                游戏评分<MIcon>mdi-star</MIcon>
+            </MTab>
+        </MTabs>
+    </div>
+    <MTabsItems @bind-Value="TabIndex">
+        <MTabItem Value="1">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <CnGalWebSite.Shared.Component.Tables.GamesTableViewTip />
+            </div>
+
+        </MTabItem>
+        <MTabItem Value="2">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <CnGalWebSite.Shared.Component.Tables.GroupsTableViewTip />
+            </div>
+        </MTabItem>
+        <MTabItem Value="3">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <CnGalWebSite.Shared.Component.Tables.StaffsTableViewTip />
+            </div>
+        </MTabItem>
+        <MTabItem Value="4">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <CnGalWebSite.Shared.Component.Tables.MakersTableViewTip />
+            </div>
+        </MTabItem>
+        <MTabItem Value="5">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <CnGalWebSite.Shared.Component.Tables.RolesTableViewTip />
+            </div>
+        </MTabItem>
+        <MTabItem Value="6">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <CnGalWebSite.Shared.Component.Tables.SteamsTableViewTip />
+            </div>
+        </MTabItem>
+        <MTabItem Value="7">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <CnGalWebSite.Shared.MasaComponent.PC.Tables.ScoresTable />
+            </div>
+        </MTabItem>
+    </MTabsItems>
 </div>
 @code {
-    private int TabIndex { get; set; } = 0;
+    private StringNumber TabIndex { get; set; } = 1;
 
     public TableViewModel Model = new TableViewModel();
     [CascadingParameter]
@@ -69,16 +111,4 @@
             ErrorHandler.ProcessError(ex, "获取汇总数据失败");
         }
     }
-    public async void OnClickUrl(NavigateModel model)
-    {
-        try
-        {
-            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
-        }
-        catch
-        {
-            await ToastService.Error("导航失败", "请尝试刷新页面");
-        }
-    }
-
 }

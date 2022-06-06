@@ -1,0 +1,142 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@if (!isReady)
+{
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+}
+else
+{
+    <Table TItem="GameScoreTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
+           OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelScores" ShowSearch="true" ShowLoading="true"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
+        <TableColumns>
+            <TableColumn @bind-Field="@context.GameId" Filterable Sortable Width="100" TextWrap Fixed />
+            <TableColumn @bind-Field="@context.GameName" Filterable Sortable Searchable Width="200" TextWrap />
+
+            <TableColumn @bind-Field="@context.AllCVSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+            <TableColumn @bind-Field="@context.AllSystemSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100"  />
+            <TableColumn @bind-Field="@context.AllShowSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100" />
+            <TableColumn @bind-Field="@context.AllPaintSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100"  />
+            <TableColumn @bind-Field="@context.AllScriptSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100" />
+            <TableColumn @bind-Field="@context.AllMusicSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100"  />
+            <TableColumn @bind-Field="@context.AllTotalSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100" />
+
+            <TableColumn @bind-Field="@context.FilterCVSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100"  />
+            <TableColumn @bind-Field="@context.FilterSystemSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100"  />
+            <TableColumn @bind-Field="@context.FilterShowSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100" />
+            <TableColumn @bind-Field="@context.FilterPaintSocre" Sortable Filterable Searchable FormatString="0.00" Width="100"  />
+            <TableColumn @bind-Field="@context.FilterScriptSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100" />
+            <TableColumn @bind-Field="@context.FilterMusicSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100"  />
+            <TableColumn @bind-Field="@context.FilterTotalSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.GameId))" />
+        </RowButtonTemplate>
+
+    </Table>
+}
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 1000 };
+    public GameScoreListViewModel ModelScores { get; set; } = new GameScoreListViewModel();
+
+    private bool isReady = false;
+    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<GameScoreTableModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<GameScoreTableModel>>> SortLambdaCacheBasic = new();
+    private GameScoreTableModel SearchModelScores { get; set; } = new GameScoreTableModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
+            ModelScores = await Http.GetFromJsonAsync<GameScoreListViewModel>(ToolHelper.WebApiPath + "api/tables/GetGameScoreList");
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取评分信息汇总表格");
+        }
+    }
+
+    [Parameter]
+    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+
+    public Task OnLook(long id)
+    {
+        NavigationManager.NavigateTo("/entries/index/" + id);
+        return Task.CompletedTask;
+
+    }
+
+    private Task<QueryData<GameScoreTableModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        IEnumerable<GameScoreTableModel> items = ModelScores.GameScores;
+        // 处理高级搜索
+        if (!string.IsNullOrWhiteSpace(SearchModelScores.GameName))
+        {
+            items = items.Where(item => item.GameName?.Contains(SearchModelScores.GameName, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+
+
+        // 处理 Searchable=true 列与 SeachText 模糊搜索
+        if (options.Searchs.Any())
+        {
+            items = items.Where(options.Searchs.GetFilterFunc<GameScoreTableModel>(FilterLogic.Or));
+        }
+        else
+        {
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.GameName?.Contains(options.SearchText) ?? false)
+                             || item.GameId.ToString().Contains(options.SearchText));
+            }
+        }
+        // 过滤
+        var isFiltered = false;
+        if (options.Filters.Any())
+        {
+            items = items.Where(options.Filters.GetFilterFunc<GameScoreTableModel>());
+            isFiltered = true;
+        }
+
+        // 排序
+        var isSorted = false;
+        if (!string.IsNullOrWhiteSpace(options.SortName))
+        {
+            // 外部未进行排序，内部自动进行排序处理
+            var invoker = SortLambdaCacheBasic.GetOrAdd(typeof(GameScoreTableModel), key => LambdaExtensions.GetSortLambda<GameScoreTableModel>().Compile());
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+            isSorted = true;
+        }
+
+        // 设置记录总数
+        var total = items.Count();
+
+        // 内存分页
+        items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
+
+        return Task.FromResult(new QueryData<GameScoreTableModel>()
+        {
+            Items = items,
+            TotalCount = total,
+            IsSorted = isSorted,
+            IsFiltered = isFiltered
+        });
+    }
+}

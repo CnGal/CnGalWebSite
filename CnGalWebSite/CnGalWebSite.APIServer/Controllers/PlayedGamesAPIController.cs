@@ -7,6 +7,7 @@ using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -92,7 +93,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var examine = examines.FirstOrDefault(s => s.Operation == Operation.EditPlayedGameMain);
                 if (examine != null)
                 {
-                    _playedGameService.UpdateArticleData(game, examine);
+                    _playedGameService.UpdatePlayedGameData(game, examine);
                 }
                 return new EditGameRecordModel
                 {
@@ -236,6 +237,20 @@ namespace CnGalWebSite.APIServer.Controllers
             await _playedGameRepository.GetRangeUpdateTable().Where(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.EntryId)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
             return new Result { Successful = true };
         }
+        /// <summary>
+        /// 公开游戏记录
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<Result>> ShowPubliclyGameRecord(HiddenGameRecordModel model)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            await _playedGameRepository.GetRangeUpdateTable().Where(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.EntryId)).Set(s => s.ShowPublicly, b => model.IsHidden).ExecuteAsync();
+            return new Result { Successful = true };
+        }
 
         /// <summary>
         ///
@@ -266,7 +281,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             foreach(var item in examines)
             {
-                _playedGameService.UpdateArticleData(games.FirstOrDefault(s => s.Id == item.PlayedGameId.Value), item);
+                _playedGameService.UpdatePlayedGameData(games.FirstOrDefault(s => s.Id == item.PlayedGameId.Value), item);
             }
 
             var model = new List<GameRecordViewModel>();
@@ -353,30 +368,26 @@ namespace CnGalWebSite.APIServer.Controllers
                 }).ToList(),
             };
 
-
-            var alls = model.UserScores.Where(s => s.Socres.IsScored);
-            if (alls!=null&&alls.Any())
+            var gameScores = await _playedGameService.GetGameScores(entry.Id);
+            if(gameScores!=null)
             {
-                model.GameTotalScores.ScriptSocre = alls.Average(s => s.Socres.ScriptSocre);
-                model.GameTotalScores.ShowSocre = alls.Average(s => s.Socres.ShowSocre);
-                model.GameTotalScores.MusicSocre = alls.Average(s => s.Socres.MusicSocre);
-                model.GameTotalScores.PaintSocre = alls.Average(s => s.Socres.PaintSocre);
-                model.GameTotalScores.SystemSocre = alls.Average(s => s.Socres.SystemSocre);
-                model.GameTotalScores.CVSocre = alls.Average(s => s.Socres.CVSocre);
-                model.GameTotalScores.TotalSocre = alls.Average(s => s.Socres.TotalSocre);
-            }
-            var reviews = alls.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > 100);
-            if (reviews != null&& reviews.Any())
-            {
-                model.GameReviewsScores.ScriptSocre = reviews.Average(s => s.Socres.ScriptSocre);
-                model.GameReviewsScores.ShowSocre = reviews.Average(s => s.Socres.ShowSocre);
-                model.GameReviewsScores.MusicSocre = reviews.Average(s => s.Socres.MusicSocre);
-                model.GameReviewsScores.PaintSocre = reviews.Average(s => s.Socres.PaintSocre);
-                model.GameReviewsScores.SystemSocre = reviews.Average(s => s.Socres.SystemSocre);
-                model.GameReviewsScores.CVSocre = reviews.Average(s => s.Socres.CVSocre);
-                model.GameReviewsScores.TotalSocre = reviews.Average(s => s.Socres.TotalSocre);
-            }
+                model.GameTotalScores.ScriptSocre = gameScores.AllScriptSocre;
+                model.GameTotalScores.TotalSocre = gameScores.AllTotalSocre;
+                model.GameTotalScores.ShowSocre = gameScores.AllShowSocre;
+                model.GameTotalScores.MusicSocre = gameScores.AllMusicSocre;
+                model.GameTotalScores.PaintSocre = gameScores.AllPaintSocre;
+                model.GameTotalScores.SystemSocre = gameScores.AllSystemSocre;
+                model.GameTotalScores.CVSocre = gameScores.AllCVSocre;
 
+                model.GameReviewsScores.ScriptSocre = gameScores.FilterScriptSocre;
+                model.GameReviewsScores.TotalSocre = gameScores.FilterTotalSocre;
+                model.GameReviewsScores.ShowSocre = gameScores.FilterShowSocre;
+                model.GameReviewsScores.MusicSocre = gameScores.FilterMusicSocre;
+                model.GameReviewsScores.PaintSocre = gameScores.FilterPaintSocre;
+                model.GameReviewsScores.SystemSocre = gameScores.FilterSystemSocre;
+                model.GameReviewsScores.CVSocre = gameScores.FilterCVSocre;
+            }
+         
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
             if (user==null)
@@ -394,7 +405,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var examine = examines.FirstOrDefault(s => s.Operation == Operation.EditPlayedGameMain);
                 if (examine != null)
                 {
-                    _playedGameService.UpdateArticleData(userScore, examine);
+                    _playedGameService.UpdatePlayedGameData(userScore, examine);
                 }
 
                 var current= model.UserScores.FirstOrDefault(s => s.User.Id == user.Id);
@@ -430,6 +441,20 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             return model;
+        }
+
+        /// <summary>
+        /// 获取词条列表
+        /// </summary>
+        /// <param name="input">分页信息</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPlayedGameAloneModel>>> GetEntryListAsync(PlayedGamesPagesInfor input)
+        {
+            var dtos = await _playedGameService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
         }
 
     }

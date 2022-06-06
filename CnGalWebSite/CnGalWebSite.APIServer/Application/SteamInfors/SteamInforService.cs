@@ -301,6 +301,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
         public async Task<bool> UpdateUserSteam(ApplicationUser user)
         {
+            var now = DateTime.Now.ToCstTime();
             var steamIds = new string[0];
             if (string.IsNullOrWhiteSpace(user.SteamId) == false)
             {
@@ -361,6 +362,8 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     EntryId = item.EntryId,
                     Type = ((steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0) > 0) ? PlayedGameType.Played : PlayedGameType.UnPlayed,
                     ApplicationUserId = user.Id,
+                    ShowPublicly = true,
+                    LastEditTime = now
                 });
             }
 

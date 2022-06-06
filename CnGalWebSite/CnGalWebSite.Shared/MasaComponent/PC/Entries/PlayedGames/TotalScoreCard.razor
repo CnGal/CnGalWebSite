@@ -31,7 +31,7 @@
     bool isReady;
     protected override async Task OnParametersSetAsync()
     {
-        if (Model.UserScores.Any(s=>s.Socres.IsScored) == false)
+        if (Model.UserScores.Any(s => s.Socres.IsScored) == false)
         {
             isReady = true;
             return;
@@ -79,12 +79,18 @@
         series.Add(new EChartsRadarOptionSeryData
         {
             Name = "所有",
-            Value = new List<double> { Model.GameTotalScores.SystemSocre, Model.GameTotalScores.CVSocre, Model.GameTotalScores.ScriptSocre, Model.GameTotalScores.ShowSocre, Model.GameTotalScores.PaintSocre, Model.GameTotalScores.MusicSocre }
+            Value = new List<double>
+            {
+                Math.Round(Model.GameTotalScores.SystemSocre, 2), Math.Round(Model.GameTotalScores.CVSocre, 2), Math.Round( Model.GameTotalScores.ScriptSocre, 2), Math.Round( Model.GameTotalScores.ShowSocre, 2),  Math.Round(Model.GameTotalScores.PaintSocre, 2),  Math.Round(Model.GameTotalScores.MusicSocre, 2)
+            }
         });
         series.Add(new EChartsRadarOptionSeryData
         {
             Name = "过滤后",
-            Value = new List<double> { Model.GameReviewsScores.SystemSocre, Model.GameReviewsScores.CVSocre, Model.GameReviewsScores.ScriptSocre, Model.GameReviewsScores.ShowSocre, Model.GameReviewsScores.PaintSocre, Model.GameReviewsScores.MusicSocre }
+            Value = new List<double>
+            {
+                Math.Round(Model.GameReviewsScores.SystemSocre, 2),  Math.Round(Model.GameReviewsScores.CVSocre, 2),  Math.Round(Model.GameReviewsScores.ScriptSocre, 2), Math.Round( Model.GameReviewsScores.ShowSocre, 2),  Math.Round(Model.GameReviewsScores.PaintSocre, 2), Math.Round( Model.GameReviewsScores.MusicSocre, 2)
+            }
         });
 
 
@@ -95,7 +101,10 @@
             series.Add(new EChartsRadarOptionSeryData
             {
                 Name = "我的",
-                Value = new List<double> { myscores.Socres.SystemSocre, myscores.Socres.CVSocre, myscores.Socres.ScriptSocre, myscores.Socres.ShowSocre, myscores.Socres.PaintSocre, myscores.Socres.MusicSocre }
+                Value = new List<double>
+                {
+                    Math.Round(myscores.Socres.SystemSocre, 2), Math.Round(myscores.Socres.CVSocre, 2), Math.Round(myscores.Socres.ScriptSocre, 2),Math.Round( myscores.Socres.ShowSocre, 2), Math.Round(myscores.Socres.PaintSocre, 2), Math.Round(myscores.Socres.MusicSocre, 2)
+                }
             });
         }
 

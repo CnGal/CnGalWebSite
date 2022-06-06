@@ -845,7 +845,12 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _lotteryService.ClearLottery(2);
+                var users = await _userRepository.GetAllListAsync(s => s.PhotoPath.Contains("NewCngalWebSite.Shared"));
+                foreach(var item in users)
+                {
+                    item.PhotoPath = null;
+                    await _userRepository.UpdateAsync(item);
+                }
                 return new Result { Successful = true };
             }
             catch (Exception ex)

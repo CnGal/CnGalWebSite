@@ -94,7 +94,7 @@
                 return;
 
             }
-            if (System.Text.RegularExpressions.Regex.Match(Model.Email, "^[\\w-]+@[\\w-]+\\.(com|net|org|edu|mil|tv|biz|info)$").Success == false)
+            if (System.Text.RegularExpressions.Regex.Match(Model.Email, "^[\\w-]+@[\\w-]+\\.[\\w-]+$").Success == false)
             {
                 await ToastService.Error("注册失败", "输入的电子邮件无效");
                 return;

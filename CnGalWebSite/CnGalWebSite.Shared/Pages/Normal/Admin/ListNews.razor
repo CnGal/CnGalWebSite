@@ -1,6 +1,6 @@
 ﻿@page "/admin/listnews"
 @attribute [Authorize(Roles = "Editor")]
-@inject HttpClient Http
+
 @inject IDataCacheService _dataCacheService
 
 <TitleTip Title="动态版块"></TitleTip>
@@ -37,24 +37,11 @@
 
 @code {
 
-
-    public ListGameNewsInforViewModel InforModel { get; set; } = new ListGameNewsInforViewModel();
-
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
     public StringNumber TabIndex { get; set; } = 1;
 
 
     protected override async Task OnInitializedAsync()
-    {
-        //try
-        //{
-        //    InforModel = await Http.GetFromJsonAsync<ListGameNewsInforViewModel>(ToolHelper.WebApiPath + "api/news/listgamenews");
-        //}
-        //catch (Exception ex)
-        //{
-        //    ErrorHandler.ProcessError(ex, "无法获取动态数据");
-        //}
+    { 
 
     }
 
