@@ -1,0 +1,216 @@
+﻿@attribute [Authorize(Roles = "Admin")]
+
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<Table TItem="ListPlayedGameAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelEntry" ShowSearch="true" @ref="TableRows"
+       ShowExtendButtons="true" ExtendButtonColumnWidth="170" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+    <TableToolbarTemplate>
+        <TableToolbarButton TItem="ListPlayedGameAloneModel" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
+        <TableToolbarButton TItem="ListPlayedGameAloneModel" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
+        <TableToolbarButton TItem="ListPlayedGameAloneModel" Color="Color.Success" Icon="fa fa-map-signs" Text="公开" OnClickCallback="OnUnHideOutlinkClick" IsAsync="true" />
+        <TableToolbarButton TItem="ListPlayedGameAloneModel" Color="Color.Primary" Icon="fa fa-unlink" Text="私密" OnClickCallback="OnHideOutlinkClick" IsAsync="true" />
+
+    </TableToolbarTemplate>
+    <TableColumns>
+        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
+        <TableColumn @bind-Field="@context.GameName" Searchable Sortable Width="120" TextWrap />
+        <TableColumn @bind-Field="@context.GameId" Sortable="true" Searchable Width="150" TextWrap/>
+        <TableColumn @bind-Field="@context.UserName" Sortable Searchable TextWrap Width="150" />
+        <TableColumn @bind-Field="@context.UserId" Sortable Searchable Width="300" />
+
+        <TableColumn @bind-Field="@context.PlayImpressions" Sortable Searchable Width="300" TextWrap/>
+        <TableColumn @bind-Field="@context.Type" Sortable Width="120" />
+        <TableColumn @bind-Field="@context.PlayDuration" Sortable="true" Width="120" ComponentType="@typeof(Switch)" />
+
+        <TableColumn @bind-Field="@context.IsInSteam" Sortable="true" Searchable Width="150" />
+
+        <TableColumn @bind-Field="@context.CVSocre" Sortable="true" Searchable Width="80" />
+        <TableColumn @bind-Field="@context.SystemSocre" Sortable="true" Searchable Width="80" />
+        <TableColumn @bind-Field="@context.ShowSocre" Sortable="true" Searchable Width="80" />
+        <TableColumn @bind-Field="@context.PaintSocre" Sortable="true" Searchable Width="80" />
+        <TableColumn @bind-Field="@context.ScriptSocre" Sortable="true" Searchable Width="80" />
+        <TableColumn @bind-Field="@context.MusicSocre" Sortable="true" Searchable Width="80" />
+        <TableColumn @bind-Field="@context.TotalSocre" Sortable="true" Searchable Width="80" />
+
+        <TableColumn @bind-Field="@context.LastEditTime" Sortable="true" Width="200" TextWrap="true" />
+
+        <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="95" />
+        <TableColumn @bind-Field="@context.ShowPublicly" Sortable="true" ComponentType="@typeof(Switch)" Width="95" />
+\    </TableColumns>
+    <RowButtonTemplate>
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.GameId ))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" IsShow="!context.IsHidden" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-link" Text="显示" IsAsync="true" IsShow="context.IsHidden" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="私密" IsAsync="true" IsShow="context.ShowPublicly" OnClickWithoutRender="@(() => OnRowEditShowPubliclyClick(new long[] { context.Id }, true, true))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-link" Text="公开" IsAsync="true" IsShow="!context.ShowPublicly" OnClickWithoutRender="@(() => OnRowEditShowPubliclyClick(new long[] { context.Id }, false, true))" />
+    </RowButtonTemplate>
+</Table>
+
+
+@code { [NotNull]
+    private Table<ListPlayedGameAloneModel>? TableRows { get; set; }
+    private List<ListPlayedGameAloneModel> SelectedRows { get; set; } = new();
+
+    public ListPlayedGamesViewModel ListModel { get; set; } = new ListPlayedGamesViewModel { PlayedGames = new List<ListPlayedGameAloneModel>() };
+
+    private ListPlayedGameAloneModel SearchModelEntry { get; set; } = new ListPlayedGameAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+
+    }
+
+    private async Task<QueryData<ListPlayedGameAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<PlayedGamesPagesInfor>(ToolHelper.WebApiPath + "api/playedgame/GetEntryList", new PlayedGamesPagesInfor { SearchModel = SearchModelEntry, Options = (QueryPageOptionsHelper)options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListPlayedGameAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取词条列表");
+            return new QueryData<ListPlayedGameAloneModel>();
+        }
+    }
+ 
+
+    private async Task OnRowEditIsHiddenClick(long[] ids, bool isHidden, bool showMessage)
+    {
+        string tempString = isHidden == true ? "隐藏" : "显示";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<HiddenArticleModel>(ToolHelper.WebApiPath + "api/playedgame/HiddenGameRecord", new HiddenArticleModel { Ids = ids, IsHidden = isHidden });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "游玩记录失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "游玩记录成功", tempString + "游玩记录成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "游玩记录失败");
+        }
+    }
+
+    private async Task OnHiddenClick(IEnumerable<ListPlayedGameAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改游玩记录显示状态", "请选中游玩记录");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), true, false);
+
+        await ToastService.Success("隐藏游玩记录成功", "隐藏游玩记录成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnUnHiddenClick(IEnumerable<ListPlayedGameAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改游玩记录显示状态", "请选中游玩记录");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), false, false);
+
+        await ToastService.Success("显示游玩记录成功", "显示游玩记录成功");
+        await TableRows.QueryAsync();
+    }
+
+    private async Task OnRowEditShowPubliclyClick(long[] ids, bool isHidden, bool showMessage)
+    {
+        string tempString = isHidden == true ? "私密" : "公开";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<HiddenArticleModel>(ToolHelper.WebApiPath + "api/playedgame/ShowPubliclyGameRecord", new HiddenArticleModel { Ids = ids, IsHidden = !isHidden });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "游玩记录失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "游玩记录成功", tempString + "游玩记录成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "游玩记录失败");
+        }
+    }
+
+    private async Task OnHideOutlinkClick(IEnumerable<ListPlayedGameAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改游玩记录显示状态", "请选中游玩记录");
+            return;
+        }
+
+        await OnRowEditShowPubliclyClick(items.Select(s => s.Id).ToArray(), true, false);
+
+        await ToastService.Success("隐藏游玩记录成功", "隐藏游玩记录成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnUnHideOutlinkClick(IEnumerable<ListPlayedGameAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改游玩记录显示状态", "请选中游玩记录");
+            return;
+        }
+
+        await OnRowEditShowPubliclyClick(items.Select(s => s.Id).ToArray(), false, false);
+
+        await ToastService.Success("显示游玩记录成功", "显示游玩记录成功");
+        await TableRows.QueryAsync();
+    }
+
+    public Task OnRowLookClick(int id)
+    {
+        NavigationManager.NavigateTo( "/entries/index/" + id);
+        return Task.CompletedTask;
+    }
+
+ 
+}
+

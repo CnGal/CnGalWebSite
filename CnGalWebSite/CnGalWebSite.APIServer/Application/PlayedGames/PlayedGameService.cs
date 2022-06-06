@@ -1,9 +1,11 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+﻿using BootstrapBlazor.Components;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -27,60 +29,99 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
             _appHelper = appHelper;
         }
 
-        public async Task<PagedResultDto<EntryInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input)
+        public async Task<QueryData<ListPlayedGameAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListPlayedGameAloneModel searchModel)
         {
-            var query = _playedGameRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == input.FilterText);
+            var items = _playedGameRepository.GetAll()
+                .Include(s => s.ApplicationUser)
+                .Include(s => s.Entry).AsNoTracking();
 
-            //统计查询数据的总条数
-            var count = query.Count(s => s.EntryId != 0);
-            //根据需求进行排序，然后进行分页逻辑的计算
-            //这个特殊方法中当前页数解释为起始位
-            query = query.OrderBy(input.Sorting).Skip(input.CurrentPage).Take(input.MaxResultCount);
-
-            //将结果转换为List集合 加载到内存中
-            List<Entry> models = null;
-            if (count != 0)
+            // 处理高级搜索
+            if (searchModel.GameId!=0)
             {
-                models = await query.AsNoTracking().Include(s => s.Entry).Where(s => s.EntryId != 0).Select(s => s.Entry).ToListAsync();
-            }
-            else
-            {
-                models = new List<Entry>();
+                items = items.Where(item => item.EntryId.ToString().Contains(searchModel.GameId.ToString(), StringComparison.OrdinalIgnoreCase));
             }
 
-            var dtos = new List<EntryInforTipViewModel>();
-            foreach (var item in models)
+            if (!string.IsNullOrWhiteSpace(searchModel.UserId))
             {
-                if (item == null)
-                {
-                    continue;
-                }
+                items = items.Where(item => item.ApplicationUserId.Contains(searchModel.UserId, StringComparison.OrdinalIgnoreCase));
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.UserName))
+            {
+                items = items.Where(item => item.ApplicationUser.UserName.Contains(searchModel.UserName, StringComparison.OrdinalIgnoreCase));
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.GameName))
+            {
+                items = items.Where(item => item.Entry.Name.Contains(searchModel.GameName, StringComparison.OrdinalIgnoreCase));
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.PlayImpressions))
+            {
+                items = items.Where(item => item.PlayImpressions.Contains(searchModel.PlayImpressions, StringComparison.OrdinalIgnoreCase));
+            }
+            if (searchModel.Type != null)
+            {
+                items = items.Where(item => item.Type == searchModel.Type);
+            }
 
-                dtos.Add(new EntryInforTipViewModel
+
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => item.EntryId.ToString().Contains(options.SearchText)
+                             || item.ApplicationUserId.Contains(options.SearchText)
+                             || item.PlayImpressions.Contains(options.SearchText));
+            }
+
+            // 排序
+            var isSorted = false;
+            if (!string.IsNullOrWhiteSpace(options.SortName))
+            {
+
+                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+                isSorted = true;
+            }
+
+            // 设置记录总数
+            var total = items.Count();
+
+            // 内存分页
+            var itemsReal = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
+
+            //复制数据
+            var resultItems = new List<ListPlayedGameAloneModel>();
+            foreach (var item in itemsReal)
+            {
+                resultItems.Add(new ListPlayedGameAloneModel
                 {
                     Id = item.Id,
-                    Name = item.Name,
-                    Type = item.Type,
-                    DisplayName = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName,
-                    MainImage = _appHelper.GetImagePath(item.MainPicture, "app.png"),
-                    BriefIntroduction = item.BriefIntroduction,
+                    ScriptSocre = item.ScriptSocre,
+                    ShowPublicly = item.ShowPublicly,
+                    ShowSocre = item.ShowSocre,
+                    SystemSocre = item.SystemSocre,
+                    CVSocre = item.CVSocre,
+                    IsInSteam = item.IsInSteam,
+                    MusicSocre = item.MusicSocre,
+                    PaintSocre = item.PaintSocre,
+                    TotalSocre = item.TotalSocre,
+                    IsHidden = item.IsHidden,
                     LastEditTime = item.LastEditTime,
-                    ReaderCount = item.ReaderCount,
-                    CommentCount = item.CommentCount
+                    PlayDuration = item.PlayDuration,
+                    PlayImpressions = item.PlayImpressions,
+                    Type = item.Type,
+                    GameId=item.EntryId??0,
+                    GameName=item.Entry?.Name,
+                    UserName=item.ApplicationUser?.UserName,
+                    UserId=item.ApplicationUserId
                 });
-
             }
-            var dtos_ = new PagedResultDto<EntryInforTipViewModel>
+
+            return new QueryData<ListPlayedGameAloneModel>()
             {
-                TotalCount = count,
-                CurrentPage = input.CurrentPage,
-                MaxResultCount = input.MaxResultCount,
-                Data = dtos,
-                FilterText = input.FilterText,
-                Sorting = input.Sorting,
-                ScreeningConditions = input.ScreeningConditions
+                Items = resultItems,
+                TotalCount = total,
+                IsSorted = isSorted,
+                // IsFiltered = isFiltered
             };
-            return dtos_;
         }
 
         public void UpdatePlayedGameDataMain(PlayedGame playedGame, PlayedGameMain examine)

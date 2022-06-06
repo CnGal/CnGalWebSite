@@ -7,6 +7,7 @@ using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -236,6 +237,20 @@ namespace CnGalWebSite.APIServer.Controllers
             await _playedGameRepository.GetRangeUpdateTable().Where(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.EntryId)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
             return new Result { Successful = true };
         }
+        /// <summary>
+        /// 公开游戏记录
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<Result>> ShowPubliclyGameRecord(HiddenGameRecordModel model)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            await _playedGameRepository.GetRangeUpdateTable().Where(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.EntryId)).Set(s => s.ShowPublicly, b => model.IsHidden).ExecuteAsync();
+            return new Result { Successful = true };
+        }
 
         /// <summary>
         ///
@@ -430,6 +445,20 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             return model;
+        }
+
+        /// <summary>
+        /// 获取词条列表
+        /// </summary>
+        /// <param name="input">分页信息</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPlayedGameAloneModel>>> GetEntryListAsync(PlayedGamesPagesInfor input)
+        {
+            var dtos = await _playedGameService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
         }
 
     }
