@@ -100,56 +100,54 @@ namespace CnGalWebSite.APIServer.Application.Users
             return dtos;
         }
 
-        public Task<QueryData<ListUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserAloneModel searchModel)
+        public async Task<QueryData<ListUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserAloneModel searchModel)
         {
-            IEnumerable<ApplicationUser> items = _userRepository.GetAll().AsNoTracking();
+            var items = _userRepository.GetAll().AsNoTracking();
             // 处理高级搜索
             if (!string.IsNullOrWhiteSpace(searchModel.UserName))
             {
-                items = items.Where(item => item.UserName?.Contains(searchModel.UserName, StringComparison.OrdinalIgnoreCase) ?? false);
+                items = items.Where(item => item.UserName.Contains(searchModel.UserName, StringComparison.OrdinalIgnoreCase) );
             }
 
             if (!string.IsNullOrWhiteSpace(searchModel.PersonalSignature))
             {
-                items = items.Where(item => item.PersonalSignature?.Contains(searchModel.PersonalSignature, StringComparison.OrdinalIgnoreCase) ?? false);
+                items = items.Where(item => item.PersonalSignature.Contains(searchModel.PersonalSignature, StringComparison.OrdinalIgnoreCase) );
             }
             if (!string.IsNullOrWhiteSpace(searchModel.Email))
             {
-                items = items.Where(item => item.Email?.Contains(searchModel.Email, StringComparison.OrdinalIgnoreCase) ?? false);
+                items = items.Where(item => item.Email.Contains(searchModel.Email, StringComparison.OrdinalIgnoreCase) );
             }
             if (!string.IsNullOrWhiteSpace(searchModel.Id))
             {
-                items = items.Where(item => item.Id?.Contains(searchModel.Id, StringComparison.OrdinalIgnoreCase) ?? false);
+                items = items.Where(item => item.Id.Contains(searchModel.Id, StringComparison.OrdinalIgnoreCase) );
             }
 
             // 处理 SearchText 模糊搜索
             if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                items = items.Where(item => (item.UserName?.Contains(options.SearchText) ?? false)
-                             || (item.PersonalSignature?.Contains(options.SearchText) ?? false)
-                              || (item.Email?.Contains(options.SearchText) ?? false)
-                               || (item.Id?.Contains(options.SearchText) ?? false));
+                items = items.Where(item => (item.UserName !=null&& item.UserName.Contains(options.SearchText) )
+                             || (item.PersonalSignature != null && item.PersonalSignature.Contains(options.SearchText))
+                              || (item.Email != null && item.Email.Contains(options.SearchText))
+                               || (item.Id != null && item.Id.Contains(options.SearchText))); 
             }
 
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
-                // 外部未进行排序，内部自动进行排序处理
-                var invoker = SortLambdaCacheApplicationUser.GetOrAdd(typeof(ApplicationUser), key => LambdaExtensions.GetSortLambda<ApplicationUser>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+
+                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
-
             // 设置记录总数
             var total = items.Count();
 
             // 内存分页
-            items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
+            var itemsReal = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
 
             //复制数据
             var resultItems = new List<ListUserAloneModel>();
-            foreach (var item in items)
+            foreach (var item in itemsReal)
             {
                 resultItems.Add(new ListUserAloneModel
                 {
@@ -159,9 +157,7 @@ namespace CnGalWebSite.APIServer.Application.Users
                     PersonalSignature = item.PersonalSignature,
                     Birthday = item.Birthday,
                     RegistTime = item.RegistTime,
-                    Integral = item.Integral,
                     CanComment = item.CanComment ?? true,
-                    ContributionValue = item.ContributionValue,
                     OnlineTime = (double)item.OnlineTime / (60 * 60),
                     LastOnlineTime = item.LastOnlineTime,
                     UnsealTime = item.UnsealTime,
@@ -172,13 +168,13 @@ namespace CnGalWebSite.APIServer.Application.Users
                 });
             }
 
-            return Task.FromResult(new QueryData<ListUserAloneModel>()
+            return new QueryData<ListUserAloneModel>()
             {
                 Items = resultItems,
                 TotalCount = total,
                 IsSorted = isSorted,
                 // IsFiltered = isFiltered
-            });
+            };
         }
 
         #region 三方登入 计划重做

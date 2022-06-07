@@ -18,7 +18,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Tables
         [Display(Name = "游戏名")]
         public string GameName { get; set; }
 
-        [Display(Name = "配音")]
+        [Display(Name = "配音（所有）")]
         public double AllCVSocre { get; set; }
         [Display(Name = "程序")]
         public double AllSystemSocre { get; set; }
@@ -33,7 +33,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Tables
         [Display(Name = "总分")]
         public double AllTotalSocre { get; set; }
 
-        [Display(Name = "配音")]
+        [Display(Name = "配音（过滤后）")]
         public double FilterCVSocre { get; set; }
         [Display(Name = "程序")]
         public double FilterSystemSocre { get; set; }

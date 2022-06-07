@@ -23,6 +23,7 @@
     </div>
 
 }
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
     [Parameter]
@@ -36,6 +37,7 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
 
 
     [CascadingParameter]
@@ -52,7 +54,7 @@
         var user = await authenticationStateTask;
         if (user.User.Identity.IsAuthenticated == false)
         {
-            if(_dataCacheService.IsApp==true)
+            if (_dataCacheService.IsApp == true)
             {
                 NavigationManager.NavigateTo("account/apps/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
 
@@ -71,7 +73,8 @@
             {
                 IsAnonymous = IsAnonymous == CheckboxState.Checked,
                 VoteId = Model.Id,
-                VoteOptionIds = Model.UserSelections
+                VoteOptionIds = Model.UserSelections,
+                Identification = await deviceIdentification.GetDeviceIdentificationModel()
             });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);

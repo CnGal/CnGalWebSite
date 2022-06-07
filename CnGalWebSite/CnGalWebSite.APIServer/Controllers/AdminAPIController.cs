@@ -10,6 +10,7 @@ using CnGalWebSite.APIServer.Application.HistoryData;
 using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.Messages;
 using CnGalWebSite.APIServer.Application.News;
+using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
@@ -24,6 +25,7 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -86,6 +88,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IVoteService _voteService;
         private readonly ILotteryService _lotteryService;
         private readonly IWeiXinService _weiXinService;
+        private readonly IOperationRecordService _operationRecordService;
         private readonly INewsService _newsService;
         private readonly IRepository<GameNews, long> _gameNewsRepository;
         private readonly IRepository<WeeklyNews, long> _weeklyNewsRepository;
@@ -112,7 +115,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository,
-        IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService,
+        IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService,
         IRepository<LotteryPrize, long> lotteryPrizeRepository)
         {
             _userManager = userManager;
@@ -168,6 +171,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _searchCacheRepository = searchCacheRepository;
             _webHostEnvironment = webHostEnvironment;
             _chartService = chartService;
+            _operationRecordService = operationRecordService;
         }
 
         /// <summary>
@@ -598,6 +602,14 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListOperationRecordAloneModel>>> GetOperationRecordListAsync(OperationRecordsPagesInfor input)
+        {
+            var dtos = await _operationRecordService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
+        }
 
 
         /// <summary>

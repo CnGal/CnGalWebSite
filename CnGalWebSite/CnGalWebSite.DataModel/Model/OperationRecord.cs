@@ -16,6 +16,12 @@ namespace CnGalWebSite.DataModel.Model
         public string Ip { get; set; }
 
         public string Cookie { get; set; }
+
+        public DateTime OperationTime { get; set; }
+
+        public string ApplicationUserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
+
     }
 
     public enum OperationRecordType
@@ -25,6 +31,10 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "抽奖")]
         Lottery,
         [Display(Name = "评分")]
-        Score
+        Score,
+        [Display(Name = "登入")]
+        Login,
+        [Display(Name = "注册")]
+        Registe,
     }
 }

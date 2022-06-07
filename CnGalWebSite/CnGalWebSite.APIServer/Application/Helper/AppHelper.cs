@@ -5,6 +5,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Gt3_server_csharp_aspnetcoremvc_bypass.Controllers.Sdk;
 using Markdig;
@@ -926,6 +927,11 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 return false;
             }
+        }
+
+        public bool CheckRecaptcha(HumanMachineVerificationResult model)
+        {
+            return CheckRecaptcha(model.Challenge, model.Validate, model.Seccode);
         }
 
         public BootstrapBlazor.Components.ChartDataSource GetCountLine(Dictionary<string, List<CountLineModel>> data, string xString, string yString, string title)

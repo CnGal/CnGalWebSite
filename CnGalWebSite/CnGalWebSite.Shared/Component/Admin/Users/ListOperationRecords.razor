@@ -1,0 +1,86 @@
+﻿@attribute [Authorize(Roles = "Admin")]
+
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+<Table TItem="ListOperationRecordAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelEntry" ShowSearch="true" @ref="TableRows"
+       ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+    <TableColumns>
+        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
+        <TableColumn @bind-Field="@context.Type" Sortable Width="120" />
+        <TableColumn @bind-Field="@context.UserName" Sortable Searchable TextWrap Width="150" />
+        <TableColumn @bind-Field="@context.UserId" Sortable Searchable TextWrap Width="300" />
+        <TableColumn @bind-Field="@context.ObjectId" Sortable Searchable TextWrap Width="300" />
+        <TableColumn @bind-Field="@context.Ip" Sortable Searchable TextWrap Width="300" />
+        <TableColumn @bind-Field="@context.Cookie" Sortable Searchable TextWrap Width="300" />
+        <TableColumn @bind-Field="@context.OperationTime" Sortable="true" Width="200" TextWrap="true" />
+
+    </TableColumns>
+    <RowButtonTemplate>
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick(context.Type,context.ObjectId))" />
+    </RowButtonTemplate>
+</Table>
+
+
+@code { [NotNull]
+    private Table<ListOperationRecordAloneModel>? TableRows { get; set; }
+    private List<ListOperationRecordAloneModel> SelectedRows { get; set; } = new();
+
+    private ListOperationRecordAloneModel SearchModelEntry { get; set; } = new ListOperationRecordAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+
+    }
+
+    private async Task<QueryData<ListOperationRecordAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<OperationRecordsPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetOperationRecordList", new OperationRecordsPagesInfor { SearchModel = SearchModelEntry, Options = (QueryPageOptionsHelper)options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListOperationRecordAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取用户操作记录列表");
+            return new QueryData<ListOperationRecordAloneModel>();
+        }
+    }
+
+
+    public Task OnRowLookClick( OperationRecordType? type,string id)
+    {
+        if(type == OperationRecordType.Vote)
+        {
+            NavigationManager.NavigateTo("/votes/index/" + id);
+
+        }
+        else if (type == OperationRecordType.Lottery)
+        {
+            NavigationManager.NavigateTo("/lotteries/index/" + id);
+
+        }
+        else if (type == OperationRecordType.Score)
+        {
+            NavigationManager.NavigateTo("/entries/index/" + id);
+        }
+
+        return Task.CompletedTask;
+    }
+
+
+}
+

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CnGalWebSite.DataModel.ViewModel.OperationRecords;
+using System.Collections.Generic;
 
 namespace CnGalWebSite.DataModel.ViewModel.Votes
 {
@@ -9,5 +10,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Votes
         public List<long> VoteOptionIds { get; set; } = new List<long>();
 
         public bool IsAnonymous { get; set; }
+
+        public DeviceIdentificationModel Identification { get; set; } = new DeviceIdentificationModel();
+
     }
 }

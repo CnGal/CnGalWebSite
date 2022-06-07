@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Lotteries;
+using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,10 +45,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<LotteryAward, long> _lotteryAwardRepository;
         private readonly IRepository<LotteryPrize, long> _lotteryPrizeRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
+        private readonly ILogger<LotteryAPIController> _logger;
+        private readonly IOperationRecordService _operationRecordService;
 
         public LotteryAPIController(IRepository<Vote, long> voteRepository, IRepository<VoteOption, long> voteOptionRepository, IRepository<VoteUser, long> voteUserRepository, IRankService rankService,
-            IRepository<WeiboUserInfor, long> weiboUserInforRepository, IRepository<ApplicationUser, string> userRepository,
-              UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository,
+            IRepository<WeiboUserInfor, long> weiboUserInforRepository, IRepository<ApplicationUser, string> userRepository, ILogger<LotteryAPIController> logger, IOperationRecordService operationRecordService,
+        UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository,
              IRepository<WeeklyNews, long> weeklyNewsRepository, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository,
              IRepository<LotteryPrize, long> lotteryPrizeRepository, ILotteryService lotteryService, IRepository<PlayedGame, long> playedGameRepository)
         {
@@ -66,6 +70,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _lotteryService = lotteryService;
             _userRepository = userRepository;
             _playedGameRepository = playedGameRepository;
+            _logger = logger;
+            _operationRecordService = operationRecordService;
         }
 
 
@@ -631,13 +637,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Result>> ParticipateInLottery(long id)
+        [HttpPost]
+        public async Task<ActionResult<Result>> ParticipateInLottery(ParticipateInLotteryModel model)
         {
             var time = DateTime.Now.ToCstTime();
             var lottery = await _lotteryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Users)
-                .FirstOrDefaultAsync(s => s.Id == id && s.EndTime > time);
+                .FirstOrDefaultAsync(s => s.Id == model.Id && s.EndTime > time);
             if (lottery == null)
             {
                 return new Result { Successful = false, Error = "未找到该抽奖或抽奖已结束" };
@@ -661,10 +667,20 @@ namespace CnGalWebSite.APIServer.Controllers
             await _lotteryUserRepository.InsertAsync(new LotteryUser
             {
                 ApplicationUserId = user.Id,
-                LotteryId = id,
+                LotteryId = model.Id,
                 ParticipationTime = time,
                 Number = lottery.Users.Count + 1
             });
+
+
+            try
+            {
+                await _operationRecordService.AddOperationRecord(OperationRecordType.Lottery, lottery.Id.ToString(), user, model.Identification, HttpContext);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
+            }
 
             return new Result { Successful = true };
         }

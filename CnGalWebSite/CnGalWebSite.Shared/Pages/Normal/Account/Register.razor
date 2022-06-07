@@ -1,11 +1,9 @@
 ﻿@page "/account/register/{*ReturnUrl}"
 @page "/account/register/"
 @inject IAuthService AuthService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IAppHelper _appHelper
 @inject ToastService? ToastService
-@inject IJSRuntime JS
 @inject HttpClient Http
 @inject IDataCacheService _dataCacheService
 
@@ -33,7 +31,7 @@
                 <a href="/privacy">CnGal资料站隐私协议</a>
             </div>
             <div class="mb-4">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="注册" IsAsync="true" OnClick="HandleRegistration" Class="w-100" Rounded Depressed />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="注册" IsAsync="true" OnClick="OnClickRegiste" Class="w-100" Rounded Depressed />
             </div>
 
             <span class=" d-flex" style="justify-content: center; ">
@@ -43,6 +41,9 @@
     </div>
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification @ref="humanMachineVerification" OnVerficated="OnVerficated" WaitChecked />
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
 
 
 
@@ -67,66 +68,54 @@
     public ErrorHandler ErrorHandler { get; set; }
 
 
-    private async Task HandleRegistration()
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification humanMachineVerification;
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
+
+
+    public async Task OnClickRegiste()
     {
-        try
+        //判断输入是否正确
+        if (Model.Password != Model.ConfirmPassword)
         {
-            //判断输入是否正确
-            if (Model.Password != Model.ConfirmPassword)
-            {
-                await ToastService.Error("注册失败", "两次输入的密码不一致");
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(Model.Name))
-            {
-                await ToastService.Error("注册失败", "请输入用户名");
-                return;
-
-            }
-            if (Model.Name.Length > 20)
-            {
-                await ToastService.Error("注册失败", "用户名必须少于20个字符");
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(Model.Email))
-            {
-                await ToastService.Error("注册失败", "请输入电子邮件");
-                return;
-
-            }
-            if (System.Text.RegularExpressions.Regex.Match(Model.Email, "^[\\w-]+@[\\w-]+\\.[\\w-]+$").Success == false)
-            {
-                await ToastService.Error("注册失败", "输入的电子邮件无效");
-                return;
-            }
-            var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode");
-
-            objRef = DotNetObjectReference.Create(this);
-            await JS.InvokeAsync<string>("initGeetestBindCAPTCHA", objRef, geetestCodeModel.Gt, geetestCodeModel.Challenge, geetestCodeModel.Success);
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "初始化极验人机验证失败");
+            await ToastService.Error("注册失败", "两次输入的密码不一致");
             return;
         }
-        isSuccess = true;
-        int count = 0;
-        while (isSuccess)
+        if (string.IsNullOrWhiteSpace(Model.Name))
         {
-            await Task.Delay(500);
-            count++;
+            await ToastService.Error("注册失败", "请输入用户名");
+            return;
+
         }
+        if (Model.Name.Length > 20)
+        {
+            await ToastService.Error("注册失败", "用户名必须少于20个字符");
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(Model.Email))
+        {
+            await ToastService.Error("注册失败", "请输入电子邮件");
+            return;
+
+        }
+        if (System.Text.RegularExpressions.Regex.Match(Model.Email, "^[\\w-]+@[\\w-]+\\.[\\w-]+$").Success == false)
+        {
+            await ToastService.Error("注册失败", "输入的电子邮件无效");
+            return;
+        }
+
+        await humanMachineVerification.StartVerification();
     }
 
 
-    [JSInvokable]
-    public async Task OnChecked(string challenge, string validate, string seccode)
+    public async Task OnVerficated(HumanMachineVerificationResult model)
     {
         try
         {
-            Model.Challenge = challenge;
-            Model.Validate = validate;
-            Model.Seccode = seccode;
+            Model.Verification = model;
+            if (deviceIdentification != null)
+            {
+                Model.Identification = await deviceIdentification.GetDeviceIdentificationModel();
+            }
 
 
             var result = await AuthService.Register(Model);
@@ -134,7 +123,7 @@
             if (result.Successful)
             {
                 _dataCacheService.UserName = Model.Name;
-                NavigationManager.NavigateTo(Provider, "/account/ConfirmEmailRegister/" + ReturnUrl, "验证邮箱", "fa-at");
+                NavigationManager.NavigateTo("/account/ConfirmEmailRegister/" + ReturnUrl);
             }
             else
             {
@@ -149,27 +138,15 @@
         }
     }
 
-    [JSInvokable]
-    public Task OnCancel()
-    {
-        isSuccess = false;
-        return Task.CompletedTask;
-    }
-
-
     private async void OnLogin()
     {
         try
         {
-            NavigationManager.NavigateTo(Provider, "/account/login/" + ReturnUrl, "登入", "fa fa-sign-in");
+            NavigationManager.NavigateTo( "/account/login/" + ReturnUrl);
         }
         catch
         {
             await ToastService.Error("尝试导航失败", "请尝试刷新页面");
         }
-    }
-    public void Dispose()
-    {
-        objRef?.Dispose();
     }
 }

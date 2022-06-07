@@ -1,0 +1,312 @@
+﻿@attribute [Authorize(Roles = "Admin")]
+@inject IAuthService AuthService
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+
+<Table TItem="ListRankAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
+       ShowExtendButtons="true" ExtendButtonColumnWidth="240" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+    <TableToolbarTemplate>
+        <TableToolbarButton TItem="ListRankAloneModel" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
+        <TableToolbarButton TItem="ListRankAloneModel" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
+        <TableToolbarButton TItem="ListRankAloneModel" Color="Color.Primary" Icon="fa fa-arrow-up" Text="增权重" OnClickCallback="OnPriorityUpClick" IsAsync="true" />
+        <TableToolbarButton TItem="ListRankAloneModel" Color="Color.Success" Icon="fa fa-arrow-down" Text="降权重" OnClickCallback="OnPriorityDownClick" IsAsync="true" />
+
+        <TableToolbarButton TItem="ListRankAloneModel" Color="Color.Danger" Icon="fa fa-plus" Text="添加" OnClickCallback="@((IEnumerable<ListRankAloneModel> items)=> { return OnCreateRank(); })" IsAsync="true" />
+
+    </TableToolbarTemplate>
+    <TableColumns>
+        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
+        <TableColumn @bind-Field="@context.Name" Searchable="true" Sortable="true" Width="120" />
+        <TableColumn @bind-Field="@context.Text" Searchable="true" TextWrap="true" Width="120" />
+        <TableColumn @bind-Field="@context.Priority" Searchable="true" TextWrap="true" Width="120" />
+        <TableColumn @bind-Field="@context.Count" Searchable="true" TextWrap="true" Width="120" />
+
+        <TableColumn @bind-Field="@context.CSS" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
+        <TableColumn @bind-Field="@context.Styles" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
+        <TableColumn @bind-Field="@context.CreateTime" Sortable="true" TextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
+        <TableColumn @bind-Field="@context.LastEditTime" Sortable="true" TextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
+        <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+    </TableColumns>
+    <RowButtonTemplate>
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => LookLink(context.Id))" />
+
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" IsShow="context.IsHidden" />
+
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" IsShow="!context.IsHidden" />
+
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new long[] { context.Id }, 1 , true))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new long[] { context.Id }, - 1 , true))" />
+    </RowButtonTemplate>
+</Table>
+@code {
+    [NotNull]
+    private Table<ListRankAloneModel>? TableRows { get; set; }
+    private List<ListRankAloneModel> SelectedRows { get; set; } = new();
+
+    public ListRanksInforViewModel InforModel { get; set; } = new ListRanksInforViewModel();
+    public ListRanksViewModel ListModel { get; set; } = new ListRanksViewModel { Ranks = new List<ListRankAloneModel>() };
+
+    private ListRankAloneModel SearchModelUser { get; set; } = new ListRankAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            InforModel = await Http.GetFromJsonAsync<ListRanksInforViewModel>(ToolHelper.WebApiPath + "api/admin/listranks");
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取消息数据");
+        }
+
+    }
+
+    private async Task<QueryData<ListRankAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<RanksPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetRankList", new RanksPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListRankAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取头衔列表");
+            return new QueryData<ListRankAloneModel>();
+        }
+    }
+
+    private Task LookLink(long id)
+    {
+        NavigationManager.NavigateTo(Provider, "/ranks/editmain/" + id, "编辑头衔", "fa fa-tree");
+        return Task.CompletedTask;
+    }
+
+    private async Task OnRowEditIsHiddenClick(long[] ids, bool isHidden, bool showMessage)
+    {
+        string tempString = isHidden == true ? "隐藏头衔" : "显示头衔";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<HiddenRankModel>(ToolHelper.WebApiPath + "api/ranks/HiddenRank", new HiddenRankModel { Ids = ids, IsHidden = isHidden });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "成功", tempString + "成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "失败");
+        }
+    }
+
+    private async Task OnHiddenClick(IEnumerable<ListRankAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改头衔状态", "请选中头衔");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), true, false);
+
+        await ToastService.Success("显示成功", "开启成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnUnHiddenClick(IEnumerable<ListRankAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改头衔状态", "请选中头衔");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), false, false);
+
+        await ToastService.Success("隐藏成功", "隐藏成功");
+        await TableRows.QueryAsync();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="item"></param>
+    private async Task OnRowDeleteClick(long[] ids, bool showMessage)
+    {
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<DeleteMessagesModel>(ToolHelper.WebApiPath + "api/space/DeleteMessages", new DeleteMessagesModel { Ids = ids });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("删除消息失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success("删除消息成功", "删除消息成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "删除消息失败");
+        }
+    }
+
+    private async Task OnDeleteClick(IEnumerable<ListMessageAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有删除消息", "请选中消息");
+            return;
+        }
+
+        await OnRowDeleteClick(items.Select(s => s.Id).ToArray(), false);
+
+        await ToastService.Success("删除消息成功", "删除消息成功");
+        await TableRows.QueryAsync();
+    }
+
+    private async Task OnRowEditPriorityClick(long[] ids, int plusPriority, bool showMessage)
+    {
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditRankPriorityViewModel>(ToolHelper.WebApiPath + "api/ranks/EditRankPriority", new EditRankPriorityViewModel { Ids = ids, PlusPriority = plusPriority });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("修改头衔权重失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success("修改头衔权重成功", "修改头衔权重成功");
+                    await TableRows.QueryAsync();
+                }
+
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "修改头衔权重失败");
+        }
+
+    }
+    [Inject]
+    [NotNull]
+    private DialogService? DialogService { get; set; }
+    public async Task OnCreateRank()
+    {
+        CreateRankModel model = new CreateRankModel();
+        var items = Utility.GenerateEditorItems<CreateRankModel>();
+        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
+        //item.Data = Foo.GenerateHobbys(Localizer);
+
+        var option = new EditDialogOption<CreateRankModel>()
+        {
+            Title = "添加新用户",
+            Model = model,
+            Items = items,
+            OnCloseAsync = () =>
+            {
+            //Trace.Log("关闭按钮被点击");
+                return Task.CompletedTask;
+            },
+            OnEditAsync = async context =>
+            {
+                return await CreateRank((CreateRankModel)context.Model);
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
+    }
+
+    private async Task<bool> CreateRank(CreateRankModel model)
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<CreateRankModel>(ToolHelper.WebApiPath + "api/ranks/CreateRank", model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("创建头衔失败", obj.Error);
+                return false;
+            }
+            else
+            {
+                await ToastService.Success("创建头衔成功", "创建头衔成功");
+                await TableRows.QueryAsync();
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "创建头衔失败");
+            return false;
+        }
+
+    }
+
+    private async Task OnPriorityUpClick(IEnumerable<ListRankAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改头衔权重", "请选中头衔");
+            return;
+        }
+
+        await OnRowEditPriorityClick(items.Select(s => s.Id).ToArray(), 1, false);
+        await ToastService.Success("修改头衔权重成功", "修改头衔权重成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnPriorityDownClick(IEnumerable<ListRankAloneModel> items)
+    {
+
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改头衔权重", "请选中头衔");
+            return;
+        }
+
+        await OnRowEditPriorityClick(items.Select(s => s.Id).ToArray(), -1, false);
+
+        await ToastService.Success("修改头衔权重成功", "修改头衔权重成功");
+        await TableRows.QueryAsync();
+    }
+}

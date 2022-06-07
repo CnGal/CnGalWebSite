@@ -6,6 +6,7 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.EntityFrameworkCore;
@@ -166,13 +167,16 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
 
         public async Task UpdateAllGameScore()
         {
+            //获取所有评分
             var globalAllScores = await _playedGameRepository.GetAll().AsNoTracking()
                 .Where(s => s.ShowPublicly)
                  .Where(s => s.CVSocre != 0 && s.ShowSocre != 0 && s.SystemSocre != 0 && s.MusicSocre != 0 && s.PaintSocre != 0 && s.TotalSocre != 0 && s.ScriptSocre != 0)
                 .ToListAsync();
 
+            //过滤评分
             var globalFilterScores = globalAllScores.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > 100);
 
+            //获取所有有评分的游戏
             var games = await _entryRepository.GetAll().AsNoTracking()
                 .Where(s => s.PlayedGames.Any(s => s.ShowPublicly && s.CVSocre != 0 && s.ShowSocre != 0 && s.SystemSocre != 0 && s.MusicSocre != 0 && s.PaintSocre != 0 && s.TotalSocre != 0 && s.ScriptSocre != 0))
                 .Select(s => new
@@ -182,9 +186,91 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
                 })
                 .ToListAsync();
 
-            foreach(var item in games)
+            //获取全局分布
+            var globalDistribution = GetGlobalDistribution(globalAllScores);
+            var globalFilterDistribution = GetGlobalDistribution(globalFilterScores);
+
+            //遍历计算每个游戏的分数并更新
+            foreach (var item in games)
             {
-                await UpdateGameScore(item.Id, item.DisplayName, globalAllScores, globalFilterScores);
+                await UpdateGameScore(item.Id, item.DisplayName, globalAllScores, globalDistribution, globalFilterDistribution);
+            }
+        }
+
+        /// <summary>
+        /// 计算出全局分布D
+        /// </summary>
+        /// <param name="scores"></param>
+        /// <returns></returns>
+        public Dictionary<PlayedGameScoreType, double[]> GetGlobalDistribution(IEnumerable<PlayedGame> scores)
+        {
+            var groups = scores.GroupBy(s => s.EntryId);
+
+            var globalDistribution = new Dictionary<PlayedGameScoreType, double[]>();
+
+            var cvlist = new double[10];
+            var showlist = new double[10];
+            var systemlist = new double[10];
+            var musiclist = new double[10];
+            var paintlist = new double[10];
+            var totallist = new double[10];
+            var scriptlist = new double[10];
+
+            //求和
+            foreach (var group in groups)
+            {
+                SumArray(ref cvlist, GetDistribution(group.Select(s => s.CVSocre)));
+                SumArray(ref showlist, GetDistribution(group.Select(s => s.ShowSocre)));
+                SumArray(ref systemlist, GetDistribution(group.Select(s => s.SystemSocre)));
+                SumArray(ref musiclist, GetDistribution(group.Select(s => s.MusicSocre)));
+                SumArray(ref paintlist, GetDistribution(group.Select(s => s.PaintSocre)));
+                SumArray(ref totallist, GetDistribution(group.Select(s => s.TotalSocre)));
+                SumArray(ref scriptlist, GetDistribution(group.Select(s => s.ScriptSocre)));
+            }
+
+            //计算平均值
+            AverageArray(ref cvlist);
+            AverageArray(ref showlist);
+            AverageArray(ref systemlist);
+            AverageArray(ref musiclist);
+            AverageArray(ref paintlist);
+            AverageArray(ref totallist);
+            AverageArray(ref scriptlist);
+
+            globalDistribution.Add(PlayedGameScoreType.CV, cvlist);
+            globalDistribution.Add(PlayedGameScoreType.Show, showlist);
+            globalDistribution.Add(PlayedGameScoreType.System, systemlist);
+            globalDistribution.Add(PlayedGameScoreType.Music, musiclist);
+            globalDistribution.Add(PlayedGameScoreType.Paint, paintlist);
+            globalDistribution.Add(PlayedGameScoreType.Total, totallist);
+            globalDistribution.Add(PlayedGameScoreType.Script, scriptlist);
+
+            return globalDistribution;
+        }
+
+        /// <summary>
+        /// 数组求和
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        public void SumArray(ref double[] a, in double[] b)
+        {
+            for (int i = 0; i < a.Length; i++)
+            {
+                a[i] += b[i];
+            }
+        }
+
+        /// <summary>
+        /// 数组求频率
+        /// </summary>
+        /// <param name="a"></param>
+        public void AverageArray(ref double[] a)
+        {
+            var sum = a.Sum();
+            for (int i = 0; i < a.Length; i++)
+            {
+                a[i] = a[i] / sum;
             }
         }
 
@@ -194,49 +280,60 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         /// <param name="id">游戏id</param>
         /// <param name="name">游戏名</param>
         /// <param name="globalAllScores">所有用户评分</param>
-        /// <param name="globalFilterScores">所有过滤后的用户评分</param>
+        /// <param name="globalDistribution">全局分布</param>
+        /// <param name="globalFilterDistribution">过滤后的全局分布</param>
         /// <returns></returns>
-        public async Task UpdateGameScore(int id, string name, IEnumerable<PlayedGame> globalAllScores, IEnumerable<PlayedGame> globalFilterScores)
+        public async Task UpdateGameScore(int id, string name, IEnumerable<PlayedGame> globalAllScores, Dictionary<PlayedGameScoreType, double[]> globalDistribution ,Dictionary<PlayedGameScoreType, double[]> globalFilterDistribution)
         {
             //获取当前游戏的所有玩家评分
             var scores = globalAllScores.Where(s => s.EntryId == id);
 
             //获取当前评分缓存
             var model = await _gameScoreTableRepository.FirstOrDefaultAsync(s => s.GameId == id);
+
             if (model == null)
             {
+                if (scores.Any() == false)
+                {
+                    return;
+                }
+
                 model = await _gameScoreTableRepository.InsertAsync(new GameScoreTableModel
                 {
                     GameId = id,
                 });
             }
+            else
+            {
+                if (scores.Any() == false)
+                {
+                    await _gameScoreTableRepository.DeleteAsync(model);
+                }
+            }
             model.GameName = name;
 
-            if (scores.Any() == false)
-            {
-                await _gameScoreTableRepository.DeleteAsync(model);
-            }
+           
 
             //依次计算
-            model.AllCVSocre = CalculateScore(scores.Select(s => s.CVSocre), globalAllScores.Select(s => s.CVSocre));
-            model.AllShowSocre = CalculateScore(scores.Select(s => s.ShowSocre), globalAllScores.Select(s => s.ShowSocre));
-            model.AllSystemSocre = CalculateScore(scores.Select(s => s.SystemSocre), globalAllScores.Select(s => s.SystemSocre));
-            model.AllMusicSocre = CalculateScore(scores.Select(s => s.MusicSocre), globalAllScores.Select(s => s.MusicSocre));
-            model.AllPaintSocre = CalculateScore(scores.Select(s => s.PaintSocre), globalAllScores.Select(s => s.PaintSocre));
-            model.AllTotalSocre = CalculateScore(scores.Select(s => s.TotalSocre), globalAllScores.Select(s => s.TotalSocre));
-            model.AllScriptSocre = CalculateScore(scores.Select(s => s.ScriptSocre), globalAllScores.Select(s => s.ScriptSocre));
+            model.AllCVSocre = CalculateScore(scores.Select(s => s.CVSocre), globalDistribution[ PlayedGameScoreType.CV]);
+            model.AllShowSocre = CalculateScore(scores.Select(s => s.ShowSocre), globalDistribution[PlayedGameScoreType.Show]);
+            model.AllSystemSocre = CalculateScore(scores.Select(s => s.SystemSocre), globalDistribution[PlayedGameScoreType.System]);
+            model.AllMusicSocre = CalculateScore(scores.Select(s => s.MusicSocre), globalDistribution[PlayedGameScoreType.Music]);
+            model.AllPaintSocre = CalculateScore(scores.Select(s => s.PaintSocre), globalDistribution[PlayedGameScoreType.Paint]);
+            model.AllTotalSocre = CalculateScore(scores.Select(s => s.TotalSocre), globalDistribution[PlayedGameScoreType.Total]);
+            model.AllScriptSocre = CalculateScore(scores.Select(s => s.ScriptSocre), globalDistribution[PlayedGameScoreType.Script]);
 
             var filterScores = scores.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > 100);
-            if (filterScores != null && filterScores.Any() && globalFilterScores != null && globalFilterScores.Any())
+            if (filterScores != null && filterScores.Any())
             {
                 //依次计算
-                model.FilterCVSocre = CalculateScore(filterScores.Select(s => s.CVSocre), globalFilterScores.Select(s => s.CVSocre));
-                model.FilterShowSocre = CalculateScore(filterScores.Select(s => s.ShowSocre), globalFilterScores.Select(s => s.ShowSocre));
-                model.FilterSystemSocre = CalculateScore(filterScores.Select(s => s.SystemSocre), globalFilterScores.Select(s => s.SystemSocre));
-                model.FilterMusicSocre = CalculateScore(filterScores.Select(s => s.MusicSocre), globalFilterScores.Select(s => s.MusicSocre));
-                model.FilterPaintSocre = CalculateScore(filterScores.Select(s => s.PaintSocre), globalFilterScores.Select(s => s.PaintSocre));
-                model.FilterTotalSocre = CalculateScore(filterScores.Select(s => s.TotalSocre), globalFilterScores.Select(s => s.TotalSocre));
-                model.FilterScriptSocre = CalculateScore(filterScores.Select(s => s.ScriptSocre), globalFilterScores.Select(s => s.ScriptSocre));
+                model.FilterCVSocre = CalculateScore(filterScores.Select(s => s.CVSocre), globalFilterDistribution[PlayedGameScoreType.CV]);
+                model.FilterShowSocre = CalculateScore(filterScores.Select(s => s.ShowSocre), globalFilterDistribution[PlayedGameScoreType.Show]);
+                model.FilterSystemSocre = CalculateScore(filterScores.Select(s => s.SystemSocre), globalFilterDistribution[PlayedGameScoreType.System]);
+                model.FilterMusicSocre = CalculateScore(filterScores.Select(s => s.MusicSocre), globalFilterDistribution[PlayedGameScoreType.Music]);
+                model.FilterPaintSocre = CalculateScore(filterScores.Select(s => s.PaintSocre), globalFilterDistribution[PlayedGameScoreType.Paint]);
+                model.FilterTotalSocre = CalculateScore(filterScores.Select(s => s.TotalSocre), globalFilterDistribution[PlayedGameScoreType.Total]);
+                model.FilterScriptSocre = CalculateScore(filterScores.Select(s => s.ScriptSocre), globalFilterDistribution[PlayedGameScoreType.Script]);
 
             }
 
@@ -248,11 +345,10 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         /// 计算评分
         /// </summary>
         /// <param name="scores">当前游戏的评分</param>
-        /// <param name="allScores">所有评分</param>
+        /// <param name="g">全局分布</param>
         /// <returns></returns>
-        public double CalculateScore(IEnumerable<int> scores, IEnumerable<int> allScores)
+        public double CalculateScore(IEnumerable<int> scores, double[] g)
         {
-            var g = GetDistribution(allScores);
             var s = GetDistribution(scores);
 
             return CalculateScoreByDirichletDistribution(g, s);
@@ -295,7 +391,7 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         /// <returns></returns>
         public double CalculateScoreByDirichletDistribution(double[] globalDistribution, double[] singleMultivariateDistribution)
         {
-            var n = globalDistribution.Length;
+            var n = globalDistribution.Count();
 
             double[] d = new double[n];
             double sum = 0;

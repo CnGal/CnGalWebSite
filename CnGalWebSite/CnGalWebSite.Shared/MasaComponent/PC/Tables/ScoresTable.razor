@@ -16,35 +16,35 @@
 }
 else
 {
-    <Table TItem="GameScoreTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
-           OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelScores" ShowSearch="true" ShowLoading="true"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
-           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
-        <TableColumns>
-            <TableColumn @bind-Field="@context.GameId" Filterable Sortable Width="100" TextWrap Fixed />
-            <TableColumn @bind-Field="@context.GameName" Filterable Sortable Searchable Width="200" TextWrap />
+<Table TItem="GameScoreTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
+       OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelScores" ShowSearch="true" ShowLoading="true"
+       ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
+       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
+    <TableColumns>
+        <TableColumn @bind-Field="@context.GameId" Filterable Sortable Width="100" TextWrap Fixed />
+        <TableColumn @bind-Field="@context.GameName" Filterable Sortable Searchable Width="200" TextWrap />
 
-            <TableColumn @bind-Field="@context.AllCVSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.AllSystemSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100"  />
-            <TableColumn @bind-Field="@context.AllShowSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.AllPaintSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100"  />
-            <TableColumn @bind-Field="@context.AllScriptSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.AllMusicSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100"  />
-            <TableColumn @bind-Field="@context.AllTotalSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100" />
+        <TableColumn @bind-Field="@context.AllCVSocre" Sortable Filterable Searchable FormatString="0.00" Width="150" />
+        <TableColumn @bind-Field="@context.AllSystemSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+        <TableColumn @bind-Field="@context.AllShowSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+        <TableColumn @bind-Field="@context.AllPaintSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+        <TableColumn @bind-Field="@context.AllScriptSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+        <TableColumn @bind-Field="@context.AllMusicSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+        <TableColumn @bind-Field="@context.AllTotalSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
 
-            <TableColumn @bind-Field="@context.FilterCVSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100"  />
-            <TableColumn @bind-Field="@context.FilterSystemSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100"  />
-            <TableColumn @bind-Field="@context.FilterShowSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.FilterPaintSocre" Sortable Filterable Searchable FormatString="0.00" Width="100"  />
-            <TableColumn @bind-Field="@context.FilterScriptSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.FilterMusicSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100"  />
-            <TableColumn @bind-Field="@context.FilterTotalSocre" Sortable Filterable Searchable  FormatString="0.00" Width="100" />
-        </TableColumns>
-        <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.GameId))" />
-        </RowButtonTemplate>
+        <TableColumn @bind-Field="@context.FilterCVSocre" Sortable Filterable Searchable FormatString="0.00" Width="180" />
+        <TableColumn @bind-Field="@context.FilterSystemSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+        <TableColumn @bind-Field="@context.FilterShowSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+        <TableColumn @bind-Field="@context.FilterPaintSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+        <TableColumn @bind-Field="@context.FilterScriptSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+        <TableColumn @bind-Field="@context.FilterMusicSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+        <TableColumn @bind-Field="@context.FilterTotalSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+    </TableColumns>
+    <RowButtonTemplate>
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.GameId))" />
+    </RowButtonTemplate>
 
-    </Table>
+</Table>
 }
 
 @code {

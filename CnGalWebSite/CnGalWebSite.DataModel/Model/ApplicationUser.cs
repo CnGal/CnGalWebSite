@@ -133,6 +133,8 @@ namespace CnGalWebSite.DataModel.Model
         public ICollection<RankUser> UserRanks { get; set; }
 
         public ICollection<PeripheryRelevanceUser> UserOwnedPeripheries { get; set; }
+
+        public ICollection<OperationRecord> OperationRecords { get; set; }
     }
 
     public class UserIntegral

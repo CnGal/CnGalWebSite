@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.DataReositories;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,9 +41,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<VoteOption, long> _voteOptionRepository;
         private readonly IRepository<VoteUser, long> _voteUserRepository;
+        private readonly ILogger<VoteAPIController> _logger;
+        private readonly IOperationRecordService _operationRecordService;
 
-        public VoteAPIController(IRepository<Vote, long> voteRepository, IRepository<VoteOption, long> voteOptionRepository, IRepository<VoteUser, long> voteUserRepository,
-              IRepository<ApplicationUser, string> userRepository, IEntryService entryService, IArticleService articleService, IRankService rankService,
+        public VoteAPIController(IRepository<Vote, long> voteRepository, IRepository<VoteOption, long> voteOptionRepository, IRepository<VoteUser, long> voteUserRepository, IOperationRecordService operationRecordService,
+        IRepository<ApplicationUser, string> userRepository, IEntryService entryService, IArticleService articleService, IRankService rankService, ILogger<VoteAPIController> logger,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IPeripheryService peripheryService)
         {
             _entryRepository = entryRepository;
@@ -56,6 +60,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _voteRepository = voteRepository;
             _voteOptionRepository = voteOptionRepository;
             _voteUserRepository = voteUserRepository;
+            _logger = logger;
+            _operationRecordService = operationRecordService;
         }
 
         [AllowAnonymous]
@@ -846,6 +852,16 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 await _voteUserRepository.UpdateAsync(voteUser);
             }
+
+            try
+            {
+                await _operationRecordService.AddOperationRecord(OperationRecordType.Vote, vote.Id.ToString(), user, model.Identification, HttpContext);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
+            }
+
 
             return new Result { Successful = true };
         }

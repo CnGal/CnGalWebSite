@@ -13,7 +13,7 @@
 
     <div class=" rounded shadow-sm p-4 bg-opacity">
         <Table TItem="ListExamineAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelExamine" ShowSearch="true" @ref="TableRows"
-               ShowExtendButtons="true" ExtendButtonColumnWidth="60" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+               ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
                ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true" IsAutoRefresh="@IsAutoRefresh">
             <TableToolbarTemplate>
                 <TableToolbarButton TItem="ListExamineAloneModel" Color="Color.Success" Icon="fa fa-paper-plane-o" Text="通过审核" OnClickCallback="OnPassedExamineClick" IsAsync="true" />

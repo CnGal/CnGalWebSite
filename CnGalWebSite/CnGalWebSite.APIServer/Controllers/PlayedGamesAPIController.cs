@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.PlayedGames;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Users;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Senparc.NeuChar.Entities;
 using System;
@@ -39,8 +41,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IPlayedGameService _playedGameService;
         private readonly IExamineService _examineService;
         private readonly IUserService _userService;
+        private readonly ILogger<PlayedGamesAPIController> _logger;
+        private readonly IOperationRecordService _operationRecordService;
 
         public PlayedGamesAPIController(IPlayedGameService playedGameService, ISteamInforService steamInforService, IRepository<ApplicationUser, string> userRepository, UserManager<ApplicationUser> userManager,
+            ILogger<PlayedGamesAPIController> logger, IOperationRecordService operationRecordService,
         IRepository<PlayedGame, long> playedGameRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IExamineService examineService, IUserService userService, IRepository<Examine, string> examineRepository)
         {
             _entryRepository = entryRepository;
@@ -53,6 +58,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _examineService = examineService;
             _userService = userService;
             _examineRepository=examineRepository;
+            _logger = logger;
+            _operationRecordService = operationRecordService;
         }
 
         /// <summary>
@@ -169,6 +176,15 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 game = await _playedGameRepository.UpdateAsync(game);
 
+            }
+
+            try
+            {
+                await _operationRecordService.AddOperationRecord(OperationRecordType.Score, game.Id.ToString(), user, model.Identification, HttpContext);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
             }
 
             if(game.ShowPublicly == model.ShowPublicly && model.PlayImpressions == game.PlayImpressions)
