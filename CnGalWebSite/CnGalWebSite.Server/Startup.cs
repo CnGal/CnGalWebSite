@@ -10,6 +10,7 @@ using CnGalWebSite.Shared.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -69,6 +70,12 @@ namespace CnGalWebSite.Server
             services.AddScoped<IImageService, ImageService>();
             //services.AddScoped<IEventBase, EventBase>();
 
+            //添加真实IP
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
@@ -87,10 +94,19 @@ namespace CnGalWebSite.Server
             //app.UseHttpsRedirection();
             //app.UseRequestLocalization(app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>().Value);
 
+            //添加真实IP中间件
+            app.UseForwardedHeaders();
+
             app.UseStaticFiles();
 
             //添加状态检查终结点
             app.UseHealthChecks("/healthz");
+
+            //转发Ip
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
 
             app.UseRouting();
 
