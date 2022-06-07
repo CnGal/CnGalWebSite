@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using Console = System.Console;
 
 namespace CnGalWebSite.APIServer.Application.PlayedGames
 {
@@ -202,76 +203,19 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         /// </summary>
         /// <param name="scores"></param>
         /// <returns></returns>
-        public Dictionary<PlayedGameScoreType, double[]> GetGlobalDistribution(IEnumerable<PlayedGame> scores)
+        public Dictionary<PlayedGameScoreType, long[]> GetGlobalDistribution(IEnumerable<PlayedGame> scores)
         {
-            var groups = scores.GroupBy(s => s.EntryId);
+            var globalDistribution = new Dictionary<PlayedGameScoreType, long[]>();
 
-            var globalDistribution = new Dictionary<PlayedGameScoreType, double[]>();
-
-            var cvlist = new double[10];
-            var showlist = new double[10];
-            var systemlist = new double[10];
-            var musiclist = new double[10];
-            var paintlist = new double[10];
-            var totallist = new double[10];
-            var scriptlist = new double[10];
-
-            //求和
-            foreach (var group in groups)
-            {
-                SumArray(ref cvlist, GetDistribution(group.Select(s => s.CVSocre)));
-                SumArray(ref showlist, GetDistribution(group.Select(s => s.ShowSocre)));
-                SumArray(ref systemlist, GetDistribution(group.Select(s => s.SystemSocre)));
-                SumArray(ref musiclist, GetDistribution(group.Select(s => s.MusicSocre)));
-                SumArray(ref paintlist, GetDistribution(group.Select(s => s.PaintSocre)));
-                SumArray(ref totallist, GetDistribution(group.Select(s => s.TotalSocre)));
-                SumArray(ref scriptlist, GetDistribution(group.Select(s => s.ScriptSocre)));
-            }
-
-            //计算平均值
-            AverageArray(ref cvlist);
-            AverageArray(ref showlist);
-            AverageArray(ref systemlist);
-            AverageArray(ref musiclist);
-            AverageArray(ref paintlist);
-            AverageArray(ref totallist);
-            AverageArray(ref scriptlist);
-
-            globalDistribution.Add(PlayedGameScoreType.CV, cvlist);
-            globalDistribution.Add(PlayedGameScoreType.Show, showlist);
-            globalDistribution.Add(PlayedGameScoreType.System, systemlist);
-            globalDistribution.Add(PlayedGameScoreType.Music, musiclist);
-            globalDistribution.Add(PlayedGameScoreType.Paint, paintlist);
-            globalDistribution.Add(PlayedGameScoreType.Total, totallist);
-            globalDistribution.Add(PlayedGameScoreType.Script, scriptlist);
+            globalDistribution.Add(PlayedGameScoreType.CV, GetDistribution(scores.Select(s => s.CVSocre)));
+            globalDistribution.Add(PlayedGameScoreType.Show, GetDistribution(scores.Select(s => s.ShowSocre)));
+            globalDistribution.Add(PlayedGameScoreType.System, GetDistribution(scores.Select(s => s.SystemSocre)));
+            globalDistribution.Add(PlayedGameScoreType.Music, GetDistribution(scores.Select(s => s.MusicSocre)));
+            globalDistribution.Add(PlayedGameScoreType.Paint, GetDistribution(scores.Select(s => s.PaintSocre)));
+            globalDistribution.Add(PlayedGameScoreType.Total, GetDistribution(scores.Select(s => s.TotalSocre)));
+            globalDistribution.Add(PlayedGameScoreType.Script, GetDistribution(scores.Select(s => s.ScriptSocre)));
 
             return globalDistribution;
-        }
-
-        /// <summary>
-        /// 数组求和
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        public void SumArray(ref double[] a, in double[] b)
-        {
-            for (int i = 0; i < a.Length; i++)
-            {
-                a[i] += b[i];
-            }
-        }
-
-        /// <summary>
-        /// 数组求频率
-        /// </summary>
-        /// <param name="a"></param>
-        public void AverageArray(ref double[] a)
-        {
-            var sum = a.Sum();
-            for (int i = 0; i < a.Length; i++)
-            {
-                a[i] = a[i] / sum;
-            }
         }
 
         /// <summary>
@@ -283,7 +227,7 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         /// <param name="globalDistribution">全局分布</param>
         /// <param name="globalFilterDistribution">过滤后的全局分布</param>
         /// <returns></returns>
-        public async Task UpdateGameScore(int id, string name, IEnumerable<PlayedGame> globalAllScores, Dictionary<PlayedGameScoreType, double[]> globalDistribution ,Dictionary<PlayedGameScoreType, double[]> globalFilterDistribution)
+        public async Task UpdateGameScore(int id, string name, IEnumerable<PlayedGame> globalAllScores, Dictionary<PlayedGameScoreType, long[]> globalDistribution ,Dictionary<PlayedGameScoreType, long[]> globalFilterDistribution)
         {
             //获取当前游戏的所有玩家评分
             var scores = globalAllScores.Where(s => s.EntryId == id);
@@ -311,8 +255,6 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
                 }
             }
             model.GameName = name;
-
-           
 
             //依次计算
             model.AllCVSocre = CalculateScore(scores.Select(s => s.CVSocre), globalDistribution[ PlayedGameScoreType.CV]);
@@ -347,7 +289,7 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         /// <param name="scores">当前游戏的评分</param>
         /// <param name="g">全局分布</param>
         /// <returns></returns>
-        public double CalculateScore(IEnumerable<int> scores, double[] g)
+        public double CalculateScore(IEnumerable<int> scores, long[] g)
         {
             var s = GetDistribution(scores);
 
@@ -363,13 +305,13 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         /// <param name="scores">分数</param>
         /// <param name="n">n档 不包括0</param>
         /// <returns></returns>
-        public double[] GetDistribution(IEnumerable<int> scores,int n=10)
+        public long[] GetDistribution(IEnumerable<int> scores,int n=10)
         {
-            var d = new double[n];
+            var d = new long[n];
 
             for (int i = 0; i < n; i++)
             {
-                d[i] = (double)scores.Count(s => s == i + 1) / scores.Count();
+                d[i] = scores.Count(s => s == i + 1);
             }
 
             return d;
@@ -389,12 +331,12 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         /// <param name="globalDistribution">先验分布</param>
         /// <param name="singleMultivariateDistribution">多元分布</param>
         /// <returns></returns>
-        public double CalculateScoreByDirichletDistribution(double[] globalDistribution, double[] singleMultivariateDistribution)
+        public double CalculateScoreByDirichletDistribution(long[] globalDistribution, long[] singleMultivariateDistribution)
         {
             var n = globalDistribution.Count();
 
-            double[] d = new double[n];
-            double sum = 0;
+            long[] d = new long[n];
+            long sum = 0;
 
             for (int i = 0; i < n; i++)
             {
@@ -409,10 +351,12 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
             for (int i = 0; i < n; i++)
             {
                 //计算分布D的均值 加权平均
-                score += d[i] *  (i + 1) / sum;
+                score += (double)d[i] *  (i + 1) / sum;
             }
 
             return score;
         }
+
+     
     }
 }

@@ -139,10 +139,10 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
 
             if (ip == _configuration["InternalIp"])
             {
-                ip = userIp;
+                ip = userIp ?? "";
             }
 
-            return ip;
+            return ip.Split(',').FirstOrDefault();
         }
     }
 }

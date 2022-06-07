@@ -318,6 +318,7 @@ namespace CnGalWebSite.Shared.Service
             PeripheryIndexPageCatche.Clean();
             VoteIndexPageCatche.Clean();
             TagIndexPageCatche.Clean();
+            PlayedGameOverviewDataCatche.Clean();
 
             LoginKey = null;
             ThirdPartyLoginTempModel = null;
