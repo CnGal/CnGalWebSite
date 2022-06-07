@@ -125,6 +125,7 @@
     </div>
 
 </div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
     [Parameter]
@@ -137,6 +138,7 @@
     public ErrorHandler ErrorHandler { get; set; }
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
 
     protected override async Task OnInitializedAsync()
     {
@@ -147,7 +149,7 @@
     public async Task Refresh()
     {
         var user = await authenticationStateTask;
-        if(user.User.Identity.IsAuthenticated)
+        if (user.User.Identity.IsAuthenticated)
         {
             try
             {
@@ -166,15 +168,22 @@
     {
         try
         {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/lotteries/ParticipateInLottery/" + ViewModel.Id);
-            if(result.Successful)
+            var result = await Http.PostAsJsonAsync<ParticipateInLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/ParticipateInLottery", new ParticipateInLotteryModel
+            {
+                Id = ViewModel.Id,
+                Identification = await deviceIdentification.GetDeviceIdentificationModel()
+            });
+
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            if (obj.Successful)
             {
                 await ToastService.Success("参与抽奖成功", "参与抽奖成功");
                 await Refresh();
             }
             else
             {
-                await ToastService.Error("参与抽奖失败", result.Error);
+                await ToastService.Error("参与抽奖失败", obj.Error);
             }
         }
         catch (Exception ex)
@@ -194,7 +203,7 @@
         var option = new DialogOption()
         {
             Title = "查看奖品",
-            Size= Size.Medium
+            Size = Size.Medium
         };
         option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<PrizePage.LookPrizeTip>(new Dictionary<string, object>
         {
@@ -227,12 +236,12 @@
 
             OnCloseAsync = () =>
             {
-                //Trace.Log("关闭按钮被点击");
+            //Trace.Log("关闭按钮被点击");
                 return Task.CompletedTask;
             },
             OnEditAsync = async context =>
             {
-                // Trace.Log("保存按钮被点击");
+            // Trace.Log("保存按钮被点击");
                 var item = (EditUserAddressModel)context.Model;
 
                 try
@@ -240,7 +249,7 @@
                     var result = await Http.PostAsJsonAsync<EditUserAddressModel>(ToolHelper.WebApiPath + "api/space/EditUserAddress", item);
                     string jsonContent = result.Content.ReadAsStringAsync().Result;
                     Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-                    //判断结果
+                //判断结果
                     if (obj.Successful == false)
                     {
                         await ToastService.Error("编辑收货地址失败", obj.Error);
@@ -248,7 +257,7 @@
                     }
                     else
                     {
-                        await ToastService.Success( "编辑收货地址成功",  "编辑收货地址成功");
+                        await ToastService.Success("编辑收货地址成功", "编辑收货地址成功");
                         await Refresh();
                         return true;
                     }

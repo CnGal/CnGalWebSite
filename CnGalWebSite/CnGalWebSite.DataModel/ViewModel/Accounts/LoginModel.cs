@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CnGalWebSite.DataModel.ViewModel.OperationRecords;
+using CnGalWebSite.DataModel.ViewModel.Others;
+using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.Model
 {
     public class LoginModel
@@ -10,18 +12,13 @@ namespace CnGalWebSite.DataModel.Model
         public string Password { get; set; }
         [Display(Name = "记住我")]
         public bool RememberMe { get; set; } = true;
-        [Display(Name = "token")]
-        public string token { get; set; }
-        [Display(Name = "randstr")]
-        public string randstr { get; set; }
-        [Display(Name = "Challenge")]
-        public string Challenge { get; set; }
-        [Display(Name = "Validate")]
-        public string Validate { get; set; }
-        [Display(Name = "Seccode")]
-        public string Seccode { get; set; }
-        [Display(Name = "isNeedVerification")]
+
         public bool isNeedVerification { get; set; }
+
+        public HumanMachineVerificationResult Verification { get; set; }=new HumanMachineVerificationResult();
+
+        public DeviceIdentificationModel Identification { get; set; } = new DeviceIdentificationModel();
+
     }
     public class LoginResult
     {

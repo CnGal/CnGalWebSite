@@ -27,7 +27,7 @@
         <GameCard Model="item" Class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4" Type="_dataCacheService.ThemeSetting.AnniversariesSetting.DisplayType" OnClick="OnClickMore" />
     }
 </div>
-@if (Items.Any() == false)
+@if (Items.Any() == false&& isReady)
 {
     <NotFoundJudgableCard GameName="@_dataCacheService.ThemeSetting.AnniversariesSetting.SearchString" />
 }
@@ -46,10 +46,14 @@
 
     CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewDialog overviewDialog;
     JudgableGameViewModel currentGame;
+
+    bool isReady;
+
     protected override async Task OnInitializedAsync()
     {
 
         await Refresh();
+        isReady = true;
     }
 
     public async Task Refresh()

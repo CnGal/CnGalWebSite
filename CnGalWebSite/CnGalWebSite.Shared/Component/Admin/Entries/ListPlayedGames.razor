@@ -40,7 +40,7 @@
 
         <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="95" />
         <TableColumn @bind-Field="@context.ShowPublicly" Sortable="true" ComponentType="@typeof(Switch)" Width="95" />
-\    </TableColumns>
+    </TableColumns>
     <RowButtonTemplate>
         <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.GameId ))" />
         <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" IsShow="!context.IsHidden" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" />
@@ -83,7 +83,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "无法获取词条列表");
+            ErrorHandler.ProcessError(ex, "无法获游玩记录条列表");
             return new QueryData<ListPlayedGameAloneModel>();
         }
     }

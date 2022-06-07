@@ -1,282 +1,53 @@
 ﻿@page "/admin/listusers"
 @attribute [Authorize(Roles = "Admin")]
-@inject IAuthService AuthService
-@inject HttpClient Http
-@inject ToastService? ToastService
-@inject IServiceProvider Provider
-@inject NavigationManager NavigationManager
-@inject IJSRuntime JS
+
+@inject IDataCacheService _dataCacheService
+
 
 
 
 <TitleTip Title="用户版块"></TitleTip>
 
-<div class="">
-    <div class="" style="padding-right: 0;padding-left: 0;">
-        <div class="  rounded shadow-sm  bg-opacity p-3">
-            <h3 class="fw-bold text-center">用户版块</h3>
-            <p class="text-center" style="color: gray;margin-top:20px">
-                <i class="fa fa-users fa-fw "></i>
-                <span class="article-infor-text">@("总计"+InforModel.UserCount + "名用户")</span>
+<div>
+    <div class="rounded  shadow-sm bg-opacity mb-4">
+        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
+               Color="@_dataCacheService.ThemeSetting.Theme">
 
-            </p>
-        </div>
-
-        <div class="mt-3" style="padding-right: 0;padding-left: 0;">
-            <div class=" rounded shadow-sm -lg p-4 bg-opacity">
-                <Table TItem="ListUserAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
-                       ShowExtendButtons="true" ExtendButtonColumnWidth="300" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-                       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-                    <TableToolbarTemplate>
-                        <TableToolbarButton TItem="ListUserAloneModel" Color="Color.Primary" Icon="fa fa-plus" Text="添加新用户" OnClickCallback="@((IEnumerable<ListUserAloneModel> items)=> { return CreateUser(); })" IsAsync="true" />
-                        <TableToolbarButton TItem="ListUserAloneModel" Color="Color.Success" Icon="fa fa-database" Text="解封" OnClickCallback="OnUnBanUsersClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListUserAloneModel" Color="Color.Info" Icon="fa fa-pencil-square-o" Text="封禁" OnClickCallback="OnBanUsersClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListUserAloneModel" Color="Color.Primary" Icon="fa fa-comments" Text="开启评论" OnClickCallback="OnCanCommentClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListUserAloneModel" Color="Color.Danger" Icon="fa fa-comments-o" Text="关闭评论" OnClickCallback="OnCanNotCommentClick" IsAsync="true" />
-
-                    </TableToolbarTemplate>
-                    <TableColumns>
-                        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="300" />
-                        <TableColumn @bind-Field="@context.UserName" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
-                        <TableColumn @bind-Field="@context.Email" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
-                        <TableColumn @bind-Field="@context.PersonalSignature" Searchable="true" TextWrap="true" Width="400" />
-
-                        <TableColumn @bind-Field="@context.Birthday" Sortable="true" FormatString="MM-dd" Width="100" />
-                        <TableColumn @bind-Field="@context.RegistTime" Sortable="true" Width="160" />
-                        <TableColumn @bind-Field="@context.Integral" Sortable="true" Width="110" />
-                        <TableColumn @bind-Field="@context.ContributionValue" Sortable="true" Width="120" />
-                        <TableColumn @bind-Field="@context.DisplayIntegral" Sortable="true" Width="110" />
-                        <TableColumn @bind-Field="@context.DisplayContributionValue" Sortable="true" Width="110" />
-                        <TableColumn @bind-Field="@context.OnlineTime" Sortable="true" Width="130" TextWrap="true" FormatString="0.00" />
-                        <TableColumn @bind-Field="@context.LastOnlineTime" Sortable="true" Width="160" />
-                        <TableColumn @bind-Field="@context.UnsealTime" Sortable="true" Width="160" />
-                        <TableColumn @bind-Field="@context.CanComment" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
-                        <TableColumn @bind-Field="@context.IsPassedVerification" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
-                    </TableColumns>
-                    <RowButtonTemplate>
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookUser( context.Id , context.UserName))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-pencil-square-o" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditUser(context.Id ))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-database" Text="解封" IsAsync="true" OnClickWithoutRender="@(() => OnRowBanUsersClick(new string[] { context.Id },false ,true))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-pencil-square-o" Text="封禁" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowBanUsersClick(new string[] { context.Id },true ,true))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-comments-o" Text="开关留言" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditCanCommentClick(new string[] { context.Id }, !context.CanComment, true))" />
-                    </RowButtonTemplate>
-                </Table>
-            </div>
-        </div>
-
+            <MTab Value="1">
+                用户<MIcon>mdi-account</MIcon>
+            </MTab>
+            <MTab Value="2">
+                头衔<MIcon>mdi-medal-outline</MIcon>
+            </MTab>
+            <MTab Value="3">
+                操作记录<MIcon>mdi-text-search</MIcon>
+            </MTab>
+        </MTabs>
     </div>
+    <MTabsItems @bind-Value="TabIndex">
+        <MTabItem Value="1">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <CnGalWebSite.Shared.Component.Admin.Users.ListUsers />
 
+            </div>
+
+        </MTabItem>
+        <MTabItem Value="2">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <CnGalWebSite.Shared.Component.Admin.Users.ListRanks />
+
+            </div>
+
+        </MTabItem>
+        <MTabItem Value="3">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <CnGalWebSite.Shared.Component.Admin.Users.ListOperationRecords />
+
+            </div>
+
+        </MTabItem>
+    </MTabsItems>
 </div>
 @code {
-    [NotNull]
-    private Table<ListUserAloneModel>? TableRows { get; set; }
-    private List<ListUserAloneModel> SelectedRows { get; set; } = new();
-
-    public ListUsersInforViewModel InforModel { get; set; } = new ListUsersInforViewModel();
-    public ListUsersViewModel ListModel { get; set; } = new ListUsersViewModel { Users = new List<ListUserAloneModel>() };
-
-    private ListUserAloneModel SearchModelUser { get; set; } = new ListUserAloneModel();
-
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
-
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            InforModel = await Http.GetFromJsonAsync<ListUsersInforViewModel>(ToolHelper.WebApiPath + "api/admin/listusers");
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取用户数据");
-        }
-
-    }
-
-    private async Task<QueryData<ListUserAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
-    {
-        try
-        {
-            options.Filters = new List<IFilterAction>();
-            options.Searchs = new List<IFilterAction>();
-
-            var result = await Http.PostAsJsonAsync<UsersPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetUserList", new UsersPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListUserAloneModel>>(jsonContent, ToolHelper.options);
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取用户列表");
-            return new QueryData<ListUserAloneModel>();
-        }
-    }
-    private Task EditUser(string id)
-    {
-        NavigationManager.NavigateTo(Provider,"/admin/edituser/" + id, "编辑用户", "fa fa-user-circle");
-        return Task.CompletedTask;
-    }
-    private Task LookUser(string id, string name)
-    {
-        NavigationManager.NavigateTo(Provider,"/space/index/" + id, name, "fa fa-star-o");
-        return Task.CompletedTask;
-    }
-
-    [Inject]
-    [NotNull]
-    private DialogService? DialogService { get; set; }
-    public async Task CreateUser()
-    {
-        RegisterModel model = new RegisterModel();
-        var items = Utility.GenerateEditorItems<RegisterModel>();
-        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
-        //item.Data = Foo.GenerateHobbys(Localizer);
-
-        var option = new EditDialogOption<RegisterModel>()
-        {
-            Title = "添加新用户",
-            Model = model,
-            Items = items,
-            OnCloseAsync = () =>
-            {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
-            OnEditAsync = async context =>
-            {
-                var result = await AuthService.Register((RegisterModel)context.Model);
-
-                if (result.Successful)
-                {
-                    await ToastService.Success("注册成功", "成功注册新用户：" + ((RegisterModel)context.Model).Name);
-                    await TableRows.QueryAsync();
-                }
-                else
-                {
-                    await ToastService.Error("注册失败", result.Error);
-                }
-                return true;
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="item"></param>
-    private async Task OnRowBanUsersClick(string[] ids, bool isBan, bool showMessage)
-    {
-        string tempString = isBan == true ? "封禁" : "解封";
-        //调用API
-        try
-        {
-            var result = await Http.PostAsJsonAsync<BanUserModel>(ToolHelper.WebApiPath + "api/account/BanUser", new BanUserModel { Ids = ids, UnsealTime = isBan ? DateTime.Now.ToCstTime().AddYears(10) : null });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-            if (obj.Successful == false)
-            {
-                await ToastService.Error(tempString + "用户失败", obj.Error);
-            }
-            else
-            {
-                if (showMessage)
-                {
-                    await ToastService.Success(tempString + "用户成功", tempString + "用户成功");
-                    await TableRows.QueryAsync();
-                }
-            }
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, tempString + "用户失败");
-        }
-    }
-
-    private async Task OnBanUsersClick(IEnumerable<ListUserAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有修改用户封禁状态", "请选中用户");
-            return;
-        }
-
-        await OnRowBanUsersClick(items.Select(s => s.Id).ToArray(), true, false);
-
-        await ToastService.Success("封禁用户成功", "封禁用户成功");
-        await TableRows.QueryAsync();
-    }
-    private async Task OnUnBanUsersClick(IEnumerable<ListUserAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有修改用户封禁示状态", "请选中用户");
-            return;
-        }
-
-        await OnRowBanUsersClick(items.Select(s => s.Id).ToArray(), false, false);
-
-        await ToastService.Success("解封用户成功", "显示词条成功");
-        await TableRows.QueryAsync();
-    }
-
-    private async Task OnRowEditCanCommentClick(string[] ids, bool canComment, bool showMessage)
-    {
-        string tempString = canComment == true ? "启用用户留言" : "关闭用户留言";
-        //调用API
-        try
-        {
-            var result = await Http.PostAsJsonAsync<EditSpaceCanComment>(ToolHelper.WebApiPath + "api/comments/EditSpaceCanComment", new EditSpaceCanComment { Ids = ids, CanComment = canComment });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-
-
-
-            if (obj.Successful == false)
-            {
-                await ToastService.Error(tempString + "失败", obj.Error);
-            }
-            else
-            {
-                if (showMessage)
-                {
-                    await ToastService.Success(tempString + "成功", tempString + "成功");
-                    await TableRows.QueryAsync();
-                }
-            }
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, tempString + "失败");
-        }
-    }
-
-    private async Task OnCanCommentClick(IEnumerable<ListUserAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有修改用户留言状态", "请选中用户");
-            return;
-        }
-
-        await OnRowEditCanCommentClick(items.Select(s => s.Id).ToArray(), true, false);
-
-        await ToastService.Success("开启用户评论成功", "开启用户评论成功");
-        await TableRows.QueryAsync();
-    }
-    private async Task OnCanNotCommentClick(IEnumerable<ListUserAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有修改用户留言状态", "请选中用户");
-            return;
-        }
-
-        await OnRowEditCanCommentClick(items.Select(s => s.Id).ToArray(), false, false);
-
-        await ToastService.Success("关闭用户评论成功", "关闭用户评论成功");
-        await TableRows.QueryAsync();
-    }
+    public StringNumber TabIndex { get; set; } = 1;
 }

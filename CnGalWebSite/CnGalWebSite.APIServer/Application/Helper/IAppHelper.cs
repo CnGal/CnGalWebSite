@@ -2,6 +2,7 @@
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -326,5 +327,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         Task<List<string>> GetSensitiveWordsInText(string text);
 
         Task<long> GetUserIntegral(string userId, DateTime time);
+
+        bool CheckRecaptcha(HumanMachineVerificationResult model);
     }
 }

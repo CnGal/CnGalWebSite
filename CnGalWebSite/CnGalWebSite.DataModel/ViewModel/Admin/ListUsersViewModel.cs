@@ -31,10 +31,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         public DateTime? Birthday { get; set; }
         [Display(Name = "注册时间")]
         public DateTime RegistTime { get; set; }
-        [Display(Name = "基础积分")]
-        public int Integral { get; set; }
-        [Display(Name = "基础贡献值")]
-        public int ContributionValue { get; set; }
         [Display(Name = "总积分")]
         public int DisplayIntegral { get; set; }
         [Display(Name = "总贡献值")]

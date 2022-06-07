@@ -5,6 +5,10 @@
 @code {
     [Parameter]
     public EventCallback<HumanMachineVerificationResult> OnVerficated { get; set; }
+    [Parameter]
+    public bool WaitChecked { get; set; }
+
+    bool isChecked;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -16,10 +20,17 @@
     {
         try
         {
+            isChecked = false;
+
             var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode");
 
             objRef = DotNetObjectReference.Create(this);
             await JS.InvokeAsync<string>("initGeetestBindCAPTCHA", objRef, geetestCodeModel.Gt, geetestCodeModel.Challenge, geetestCodeModel.Success);
+
+            while(!isChecked&&WaitChecked)
+            {
+                await Task.Delay(500);
+            }
         }
         catch (Exception ex)
         {
@@ -39,12 +50,15 @@
             Validate = validate
         });
 
+        isChecked = true;
+
     }
 
     [JSInvokable]
     public async Task OnCancel()
     {
         await OnVerficated.InvokeAsync(new HumanMachineVerificationResult());
+        isChecked = true;
     }
 
     #region 释放实例
@@ -54,6 +68,7 @@
         {
             objRef?.Dispose();
         }
+        isChecked = true;
         GC.SuppressFinalize(this);
     }
     #endregion

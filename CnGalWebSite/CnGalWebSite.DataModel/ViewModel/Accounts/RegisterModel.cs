@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using CnGalWebSite.DataModel.ViewModel.OperationRecords;
+using CnGalWebSite.DataModel.ViewModel.Others;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.Model
 {
@@ -23,17 +25,10 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "用户名")]
         //[Required(ErrorMessage = "请输入用户名")]
         public string Name { get; set; }
-        [Display(Name = "Token")]
-        public string Token { get; set; }
-        [Display(Name = "randstr")]
-        public string randstr { get; set; }
 
-        [Display(Name = "Challenge")]
-        public string Challenge { get; set; }
-        [Display(Name = "Validate")]
-        public string Validate { get; set; }
-        [Display(Name = "Seccode")]
-        public string Seccode { get; set; }
+        public HumanMachineVerificationResult Verification { get; set; } = new HumanMachineVerificationResult();
+
+        public DeviceIdentificationModel Identification { get; set; } = new DeviceIdentificationModel();
 
     }
     public class RegisterResult

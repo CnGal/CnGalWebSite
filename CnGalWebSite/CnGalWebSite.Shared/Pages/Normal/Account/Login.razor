@@ -7,11 +7,8 @@
 @inject ToastService ToastService
 @inject IJSRuntime JS
 @inject HttpClient Http
-@implements IDisposable
 @inject IDataCacheService _dataCacheService
-
-@inject WebClientService? ClientService
-@inject IAppHelper? _appHelper
+@inject IAppHelper _appHelper
 
 <TitleTip Title="登入"></TitleTip>
 
@@ -29,7 +26,7 @@
 
                 <div>
                     <div>
-                        <MTextField  Label="用户名或邮箱" Color="@_dataCacheService.ThemeSetting.Theme"
+                        <MTextField Label="用户名或邮箱" Color="@_dataCacheService.ThemeSetting.Theme"
                                     @bind-Value="Model.UserName"></MTextField>
 
                     </div>
@@ -53,7 +50,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入" IsAsync="true" OnClick="HandleLogin" Class="w-100" Rounded Depressed />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入" IsAsync="true" OnClick="OnClickLogin" Class="w-100" Rounded Depressed />
                     </div>
 
                     <span class="mb-4 d-flex" style="justify-content: center; ">
@@ -69,14 +66,14 @@
     }
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification @ref="humanMachineVerification" OnVerficated="OnVerficated" WaitChecked/>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification @ref="deviceIdentification" />
 
 @code {
     [Parameter]
     public string ReturnUrl { get; set; }
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-
-    private DotNetObjectReference<Login> objRef;
 
     bool isOnRedirecting = false;
     bool isReady = false;
@@ -95,14 +92,30 @@
     }
 
     bool isSuccess = true;
-    [Inject]
-    [NotNull]
-    private SwalService? SwalService { get; set; }
 
     string Challenge = "";
     string Validate = "";
     string Seccode = "";
     bool IsInitGeetest = false;
+
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification humanMachineVerification;
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
+
+    public async Task OnClickLogin()
+    {
+        if (string.IsNullOrWhiteSpace(Model.Password))
+        {
+            await ToastService.Error("请输入密码", "请输入密码");
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(Model.UserName))
+        {
+            await ToastService.Error("请输入用户名", "请输入户名");
+            return;
+        }
+
+        await humanMachineVerification.StartVerification();
+    }
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -147,69 +160,18 @@
     }
 
 
-    private async Task HandleLogin()
-    {
-        if(string.IsNullOrWhiteSpace(Model.Password))
-        {
-           await ToastService.Error("请输入密码", "请输入密码");
-            return;
-        }
-        if (string.IsNullOrWhiteSpace(Model.UserName))
-        {
-           await ToastService.Error("请输入用户名", "请输入户名");
-            return;
-        }
 
+    public async Task OnVerficated(HumanMachineVerificationResult model)
+    {
         try
         {
-            var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode");
-
-            objRef = DotNetObjectReference.Create(this);
-            await JS.InvokeAsync<string>("initGeetestBindCAPTCHA", objRef, geetestCodeModel.Gt, geetestCodeModel.Challenge, geetestCodeModel.Success);
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "初始化极验人机验证失败");
-            return;
-        }
-        isSuccess = true;
-        int count = 0;
-        while (isSuccess)
-        {
-            /*if (count > 5)
+            Model.Verification = model;
+            if(deviceIdentification!=null)
             {
-                isSuccess = false;
-            }*/
-            await Task.Delay(500);
-            count++;
-        }
-    }
-
-
-    [JSInvokable]
-    public async Task OnChecked(string challenge, string validate, string seccode)
-    {
-        try
-        {
-            Model.Challenge = challenge;
-            Model.Validate = validate;
-            Model.Seccode = seccode;
+                Model.Identification =await deviceIdentification.GetDeviceIdentificationModel();
+            }
 
             Model.isNeedVerification = false;
-
-            //判断是否需要验证
-            /* string country;
-             if (ToolHelper.IsSSR)
-             {
-                 //await ClientService.RetrieveRemoteInfo();
-                 //country = ClientService.City;
-
-             }
-             else
-             {
-                country=await  _appHelper.GetIPCountiy("67.220.90.13");
-             }*/
-
 
             var result = await AuthService.Login(Model);
 
@@ -242,12 +204,6 @@
             isSuccess = false;
         }
     }
-    [JSInvokable]
-    public Task OnCancel()
-    {
-        isSuccess = false;
-        return Task.CompletedTask;
-    }
 
     private void OnRegister()
     {
@@ -261,16 +217,6 @@
         return Task.CompletedTask;
     }
 
-    #region 释放实例
-    public void Dispose()
-    {
-        if (objRef != null)
-        {
-            objRef?.Dispose();
-        }
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }
 
 

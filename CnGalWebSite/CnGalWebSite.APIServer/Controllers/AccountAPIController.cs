@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -32,11 +34,13 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<HistoryUser, int> _historyUserRepository;
         private readonly IRepository<ApplicationUser, int> _userRepository;
         private readonly IUserService _userService;
+        private readonly IOperationRecordService _operationRecordService;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AccountAPIController> _logger;
 
 
         public AccountAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<ApplicationUser, int> userRepository,
-        SignInManager<ApplicationUser> signInManager, IRepository<HistoryUser, int> historyUserRepository, IUserService userService, IConfiguration configuration)
+        SignInManager<ApplicationUser> signInManager, IRepository<HistoryUser, int> historyUserRepository, IUserService userService, IConfiguration configuration, ILogger<AccountAPIController> logger, IOperationRecordService operationRecordService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -46,6 +50,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _userRepository = userRepository;
             _userService = userService;
             _configuration = configuration;
+            _logger = logger;
+            _operationRecordService = operationRecordService;
         }
 
         /// <summary>
@@ -67,9 +73,10 @@ namespace CnGalWebSite.APIServer.Controllers
             //提前判断是否通过人机验证
             if (user_temp == null || await _userManager.IsInRoleAsync(user_temp, "Admin") == false)
             {
-                if (_appHelper.CheckRecaptcha(model.Challenge, model.Validate, model.Seccode) == false)
+                //提前判断是否通过人机验证
+                if (_appHelper.CheckRecaptcha(model.Verification) == false)
                 {
-                    return new Result { Successful = false, Error = "没有通过人机验证" };
+                    return BadRequest(new LoginResult { Code = LoginResultCode.FailedRecaptchaValidation, ErrorDescribe = "没有通过人机验证" });
                 }
             }
 
@@ -143,6 +150,17 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = "发送验证码的过程中发生错误，" + result_2 };
                 }
 
+                //成功登入 记录ip
+                try
+                {
+                    await _operationRecordService.AddOperationRecord(OperationRecordType.Registe, null, user, model.Identification, HttpContext);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "身份识别失败");
+                    return new Result { Successful=false, Error = "身份识别失败" };
+                }
+
                 return new Result { Successful = true, Error = "User" };
             }
             else
@@ -165,8 +183,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<LoginResult>> Login(LoginModel model)
         {
             //提前判断是否通过人机验证
-
-            if (_appHelper.CheckRecaptcha(model.Challenge, model.Validate, model.Seccode) == false)
+            if (_appHelper.CheckRecaptcha(model.Verification) == false)
             {
                 return BadRequest(new LoginResult { Code = LoginResultCode.FailedRecaptchaValidation, ErrorDescribe = "没有通过人机验证" });
             }
@@ -235,6 +252,17 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 else
                 {
+                    //成功登入 记录ip
+                    try
+                    {
+                       await _operationRecordService.AddOperationRecord(OperationRecordType.Login, null, user, model.Identification, HttpContext);
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger.LogError(ex, "身份识别失败");
+                        return new LoginResult { Code = LoginResultCode.FailedRecaptchaValidation,ErrorDescribe="身份识别失败" };
+                    }
+
                     return new LoginResult { Code = LoginResultCode.OK, Token = await _appHelper.GetUserJWTokenAsync(user) };
                 }
             }
@@ -1399,6 +1427,17 @@ namespace CnGalWebSite.APIServer.Controllers
                 Gt = obj["gt"].ToString()
             };
             return model;
+        }
+
+        /// <summary>
+        /// 获取Ip地址
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<string>> GetIp()
+        {
+            return _operationRecordService.GetIp(HttpContext, null);
         }
     }
 }

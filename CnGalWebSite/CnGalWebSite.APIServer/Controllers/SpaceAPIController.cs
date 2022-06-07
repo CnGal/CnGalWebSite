@@ -693,7 +693,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<Result>> UnBindGroupQQAsync(UnBindGroupQQModel model)
         {
             //提前判断是否通过人机验证
-            if (_appHelper.CheckRecaptcha(model.Verification.Challenge, model.Verification.Validate, model.Verification.Seccode) == false)
+            if (_appHelper.CheckRecaptcha(model.Verification) == false)
             {
                 return BadRequest(new Result { Error = "没有通过人机验证" });
             }
@@ -719,7 +719,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<Result>> GetBindGroupQQCodeAsync(BindGroupQQModel model)
         {
             //提前判断是否通过人机验证
-            if (_appHelper.CheckRecaptcha(model.Verification.Challenge, model.Verification.Validate, model.Verification.Seccode) == false)
+            if (_appHelper.CheckRecaptcha(model.Verification) == false)
             {
                 return BadRequest(new Result { Error = "没有通过人机验证" });
             }
