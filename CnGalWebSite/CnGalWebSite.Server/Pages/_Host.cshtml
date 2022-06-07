@@ -1,9 +1,15 @@
 ﻿@page "/"
 @using CnGalWebSite.Shared
 @using CnGalWebSite.Shared.Component.Home
+@using CnGalWebSite.DataModel.ViewModel.OperationRecords
+
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     Layout = "_Layout";
+    var connectionInfo = new ConnectionInfo()
+    {
+        RemoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString()
+    };
 }
 
-<component type="typeof(App)" render-mode="ServerPrerendered" />
+<component type="typeof(App)" render-mode="ServerPrerendered" param-ConnectionInfo="connectionInfo"/>

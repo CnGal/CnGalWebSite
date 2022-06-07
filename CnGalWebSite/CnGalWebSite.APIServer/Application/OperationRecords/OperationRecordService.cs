@@ -104,7 +104,7 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
 
         public async Task AddOperationRecord(OperationRecordType type, string objectId, ApplicationUser user, DeviceIdentificationModel model, HttpContext context)
         {
-            if (string.IsNullOrEmpty(model.Ip) || string.IsNullOrEmpty(model.Cookie))
+            if (string.IsNullOrEmpty(model.Cookie)||string.IsNullOrWhiteSpace(model.Ip))
             {
                 throw new Exception("身份验证参数不能为空");
             }
