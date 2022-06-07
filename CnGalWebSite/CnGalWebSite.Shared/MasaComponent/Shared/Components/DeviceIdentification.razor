@@ -1,11 +1,14 @@
 ﻿@inject HttpClient Http
 @inject ILocalStorageService _localStorage
+@inject IJSRuntime JS
 
 @code {
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
     private DeviceIdentificationModel Model { get; set; } = new DeviceIdentificationModel();
+    [CascadingParameter]
+    private ConnectionInfo? connectionInfo { get; set; }
 
     public async Task<DeviceIdentificationModel> GetDeviceIdentificationModel()
     {
@@ -24,7 +27,15 @@
 
         try
         {
-            Model.Ip = await Http.GetStringAsync(ToolHelper.WebApiPath + "api/account/GetIp");
+            if(connectionInfo!=null&&string.IsNullOrWhiteSpace( connectionInfo.RemoteIpAddress)==false)
+            {
+                Model.Ip = connectionInfo.RemoteIpAddress;
+            }
+            else
+            {
+                Model.Ip = await Http.GetStringAsync(ToolHelper.WebApiPath + "api/account/GetIp");
+
+            }
 
         }
         catch (Exception ex)
@@ -40,7 +51,7 @@
         try
         {
             Model = await _localStorage.GetItemAsync<DeviceIdentificationModel>("DeviceIdentification");
-            if(Model==null)
+            if (Model == null)
             {
                 Model = new DeviceIdentificationModel();
             }
@@ -55,7 +66,7 @@
     {
         try
         {
-             await _localStorage.SetItemAsync("DeviceIdentification",Model);
+            await _localStorage.SetItemAsync("DeviceIdentification", Model);
         }
         catch
         {

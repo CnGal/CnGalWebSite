@@ -10,4 +10,9 @@ namespace CnGalWebSite.DataModel.ViewModel.OperationRecords
 
         public string Cookie { get; set; }
     }
+
+    public class ConnectionInfo
+    {
+        public string RemoteIpAddress { get; set; } = "-none-";
+    }
 }

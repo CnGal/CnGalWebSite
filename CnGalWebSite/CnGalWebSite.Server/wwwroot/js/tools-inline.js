@@ -196,5 +196,3 @@ function isMobile() {
 　　　　return 'false';
 　　}
 };
-
-
