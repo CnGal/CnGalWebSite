@@ -180,7 +180,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             try
             {
-                await _operationRecordService.AddOperationRecord(OperationRecordType.Score, game.Id.ToString(), user, model.Identification, HttpContext);
+                await _operationRecordService.AddOperationRecord(OperationRecordType.Score, entry.Id.ToString(), user, model.Identification, HttpContext);
             }
             catch (Exception ex)
             {
