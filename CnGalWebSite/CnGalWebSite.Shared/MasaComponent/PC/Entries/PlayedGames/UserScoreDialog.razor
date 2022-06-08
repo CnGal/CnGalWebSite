@@ -10,7 +10,7 @@
 
         <MCardText Class="pt-6">
 
-            <a href="@("/space/index/"+@Model.User.Id)" class="d-flex mb-2">
+            <div class="d-flex mb-2" @onclick="@(()=>OnNav("/space/index/"+@Model.User.Id))">
                 <img loading="lazy" class="shadow-sm" src="@Model.User.PhotoPath" style="height: 50px;width: 50px;border-radius: 50%;" />
                 <div class="comment-tx-div">
                     <div class="new-row-warp no-margin">
@@ -21,7 +21,7 @@
                     </div>
                     <div class="a-font-color text-truncate-1">@Model.User.Name</div>
                 </div>
-            </a>
+            </div>
 
             @if (Model.Socres.IsScored)
             {
@@ -47,11 +47,11 @@
             @Model.LastEditTime.ToString("yyyy-MM-dd HH:mm:ss")
         </MCardText>
 
-        @if (gameId!=0)
+        @if (gameId != 0)
         {
             <MCardActions>
                 <MSpacer></MSpacer>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看词条页面" OnClick="OnNav" Icon="mdi-share-all-outline" TextStyle />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看词条页面" OnClick="@(()=>OnNav("/entries/index/" + gameId))" Icon="mdi-share-all-outline" TextStyle />
             </MCardActions>
         }
 
@@ -68,7 +68,7 @@
     int gameId = 0;
     string gameName;
 
-    public Task Refresh(bool dialog, PlayedGameUserScoreModel model,string _gameName=null,int _gameId=0)
+    public Task Refresh(bool dialog, PlayedGameUserScoreModel model, string _gameName = null, int _gameId = 0)
     {
         gameId = _gameId;
         gameName = _gameName;
@@ -79,10 +79,12 @@
     }
 
 
-    public async Task OnNav()
+    public async Task OnNav(string url)
     {
         Dialog = false;
         await Task.Delay(1);
-        NavigationManager.NavigateTo("/entries/index/" + gameId);
+        NavigationManager.NavigateTo(url);
     }
+
+
 }
