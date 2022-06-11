@@ -37,7 +37,7 @@
 
                 }
             }
-            @foreach (var item in Items.Where(s => s.User.Id != Model.CurrentUserId).Take(MaxCount))
+            @foreach (var item in Items.Where(s => s.User.Id != Model.CurrentUserId).Where(s => s.Socres.IsScored || string.IsNullOrWhiteSpace(s.PlayImpressions)==false).Take(MaxCount))
             {
                 <div class="p-2" style="min-width: 300px;">
                     <UserScoreCard Model="item" OnClick="@(()=>OnClickUser(item))" />
@@ -95,7 +95,7 @@
 
                 }
 
-                @foreach (var item in Items.Where(s => s.User.Id != Model.CurrentUserId).Take(MaxCount))
+                @foreach (var item in Items.Where(s => s.User.Id != Model.CurrentUserId).Where(s=>s.Socres.IsScored||string.IsNullOrWhiteSpace( s.PlayImpressions)==false).Take(MaxCount))
                 {
                     <MSlideItem>
                         <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"

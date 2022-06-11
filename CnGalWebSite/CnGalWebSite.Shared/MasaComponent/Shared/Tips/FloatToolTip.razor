@@ -14,7 +14,10 @@
 
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial Icon="mdi-toolbox" Direction="left" Text="工具箱" Class="mb-4">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-archive" Tooltip="合并词条" OnClick="OnMergeEntries" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-script-text" Tooltip="转载文章" OnClick="OnRepostArticles" />
+                @if (ToolHelper.IsSSR)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-script-text" Tooltip="转载文章" OnClick="OnRepostArticles" />
+                }
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial>
 
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-transfer-up" Tooltip="回到顶部" OnClick="OnClickFly" />
