@@ -16,6 +16,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
 
         public bool IsMasa { get; set; } = true;
 
+        public bool IsCommentUseMarkdown { get; set; }
+
         public int PlayedGameInforCount { get; set; } = 3;
 
         public DisplayMode ListDisplayMode { get; set; }

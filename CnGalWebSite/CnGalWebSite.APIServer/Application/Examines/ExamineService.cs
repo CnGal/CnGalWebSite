@@ -1,5 +1,6 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Disambigs;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -57,20 +58,22 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IRankService _rankService;
         private readonly IPerfectionService _perfectionService;
         private readonly IPlayedGameService _playedGameService;
+        private readonly ICommentService _commentService;
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<ExamineService> _logger;
+        private readonly IRepository<Message, long> _messageRepository;
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
-        private readonly IRepository<Message, long> _messageRepository;
+
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Examine>, string, SortOrder, IEnumerable<Examine>>> SortLambdaCacheEntry = new();
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService,
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository, IRepository<Message, long> messageRepository,
         IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService,
-        IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger,
-        IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<PlayedGame, string> playedGameRepository, IRepository<Vote, long> voteRepository, IRepository<Lottery, long> lotteryRepository)
+        IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger, IRepository<Lottery, long> lotteryRepository,
+        IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<PlayedGame, string> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository)
         {
             _examineRepository = examineRepository;
             _appHelper = appHelper;
@@ -94,9 +97,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _logger = logger;
             _playedGameService = playedGameService;
             _playedGameRepository = playedGameRepository;
-            _voteRepository = voteRepository;
-            _lotteryRepository = lotteryRepository;
             _messageRepository = messageRepository;
+            _commentService = commentService;
+            _lotteryRepository = lotteryRepository;
+            _voteRepository = voteRepository;
         }
 
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "")
@@ -1447,11 +1451,6 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     },
                     new KeyValueModel
                     {
-                        DisplayName="内容",
-                        DisplayValue=commentText.Text
-                    },
-                    new KeyValueModel
-                    {
                         DisplayName="类型",
                         DisplayValue=commentText.Type.GetDisplayName()
                     },
@@ -1463,9 +1462,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 }
             });
 
+            model.AfterModel.MainPage = _appHelper.MarkdownToHtml(commentText.Text);
+
             while (commentText.Type == CommentType.ReplyComment)
             {
-                var item = await _commentRepository.FirstOrDefaultAsync(s => s.Id.ToString() == commentText.ObjectId);
+                var item = await _commentRepository.GetAll()
+                    .Include(s => s.ParentCodeNavigation)
+                    .FirstOrDefaultAsync(s => s.Id.ToString() == commentText.ObjectId);
                 commentText.Type = item.Type;
                 commentText.ObjectId = item.Type switch
                 {
@@ -2771,141 +2774,19 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task ExaminePublishCommentTextAsync(Comment comment, CommentText examine)
         {
 
-            //复制基础数据
-            comment.Text = examine.Text;
-            comment.CommentTime = examine.CommentTime;
-            comment.Type = examine.Type;
-            comment.ApplicationUserId = examine.PubulicUserId;
-            comment.Text = examine.Text;
-
-            //查找父对象
-            Article article = null;
-            Entry entry = null;
-            Periphery periphery = null;
-            Vote vote = null;
-            Lottery lottery = null;
-            UserSpaceCommentManager userSpace = null;
-            Comment replyComment = null;
-            ApplicationUser userTemp = null;
-            long tempId = 0;
-            if (examine.Type != CommentType.CommentUser)
-            {
-                tempId = long.Parse(examine.ObjectId);
-            }
-            //判断当前是否能够编辑
-            switch (examine.Type)
-            {
-                case CommentType.CommentArticle:
-                    article = await _articleRepository.GetAll().Include(s => s.CreateUser).FirstOrDefaultAsync(s => s.Id == tempId);
-                    if (article == null)
-                    {
-                        return;
-                    }
-                    break;
-                case CommentType.CommentEntries:
-                    entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
-                    if (entry == null)
-                    {
-                        return;
-                    }
-                    break;
-                case CommentType.CommentPeriphery:
-                    periphery = await _peripheryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
-                    if (periphery == null)
-                    {
-                        return;
-                    }
-                    break;
-                case CommentType.CommentVote:
-                    vote = await _voteRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
-                    if (vote == null)
-                    {
-                        return;
-                    }
-                    break;
-                case CommentType.CommentLottery:
-                    lottery = await _lotteryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
-                    if (lottery == null)
-                    {
-                        return;
-                    }
-                    break;
-                case CommentType.CommentUser:
-                    userTemp = await _userRepository.GetAll().Include(s => s.UserSpaceCommentManager).FirstOrDefaultAsync(s => s.Id == examine.ObjectId);
-                    if (userTemp == null)
-                    {
-                        //判断是不是本人
-                        if (examine.PubulicUserId != userTemp?.Id)
-                        {
-                            return;
-                        }
-                    }
-                    if (userTemp.UserSpaceCommentManager == null)
-                    {
-                        userTemp.UserSpaceCommentManager = new UserSpaceCommentManager();
-                        userTemp = await _userRepository.UpdateAsync(userTemp);
-                    }
-                    userSpace = userTemp.UserSpaceCommentManager;
-                    break;
-                case CommentType.ReplyComment:
-                    replyComment = await _commentRepository.GetAll().Include(s => s.ApplicationUser).Include(s => s.Article).Include(s => s.Entry).Include(s => s.UserSpaceCommentManager).FirstOrDefaultAsync(s => s.Id == tempId);
-                    if (replyComment == null)
-                    {
-                        return;
-                    }
-                    break;
-                default:
-                    return;
-            }
-
-
-            //关联父对象
-            if (examine.Type != CommentType.CommentUser)
-            {
-                tempId = long.Parse(examine.ObjectId);
-            }
-            switch (comment.Type)
-            {
-                case CommentType.CommentArticle:
-                    comment.ArticleId = tempId;
-                    break;
-                case CommentType.CommentEntries:
-                    comment.EntryId = (int)tempId;
-                    break;
-                case CommentType.CommentPeriphery:
-                    comment.PeripheryId = tempId;
-                    break;
-                case CommentType.CommentVote:
-                    comment.VoteId = tempId;
-                    break;
-                case CommentType.CommentLottery:
-                    comment.LotteryId = tempId;
-                    break;
-                case CommentType.CommentUser:
-                    comment.UserSpaceCommentManager = userSpace;
-                    comment.UserSpaceCommentManagerId = userSpace.Id;
-                    break;
-                case CommentType.ReplyComment:
-                    //同步关联父对象的关联对象
-                    comment.Article = replyComment.Article;
-                    comment.Entry = replyComment.Entry;
-                    comment.UserSpaceCommentManager = replyComment.UserSpaceCommentManager;
-                    comment.ParentCodeNavigation = replyComment;
-                    break;
-            }
-
-
-
+            await _commentService.UpdateCommentDataMainAsync(comment, examine);
+            _userRepository.Clear();
             //保存
             comment = await _commentRepository.UpdateAsync(comment);
+
             //获取发表评论的用户
-            var user = await _userManager.FindByIdAsync(examine.PubulicUserId);
+            var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examine.PubulicUserId);
             //向归属者发送消息
             Message message = null;
             switch (examine.Type)
             {
                 case CommentType.CommentArticle:
-                    if (examine.PubulicUserId == article.CreateUser.Id)
+                    if (examine.PubulicUserId == comment.Article.CreateUser.Id)
                     {
                         break;
                     }
@@ -2915,17 +2796,16 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         PostTime = DateTime.Now.ToCstTime(),
                         Image = user.PhotoPath,
                         // Rank = "系统",
-                        Text = "在你的文章『" + (article.DisplayName ?? article.Name) + "』下回复了你『\n" + examine.Text + "\n』",
-                        Link = "articles/index/" + article.Id,
-                        LinkTitle = article.Name,
+                        Text = "在你的文章『" + (comment.Article.DisplayName ?? comment.Article.Name) + "』下回复了你『\n" + examine.Text + "\n』",
+                        Link = "articles/index/" + comment.Article.Id,
+                        LinkTitle = comment.Article.Name,
                         Type = MessageType.ArticleReply,
-                        ApplicationUser = article.CreateUser,
-                        ApplicationUserId = article.CreateUser.Id,
+                        ApplicationUserId = comment.Article.CreateUser.Id,
                         AdditionalInfor = comment.Id.ToString()
                     };
                     break;
                 case CommentType.CommentUser:
-                    if (user.Id == userTemp.Id)
+                    if (user.Id == comment.UserSpaceCommentManager.ApplicationUser.Id)
                     {
                         break;
                     }
@@ -2936,16 +2816,15 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Image = user.PhotoPath,
                         // Rank = "系统",
                         Text = "在你的空间下留言『\n" + examine.Text + "\n』",
-                        Link = "space/index/" + userTemp.Id,
-                        LinkTitle = userTemp.UserName,
+                        Link = "space/index/" + comment.UserSpaceCommentManager.ApplicationUser.Id,
+                        LinkTitle = comment.ApplicationUser.UserName,
                         Type = MessageType.SpaceReply,
-                        ApplicationUser = userTemp,
-                        ApplicationUserId = userTemp.Id,
+                        ApplicationUserId = comment.UserSpaceCommentManager.ApplicationUser.Id,
                         AdditionalInfor = comment.Id.ToString()
                     };
                     break;
                 case CommentType.ReplyComment:
-                    if (user.Id == replyComment.ApplicationUser.Id)
+                    if (user.Id == comment.ParentCodeNavigation.ApplicationUser.Id)
                     {
                         break;
                     }
@@ -2955,10 +2834,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         PostTime = DateTime.Now.ToCstTime(),
                         Image = user.PhotoPath,
                         // Rank = "系统",
-                        Text = "在你的评论『" +_appHelper.GetStringAbbreviation(replyComment.Text, 20) + "』下回复了你『\n" + examine.Text + "\n』",
+                        Text = "在你的评论『" +_appHelper.GetStringAbbreviation(comment.ParentCodeNavigation.Text, 20) + "』下回复了你『\n" + examine.Text + "\n』",
                         Type = MessageType.CommentReply,
-                        ApplicationUser = replyComment.ApplicationUser,
-                        ApplicationUserId = replyComment.ApplicationUser.Id,
+                        ApplicationUserId = comment.ParentCodeNavigation.ApplicationUser.Id,
                         AdditionalInfor = comment.Id.ToString()
                     };
                     break;
@@ -2972,24 +2850,24 @@ namespace CnGalWebSite.APIServer.Application.Examines
             switch (comment.Type)
             {
                 case CommentType.CommentArticle:
-                    tempCount = await _commentRepository.CountAsync(s => s.ArticleId == tempId);
-                    await _articleRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    tempCount = await _commentRepository.CountAsync(s => s.ArticleId == comment.ArticleId);
+                    await _articleRepository.GetRangeUpdateTable().Where(s => s.Id == comment.ArticleId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
                     break;
                 case CommentType.CommentEntries:
-                    tempCount = await _commentRepository.CountAsync(s => s.EntryId == tempId);
-                    await _entryRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    tempCount = await _commentRepository.CountAsync(s => s.EntryId == comment.EntryId);
+                    await _entryRepository.GetRangeUpdateTable().Where(s => s.Id == comment.EntryId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
                     break;
                 case CommentType.CommentPeriphery:
-                    tempCount = await _commentRepository.CountAsync(s => s.PeripheryId == tempId);
-                    await _peripheryRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    tempCount = await _commentRepository.CountAsync(s => s.PeripheryId == comment.PeripheryId);
+                    await _peripheryRepository.GetRangeUpdateTable().Where(s => s.Id == comment.PeripheryId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
                     break;
                 case CommentType.CommentVote:
-                    tempCount = await _commentRepository.CountAsync(s => s.VoteId == tempId);
-                    await _voteRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    tempCount = await _commentRepository.CountAsync(s => s.VoteId == comment.VoteId);
+                    await _voteRepository.GetRangeUpdateTable().Where(s => s.Id == comment.VoteId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
                     break;
                 case CommentType.CommentLottery:
-                    tempCount = await _commentRepository.CountAsync(s => s.VoteId == tempId);
-                    await _lotteryRepository.GetRangeUpdateTable().Where(s => s.Id == tempId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    tempCount = await _commentRepository.CountAsync(s => s.LotteryId == comment.LotteryId);
+                    await _lotteryRepository.GetRangeUpdateTable().Where(s => s.Id == comment.LotteryId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
                     break;
             }
         }
@@ -3617,7 +3495,6 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PassedTime = DateTime.Now.ToCstTime(),
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
-                    ApplicationUser = user,
                     Note = note
                 };
                 await _examineRepository.InsertAsync(examine);
@@ -3633,7 +3510,6 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     CommentId = comment.Id,
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
-                    ApplicationUser = user,
                     Note = note
                 };
                 //添加到审核列表

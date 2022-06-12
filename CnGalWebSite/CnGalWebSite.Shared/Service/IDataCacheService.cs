@@ -18,6 +18,7 @@ using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Theme;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.ViewModel.Articles;
+using CnGalWebSite.Helper.ViewModel.Comments;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -91,6 +92,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<LineChartModel> LineChartDataCatche { get; set; }
 
         IPageModelCatche<PlayedGameOverviewModel> PlayedGameOverviewDataCatche { get; set; }
+
+        IPageModelCatche<CommentCacheModel> CommentDataCatche { get; set; }
 
         List<DocumentViewModel> DocumentsCatche { get; set; }
 

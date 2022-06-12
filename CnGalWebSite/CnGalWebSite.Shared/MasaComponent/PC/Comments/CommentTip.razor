@@ -1,10 +1,22 @@
 ﻿@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
 
 <div>
     @if (CanComment)
     {
-        <CommentListView OnPageChanged="OnCommentPageClick" Comments="ListComments" IsShowNotFound="IsShowNotFound" RelyCallBack="OnRely" CanDeleted="CanDeleted" DeletedCallBack="OnDeleted"></CommentListView>
-        <ReplyCommentTip IsChild="false" ObjectId="@ObjectId" Type="Type" RelyCallBack="OnRely"></ReplyCommentTip>
+        <CommentListView Model="Model" CanDeleted="CanDeleted" OnRefrsh="Refresh" @ref="commentListView"></CommentListView>
+        <AuthorizeView>
+            <Authorized>
+                <ReplyCommentTip IsChild="false" ObjectId="@ObjectId" Type="Type" OnRefresh="OnOutComment"></ReplyCommentTip>
+
+            </Authorized>
+            <NotAuthorized>
+                <div style="display:flex;">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后发表评论" OnClick="OnLoginClick" Icon="mdi-login" />
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
     }
     else
     {
@@ -27,18 +39,36 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel>();
+    public CommentCacheModel Model = new CommentCacheModel();
+    CommentListView commentListView;
 
     protected override async Task OnInitializedAsync()
     {
-      await OnCommentPageClick(1);
+        if (CanComment)
+        {
+            await GetData();
+        }
     }
-    private async Task OnCommentPageClick(int pageIndex)
+
+    private async Task Refresh()
+    {
+        _dataCacheService.CommentDataCatche.Clean((int)Type + "/" + ObjectId);
+        await GetData();
+    }
+    private async Task OnOutComment()
+    {
+        await Refresh();
+        if (commentListView!=null)
+        {
+            await commentListView.PageToEnd();
+        }
+
+    }
+    private async Task GetData()
     {
         try
         {
-            //获取用户编辑记录
-            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)Type + "/" + ObjectId + "/" + pageIndex + "/8");
+            Model = await _dataCacheService.CommentDataCatche.GetCatche((int)Type + "/" + ObjectId);
             StateHasChanged();
         }
         catch (Exception ex)
@@ -46,14 +76,9 @@
             ErrorHandler.ProcessError(ex, "获取评论列表失败");
         }
     }
-
-
-    private async Task OnRely()
+    public Task OnLoginClick()
     {
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
-    private async Task OnDeleted()
-    {
-        await OnCommentPageClick(ListComments.CurrentPage);
+        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        return Task.CompletedTask;
     }
 }
