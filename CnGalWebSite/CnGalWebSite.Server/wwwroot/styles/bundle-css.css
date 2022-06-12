@@ -201,7 +201,7 @@
 
 .comment-layout-child {
     width: 100%;
-    background-color: #fffdf1;
+    background-color: rgba(255, 253, 241, 0.7) !important;
 }
 
 .comment-layout {

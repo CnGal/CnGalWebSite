@@ -37,13 +37,14 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Comment, long> _commentRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
         private readonly IRankService _rankService;
 
 
         public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository,
-        IRepository<Message, long> messageRepository,
+        IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository,
         UserManager<ApplicationUser> userManager, IExamineService examineService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository)
         {
@@ -60,6 +61,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _rankService = rankService;
             _peripheryRepository = peripheryRepository;
             _playedGameRepository = playedGameRepository;
+            _userRepository = userRepository;
         }
 
 
@@ -125,7 +127,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return NotFound("生成审核视图出错");
             }
@@ -154,7 +156,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Successful = false, Error = "该记录已经被被审核，不能修改审核状态" };
             }
-            var user = await _userManager.Users.SingleAsync(x => x.Id == examine.ApplicationUserId);
+            var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examine.ApplicationUserId);
             if (user == null)
             {
                 return NotFound();
@@ -186,10 +188,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 switch (examine.Operation)
                 {
                     case Operation.UserMainPage:
+                        user = await _userRepository.GetAll().FirstOrDefaultAsync(s => s.Id == examine.ApplicationUserId);
                         await _examineService.ExamineEditUserMainPageAsync(user, examine.Context);
                         break;
                     case Operation.EditUserMain:
-
+                        user = await _userRepository.GetAll().FirstOrDefaultAsync(s => s.Id == examine.ApplicationUserId);
                         //序列化数据
                         UserMain userMain = null;
                         using (TextReader str = new StringReader(examine.Context))
@@ -393,7 +396,9 @@ namespace CnGalWebSite.APIServer.Controllers
                         await _examineService.ExamineEditTagChildEntriesAsync(tag, tagChildEntries);
                         break;
                     case Operation.PubulishComment:
-                        comment = await _commentRepository.FirstOrDefaultAsync(s => s.Id == examine.CommentId);
+                        comment = await _commentRepository.GetAll()
+                            .Include(s=>s.ParentCodeNavigation)
+                            .FirstOrDefaultAsync(s => s.Id == examine.CommentId);
                         if (comment == null)
                         {
                             return NotFound();

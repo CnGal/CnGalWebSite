@@ -1,27 +1,13 @@
 ﻿@inject HttpClient Http
 @inject ToastService? ToastService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JS
-@using System.Text.Json
 
-<style>
-    /*评论Markdown样式*/
-    .comment-text-markdown .markdown-body {
-        font-weight: 300;
-    }
 
-        .comment-text-markdown .markdown-body p {
-            font-size: 19px;
-        }
-</style>
-<div class=" ps-4 pe-4 pt-3 pb-3 mt-3 @(IsChild ? "comment-layout-child" : "comment-layout") comment-layout-transition shadow-sm rounded bg-opacity" style="cursor:default">
+<div class=" ps-4 pe-4 pt-3 pb-3 mt-3 @(IsChild ? "comment-layout-child" : " bg-opacity") shadow-sm rounded " style="cursor:default">
     <div>
         <UserRankTextViewTip UserId="@Model.ApplicationUserId" UserName="@Model.UserName" Image="@Model.UserImage" Ranks="@Model.Ranks" Text="@Model.CommentTime.ToString("yyyy年M月d日 H:mm")"></UserRankTextViewTip>
         <div class="mt-2">
-            <div class="markdown-body">
-                @((MarkupString)(ReplyTip+Model.Text))
-            </div>
+            <MarkdownViewTip IsNeedHighlight="true" Text="@(ReplyTip+Model.Text)"/>
         </div>
 
         <AuthorizeView>
@@ -29,17 +15,17 @@
                 <div class="mt-2" style=" display: flex; justify-content: flex-end; ">
                     @if (IsReplying)
                     {
-                        <button class="comment-reply comment-reply-color mb-3" style="float: right;" @onclick="OnUnReplyClick">取消回复</button>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="取消回复" OnClick="OnUnReplyClick" XSmall />
                     }
                     else
                     {
-                        <button class="comment-reply comment-reply-color" style="float: right;" @onclick="OnReplyClick">回复</button>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="回复" OnClick="OnReplyClick" IsAsync XSmall />
                     }
 
 
                     @if (CanDeleted)
                     {
-                        <button class="comment-reply comment-reply-color" style="float: right;" @onclick="OnDeleteClick">删除</button>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="删除" OnClick="OnDeleteClick" IsAsync XSmall Class="ms-3"/>
                     }
                 </div>
             </Authorized>
@@ -51,13 +37,15 @@
         {
             if (IsReplying)
             {
-                <ReplyCommentTip ObjectId="@ObjectId" IsChild="IsChild" Type="CommentType.ReplyComment" RelyCallBack="OnRely" ></ReplyCommentTip>
+                <div class="mt-3">
+                    <ReplyCommentTip ObjectId="@ObjectId" IsChild="IsChild" Type="CommentType.ReplyComment" OnRefresh="OnRely"></ReplyCommentTip>
+                </div>
             }
             @foreach (var item in Model.InverseParentCodeNavigation)
             {
 
-                <CommentPartTip Model="item" IsChild="true"  RelyCallBack="OnRely_Comment"
-                                Deepth="Deepth+1" ParentCommentUserName="@Model.UserName" CanDeleted="@CanDeleted" DeletedCallBack="DeletedCallBack"></CommentPartTip>
+                <CommentPartTip Model="item" IsChild="true" OnRefresh="OnRely_Comment"
+                                Deepth="Deepth+1" ParentCommentUserName="@Model.UserName" CanDeleted="@CanDeleted" ></CommentPartTip>
             }
         }
 
@@ -67,12 +55,15 @@
 {
     @if (IsReplying)
     {
-        <ReplyCommentTip ObjectId="@ObjectId" IsChild="IsChild" Type="CommentType.ReplyComment" RelyCallBack="OnRely" ></ReplyCommentTip>
+        <div class="mt-3">
+            <ReplyCommentTip ObjectId="@ObjectId" IsChild="IsChild" Type="CommentType.ReplyComment" OnRefresh="OnRely"></ReplyCommentTip>
+
+        </div>
     }
     @foreach (var item in Model.InverseParentCodeNavigation)
     {
-        <CommentPartTip Model="item" IsChild="true" RelyCallBack="OnRely_Comment"
-                        Deepth="Deepth+1" ParentCommentUserName="@Model.UserName" CanDeleted="@CanDeleted" DeletedCallBack="DeletedCallBack"></CommentPartTip>
+        <CommentPartTip Model="item" IsChild="true" OnRefresh="OnRely_Comment"
+                        Deepth="Deepth+1" ParentCommentUserName="@Model.UserName" CanDeleted="@CanDeleted" ></CommentPartTip>
     }
 }
 
@@ -84,7 +75,7 @@
     public bool IsChild { get; set; }
 
     [Parameter]
-    public EventCallback RelyCallBack { get; set; }
+    public EventCallback OnRefresh { get; set; }
 
     [Parameter]
     public string ParentCommentUserName { get; set; }
@@ -94,16 +85,12 @@
     [Parameter]
     public bool CanDeleted { get; set; }
 
-
     [Parameter]
     public int Deepth { get; set; }
 
     private int MaxDeepth = 3;
 
     bool isRead = false;
-
-    [Parameter]
-    public EventCallback DeletedCallBack { get; set; }
 
     private bool IsReplying { get; set; }
 
@@ -146,28 +133,25 @@
     {
         //这是回复组件的事件回调
         IsReplying = false;
-        await RelyCallBack.InvokeAsync();
+        await OnRefresh.InvokeAsync();
     }
 
     public async Task OnRely_Comment()
     {
         //这是级联传递的事件回调
-        await RelyCallBack.InvokeAsync();
+        await OnRefresh.InvokeAsync();
     }
 
     public void OnUserClick()
     {
         if (Model != null)
         {
-            NavigationManager.NavigateTo(Provider, "/space/index/" + Model.ApplicationUserId, Model.UserName, "fa fa-star-o");
+            NavigationManager.NavigateTo( "/space/index/" + Model.ApplicationUserId);
         }
     }
 
     int count = 0;
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="item"></param>
+
     private async Task OnDeleteClick()
     {
 
@@ -193,7 +177,7 @@
             {
 
                 await ToastService.Success("删除评论成功", "删除评论成功");
-                await DeletedCallBack.InvokeAsync();
+                await OnRefresh.InvokeAsync();
             }
         }
         catch (Exception ex)

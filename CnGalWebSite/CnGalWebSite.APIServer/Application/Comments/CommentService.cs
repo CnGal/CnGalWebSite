@@ -4,15 +4,20 @@ using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
+using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using Markdig;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using NuGet.Packaging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -23,24 +28,39 @@ namespace CnGalWebSite.APIServer.Application.Comments
     {
         private readonly IRepository<Comment, long> _commentRepository;
         private readonly IRepository<UserSpaceCommentManager, long> _userSpaceCommentManagerRepository;
-        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Comment>, string, SortOrder, IEnumerable<Comment>>> SortLambdaCache = new();
-
         private readonly IAppHelper _appHelper;
         private readonly IRankService _rankService;
+        private readonly IRepository<Article, long> _articleRepository;
+        private readonly IRepository<Entry, int> _entryRepository;
+        private readonly IRepository<Periphery, long> _peripheryRepository;
+        private readonly IRepository<ApplicationUser, string> _userRepository;
+        private readonly IRepository<Vote, long> _voteRepository;
+        private readonly IRepository<Lottery, long> _lotteryRepository;
 
-        public CommentService(IAppHelper appHelper, IRepository<Comment, long> commentRepository, IRepository<UserSpaceCommentManager, long> userSpaceCommentManagerRepository,
-            IRankService rankService)
+        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Comment>, string, SortOrder, IEnumerable<Comment>>> SortLambdaCache = new();
+
+        public CommentService(IAppHelper appHelper, IRepository<Comment, long> commentRepository, IRepository<UserSpaceCommentManager, long> userSpaceCommentManagerRepository, IRepository<Article, long> articleRepository,
+        IRankService rankService, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<ApplicationUser, string> userRepository, IRepository<Vote, long> voteRepository, IRepository<Lottery, long> lotteryRepository)
         {
             _commentRepository = commentRepository;
             _rankService = rankService;
             _userSpaceCommentManagerRepository = userSpaceCommentManagerRepository;
             _appHelper = appHelper;
+            _articleRepository = articleRepository;
+            _entryRepository = entryRepository;
+            _peripheryRepository = peripheryRepository;
+            _userRepository = userRepository;
+            _voteRepository = voteRepository;
+            _lotteryRepository = lotteryRepository;
         }
-        public async Task<PagedResultDto<CommentViewModel>> GetPaginatedResult(GetCommentInput input, CommentType type, string Id, string rankName, string ascriptionUserId)
+
+        public async Task<List<CommentViewModel>> GetComments( CommentType type, string Id, string rankName, string ascriptionUserId,List<Comment> examineComments)
         {
             //筛选出符合类型的所有评论
 
-            var query = _commentRepository.GetAll().AsNoTracking().Where(s => s.ParentCodeNavigation == null);
+            var query = _commentRepository.GetAll().AsNoTracking()
+                .Include(s => s.InverseParentCodeNavigation).Include(s => s.ApplicationUser)
+                .Where(s => s.ParentCodeNavigation == null);
             long tempId = 0;
             if (type != CommentType.CommentUser)
             {
@@ -73,7 +93,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     }
                     else
                     {
-                        return new PagedResultDto<CommentViewModel>() { Data = new List<CommentViewModel>(), TotalCount = 0 };
+                        return new List<CommentViewModel>();
                     }
                     break;
                 default:
@@ -84,41 +104,33 @@ namespace CnGalWebSite.APIServer.Application.Comments
             //统计查询数据的总条数 不包括子评论
             var count = query.Count();
             //根据需求进行排序，然后进行分页逻辑的计算
-            query = query.OrderBy("Priority desc").ThenBy(input.Sorting).Skip((input.CurrentPage - 1) * input.MaxResultCount).Take(input.MaxResultCount);
+            query = query.OrderBy("Priority desc");
             //将结果转换为List集合 加载到内存中
-            var tempQuery = await query.Select(s => s.Id).ToArrayAsync();
+            var tempQuery = await query.ToListAsync();
+            //加载预览评论
+            tempQuery.AddRange(examineComments.Where(s => s.ParentCodeNavigation == null));
+            //删除已加载的预览评论
+            examineComments.RemoveAll(s => s.ParentCodeNavigation == null);
 
             var models = new List<CommentViewModel>();
             foreach (var item in tempQuery)
             {
-                models.Add(await CombinationDataAsync(item, rankName, ascriptionUserId));
+                models.Add(await CombinationDataAsync(item, rankName, ascriptionUserId, examineComments));
             }
-
-            var dtos = new PagedResultDto<CommentViewModel>
-            {
-                TotalCount = count,
-                CurrentPage = input.CurrentPage,
-                MaxResultCount = input.MaxResultCount,
-                Data = models,
-                FilterText = input.FilterText,
-                Sorting = input.Sorting,
-                ScreeningConditions = input.ScreeningConditions
-            };
-
-            return dtos;
+            return models;
         }
 
         /// <summary>
         /// 递归复制数据到视图模型
         /// </summary>
-        /// <param name="index">评论</param>
+        /// <param name="comment">评论</param>
         /// <param name="rankName">归属者头衔</param>
         /// <param name="ascriptionUserId">归属者Id</param>
+        /// <param name="examineComments"></param>
         /// <returns></returns>
-        private async Task<CommentViewModel> CombinationDataAsync(long index, string rankName, string ascriptionUserId)
+        private async Task<CommentViewModel> CombinationDataAsync(Comment comment, string rankName, string ascriptionUserId, List<Comment> examineComments)
         {
-            //获取评论
-            var comment = await _commentRepository.GetAll().AsNoTracking().Include(s => s.InverseParentCodeNavigation).Include(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == index);
+
             var model = new CommentViewModel
             {
                 ApplicationUserId = comment.ApplicationUserId,
@@ -156,9 +168,18 @@ namespace CnGalWebSite.APIServer.Application.Comments
             }
 
             //递归初始化子评论
-            foreach (var item in comment.InverseParentCodeNavigation)
+            if (comment.InverseParentCodeNavigation.Any())
             {
-                model.InverseParentCodeNavigation.Add(await CombinationDataAsync(item.Id, rankName, ascriptionUserId));
+                foreach (var item in await _commentRepository.GetAll().AsNoTracking().Include(s => s.InverseParentCodeNavigation).Include(s => s.ApplicationUser).Where(s => comment.InverseParentCodeNavigation.Select(s => s.Id).Contains(s.Id)).ToListAsync())
+                {
+                    model.InverseParentCodeNavigation.Add(await CombinationDataAsync(item, rankName, ascriptionUserId, examineComments));
+                }
+            }
+        
+            //递归初始化预览评论
+            foreach (var item in examineComments.Where(s => s.ParentCodeNavigation.Id == comment.Id))
+            {
+                model.InverseParentCodeNavigation.Add(await CombinationDataAsync(item, rankName, ascriptionUserId, examineComments));
             }
 
             return model;
@@ -284,6 +305,173 @@ namespace CnGalWebSite.APIServer.Application.Comments
                 IsSorted = isSorted,
                 // IsFiltered = isFiltered
             };
+        }
+
+        public async Task UpdateCommentDataMainAsync(Comment comment, CommentText examine)
+        {
+            //复制基础数据
+            comment.Text = examine.Text;
+            comment.CommentTime = examine.CommentTime;
+            comment.Type = examine.Type;
+            comment.ApplicationUserId = examine.PubulicUserId;
+            comment.Text = examine.Text;
+
+            //查找父对象
+            Article article = null;
+            Entry entry = null;
+            Periphery periphery = null;
+            Vote vote = null;
+            Lottery lottery = null;
+            UserSpaceCommentManager userSpace = null;
+            Comment replyComment = null;
+            ApplicationUser userTemp = null;
+            long tempId = 0;
+            if (examine.Type != CommentType.CommentUser)
+            {
+                tempId = long.Parse(examine.ObjectId);
+            }
+            //判断当前是否能够编辑
+            switch (examine.Type)
+            {
+                case CommentType.CommentArticle:
+                    article = await _articleRepository.GetAll().AsNoTracking().Include(s => s.CreateUser).FirstOrDefaultAsync(s => s.Id == tempId);
+                    if (article == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentEntries:
+                    entry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
+                    if (entry == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentPeriphery:
+                    periphery = await _peripheryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
+                    if (periphery == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentVote:
+                    vote = await _voteRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
+                    if (vote == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentLottery:
+                    lottery = await _lotteryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
+                    if (lottery == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentUser:
+                    userTemp = await _userRepository.GetAll().Include(s => s.UserSpaceCommentManager).FirstOrDefaultAsync(s => s.Id == examine.ObjectId);
+                    if (userTemp == null)
+                    {
+                        //判断是不是本人
+                        if (examine.PubulicUserId != userTemp?.Id)
+                        {
+                            return;
+                        }
+                    }
+                    if (userTemp.UserSpaceCommentManager == null)
+                    {
+                        userTemp.UserSpaceCommentManager = new UserSpaceCommentManager();
+                        userTemp = await _userRepository.UpdateAsync(userTemp);
+                    }
+                    userSpace = userTemp.UserSpaceCommentManager;
+                    _userRepository.Clear();
+                    break;
+                case CommentType.ReplyComment:
+                    replyComment = await _commentRepository.GetAll().AsNoTracking()
+                        .Include(s => s.Article)
+                        .Include(s => s.Entry)
+                        .Include(s=>s.ApplicationUser)
+                        .Include(s => s.UserSpaceCommentManager).ThenInclude(s=>s.ApplicationUser)
+                        .Include(s=>s.Lottery)
+                        .Include(s=>s.Vote)
+                        .Include(s=>s.Periphery)
+                        .FirstOrDefaultAsync(s => s.Id == tempId);
+                    if (replyComment == null)
+                    {
+                        return;
+                    }
+                    break;
+                default:
+                    return;
+            }
+
+
+            //关联父对象
+            if (examine.Type != CommentType.CommentUser)
+            {
+                tempId = long.Parse(examine.ObjectId);
+            }
+            switch (comment.Type)
+            {
+                case CommentType.CommentArticle:
+                    comment.ArticleId = tempId;
+                    comment.Article = article;
+                    break;
+                case CommentType.CommentEntries:
+                    comment.EntryId = (int)tempId;
+                    comment.Entry = entry;
+                    break;
+                case CommentType.CommentPeriphery:
+                    comment.PeripheryId = tempId;
+                    comment.Periphery = periphery;
+                    break;
+                case CommentType.CommentVote:
+                    comment.VoteId = tempId;
+                    comment.Vote = vote;
+                    break;
+                case CommentType.CommentLottery:
+                    comment.LotteryId = tempId;
+                    comment.Lottery = lottery;
+                    break;
+                case CommentType.CommentUser:
+                    comment.UserSpaceCommentManager = userSpace;
+                    comment.UserSpaceCommentManagerId = userSpace.Id;
+                    break;
+                case CommentType.ReplyComment:
+                    //同步关联父对象的关联对象
+                    comment.Article = replyComment.Article;
+                    comment.ArticleId = replyComment.Article?.Id;
+                    comment.Entry = replyComment.Entry;
+                    comment.EntryId = replyComment.Entry?.Id;
+                    comment.UserSpaceCommentManager = replyComment.UserSpaceCommentManager;
+                    comment.UserSpaceCommentManagerId = replyComment.UserSpaceCommentManager?.Id;
+                    comment.Lottery = lottery;
+                    comment.LotteryId = lottery?.Id;
+                    comment.Vote = vote;
+                    comment.VoteId= vote?.Id;
+                    comment.Periphery = periphery;
+                    comment.PeripheryId = periphery?.Id;
+                    comment.ParentCodeNavigation = replyComment;
+                    break;
+            }
+
+        }
+
+        public async Task UpdateCommentData(Comment comment, Examine examine)
+        {
+            switch (examine.Operation)
+            {
+                case Operation.PubulishComment:
+                    CommentText commentText = null;
+                    using (TextReader str = new StringReader(examine.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        commentText = (CommentText)serializer.Deserialize(str, typeof(CommentText));
+                    }
+
+                   await UpdateCommentDataMainAsync(comment, commentText);
+                    break;
+            }
         }
 
     }

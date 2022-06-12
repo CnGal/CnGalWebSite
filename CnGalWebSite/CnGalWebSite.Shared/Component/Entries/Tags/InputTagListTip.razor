@@ -36,6 +36,7 @@
 
         if (firstRender)
         {
+            await Task.Delay(500);
             await OnInput.InvokeAsync();
         }
     }

@@ -20,6 +20,7 @@ using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Theme;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.ViewModel.Articles;
+using CnGalWebSite.Helper.ViewModel.Comments;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -159,6 +160,10 @@ namespace CnGalWebSite.Shared.Service
         /// 图表缓存
         /// </summary>
         public IPageModelCatche<PlayedGameOverviewModel> PlayedGameOverviewDataCatche { get; set; }
+        /// <summary>
+        /// 评论缓存
+        /// </summary>
+        public IPageModelCatche<CommentCacheModel> CommentDataCatche { get; set; }
 
         public List<DocumentViewModel> DocumentsCatche { get; set; } = new List<DocumentViewModel>();
         /// <summary>
@@ -248,6 +253,7 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<SearchViewModel> searchViewCatche,
         IPageModelCatche<ChartDataSource> chartDataCatche,
         IPageModelCatche<LineChartModel> lineChartDataCatche,
+        IPageModelCatche<CommentCacheModel> commentDataCatche,
         IPageModelCatche<PlayedGameOverviewModel> playedGameOverviewDataCatche)
         {
             _httpClient = httpClient;
@@ -263,11 +269,14 @@ namespace CnGalWebSite.Shared.Service
             (PeripheryContrastEditRecordViewCatche = peripheryContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/peripheries/GetContrastEditRecordViews/");
             (TagContrastEditRecordViewCatche = tagContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/tags/GetContrastEditRecordViews/");
             (PlayedGameOverviewDataCatche = playedGameOverviewDataCatche).Init(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameOverview/");
+            (CommentDataCatche = commentDataCatche).Init(ToolHelper.WebApiPath + "api/comments/GetComments/");
+
             (ChartDataCatche = chartDataCatche).Init("", true);
             (LineChartDataCatche = lineChartDataCatche).Init("");
             HomePageNewsCatche = homePageNewsCatche;
             HomePageCarouselsCatche = homePageCarouselsCatche;
             SearchViewCatche = searchViewCatche;
+
         }
 
         public async Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>> GetHomePageListCardMode(string apiUrl, string type, int maxCount, bool isRefresh)

@@ -11,6 +11,7 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.Helper.ViewModel.Comments;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -38,13 +39,14 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
+        private readonly IRepository<Examine, long> _examineRepository;
         private readonly ICommentService _commentService;
         private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
 
         public CommentsAPIController(UserManager<ApplicationUser> userManager, IRepository<ApplicationUser, string> userRepository, ICommentService commentService,
             IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository, IExamineService examineService,
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository, IExamineService examineService, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
         {
             _entryRepository = entryRepository;
@@ -58,11 +60,12 @@ namespace CnGalWebSite.APIServer.Controllers
             _voteRepository = voteRepository;
             _lotteryRepository = lotteryRepository;
             _examineService = examineService;
+            _examineRepository = examineRepository;
         }
 
         [AllowAnonymous]
-        [HttpGet("{type}/{id}/{currentPage}/{MaxResultCount}")]
-        public async Task<ActionResult<PagedResultDto<CommentViewModel>>> GetCommentsAsync(int type, string id, int currentPage, int MaxResultCount)
+        [HttpGet("{type}/{id}")]
+        public async Task<ActionResult<CommentCacheModel>> GetCommentsAsync(int type, string id)
         {
             var commentType = (CommentType)type;
 
@@ -80,7 +83,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     //判断是否被关闭
                     if (article.CanComment == false)
                     {
-                        return new PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>() };
+                        return NotFound("评论区被关闭");
                     }
                 }
             }
@@ -95,7 +98,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     //判断是否被关闭
                     if (userSpace.CanComment == false)
                     {
-                        return new PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>() };
+                        return NotFound("评论区被关闭");
                     }
                 }
             }
@@ -107,7 +110,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     //判断是否被关闭
                     if (entry.CanComment == false)
                     {
-                        return new PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>() };
+                        return NotFound("评论区被关闭");
                     }
                 }
             }
@@ -119,7 +122,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     //判断是否被关闭
                     if (periphery.CanComment == false)
                     {
-                        return new PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>() };
+                        return NotFound("评论区被关闭");
                     }
                 }
             }
@@ -131,7 +134,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     //判断是否被关闭
                     if (vote.CanComment == false)
                     {
-                        return new PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>() };
+                        return NotFound("评论区被关闭");
                     }
                 }
             }
@@ -143,19 +146,38 @@ namespace CnGalWebSite.APIServer.Controllers
                     //判断是否被关闭
                     if (lottery.CanComment == false)
                     {
-                        return new PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>() };
+                        return NotFound("评论区被关闭");
                     }
                 }
             }
 
-            var input = new GetCommentInput
+            //获取审核预览
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            var examinesComments = new List<Comment>();
+            if (user != null)
             {
-                CurrentPage = currentPage,
-                MaxResultCount = MaxResultCount,
-                ScreeningConditions = "全部"
+                //获取审核记录
+                var examines = await _examineRepository.GetAllListAsync(s => s.CommentId != null && s.ApplicationUserId == user.Id && (s.Operation == Operation.PubulishComment) && s.IsPassed == null);
+
+                foreach (var item in examines)
+                {
+                    var temp = new Comment
+                    {
+                        ApplicationUser = user,
+                        InverseParentCodeNavigation = new List<Comment>(),
+                        Id = item.CommentId.Value
+                    };
+                    examinesComments.Add(temp);
+                    await _commentService.UpdateCommentData(temp, item);
+                }
+            }
+
+            var dtos = await _commentService.GetComments(commentType, id, rankName, ascriptionUserId, examinesComments);
+            return new CommentCacheModel
+            {
+                Items = dtos
             };
-            var dtos = await _commentService.GetPaginatedResult(input, commentType, id, rankName, ascriptionUserId);
-            return dtos;
         }
 
         [HttpPost]
@@ -180,7 +202,7 @@ namespace CnGalWebSite.APIServer.Controllers
             switch (model.Type)
             {
                 case CommentType.CommentArticle:
-                    article = await _articleRepository.GetAll().Include(s => s.CreateUser).FirstOrDefaultAsync(s => s.Id == tempId);
+                    article = await _articleRepository.GetAll().AsNoTracking().Include(s => s.CreateUser).FirstOrDefaultAsync(s => s.Id == tempId);
                     if (article == null)
                     {
                         return new Result { Successful = false, Error = "无法找到该文章，Id" + model.ObjectId };
@@ -191,7 +213,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                     break;
                 case CommentType.CommentEntries:
-                    entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
+                    entry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
                     if (entry == null)
                     {
                         return new Result { Successful = false, Error = "无法找到该词条，Id" + model.ObjectId };
@@ -202,7 +224,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                     break;
                 case CommentType.CommentPeriphery:
-                    periphery = await _peripheryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
+                    periphery = await _peripheryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
                     if (periphery == null)
                     {
                         return new Result { Successful = false, Error = "无法找到该周边，Id" + model.ObjectId };
@@ -213,7 +235,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                     break;
                 case CommentType.CommentVote:
-                    vote = await _voteRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
+                    vote = await _voteRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
                     if (vote == null)
                     {
                         return new Result { Successful = false, Error = "无法找到该投票，Id" + model.ObjectId };
@@ -224,7 +246,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                     break;
                 case CommentType.CommentLottery:
-                    lottery = await _lotteryRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
+                    lottery = await _lotteryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
                     if (lottery == null)
                     {
                         return new Result { Successful = false, Error = "无法找到该抽奖，Id" + model.ObjectId };
@@ -250,9 +272,10 @@ namespace CnGalWebSite.APIServer.Controllers
                         userTemp = await _userRepository.UpdateAsync(userTemp);
                     }
                     userSpace = userTemp.UserSpaceCommentManager;
+                    _userRepository.Clear();
                     break;
                 case CommentType.ReplyComment:
-                    replyComment = await _commentRepository.GetAll().Include(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == tempId);
+                    replyComment = await _commentRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == tempId);
                     if (replyComment == null)
                     {
                         return new Result { Successful = false, Error = "无法找到该评论，Id" + model.ObjectId };
