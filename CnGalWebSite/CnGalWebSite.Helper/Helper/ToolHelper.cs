@@ -509,11 +509,15 @@ namespace CnGalWebSite.DataModel.Helper
             }
 
             //查找其他符合的文本
-            if (text.Contains("原画"))
+            if (text.Contains("原画")||text.Contains("画师"))
             {
                 return PositionGeneralType.FineArts;
             }
-            if (text.Contains("配音") || text.ToUpper().Contains("CV"))
+            else if (text.Contains("设计"))
+            {
+                return PositionGeneralType.FineArts;
+            }
+            else if (text.Contains("配音") || text.ToUpper().Contains("CV"))
             {
                 return PositionGeneralType.CV;
             }
