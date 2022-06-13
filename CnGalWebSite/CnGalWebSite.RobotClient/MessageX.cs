@@ -121,6 +121,11 @@ namespace CnGalWebSite.RobotClient
                     if (string.IsNullOrWhiteSpace(imageStr) == false)
                     {
                         vaule = vaule.Replace("[image=" + imageStr + "]", "");
+                        //修正一部分图片链接缺省协议
+                        if(imageStr.Contains("http")==false)
+                        {
+                            imageStr = "https:" + imageStr;
+                        }
                         messages.Add(new Image(url: imageStr.Replace("http://image.cngal.org/", "https://image.cngal.org/")));
                     }
                 }

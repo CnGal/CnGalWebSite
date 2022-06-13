@@ -2,9 +2,13 @@
 @inject ToastService? ToastService
 @inject IDataCacheService _dataCacheService
 
-<div class=" ps-4 pe-4 pt-3 pb-3 mb-3 @(IsChild ? "comment-layout-child" : " bg-opacity") shadow-sm rounded ">
-
-    <UserRankTextViewTip UserId="@_dataCacheService.UserInfor.Id" UserName="@_dataCacheService.UserInfor.Name" Image="@_dataCacheService.UserInfor.PhotoPath" Text="@DateTime.Now.ToCstTime().ToString("yyyy年M月d日 H:mm")"></UserRankTextViewTip>
+<div class=" ps-4 pe-4 pb-3 mb-3 @(IsChild ? "comment-layout-child" : " bg-opacity") shadow-sm rounded ">
+    @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor.Id) == false)
+    {
+        <div class="mb-3 mt-3">
+            <UserRankTextViewTip UserId="@_dataCacheService.UserInfor.Id" UserName="@_dataCacheService.UserInfor.Name" Image="@_dataCacheService.UserInfor.PhotoPath" Text="@DateTime.Now.ToCstTime().ToString("yyyy年M月d日 H:mm")"></UserRankTextViewTip>
+        </div>
+    }
 
     @if (_dataCacheService.ThemeSetting.IsCommentUseMarkdown)
     {
@@ -13,7 +17,7 @@
     else
     {
         <MTextarea Rows="3" Color="@_dataCacheService.ThemeSetting.Theme" Placeholder="还不快点说点什么呀~"
-                   @bind-Value="Text" Class="mt-3">
+                   @bind-Value="Text">
         </MTextarea>
     }
 

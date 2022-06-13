@@ -21,6 +21,8 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string WikiDataId { get; set; }
         [Display(Name = "VNDB条目Id")]
         public string VNDBId { get; set; }
+        [Display(Name = "月幕Galgame档案Id")]
+        public string YMGalId { get; set; }
         [Display(Name = "萌娘百科条目名称")]
         public string MoegirlName { get; set; }
         [Display(Name = "百度百科条目名称")]

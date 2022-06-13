@@ -2328,7 +2328,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
             foreach (var item in entry.Outlinks)
             {
-                if (item.Link.Contains("moegirl.org"))
+                if (item.Link.Contains("zh.moegirl.org.cn"))
                 {
                     model.MoegirlName = HttpUtility.UrlDecode(item.Link.Replace("https://zh.moegirl.org.cn/", "").Split('/').FirstOrDefault());
                 }
@@ -2336,9 +2336,13 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     model.VNDBId = item.Link.Replace("https://vndb.org/", "").Split('/').FirstOrDefault();
                 }
-                else if (item.Link.Contains("bangumi.tv"))
+                else if (item.Link.Contains("www.ymgal.com"))
                 {
-                    model.BangumiId = item.Link.Replace("https://bangumi.tv/subject/", "").Split('/').FirstOrDefault();
+                    model.YMGalId = item.Link.Split('/').LastOrDefault();
+                }
+                else if (item.Link.Contains("bangumi.tv")|| item.Link.Contains("bgm.tv"))
+                {
+                    model.BangumiId = item.Link.Split('/').LastOrDefault();
                 }
                 else if (item.Link.Contains("wikidata.org"))
                 {
@@ -2643,13 +2647,28 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     Link = "https://vndb.org/" + model.VNDBId
                 });
             }
+            if (string.IsNullOrWhiteSpace(model.YMGalId) == false)
+            {
+                model.others.Add(new RelevancesModel
+                {
+                    DisplayName = "月幕Galgame",
+                    Link = "https://www.ymgal.com/" + model.YMGalId
+                });
+            }
 
             if (string.IsNullOrWhiteSpace(model.BangumiId) == false)
             {
                 model.others.Add(new RelevancesModel
                 {
                     DisplayName = "Bangumi",
-                    Link = "https://bangumi.tv/subject/" + model.BangumiId
+                    Link = "https://bangumi.tv/" +model.Type switch
+                    {
+                        EntryType.Game => "subject/",
+                        EntryType.Role => "character/",
+                        EntryType.Staff => "person/",
+                        EntryType.ProductionGroup => "person/",
+                        _ => "subject/",
+                    } + model.BangumiId
                 });
             }
 
