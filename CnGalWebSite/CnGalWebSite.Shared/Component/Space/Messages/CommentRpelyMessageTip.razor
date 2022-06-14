@@ -17,22 +17,32 @@
         <div class="mt-2">
             <MarkdownViewTip Text="@Model.Text" IsNeedHighlight="false" />
         </div>
-        <div class="col-12 p-0 pt-2">
-            @if (IsReplying)
+        <div class="col-12 p-0 pt-2" style="display: flex; justify-content: flex-end;">
+            @if (string.IsNullOrWhiteSpace(Model.Link) == false)
             {
-                <button class="comment-reply comment-reply-color" style="float: right;" @onclick="OnUnReplyClick">取消回复</button>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="查看" OnClick="@(()=>NavigationManager.NavigateTo(Model.Link))" XSmall Class="me-3" />
             }
-            else
+            @if (CommentId != 0)
             {
-                <button class="comment-reply comment-reply-color" style="float: right;" @onclick="OnReplyClick">回复</button>
+                @if (IsReplying)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="取消回复" OnClick="OnUnReplyClick" XSmall />
+                }
+                else
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="回复" OnClick="OnReplyClick" XSmall />
+                }
             }
+
         </div>
         @if (IsReplying)
         {
-            <ReplyCommentTip ObjectId="@CommentId.ToString()" IsChild="true" Type="CommentType.ReplyComment" RelyCallBack="OnRely"></ReplyCommentTip>
+            <ReplyCommentTip ObjectId="@CommentId.ToString()" IsChild="true" Type="CommentType.ReplyComment" OnRefresh="OnRely"></ReplyCommentTip>
         }
     </div>
 </div>
+<PToast @ref="_toast" MaxCount="3">
+</PToast>
 
 @code {
     [Parameter]
@@ -42,6 +52,7 @@
     public long CommentId { get; set; }
 
     private bool IsReplying { get; set; }
+    PToast _toast;
 
     public void OnReplyClick()
     {
@@ -55,10 +66,16 @@
         StateHasChanged();
     }
 
-    public void OnRely()
+    public async Task OnRely()
     {
         IsReplying = false;
         StateHasChanged();
+        await _toast.AddToast(new ToastConfig
+        {
+            Type = AlertTypes.Success,
+            Title = "回复成功",
+            Duration = 4000
+        });
     }
-    
+
 }
