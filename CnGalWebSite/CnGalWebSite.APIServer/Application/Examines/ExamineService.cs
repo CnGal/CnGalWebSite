@@ -2834,8 +2834,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         PostTime = DateTime.Now.ToCstTime(),
                         Image = user.PhotoPath,
                         // Rank = "系统",
-                        Text = "在你的评论『" +_appHelper.GetStringAbbreviation(comment.ParentCodeNavigation.Text, 20) + "』下回复了你『\n" + examine.Text + "\n』",
+                        Text = "在主题『" + (comment.Article?.DisplayName??comment.Entry?.DisplayName??comment.Periphery?.DisplayName??comment.Vote?.DisplayName??comment.Lottery?.DisplayName??comment.UserSpaceCommentManager?.ApplicationUser?.UserName) + "』你的评论『" + _appHelper.GetStringAbbreviation(comment.ParentCodeNavigation.Text, 20) + "』下回复了你『\n" + examine.Text + "\n』",
                         Type = MessageType.CommentReply,
+                        Link = comment.ArticleId!=null? $"articles/index/{ comment.ArticleId}" :(comment.EntryId != null ? $"entries/index/{comment.EntryId}" : (comment.PeripheryId != null ? $"peripheries/index/{comment.PeripheryId}" : (comment.VoteId != null ? $"votes/index/{comment.VoteId}" : (comment.LotteryId != null ? $"lotteries/index/{comment.LotteryId}":"" )))),
                         ApplicationUserId = comment.ParentCodeNavigation.ApplicationUser.Id,
                         AdditionalInfor = comment.Id.ToString()
                     };

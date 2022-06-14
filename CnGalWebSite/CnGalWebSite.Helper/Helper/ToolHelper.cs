@@ -1131,7 +1131,7 @@ namespace CnGalWebSite.DataModel.Helper
 
                     if (image.Contains("http://pic.cngal.top"))
                     {
-                        return image.Replace("http://pic.cngal.top", "https://pic.cngal.top");
+                        return image.Replace("http://pic.cngal.top", "https://image.cngal.org");
                     }
 
                     return image;

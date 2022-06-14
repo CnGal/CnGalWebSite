@@ -46,11 +46,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
         private readonly IRepository<TokenCustom, int> _tokenCustomRepository;
         private readonly IRepository<FileManager, int> _fileManagerRepository;
         private readonly IRepository<Comment, long> _commentRepository;
-        private readonly IRepository<Message, long> _messageRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<HistoryUser, int> _historyUserRepository;
         private readonly IRepository<ErrorCount, long> _errorCountRepository;
-        private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<UserFile, int> _userFileRepository;
         private readonly IRepository<BackUpArchive, long> _backUpArchiveRepository;
         private readonly IRepository<BackUpArchiveDetail, long> _backUpArchiveDetailRepository;
@@ -58,20 +56,18 @@ namespace CnGalWebSite.APIServer.Application.Helper
         private readonly IRepository<FavoriteFolder, long> _favoriteFolderRepository;
         private readonly IRepository<SendCount, long> _sendCountRepository;
         private readonly IRepository<Loginkey, long> _loginkeyRepository;
-        private readonly IRepository<Vote, long> _voteRepository;
-        private readonly IRepository<Lottery, long> _lotteryRepository;
+
         private readonly IRepository<UserIntegral, long> _userIntegralRepository;
         private readonly IEmailService _EmailService;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _configuration;
 
-        public AppHelper(IRepository<TimedTask, int> timedTaskRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<SignInDay, long> signInDayRepository, IRepository<Periphery, long> peripheryRepository,
-        IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<Vote, long> voteRepository,
-        IRepository<ErrorCount, long> errorCountRepository, IRepository<PlayedGame, long> playedGameRepository, IRepository<HistoryUser, int> historyUserRepository, IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository,
-            IRepository<Comment, long> commentRepository, IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<SteamInfor, int> steamInforRepository, IRepository<Loginkey, long> loginkeyRepository,
+        public AppHelper(IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<SignInDay, long> signInDayRepository,IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IRepository<UserFile, int> userFileRepository,
+            IRepository<FavoriteFolder, long> favoriteFolderRepository,IRepository<ErrorCount, long> errorCountRepository,  IRepository<HistoryUser, int> historyUserRepository, IRepository<ApplicationUser, string> userRepository,
+            IRepository<Comment, long> commentRepository, IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<Loginkey, long> loginkeyRepository,
         IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository, IEmailService EmailService, IRepository<TokenCustom, int> tokenCustomRepository,
             IRepository<Article, long> aricleRepository, SignInManager<ApplicationUser> signInManager, IRepository<Entry, int> entryRepository, IRepository<SendCount, long> sendCountRepository,
-        IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<Lottery, long> lotteryRepository,
+        IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository,
         IRepository<UserIntegral, long> userIntegralRepository)
         {
             _userManager = userManager;
@@ -89,7 +85,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
             _userRepository = userRepository;
             _commentRepository = commentRepository;
             _examineRepository = examineRepository;
-            _messageRepository = messageRepository;
             _historyUserRepository = historyUserRepository;
             _errorCountRepository = errorCountRepository;
             _backUpArchiveDetailRepository = backUpArchiveDetailRepository;
@@ -99,9 +94,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
             _favoriteFolderRepository = favoriteFolderRepository;
             _sendCountRepository = sendCountRepository;
             _loginkeyRepository = loginkeyRepository;
-            _peripheryRepository = peripheryRepository;
-            _voteRepository = voteRepository;
-            _lotteryRepository = lotteryRepository;
             _userIntegralRepository = userIntegralRepository;
         }
 
