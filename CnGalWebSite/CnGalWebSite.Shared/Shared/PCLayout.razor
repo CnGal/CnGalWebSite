@@ -19,6 +19,7 @@
             <MTab OnClick="OnNavSquareClick">广场</MTab>
             <AuthorizeView Roles="Editor">
                 <Authorized>
+                    <MTab OnClick="OnTreeMapClick">数据</MTab>
                     <MTab OnClick="On7thClick">周年庆</MTab>
                 </Authorized>
             </AuthorizeView>
@@ -85,6 +86,11 @@
     public Task On7thClick()
     {
         NavigationManager.NavigateTo("/7th");
+        return Task.CompletedTask;
+    }
+    public Task OnTreeMapClick()
+    {
+        NavigationManager.NavigateTo("/treemap");
         return Task.CompletedTask;
     }
 }

@@ -106,7 +106,7 @@ namespace CnGalWebSite.RobotClient
 
             foreach (var item in events)
             {
-                if (ExecuteInfors.Any(s =>  s.RealExecute && s.LastRunTime.Date >= DateTime.Now.ToCstTime().Date && s.Note == item.Note))
+                if (ExecuteInfors.Any(s => (s.Id == item.Id || s.RealExecute) && s.LastRunTime.Date >= DateTime.Now.ToCstTime().Date && s.Note == item.Note))
                 {
                     continue;
                 }
