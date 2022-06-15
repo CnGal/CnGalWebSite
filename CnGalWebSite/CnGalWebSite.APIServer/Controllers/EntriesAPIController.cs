@@ -496,6 +496,11 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 await _entryService.UpdateEntryDataAsync(entry, examine);
             }
+            examine = await _examineService.GetUserEntryActiveExamineAsync(entry.Id, user.Id, Operation.EstablishMain);
+            if (examine != null)
+            {
+                await _entryService.UpdateEntryDataAsync(entry, examine);
+            }
 
             return _entryService.GetEditAddInforViewModel(entry);
         }
@@ -689,7 +694,11 @@ namespace CnGalWebSite.APIServer.Controllers
             if (examine != null)
             {
                 await _entryService.UpdateEntryDataAsync(entry, examine);
-
+            }
+            examine = await _examineService.GetUserEntryActiveExamineAsync(entry.Id, user.Id, Operation.EstablishMain);
+            if (examine != null)
+            {
+                await _entryService.UpdateEntryDataAsync(entry, examine);
             }
 
             return _entryService.GetEditRelevancesViewModel(entry);
