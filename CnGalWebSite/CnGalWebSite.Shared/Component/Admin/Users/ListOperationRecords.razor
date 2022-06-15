@@ -9,7 +9,7 @@
        ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
        ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
     <TableColumns>
-        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
+        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" DefaultSortOrder="SortOrder.Desc"/>
         <TableColumn @bind-Field="@context.Type" Sortable Width="120" />
         <TableColumn @bind-Field="@context.UserName" Sortable Searchable TextWrap Width="150" />
         <TableColumn @bind-Field="@context.UserId" Sortable Searchable TextWrap Width="300" />

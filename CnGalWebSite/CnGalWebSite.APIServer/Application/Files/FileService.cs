@@ -235,7 +235,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                 {
                     item.MainPicture = temp;
                     await _entryRepository.UpdateAsync(item);
-                    _logger.LogInformation("上传词条：{name}({id})的主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
+                    _logger.LogInformation("转存 词条 - {name}({id}) 主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
                 }
             }
 
@@ -250,7 +250,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                 {
                     item.MainPicture = temp;
                     await _articleRepository.UpdateAsync(item);
-                    _logger.LogInformation("上传文章：{name}({id})的主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
+                    _logger.LogInformation("转存 文章 - {name}({id}) 主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
                 }
             }
         }

@@ -111,7 +111,7 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
 
             model.Ip = GetIp(context, model.Ip);
 
-            var item = await _operationRecordRepository.FirstOrDefaultAsync(s => s.Type == type && (s.ObjectId == objectId || s.Type == OperationRecordType.Login) && s.ApplicationUserId != user.Id);
+            var item = await _operationRecordRepository.FirstOrDefaultAsync(s => s.Type == type && (s.ObjectId == objectId || s.Type == OperationRecordType.Login) && s.ApplicationUserId == user.Id);
             if (item == null)
             {
                 item = await _operationRecordRepository.InsertAsync(new OperationRecord
