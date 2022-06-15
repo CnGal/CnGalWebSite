@@ -1,6 +1,8 @@
 ﻿using CnGalWebSite.APIServer.Application.PlayedGames;
+using CnGalWebSite.APIServer.Application.Tables;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,11 +27,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<SteamInforTableModel, long> _steamInforTableModelRepository;
         private readonly IRepository<MakerInforTableModel, long> _makerInforTableModelRepository;
         private readonly IRepository<GameScoreTableModel, long> _gameScoreTableRepository;
-
+        private readonly ITableService _tableService;
         public TablesAPIController(IRepository<BasicInforTableModel, long> basicInforTableModelRepository, IRepository<GameScoreTableModel, long> gameScoreTableRepository,
         IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository, IRepository<GroupInforTableModel, long> groupInforTableModelRepository,
             IRepository<StaffInforTableModel, long> staffInforTableModelRepository, IRepository<RoleInforTableModel, long> roleInforTableModelRepository, IRepository<SteamInforTableModel, long> steamInforTableModelRepository,
-           IRepository<MakerInforTableModel, long> makerInforTableModelRepository)
+           IRepository<MakerInforTableModel, long> makerInforTableModelRepository, ITableService tableService)
         {
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
@@ -41,6 +43,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _steamInforTableModelRepository = steamInforTableModelRepository;
             _makerInforTableModelRepository=makerInforTableModelRepository;
             _gameScoreTableRepository = gameScoreTableRepository;
+            _tableService = tableService;
         }
 
         [HttpGet]
@@ -151,6 +154,12 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             return model;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<EChartsTreeMapOptionModel>> GetGroupGameRoleTreeMapAsync()
+        {
+            return await _tableService.GetGroupGameRoleTreeMap();
         }
     }
 }

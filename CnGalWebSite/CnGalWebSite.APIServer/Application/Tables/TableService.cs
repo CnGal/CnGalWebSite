@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.APIServer.Application.PlayedGames;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -701,6 +702,91 @@ namespace CnGalWebSite.APIServer.Application.Tables
             await UpdateStaffInforListAsync();
             await UpdateSteamInforListAsync();
             await _playedGameService.UpdateAllGameScore();
+        }
+
+        public async Task<EChartsTreeMapOptionModel> GetGroupGameRoleTreeMap()
+        {
+           
+
+            //获取所有制作组
+            var groups = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Where(s => s.Type == EntryType.ProductionGroup && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false && s.EntryRelationFromEntryNavigation.Any())
+                .Select(s => new
+                {
+                    s.Id,
+                    s.DisplayName,
+                    Entries = s.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.Type == EntryType.Game).Select(s => s.ToEntryNavigation)
+                })
+                .ToListAsync();
+
+            //获取所有游戏
+            var gameIds = new List<int>();
+            groups.ForEach(s => gameIds.AddRange(s.Entries.Select(x => x.Id)));
+
+            var games = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Where(s =>gameIds.Contains(s.Id))
+                .Select(s => new
+                {
+                    s.Id,
+                    s.DisplayName,
+                    Entries = s.EntryRelationFromEntryNavigation.Where(s=>s.ToEntryNavigation.Type== EntryType.Role).Select(s => s.ToEntryNavigation)
+                })
+                .ToListAsync();
+
+            //获取所有角色
+            var roleIds = new List<int>();
+            games.ForEach(s => roleIds.AddRange(s.Entries.Select(x => x.Id)));
+
+            var roles = await _entryRepository.GetAll().AsNoTracking()
+                .Where(s => roleIds.Contains(s.Id))
+                .Select(s => new
+                {
+                    s.Id,
+                    s.DisplayName,
+                })
+                .ToListAsync();
+
+            //依次遍历制作组游戏角色 生成图表数据
+
+            var roleDatas = new List<EChartsTreeMapOptionSeryDataChildren>();
+            roles.ForEach(s => roleDatas.Add(new EChartsTreeMapOptionSeryDataChildren
+            {
+                Name = s.DisplayName,
+                Value = 1,
+                Id = s.Id
+            }));
+
+            var gameDatas = new List<EChartsTreeMapOptionSeryDataChildren>();
+            games.ForEach(s => gameDatas.Add(new EChartsTreeMapOptionSeryDataChildren
+            {
+                Name = s.DisplayName,
+                Value = s.Entries.Count(),
+                Id=s.Id,
+                Children = roleDatas.Where(x => s.Entries.Select(s => s.Id).Contains(x.Id)).ToList()
+            }));
+
+            var groupDatas = new List<EChartsTreeMapOptionSeryData>();
+            groups.ForEach(s => groupDatas.Add(new EChartsTreeMapOptionSeryData
+            {
+                Name = s.DisplayName,
+                Children = gameDatas.Where(x => s.Entries.Select(s => s.Id).Contains(x.Id)).ToList()
+            }));
+            groupDatas.ForEach(s => s.Value = s.Children.Sum(s => s.Value));
+
+            return new EChartsTreeMapOptionModel
+            {
+                Series = new List<EChartsTreeMapOptionSery>
+              {
+                  new EChartsTreeMapOptionSery
+                  {
+                      Data=groupDatas,
+                      Name="制作组"
+                  }
+              }
+            };
+
         }
     }
 }

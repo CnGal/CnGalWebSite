@@ -69,7 +69,9 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "补全审核记录")]
         ExaminesCompletion,
         [Display(Name = "自动抽奖")]
-        DrawLottery
+        DrawLottery,
+        [Display(Name = "转存主图到第三方图床")]
+        TransferAllMainImages
     }
     public enum TimedTaskExecuteType
     {

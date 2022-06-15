@@ -9,6 +9,8 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Files;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -19,27 +21,35 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using SortOrder = BootstrapBlazor.Components.SortOrder;
+using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.APIServer.Application.Files
 {
     public class FileService : IFileService
     {
         private readonly IRepository<UserFile, int> _userFileRepository;
+        private readonly IRepository<Article, long> _articleRepository;
+        private readonly IRepository<Entry, int> _entryRepository;
         private readonly IAppHelper _appHelper;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IRepository<FileManager, int> _fileManagerRepository;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<FileService> _logger;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<UserFile>, string, SortOrder, IEnumerable<UserFile>>> SortLambdaCache = new();
 
 
-        public FileService(IAppHelper appHelper, IRepository<UserFile, int> userFileRepository, IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository, IConfiguration configuration)
+        public FileService(IAppHelper appHelper, IRepository<UserFile, int> userFileRepository, IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository, IConfiguration configuration,
+            IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, ILogger<FileService> logger)
         {
             _userFileRepository = userFileRepository;
             _appHelper = appHelper;
             _clientFactory = clientFactory;
             _fileManagerRepository = fileManagerRepository;
             _configuration = configuration;
+            _entryRepository = entryRepository;
+            _articleRepository = articleRepository;
+            _logger = logger;
         }
 
         public async Task<PagedResultDto<ImageInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input)
@@ -166,7 +176,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                     Y = y
                 });
                 var jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
 
                 if (obj.Successful)
                 {
@@ -183,5 +193,68 @@ namespace CnGalWebSite.APIServer.Application.Files
             }
 
         }
+
+        public async Task<string> TransferDepositFile(string url)
+        {
+            using var client = _clientFactory.CreateClient();
+
+            using var content = new MultipartFormDataContent();
+            using var fileContent = new StreamContent(await client.GetStreamAsync(url));
+
+            content.Add(
+                content: fileContent,
+                name: "file",
+                fileName: "test.png");
+            content.Add(new StringContent(_configuration["TucangCCAPIToken"]), "token");
+
+            var response = await client.PostAsync("https://tucang.cc/api/v1/upload", content);
+
+            var newUploadResults = await response.Content.ReadAsStringAsync();
+            var result = JObject.Parse(newUploadResults);
+
+            if (result["code"].ToObject<int>() == 200)
+            {
+                return result["data"]["url"].ToObject<string>() + "?" + url;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public async Task TransferAllMainImages(int maxCount)
+        {
+            var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("cngal"))
+                .OrderBy(s=>s.Id)
+                .Take(maxCount).ToListAsync();
+
+            foreach(var item in entries)
+            {
+                var temp =await TransferDepositFile(item.MainPicture);
+                if(string.IsNullOrWhiteSpace(temp)==false)
+                {
+                    item.MainPicture = temp;
+                    await _entryRepository.UpdateAsync(item);
+                    _logger.LogInformation("上传词条：{name}({id})的主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
+                }
+            }
+
+            var articles = await _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("cngal"))
+                .OrderBy(s => s.Id)
+               .Take(maxCount).ToListAsync();
+
+            foreach (var item in articles)
+            {
+                var temp = await TransferDepositFile(item.MainPicture);
+                if (string.IsNullOrWhiteSpace(temp) == false)
+                {
+                    item.MainPicture = temp;
+                    await _articleRepository.UpdateAsync(item);
+                    _logger.LogInformation("上传文章：{name}({id})的主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
+                }
+            }
+        }
     }
 }
+
+

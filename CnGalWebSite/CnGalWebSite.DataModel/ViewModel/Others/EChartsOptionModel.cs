@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.Others
 {
+    /// <summary>
+    /// 折线图
+    /// </summary>
     [Serializable]
     public class EChartsOptionModel
     {
@@ -15,11 +17,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         public List<EChartsOptionSery> Series { get; set; } = new List<EChartsOptionSery>();
     }
 
-    public class EChartsRadarOptionModel 
+    /// <summary>
+    /// 雷达图
+    /// </summary>
+    public class EChartsRadarOptionModel
     {
         public EChartsOptionTooltip Tooltip { get; set; } = new EChartsOptionTooltip
         {
-            Trigger= "item"
+            Trigger = "item"
         };
         public EChartsRadarOptionLegend Legend { get; set; } = new EChartsRadarOptionLegend();
 
@@ -27,6 +32,20 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         public List<EChartsRadarOptionSery> Series { get; set; } = new List<EChartsRadarOptionSery>();
     }
 
+    /// <summary>
+    /// 矩形树图
+    /// </summary>
+    public class EChartsTreeMapOptionModel
+    {
+        public List<EChartsTreeMapOptionSery> Series { get; set; } = new List<EChartsTreeMapOptionSery>();
+        public EChartsOptionTooltip Tooltip { get; set; } = new EChartsOptionTooltip
+        {
+            Trigger = "item"
+        };
+
+    }
+
+    #region 折线图 基类
     public class EChartsOptionTitle
     {
         public string Left { get; set; } = "center";
@@ -61,7 +80,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         public bool Smooth { get; set; } = true;
         public List<double> Data { get; set; } = new List<double>();
     }
+    #endregion
 
+
+    #region 雷达图
 
     public class EChartsRadarOptionRadar
     {
@@ -90,4 +112,29 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         public int Bottom { get; set; } = 0;
         public List<string> Data { get; set; } = new List<string>();
     }
+    #endregion
+
+    #region 矩形树图
+    public class EChartsTreeMapOptionSery
+    {
+        public string Name { get; set; }
+        public string Type { get; set; } = "treemap";
+        public int visibleMin { get; set; } = 100;
+        public List<EChartsTreeMapOptionSeryData> Data { get; set; } = new List<EChartsTreeMapOptionSeryData>();
+    }
+    public class EChartsTreeMapOptionSeryData
+    {
+        public string Name { get; set; }
+        public int Value { get; set; }
+        public List<EChartsTreeMapOptionSeryDataChildren> Children { get; set; } = new List<EChartsTreeMapOptionSeryDataChildren>();
+    }
+    public class EChartsTreeMapOptionSeryDataChildren
+    {
+        public string Name { get; set; }
+        public int Value { get; set; }
+        public int Id;
+        public List<EChartsTreeMapOptionSeryDataChildren> Children { get; set; } = new List<EChartsTreeMapOptionSeryDataChildren>();
+    }
+    #endregion
+
 }
