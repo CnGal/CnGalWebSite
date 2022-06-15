@@ -153,7 +153,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 //成功登入 记录ip
                 try
                 {
-                    await _operationRecordService.AddOperationRecord(OperationRecordType.Registe, null, user, model.Identification, HttpContext);
+                    await _operationRecordService.AddOperationRecord(OperationRecordType.Registe, user.Id, user, model.Identification, HttpContext);
                 }
                 catch (Exception ex)
                 {

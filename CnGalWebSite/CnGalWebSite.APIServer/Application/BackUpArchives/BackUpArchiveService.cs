@@ -152,7 +152,9 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
         {
             //获取数据
             var articles = new List<BackUpArchive>();
-            var tempIndex = await _articleRepository.GetAll().Include(s => s.BackUpArchive).Where(s => s.BackUpArchive == null && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id)
+            var tempIndex = await _articleRepository.GetAll().Include(s => s.BackUpArchive).Where(s => s.BackUpArchive == null && string.IsNullOrWhiteSpace(s.Name) == false)
+                .OrderBy(s => s.Id)
+                .Select(s => s.Id)
                 .Take(maxNum).ToListAsync();
             //创建备份记录
             foreach (var item in tempIndex)
@@ -167,7 +169,9 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
             if (articles.Count == 0)
             {
                 articles = await _articleRepository.GetAll()
-                   .Include(s => s.BackUpArchive).Where(s => s.BackUpArchive != null && (s.BackUpArchive.LastBackUpTime < s.LastEditTime || s.BackUpArchive.IsLastFail == true) && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.BackUpArchive)
+                   .Include(s => s.BackUpArchive).Where(s => s.BackUpArchive != null && (s.BackUpArchive.LastBackUpTime < s.LastEditTime || s.BackUpArchive.IsLastFail == true) && string.IsNullOrWhiteSpace(s.Name) == false)
+                    .OrderBy(s => s.Id)
+                   .Select(s => s.BackUpArchive)
                    .Take(maxNum).ToListAsync();
             }
 
@@ -182,7 +186,9 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
         {
             //获取数据
             var entries = new List<BackUpArchive>();
-            var tempIndex = await _entryRepository.GetAll().Include(s => s.BackUpArchive).Where(s => s.BackUpArchive == null && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id)
+            var tempIndex = await _entryRepository.GetAll().Include(s => s.BackUpArchive).Where(s => s.BackUpArchive == null && string.IsNullOrWhiteSpace(s.Name) == false)
+                 .OrderBy(s => s.Id)
+                .Select(s => s.Id)
                 .Take(maxNum).ToListAsync();
             //创建备份记录
             foreach (var item in tempIndex)
@@ -197,7 +203,9 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
             if (entries.Count == 0)
             {
                 entries = await _entryRepository.GetAll()
-                   .Include(s => s.BackUpArchive).Where(s => s.BackUpArchive != null && (s.BackUpArchive.LastBackUpTime < s.LastEditTime || s.BackUpArchive.IsLastFail == true) && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.BackUpArchive)
+                   .Include(s => s.BackUpArchive).Where(s => s.BackUpArchive != null && (s.BackUpArchive.LastBackUpTime < s.LastEditTime || s.BackUpArchive.IsLastFail == true) && string.IsNullOrWhiteSpace(s.Name) == false)
+                    .OrderBy(s => s.Id)
+                   .Select(s => s.BackUpArchive)
                    .Take(maxNum).ToListAsync();
             }
 

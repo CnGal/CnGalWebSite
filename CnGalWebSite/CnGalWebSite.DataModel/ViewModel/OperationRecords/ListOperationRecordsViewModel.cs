@@ -23,7 +23,7 @@ namespace CnGalWebSite.DataModel.ViewModel.OperationRecords
         public string Ip { get; set; }
         [Display(Name = "Cookie")]
         public string Cookie { get; set; }
-        [Display(Name = "Cookie")]
+        [Display(Name = "操作时间")]
         public DateTime OperationTime { get; set; }
     }
 
