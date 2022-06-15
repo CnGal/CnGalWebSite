@@ -14,5 +14,8 @@ namespace CnGalWebSite.APIServer.Application.Files
 
         Task<string> SaveImageAsync(string url, string userId, double x = 0, double y = 0);
 
+        Task<string> TransferDepositFile(string url);
+
+        Task TransferAllMainImages(int maxCount);
     }
 }

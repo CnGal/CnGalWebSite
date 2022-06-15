@@ -857,12 +857,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var users = await _userRepository.GetAllListAsync(s => s.PhotoPath.Contains("NewCngalWebSite.Shared"));
-                foreach(var item in users)
-                {
-                    item.PhotoPath = null;
-                    await _userRepository.UpdateAsync(item);
-                }
+                var url = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/06/13/d82819370b57.jpg");
                 return new Result { Successful = true };
             }
             catch (Exception ex)

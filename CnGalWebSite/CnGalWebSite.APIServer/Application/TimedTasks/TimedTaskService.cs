@@ -1,5 +1,6 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.BackUpArchives;
+using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Perfections;
@@ -11,7 +12,9 @@ using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.TimedTasks;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -31,11 +34,13 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         private readonly INewsService _newsService;
         private readonly IExamineService _examineService;
         private readonly ILotteryService _lotteryService;
+        private readonly IFileService _fileService;
+        private readonly ILogger<TimedTaskService> _logger;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<TimedTask>, string, SortOrder, IEnumerable<TimedTask>>> SortLambdaCacheApplicationUser = new();
 
-        public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, ISteamInforService steamInforService, IBackUpArchiveService backUpArchiveService, ITableService tableService,
-            IPerfectionService perfectionService, ISearchHelper searchHelper, INewsService newsService, IExamineService examineService, ILotteryService lotteryService)
+        public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, ISteamInforService steamInforService, IBackUpArchiveService backUpArchiveService, ITableService tableService, ILogger<TimedTaskService> logger,
+        IPerfectionService perfectionService, ISearchHelper searchHelper, INewsService newsService, IExamineService examineService, ILotteryService lotteryService, IFileService fileService)
         {
             _timedTaskRepository = timedTaskRepository;
             _steamInforService = steamInforService;
@@ -46,6 +51,8 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             _newsService = newsService;
             _examineService = examineService;
             _lotteryService = lotteryService;
+            _fileService = fileService;
+            _logger = logger;
         }
 
         public Task<QueryData<ListTimedTaskAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListTimedTaskAloneModel searchModel)
@@ -159,15 +166,11 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         await _backUpArchiveService.BackUpAllEntries(maxNum);
                         break;
                     case TimedTaskType.BackupArticle:
-                        maxNum = 10;
-                        try
+                        if (int.TryParse(item.Parameter, out maxNum) == false)
                         {
-                            if (string.IsNullOrWhiteSpace(item.Parameter) == false)
-                            {
-                                maxNum = int.Parse(item.Parameter);
-                            }
+                            maxNum = 10;
                         }
-                        catch { }
+
                         await _backUpArchiveService.BackUpAllArticles(maxNum);
                         break;
                     case TimedTaskType.UpdateDataSummary:
@@ -200,6 +203,15 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                     case TimedTaskType.DrawLottery:
                         await _lotteryService.DrawAllLottery();
                         break;
+                    case TimedTaskType.TransferAllMainImages:
+
+                        if (int.TryParse(item.Parameter, out maxNum) == false)
+                        {
+                            maxNum = 2;
+                        }
+
+                        await _fileService.TransferAllMainImages(maxNum);
+                        break;
                 }
                 //记录执行时间
                 _timedTaskRepository.Clear();
@@ -211,9 +223,12 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                     item.LastExecutedTime = DateTime.Now.ToCstTime();
                     await _timedTaskRepository.UpdateAsync(item);
                 }
+                _logger.LogInformation("成功执行定时任务：{name}", item.Name ?? item.Type.GetDisplayName());
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "执行定时任务失败：{name}", item.Name ?? item.Type.GetDisplayName());
+
                 _timedTaskRepository.Clear();
                 item = await _timedTaskRepository.FirstOrDefaultAsync(s => s.Id == item.Id);
                 if (item != null)
