@@ -62,5 +62,10 @@ namespace CnGalWebSite.RobotClient
 
             return words;
         }
+
+        public List<string> Check(string text)
+        {
+            return ToolHelper.FindStringListInText(text, SensitiveWords);
+        }
     }
 }
