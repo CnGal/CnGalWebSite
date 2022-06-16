@@ -178,7 +178,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
             try
             {
                 //解析查询字符串
-                if (Types.Length != 0)
+                if (Types != null && Types.Length != 0)
                 {
                     model.Types.Clear();
                     foreach (var item in Types)
@@ -193,7 +193,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
                         }
                     }
                 }
-                if (Times.Length != 0)
+                if (Times!=null&& Times.Length != 0)
                 {
                     model.Times.Clear();
                     foreach (var item in Times)
@@ -210,7 +210,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
                 }
                 model.Sorting = Sort ?? "";
                 model.CurrentPage = Page == 0 ? 1 : Page;
-                model.FilterText = Text;
+                model.FilterText = Text ?? "";
 
                 return true;
 

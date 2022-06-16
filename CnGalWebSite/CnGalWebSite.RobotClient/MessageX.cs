@@ -49,12 +49,28 @@ namespace CnGalWebSite.RobotClient
             }
 
             var index = new Random().Next(0, replies.FirstOrDefault().Count());
+            var reply = replies.FirstOrDefault().ToList()[index];
 
-            return replies.FirstOrDefault().ToList()[index];
+            //检查是否含有变量替换 如果有 则检查输入是否包含敏感词
+            if (reply.Value.Contains('$'))
+            {
+                var words = _SensitiveWordX.Check(message);
+
+                if (words.Count != 0)
+                {
+                    return new RobotReply
+                    {
+                        Value = _messageArgs.FirstOrDefault(s => s.Name == "SensitiveReply")?.Value ?? "看板娘不知道哦~",
+                    };
+                }
+            }
+
+            return reply;
         }
 
         public async Task<Message[]> ProcMessageAsync(string reply, string message, string regex,long qq,string name)
         {
+
             var args = new List<KeyValuePair<string, string>>();
             try
             {
