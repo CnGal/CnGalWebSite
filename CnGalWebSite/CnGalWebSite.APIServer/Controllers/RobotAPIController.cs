@@ -17,12 +17,14 @@ using CnGalWebSite.APIServer.Application.Votes;
 using CnGalWebSite.APIServer.Application.WeiXin;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
+using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ImportModel;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Robots;
 using CnGalWebSite.Helper.Extensions;
+using Elasticsearch.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -30,6 +32,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Utilities;
 using Senparc.Weixin.MP.AdvancedAPIs.MerChant;
 using System;
 using System.Collections.Generic;
@@ -703,7 +706,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var entryName = model.Infor.Replace("看板娘介绍一下", "").Replace("看板娘介绍", "").Trim();
 
-                var result = await _searchHelper.QueryAsync(1, 10, entryName, "词条", null, QueryType.Page);
+                var result = await _searchHelper.QueryAsync(SearchInputModel.Parse(new string[] { "Entry" }, null, entryName, null, 0)); 
 
                 var entry = result.Data.FirstOrDefault(s => s.entry != null)?.entry;
                 if (entry == null)
