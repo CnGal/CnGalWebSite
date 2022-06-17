@@ -21,7 +21,7 @@
 
     </TableToolbarTemplate>
     <TableColumns>
-        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
+        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60"  DefaultSortOrder="SortOrder.Desc"/>
         <TableColumn @bind-Field="@context.Type" Searchable="true" Sortable="true" Width="80" />
         <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" Width="120" TextWrap="true" />
         <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" TextWrap="true" Width="300" />

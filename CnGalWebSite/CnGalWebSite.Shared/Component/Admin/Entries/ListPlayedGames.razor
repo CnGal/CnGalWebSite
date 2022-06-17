@@ -16,7 +16,7 @@
 
     </TableToolbarTemplate>
     <TableColumns>
-        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
+        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" DefaultSortOrder="SortOrder.Desc"/>
         <TableColumn @bind-Field="@context.GameName" Searchable Sortable Width="120" TextWrap />
         <TableColumn @bind-Field="@context.GameId" Sortable="true" Searchable Width="150" TextWrap/>
         <TableColumn @bind-Field="@context.UserName" Sortable Searchable TextWrap Width="150" />

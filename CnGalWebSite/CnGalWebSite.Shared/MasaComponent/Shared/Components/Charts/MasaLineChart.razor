@@ -5,15 +5,19 @@
 <div class="@(Class+(AllowExtend?(isExtend?" col-12":" col-12  col-xl-6"):""))">
     <div class="@(Outline?" ":"h-100 rounded shadow-sm bg-opacity pt-4") ">
         <div style="display: flex; justify-content: flex-end; ">
-            <div style="max-width:100px;">
+            @if (AllowChangeTime)
+            {
+                <div style="max-width:100px;">
 
-                <MSelect Value="_days" ValueChanged="ValueChanged" TValue="int" TItem="KeyValuePair<string, int>" TItemValue="int" Color="@_dataCacheService.ThemeSetting.Theme"
-                         Items="@items" ItemColor="@_dataCacheService.ThemeSetting.Theme" Class="pe-4 pt-0"
-                         ItemText="u => u.Key"
-                         ItemValue="u => u.Value"
-                         MenuProps="props => props.OffsetY = true">
-                </MSelect>
-            </div>
+                    <MSelect Value="_days" ValueChanged="ValueChanged" TValue="int" TItem="KeyValuePair<string, int>" TItemValue="int" Color="@_dataCacheService.ThemeSetting.Theme"
+                             Items="@items" ItemColor="@_dataCacheService.ThemeSetting.Theme" Class="pe-4 pt-0"
+                             ItemText="u => u.Key"
+                             ItemValue="u => u.Value"
+                             MenuProps="props => props.OffsetY = true">
+                    </MSelect>
+                </div>
+            }
+
             @if (AllowExtend)
             {
                 <div style="max-width:100px;">
@@ -56,6 +60,8 @@
     public bool HideTitle { get; set; }
     [Parameter]
     public bool AllowExtend { get; set; } = true;
+    [Parameter]
+    public bool AllowChangeTime { get; set; } = true;
 
     public bool isExtend { get; set; }
 

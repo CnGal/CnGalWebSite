@@ -189,7 +189,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             var model = new List<EntryInforTipViewModel>();
-            foreach (var entry in tag.Entries)
+            foreach (var entry in tag.Entries.Where(s=>s.IsHidden==false))
             {
                 model.Add(await _appHelper.GetEntryInforTipViewModel(entry));
             }

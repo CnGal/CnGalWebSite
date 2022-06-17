@@ -45,6 +45,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         BackUpArchive,
         [Display(Name = "编辑")]
         Edit,
+        [Display(Name = "完善度统计数据")]
+        StatisticalData,
+        [Display(Name = "全站完善度")]
+        PerfectionLevel,
     }
 
 }
