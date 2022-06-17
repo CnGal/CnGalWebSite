@@ -45,6 +45,20 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
 
     }
 
+    /// <summary>
+    /// 饼图
+    /// </summary>
+    public class EChartsPieOptionModel
+    {
+        public EChartsOptionTitle Title { get; set; } = new EChartsOptionTitle();
+        public EChartsOptionTooltip Tooltip { get; set; } = new EChartsOptionTooltip
+        {
+            Trigger = "item"
+        };
+        public EChartsPieOptionLegend Legend { get; set; } = new EChartsPieOptionLegend();
+        public List<EChartsPieOptionSery> Series { get; set; } = new List<EChartsPieOptionSery>();
+    }
+
     #region 折线图 基类
     public class EChartsOptionTitle
     {
@@ -79,6 +93,26 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         public string Stack { get; set; }
         public bool Smooth { get; set; } = true;
         public List<double> Data { get; set; } = new List<double>();
+    }
+    #endregion
+    #region 饼图
+  public class EChartsPieOptionSery
+    {
+        public string Name { get; set; }
+        public string Type { get; set; } = "pie";
+        public string Radius { get; set; } = "50%";
+        public List<EChartsPieOptionSeryData> Data { get; set; } = new List<EChartsPieOptionSeryData>();
+    }
+    public class EChartsPieOptionSeryData
+    {
+        public string Name { get; set; }
+        public int Value { get; set; }
+    }
+
+    public class EChartsPieOptionLegend
+    {
+        public string Orient { get; set; } = "vertical";
+        public string Left { get; set; } = "left";
     }
     #endregion
 

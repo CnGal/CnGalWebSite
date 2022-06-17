@@ -10,6 +10,7 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.DataModel.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CnGalWebSite.APIServer.Application.Charts
 {
@@ -27,10 +28,11 @@ namespace CnGalWebSite.APIServer.Application.Charts
         private readonly IRepository<Message, long> _messageRepository;
         private readonly IRepository<UserFile, int> _userFileRepository;
         private readonly IRepository<BackUpArchiveDetail, long> _backUpArchiveDetailRepository;
+        private readonly IRepository<PerfectionOverview, long> _perfectionOverviewRepository;
 
         public ChartService(IRepository<ApplicationUser, string> userRepository, IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<SignInDay, long> signInDayRepository,
-            IRepository<Examine, long> examineRepository, IRepository<Comment, long> commentRepository,
-            IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<Article, long> articleRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Message, long> messageRepository, IRepository<UserFile, int> userFileRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository)
+            IRepository<Examine, long> examineRepository, IRepository<Comment, long> commentRepository, IRepository<PerfectionOverview, long> perfectionOverviewRepository,
+        IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<Article, long> articleRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Message, long> messageRepository, IRepository<UserFile, int> userFileRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository)
         {
             _userRepository = userRepository;
             _userOnlineInforRepository = userOnlineInforRepository;
@@ -43,6 +45,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
             _messageRepository = messageRepository;
             _userFileRepository = userFileRepository;
             _backUpArchiveDetailRepository = backUpArchiveDetailRepository;
+            _perfectionOverviewRepository = perfectionOverviewRepository;
         }
 
         public async Task<LineChartModel> GetLineChartAsync(LineChartType type, DateTime afterTime, DateTime beforeTime)
@@ -64,6 +67,8 @@ namespace CnGalWebSite.APIServer.Application.Charts
                     LineChartType.File => await GetFileLineChartAsync(afterTime, beforeTime),
                     LineChartType.BackUpArchive => await GetBackUpArchiveLineChartAsync(afterTime, beforeTime),
                     LineChartType.Edit => await GetEditLineChartAsync(afterTime, beforeTime),
+                    LineChartType.StatisticalData => await GetPerfectionStatisticalLineChartAsync(afterTime, beforeTime),
+                    LineChartType.PerfectionLevel => await GetPerfectionLeveLineChartAsync(afterTime, beforeTime),
                     _ => new EChartsOptionModel()
                 }
             };
@@ -450,7 +455,54 @@ namespace CnGalWebSite.APIServer.Application.Charts
 
             return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["词条"] = entryCounts, ["文章"] = articleCounts, ["标签"] = tagCounts, ["周边"] = peripheryCounts }, "编辑概览");
         }
+        /// <summary>
+        /// 获取 统计数据 图表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<EChartsOptionModel> GetPerfectionStatisticalLineChartAsync(DateTime afterTime, DateTime beforeTime)
+        {
+                var tempDateTimeNow = DateTime.Now.ToCstTime();
 
+                //获取数据
+                var datas = await _perfectionOverviewRepository.GetAll().Where(s => s.LastUpdateTime <= beforeTime && s.LastUpdateTime >= afterTime)
+                   .Select(n => new { Time = n.LastUpdateTime.Date, n.AverageValue, n.Median, n.Mode, n.StandardDeviation })
+                   .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+                   .ToListAsync();
+
+                var averageValues = datas.Select(s => new LineChartSingleData { Count = s.AverageValue, Time = s.Time }).ToList();
+                var medians = datas.Select(s => new LineChartSingleData { Count = s.Median, Time = s.Time }).ToList();
+                var modes = datas.Select(s => new LineChartSingleData { Count = s.Mode, Time = s.Time }).ToList();
+                var standardDeviations = datas.Select(s => new LineChartSingleData { Count = s.StandardDeviation, Time = s.Time }).ToList();
+
+                var temp = GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["平均值"] = averageValues, ["中位数"] = medians, ["众数"] = modes, ["标准差"] = standardDeviations }, "统计数据概览");
+                return temp;
+
+        }
+
+        /// <summary>
+        /// 获取 全站完善度 图表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<EChartsOptionModel> GetPerfectionLeveLineChartAsync(DateTime afterTime, DateTime beforeTime)
+        {
+
+            var tempDateTimeNow = DateTime.Now.ToCstTime();
+
+            //获取数据
+            var datas = await _perfectionOverviewRepository.GetAll().Where(s => s.LastUpdateTime <= beforeTime && s.LastUpdateTime >= afterTime)
+               // 先进行了时间字段变更为String字段，切只保留到天
+               // 采用拼接的方式
+               .Select(n => new { Time = n.LastUpdateTime.Date, n.ToBeImprovedCount, n.GoodCount, n.ExcellentCount })
+               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .ToListAsync();
+
+            var toBeImprovedCounts = datas.Select(s => new LineChartSingleData { Count = s.ToBeImprovedCount, Time = s.Time }).ToList();
+            var goodCounts = datas.Select(s => new LineChartSingleData { Count = s.GoodCount, Time = s.Time }).ToList();
+            var excellentCounts = datas.Select(s => new LineChartSingleData { Count = s.ExcellentCount, Time = s.Time }).ToList();
+
+            var temp = GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["已完善"] = excellentCounts, ["待完善"] = goodCounts, ["急需完善"] = toBeImprovedCounts }, "全站完善度概览");
+            return temp;
+        }
         public EChartsOptionModel GetCountLine(Dictionary<string, List<LineChartSingleData>> data,  string title)
         {
             var ds = new EChartsOptionModel();

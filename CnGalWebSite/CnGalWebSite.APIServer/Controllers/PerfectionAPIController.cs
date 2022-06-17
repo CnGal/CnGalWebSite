@@ -84,16 +84,21 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<LineChartModel>> GetEditCountLineAsync([FromQuery] LineChartType type, [FromQuery] long afterTime, [FromQuery] long beforeTime)
+        public async Task<ActionResult<LineChartModel>> GetPerfectionLineChartAsync([FromQuery] LineChartType type, [FromQuery] long afterTime, [FromQuery] long beforeTime)
         {
-            if(type!= LineChartType.Edit)
+            if (type == LineChartType.Edit || type == LineChartType.PerfectionLevel || type == LineChartType.StatisticalData)
+            {
+                var after = DateTime.FromBinary(afterTime);
+                var before = DateTime.FromBinary(beforeTime);
+
+                return await _chartService.GetLineChartAsync(type, after, before);
+            }
+            else
             {
                 return NotFound("其他类型图表请使用更高权限的接口");
-            }
-            var after = DateTime.FromBinary(afterTime);
-            var before = DateTime.FromBinary(beforeTime);
 
-            return await _chartService.GetLineChartAsync(type, after, before);
+            }
+
         }
 
         /// <summary>
@@ -161,7 +166,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<List<ExaminedNormalListModel>>> GetRecentlyEditListAsync()
         {
             return await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => (s.PrepositionExamineId == null || s.PrepositionExamineId == -1) && s.IsPassed == true
-            && s.Operation != Operation.UserMainPage && s.Operation != Operation.EditUserMain && s.Operation != Operation.PubulishComment).OrderByDescending(s => s.Id).Take(6), true);
+            && s.Operation != Operation.UserMainPage && s.Operation != Operation.EditUserMain && s.Operation != Operation.PubulishComment).OrderByDescending(s => s.Id).Take(12), true);
         }
 
         [AllowAnonymous]
