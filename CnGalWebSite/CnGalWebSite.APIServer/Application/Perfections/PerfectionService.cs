@@ -414,6 +414,10 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
         public async Task UpdateAllEntryPerfectionsAsync()
         {
+            //删除不符合条件词条的完善度检查
+            await _perfectionCheckRepository.DeleteRangeAsync(s => s.Perfection.Entry.Type != EntryType.Game || string.IsNullOrWhiteSpace(s.Perfection.Entry.Name) || s.Perfection.Entry.IsHidden == true);
+            await _perfectionRepository.DeleteRangeAsync(s => s.Entry.Type != EntryType.Game || string.IsNullOrWhiteSpace(s.Entry.Name) || s.Entry.IsHidden == true);
+
             var entries = await _entryRepository.GetAll().AsNoTracking().Where(s => s.Type == EntryType.Game && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
             foreach (var item in entries)
             {
