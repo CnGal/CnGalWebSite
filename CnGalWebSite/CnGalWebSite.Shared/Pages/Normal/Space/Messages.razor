@@ -3,15 +3,7 @@
 
 @inject IDataCacheService _dataCacheService
 
-@if (_dataCacheService.IsApp == true)
-{
-    <CnGalWebSite.Shared.Pages.Apps.Home.MessageCenter/>
-}
-else
-{
     <CnGalWebSite.Shared.MasaComponent.PC.Users.Messages.MessagesCard />
-}
-
 
 
 

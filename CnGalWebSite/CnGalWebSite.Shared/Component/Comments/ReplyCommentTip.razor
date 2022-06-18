@@ -73,6 +73,8 @@
             }
             else
             {
+                Text = "";
+                await ToastService.Success("发表评论成功", "我们需要对你的评论进行审核，在通过审核之前，你的评论仅自己可见");
                 await OnRefresh.InvokeAsync();
             }
         }

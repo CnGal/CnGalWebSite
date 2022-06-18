@@ -38,6 +38,7 @@ namespace CnGalWebSite.Shared
             _dataCacheService.OpenNewPage = EventCallback.Factory.Create(this, (string s) => OpenNewPage(s));
             _dataCacheService.ThemeChanged = EventCallback.Factory.Create(this, (string s) => ThemeChanged(s));
             _dataCacheService.ShareLink = EventCallback.Factory.Create(this, (ShareLinkModel s) => ShareLink(s));
+            _dataCacheService.Quit = EventCallback.Factory.Create(this, () => Quit());
 
             //ShowAlert();
         }
@@ -141,6 +142,11 @@ namespace CnGalWebSite.Shared
         }
 
         public virtual void Loaded()
+        {
+
+        }
+
+        public virtual void Quit()
         {
 
         }

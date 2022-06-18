@@ -4,36 +4,60 @@
     <TitleTip Title="消息中心"></TitleTip>
 
     <div class="row">
-        <div class="col-12 col-lg-3 mb-4">
-            <MList Class="p-0">
-                <MListItemGroup @bind-Value="selected" Color="@_dataCacheService.ThemeSetting.Theme">
-                    <MListItem @key="0">
-                        <MListItemIcon>
-                            <MIcon>mdi-comment-text-multiple-outline </MIcon>
-                        </MListItemIcon>
-                        <MListItemContent>
-                            <MListItemTitle>回复我的</MListItemTitle>
-                        </MListItemContent>
-                    </MListItem>
-                    <MListItem @key="1">
-                        <MListItemIcon>
-                            <MIcon>mdi-checkbox-marked-circle-outline</MIcon>
-                        </MListItemIcon>
-                        <MListItemContent>
-                            <MListItemTitle>编辑通过提醒</MListItemTitle>
-                        </MListItemContent>
-                    </MListItem>
-                    <MListItem @key="2">
-                        <MListItemIcon>
-                            <MIcon>mdi-alert-circle-outline</MIcon>
-                        </MListItemIcon>
-                        <MListItemContent>
-                            <MListItemTitle>编辑驳回提醒</MListItemTitle>
-                        </MListItemContent>
-                    </MListItem>
-                </MListItemGroup>
-            </MList>
-        </div>
+
+
+        @if (_dataCacheService.IsApp)
+        {
+            <div class="col-12 mb-4">
+                <MTabs @bind-Value="selected" IconsAndText Grow Class="rounded" CenterActive
+                       Color="@_dataCacheService.ThemeSetting.Theme">
+
+                    <MTab Value="0">
+                        回复我的<MIcon>mdi-comment-text-multiple-outline</MIcon>
+                    </MTab>
+                    <MTab Value="1">
+                        编辑通过提醒<MIcon>mdi-checkbox-marked-circle-outline</MIcon>
+                    </MTab>
+                    <MTab Value="2">
+                        编辑驳回提醒<MIcon>mdi-alert-circle-outline</MIcon>
+                    </MTab>
+                </MTabs>
+            </div>
+        }
+        else
+        {
+            <div class="col-12 col-lg-3 mb-4">
+                <MList Class="p-0">
+                    <MListItemGroup @bind-Value="selected" Color="@_dataCacheService.ThemeSetting.Theme">
+                        <MListItem @key="0">
+                            <MListItemIcon>
+                                <MIcon>mdi-comment-text-multiple-outline </MIcon>
+                            </MListItemIcon>
+                            <MListItemContent>
+                                <MListItemTitle>回复我的</MListItemTitle>
+                            </MListItemContent>
+                        </MListItem>
+                        <MListItem @key="1">
+                            <MListItemIcon>
+                                <MIcon>mdi-checkbox-marked-circle-outline</MIcon>
+                            </MListItemIcon>
+                            <MListItemContent>
+                                <MListItemTitle>编辑通过提醒</MListItemTitle>
+                            </MListItemContent>
+                        </MListItem>
+                        <MListItem @key="2">
+                            <MListItemIcon>
+                                <MIcon>mdi-alert-circle-outline</MIcon>
+                            </MListItemIcon>
+                            <MListItemContent>
+                                <MListItemTitle>编辑驳回提醒</MListItemTitle>
+                            </MListItemContent>
+                        </MListItem>
+                    </MListItemGroup>
+                </MList>
+            </div>
+        }
+
         <div class="col-12 col-lg-9">
             @if (isReady)
             {

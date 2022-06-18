@@ -82,10 +82,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
             if (string.IsNullOrWhiteSpace(SteamId) == false)
             {
                 System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex("^(-?[0-9]*[.]*[0-9]{0,3})$");
-                var steamIds = SteamId.Replace("，", ",").Replace("、", ",").Split(',');
+                var steamIds = SteamId.Replace(" ","").Replace("，", ",").Replace("、", ",").Split(',');
                 foreach (var item in steamIds)
                 {
-                    if (regex.IsMatch(SteamId) == false)
+                    if (regex.IsMatch(item) == false)
                     {
                         return new Result { Error = "SteamId需为64位纯数字" };
                     }

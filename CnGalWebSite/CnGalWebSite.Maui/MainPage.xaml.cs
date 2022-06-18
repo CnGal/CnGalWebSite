@@ -1,8 +1,4 @@
-﻿#if ANDROID
-
-using CnGalWebSite.Maui.Platforms.Android.Services;
-#endif
-
+﻿
 using CnGalWebSite.Maui.Services;
 using Microsoft.AspNetCore.Components.WebView;
 
@@ -22,11 +18,13 @@ namespace CnGalWebSite.Maui
             _overviewService.Init(this);
 
             InitializeComponent();
+#if ANDROID
             blazorWebView.UrlLoading +=
                 (sender, urlLoadingEventArgs) =>
                 {
                     urlLoadingEventArgs.UrlLoadingStrategy = UrlLoadingStrategy.OpenExternally;
                 };
+#endif
             Loaded += MainPage_LoadedAsync;
         }
 
@@ -38,6 +36,7 @@ namespace CnGalWebSite.Maui
             //    LaunchMode = BrowserLaunchMode.SystemPreferred,
             //    TitleMode = BrowserTitleMode.Show
             //});
+
 #if ANDROID
             var themeService = new ThemeService();
             themeService.SetStatusBarColor(Color.FromArgb("#FFFFFF"));
