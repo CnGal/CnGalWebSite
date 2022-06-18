@@ -560,7 +560,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                             temp.Add(0);
                         }
                         //添加数据
-                        temp.Add(item.Count);
+                        temp.Add(Math.Round(item.Count, 2));
                         lastTime = item.Time;
                     }
                     //给没有数据的天数添加默认值0

@@ -857,7 +857,6 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var url = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/06/13/d82819370b57.jpg");
                 return new Result { Successful = true };
             }
             catch (Exception ex)

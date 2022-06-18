@@ -74,9 +74,9 @@
         bar.XAxis.Data = new List<string>() { "平均数", "众数", "中位数", "标准差" };
         bar.Series.Add(new EChartsOptionSery
         {
-            Type="bar",
-            Stack="default",
-            Data = new List<double> { Model.AverageValue, Model.Mode, Model.Median, Model.StandardDeviation }
+            Type = "bar",
+            Stack = "default",
+            Data = new List<double> { Math.Round(Model.AverageValue, 2),Model.Mode, Math.Round(Model.Median, 2), Math.Round(Model.StandardDeviation, 2) }
         });
         return Task.CompletedTask;
     }
