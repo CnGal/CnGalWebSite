@@ -32,8 +32,8 @@ namespace CnGalWebSite.DataModel.Helper
         //public const string ImageApiPath = "http://localhost:5098";
 
 
-        public static bool IsMaui = false;
-        public static bool IsApp = true;
+        public const bool IsMaui = false;
+        public const bool IsApp = true;
 
         public static readonly JsonSerializerOptions options = new()
         {

@@ -35,6 +35,8 @@ namespace CnGalWebSite.Shared.Service
 
         EventCallback<string> ThemeChanged { get; set; }
 
+        EventCallback Quit { get; set; }
+
         EventCallback<ShareLinkModel> ShareLink { get; set; }
 
         EventCallback SavaTheme { get; set; }

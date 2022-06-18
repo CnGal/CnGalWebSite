@@ -1,0 +1,67 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject ILocalStorageService _localStorage
+
+
+<MDialog @bind-Value="dialog"
+         Persistent
+         MaxWidth="400">
+
+    <MCard>
+        <MCardTitle>
+            CnGal资料站隐私协议
+        </MCardTitle>
+        <MCardText>请你务必审慎阅读、充分理解下述条款，包括但不限于：为了能给你提供更好更个性化的服务，我们会收集你的设备信息、操作日志等基础信息。</MCardText>
+        <MCardText>
+            请你阅读
+            <a @onclick="Nav" class="font-color">《CnGal资料站隐私协议》</a>了解更详细的信息，如你同意，请点击“同意”开始接受我们的服务。
+        </MCardText>
+        <MCardActions>
+            <MSpacer></MSpacer>
+            <MButton Color="red"
+                     Text
+                     OnClick="OnDisagree">
+                拒绝
+            </MButton>
+            <MButton Color="green"
+                     Text
+                     OnClick="OnAgree">
+                同意
+            </MButton>
+        </MCardActions>
+    </MCard>
+</MDialog>
+
+@code {
+        bool dialog = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (ToolHelper.IsMaui && ToolHelper.IsApp && await _localStorage.GetItemAsync<bool>("AgreeUserLicenseAgreement") == false)
+            {
+                dialog = true;
+            }
+        }
+        catch
+        {
+            dialog = true;
+        }
+    }
+
+    public async Task Nav()
+    {
+        await _dataCacheService.OpenNewPage.InvokeAsync("https://www.cngal.org/privacy");
+    }
+
+    public async Task OnAgree()
+    {
+        await _localStorage.SetItemAsync("AgreeUserLicenseAgreement", true);
+        dialog = false;
+    }
+
+    public async Task OnDisagree()
+    {
+        await _dataCacheService.Quit.InvokeAsync();
+    }
+}

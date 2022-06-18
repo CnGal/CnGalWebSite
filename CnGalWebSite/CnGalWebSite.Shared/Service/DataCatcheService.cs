@@ -55,6 +55,11 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public EventCallback<string> ThemeChanged { get; set; }
         /// <summary>
+        /// 退出应用
+        /// </summary>
+        public EventCallback Quit { get; set; }
+
+        /// <summary>
         /// 分享页面
         /// </summary>
         public EventCallback<ShareLinkModel> ShareLink { get; set; }

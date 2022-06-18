@@ -2,7 +2,7 @@
 using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using Platform = Microsoft.Maui.ApplicationModel.Platform;
 
-namespace CnGalWebSite.Maui.Platforms.Android.Services
+namespace CnGalWebSite.Maui.Services
 {
     public partial class ThemeService
     {

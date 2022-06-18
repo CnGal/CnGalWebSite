@@ -1,7 +1,4 @@
-﻿#if ANDROID
-using CnGalWebSite.Maui.Platforms.Android.Services;
-#endif
-using CnGalWebSite.Maui.Services;
+﻿using CnGalWebSite.Maui.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
 using System.Diagnostics.CodeAnalysis;
@@ -40,6 +37,12 @@ namespace CnGalWebSite.Maui
         public override void Loaded()
         {
 
+        }
+
+        public override void Quit()
+        {
+            var applicationService = new ApplicationService();
+            applicationService.CloseApplication();
         }
 
         public override void ThemeChanged(string theme)
