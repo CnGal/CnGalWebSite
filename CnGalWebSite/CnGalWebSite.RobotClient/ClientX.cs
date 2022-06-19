@@ -29,6 +29,13 @@ namespace CnGalWebSite.RobotClient
             MiraiClient = new($"ws://{_setting.MiraiUrl}/all?verifyKey={_setting.VerifyKey}&qq={_setting.QQ}", true, true, -1);
         }
 
+        /// <summary>
+        /// 回复好友消息
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="e"></param>
+        /// <param name="range"></param>
+        /// <returns></returns>
         public async Task ReplyFromFriendAsync(FriendMessageSender s, Message[] e, RobotReplyRange range)
         {
             var message = e.MGetPlainString();
@@ -103,6 +110,13 @@ namespace CnGalWebSite.RobotClient
             }
         }
 
+        /// <summary>
+        /// 回复群聊消息
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="e"></param>
+        /// <param name="range"></param>
+        /// <returns></returns>
         public async Task ReplyFromGroupAsync(GroupMessageSender s, Message[] e, RobotReplyRange range)
         {
             var message = e.MGetPlainString();
@@ -181,6 +195,7 @@ namespace CnGalWebSite.RobotClient
                     return;
                 }
 
+                //添加发送记录
                 _post.Add(new PostLog
                 {
                     Message = message,
