@@ -199,15 +199,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <param name="seccode"></param>
         /// <returns></returns>
         bool CheckRecaptcha(string challenge, string validate, string seccode);
-        /// <summary>
-        /// 将原始数据转发成图表数据模板
-        /// </summary>
-        /// <param name="data">原始数据</param>
-        /// <param name="xString">X轴标题</param>
-        /// <param name="yString">Y轴标题</param>
-        /// <param name="title">标题</param>
-        /// <returns></returns>
-        BootstrapBlazor.Components.ChartDataSource GetCountLine(Dictionary<string, List<CountLineModel>> data, string xString, string yString, string title);
 
 
         /// <summary>

@@ -1,6 +1,0 @@
-<linker>
-  <assembly fullname="Mono.Android">
-    <type fullname="Android.Runtime.InputStreamAdapter" preserve="methods" />
-    <type fullname="Android.Runtime.InputStreamInvoker" preserve="methods" />
-  </assembly>
-</linker>
