@@ -34,6 +34,12 @@ namespace CnGalWebSite.RobotClient
             _SensitiveWordX = SensitiveWordX;
         }
 
+        /// <summary>
+        /// 获取可能的回复
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="range"></param>
+        /// <returns></returns>
         public RobotReply GetAutoReply(string message, RobotReplyRange range)
         {
 
@@ -68,6 +74,16 @@ namespace CnGalWebSite.RobotClient
             return reply;
         }
 
+        /// <summary>
+        /// 处理消息回复
+        /// </summary>
+        /// <param name="reply"></param>
+        /// <param name="message"></param>
+        /// <param name="regex"></param>
+        /// <param name="qq"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgError"></exception>
         public async Task<Message[]> ProcMessageAsync(string reply, string message, string regex,long qq,string name)
         {
 
@@ -119,6 +135,11 @@ namespace CnGalWebSite.RobotClient
             return ProcMessageArray(reply);
         }
 
+        /// <summary>
+        /// 将纯文本回复转换成可发送的消息数组
+        /// </summary>
+        /// <param name="vaule"></param>
+        /// <returns></returns>
         public Message[] ProcMessageArray(string vaule)
         {
             if (string.IsNullOrWhiteSpace(vaule))
@@ -191,6 +212,13 @@ namespace CnGalWebSite.RobotClient
             }
         }
 
+        /// <summary>
+        /// 执行参数替换
+        /// </summary>
+        /// <param name="reply"></param>
+        /// <param name="message"></param>
+        /// <param name="regex"></param>
+        /// <param name="args"></param>
         public void ProcMessageReplaceInput(string reply, string message, string regex, List<KeyValuePair<string, string>> args)
         {
             if (string.IsNullOrWhiteSpace(regex))
@@ -212,6 +240,15 @@ namespace CnGalWebSite.RobotClient
             }
         }
 
+        /// <summary>
+        /// 获取参数替换列表
+        /// </summary>
+        /// <param name="reply"></param>
+        /// <param name="message"></param>
+        /// <param name="qq"></param>
+        /// <param name="name"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public async Task ProcMessageArgument(string reply, string message, long qq, string name, List<KeyValuePair<string, string>> args)
         {
             while (true)
@@ -241,6 +278,11 @@ namespace CnGalWebSite.RobotClient
             }
         }
 
+        /// <summary>
+        /// 处理表情
+        /// </summary>
+        /// <param name="reply"></param>
+        /// <param name="args"></param>
         public void ProcMessageFace(string reply, List<KeyValuePair<string, string>> args)
         {
             if (string.IsNullOrWhiteSpace(reply))
@@ -265,6 +307,13 @@ namespace CnGalWebSite.RobotClient
             }
         }
 
+        /// <summary>
+        /// 获取参数值
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="infor"></param>
+        /// <param name="qq"></param>
+        /// <returns></returns>
         public async Task<string> GetArgValue(string name, string infor, long qq)
         {
             return await GetArgValue(name, infor,qq, new Dictionary<string, string>());

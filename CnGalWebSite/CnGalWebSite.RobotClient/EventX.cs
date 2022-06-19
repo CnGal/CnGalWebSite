@@ -85,6 +85,9 @@ namespace CnGalWebSite.RobotClient
 
         }
 
+        /// <summary>
+        /// 保存事件执行记录
+        /// </summary>
         public void SaveExecuteInfors()
         {
             var path = Path.Combine(_setting.RootPath, "ExecuteInfors.json");
@@ -98,6 +101,10 @@ namespace CnGalWebSite.RobotClient
             }
         }
 
+        /// <summary>
+        /// 获取当前时间点定时事件
+        /// </summary>
+        /// <returns></returns>
         public string GetCurrentTimeEvent()
         {
             var events = Events.Where(s => s.Time.TimeOfDay < DateTime.Now.ToCstTime().TimeOfDay && s.Time.AddSeconds(s.DelaySecond).TimeOfDay > DateTime.Now.ToCstTime().TimeOfDay && s.IsHidden == false && s.Type == RobotEventType.FixedTime);
@@ -155,6 +162,10 @@ namespace CnGalWebSite.RobotClient
 
         }
 
+        /// <summary>
+        /// 获取当前时间点概率事件
+        /// </summary>
+        /// <returns></returns>
         public string GetProbabilityEvents()
         {
             var p = new Random().NextDouble();
@@ -196,6 +207,10 @@ namespace CnGalWebSite.RobotClient
             return temp.Text;
         }
 
+        /// <summary>
+        /// 刷新
+        /// </summary>
+        /// <returns></returns>
         public async Task RefreshAsync()
         {
             try
