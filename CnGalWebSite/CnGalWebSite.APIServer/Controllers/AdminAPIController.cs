@@ -101,6 +101,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<LotteryPrize, long> _lotteryPrizeRepository;
         private readonly IRepository<RobotReply, long> _robotReplyRepository;
         private readonly IRepository<SearchCache, long> _searchCacheRepository;
+        private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IChartService _chartService;
 
@@ -115,7 +116,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository,
-        IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService,
+        IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository,
         IRepository<LotteryPrize, long> lotteryPrizeRepository)
         {
             _userManager = userManager;
@@ -172,6 +173,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _webHostEnvironment = webHostEnvironment;
             _chartService = chartService;
             _operationRecordService = operationRecordService;
+            _playedGameRepository = playedGameRepository;
         }
 
         /// <summary>
@@ -857,6 +859,15 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
+               var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == "7b6b7e95-24c9-4443-ab4f-0400e962c803");
+                if(user!=null)
+                {
+                    user.MainPageContext = user.MainPageContext.Replace("pic.sliots.top", "image.cngal.org");
+                    await _userRepository.UpdateAsync(user);
+                }
+
+                await _playedGameRepository.DeleteRangeAsync(s => s.EntryId == 3951);
+              
                 return new Result { Successful = true };
             }
             catch (Exception ex)
