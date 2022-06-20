@@ -344,3 +344,6 @@ input.te-image-file-input {
 .m-rating .m-icon {
     padding: 0.1rem;
 }
+.theme--light.m-tabs > .m-tabs-bar {
+    background-color: transparent;
+}
