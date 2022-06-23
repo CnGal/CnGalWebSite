@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.RobotClient", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CnGalWebSite.PublicToolbox", "CnGalWebSite\CnGalWebSite.PublicToolbox\CnGalWebSite.PublicToolbox.csproj", "{5DA487BA-909F-4962-9898-9D05BDC52945}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeowMiraiLib", "..\MeowMiraiLib\MeowMiraiLib.csproj", "{45A00F48-76DA-4CBD-8787-50991C300231}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -291,6 +293,26 @@ Global
 		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|x64.Build.0 = Release|Any CPU
 		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|x86.ActiveCfg = Release|Any CPU
 		{5DA487BA-909F-4962-9898-9D05BDC52945}.Release|x86.Build.0 = Release|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Debug|ARM.Build.0 = Debug|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Debug|x64.Build.0 = Debug|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Debug|x86.Build.0 = Debug|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Release|ARM.ActiveCfg = Release|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Release|ARM.Build.0 = Release|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Release|ARM64.Build.0 = Release|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Release|x64.ActiveCfg = Release|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Release|x64.Build.0 = Release|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Release|x86.ActiveCfg = Release|Any CPU
+		{45A00F48-76DA-4CBD-8787-50991C300231}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
