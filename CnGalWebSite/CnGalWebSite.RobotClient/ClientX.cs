@@ -105,7 +105,7 @@ namespace CnGalWebSite.RobotClient
                     Reply = reply.Value
                 });
 
-                var j = await new FriendMessage(sendto, result).SendAsync(MiraiClient);
+                var j = result.SendToFriend(sendto, MiraiClient);
                 Console.WriteLine(j);
             }
         }
@@ -203,8 +203,7 @@ namespace CnGalWebSite.RobotClient
                     QQ = s.id,
                     Reply = reply.Value
                 });
-
-                var j = await new GroupMessage(sendto, result).SendAsync(MiraiClient);
+                var j = result.SendToGroup(sendto, MiraiClient);
                 Console.WriteLine(j);
             }
         }

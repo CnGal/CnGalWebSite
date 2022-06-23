@@ -1,6 +1,8 @@
 ﻿using CnGalWebSite.Helper.Helper;
 using CnGalWebSite.RobotClient;
+using MeowMiraiLib;
 using MeowMiraiLib.Msg;
+using MeowMiraiLib.Msg.Type;
 
 var httpClient = new HttpClient();
 var cacheX = new CacheX();
@@ -82,8 +84,8 @@ t.Elapsed += async (s, e) =>
         if (result != null)
         {
             foreach (var item in groupX.Groups)
-            {
-                var j = await new GroupMessage(item.GroupId, result).SendAsync(c);
+{
+                var j=result.SendToGroup(item.GroupId, c);
                 Console.WriteLine(j);
             }
         }
@@ -104,7 +106,7 @@ t2.Elapsed += async (s, e) =>
         {
             foreach (var item in groupX.Groups)
             {
-                var j = await new GroupMessage(item.GroupId, result).SendAsync(c);
+                var j = result.SendToGroup(item.GroupId, c);
                 Console.WriteLine(j);
             }
         }
@@ -125,7 +127,7 @@ t2.Elapsed += async (s, e) =>
 //};
 
 
-c.OnFriendMessageReceive += async (s, e) =>
+c.OnFriendMessageReceive +=  async (s, e) =>
 {
     try
     {
@@ -139,7 +141,7 @@ c.OnFriendMessageReceive += async (s, e) =>
 };
 
 
-c.OnGroupMessageReceive += async (s, e) =>
+c.OnGroupMessageReceive +=  async (s, e) =>
 {
     try
     {

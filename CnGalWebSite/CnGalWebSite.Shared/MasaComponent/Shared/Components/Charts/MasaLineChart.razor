@@ -45,6 +45,7 @@
     </div>
 
 </div>
+
 @code {
     [Parameter]
     public LineChartType Type { get; set; }
@@ -107,7 +108,7 @@
     {
         try
         {
-            if(_days>999)
+            if (_days > 999)
             {
                 Model.BeforeTime = DateTime.MaxValue;
                 Model.AfterTime = DateTime.MinValue;
