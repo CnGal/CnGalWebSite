@@ -343,7 +343,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                             {
                                 if (string.IsNullOrWhiteSpace(item.DisplayValue) == false && string.IsNullOrWhiteSpace(entry.MainPicture))
                                 {
-                                    entry.MainPicture = "https://media.st.dl.pinyuncloud.com/steam/apps/" + item.DisplayValue + "/header.jpg";
+                                    entry.MainPicture = "https://media.st.dl.eccdnx.com/steam/apps/" + item.DisplayValue + "/header.jpg";
                                 }
                             }
 

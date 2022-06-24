@@ -34,6 +34,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -104,6 +105,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IChartService _chartService;
+        private readonly ILogger<AdminAPIController> _logger;
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
@@ -115,7 +117,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
-        IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository,
+        IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, ILogger<AdminAPIController> logger,
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository,
         IRepository<LotteryPrize, long> lotteryPrizeRepository)
         {
@@ -174,6 +176,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _chartService = chartService;
             _operationRecordService = operationRecordService;
             _playedGameRepository = playedGameRepository;
+            _logger = logger;
         }
 
         /// <summary>
@@ -859,14 +862,14 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-               var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == "7b6b7e95-24c9-4443-ab4f-0400e962c803");
-                if(user!=null)
-                {
-                    user.MainPageContext = user.MainPageContext.Replace("pic.sliots.top", "image.cngal.org");
-                    await _userRepository.UpdateAsync(user);
-                }
+                var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("media.st.dl.pinyuncloud.com")).ToListAsync();
 
-                await _playedGameRepository.DeleteRangeAsync(s => s.EntryId == 3951);
+                foreach(var item in entries)
+                {
+                    item.MainPicture = item.MainPicture.Replace("media.st.dl.pinyuncloud.com", "media.st.dl.eccdnx.com");
+                    await _entryRepository.UpdateAsync(item);
+                    _logger.LogInformation("成功替换 词条 - {name}({id}) 主图Steam域名",item.Name,item.Id);
+                }
               
                 return new Result { Successful = true };
             }
