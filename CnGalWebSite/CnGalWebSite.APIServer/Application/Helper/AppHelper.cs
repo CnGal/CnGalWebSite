@@ -1328,7 +1328,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
                 if (string.IsNullOrWhiteSpace(steamId) == false)
                 {
-                    item.MainPicture = "https://media.st.dl.pinyuncloud.com/steam/apps/" + steamId + "/header.jpg";
+                    item.MainPicture = "https://media.st.dl.eccdnx.com/steam/apps/" + steamId + "/header.jpg";
                     await _entryRepository.UpdateAsync(item);
                 }
             }
