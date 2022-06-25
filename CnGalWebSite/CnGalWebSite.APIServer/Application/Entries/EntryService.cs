@@ -969,7 +969,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 //判断
                 if (item.DisplayName == "性别")
                 {
-                    item.DisplayValue = ((GenderType)Enum.Parse(typeof(GenderType), item.DisplayValue)).GetDisplayName();
+                    if (Enum.TryParse(typeof(GenderType), item.DisplayValue, true, out object gender))
+                    {
+                        item.DisplayValue = ((GenderType)gender).GetDisplayName();
+                    }
                 }
                 else if (item.DisplayName == "Steam平台Id")
                 {
@@ -2098,7 +2101,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
                                     model.CV = item.DisplayValue;
                                     break;
                                 case "性别":
-                                    model.Gender = (GenderType)Enum.Parse(typeof(GenderType), item.DisplayValue);
+                                    if(Enum.TryParse(typeof(GenderType), item.DisplayValue,true,  out object gender))
+                                    {
+                                        model.Gender = (GenderType)gender;
+                                    }
                                     break;
                                 case "身材数据":
                                     model.FigureData = item.DisplayValue;
