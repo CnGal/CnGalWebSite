@@ -18,7 +18,7 @@
         @if (string.IsNullOrWhiteSpace(Model.Comments) == false)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-tags" Title="批注" Class="mb-4" Collapable Outline OutlineHead>
-                <div>
+                <div style=" white-space: break-spaces;">
                     @Model.Comments
                 </div>
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
@@ -26,7 +26,7 @@
         @if (string.IsNullOrWhiteSpace(Model.Note) == false)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-sticky-note-o" Title="备注" Class="mb-4" Collapable Outline OutlineHead>
-                <div>
+                <div style=" white-space: break-spaces;">
                     @Model.Note
                 </div>
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
