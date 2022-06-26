@@ -6,7 +6,7 @@
 
 <MApp Dark="_dataCacheService.ThemeSetting.IsDark">
     <BootstrapBlazorRoot>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip @ref="cngalRootTip">
             <CascadingValue Value="connectionInfo" IsFixed="true">
                 @if (NavigationManager.Uri.Contains("/admin"))
                 {

@@ -167,27 +167,6 @@
     color: gray!important;
     background-color: transparent;
 }
-/*小屏幕文章操作Tab*/
-.article-operation-color-small-1 {
-    color: #3496e6;
-    cursor: pointer;
-}
-
-.article-operation-color-small-2 {
-    color: #D26A99;
-    cursor: pointer;
-}
-
-.article-operation-color-small-3 {
-    color: #E67B53;
-    cursor: pointer;
-}
-
-.article-operation-color-small-4 {
-    color: #78ce79;
-    cursor: pointer;
-}
-/*超大屏幕文章操作Tab*/
 
 /*评论样式*/
 .comment-tag {
@@ -311,38 +290,6 @@
     -webkit-transition: all .3s ease;
     transition: all .3s ease;
     margin-top: 5px;
-}
-
-    /*分页栏样式*/
-.page-dto-part {
-    padding: 0px 5px;
-    border: 1px solid #e87461;
-    border-radius: 0;
-    box-shadow: none;
-    color: #e87461;
-    text-align: center;
-    text-decoration: none;
-    font-size: 16px;
-    -webkit-transition: all .3s ease;
-    transition: all .3s ease;
-    margin-left: 8px;
-    margin-right: 8px;
-}
-
-
-.page-dto-btn {
-    padding-left: 8px;
-    padding-right: 8px;
-    height: 35px;
-    border: 1px solid #D979A2;
-    border-radius: 0;
-    box-shadow: none;
-    color: #D979A2;
-    text-align: center;
-    text-decoration: none;
-    font-size: 14px;
-    -webkit-transition: all .3s ease;
-    transition: all .3s ease;
 }
 
 

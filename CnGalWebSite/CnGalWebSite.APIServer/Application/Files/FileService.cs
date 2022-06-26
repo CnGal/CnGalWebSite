@@ -196,42 +196,51 @@ namespace CnGalWebSite.APIServer.Application.Files
 
         public async Task<string> TransferDepositFile(string url)
         {
-            using var client = _clientFactory.CreateClient();
-
-            using var content = new MultipartFormDataContent();
-            using var fileContent = new StreamContent(await client.GetStreamAsync(url));
-
-            content.Add(
-                content: fileContent,
-                name: "file",
-                fileName: "test.png");
-            content.Add(new StringContent(_configuration["TucangCCAPIToken"]), "token");
-
-            var response = await client.PostAsync("https://tucang.cc/api/v1/upload", content);
-
-            var newUploadResults = await response.Content.ReadAsStringAsync();
-            var result = JObject.Parse(newUploadResults);
-
-            if (result["code"].ToObject<int>() == 200)
+            try
             {
-                return result["data"]["url"].ToObject<string>() + "?" + url;
+                using var client = _clientFactory.CreateClient();
+
+                using var content = new MultipartFormDataContent();
+                using var fileContent = new StreamContent(await client.GetStreamAsync(url));
+
+                content.Add(
+                    content: fileContent,
+                    name: "file",
+                    fileName: "test.png");
+                content.Add(new StringContent(_configuration["TucangCCAPIToken"]), "token");
+
+                var response = await client.PostAsync("https://tucang.cc/api/v1/upload", content);
+
+                var newUploadResults = await response.Content.ReadAsStringAsync();
+                var result = JObject.Parse(newUploadResults);
+
+                if (result["code"].ToObject<int>() == 200)
+                {
+                    return result["data"]["url"].ToObject<string>() + "?" + url;
+                }
+                else
+                {
+                    return null;
+                }
+
             }
-            else
+            catch (Exception ex)
             {
-                return null;
+                _logger.LogError(ex, "转存图片失败：{url}", url);
+                throw;
             }
         }
 
         public async Task TransferAllMainImages(int maxCount)
         {
             var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("cngal"))
-                .OrderBy(s=>s.Id)
+                .OrderBy(s => s.Id)
                 .Take(maxCount).ToListAsync();
 
-            foreach(var item in entries)
+            foreach (var item in entries)
             {
-                var temp =await TransferDepositFile(item.MainPicture);
-                if(string.IsNullOrWhiteSpace(temp)==false)
+                var temp = await TransferDepositFile(item.MainPicture);
+                if (string.IsNullOrWhiteSpace(temp) == false)
                 {
                     item.MainPicture = temp;
                     await _entryRepository.UpdateAsync(item);

@@ -1,33 +1,26 @@
-﻿
-<div class="row">
-    <div class="col-12 col-lg-4">
-        <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h2 class="fw-bold m-0 font-color h5"><i class="fa fa-filter"></i>&nbsp;&nbsp;筛选</h2>
-            </div>
-            <Select TValue="ScreenSteamType" Value="ScreenType" ValueChanged="OnScreenTypeChanged" style="width:105px"></Select>
-        </div>
+﻿@inject IDataCacheService _datacacheService
 
-    </div>
-    <div class="col-12 col-lg-4">
-        <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h2 class="fw-bold  m-0 font-color h5"><i class="fa fa-sort-amount-desc"></i>&nbsp;&nbsp;主排</h2>
-            </div>
-            <Select TValue="SteamSortType" Value="OrderType" ValueChanged="OnOrderTypeChangedChanged" style="width:105px"></Select>
-        </div>
+<div class="rounded shadow-sm  bg-opacity mb-4">
 
+    <div style="display: flex;flex-direction: column;align-items: center;align-content: center;" class="pt-4">
+        @if (_datacacheService.IsApp == false)
+        {
+            <div class="h4 fw-bold font-color">折扣中的游戏</div>
+        }
+        <div style="color: gray; word-break: break-all; text-align-last: center; " class="ps-4 pe-4">Steam信息来源：<a href="https://isthereanydeal.com/" rel="noreferrer"> https://isthereanydeal.com/</a></div>
     </div>
-    <div class="col-12 col-lg-4">
-        <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h2 class="fw-bold  m-0 font-color h5"><i class="fa fa-sort-amount-desc"></i>&nbsp;&nbsp;次排</h2>
-            </div>
-            <Select TValue="SteamSortType" Value="ThenOrderType" ValueChanged="OnThenOrderTypeChangedChanged" style="width:105px"></Select>
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-4">
+        <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="ScreenType" ValueChanged="OnScreenTypeChanged" TValue="ScreenSteamType" Class="pt-0" Lable="筛选" />
+        </div>
+        <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="OrderType" ValueChanged="OnOrderTypeChangedChanged" TValue="SteamSortType" Class="pt-0" Lable="排序" />
+        </div>
+        <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="DisplayType" ValueChanged="OnDisplayTypeChangedChanged" TValue="SteamDisplayType" Class="pt-0" Lable="样式" />
         </div>
     </div>
 </div>
-
 
 @code {
     [Parameter]
@@ -35,14 +28,15 @@
     [Parameter]
     public SteamSortType OrderType { get; set; }
     [Parameter]
-    public SteamSortType ThenOrderType { get; set; }
+    public SteamDisplayType DisplayType { get; set; }
 
     [Parameter]
-    public EventCallback< ScreenSteamType> ScreenTypeChanged { get; set; }
+    public EventCallback<ScreenSteamType> ScreenTypeChanged { get; set; }
     [Parameter]
-    public EventCallback<SteamSortType>  OrderTypeChanged { get; set; }
+    public EventCallback<SteamSortType> OrderTypeChanged { get; set; }
     [Parameter]
-    public EventCallback<SteamSortType>  ThenOrderTypeChanged { get; set; }
+    public EventCallback<SteamDisplayType> DisplayTypeChanged { get; set; }
+
 
     public async Task OnScreenTypeChanged(ScreenSteamType type)
     {
@@ -52,9 +46,9 @@
     {
         await OrderTypeChanged.InvokeAsync(type);
     }
-    public async Task OnThenOrderTypeChangedChanged(SteamSortType type)
-    {
-        await ThenOrderTypeChanged.InvokeAsync(type);
-    }
 
+    public async Task OnDisplayTypeChangedChanged(SteamDisplayType type)
+    {
+        await DisplayTypeChanged.InvokeAsync(type);
+    }
 }

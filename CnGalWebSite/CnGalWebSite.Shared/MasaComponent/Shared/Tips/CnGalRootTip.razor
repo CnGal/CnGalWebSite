@@ -3,8 +3,8 @@
 
 <ErrorHandler>
     <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" OnStateChanged="OnStateChanged" />
-    <ImagesLargeViewTip />
-    <FloatToolTip />
+    <ImagesLargeViewTip/>
+    <FloatToolTip  @ref="floatToolTip"/>
     <UserLicenseAgreementTip/>
 
     <CascadingValue Value=this IsFixed="true">
@@ -19,6 +19,15 @@
         public RenderFragment ChildContent { get; set; }
 
         CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip styleTip;
+        FloatToolTip floatToolTip;
+
+        public async Task ChangeDisplayMode()
+        {
+            if (floatToolTip != null)
+            {
+                await floatToolTip.Refresh();
+            }
+        }
 
         public async Task SaveTheme()
         {

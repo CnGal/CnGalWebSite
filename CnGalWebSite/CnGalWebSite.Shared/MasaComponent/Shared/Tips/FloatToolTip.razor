@@ -1,9 +1,8 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-@if (_dataCacheService.IsApp == false)
-{
-    <div style="position: fixed; z-index: 4; bottom: 125px; right: 50px; ">
+
+    <div style="position: fixed; z-index: 4; bottom: 125px; right: 50px; " class="@(_dataCacheService.IsApp?"d-none":"")">
         <div>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial Icon="mdi-link" Direction="top" Text="社区交流" Class="mb-4">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaImageToolTip Icon="mdi-wechat" Image="https://image.cngal.org/images/2022/06/02/76142d8159b0.jpg" />
@@ -27,13 +26,15 @@
     </div>
     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard @ref="mergeEntriesCard" />
     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard @ref="repostArticlesCard" />
-}
+
 
 
 @code {
     private bool fab;
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard mergeEntriesCard;
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard repostArticlesCard;
+
+
     public Task OnClickFly()
     {
         NavigationManager.NavigateTo(NavigationManager.Uri, false, true);

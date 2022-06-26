@@ -17,6 +17,7 @@ namespace CnGalWebSite.Shared
     {
 
         private System.Threading.Timer mytimer;
+        CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip cngalRootTip;
 
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -44,10 +45,13 @@ namespace CnGalWebSite.Shared
         }
 
 
-        public Task OnRefresh()
+        public async Task OnRefresh()
         {
             StateHasChanged();
-            return Task.CompletedTask;
+            if(cngalRootTip!=null)
+            {
+               await cngalRootTip.ChangeDisplayMode();
+            }
         }
 
 
@@ -76,7 +80,7 @@ namespace CnGalWebSite.Shared
                     if (isApp != _dataCacheService.IsApp)
                     {
                         _dataCacheService.IsApp = isApp;
-                        StateHasChanged();
+                       await OnRefresh();
                     }
 
                 }

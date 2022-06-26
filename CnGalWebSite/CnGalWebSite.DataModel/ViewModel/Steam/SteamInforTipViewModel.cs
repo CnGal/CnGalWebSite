@@ -43,8 +43,18 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
     {
         [Display(Name = "全部")]
         All,
+        [Display(Name = "平史低")]
+        FlatHistoryLow,
         [Display(Name = "新史低")]
         NewHistoryLow
+    }
+
+    public enum SteamDisplayType
+    {
+        [Display(Name = "条幅")]
+        LongCard,
+        [Display(Name = "大卡片")]
+        LargeCard
     }
 
     public enum SteamSortType
