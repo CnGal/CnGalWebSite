@@ -61,7 +61,7 @@ function initUploadButton(objRef, up_to_chevereto, up_img_label) {
             jQuery.ajax({
                 async: true,
                 crossDomain: true,
-                url: 'https://pic.cngal.top/api/1/upload/?format=json&key=00ee89a663169218bd1ddeab71d54ddf',
+                url: 'https://image.cngal.org/api/1/upload/?format=json&key=00ee89a663169218bd1ddeab71d54ddf',
                 type: 'POST',
                 processData: false,
                 contentType: false,

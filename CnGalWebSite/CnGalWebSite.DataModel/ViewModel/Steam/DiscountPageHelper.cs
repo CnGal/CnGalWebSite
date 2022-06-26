@@ -8,6 +8,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
         private List<SteamInforTipViewModel> Model = new List<SteamInforTipViewModel>();
         public List<SteamInforTipViewModel> Items = new List<SteamInforTipViewModel>();
 
+        public int TabIndex { get; set; } = 1;
+
+        public int MaxCount { get; set; } = 12;
+
+        public int TotalPages => (Items.Count / MaxCount) + 1;
+
+        public int CurrentPage { get; set; } = 1;
+
         private ScreenSteamType screenType;
         public ScreenSteamType ScreenType
         {
@@ -40,6 +48,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
             }
         }
 
+        public SteamDisplayType steamDisplayType { get; set; }
+
         public bool IsInit => Model.Count > 0;
 
         public DiscountPageHelper()
@@ -62,6 +72,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
                     break;
                 case ScreenSteamType.NewHistoryLow:
                     Items = Model.Where(s => s.CutNow > s.CutLowest && s.CutLowest > 0).ToList();
+                    break;
+                case ScreenSteamType.FlatHistoryLow:
+                    Items = Model.Where(s => s.CutNow == s.CutLowest && s.CutLowest > 0).ToList();
                     break;
             };
 

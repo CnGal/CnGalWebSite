@@ -55,6 +55,16 @@
             Index = 1,
             OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnScreenChange(a)),
             RandomIndex = ScreenRandomIndex,
+            Text = "平史低",
+            Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
+            ClassNames = $"col-auto pe-2 p-0"
+        });
+        ScreenModel.Items.Add(new CnGalWebSite.Shared.AppComponent.Normal.Tabs.TabViewItemModel
+        {
+            DefaultIndex = (int)ScreenType,
+            Index = 2,
+            OnTabClick = EventCallback.Factory.Create<int>(this, async (a) => await OnScreenChange(a)),
+            RandomIndex = ScreenRandomIndex,
             Text = "新史低",
             Type = CnGalWebSite.Shared.AppComponent.Normal.Tabs.TableItemType.Badge,
             ClassNames = $"col-auto pe-2 p-0"

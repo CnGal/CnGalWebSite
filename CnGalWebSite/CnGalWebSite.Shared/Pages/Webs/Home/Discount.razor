@@ -2,8 +2,6 @@
 @inject ToastService? ToastService
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
-@implements IAsyncDisposable
-@inject IDataCacheService _dataCacheService
 
 <TitleTip Title="打折中的游戏" Description="Steam游戏折扣专题页，可以按价格，发行时间，好评率等排序"></TitleTip>
 
@@ -57,19 +55,23 @@
         <div>
             <CnGalWebSite.Shared.Component.Steam.ScreenGamesTip ScreenType="_dataCacheService.DiscountPageCatcheHelper.ScreenType"
                                                                 OrderType="_dataCacheService.DiscountPageCatcheHelper.OrderType"
-                                                                ThenOrderType="_dataCacheService.DiscountPageCatcheHelper.ThenOrderType"
-                                                                ScreenTypeChanged="ScreenTypeChanged" OrderTypeChanged="OrderTypeChanged" ThenOrderTypeChanged="ThenOrderTypeChanged" />
+                                                                DisplayType="_dataCacheService.DiscountPageCatcheHelper.steamDisplayType"
+                                                                ScreenTypeChanged="ScreenTypeChanged" OrderTypeChanged="OrderTypeChanged" DisplayTypeChanged="DisplayTypeChanged" />
         </div>
         <div class="row">
-            @foreach (var item in _dataCacheService.DiscountPageCatcheHelper.Items)
+            @foreach (var item in _dataCacheService.DiscountPageCatcheHelper.Items.Skip((_dataCacheService.DiscountPageCatcheHelper.CurrentPage - 1) * _dataCacheService.DiscountPageCatcheHelper.MaxCount).Take(_dataCacheService.DiscountPageCatcheHelper.MaxCount))
             {
-                <div class="@("mb-3 "+(IsSmallScreen?"col-12 col-md-6":"col-12"))">
-                    <CnGalWebSite.Shared.Component.Steam.SteamInforViewTip Model="item" IsSmallScreen="IsSmallScreen" />
+                <div class="@("mb-3 "+(_dataCacheService.DiscountPageCatcheHelper.steamDisplayType== SteamDisplayType.LongCard?"col-12":"col-12 col-md-6 col-xxl-4"))">
+                    <CnGalWebSite.Shared.Component.Steam.SteamInforViewTip Model="item" Type="_dataCacheService.DiscountPageCatcheHelper.steamDisplayType" />
                 </div>
             }
 
 
         </div>
+        @if (_dataCacheService.DiscountPageCatcheHelper.TotalPages > 1)
+        {
+            <MPagination Value="@_dataCacheService.DiscountPageCatcheHelper.CurrentPage" Class="my-4" Length="@_dataCacheService.DiscountPageCatcheHelper.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+        }
         @if (_dataCacheService.DiscountPageCatcheHelper.Items.Count == 0)
         {
             <NotFoundTip IsNeedLayput="true" />
@@ -82,60 +84,7 @@
     public ErrorHandler ErrorHandler { get; set; }
     bool isReady = false;
 
-    #region 获取屏幕大小
-    public bool IsSmallScreen { get; set; }
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; } = true;
 
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime JSRuntime { get; set; }
-
-    private JSInterop<Discount> Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            Interop = new JSInterop<Discount>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
-        }
-    }
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 1100))
-        {
-            IsSmallScreen = width < 1100;
-
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 1100 && width < 1630))
-        {
-            IsNormalScreen = width >= 1100 && width < 1630;
-
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 1630))
-        {
-            IsLargeScreen = width >= 1630;
-            StateHasChanged();
-        }
-    }
-    #endregion
 
     protected override async Task OnInitializedAsync()
     {
@@ -179,23 +128,17 @@
         StateHasChanged();
         return Task.CompletedTask;
     }
-
-
-
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
+    public Task DisplayTypeChanged(SteamDisplayType type)
     {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
+        _dataCacheService.DiscountPageCatcheHelper.steamDisplayType = type;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
-    public async ValueTask DisposeAsync()
+
+    private Task OnPageClick(int pageIndex)
     {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
+        _dataCacheService.DiscountPageCatcheHelper.CurrentPage = pageIndex;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
-    #endregion
 }

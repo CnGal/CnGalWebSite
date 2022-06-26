@@ -1,5 +1,9 @@
-﻿<TabLink Icon="fa fa-codepen" Url="@("/entries/index/" + Model.EntryId)" Text="@Model.Name" class="a-font-color">
-    @if (IsSmallScreen)
+﻿@inject IDataCacheService _datacacheService
+
+
+
+<a href="@("/entries/index/" + Model.EntryId)" class="a-font-color">
+    @if (Type == SteamDisplayType.LargeCard)
     {
         <div class="div-shadow rounded  bg-opacity h-100">
             <div class="h-100" style="display: flex; flex-direction: column;">
@@ -18,7 +22,7 @@
                     </div>
                     <div class="mt-2" style="display: flex; justify-content: space-between;">
                         <div style="display: flex; flex-direction: column;">
-                            @if (Model.EvaluationCount>0)
+                            @if (Model.EvaluationCount > 0)
                             {
                                 <div>
                                     <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-thumbs-o-up"
@@ -47,11 +51,11 @@
 
                             }
                         </div>
-                        <div style=" display: flex; flex-direction: column; align-items: center; width: 100px; justify-content: center;">
-                            <span class="h4 m-0 font-color" >
+                        <div style=" display: flex; flex-direction: column; align-items: center; width: 100px; justify-content: center; color: var(--active-color);">
+                            <span class="h4 m-0 fw-bold">
                                 @(Model.PriceNowString)
                             </span>
-                            <span class="font-color" >
+                            <span>
                                 @(Model.CutNow+"% OFF")
                             </span>
 
@@ -70,75 +74,120 @@
     }
     else
     {
-        <div class="div-shadow rounded  bg-opacity p-3 h-100">
-            <div style="display:flex;">
+        @if (_datacacheService.IsApp)
+        {
+            <div style="display:flex;" class="shadow-sm bg-opacity rounded">
                 <div style="display: flex; width: 100%;">
-                    <img style="height: 115px;" src="@Model.Image">
-                    <div class="ps-3" style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-                        <header class="text-truncate-2">
-                            <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
-                        </header>
-                        <span class="text-truncate-2">
-                            @Model.BriefIntroduction
-                        </span>
-                        <div class="row">
+                    <img style=" height: 67px; " src="@Model.Image">
+                    <div class="ps-2" style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                        <span class="text-truncate-1" style="font-size: larger;">@Model.Name</span>
+                        <div style="display: flex; flex-direction: column;">
                             @if (Model.EvaluationCount > 0)
                             {
-                                <div class="col-6 col-xxl-4">
+                                <div>
                                     <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-thumbs-o-up"
-                                                                                                         Text="@($"{Model.RecommendationRate}% 好评（{Model.EvaluationCount}条评测）")" />
+                                                                                                         Text="@($"{Model.RecommendationRate}% ({Model.EvaluationCount})")" />
 
                                 </div>
-                            }
-
-                            @if (Model.PublishTime != null)
-                            {
-                                <div class="col-6 col-xxl-4">
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-calendar-check-o"
-                                                                                                         Text="@(Model.PublishTime?.ToString("yyyy年M月d日"))" />
-
-                                </div>
-
                             }
 
                             @if (Model.CutLowest > 0)
                             {
-                                <div class="col-6 col-xxl-4">
+                                <div>
                                     <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-area-chart"
-                                                                                                         Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " - "+Model.CutLowest+"% OFF"))" />
-
+                                                                                                         Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " (-"+Model.CutLowest+"%)"))" />
                                 </div>
-
                             }
                         </div>
                     </div>
                 </div>
-                <div style=" display: flex; flex-direction: column; align-items: center; width: 170px; justify-content: center;">
-                    <span style="display: flex; align-items: center;" class="font-color">
-                        <span class="h4">
-                            @(Model.PriceNowString)
-                        </span>
-                        <span class="ms-1">
-                            @(Model.CutNow+"% OFF")
-                        </span>
+                <div style=" display: flex; flex-direction: column; align-items: center; width: 100px; justify-content: center; color: var(--active-color); ">
+                    <span class="h5 m-0">
+                        @(Model.PriceNowString)
                     </span>
-
-                    <span class="h6" style=" color: gray; text-decoration: line-through; ">
+                    <span style="font-size:small ">
+                        @(Model.CutNow+"% OFF")
+                    </span>
+                    <span style=" color: gray; text-decoration: line-through; ">
                         @("¥ "+((double)Model.OriginalPrice/100).ToString("0.00"))
                     </span>
-
                 </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="div-shadow rounded  bg-opacity p-3 h-100">
+                <div style="display:flex;">
+                    <div style="display: flex; width: 100%;">
+                        <img style="height: 115px;" src="@Model.Image">
+                        <div class="ps-3" style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                            <header class="text-truncate-2">
+                                <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                            </header>
+                            <span class="text-truncate-2">
+                                @Model.BriefIntroduction
+                            </span>
+                            <div class="row">
+                                @if (Model.EvaluationCount > 0)
+                                {
+                                    <div class="col-6 col-xxl-4">
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-thumbs-o-up"
+                                                                                                             Text="@($"{Model.RecommendationRate}% 好评（{Model.EvaluationCount}条评测）")" />
+
+                                    </div>
+                                }
+
+                                @if (Model.PublishTime != null)
+                                {
+                                    <div class="col-6 col-xxl-4">
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-calendar-check-o"
+                                                                                                             Text="@(Model.PublishTime?.ToString("yyyy年M月d日"))" />
+
+                                    </div>
+
+                                }
+
+                                @if (Model.CutLowest > 0)
+                                {
+                                    <div class="col-6 col-xxl-4">
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-area-chart"
+                                                                                                             Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " - "+Model.CutLowest+"% OFF"))" />
+
+                                    </div>
+
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div style=" display: flex; flex-direction: column; align-items: center; width: 180px; justify-content: center; color: var(--active-color);">
+                        <span style="display: flex; align-items: center;">
+                            <span class="h4 fw-bold">
+                                @(Model.PriceNowString)
+                            </span>
+                            <span class="ms-1">
+                                @(Model.CutNow+"% OFF")
+                            </span>
+                        </span>
+
+                        <span class="h6" style=" color: gray; text-decoration: line-through; ">
+                            @("¥ "+((double)Model.OriginalPrice/100).ToString("0.00"))
+                        </span>
+
+                    </div>
+                </div>
+            </div>
+
+        }
+
 
     }
 
-</TabLink>
+</a>
 
 @code {
     [Parameter]
     public SteamInforTipViewModel Model { get; set; }
     [Parameter]
-    public bool IsSmallScreen { get; set; }
+    public SteamDisplayType Type { get; set; }
 
 }
