@@ -198,6 +198,10 @@ namespace CnGalWebSite.APIServer.Application.Files
         {
             try
             {
+                if(url.Contains("http")==false)
+                {
+                    url = "https:" + url;
+                }
                 using var client = _clientFactory.CreateClient();
 
                 using var content = new MultipartFormDataContent();
