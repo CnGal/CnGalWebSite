@@ -114,6 +114,8 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<Lottery>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Disambig>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<GameScoreTableModel>().HasIndex(g => g.GameId).IsUnique();
+            modelBuilder.Entity<SteamInfor>().HasIndex(g => g.SteamId).IsUnique();
+            modelBuilder.Entity<SteamInforTableModel>().HasIndex(g => g.SteamId).IsUnique();
 
             //设定默认值
             modelBuilder.Entity<Article>().Property(b => b.CanComment).HasDefaultValue(true);
