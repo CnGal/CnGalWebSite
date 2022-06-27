@@ -27,6 +27,7 @@ using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
+using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -103,6 +104,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<RobotReply, long> _robotReplyRepository;
         private readonly IRepository<SearchCache, long> _searchCacheRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
+        private readonly IRepository<SteamInforTableModel, long> _steamInforTableModelRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IChartService _chartService;
         private readonly ILogger<AdminAPIController> _logger;
@@ -115,7 +117,7 @@ namespace CnGalWebSite.APIServer.Controllers
         UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
         IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
-        IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository,
+        IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository, IRepository<SteamInforTableModel, long> steamInforTableModelRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, ILogger<AdminAPIController> logger,
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository,
@@ -177,6 +179,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _operationRecordService = operationRecordService;
             _playedGameRepository = playedGameRepository;
             _logger = logger;
+            _steamInforTableModelRepository = steamInforTableModelRepository;
         }
 
         /// <summary>
@@ -862,15 +865,9 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("media.st.dl.pinyuncloud.com")).ToListAsync();
+                await _steamInforRepository.DeleteRangeAsync(s => true);
+                await _steamInforTableModelRepository.DeleteRangeAsync(s => true);
 
-                foreach(var item in entries)
-                {
-                    item.MainPicture = item.MainPicture.Replace("media.st.dl.pinyuncloud.com", "media.st.dl.eccdnx.com");
-                    await _entryRepository.UpdateAsync(item);
-                    _logger.LogInformation("成功替换 词条 - {name}({id}) 主图Steam域名",item.Name,item.Id);
-                }
-              
                 return new Result { Successful = true };
             }
             catch (Exception ex)
