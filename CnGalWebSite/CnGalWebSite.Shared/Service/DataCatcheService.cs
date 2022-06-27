@@ -19,6 +19,7 @@ using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Theme;
 using CnGalWebSite.DataModel.ViewModel.Votes;
+using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.Helper.ViewModel.Articles;
 using CnGalWebSite.Helper.ViewModel.Comments;
 using Microsoft.AspNetCore.Components;
@@ -27,6 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.Shared.Service
@@ -246,10 +248,11 @@ namespace CnGalWebSite.Shared.Service
         public IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
 
         private readonly HttpClient _httpClient;
+        private readonly NavigationManager _navigationManager;
 
         public DataCatcheService(HttpClient httpClient, IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche, IPageModelCatche<VoteViewModel> voteIndexPageCatche,
         IPageModelCatche<PeripheryViewModel> peripheryIndexPageCatche, IPageModelCatche<TagIndexViewModel> tagIndexPageCatche, IPageModelCatche<List<HomeNewsAloneViewModel>> homePageNewsCatche,
-        IPageModelCatche<List<CarouselViewModel>> homePageCarouselsCatche, IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
+        IPageModelCatche<List<CarouselViewModel>> homePageCarouselsCatche, IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche, NavigationManager navigationManager,
         IPageModelCatche<LotteryViewModel> lotteryIndexPageCatche,
         IPageModelCatche<ArticleContrastEditRecordViewModel> articleContrastEditRecordViewCatche,
         IPageModelCatche<PeripheryContrastEditRecordViewModel> peripheryContrastEditRecordViewCatche,
@@ -281,6 +284,7 @@ namespace CnGalWebSite.Shared.Service
             HomePageNewsCatche = homePageNewsCatche;
             HomePageCarouselsCatche = homePageCarouselsCatche;
             SearchViewCatche = searchViewCatche;
+            _navigationManager= navigationManager;
 
         }
 
@@ -314,7 +318,7 @@ namespace CnGalWebSite.Shared.Service
                         Image = item.Image,
                         Name = item.DisPlayName,
                         ReadCount = item.ReadCount,
-                        Url = string.IsNullOrWhiteSpace(type) ? item.DisPlayValue : (type + "/index/" + item.Id)
+                        Url = string.IsNullOrWhiteSpace(type) ? item.DisPlayValue : (_navigationManager.BaseUri+type + "/index/" + item.Id)
                     });
                 }
                 HomeListCards.Add(new KeyValuePair<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>, string>(items, apiUrl));
@@ -325,6 +329,11 @@ namespace CnGalWebSite.Shared.Service
                 return new List<AppComponent.Normal.Cards.MainImageCardModel>();
             }
         }
+
+  
+
+
+
         public void RefreshAllCatche()
         {
             EntryIndexPageCatche.Clean();

@@ -4,17 +4,22 @@
 @inject IDataCacheService _dataCacheService
 
 
-<TitleTip></TitleTip>
+<TitleTip StructuredData="@structuredData"></TitleTip>
 
-
+<div itemscope itemtype="https://schema.org/WebSite">
+    <meta itemprop="url" content="https://www.cngal.com/" />
+    <form itemprop="potentialAction" itemscope itemtype="https://schema.org/SearchAction">
+        <meta itemprop="target" content="https://www.cngal.com/search?Text={search_term_string}" />
+        <input itemprop="query-input" type="text" name="search_term_string" required />
+        <input type="submit" />
+    </form>
+</div>
 
 <div>
     <div class=" mb-4">
         <BootstrapBlazor.Components.Carousel Images="@Images" IsFade="true" OnClick="OnClick" class="rounded shadow-sm"></BootstrapBlazor.Components.Carousel>
     </div>
-
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.NoticeCard Class="rounded shadow-sm p-2 bg-opacity mb-4"/>
-
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.NoticeCard Class="rounded shadow-sm p-2 bg-opacity mb-4" />
     <div class=" mb-4">
         <HomeNewsViewTip></HomeNewsViewTip>
     </div>
@@ -42,25 +47,30 @@
     }
     #endregion
 
+    string structuredData = "";
 
     protected override async Task OnInitializedAsync()
     {
 
         try
         {
+
+
             Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView", true);
 
-            Images = Carousels.OrderByDescending(s=>s.Priority).Take(3).Select(s => s.Image).ToList();
-            if(Carousels.Count>=6)
+            Images = Carousels.OrderByDescending(s => s.Priority).Take(3).Select(s => s.Image).ToList();
+            if (Carousels.Count >= 6)
             {
-                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x) == false).ToList().Random().Take(3).Select(s=>s.Image));
+                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x) == false).ToList().Random().Take(3).Select(s => s.Image));
 
             }
             else
             {
-                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x) == false).Select(s=>s.Image));
+                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x) == false).Select(s => s.Image));
             }
 
+            //生成轮播结构数据
+           await GenerateCarouselStructuredDataJson();
 
         }
         catch (Exception ex)
@@ -68,7 +78,21 @@
             ErrorHandler.ProcessError(ex, "获取主页轮播图列表失败");
         }
 
+    }
 
+    public async Task GenerateCarouselStructuredDataJson()
+    {
+        var urls = new List<string>();
+        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeRecentIssuelGameView", "entries", 12, false)).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeNewestGameView", "entries", 12, false)).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeRecentEditView", "entries", 12, false)).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeNoticesView", "articles", 12, false)).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeArticlesView", "articles", 12, false)).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeNewsView", "articles", 12, false)).Select(s => s.Url));
+
+        urls.RemoveAll(s => string.IsNullOrWhiteSpace(s));
+        urls.Purge();
+        structuredData = ToolHelper.GenerateCarouselStructuredDataJson(urls);
     }
 
 

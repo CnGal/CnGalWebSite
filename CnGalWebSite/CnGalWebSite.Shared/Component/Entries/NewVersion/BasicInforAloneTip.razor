@@ -4,7 +4,19 @@
 @if (string.IsNullOrWhiteSpace(Url))
 {
     <span class="@Class">
-        <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text
+        <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;
+        @if (string.IsNullOrWhiteSpace(Title) == false)
+        {
+            <span>
+                @Title：
+            </span>
+        }
+
+            <span itemprop="@ItemProp">
+                @Text
+            </span>
+        
+
     </span>
 }
 else
@@ -12,20 +24,31 @@ else
     @if (ToolHelper.IsMaui)
     {
         <span class="@Class" style=" word-break: break-all;">
-            <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text<a class="font-color" @onclick="OnClick">@Url</a>
+            <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text
+
+                <a class="font-color" @onclick="OnClick" itemprop="@ItemProp">@Url</a>
+
+            
         </span>
     }
     else
     {
         <span class="@Class" style=" word-break: break-all;">
-            <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text<a href="@Url" target="_blank">@Url</a>
+            <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text
+
+
+                <a href="@Url" target="_blank" itemprop="@ItemProp">@Url</a>
+            
         </span>
 
     }
 
 }
 
+
 @code {
+    [Parameter]
+    public string Title { get; set; }
     [Parameter]
     public string Text { get; set; }
     [Parameter]
@@ -34,6 +57,10 @@ else
     public string Url { get; set; }
     [Parameter]
     public string Icon { get; set; }
+    [Parameter]
+    public string ItemProp { get; set; }
+    [Parameter]
+    public string Content { get; set; }
 
 
     private async Task OnClick()

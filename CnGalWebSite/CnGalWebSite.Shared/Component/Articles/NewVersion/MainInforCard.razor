@@ -1,31 +1,35 @@
-﻿<div>
+﻿@inject NavigationManager NavigationManager
+
+<div>
 
     @if (string.IsNullOrWhiteSpace(Model.MainPicture) == false && HiddenImage == false)
     {
-        <img style="width:100%" src="@Model.MainPicture" alt="@Model.Name">
+        <img style="width:100%" src="@Model.MainPicture" alt="@Model.Name" itemprop="image">
     }
     <div class="@(Outline?"":"ps-4 pe-4 pt-8") ">
 
         @if (HiddenTitle == false)
         {
             <div style="display: flex; flex-direction: column; align-items: center;">
-                <h1 class="fw-bold text-center h3 mb-8">@Model.Name</h1>
-
-                <a href="@("/space/index/"+Model.UserInfor.Id)" style=" display: flex; flex-direction: column; align-items: center;" class="a-font-color mb-2">
-                    <img src="@Model.UserInfor.PhotoPath" alt="@Model.UserInfor.Name" style="width:50px;border-radius:50%;" class="mb-2" />
-                    <div class="d-flex" style=" align-items: center;">
-                        <span style="font-size: large; font-weight: bold; ">
-                            @Model.UserInfor.Name
-                        </span>
-                        @if (Model.UserInfor.Ranks != null)
-                        {
-                            @foreach (var item in Model.UserInfor.Ranks)
+                <h1 class="fw-bold text-center h3 mb-8" itemprop="headline">@Model.Name</h1>
+                <div itemprop="author" itemscope itemtype="http://schema.org/Person">
+                    <a href="@("/space/index/"+Model.UserInfor.Id)" style=" display: flex; flex-direction: column; align-items: center;" class="a-font-color mb-2" itemprop="url">
+                        <img src="@Model.UserInfor.PhotoPath" alt="@Model.UserInfor.Name" style="width:50px;border-radius:50%;" class="mb-2" itemprop="image" />
+                        <div class="d-flex" style=" align-items: center;">
+                            <span style="font-size: large; font-weight: bold; " itemprop="name">
+                                @Model.UserInfor.Name
+                            </span>
+                            @if (Model.UserInfor.Ranks != null)
                             {
-                                <RankAloneViewTip Model="item" Class="ms-2"></RankAloneViewTip>
+                                @foreach (var item in Model.UserInfor.Ranks)
+                                {
+                                    <RankAloneViewTip Model="item" Class="ms-2"></RankAloneViewTip>
+                                }
                             }
-                        }
-                    </div>
-                </a>
+                        </div>
+                    </a>
+                </div>
+
                 <div style="color:gray;text-align: center;">
                     <i class="fa fa-calendar fa-fw "></i>
                     <span>@((Model.CreateTime.Year<1900?Model.LastEditTime: Model.CreateTime).ToString("yyyy-MM-dd"))</span>&nbsp;&nbsp;&nbsp;
@@ -39,14 +43,36 @@
 
         <div class="@(HiddenTitle?"":"mt-4")">
 
-            @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false&&HiddenTitle==false)
+            @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false && HiddenTitle == false)
             {
+
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
                     作者：
                     <strong> @Model.OriginalAuthor</strong>
                     &nbsp; 原文发表在：
-                    <a href="@Model.OriginalLink" class="info--text fw-bold" style="word-break:break-all;" target="_blank">@Model.OriginalLink</a>
+                    <a href="@Model.OriginalLink" class="info--text fw-bold" style="word-break:break-all;" target="_blank" itemprop="url">@Model.OriginalLink</a>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+                <div itemprop="author" itemscope itemtype="http://schema.org/Person">
+                    @foreach (var item in Model.OriginalAuthor.Replace("，", ",").Replace("、", ",").Split(','))
+                    {
+                        <meta itemprop="name" content="@item" />
+
+                    }
+                </div>
+                <div itemprop="publisher" itemscope itemtype="http://schema.org/Person">
+                    <meta itemprop="url" content="@(NavigationManager.BaseUri+"space/index/"+Model.UserInfor.Id)" />
+                    <meta itemprop="name" content="@Model.UserInfor.Name" />
+                    <meta itemprop="image" content="@Model.UserInfor.PhotoPath" />
+                </div>
+            }
+            else
+            {
+                <div itemprop="author" itemscope itemtype="http://schema.org/Person">
+                    <meta itemprop="url" content="@(NavigationManager.BaseUri+"space/index/"+Model.UserInfor.Id)" />
+                    <meta itemprop="name" content="@Model.UserInfor.Name" />
+                    <meta itemprop="image" content="@Model.UserInfor.PhotoPath" />
+                </div>
             }
 
             @if (Model.MainPageState == EditState.Preview || Model.MainState == EditState.Preview || Model.RelevancesState == EditState.Preview)
@@ -59,6 +85,10 @@
             </div>
         </div>
     </div>
+
+    <meta itemprop="datePublished" content="@Model.CreateTime.ToString("G")" />
+    <meta itemprop="dateModified" content="@Model.LastEditTime.ToString("G")" />
+
 
 </div>
 

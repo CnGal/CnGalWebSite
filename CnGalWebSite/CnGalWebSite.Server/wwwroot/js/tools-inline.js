@@ -196,3 +196,14 @@ function isMobile() {
 　　　　return 'false';
 　　}
 };
+
+/*加载友盟js*/
+var structuredData = document.createElement('script');
+structuredData.type = 'application/ld+json';
+var root_s = document.head;
+root_s.parentNode.insertBefore(structuredData, root_s);
+
+function setStructuredData(data) {
+    structuredData.innerText = data;
+}
+

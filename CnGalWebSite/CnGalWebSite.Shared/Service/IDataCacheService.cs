@@ -130,6 +130,5 @@ namespace CnGalWebSite.Shared.Service
         Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>> GetHomePageListCardMode(string apiUrl, string type, int maxCount, bool isRefresh);
 
         void RefreshAllCatche();
-
     }
 }

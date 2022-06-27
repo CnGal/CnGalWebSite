@@ -11,16 +11,22 @@
             {
                 @foreach (var temp in item.Informations)
                 {
-                    @if (string.IsNullOrWhiteSpace(temp.Link))
+                    @if (temp.Id == 0)
                     {
-                        <button class="article-tag article-tag-color-large me-2" @onclick="@(()=>OnClickNull(temp.DisplayName))">@temp.DisplayName</button>
+                        <button class="article-tag article-tag-color-large me-2" @onclick="@(() => OnClickNull(temp.DisplayName))">@temp.DisplayName</button>
 
                     }
                     else
                     {
-                        <TabLink class="article-tag article-tag-color-large me-2" Url="@temp.Link" Text="@temp.DisplayName" Icon="fa fa-link">@temp.DisplayName</TabLink>
+
+                        <a class="article-tag article-tag-color-large me-2" href="@(item.Modifier=="词条"?(NavigationManager.BaseUri+"entries/index/"+temp.Id):(NavigationManager.BaseUri+"/articles/index/"+temp.Id))">
+
+                            @temp.DisplayName
+                        </a>
 
                     }
+
+
                 }
             }
         </div>
@@ -33,6 +39,7 @@
         <span class="font-color me-2">最后编辑：@Model.LastEditTime.ToString("yyyy-MM-dd")</span>
     </div>
 </div>
+
 
 @code {
     [Parameter]

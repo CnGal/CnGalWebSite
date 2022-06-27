@@ -33,7 +33,7 @@
             <ChildContent>
                 <TotalScoreCard Model="Model" Outline />
                 <div>
-                   
+
                     <AuthorizeView>
                         <Authorized>
                             <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickEditGameRecored">
@@ -55,11 +55,21 @@
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     }
 
+    @if (Model.GameTotalScores.IsScored)
+    {
+        <div itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+            <meta itemprop="ratingValue" content="@Model.GameTotalScores.TotalSocre" />
+            <meta itemprop="worstRating" content="1">
+            <meta itemprop="bestRating" content="10" />
+            <meta itemprop="ratingCount" content="@Model.UserScores.Count" />
+        </div>
+
+    }
 
 
 }
 <CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip @ref="editGameRecordTip" OnChanged="OnChanged" />
-<OverviewDialog ShowBlankAction @ref="overviewDialog"/>
+<OverviewDialog ShowBlankAction @ref="overviewDialog" />
 
 
 @code {

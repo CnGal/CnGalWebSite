@@ -1,56 +1,44 @@
 ﻿
-@if (Circle)
+@if (ShowCount)
 {
-    <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color">
-        <div class=" h-100 ">
-            <img loading="lazy" src="@Image" class="card-img-top" alt="@Name" style="border-radius:50%" />
-            <div class="pt-2">
-                <p class="m-0 text-center home-card-name-text" style="font-size:16px">@Name</p>
-                @if (Circle)
-                {
-                    <div class="row" style="color:gray">
-                        <div class="col-6">
-                            <i class="fa fa-eye fa-fw "></i>
-                            <span class="article-infor-text">@ReadCount</span>
-                        </div>
-                        <div class="col-6">
-                            <i class="fa fa-comments-o fa-fw "></i>
-                            <span class="article-infor-text">@CommentCount</span>
-                        </div>
-                    </div>
-                }
 
+        <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color">
+            <div class=" h-100 ">
+                <img loading="lazy" src="@Image" class="card-img-top" alt="@Name" />
+                <div class="pt-2">
+                    <span class="home-card-name-text">@Name</span>
+                    @if (ShowCount)
+                    {
+                        <div class="row" style="color:gray">
+                            <div class="col-6">
+                                <i class="fa fa-eye fa-fw "></i>
+                                <span class="article-infor-text">@ReadCount</span>
+                            </div>
+                            <div class="col-6">
+                                <i class="fa fa-comments-o fa-fw "></i>
+                                <span class="article-infor-text">@CommentCount</span>
+                            </div>
+                        </div>
+                    }
+
+                </div>
             </div>
-        </div>
-    </a>
+        </a>
 
 }
 else
 {
-    <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color">
+    <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color" itemprop="url">
         <div class=" h-100 ">
-            <img loading="lazy" src="@Image" class="card-img-top" alt="@Name" />
+            <img loading="lazy" src="@Image" class="card-img-top" alt="@Name" itemprop="image" />
             <div class="pt-2">
-                <span class="home-card-name-text">@Name</span>
-                @if (ShowCount)
-                {
-                    <div class="row" style="color:gray">
-                        <div class="col-6">
-                            <i class="fa fa-eye fa-fw "></i>
-                            <span class="article-infor-text">@ReadCount</span>
-                        </div>
-                        <div class="col-6">
-                            <i class="fa fa-comments-o fa-fw "></i>
-                            <span class="article-infor-text">@CommentCount</span>
-                        </div>
-                    </div>
-                }
-
+                <span class="home-card-name-text" itemprop="name">@Name</span>
             </div>
         </div>
     </a>
-
 }
+
+
 
 @code {
     [Parameter]
@@ -69,6 +57,4 @@ else
     public bool ShowCount { get; set; }
     [Parameter]
     public bool Outlink { get; set; }
-    [Parameter]
-    public bool Circle { get; set; }
 }

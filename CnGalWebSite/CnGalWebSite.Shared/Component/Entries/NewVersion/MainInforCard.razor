@@ -12,11 +12,11 @@
             <div class="w-100 col-12 p-0" style="display: flex; justify-content: center;">
                 @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
                 {
-                    <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name">
+                    <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name"  itemprop="image">
                 }
                 else
                 {
-                    <img style="height:200px;border-radius:50%;" src="@Model.Thumbnail" alt="@Model.Name">
+                    <img style="height:200px;border-radius:50%;" src="@Model.Thumbnail" alt="@Model.Name"  itemprop="image">
                 }
             </div>
         }
@@ -28,7 +28,7 @@
 
 
 
-                    <img style="height:200px;" src="@Model.MainPicture" alt="@Model.Name">
+                    <img style="height:200px;" src="@Model.MainPicture" alt="@Model.Name"  itemprop="image">
 
 
 
@@ -39,14 +39,14 @@
 
                 }
             </div>
-            <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;">
+            <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;" >
                 @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
                 {
                     <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name">
                 }
                 else
                 {
-                    <img style="height:200px;border-radius:50%;" src="@Model.Thumbnail" alt="@Model.Name">
+                    <img style="height:200px;border-radius:50%;" src="@Model.Thumbnail" alt="@Model.Name" >
                 }
             </div>
         }
@@ -56,13 +56,13 @@
             @if (ForceSmall)
             {
                 <div class="@(((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
-                    <h1 class="fw-bold h3">@Model.Name</h1>
+                    <h1 class="fw-bold h3" itemprop="name">@Model.Name</h1>
                 </div>
             }
             else
             {
                 <div class="@("d-md-none-co "+((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
-                    <h1 class="fw-bold h3">@Model.Name</h1>
+                    <h1 class="fw-bold h3" itemprop="name">@Model.Name</h1>
                 </div>
 
                 <div class="d-md-flex d-none">
@@ -80,7 +80,7 @@
                             @foreach (var temp in Model.ProductionGroups)
                             {
                                 <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
-                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
+                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" ItemProp="author" ItemType="http://schema.org/Organization"/>
                             }
                         }
                     </div>
@@ -94,7 +94,7 @@
                             @foreach (var temp in Model.Publishers)
                             {
                                 <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
-                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
+                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" ItemProp="publisher" ItemType="http://schema.org/Organization"/>
                             }
                         }
                     </div>
@@ -104,7 +104,7 @@
             @if (ForceSmall)
             {
                 <div class="@(((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
-                    <span>
+                    <span itemprop="description">
                         @Model.BriefIntroduction
                     </span>
                 </div>
@@ -112,7 +112,7 @@
             else
             {
                 <div class="@("d-md-none-co "+((Model.Type==EntryType.Role||Model.Type==EntryType.Staff)?" text-center":"")) ">
-                    <span>
+                    <span itemprop="description">
                         @Model.BriefIntroduction
                     </span>
                 </div>
@@ -135,6 +135,11 @@
                         <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ShareButton Title="@(Model.Type.GetDisplayName()+" - "+Model.Name)" Class="ms-4" Text="@($"【{Model.Type.GetDisplayName()}】《{Model.Name}》\n{Model.BriefIntroduction}")" />
                     }
                 </div>
+            }
+
+            @if(Model.Type== EntryType.ProductionGroup&&string.IsNullOrWhiteSpace(Model.Thumbnail)==false&&Model.Thumbnail.Contains("user.png")==false)
+            {
+                <meta itemprop="logo" content="@Model.Thumbnail"/>
             }
         </div>
 

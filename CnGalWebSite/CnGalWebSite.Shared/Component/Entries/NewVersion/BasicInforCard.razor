@@ -8,6 +8,12 @@
 }
 
 
+@if (Model.Type == EntryType.Game)
+{
+    <meta itemprop="applicationCategory" content="Game" />
+    <meta itemprop="applicationSubCategory" content="AVG" />
+}
+
 @if (Model.Information.Any(s => s.Modifier == "基本信息" && s.Informations.Any(s => s.DisplayName != "官网")))
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="fa fa-fw fa-info-circle" Class="mb-4">
@@ -24,7 +30,7 @@
                         }
                         else
                         {
-                            <BasicInforAloneTip Icon="fa-calendar-check-o" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                            <BasicInforAloneTip Icon="fa-calendar-check-o" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" ItemProp="datePublished" />
 
                         }
                     }
@@ -38,6 +44,10 @@
                     }
                     else if (item.DisplayName == "游戏平台")
                     {
+                        @foreach (var temp in item.DisplayValue.Replace("，", ",").Replace("、", ",").Split(','))
+                        {
+                            <meta itemprop="operatingSystem" content="@temp" />
+                        }
                         <BasicInforAloneTip Icon="fa-gamepad" Text="@item.DisplayValue" Class="col-12" />
                     }
 

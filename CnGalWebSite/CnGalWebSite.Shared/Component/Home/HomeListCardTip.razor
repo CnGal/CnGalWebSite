@@ -2,6 +2,8 @@
 @inject HttpClient Http
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCatcheService
+
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@Title" Icon="@Icon" Class="mb-4">
     <ButtonContent>
@@ -19,11 +21,12 @@
             @foreach (var item in Items.Take(12))
             {
                 <div class="col-12 col-md-4 col-lg-3 col-xl-2 mb-2">
-                    <HomeCardViewTip Icon="fa fa-codepen" Image="@item.Image" ReadCount="item.ReadCount" CommentCount="item.CommentCount"  ShowCount="ShowCount" Circle="Circle" Outlink="Outlink"
-                                     Name="@item.Name" Url="@item.Url"/>
+                    <HomeCardViewTip Icon="fa fa-codepen" Image="@item.Image" ReadCount="item.ReadCount" CommentCount="item.CommentCount" ShowCount="ShowCount" Outlink="Outlink"
+                                     Name="@item.Name" Url="@item.Url" />
                 </div>
             }
         </div>
+
     </ChildContent>
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
@@ -41,8 +44,6 @@
     public string Icon { get; set; }
     [Parameter]
     public bool ShowCount { get; set; }
-    [Parameter]
-    public bool Circle { get; set; }
     [Parameter]
     public bool Outlink { get; set; }
     [Parameter]
