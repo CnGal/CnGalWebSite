@@ -5,6 +5,7 @@
 @inject IAppHelper _appHelper
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCatcheService
+@inject IStructuredDataService _structuredDataService
 
 @inject DialogService DialogService
 
@@ -13,7 +14,7 @@
 
 @if (string.IsNullOrWhiteSpace(EntryView.Name) == false)
 {
-    <TitleTip Title="@(EntryView.Name)" Description="@EntryView.BriefIntroduction" Image="@EntryView.MainPicture" StructuredData="@structuredData"></TitleTip>
+    <TitleTip Title="@(EntryView.Name)" Description="@EntryView.BriefIntroduction" Image="@EntryView.MainPicture"></TitleTip>
 }
 else
 {
@@ -348,9 +349,6 @@ else
     public bool CanDeleted { get; set; }
     string LastLookName = "";
 
-    string structuredData = "";
-
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
@@ -399,7 +397,7 @@ else
 
 
             //生成轮播结构数据
-            GenerateCarouselStructuredDataJson();
+            await GenerateCarouselStructuredDataJson();
 
             isReady = true;
             StateHasChanged();
@@ -414,7 +412,7 @@ else
 
     }
 
-    public void  GenerateCarouselStructuredDataJson()
+    public async Task GenerateCarouselStructuredDataJson()
     {
         var urls = new List<string>();
         urls.AddRange(EntryView.EntryRelevances.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
@@ -422,10 +420,7 @@ else
         urls.AddRange(EntryView.ProductionGroups.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
         urls.AddRange(EntryView.StaffGames.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
         urls.AddRange(EntryView.ArticleRelevances.Select(s => NavigationManager.BaseUri + "articles/" + s.Id));
-
-        urls.RemoveAll(s => string.IsNullOrWhiteSpace(s));
-        urls.Purge();
-        structuredData = ToolHelper.GenerateCarouselStructuredDataJson(urls);
+        await _structuredDataService.SetStructuredData(urls);
     }
 
 

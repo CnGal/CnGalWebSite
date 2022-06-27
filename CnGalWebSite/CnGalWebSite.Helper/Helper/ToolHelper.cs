@@ -193,7 +193,7 @@ namespace CnGalWebSite.DataModel.Helper
 
         public static string Base64EncodeString(string content)
         {
-            if(content == null)
+            if (content == null)
             {
                 return null;
             }
@@ -509,7 +509,7 @@ namespace CnGalWebSite.DataModel.Helper
             }
 
             //查找其他符合的文本
-            if (text.Contains("原画")||text.Contains("画师"))
+            if (text.Contains("原画") || text.Contains("画师"))
             {
                 return PositionGeneralType.FineArts;
             }
@@ -1145,54 +1145,29 @@ namespace CnGalWebSite.DataModel.Helper
             }
         }
 
-        /// <summary>
-        /// 生成轮播数据结构
-        /// </summary>
-        /// <param name="urls"></param>
-        /// <returns></returns>
-        public static string GenerateCarouselStructuredDataJson(List<string> urls)
+
+    }
+        public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions
         {
-            var result = new StringBuilder("{\"@context\":\"https://schema.org\",\"@type\":\"ItemList\",\"itemListElement\":[");
-            foreach (var item in urls)
+            /// <summary>
+            /// 隐式转换
+            /// </summary>
+            /// <param name="cat"></param>
+            public static implicit operator QueryPageOptionsHelper(BootstrapBlazor.Components.QueryPageOptions cat)
             {
-                if (urls.IndexOf(item) != 0)
+                return new QueryPageOptionsHelper
                 {
-                    result.Append(',');
-                }
-
-                result.Append($"{{\"@type\":\"ListItem\",\"position\":{urls.IndexOf(item) + 1},\"url\":\"{item}\"}}");
-
-
+                    SearchText = cat.SearchText,
+                    SortName = cat.SortName,
+                    SortOrder = (CnGalWebSite.DataModel.ViewModel.Search.SortOrder)cat.SortOrder,
+                    SearchModel = cat.SearchModel,
+                    PageIndex = cat.PageIndex,
+                    StartIndex = cat.StartIndex,
+                    PageItems = cat.PageItems,
+                    IsPage = cat.IsPage,
+                };
             }
-
-            result.Append("]}");
-
-            return result.ToString();
         }
 
-    }
-
-    public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions
-    {
-        /// <summary>
-        /// 隐式转换
-        /// </summary>
-        /// <param name="cat"></param>
-        public static implicit operator QueryPageOptionsHelper(BootstrapBlazor.Components.QueryPageOptions cat)
-        {
-            return new QueryPageOptionsHelper
-            {
-                SearchText = cat.SearchText,
-                SortName = cat.SortName,
-                SortOrder = (CnGalWebSite.DataModel.ViewModel.Search.SortOrder)cat.SortOrder,
-                SearchModel = cat.SearchModel,
-                PageIndex = cat.PageIndex,
-                StartIndex = cat.StartIndex,
-                PageItems = cat.PageItems,
-                IsPage = cat.IsPage,
-            };
-        }
-    }
-
-
+    
 }

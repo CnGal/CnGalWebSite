@@ -1,8 +1,9 @@
 ﻿@inject ToastService ToastService
 @inject HttpClient Http
 @inject IDataCacheService _dataCacheService
+@inject IStructuredDataService _structuredDataService
 
-<TitleTip StructuredData="@structuredData"></TitleTip>
+<TitleTip></TitleTip>
 
 <div itemscope itemtype="https://schema.org/WebSite" style="display:none;">
     <meta itemprop="url" content="https://m.cngal.com/" />
@@ -34,8 +35,8 @@
         <div class="@("tab-pane fade" + (defaultIndex == 2 ? " show active " : "") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
             @if (isReadyTab2)
             {
-               <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.RandomArticleGroup Class="mb-3"/>
-               <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.WeeklyNewsGroup Class="mb-3"/>
+                <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.RandomArticleGroup Class="mb-3" />
+                <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.WeeklyNewsGroup Class="mb-3" />
             }
 
         </div>
@@ -87,7 +88,6 @@
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-    string structuredData = "";
 
 
     protected override async Task OnInitializedAsync()
@@ -115,9 +115,7 @@
         urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeArticlesView", "articles", 12, false)).Select(s => s.Url));
         urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeNewsView", "articles", 12, false)).Select(s => s.Url));
 
-        urls.RemoveAll(s => string.IsNullOrWhiteSpace(s));
-        urls.Purge();
-        structuredData = ToolHelper.GenerateCarouselStructuredDataJson(urls);
+        await _structuredDataService.SetStructuredData(urls);
     }
 
     public async Task OnTabClick(int index)

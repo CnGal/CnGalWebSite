@@ -77,6 +77,9 @@ namespace CnGalWebSite.Server
                     ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
 
+            //添加结构化数据
+            services.AddScoped<IStructuredDataService, StructuredDataService>();
+
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 

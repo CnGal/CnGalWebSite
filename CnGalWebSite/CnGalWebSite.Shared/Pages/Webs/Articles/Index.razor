@@ -5,12 +5,13 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCatcheService
+@inject IStructuredDataService _structuredDataService
 
 @inject DialogService DialogService
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
-    <TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture" StructuredData="@structuredData"></TitleTip>
+    <TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
 }
 else
 {
@@ -37,7 +38,7 @@ else
 else
 {
     <div style=" display: flex; flex-direction: column; align-items: center; align-content: center; ">
-        <div style=" max-width: 900px; " class="w-100"  itemscope itemtype="http://schema.org/Article">
+        <div style=" max-width: 900px; " class="w-100" itemscope itemtype="http://schema.org/Article">
             @if (isReady == false)
             {
                 <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
@@ -116,7 +117,6 @@ else
     public bool CanDeleted { get; set; } = false;
     string LastLookName = "";
     bool isFrist = true;
-    string structuredData = "";
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -176,7 +176,7 @@ else
             }
 
             //生成轮播结构数据
-            GenerateCarouselStructuredDataJson();
+           await  GenerateCarouselStructuredDataJson();
 
         }
         catch (Exception exc)
@@ -189,12 +189,12 @@ else
     }
 
 
-    public void GenerateCarouselStructuredDataJson()
+    public async Task GenerateCarouselStructuredDataJson()
     {
         var urls = new List<string>();
 
         var rel = Model.Relevances.FirstOrDefault(s => s.Modifier == "词条");
-        if(rel!=null)
+        if (rel != null)
         {
             urls.AddRange(rel.Informations.Where(s => s.Id != 0).Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
         }
@@ -204,9 +204,7 @@ else
             urls.AddRange(rel.Informations.Where(s => s.Id != 0).Select(s => NavigationManager.BaseUri + "articles/" + s.Id));
         }
 
-        urls.RemoveAll(s => string.IsNullOrWhiteSpace(s));
-        urls.Purge();
-        structuredData = ToolHelper.GenerateCarouselStructuredDataJson(urls);
+        await _structuredDataService.SetStructuredData(urls);
     }
 
 
