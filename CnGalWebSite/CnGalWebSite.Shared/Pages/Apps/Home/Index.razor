@@ -2,7 +2,16 @@
 @inject HttpClient Http
 @inject IDataCacheService _dataCacheService
 
-<TitleTip></TitleTip>
+<TitleTip StructuredData="@structuredData"></TitleTip>
+
+<div itemscope itemtype="https://schema.org/WebSite">
+    <meta itemprop="url" content="https://m.cngal.com/" />
+    <form itemprop="potentialAction" itemscope itemtype="https://schema.org/SearchAction">
+        <meta itemprop="target" content="https://m.cngal.com/search?Text={search_term_string}" />
+        <input itemprop="query-input" type="text" name="search_term_string" required />
+        <input type="submit" />
+    </form>
+</div>
 
 <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCarousel />
 
@@ -76,12 +85,40 @@
     bool isReadyTab2 = false;
     bool isReadyTab3 = false;
 
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    string structuredData = "";
+
+
     protected override async Task OnInitializedAsync()
     {
 
+        try
+        {
+            //生成轮播结构数据
+            await GenerateCarouselStructuredDataJson();
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取轮播结构化数据失败");
+        }
 
     }
+    public async Task GenerateCarouselStructuredDataJson()
+    {
+        var urls = new List<string>();
+        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeRecentIssuelGameView", "entries", 12, false)).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeNewestGameView", "entries", 12, false)).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeRecentEditView", "entries", 12, false)).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeNoticesView", "articles", 12, false)).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeArticlesView", "articles", 12, false)).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeNewsView", "articles", 12, false)).Select(s => s.Url));
 
+        urls.RemoveAll(s => string.IsNullOrWhiteSpace(s));
+        urls.Purge();
+        structuredData = ToolHelper.GenerateCarouselStructuredDataJson(urls);
+    }
 
     public async Task OnTabClick(int index)
     {

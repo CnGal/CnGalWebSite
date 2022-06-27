@@ -13,7 +13,7 @@
 
 @if (string.IsNullOrWhiteSpace(EntryView.Name) == false)
 {
-    <TitleTip Title="@(EntryView.Name)" Description="@EntryView.BriefIntroduction" Image="@EntryView.MainPicture"></TitleTip>
+    <TitleTip Title="@(EntryView.Name)" Description="@EntryView.BriefIntroduction" Image="@EntryView.MainPicture" StructuredData="@structuredData"></TitleTip>
 }
 else
 {
@@ -41,7 +41,7 @@ else
 {
     @if (isReady)
     {
-        <div class="row">
+        <div class="row" itemscope itemtype="@(EntryView.Type== EntryType.Game?("http://schema.org/SoftwareApplication"):(EntryView.Type== EntryType.Role?("http://schema.org/Role"):(EntryView.Type== EntryType.ProductionGroup?("http://schema.org/Organization"):("http://schema.org/Person"))))">
             <div class="col-12 mb-4">
                 @if (EntryView.IsHidden == true)
                 {
@@ -347,6 +347,10 @@ else
     public bool IsAdmin { get; set; } = false;
     public bool CanDeleted { get; set; }
     string LastLookName = "";
+
+    string structuredData = "";
+
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
@@ -393,6 +397,10 @@ else
                 CanDeleted = true;
             }
 
+
+            //生成轮播结构数据
+            GenerateCarouselStructuredDataJson();
+
             isReady = true;
             StateHasChanged();
 
@@ -405,6 +413,21 @@ else
         }
 
     }
+
+    public void  GenerateCarouselStructuredDataJson()
+    {
+        var urls = new List<string>();
+        urls.AddRange(EntryView.EntryRelevances.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
+        urls.AddRange(EntryView.Roles.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
+        urls.AddRange(EntryView.ProductionGroups.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
+        urls.AddRange(EntryView.StaffGames.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
+        urls.AddRange(EntryView.ArticleRelevances.Select(s => NavigationManager.BaseUri + "articles/" + s.Id));
+
+        urls.RemoveAll(s => string.IsNullOrWhiteSpace(s));
+        urls.Purge();
+        structuredData = ToolHelper.GenerateCarouselStructuredDataJson(urls);
+    }
+
 
     [Inject]
     [NotNull]

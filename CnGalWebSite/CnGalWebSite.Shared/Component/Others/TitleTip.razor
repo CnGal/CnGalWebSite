@@ -1,4 +1,7 @@
-﻿<PageTitle>@(string.IsNullOrWhiteSpace(Title)?"CnGal 中文GalGame资料站":(Title + " - CnGal 中文GalGame资料站"))</PageTitle>
+﻿@inject IJSRuntime JS
+
+
+<PageTitle>@(string.IsNullOrWhiteSpace(Title)?"CnGal 中文GalGame资料站":(Title + " - CnGal 中文GalGame资料站"))</PageTitle>
 <HeadContent>
     <meta name="description" content="@(string.IsNullOrWhiteSpace(Description)?"CnGal资料站的建站目的是收集，索引国产gal及中文化galgame资料、文章、攻略，为galgame同好们提供方便。":Description)">
     <meta itemprop="name" content="@(string.IsNullOrWhiteSpace(Title)?"CnGal 中文GalGame资料站":(Title + " - CnGal 中文GalGame资料站"))" />
@@ -13,6 +16,8 @@
 
     [Parameter]
     public string Description { get; set; }
+    [Parameter]
+    public string StructuredData { get; set; }
     [CascadingParameter]
     private AppLayout appLayout { get; set; }
     [CascadingParameter]
@@ -27,6 +32,18 @@
         if (adminLayout != null)
         {
             await adminLayout.ChangeTitle(string.IsNullOrWhiteSpace(Title) ? "CnGal 中文GalGame资料站" : Title);
+        }
+
+        if (string.IsNullOrWhiteSpace(StructuredData) == false)
+        {
+            try
+            {
+                await JS.InvokeAsync<string>("setStructuredData", StructuredData);
+            }
+            catch
+            {
+
+            }
         }
     }
 }

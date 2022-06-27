@@ -43,5 +43,28 @@ namespace CnGalWebSite.Helper.Extensions
             var reslut = sb.ToString();
             return reslut;
         }
+
+        /// <summary>
+        /// 词条 相册 的 列表 清理相同项目
+        /// </summary>
+        /// <param name="informations"></param>
+        /// <returns></returns>
+        public static List<string> Purge(this List<string> informations)
+        {
+            var list = informations.ToList();
+            foreach (var item in list)
+            {
+                if (informations.Count(s => item == s) > 1)
+                {
+                    var temp = informations.FirstOrDefault(s => item == s);
+                    if (temp != null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
     }
 }

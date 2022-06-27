@@ -625,7 +625,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                     {
                         DisplayName = item.Name ?? item.DisplayName,
                         DisplayValue = item.BriefIntroduction,
-                        Link = "/entries/index/" + item.Id,
+                        Id =  item.Id,
                     });
                 }
             }
@@ -644,7 +644,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                     {
                         DisplayName = item.Name ?? item.DisplayName,
                         DisplayValue = item.BriefIntroduction,
-                        Link = "/articles/index/" + item.Id,
+                        Id = item.Id,
                     });
                 }
             }

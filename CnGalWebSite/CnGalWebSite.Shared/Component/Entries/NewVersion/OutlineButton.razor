@@ -5,7 +5,13 @@
 @if (IsTitile)
 {
     <div class="@("outline-button-title badge me-2 bg-title bg-title-color-"+ColorNum)">
-        @Text
+
+        <span itemscope itemprop="@ItemProp" itemtype="@ItemType">
+            <span itemprop="@(string.IsNullOrWhiteSpace(ItemType)?"":"name")">
+                @Text
+            </span>
+        </span>
+
     </div>
 }
 else
@@ -14,7 +20,11 @@ else
     {
         <div @onclick="OnClickNull"
              class="@("btn me-2 outline-button-null-url bg-context-"+ColorNum)">
-            @Text
+
+                <span itemprop="@ItemProp">
+                    @Text
+                </span>
+            
         </div>
 
     }
@@ -22,7 +32,14 @@ else
     {
         <TabLink Text="@Text" Url="@Url" Icon="@Icon"
                  class="@("btn me-2 outline-button-normal bg-context-"+ColorNum)">
-            <span>@Text</span>
+
+            <span itemscope itemprop="@ItemProp" itemtype="@ItemType">
+                <span itemprop="@(string.IsNullOrWhiteSpace(ItemType)?"":"name")">
+                    @Text
+                </span>
+
+            </span>
+            
             @if (IsShowExistTag)
             {
                 <i class="fa fa-check-circle fa-fw"></i>
@@ -48,13 +65,16 @@ else
 
     [Parameter]
     public bool IsShowExistTag { get; set; }
-
+    [Parameter]
+    public string ItemProp { get; set; }
+    [Parameter]
+    public string ItemType { get; set; }
     [Parameter]
     public string ColorNum { get; set; }
 
     public async Task OnClickNull()
     {
-        if(IsNotShowTip==false)
+        if (IsNotShowTip == false)
         {
             if (IsShowExistTag)
             {

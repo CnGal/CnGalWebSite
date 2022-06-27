@@ -2,7 +2,7 @@
 
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="Steam信息" Icon="fa fa-fw fa-steam" >
-    <div class="row">
+    <div class="row" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
         @if (IsReady)
         {
             @if (SteamInfor.PriceNow > 0)
@@ -14,7 +14,7 @@
                     {
                         <s>@((SteamInfor.OriginalPrice/100.0).ToString(" 0.00"))</s>
                     }
-                <span> @(" "+(SteamInfor.PriceNow/100.0).ToString("0.00") + (SteamInfor.CutNow == 0 ? "" : " - 折扣 " + SteamInfor.CutNow + "%"))</span>
+                    <span> @(" "+(SteamInfor.PriceNow/100.0).ToString("0.00") + (SteamInfor.CutNow == 0 ? "" : " - 折扣 " + SteamInfor.CutNow + "%"))</span>
                 </span>
                 @if (SteamInfor.CutLowest > 0)
                 {
@@ -29,21 +29,28 @@
             else if (SteamInfor.PriceNow == -1)
             {
                 <BasicInforAloneTip Icon="fa-calendar-plus-o" Text="未发售" Class="col-12" />
+                <meta itemprop="availability" content="PreOrder" />
 
             }
             else if (SteamInfor.PriceNow == -2)
             {
                 <BasicInforAloneTip Icon="fa-calendar-times-o" Text="已下架" Class="col-12" />
-
+                <meta itemprop="availability" content="SoldOut" />
             }
             @if (SteamInfor.EvaluationCount > 0)
             {
                 <BasicInforAloneTip Icon="fa-thumbs-o-up" Text="@($"{SteamInfor.RecommendationRate}% 好评（{SteamInfor.EvaluationCount}条评测）")" Class="col-12" />
 
             }
+
+            @if (SteamInfor.OriginalPrice >= 0)
+            {
+                <meta itemprop="priceCurrency" content="CNY" />
+                <meta itemprop="price" content="@(SteamInfor.OriginalPrice/100.0)" />
+            }
         }
 
-        <BasicInforAloneTip Icon="fa-home" Text="商店页面：" Url="@("https://store.steampowered.com/app/" + Model.SteamId)" Class="col-12 text-truncate-1" />
+        <BasicInforAloneTip Icon="fa-home" Text="商店页面：" Url="@("https://store.steampowered.com/app/" + Model.SteamId)" Class="col-12 text-truncate-1" ItemProp="url" />
     </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 

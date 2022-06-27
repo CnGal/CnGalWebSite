@@ -1145,6 +1145,31 @@ namespace CnGalWebSite.DataModel.Helper
             }
         }
 
+        /// <summary>
+        /// 生成轮播数据结构
+        /// </summary>
+        /// <param name="urls"></param>
+        /// <returns></returns>
+        public static string GenerateCarouselStructuredDataJson(List<string> urls)
+        {
+            var result = new StringBuilder("{\"@context\":\"https://schema.org\",\"@type\":\"ItemList\",\"itemListElement\":[");
+            foreach (var item in urls)
+            {
+                if (urls.IndexOf(item) != 0)
+                {
+                    result.Append(',');
+                }
+
+                result.Append($"{{\"@type\":\"ListItem\",\"position\":{urls.IndexOf(item) + 1},\"url\":\"{item}\"}}");
+
+
+            }
+
+            result.Append("]}");
+
+            return result.ToString();
+        }
+
     }
 
     public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions

@@ -14,6 +14,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Search
 
         public string CreateUserName { get; set; }
 
+        public string CreateUserId { get; set; }
+
         public string MainImage { get; set; }
 
         public string BriefIntroduction { get; set; }

@@ -937,6 +937,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 Type = item.Type,
                 DisplayName = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName,
                 CreateUserName = item.CreateUser?.UserName,
+                CreateUserId=item.CreateUserId,
                 MainImage = GetImagePath(item.MainPicture, "certificate.png", true),
                 BriefIntroduction = item.BriefIntroduction,
                 LastEditTime = item.LastEditTime,
@@ -944,6 +945,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 ThumbsUpCount = item.ThumbsUpCount,
                 CommentCount = item.CommentCount,
                 Link = item.OriginalLink
+
             };
         }
 
