@@ -6,6 +6,7 @@ using CnGalWebSite.PublicToolbox.DataRepositories;
 using CnGalWebSite.PublicToolbox.PostTools;
 using CnGalWebSite.Shared;
 using CnGalWebSite.Shared.DataRepositories;
+using CnGalWebSite.Shared.MasaComponent.Shared.Tips;
 using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -62,6 +63,9 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.AddScoped<IEntryService, EntryService>();
             builder.Services.AddScoped<IArticleService, ArticleService>();
             builder.Services.AddScoped<IImageService, ImageService>();
+            //添加结构化数据
+            builder.Services.AddScoped<IStructuredDataService, StructuredDataService>();
+            builder.RootComponents.Add<StructuredDataTip>("head::after");
 
             builder.Services.BuildServiceProvider(validateScopes: false);
 

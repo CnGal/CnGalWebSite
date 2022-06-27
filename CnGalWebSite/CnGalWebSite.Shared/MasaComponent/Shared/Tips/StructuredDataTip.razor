@@ -1,0 +1,19 @@
+﻿@inject IStructuredDataService _structuredDataService
+
+@if (string.IsNullOrWhiteSpace(_structuredDataService.Data) == false)
+{
+    @((MarkupString)_structuredDataService.Data)
+}
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        _structuredDataService.Refresh = EventCallback.Factory.Create(this, async () => await OnRefresh());
+    }
+
+    public async Task OnRefresh()
+    {
+        StateHasChanged();
+    }
+}

@@ -2,9 +2,10 @@
 @inject ToastService? ToastService
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
+@inject IStructuredDataService _structuredDataService
 
 
-<TitleTip StructuredData="@structuredData"></TitleTip>
+<TitleTip></TitleTip>
 
 <div itemscope itemtype="https://schema.org/WebSite" style="display:none">
     <meta itemprop="url" content="https://www.cngal.com/" />
@@ -19,7 +20,7 @@
     <div class=" mb-4">
         <BootstrapBlazor.Components.Carousel Images="@Images" IsFade="true" OnClick="OnClick" class="rounded shadow-sm"></BootstrapBlazor.Components.Carousel>
     </div>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.NoticeCard Class="rounded shadow-sm p-2 bg-opacity mb-4" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.NoticeCard Class="rounded shadow-sm p-2 bg-opacity mb-4" />
     <div class=" mb-4">
         <HomeNewsViewTip></HomeNewsViewTip>
     </div>
@@ -47,8 +48,6 @@
     }
     #endregion
 
-    string structuredData = "";
-
     protected override async Task OnInitializedAsync()
     {
 
@@ -70,7 +69,7 @@
             }
 
             //生成轮播结构数据
-           await GenerateCarouselStructuredDataJson();
+            await GenerateCarouselStructuredDataJson();
 
         }
         catch (Exception ex)
@@ -89,10 +88,8 @@
         urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeNoticesView", "articles", 12, false)).Select(s => s.Url));
         urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeArticlesView", "articles", 12, false)).Select(s => s.Url));
         urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeNewsView", "articles", 12, false)).Select(s => s.Url));
+        await _structuredDataService.SetStructuredData(urls);
 
-        urls.RemoveAll(s => string.IsNullOrWhiteSpace(s));
-        urls.Purge();
-        structuredData = ToolHelper.GenerateCarouselStructuredDataJson(urls);
     }
 
 

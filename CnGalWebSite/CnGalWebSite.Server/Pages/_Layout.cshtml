@@ -1,6 +1,7 @@
 ﻿@namespace CnGalWebSite.Server.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.AspNetCore.Components.Web
+@using CnGalWebSite.Shared.MasaComponent.Shared.Tips
 @{
     Layout = null;
 }
@@ -79,7 +80,7 @@
     <link rel="search" type="application/opensearchdescription+xml" target="_blank" class="external-link" href="https://app.cngal.org/_content/CnGalWebSite.Shared/OpenSearch.xml" title="CnGal资料站" />
 
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
-
+    <component type="typeof(StructuredDataTip)" render-mode="ServerPrerendered" />
 
     <style>
         .d-ssr {
@@ -131,7 +132,7 @@
 
     <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/bundle-js.min.js"></script>
     <script src="https://app.cngal.org/_content/CnGalWebSite.Shared/js/check.min.js"></script>
-    
+
     <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/11.4.0/highlight.min.js"></script>
     <script src="https://cdn.masastack.com/npm/vditor/3.8.12/dist/index.min.js"></script>
     <script src="https://cdn.masastack.com/npm/echarts/5.1.1/echarts.min.js"></script>
