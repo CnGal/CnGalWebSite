@@ -318,7 +318,8 @@ namespace CnGalWebSite.Shared.Service
                         Image = item.Image,
                         Name = item.DisPlayName,
                         ReadCount = item.ReadCount,
-                        Url = string.IsNullOrWhiteSpace(type) ? item.DisPlayValue : (_navigationManager.BaseUri+type + "/index/" + item.Id)
+                        Url = string.IsNullOrWhiteSpace(type) ? item.DisPlayValue : (_navigationManager.BaseUri+type + "/index/" + item.Id),
+                        IsOutlink= string.IsNullOrWhiteSpace(type)
                     });
                 }
                 HomeListCards.Add(new KeyValuePair<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>, string>(items, apiUrl));

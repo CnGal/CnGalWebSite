@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
 
@@ -143,11 +144,22 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.Awards).ThenInclude(s => s.WinningUsers).ThenInclude(s => s.ApplicationUser)
                 .Include(s => s.Users)
                 .FirstOrDefaultAsync(s => s.Id == id);
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
 
             if (lottery == null)
             {
                 return NotFound("未找到该抽奖");
+            }
+
+            //判断当前是否隐藏
+            if (lottery.IsHidden == true)
+            {
+                if (user == null || await _userManager.IsInRoleAsync(user, "Editor") != true)
+                {
+                    return NotFound();
+                }
             }
 
             var model = new LotteryViewModel
@@ -191,7 +203,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Priority = item.Priority,
                     Type = item.Type,
                     Sponsor = item.Sponsor,
-                    Image=_appHelper.GetImagePath(item.Image,"app.png"),
+                    Image = _appHelper.GetImagePath(item.Image, "app.png"),
                     Link = item.Link,
                 };
 

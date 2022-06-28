@@ -4,7 +4,7 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
-@inject IDataCacheService _dataCatcheService
+@inject IDataCacheService _dataCacheService
 
 @inject DialogService DialogService
 
@@ -17,7 +17,7 @@ else
     <TitleTip></TitleTip>
 }
 
-@if (_dataCatcheService.ThemeSetting.IsTransparent)
+@if (_dataCacheService.ThemeSetting.IsTransparent)
 {
 
     @if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
@@ -39,39 +39,92 @@ else
 }
 else
 {
-    <div>
-        @if (isReady == false)
+<div>
+    @if (isReady == false)
+    {
+        <div>
+            <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                <SkeletonParagraph />
+                <hr class="m-2" />
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+            </div>
+        </div>
+    }
+    else
+    {
+        @if (Model.IsHidden == true)
         {
-            <div>
-                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
-                    <SkeletonParagraph />
-                    <hr class="m-2" />
-                    <SkeletonParagraph />
-                    <div class="mt-2">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
+                当前抽奖处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+        }
+
+        @if (_dataCacheService.IsApp)
+        {
+            <div class="row">
+                <div class="col-12 col-lg-9">
+
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
+
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.BasicInforCard Model="Model" />
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.OptionInforCard ViewModel="Model" />
+
+                    <div class="rounded  shadow-sm bg-opacity mb-4">
+                        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
+                               Color="@_dataCacheService.ThemeSetting.Theme">
+                            <MTab Value="1">
+                                首页<MIcon>mdi-home</MIcon>
+                            </MTab>
+                            <MTab Value="2">
+                                奖品<MIcon>mdi-wallet-giftcard </MIcon>
+                            </MTab>
+                            @if (Model.Awards.Any(s => s.Users.Any()))
+                            {
+                                <MTab Value="3">
+                                    中奖用户<MIcon>mdi-calendar-range</MIcon>
+                                </MTab>
+                            }
+
+                        </MTabs>
                     </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
+                    <MTabsItems @bind-Value="TabIndex">
+                        <MTabItem Value="1">
+                            <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainPageCard Model="Model" />
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+                                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
+                            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                        </MTabItem>
+                        <MTabItem Value="2">
+                            <CnGalWebSite.Shared.Component.Lotteries.MainPage.AwardListCard Model="Model.Awards" />
+
+                        </MTabItem>
+                        <MTabItem Value="3">
+                            <CnGalWebSite.Shared.Component.Lotteries.MainPage.WinningUserListCard Model="Model.Awards" />
+                        </MTabItem>
+                    </MTabsItems>
+
+
+
                 </div>
             </div>
         }
         else
         {
-            @if (Model.IsHidden == true)
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
-                    当前抽奖处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-
-            }
             <div class="row">
                 <div class="col-12 col-lg-9">
 
                     <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainInforCard Model="Model" StateChanged="HiddenStateChanged" />
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainPageCard Model="Model" />
 
 
                     <CnGalWebSite.Shared.Component.Lotteries.MainPage.AwardListCard Model="Model.Awards" />
@@ -88,10 +141,12 @@ else
                     <CnGalWebSite.Shared.Component.Lotteries.MainPage.WinningUserListCard Model="Model.Awards" />
                 </div>
             </div>
-
-
         }
-    </div>
+
+
+
+    }
+</div>
 }
 
 
@@ -111,12 +166,10 @@ else
             }
         }
     }
-    public string MainPageHtml { get; set; }
-    public int currentPage { get; set; } = 1;
-    public string NoticeCard { get; set; } = "";
-    public string CurrentUserRank { get; set; }
+
     bool isReady = false;
     bool isNotFound = false;
+    public StringNumber TabIndex { get; set; } = 1;
 
     public LotteryViewModel Model { get; set; } = new LotteryViewModel();
 
@@ -158,7 +211,7 @@ else
 
 
             //获取周边信息
-            Model = await _dataCatcheService.LotteryIndexPageCatche.GetCatche(Id);
+            Model = await _dataCacheService.LotteryIndexPageCatche.GetCatche(Id);
             //判断投票名称是否为空 为空则跳转到主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {
@@ -174,7 +227,7 @@ else
             }
             else
             {
-                _dataCatcheService.VoteIndexPageCatche.Clean(Id);
+                _dataCacheService.VoteIndexPageCatche.Clean(Id);
             }
 
 
@@ -193,18 +246,6 @@ else
         Model.IsHidden = !Model.IsHidden;
         StateHasChanged();
         return Task.CompletedTask;
-    }
-
-    public async void OnClickUrl(NavigateModel model)
-    {
-        try
-        {
-            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
-        }
-        catch
-        {
-            await ToastService.Error("导航失败", "请尝试刷新页面");
-        }
     }
 
 }

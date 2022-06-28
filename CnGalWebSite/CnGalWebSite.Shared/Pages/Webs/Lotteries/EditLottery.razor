@@ -1,11 +1,8 @@
 ﻿
 @inject HttpClient Http
-@inject ExamineService _examineService
-@inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
-@inject IAppHelper _appHelper
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -42,12 +39,34 @@ else
     else
     {
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-dropbox" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"管理 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-dropbox" Outline>
+            <div class="rounded  shadow-sm bg-opacity mb-4">
+                <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
+                       Color="@_dataCacheService.ThemeSetting.Theme">
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" Class="mb-4" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainPageCard Model="Model" Class="mb-4" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.AwardsCard Model="Model" Class="mb-4" />
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+                    <MTab Value="1">
+                        编辑<MIcon>mdi-pencil</MIcon>
+                    </MTab>
+                    <MTab Value="2">
+                        参与者<MIcon>mdi-account-multiple </MIcon>
+                    </MTab>
+                </MTabs>
+            </div>
+            <MTabsItems @bind-Value="TabIndex">
+                <MTabItem Value="1">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" Class="mb-4" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainPageCard Model="Model" Class="mb-4" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.AwardsCard Model="Model" Class="mb-4" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+                </MTabItem>
+                <MTabItem Value="2">
+                    <div class="  rounded shadow-sm p-3 bg-opacity">
+                        <CnGalWebSite.Shared.Component.Lotteries.EditPage.ListLotteryUserTip />
+                    </div>
+
+                </MTabItem>
+            </MTabsItems>
+
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     }
 </div>
@@ -58,6 +77,7 @@ else
     private EditLotteryModel Model { get; set; } = new EditLotteryModel();
 
     private bool isReady = false;
+    public StringNumber TabIndex { get; set; } = 1;
 
 
     [CascadingParameter]
@@ -93,7 +113,7 @@ else
             else
             {
                 await ToastService.Success("编辑抽奖成功", "编辑抽奖成功");
-                NavigationManager.NavigateTo(Provider, "/lotteries/index/" + Model.Id, Model.Name, "fa fa-dropbox");
+                NavigationManager.NavigateTo("/lotteries/index/" + Model.Id);
             }
         }
         catch (Exception ex)
