@@ -40,34 +40,33 @@ else
     {
 
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"管理 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-dropbox" Outline>
-            <div class="rounded  shadow-sm bg-opacity mb-4">
-                <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
-                       Color="@_dataCacheService.ThemeSetting.Theme">
-
-                    <MTab Value="1">
-                        编辑<MIcon>mdi-pencil</MIcon>
-                    </MTab>
-                    <MTab Value="2">
-                        参与者<MIcon>mdi-account-multiple </MIcon>
-                    </MTab>
-                </MTabs>
-            </div>
-            <MTabsItems @bind-Value="TabIndex">
-                <MTabItem Value="1">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" Class="mb-4" />
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainPageCard Model="Model" Class="mb-4" />
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.AwardsCard Model="Model" Class="mb-4" />
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
-                </MTabItem>
-                <MTabItem Value="2">
-                    <div class="  rounded shadow-sm p-3 bg-opacity">
-                        <CnGalWebSite.Shared.Component.Lotteries.EditPage.ListLotteryUserTip />
-                    </div>
-
-                </MTabItem>
-            </MTabsItems>
-
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        <div class="rounded  shadow-sm bg-opacity mb-4">
+            <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
+                   Color="@_dataCacheService.ThemeSetting.Theme">
+
+                <MTab Value="1">
+                    编辑<MIcon>mdi-pencil</MIcon>
+                </MTab>
+                <MTab Value="2">
+                    参与者<MIcon>mdi-account-multiple </MIcon>
+                </MTab>
+            </MTabs>
+        </div>
+        <MTabsItems @bind-Value="TabIndex">
+            <MTabItem Value="1">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainCard Model="Model" Class="mb-4" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.MainPageCard Model="Model" Class="mb-4" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Lotteries.AwardsCard Model="Model" Class="mb-4" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+            </MTabItem>
+            <MTabItem Value="2">
+                <div class="  rounded shadow-sm p-3 bg-opacity">
+                    <CnGalWebSite.Shared.Component.Lotteries.EditPage.ListLotteryUserTip Id="Model.Id" />
+                </div>
+
+            </MTabItem>
+        </MTabsItems>
     }
 </div>
 @code {
