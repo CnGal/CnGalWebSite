@@ -1,7 +1,5 @@
 ﻿@inject HttpClient Http
-@inject ExamineService _examineService
 @inject ToastService? ToastService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
 
@@ -60,12 +58,12 @@
 
     public Task OnEdit()
     {
-        NavigationManager.NavigateTo(Provider, "/lotteries/editlottery/" + Model.Id, "编辑抽奖","fa fa-gift");
+        NavigationManager.NavigateTo( "/lotteries/editlottery/" + Model.Id);
         return Task.CompletedTask;
     }
     public Task OnDraw()
     {
-        NavigationManager.NavigateTo(Provider, "/lotteries/drawlottery/" + Model.Id, "正在抽奖", "fa fa-gift");
+        NavigationManager.NavigateTo( "/lotteries/drawlottery/" + Model.Id);
         return Task.CompletedTask;
     }
 }
