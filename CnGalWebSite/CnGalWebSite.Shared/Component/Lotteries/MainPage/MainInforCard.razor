@@ -8,7 +8,10 @@
         <div class="pt-4">
             <h1 class="fw-bold text-center h3">@Model.Name</h1>
         </div>
-        <MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true"/>
+        <span class="text-truncate-4" style=" text-align: center;">
+            @Model.BriefIntroduction
+        </span>
+
         <AuthorizeView Roles="Admin">
             <Authorized>
                 <div class="mt-3">

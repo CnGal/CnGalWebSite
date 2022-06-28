@@ -26,5 +26,8 @@
         /// 分类 底部显示文字
         /// </summary>
         public string Classification { get; set; }
+
+        public bool IsOutlink { get; set; }
+
     }
 }

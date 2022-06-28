@@ -127,7 +127,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         public int Integral { get; set; }
 
         /// <summary>
-        /// 参加的用户
+        /// 中奖的用户
         /// </summary>
         public List<LotteryUserViewModel> Users { get; set; } = new List<LotteryUserViewModel>();
 

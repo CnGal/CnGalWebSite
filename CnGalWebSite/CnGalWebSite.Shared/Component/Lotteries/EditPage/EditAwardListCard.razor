@@ -82,9 +82,8 @@
 
     public Task OnRefreshTable(EditLotteryAwardModel model)
     {
-        if(model.Id==0)
+        if(Awards.Any(s=>s==model)==false)
         {
-            model.Id = Awards.Any() ? (Awards.Max(s => s.Id) + 1) : 1;
             Awards.Add(model);
         }
         StateHasChanged();

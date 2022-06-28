@@ -1,18 +1,34 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject ImagesLargeViewService ImagesLargeViewService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="奖品" Icon="fa fa-fw fa-gift" Class="mb-4" Collapable Outline>
+@if (_dataCacheService.IsApp)
+{
     <div class="row">
         @foreach (var item in Model)
         {
             <div class="col-6 col-lg-4 col-xxl-3 mb-4">
-                <AwardCard Model="item"  OnClickImage="()=>OnClickImage(item)"/>
+                <AwardCard Model="item" OnClickImage="()=>OnClickImage(item)" />
 
             </div>
         }
     </div>
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="奖品" Icon="fa fa-fw fa-gift" Class="mb-4" Collapable Outline>
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-6 col-lg-4 col-xxl-3 mb-4">
+                    <AwardCard Model="item" OnClickImage="()=>OnClickImage(item)" />
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                </div>
+            }
+        </div>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+
 
 @code {
 
@@ -23,7 +39,7 @@
     {
         if (_dataCacheService.IsApp)
         {
-           await _dataCacheService.OpenNewPage.InvokeAsync(model.Image);
+            await _dataCacheService.OpenNewPage.InvokeAsync(model.Image);
         }
         else
         {
@@ -33,7 +49,7 @@
                 Pictures = Model.Select(s => new EditImageAloneModel
                 {
                     Url = s.Image,
-                    Note=s.Name
+                    Note = s.Name
                 }).ToList()
             });
         }

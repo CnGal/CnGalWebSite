@@ -84,7 +84,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         public int Priority { get; set; }
 
         [Display(Name = "数量")]
-        public int Count { get; set; }
+        public int Count { get; set; } = 1;
 
         [Display(Name = "赞助商")]
         public string Sponsor { get; set; }
