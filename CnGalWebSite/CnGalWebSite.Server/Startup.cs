@@ -33,6 +33,7 @@ namespace CnGalWebSite.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            
             services.AddServerSideBlazor()
                 .AddHubOptions(options =>
                 {
