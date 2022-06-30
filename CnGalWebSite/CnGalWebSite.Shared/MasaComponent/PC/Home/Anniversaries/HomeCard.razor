@@ -1,0 +1,46 @@
+﻿<div class="rounded  shadow-sm bg-opacity mb-4">
+    <a href="/Anniversaries/Lottery">
+        <img style="width:100%" src="https://tucang.cc/api/image/show/8394e75c9094cd50384bbf4358851991?https://image.cngal.org/images/2022/06/30/0fbc4950e06e.png" />
+    </a>
+    <a href="/Anniversaries/Rating">
+        <img style="width:100%" src="https://tucang.cc/api/image/show/0b3027f193cec504122c19b8e67f290e?https://image.cngal.org/images/2022/06/30/b3ad65f2b76a.png" />
+    </a>
+</div>
+@if (isReady)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="3" Type="CommentType.CommentLottery" />
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+}
+
+@code {
+
+    bool CanDeleted;
+    bool isReady;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var userState = await authenticationStateTask;
+            var user = userState.User;
+            if (user.IsInRole("Admin"))
+            {
+                CanDeleted = true;
+            }
+
+            isReady = true;
+        }
+        catch (Exception exc)
+        {
+            //isNotFound = true;
+            //isReady = true;
+            //StateHasChanged();
+        }
+
+    }
+
+}

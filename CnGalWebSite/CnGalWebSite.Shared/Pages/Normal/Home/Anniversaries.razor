@@ -7,7 +7,7 @@
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
-
+<TitleTip Title="@("周年庆"+Type switch { "Home" =>" - 主页","Rating"=>" - 评选","Vote"=> " - 投票","Lottery" =>" - 抽奖",_=>""})"/>
 <div class="rounded  shadow-sm bg-opacity mb-4">
     <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow Class="rounded" CenterActive
            Color="@_dataCacheService.ThemeSetting.Theme">
@@ -20,24 +20,24 @@
         <MTab Value="3">
             投票<MIcon>mdi-vote</MIcon>
         </MTab>
-        <MTab Value="3">
+        <MTab Value="4">
             抽奖<MIcon>mdi-wallet-giftcard</MIcon>
         </MTab>
     </MTabs>
 </div>
 <MTabsItems @bind-Value="index">
     <MTabItem Value="1">
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.RandomUserScoreGroup/>
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.GameGroup/>
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.HomeCard/>
     </MTabItem>
     <MTabItem Value="2">
-
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.RandomUserScoreGroup />
+        <CnGalWebSite.Shared.MasaComponent.PC.Home.Anniversaries.Ratings.GameGroup />
     </MTabItem>
     <MTabItem Value="3">
 
     </MTabItem>
-    <MTabItem Value="3">
-
+    <MTabItem Value="4">
+        <CnGalWebSite.Shared.Pages.Webs.Lotteries.Index Id="3"/>
     </MTabItem>
 </MTabsItems>
 
@@ -57,7 +57,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        LocationChanged(null, null);
+
+            LocationChanged(null, null);
+
     }
 
     public async void LocationChanged(object sender, LocationChangedEventArgs args)
@@ -70,6 +72,7 @@
             "Lottery" => 4,
             _=>1
         };
+        StateHasChanged();
 
     }
 
