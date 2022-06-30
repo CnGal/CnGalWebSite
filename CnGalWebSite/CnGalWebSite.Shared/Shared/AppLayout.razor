@@ -3,30 +3,30 @@
 @inject NavigationManager NavigationManager
 
 
-    <MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:_dataCacheService.ThemeSetting.Theme)" Dark Dense>
-        <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
+<MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:_dataCacheService.ThemeSetting.Theme)" Dark Dense>
+    <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
 
-        <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard @ref="homeTitleCard" />
-        <MSpacer></MSpacer>
+    <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard @ref="homeTitleCard" />
+    <MSpacer></MSpacer>
 
-        <MButton Icon OnClick="OnClickSearch">
-            <MIcon>mdi-magnify</MIcon>
-        </MButton>
-    </MAppBar>
-    <CnGalWebSite.Shared.MasaComponent.App.Layout.NavButton Drawer="drawer" @ref="navButton" />
+    <MButton Icon OnClick="OnClickSearch">
+        <MIcon>mdi-magnify</MIcon>
+    </MButton>
+</MAppBar>
+<CnGalWebSite.Shared.MasaComponent.App.Layout.NavButton Drawer="drawer" @ref="navButton" />
 
-    <MMain Class="pb-0">
-        <MContainer>
+<MMain Class="pb-0">
+    <MContainer>
 
-            <CascadingValue Value="this" IsFixed="true">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
-                    @Body
+        <CascadingValue Value="this" IsFixed="true">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
+                @Body
 
-                </CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
-            </CascadingValue>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
+        </CascadingValue>
 
-        </MContainer>
-    </MMain>
+    </MContainer>
+</MMain>
 
 @code {
     bool drawer { get; set; }

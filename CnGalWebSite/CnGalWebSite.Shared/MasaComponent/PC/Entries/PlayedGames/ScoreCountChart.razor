@@ -53,19 +53,43 @@
 
     public void Refresh()
     {
+        if (model.XAxis.Data.Any() == false)
+        {
+            model.XAxis.Data.AddRange(new List<string> { "1分", "2分", "3分", "4分", "5分", "6分", "7分", "8分", "9分", "10分" });
+        }
+
+        if (model.Legend.Data.Any() == false)
+        {
+            model.Legend.Data.Add("人数");
+        }
+
+        if (model.Series.Any() == false)
+        {
+            model.Series.Add(new EChartsOptionSery
+            {
+                Name = "人数",
+                Stack = "default",
+                Type = "bar"
+            });
+
+        }
+
+        var series = model.Series.First().Data;
+        series.Clear();
+
         if (Model.UserScores.Any(s => s.Socres.IsScored)==false)
         {
             isReady = true;
             return;
         }
 
-        if(Model.UserScores.Any(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions) && s.PlayImpressions.Length > 100))==false)
+        if(Model.UserScores.Any(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions)==false && s.PlayImpressions.Length > 100))==false)
         {
             isReady = true;
             return;
         }
 
-        var data = Model.UserScores.Where(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions) && s.PlayImpressions.Length > 100)).Select(s => type switch
+        var data = Model.UserScores.Where(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions)==false && s.PlayImpressions.Length > 100)).Select(s => type switch
         {
             PlayedGameScoreType.Script => s.Socres.ScriptSocre,
             PlayedGameScoreType.System => s.Socres.SystemSocre,
@@ -78,27 +102,10 @@
         });
 
 
-        if (model.XAxis.Data.Any() == false)
-        {
-            model.XAxis.Data.AddRange(new List<string> { "1分", "2分", "3分", "4分", "5分", "6分", "7分", "8分", "9分", "10分" });
-        }
 
-        if(model.Legend.Data.Any()==false)
-        {
-            model.Legend.Data.Add("人数");
-        }
 
-        if (model.Series.Any() == false)
-        {
-            model.Series.Add(new EChartsOptionSery
-            {
-                Name="人数",
-                Stack = "default",
-                Type = "bar"
-            });
-        }
-        var series = model.Series.First().Data;
-        series.Clear();
+
+
 
 
         series.AddRange(new List<double>
