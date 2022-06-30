@@ -865,8 +865,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _steamInforRepository.DeleteRangeAsync(s => true);
-                await _steamInforTableModelRepository.DeleteRangeAsync(s => true);
+                var url1 = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/06/30/0fbc4950e06e.png");
+                var url2 = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/06/30/b3ad65f2b76a.png");
 
                 return new Result { Successful = true };
             }
