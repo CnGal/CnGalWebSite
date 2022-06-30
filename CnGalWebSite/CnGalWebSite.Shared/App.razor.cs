@@ -25,6 +25,9 @@ namespace CnGalWebSite.Shared
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+
+            I18n.SetCulture(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"));//将语言切换成zh-CN
+
             if (NavigationManager.Uri.Contains("m.cngal.org"))
             {
                 _dataCacheService.IsApp = true;
