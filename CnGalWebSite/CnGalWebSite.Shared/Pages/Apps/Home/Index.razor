@@ -2,6 +2,7 @@
 @inject HttpClient Http
 @inject IDataCacheService _dataCacheService
 @inject IStructuredDataService _structuredDataService
+@inject NavigationManager NavigationManager
 
 <TitleTip></TitleTip>
 
@@ -14,77 +15,83 @@
     </form>
 </div>
 
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCarousel />
+<style>
+    .font-color {
+        color: var(--main-color) !important;
+    }
+</style>
+    <MTabsItems @bind-Value="TabIndex" Class="pb-8">
+        <MTabItem Value="0">
+            <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCarousel />
 
-<div style="width: 100%; margin-bottom: 50px;">
-    <div class="tab-content" id="@("pills" + randomIndex + "-tabContent")">
-        <div class="@("tab-pane fade" + (defaultIndex == 0 ? " show active " : "") )" id="@("pills" + randomIndex + "-0")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-0-tab")">
-            <div>
-                <CnGalWebSite.Shared.AppComponent.Pages.Home.Index />
-            </div>
-        </div>
-        <div class="@("tab-pane fade" + (defaultIndex == 1 ? " show active " : "") )" id="@("pills" + randomIndex + "-1")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-1-tab")">
-            @if (isReadyTab1)
-            {
-                <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.FreeGameGroup Class="mb-3" />
-                <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.DiscountGameGroup Class="mb-3" />
-                <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.GameRoleGroup Class="mb-3" />
+            <CnGalWebSite.Shared.AppComponent.Pages.Home.Index />
+        </MTabItem>
+        <MTabItem Value="1">
+            <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.FreeGameGroup Class="mb-3" />
+            <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.DiscountGameGroup Class="mb-3" />
+            <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.GameRoleGroup Class="mb-3" />
 
-            }
-        </div>
-        <div class="@("tab-pane fade" + (defaultIndex == 2 ? " show active " : "") )" id="@("pills" + randomIndex + "-2")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-2-tab")">
-            @if (isReadyTab2)
-            {
-                <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.RandomArticleGroup Class="mb-3" />
-                <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.WeeklyNewsGroup Class="mb-3" />
-            }
+        </MTabItem>
+        <MTabItem Value="2">
+            <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.RandomArticleGroup Class="mb-3" />
+            <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.WeeklyNewsGroup Class="mb-3" />
 
-        </div>
-        <div class="@("tab-pane fade" + (defaultIndex == 3 ? " show active " : "") )" id="@("pills" + randomIndex + "-3")" role="tabpanel" aria-labelledby="@("pills" + randomIndex + "-3-tab")">
-            @if (isReadyTab3)
-            {
-                <div>
-                    <CnGalWebSite.Shared.AppComponent.Pages.Home.Others.Index />
-                </div>
-            }
+        </MTabItem>
+        <MTabItem Value="3">
+            <CnGalWebSite.Shared.AppComponent.Pages.Home.Others.Index />
+        </MTabItem>
+        <MTabItem Value="4">
+            <AuthorizeView>
+                <Authorized>
+                    <CnGalWebSite.Shared.Pages.Webs.Space.Index Id="@_dataCacheService.UserInfor.Id"></CnGalWebSite.Shared.Pages.Webs.Space.Index>
 
-        </div>
-    </div>
-</div>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="w-100" style="height: calc(100vh); display: flex; justify-content: center; align-items: center; ">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后进入个人空间" Icon="mdi-login" OnClick="OnLogin"/>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+        </MTabItem>
+    </MTabsItems>
 
+<MFooter Fixed Padless>
+    <MBottomNavigation @bind-Value="TabIndex" Shift Grow>
+        <MButton ActiveClass="font-color">
+            <span>发现</span>
 
+            <MIcon>mdi-home-outline </MIcon>
+        </MButton>
 
-<CnGalWebSite.Shared.AppComponent.Pages.Home.HomeFooter OnTabClick="OnTabClick" DefaultIndex="defaultIndex" RandomIndex="randomIndex" />
+        <MButton ActiveClass="font-color">
+            <span>词条</span>
+
+            <MIcon>mdi-archive-outline</MIcon>
+        </MButton>
+
+        <MButton ActiveClass="font-color">
+            <span>文章</span>
+
+            <MIcon>mdi-sticker-text-outline </MIcon>
+        </MButton>
+
+        <MButton ActiveClass="font-color">
+            <span>广场</span>
+
+            <MIcon>mdi-av-timer</MIcon>
+        </MButton>
+        <MButton ActiveClass="font-color">
+            <span>空间</span>
+
+            <MIcon>mdi-account-outline</MIcon>
+        </MButton>
+    </MBottomNavigation>
+</MFooter>
 
 @code {
 
-    private int defaultIndex { get; set; } = 0;
     [Parameter]
-    public string DefaultIndex
-    {
-        get
-        {
-            return defaultIndex.ToString();
-        }
-        set
-        {
-            try
-            {
-                defaultIndex = int.Parse(value);
-            }
-            catch
-            {
-                defaultIndex = 0;
-            }
-        }
-
-    }
-    public int TabIndexNum = 0;
-    public int randomIndex = new Random().Next();
-
-    bool isReadyTab1 = false;
-    bool isReadyTab2 = false;
-    bool isReadyTab3 = false;
+    public StringNumber TabIndex { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -118,21 +125,10 @@
         await _structuredDataService.SetStructuredData(urls);
     }
 
-    public async Task OnTabClick(int index)
+    public Task OnLogin()
     {
-        if (index == 1)
-        {
-            isReadyTab1 = true;
-        }
-        else if (index == 2)
-        {
-            isReadyTab2 = true;
-        }
-        else if (index == 3)
-        {
-            isReadyTab3 = true;
-        }
-        StateHasChanged();
-        TabIndexNum = index;
+        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        return Task.CompletedTask;
     }
+
 }
