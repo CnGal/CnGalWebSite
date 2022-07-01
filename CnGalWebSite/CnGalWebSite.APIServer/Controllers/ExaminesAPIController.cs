@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Linq.Dynamic.Core;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -562,7 +563,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 examine.IsPassed = false;
                 examine = await _examineRepository.UpdateAsync(examine);
                 //修改以其为前置审核的审核状态
-                if (await _examineRepository.CountAsync(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id) != 0)
+                if (await _examineRepository.GetAll().AnyAsync(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id))
                 {
                     var temp = _examineRepository.GetAll().Where(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id);
                     foreach (var item in temp)
@@ -589,7 +590,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 if (examine.PrepositionExamineId == null || examine.PrepositionExamineId <= 0)
                 {
                     //查找是否有以此为前置审核的审核 如果有 则代表第一次创建
-                    if (await _examineRepository.CountAsync(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id) != 0)
+                    if (await _examineRepository.GetAll().AnyAsync(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id) )
                     {
                         await _messageRepository.InsertAsync(new Message
                         {
@@ -601,7 +602,6 @@ namespace CnGalWebSite.APIServer.Controllers
                             Link = "articles/index/" + examine.Article.Id,
                             LinkTitle = article.Name,
                             Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
-                            ApplicationUser = user,
                             ApplicationUserId = user.Id
                         });
                     }
@@ -617,7 +617,6 @@ namespace CnGalWebSite.APIServer.Controllers
                             Link = "articles/index/" + article.Id,
                             LinkTitle = article.Name,
                             Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
-                            ApplicationUser = user,
                             ApplicationUserId = user.Id
                         });
                     }
@@ -629,7 +628,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 if (examine.PrepositionExamineId == null || examine.PrepositionExamineId <= 0)
                 {
                     //查找是否有以此为前置审核的审核 如果有 则代表第一此创建
-                    if (await _examineRepository.CountAsync(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id) != 0)
+                    if (await _examineRepository.GetAll().AnyAsync(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id) )
                     {
                         await _messageRepository.InsertAsync(new Message
                         {
@@ -641,7 +640,6 @@ namespace CnGalWebSite.APIServer.Controllers
                             Link = "entries/index/" + entry.Id,
                             LinkTitle = entry.Name,
                             Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
-                            ApplicationUser = user,
                             ApplicationUserId = user.Id
                         });
                     }
@@ -657,7 +655,6 @@ namespace CnGalWebSite.APIServer.Controllers
                             Link = "entries/index/" + entry.Id,
                             LinkTitle = entry.Name,
                             Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
-                            ApplicationUser = user,
                             ApplicationUserId = user.Id
                         });
                     }
@@ -668,7 +665,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 if (examine.PrepositionExamineId == null || examine.PrepositionExamineId <= 0)
                 {
                     //查找是否有以此为前置审核的审核 如果有 则代表第一此创建
-                    if (await _examineRepository.CountAsync(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id) != 0)
+                    if (await _examineRepository.GetAll().AnyAsync(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id) )
                     {
                         await _messageRepository.InsertAsync(new Message
                         {
@@ -680,7 +677,6 @@ namespace CnGalWebSite.APIServer.Controllers
                             Link = "peripheries/index/" + periphery.Id,
                             LinkTitle = periphery.Name,
                             Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
-                            ApplicationUser = user,
                             ApplicationUserId = user.Id
                         });
                     }
@@ -696,7 +692,6 @@ namespace CnGalWebSite.APIServer.Controllers
                             Link = "peripheries/index/" + periphery.Id,
                             LinkTitle = periphery.Name,
                             Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
-                            ApplicationUser = user,
                             ApplicationUserId = user.Id
                         });
                     }
@@ -707,7 +702,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 if (examine.PrepositionExamineId == null || examine.PrepositionExamineId <= 0)
                 {
                     //查找是否有以此为前置审核的审核 如果有 则代表第一此创建
-                    if (await _examineRepository.CountAsync(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id) != 0)
+                    if (await _examineRepository.GetAll().AnyAsync(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id))
                     {
                         await _messageRepository.InsertAsync(new Message
                         {
@@ -719,7 +714,6 @@ namespace CnGalWebSite.APIServer.Controllers
                             Link = "disambigs/index/" + disambig.Id,
                             LinkTitle = disambig.Name,
                             Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
-                            ApplicationUser = user,
                             ApplicationUserId = user.Id
                         });
                     }
@@ -735,7 +729,6 @@ namespace CnGalWebSite.APIServer.Controllers
                             Link = "disambigs/index/" + disambig.Id,
                             LinkTitle = examine.Entry.Name,
                             Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
-                            ApplicationUser = user,
                             ApplicationUserId = user.Id
                         });
                     }
@@ -746,7 +739,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 if (examine.PrepositionExamineId == null || examine.PrepositionExamineId <= 0)
                 {
                     //查找是否有以此为前置审核的审核 如果有 则代表第一此创建
-                    if (await _examineRepository.CountAsync(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id) != 0)
+                    if (await _examineRepository.GetAll().AnyAsync(s => s.IsPassed == null && s.PrepositionExamineId == examine.Id) )
                     {
                         await _messageRepository.InsertAsync(new Message
                         {
@@ -758,7 +751,6 @@ namespace CnGalWebSite.APIServer.Controllers
                             Link = "tags/index/" + tag.Id,
                             LinkTitle = tag.Name,
                             Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
-                            ApplicationUser = user,
                             ApplicationUserId = user.Id
                         });
                     }
@@ -774,7 +766,6 @@ namespace CnGalWebSite.APIServer.Controllers
                             Link = "tags/index/" + tag.Id,
                             LinkTitle = tag.Name,
                             Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
-                            ApplicationUser = user,
                             ApplicationUserId = user.Id
                         });
                     }
@@ -792,7 +783,6 @@ namespace CnGalWebSite.APIServer.Controllers
                     Link = "",
                     LinkTitle = "",
                     Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
-                    ApplicationUser = user,
                     ApplicationUserId = user.Id
                 });
             }
@@ -808,7 +798,6 @@ namespace CnGalWebSite.APIServer.Controllers
                     Link = "home/examined/" + examine.Id,
                     LinkTitle = "第" + examine.Id + "条审核记录",
                     Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
-                    ApplicationUser = user,
                     ApplicationUserId = user.Id
                 });
 

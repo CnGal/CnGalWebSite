@@ -22,12 +22,19 @@
 </div>
 
 <div class="row">
-    @foreach (var item in Items)
+    @foreach (var item in Items.Skip((_dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage - 1) * _dataCacheService.ThemeSetting.AnniversariesSetting.MaxCount).Take(_dataCacheService.ThemeSetting.AnniversariesSetting.MaxCount))
     {
         <GameCard Model="item" Class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4" Type="_dataCacheService.ThemeSetting.AnniversariesSetting.DisplayType" OnClick="OnClickMore" />
     }
+
 </div>
-@if (Items.Any() == false&& isReady)
+
+    @if (_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages > 1)
+{
+    <MPagination Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage" Class="my-4" Length="@_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+}
+
+@if (Items.Any() == false && isReady)
 {
     <NotFoundJudgableCard GameName="@_dataCacheService.ThemeSetting.AnniversariesSetting.SearchString" />
 }
@@ -88,6 +95,8 @@
                 JudgableGamesSortType.ReadCount => Items.OrderByDescending(s => s.ReaderCount).ToList(),
                 _ => Items
             };
+
+            _dataCacheService.ThemeSetting.AnniversariesSetting.Count = Items.Count;
         }
         catch (Exception ex)
         {
@@ -151,6 +160,16 @@
 
 
         }
+    }
+
+    private async Task OnPageClick(int pageIndex)
+    {
+        _dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage = pageIndex;
+        if (CnGalRootTip != null)
+        {
+            await CnGalRootTip.SaveTheme();
+        }
+        StateHasChanged();
     }
 
 }

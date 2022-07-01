@@ -192,15 +192,6 @@ else
             {
                 _dataCatcheService.VoteIndexPageCatche.Clean(Id);
             }
-
-            try
-            {
-                await OnCommentPageClick(1);
-            }
-            catch (Exception ex)
-            {
-                ErrorHandler.ProcessError(ex, "获取投票评论列表失败");
-            }
         }
         catch (Exception exc)
         {
@@ -229,39 +220,4 @@ else
         return Task.CompletedTask;
     }
 
-
-    private async Task OnCommentPageClick(int pageIndex)
-    {
-        try
-        {
-            ListComments = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)CommentType.CommentVote + "/" + Id + "/" + pageIndex + "/8");
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取评论列表失败");
-        }
-    }
-
-    private async Task OnRely()
-    {
-        Model.CommentCount++;
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
-    private async Task OnDeleted()
-    {
-        await OnCommentPageClick(ListComments.CurrentPage);
-    }
-
-    public async void OnClickUrl(NavigateModel model)
-    {
-        try
-        {
-            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
-        }
-        catch
-        {
-            await ToastService.Error("导航失败", "请尝试刷新页面");
-        }
-    }
 }

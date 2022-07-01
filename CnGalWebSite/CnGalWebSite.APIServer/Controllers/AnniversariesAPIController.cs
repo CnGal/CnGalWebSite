@@ -176,12 +176,15 @@ namespace CnGalWebSite.APIServer.Controllers
             _playedGameRepository = playedGameRepository;
         }
 
+
+        static readonly DateTime before = new DateTime(2022, 5, 31);
+        static readonly DateTime after = new DateTime(2021, 5, 31);
+
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<JudgableGameViewModel>>> GetAllJudgableGamesAsync()
         {
-            var before = new DateTime(2022, 5, 31);
-            var after = new DateTime(2021, 5, 31);
+
 
             var games = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.PlayedGames)
@@ -222,12 +225,10 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<PlayedGameUserScoreRandomModel>>> GetRandomUserScoresAsync()
         {
-            var before = new DateTime(2022, 5, 31);
-            var after = new DateTime(2021, 5, 31);
-
             var games = await _playedGameRepository.GetAll().AsNoTracking()
                 .Include(s => s.ApplicationUser)
                 .Include(s=>s.Entry)
+                .Where(s =>  s.Entry.PubulishTime != null && s.Entry.PubulishTime.Value.Date <= before.Date && s.Entry.PubulishTime.Value.Date >= after.Date)
                 .Where(s =>s.ShowPublicly && s.MusicSocre != 0 && s.PaintSocre != 0 && s.CVSocre != 0 && s.SystemSocre != 0 && s.ScriptSocre != 0 && s.TotalSocre != 0 && s.CVSocre != 0 && string.IsNullOrWhiteSpace(s.PlayImpressions)==false && s.PlayImpressions.Length > 100)
                 .ToListAsync();
             var model = new List<PlayedGameUserScoreRandomModel>();
