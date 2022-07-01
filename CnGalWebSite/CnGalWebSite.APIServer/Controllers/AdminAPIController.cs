@@ -866,7 +866,9 @@ namespace CnGalWebSite.APIServer.Controllers
             try
             {
                 var url1 = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/06/30/0fbc4950e06e.png");
-                var url2 = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/06/30/b3ad65f2b76a.png");
+                var url2 = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/07/01/9b627a822af1.png");
+                var url3 = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/07/01/ac2ebf501a9b.png");
+                var url4 = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/07/01/7c6a07dfec91.png");
 
                 return new Result { Successful = true };
             }
