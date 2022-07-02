@@ -175,7 +175,7 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
                 .ToListAsync();
 
             //过滤评分
-            var globalFilterScores = globalAllScores.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > 100);
+            var globalFilterScores = globalAllScores.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength);
 
             //获取所有有评分的游戏
             var games = await _entryRepository.GetAll().AsNoTracking()
@@ -265,7 +265,7 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
             model.AllTotalSocre = CalculateScore(scores.Select(s => s.TotalSocre), globalDistribution[PlayedGameScoreType.Total]);
             model.AllScriptSocre = CalculateScore(scores.Select(s => s.ScriptSocre), globalDistribution[PlayedGameScoreType.Script]);
 
-            var filterScores = scores.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > 100);
+            var filterScores = scores.Where(s => string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength);
             if (filterScores != null && filterScores.Any())
             {
                 //依次计算

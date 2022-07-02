@@ -41,6 +41,7 @@ namespace CnGalWebSite.DataModel.Helper
         };
 
         public const int MaxEditorCount = 200;
+        public const int MinValidPlayImpressionsLength = 30;
 
         //临时储存的信息
 

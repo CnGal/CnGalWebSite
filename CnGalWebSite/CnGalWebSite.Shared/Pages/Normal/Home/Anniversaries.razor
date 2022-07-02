@@ -7,7 +7,7 @@
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
-<TitleTip Title="@("周年庆"+Type switch { "Home" =>" - 主页","Rating"=>" - 评选","Vote"=> " - 投票","Lottery" =>" - 抽奖",_=>""})"/>
+<TitleTip Title="@("周年庆"+Type switch {"Rating"=>" - 评选","Vote"=> " - 投票","Lottery" =>" - 抽奖",_=>""})"/>
 <div class="rounded  shadow-sm bg-opacity mb-4">
     <MTabs Value="index" ValueChanged="IndexChanged" IconsAndText Grow Class="rounded" CenterActive
            Color="@_dataCacheService.ThemeSetting.Theme">
