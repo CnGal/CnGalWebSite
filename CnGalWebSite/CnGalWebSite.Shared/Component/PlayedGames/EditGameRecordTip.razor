@@ -154,7 +154,7 @@
             else
             {
 
-                if (string.IsNullOrWhiteSpace(Model.PlayImpressions) || Model.PlayImpressions.Length <= 100)
+                if (string.IsNullOrWhiteSpace(Model.PlayImpressions) || Model.PlayImpressions.Length <= ToolHelper.MinValidPlayImpressionsLength)
                 {
                     if (_dataCacheService.ThemeSetting.PlayedGameInforCount >= 0)
                     {
@@ -163,7 +163,7 @@
                         {
                             Type = AlertTypes.Info,
                             Title = "提示",
-                            Content = $"只有大于100字评语的评分才会记录到总分中哦。当然，不写评语也是OK的。" + (_dataCacheService.ThemeSetting.PlayedGameInforCount > 0 ? $"这个提醒还会再出现{_dataCacheService.ThemeSetting.PlayedGameInforCount}次。" : ""),
+                            Content = $"只有大于{ToolHelper.MinValidPlayImpressionsLength}字评语的评分才会记录到总分中哦。当然，不写评语也是OK的。" + (_dataCacheService.ThemeSetting.PlayedGameInforCount > 0 ? $"这个提醒还会再出现{_dataCacheService.ThemeSetting.PlayedGameInforCount}次。" : ""),
                             Duration = 100000
                         });
 

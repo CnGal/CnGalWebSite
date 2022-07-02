@@ -83,13 +83,13 @@
             return;
         }
 
-        if(Model.UserScores.Any(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions)==false && s.PlayImpressions.Length > 100))==false)
+        if(Model.UserScores.Any(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions)==false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength))==false)
         {
             isReady = true;
             return;
         }
 
-        var data = Model.UserScores.Where(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions)==false && s.PlayImpressions.Length > 100)).Select(s => type switch
+        var data = Model.UserScores.Where(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions)==false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength)).Select(s => type switch
         {
             PlayedGameScoreType.Script => s.Socres.ScriptSocre,
             PlayedGameScoreType.System => s.Socres.SystemSocre,
