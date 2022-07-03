@@ -1,4 +1,6 @@
-﻿<div class="rounded  shadow-sm bg-opacity mb-4">
+﻿@inject IDataCacheService _dataCatcheService
+
+@*<div class="rounded  shadow-sm bg-opacity mb-4">
         <a href="/Anniversaries/Lottery">
             <img loading="lazy" style="width:100%" src="https://tucang.cc/api/image/show/8394e75c9094cd50384bbf4358851991?https://image.cngal.org/images/2022/06/30/0fbc4950e06e.png">
         </a>
@@ -9,11 +11,17 @@
             <img loading="lazy" style="width:100%" src="https://tucang.cc/api/image/show/f3418fd7a8c91882e76b39b00d35b928?https://image.cngal.org/images/2022/07/01/ac2ebf501a9b.png">
             <img loading="lazy" style="width:100%" src="https://tucang.cc/api/image/show/e6bde7cd852902901a0f8ec1980e0001?https://image.cngal.org/images/2022/07/01/7c6a07dfec91.png">
         </a>
+    </div>*@
+<div class="rounded  shadow-sm bg-opacity mb-4">
+    @((MarkupString)Model.MainPage)
 </div>
+
+
+
 @if (isReady)
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
-        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="3" Type="CommentType.CommentLottery" />
+        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment CanDeleted="CanDeleted" ObjectId="1220" Type="CommentType.CommentArticle" />
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 }
@@ -24,6 +32,7 @@
     bool isReady;
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+    public ArticleViewModel Model { get; set; } = new ArticleViewModel();
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,7 +44,7 @@
             {
                 CanDeleted = true;
             }
-
+            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCatche("1220");
             isReady = true;
         }
         catch (Exception exc)
