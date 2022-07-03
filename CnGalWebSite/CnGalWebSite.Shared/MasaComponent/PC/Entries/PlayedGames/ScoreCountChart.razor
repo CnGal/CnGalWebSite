@@ -1,16 +1,16 @@
 ﻿@if (isReady)
 {
     <div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100")">
-        @if (Model.UserScores.Any(s=>s.Socres.IsScored))
+        @if (Model.UserScores.Any(s => s.Socres.IsScored))
         {
-           <div style="display: flex; justify-content: flex-end;">
-               <div style="max-width:100px;">
-                   <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="scope" ValueChanged="ScopeValueChanged" TValue="PlayedGameCountScope"  Class="pe-4 pt-0"/>
-               </div>
-               <div style="max-width:100px;">
-                   <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="type" ValueChanged="TypeValueChanged" TValue="PlayedGameScoreType"  Class="pe-4 pt-0"/>
-               </div>
-           </div>
+            <div style="display: flex; justify-content: flex-end;">
+                <div style="max-width:100px;">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="scope" ValueChanged="ScopeValueChanged" TValue="PlayedGameCountScope" Class="pe-4 pt-0" />
+                </div>
+                <div style="max-width:100px;">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="type" ValueChanged="TypeValueChanged" TValue="PlayedGameScoreType" Class="pe-4 pt-0" />
+                </div>
+            </div>
             <div class="d-flex align-center justify-center">
                 @if (isReady)
                 {
@@ -30,7 +30,8 @@
     </div>
 }
 
-
+<PToast @ref="_toast" MaxCount="3">
+</PToast>
 
 
 @code {
@@ -39,6 +40,7 @@
 
     [Parameter]
     public PlayedGameOverviewModel Model { get; set; }
+    PToast _toast;
 
     EChartsOptionModel model = new EChartsOptionModel();
 
@@ -77,19 +79,19 @@
         var series = model.Series.First().Data;
         series.Clear();
 
-        if (Model.UserScores.Any(s => s.Socres.IsScored)==false)
+        if (Model.UserScores.Any(s => s.Socres.IsScored) == false)
         {
             isReady = true;
             return;
         }
 
-        if(Model.UserScores.Any(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions)==false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength))==false)
+        if (Model.UserScores.Any(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength)) == false)
         {
             isReady = true;
             return;
         }
 
-        var data = Model.UserScores.Where(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions)==false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength)).Select(s => type switch
+        var data = Model.UserScores.Where(s => scope == PlayedGameCountScope.All || (string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength)).Select(s => type switch
         {
             PlayedGameScoreType.Script => s.Socres.ScriptSocre,
             PlayedGameScoreType.System => s.Socres.SystemSocre,
@@ -103,13 +105,8 @@
 
 
 
-
-
-
-
-
         series.AddRange(new List<double>
-        {
+    {
             data.Count(s=>s==1),
             data.Count(s=>s==2),
             data.Count(s=>s==3),
@@ -126,12 +123,21 @@
         isReady = true;
     }
 
-    public Task TypeValueChanged(PlayedGameScoreType _type)
+    public async Task TypeValueChanged(PlayedGameScoreType _type)
     {
+        if (Model.IsDubbing == false && _type == PlayedGameScoreType.CV)
+        {
+            await _toast.AddToast(new ToastConfig
+            {
+                Type = AlertTypes.Error,
+                Title = "这个游戏没有配音哦~",
+                Duration = 4000
+            });
+            return;
+        }
         type = _type;
         Refresh();
 
-        return Task.CompletedTask;
     }
     public Task ScopeValueChanged(PlayedGameCountScope _scope)
     {

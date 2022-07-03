@@ -349,6 +349,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var entry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.PlayedGames).ThenInclude(s => s.ApplicationUser)
+                .Include(s=>s.Tags)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (entry == null)
@@ -359,8 +360,6 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return NotFound("只有游戏才有评分");
             }
-
-
 
             var model = new PlayedGameOverviewModel
             {
@@ -383,6 +382,17 @@ namespace CnGalWebSite.APIServer.Controllers
                     User = _userService.GetUserInforViewModel(s.ApplicationUser, true).Result
                 }).ToList(),
             };
+            //判断是否有配音
+            if(entry.Tags!=null&&entry.Tags.Any(s=>s.Name=="无配音"))
+            {
+                model.IsDubbing = false;
+
+            }
+            else
+            {
+                model.IsDubbing = true;
+            }
+
 
             var gameScores = await _playedGameService.GetGameScores(entry.Id);
             if(gameScores!=null)

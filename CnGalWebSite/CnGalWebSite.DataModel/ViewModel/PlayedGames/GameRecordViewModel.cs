@@ -37,6 +37,10 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
         /// 评语
         /// </summary>
         public string PlayImpressions { get; set; }
+        /// <summary>
+        /// 是否配音 仅限游戏词条
+        /// </summary>
+        public bool IsDubbing { get; set; }
 
         /// <summary>
         /// 配音

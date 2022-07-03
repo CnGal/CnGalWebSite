@@ -16,6 +16,10 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
         public PlayedGameScoreModel GameReviewsScores { get; set; } = new PlayedGameScoreModel();
 
         public List<PlayedGameUserScoreModel> UserScores { get; set; } = new List<PlayedGameUserScoreModel>();
+        /// <summary>
+        /// 是否配音 仅限游戏词条
+        /// </summary>
+        public bool IsDubbing { get; set; } = true;
 
         /// <summary>
         /// 当前用户的评分是否公开
@@ -38,6 +42,10 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
     {
         public string GameName { get; set; }
         public int GameId { get; set; }
+        /// <summary>
+        /// 是否配音 仅限游戏词条
+        /// </summary>
+        public bool IsDubbing { get; set; } = true;
     }
 
 
