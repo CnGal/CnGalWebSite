@@ -32,16 +32,17 @@
         <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.GameRoleGroup Class="mb-3" />
 
     </MTabItem>
+
     <MTabItem Value="2">
-       <CnGalWebSite.Shared.Pages.Normal.Home.Anniversaries/>
-    </MTabItem>
-    <MTabItem Value="3">
         <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.RandomArticleGroup Class="mb-3" />
         <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.WeeklyNewsGroup Class="mb-3" />
 
     </MTabItem>
-    <MTabItem Value="4">
+    <MTabItem Value="3">
         <CnGalWebSite.Shared.AppComponent.Pages.Home.Others.Index />
+    </MTabItem>
+    <MTabItem Value="4">
+        <CnGalWebSite.Shared.Pages.Normal.Home.Anniversaries />
     </MTabItem>
     <MTabItem Value="5">
         <AuthorizeView>
@@ -72,11 +73,7 @@
             <MIcon>mdi-archive-outline</MIcon>
         </MButton>
 
-        <MButton ActiveClass="font-color">
-            <span>周年庆</span>
 
-            <MIcon>mdi-cake</MIcon>
-        </MButton>
         <MButton ActiveClass="font-color">
             <span>文章</span>
 
@@ -88,6 +85,15 @@
 
             <MIcon>mdi-av-timer</MIcon>
         </MButton>
+        <AuthorizeView Roles="Editor">
+            <Authorized>
+                <MButton ActiveClass="font-color">
+                    <span>周年庆</span>
+
+                    <MIcon>mdi-cake</MIcon>
+                </MButton>
+            </Authorized>
+        </AuthorizeView>
         @*<MButton ActiveClass="font-color">
             <span>空间</span>
 
