@@ -20,40 +20,43 @@
         color: var(--main-color) !important;
     }
 </style>
-    <MTabsItems @bind-Value="TabIndex" Class="pb-12">
-        <MTabItem Value="0">
-            <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCarousel />
+<MTabsItems @bind-Value="TabIndex" Class="pb-12">
+    <MTabItem Value="0">
+        <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCarousel />
 
-            <CnGalWebSite.Shared.AppComponent.Pages.Home.Index />
-        </MTabItem>
-        <MTabItem Value="1">
-            <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.FreeGameGroup Class="mb-3" />
-            <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.DiscountGameGroup Class="mb-3" />
-            <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.GameRoleGroup Class="mb-3" />
+        <CnGalWebSite.Shared.AppComponent.Pages.Home.Index />
+    </MTabItem>
+    <MTabItem Value="1">
+        <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.FreeGameGroup Class="mb-3" />
+        <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.DiscountGameGroup Class="mb-3" />
+        <CnGalWebSite.Shared.MasaComponent.App.Home.Entries.GameRoleGroup Class="mb-3" />
 
-        </MTabItem>
-        <MTabItem Value="2">
-            <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.RandomArticleGroup Class="mb-3" />
-            <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.WeeklyNewsGroup Class="mb-3" />
+    </MTabItem>
+    <MTabItem Value="2">
+       <CnGalWebSite.Shared.Pages.Normal.Home.Anniversaries/>
+    </MTabItem>
+    <MTabItem Value="3">
+        <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.RandomArticleGroup Class="mb-3" />
+        <CnGalWebSite.Shared.MasaComponent.App.Home.Articles.WeeklyNewsGroup Class="mb-3" />
 
-        </MTabItem>
-        <MTabItem Value="3">
-            <CnGalWebSite.Shared.AppComponent.Pages.Home.Others.Index />
-        </MTabItem>
-        <MTabItem Value="4">
-            <AuthorizeView>
-                <Authorized>
-                    <CnGalWebSite.Shared.Pages.Webs.Space.Index Id="@_dataCacheService.UserInfor.Id"></CnGalWebSite.Shared.Pages.Webs.Space.Index>
+    </MTabItem>
+    <MTabItem Value="4">
+        <CnGalWebSite.Shared.AppComponent.Pages.Home.Others.Index />
+    </MTabItem>
+    <MTabItem Value="5">
+        <AuthorizeView>
+            <Authorized>
+                <CnGalWebSite.Shared.Pages.Webs.Space.Index Id="@_dataCacheService.UserInfor.Id"></CnGalWebSite.Shared.Pages.Webs.Space.Index>
 
-                </Authorized>
-                <NotAuthorized>
-                    <div class="w-100" style="height: calc(100vh); display: flex; justify-content: center; align-items: center; ">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后进入个人空间" Icon="mdi-login" OnClick="OnLogin"/>
-                    </div>
-                </NotAuthorized>
-            </AuthorizeView>
-        </MTabItem>
-    </MTabsItems>
+            </Authorized>
+            <NotAuthorized>
+                <div class="w-100" style="height: calc(100vh); display: flex; justify-content: center; align-items: center; ">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后进入个人空间" Icon="mdi-login" OnClick="OnLogin" />
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+    </MTabItem>
+</MTabsItems>
 
 <MFooter Fixed Padless>
     <MBottomNavigation @bind-Value="TabIndex" Shift Grow>
@@ -69,6 +72,11 @@
             <MIcon>mdi-archive-outline</MIcon>
         </MButton>
 
+        <MButton ActiveClass="font-color">
+            <span>周年庆</span>
+
+            <MIcon>mdi-cake</MIcon>
+        </MButton>
         <MButton ActiveClass="font-color">
             <span>文章</span>
 
