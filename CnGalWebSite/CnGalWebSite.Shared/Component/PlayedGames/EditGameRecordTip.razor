@@ -37,7 +37,11 @@
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.ScriptSocre" Lable="剧本" />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.ShowSocre" Lable="演出" />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.SystemSocre" Lable="程序" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.CVSocre" Lable="配音" />
+                @if (isDubbing)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.CVSocre" Lable="配音" />
+
+                }
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.TotalSocre" Lable="总评" />
 
                 <MTextarea Label="评语" Rows="5" Color="@_dataCacheService.ThemeSetting.Theme" Placeholder="@($"超过{ToolHelper.MinValidPlayImpressionsLength}字才会被年度游戏评选收录哦~")"
@@ -106,6 +110,7 @@
     private CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip CnGalRootTip { get; set; }
 
     bool isReady = false;
+    bool isDubbing;
 
     CnGalWebSite.Shared.MasaComponent.Shared.Components.DeviceIdentification deviceIdentification;
 
@@ -138,6 +143,10 @@
     {
         try
         {
+            if (isDubbing == false)
+            {
+                Model.CVSocre = -1;
+            }
             if (Model.ScriptSocre == 0 || Model.MusicSocre == 0 || Model.PaintSocre == 0 || Model.ShowSocre == 0 || Model.TotalSocre == 0 || Model.SystemSocre == 0 || Model.CVSocre == 0)
             {
                 if (Model.ScriptSocre + Model.MusicSocre + Model.PaintSocre + Model.ShowSocre + Model.TotalSocre + Model.SystemSocre + Model.CVSocre != 0)
@@ -222,11 +231,16 @@
         }
     }
 
-    public async Task Refresh(bool dialog, int id, GameRecordViewModel viewModel)
+    public async Task Refresh(bool dialog, int id, GameRecordViewModel viewModel, bool _isDubbing=true)
     {
         Dialog = dialog;
         Id = id;
         ViewModel = viewModel;
+        isDubbing = _isDubbing;
+        if(viewModel!=null)
+        {
+            isDubbing = viewModel.IsDubbing;
+        }
 
         await OnInit();
 

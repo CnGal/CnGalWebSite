@@ -62,6 +62,10 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// 是否查看编辑记录状态
         /// </summary>
         public bool IsExamineList { get; set; }
+        /// <summary>
+        /// 是否配音 仅限游戏词条
+        /// </summary>
+        public bool IsDubbing { get; set; } = true;
 
         public int DisambigId { get; set; }
 

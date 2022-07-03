@@ -10,7 +10,7 @@
             @if (Model.IsCurrentUserScoreExist)
             {
                 <div class="p-2" style="min-width: 300px;">
-                    <UserScoreCard Model="Model.UserScores.FirstOrDefault(s => s.User.Id == Model.CurrentUserId)" OnEdit="OnEdit" ShowAction IsPublic="Model.IsCurrentUserScorePublic" />
+                    <UserScoreCard Model="Model.UserScores.FirstOrDefault(s => s.User.Id == Model.CurrentUserId)" OnEdit="OnEdit" ShowAction IsPublic="Model.IsCurrentUserScorePublic"  IsDubbing="Model.IsDubbing"/>
 
                 </div>
             }
@@ -65,7 +65,7 @@
                     <MSlideItem>
                         <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"
                                RefBack="@context.Ref">
-                            <UserScoreCard Model="Model.UserScores.FirstOrDefault(s=>s.User.Id==Model.CurrentUserId)" OnEdit="OnEdit" ShowAction IsPublic="Model.IsCurrentUserScorePublic" />
+                            <UserScoreCard Model="Model.UserScores.FirstOrDefault(s=>s.User.Id==Model.CurrentUserId)" OnEdit="OnEdit" ShowAction IsPublic="Model.IsCurrentUserScorePublic" IsDubbing="Model.IsDubbing"/>
                         </MCard>
                     </MSlideItem>
                 }
@@ -101,7 +101,7 @@
                         <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"
                                OnClick="@context.Toggle"
                                RefBack="@context.Ref">
-                            <UserScoreCard Model="item" OnClick="@(()=>OnClickUser(item))" />
+                            <UserScoreCard Model="item" OnClick="@(()=>OnClickUser(item))"  IsDubbing="Model.IsDubbing"/>
                         </MCard>
                     </MSlideItem>
                 }

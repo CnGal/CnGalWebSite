@@ -28,7 +28,7 @@
 
         <TableColumn @bind-Field="@context.IsInSteam" Sortable="true" Searchable Width="150" />
 
-        <TableColumn @bind-Field="@context.CVSocre" Sortable="true" Searchable Width="80" />
+        <TableColumn @bind-Field="@context.CVSocre" Sortable="true" Searchable Width="80"  Formatter="CVRateFormatter"/>
         <TableColumn @bind-Field="@context.SystemSocre" Sortable="true" Searchable Width="80" />
         <TableColumn @bind-Field="@context.ShowSocre" Sortable="true" Searchable Width="80" />
         <TableColumn @bind-Field="@context.PaintSocre" Sortable="true" Searchable Width="80" />
@@ -87,7 +87,18 @@
             return new QueryData<ListPlayedGameAloneModel>();
         }
     }
- 
+
+    public async Task<string> CVRateFormatter(object cut)
+    {
+        string res = ((double)((BootstrapBlazor.Components.TableColumnContext<ListPlayedGameAloneModel, System.Object>)cut).Value).ToString("0.00");
+        if (res == "-1.00")
+        {
+            res = "无配音";
+        }
+
+
+        return res;
+    }
 
     private async Task OnRowEditIsHiddenClick(long[] ids, bool isHidden, bool showMessage)
     {
@@ -211,6 +222,6 @@
         return Task.CompletedTask;
     }
 
- 
+
 }
 

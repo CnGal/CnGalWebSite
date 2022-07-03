@@ -904,6 +904,15 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 IsHideOutlink = entry.IsHideOutlink,
             };
 
+            //查看是否有配音
+            if (entry.Tags != null && entry.Tags.Any(s => s.Name == "无配音"))
+            {
+                model.IsDubbing = false;
+            }
+            else
+            {
+                model.IsDubbing = true;
+            }
 
             //初始化图片链接
             model.MainPicture = _appHelper.GetImagePath(entry.MainPicture, (entry.Type == EntryType.Staff || entry.Type == EntryType.Role) ? "" : "app.png");

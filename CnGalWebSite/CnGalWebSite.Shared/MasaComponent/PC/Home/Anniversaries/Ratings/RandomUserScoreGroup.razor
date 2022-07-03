@@ -15,7 +15,7 @@
             @foreach (var item in _dataCacheService.RandomUserScoresCatche)
             {
                 <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
-                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.UserScoreCard Model="item" GameName="@item.GameName"  Clickable OnClick="@(()=>OnClickUser(item))"/>
+                    <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.UserScoreCard Model="item" GameName="@item.GameName"  Clickable OnClick="@(()=>OnClickUser(item))" IsDubbing="item.IsDubbing"/>
                 </div>
             }
         </div>
@@ -66,7 +66,7 @@
     {
         if (userScoreDialog != null)
         {
-            await userScoreDialog.Refresh(true, model, model.GameName, model.GameId);
+            await userScoreDialog.Refresh(true, model, model.GameName, model.GameId, model.IsDubbing);
         }
     }
 }

@@ -179,11 +179,13 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
 
             //获取所有有评分的游戏
             var games = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s=>s.Tags)
                 .Where(s => s.PlayedGames.Any(s => s.ShowPublicly && s.CVSocre != 0 && s.ShowSocre != 0 && s.SystemSocre != 0 && s.MusicSocre != 0 && s.PaintSocre != 0 && s.TotalSocre != 0 && s.ScriptSocre != 0))
                 .Select(s => new
                 {
                     s.DisplayName,
-                    s.Id
+                    s.Id,
+                    IsDubbing = !(s.Tags != null && s.Tags.Any(s => s.Name == "无配音"))
                 })
                 .ToListAsync();
 
@@ -194,7 +196,7 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
             //遍历计算每个游戏的分数并更新
             foreach (var item in games)
             {
-                await UpdateGameScore(item.Id, item.DisplayName, globalAllScores, globalDistribution, globalFilterDistribution);
+                await UpdateGameScore(item.Id, item.DisplayName,item.IsDubbing, globalAllScores, globalDistribution, globalFilterDistribution);
             }
         }
 
@@ -207,7 +209,7 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         {
             var globalDistribution = new Dictionary<PlayedGameScoreType, long[]>();
 
-            globalDistribution.Add(PlayedGameScoreType.CV, GetDistribution(scores.Select(s => s.CVSocre)));
+            globalDistribution.Add(PlayedGameScoreType.CV, GetDistribution(scores.Where(s=>s.CVSocre>0).Select(s => s.CVSocre)));
             globalDistribution.Add(PlayedGameScoreType.Show, GetDistribution(scores.Select(s => s.ShowSocre)));
             globalDistribution.Add(PlayedGameScoreType.System, GetDistribution(scores.Select(s => s.SystemSocre)));
             globalDistribution.Add(PlayedGameScoreType.Music, GetDistribution(scores.Select(s => s.MusicSocre)));
@@ -223,11 +225,12 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         /// </summary>
         /// <param name="id">游戏id</param>
         /// <param name="name">游戏名</param>
+        /// <param name="isDubbing">是否配音</param>
         /// <param name="globalAllScores">所有用户评分</param>
         /// <param name="globalDistribution">全局分布</param>
         /// <param name="globalFilterDistribution">过滤后的全局分布</param>
         /// <returns></returns>
-        public async Task UpdateGameScore(int id, string name, IEnumerable<PlayedGame> globalAllScores, Dictionary<PlayedGameScoreType, long[]> globalDistribution ,Dictionary<PlayedGameScoreType, long[]> globalFilterDistribution)
+        public async Task UpdateGameScore(int id, string name,bool isDubbing, IEnumerable<PlayedGame> globalAllScores, Dictionary<PlayedGameScoreType, long[]> globalDistribution ,Dictionary<PlayedGameScoreType, long[]> globalFilterDistribution)
         {
             //获取当前游戏的所有玩家评分
             var scores = globalAllScores.Where(s => s.EntryId == id);
@@ -257,7 +260,7 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
             model.GameName = name;
 
             //依次计算
-            model.AllCVSocre = CalculateScore(scores.Select(s => s.CVSocre), globalDistribution[ PlayedGameScoreType.CV]);
+            model.AllCVSocre = isDubbing ? CalculateScore(scores.Where(s => s.CVSocre > 0).Select(s => s.CVSocre), globalDistribution[PlayedGameScoreType.CV]) : -1;
             model.AllShowSocre = CalculateScore(scores.Select(s => s.ShowSocre), globalDistribution[PlayedGameScoreType.Show]);
             model.AllSystemSocre = CalculateScore(scores.Select(s => s.SystemSocre), globalDistribution[PlayedGameScoreType.System]);
             model.AllMusicSocre = CalculateScore(scores.Select(s => s.MusicSocre), globalDistribution[PlayedGameScoreType.Music]);
@@ -269,7 +272,7 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
             if (filterScores != null && filterScores.Any())
             {
                 //依次计算
-                model.FilterCVSocre = CalculateScore(filterScores.Select(s => s.CVSocre), globalFilterDistribution[PlayedGameScoreType.CV]);
+                model.FilterCVSocre = isDubbing ? CalculateScore(filterScores.Where(s => s.CVSocre > 0).Select(s => s.CVSocre), globalFilterDistribution[PlayedGameScoreType.CV]) : -1;
                 model.FilterShowSocre = CalculateScore(filterScores.Select(s => s.ShowSocre), globalFilterDistribution[PlayedGameScoreType.Show]);
                 model.FilterSystemSocre = CalculateScore(filterScores.Select(s => s.SystemSocre), globalFilterDistribution[PlayedGameScoreType.System]);
                 model.FilterMusicSocre = CalculateScore(filterScores.Select(s => s.MusicSocre), globalFilterDistribution[PlayedGameScoreType.Music]);

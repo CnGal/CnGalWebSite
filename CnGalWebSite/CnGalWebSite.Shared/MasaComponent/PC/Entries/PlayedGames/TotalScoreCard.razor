@@ -4,7 +4,7 @@
         @if (Model.UserScores.Any(s => s.Socres.IsScored))
         {
             <div class="pb-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaRadarChart Model="model" MaxHeight="300" MaxWidth="250" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaRadarChart Model="model" MaxHeight="300" MaxWidth="270" />
             </div>
 
         }
@@ -16,7 +16,6 @@
         }
     </div>
 }
-
 
 
 
@@ -43,10 +42,13 @@
             {
                 Name = "程序"
             });
-            model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+            if (Model.IsDubbing)
             {
-                Name = "配音"
-            });
+                model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+                {
+                    Name = "配音"
+                });
+            }
             model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
             {
                 Name = "剧本"
@@ -80,7 +82,7 @@
         {
             Name = "所有",
             Value = new List<double>
-            {
+    {
                 Math.Round(Model.GameTotalScores.SystemSocre, 2), Math.Round(Model.GameTotalScores.CVSocre, 2), Math.Round( Model.GameTotalScores.ScriptSocre, 2), Math.Round( Model.GameTotalScores.ShowSocre, 2),  Math.Round(Model.GameTotalScores.PaintSocre, 2),  Math.Round(Model.GameTotalScores.MusicSocre, 2)
             }
         });
@@ -88,10 +90,11 @@
         {
             Name = "过滤后",
             Value = new List<double>
-            {
+    {
                 Math.Round(Model.GameReviewsScores.SystemSocre, 2),  Math.Round(Model.GameReviewsScores.CVSocre, 2),  Math.Round(Model.GameReviewsScores.ScriptSocre, 2), Math.Round( Model.GameReviewsScores.ShowSocre, 2),  Math.Round(Model.GameReviewsScores.PaintSocre, 2), Math.Round( Model.GameReviewsScores.MusicSocre, 2)
             }
         });
+
 
 
         var myscores = Model.UserScores.FirstOrDefault(s => s.User.Id == Model.CurrentUserId && s.Socres.IsScored);
@@ -102,10 +105,20 @@
             {
                 Name = "我的",
                 Value = new List<double>
-                {
+        {
                     Math.Round(myscores.Socres.SystemSocre, 2), Math.Round(myscores.Socres.CVSocre, 2), Math.Round(myscores.Socres.ScriptSocre, 2),Math.Round( myscores.Socres.ShowSocre, 2), Math.Round(myscores.Socres.PaintSocre, 2), Math.Round(myscores.Socres.MusicSocre, 2)
                 }
             });
+        }
+
+        if (Model.IsDubbing == false)
+        {
+            series[0].Value.RemoveAt(1);
+            series[1].Value.RemoveAt(1);
+            if (series.Count > 2)
+            {
+                series[2].Value.RemoveAt(1);
+            }
         }
 
         isReady = true;
