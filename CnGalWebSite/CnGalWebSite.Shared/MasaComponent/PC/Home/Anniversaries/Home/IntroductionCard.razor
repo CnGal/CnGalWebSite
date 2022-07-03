@@ -1,0 +1,34 @@
+﻿@inject IDataCacheService _dataCatcheService
+
+
+<div class="rounded  shadow-sm bg-opacity mb-4">
+    @((MarkupString)Model.MainPage)
+</div>
+
+
+
+@code {
+
+    bool CanDeleted;
+    bool isReady;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    public ArticleViewModel Model { get; set; } = new ArticleViewModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCatche("1301");
+            isReady = true;
+        }
+        catch (Exception exc)
+        {
+            //isNotFound = true;
+            //isReady = true;
+            //StateHasChanged();
+        }
+
+    }
+
+}

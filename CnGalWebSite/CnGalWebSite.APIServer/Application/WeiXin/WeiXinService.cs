@@ -178,9 +178,21 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
             var sb = new StringBuilder();
 
-            if (plainText && string.IsNullOrWhiteSpace(entry.MainPicture) == false)
+            if (plainText)
             {
-                sb.AppendLine($"[image={_appHelper.GetImagePath(entry.MainPicture, "app.png")}]");
+                if (string.IsNullOrWhiteSpace(entry.MainPicture) == false)
+                {
+                    sb.AppendLine($"[image={_appHelper.GetImagePath(entry.MainPicture, "app.png")}]");
+
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(entry.Thumbnail) == false)
+                    {
+                        sb.AppendLine($"[image={_appHelper.GetImagePath(entry.Thumbnail, "app.png")}]");
+
+                    }
+                }
             }
 
             var model = await _appHelper.GetEntryInforTipViewModel(entry);
