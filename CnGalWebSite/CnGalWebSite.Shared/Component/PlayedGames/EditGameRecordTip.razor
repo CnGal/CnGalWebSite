@@ -40,7 +40,7 @@
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.CVSocre" Lable="配音" />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.TotalSocre" Lable="总评" />
 
-                <MTextarea Label="评语" Rows="5" Color="@_dataCacheService.ThemeSetting.Theme"
+                <MTextarea Label="评语" Rows="5" Color="@_dataCacheService.ThemeSetting.Theme" Placeholder="@($"超过{ToolHelper.MinValidPlayImpressionsLength}字才会被年度游戏评选收录哦~")"
                            @bind-Value="Model.PlayImpressions" Counter="true">
 
                 </MTextarea>
