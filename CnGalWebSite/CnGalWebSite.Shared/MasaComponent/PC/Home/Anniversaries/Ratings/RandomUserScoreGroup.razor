@@ -12,7 +12,7 @@
     </ButtonContent>
     <ChildContent>
         <div class="row">
-            @foreach (var item in _dataCacheService.RandomUserScoresCatche)
+            @foreach (var item in _dataCacheService.RandomUserScoresCatche.Take(_dataCacheService.IsApp?2:6))
             {
                 <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
                     <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.UserScoreCard Model="item" GameName="@item.GameName"  Clickable OnClick="@(()=>OnClickUser(item))" IsDubbing="item.IsDubbing"/>

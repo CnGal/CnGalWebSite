@@ -79,39 +79,19 @@ else
                     <CnGalWebSite.Shared.Component.Lotteries.MainPage.BasicInforCard Model="Model" />
                     <CnGalWebSite.Shared.Component.Lotteries.MainPage.OptionInforCard ViewModel="Model" />
 
-                    <div class="rounded  shadow-sm bg-opacity mb-4">
-                        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
-                               Color="@_dataCacheService.ThemeSetting.Theme">
-                            <MTab Value="1">
-                                首页<MIcon>mdi-home</MIcon>
-                            </MTab>
-                            <MTab Value="2">
-                                奖品<MIcon>mdi-wallet-giftcard </MIcon>
-                            </MTab>
-                            @if (Model.Awards.Any(s => s.Users.Any()))
-                            {
-                                <MTab Value="3">
-                                    中奖用户<MIcon>mdi-calendar-range</MIcon>
-                                </MTab>
-                            }
 
-                        </MTabs>
-                    </div>
-                    <MTabsItems @bind-Value="TabIndex">
-                        <MTabItem Value="1">
-                            <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainPageCard Model="Model" />
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
-                                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
-                            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-                        </MTabItem>
-                        <MTabItem Value="2">
-                            <CnGalWebSite.Shared.Component.Lotteries.MainPage.AwardListCard Model="Model.Awards" />
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.MainPageCard Model="Model" />
 
-                        </MTabItem>
-                        <MTabItem Value="3">
-                            <CnGalWebSite.Shared.Component.Lotteries.MainPage.WinningUserListCard Model="Model.Awards" />
-                        </MTabItem>
-                    </MTabsItems>
+                    <CnGalWebSite.Shared.Component.Lotteries.MainPage.AwardListCard Model="Model.Awards" />
+
+                    @if (Model.Awards.Any(s => s.Users.Any()))
+                    {
+                        <CnGalWebSite.Shared.Component.Lotteries.MainPage.WinningUserListCard Model="Model.Awards" />
+                    }
+
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentLottery" />
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 
 
