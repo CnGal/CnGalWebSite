@@ -192,7 +192,7 @@ namespace CnGalWebSite.APIServer.Controllers
             model.MainPage = Markdown.ToHtml(model.MainPage ?? "", pipeline);
 
 
-            foreach (var item in lottery.Awards)
+            foreach (var item in lottery.Awards.OrderByDescending(s=>s.Priority))
             {
                 var temp = new LotteryAwardViewModel
                 {
