@@ -26,10 +26,9 @@
     {
         <GameCard Model="item" Class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4" Type="_dataCacheService.ThemeSetting.AnniversariesSetting.DisplayType" OnClick="OnClickMore" />
     }
-
 </div>
 
-    @if (_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages > 1)
+@if (_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages > 1)
 {
     <MPagination Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage" Class="my-4" Length="@_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
 }

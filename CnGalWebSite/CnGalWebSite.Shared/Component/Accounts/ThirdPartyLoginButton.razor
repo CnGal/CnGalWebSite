@@ -1,5 +1,4 @@
-﻿@inject IServiceProvider Provider
-@inject NavigationManager NavigationManager
+﻿@inject NavigationManager NavigationManager
 @inject ToastService ToastService
 
 <div class="@Class" style="display: flex; flex-direction: column; align-items: center; cursor:pointer" @onclick="OnClick">
@@ -38,8 +37,9 @@
     {
         try
         {
-            await OnRedirecting.InvokeAsync();
             NavigationManager.NavigateTo(ToolHelper.GetThirdPartyLoginUrl(ReturnUrl, Type));
+            await OnRedirecting.InvokeAsync();
+
         }
         catch
         {
