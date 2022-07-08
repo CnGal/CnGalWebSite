@@ -29,7 +29,7 @@
         foreach (var item in oldImages)
         {
 
-            var result = await Http.PostAsJsonAsync(ToolHelper.ImageApiPath + "/api/files/TransferDepositFile", new TransferDepositFileModel
+            var result = await Http.PostAsJsonAsync(ToolHelper.ImageApiPath + "api/files/TransferDepositFile", new TransferDepositFileModel
             {
                 Url = item,
             });

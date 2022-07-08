@@ -35,19 +35,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         string GetImagePath(string image, string defaultStr, bool mediumImage = false);
 
         /// <summary>
-        /// 上传图片 并保存到数据库记录中 并按比例裁剪
-        /// </summary>
-        /// <param name="fileManager">用户文件管理对象</param>
-        /// <param name="image">图片</param>
-        /// <param name="x">x轴宽度</param>
-        /// <param name="y">y轴宽度</param>
-        /// <param name="path">保存路径</param>
-        /// <param name="server">0 image.cngal.org  1  pic.cngal.top</param>
-        /// <param name="name">保存名称</param>
-        /// <returns>图片名称</returns>
-        Task<string> UploadImageNewAsync(FileManager fileManager, IFormFile image, double x = 0, double y = 0, int server = 0, string path = "", string name = "");
-
-        /// <summary>
         /// 获取字符串的缩略
         /// </summary>
         /// <param name="str">字符串</param>

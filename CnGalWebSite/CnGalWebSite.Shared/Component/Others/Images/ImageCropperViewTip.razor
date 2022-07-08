@@ -1,6 +1,7 @@
 ﻿@inject IJSRuntime JSRuntime;
 @inject IAppHelper _appHelper;
 @inject ToastService ToastService
+@using Microsoft.AspNetCore.Http
 
 <style>
     .modal-footer {
@@ -11,6 +12,7 @@
     <div class="card-body py-0">
         <Cropper CropperHeight="300" InitCropWidth="200" InitCropHeight="200" MaxCropedHeight="1080" MaxCropedWidth="1920"
                  @ref="cropper"
+                 PureCSharpProcessing
                  AspectRatio="AspectRatio"
                  RequireAspectRatio="@IsAspectRatioEnabled"
                  InputId="@Id"
@@ -177,19 +179,19 @@
         try
         {
             //上传
-            var obj = await _appHelper.UploadFilesAsync(await args.GetBase64Async(), Type);
-            if (obj[0].Uploaded == true)
+            var obj = await _appHelper.UploadFilesAsync(await args.GetDataAsync(),file.Name, Type);
+            if (obj.Uploaded == true)
             {
 
-                PreviewImagePath = obj[0].FileURL;
+                PreviewImagePath = obj.FileURL;
             }
             else
             {
-                await ToastService.Error("图片上传失败", $"<{file.Name}> " + obj[0].Error);
+                await ToastService.Error("图片上传失败", $"<{file.Name}> " + obj.Error);
                 return;
             }
         }
-        catch(Exception exc)
+        catch (Exception exc)
         {
             await ToastService.Error("图片裁剪失败", "图片过于复杂无法处理，请尝试压缩图片或直接上传");
             return;
@@ -206,20 +208,20 @@
     {
         try
         {
-            List<UploadResult> obj = await _appHelper.UploadFilesAsync(new List<IBrowserFile> { file }, 5 * 1024 * 1024, 1, ToolHelper.WebApiPath + "api/files/postfile" + Type.GetDisplayName());
-            if (obj[0].Uploaded == true)
+            var obj = await _appHelper.UploadFilesAsync(file,Type);
+            if (obj.Uploaded == true)
             {
 
-                PreviewImagePath = obj[0].FileURL;
+                PreviewImagePath = obj.FileURL;
                 StateHasChanged();
             }
             else
             {
-                await ToastService.Error("图片上传失败", $"<{file.Name}> {obj[0].Error}");
+                await ToastService.Error("图片上传失败", $"<{file.Name}> {obj.Error}");
                 return;
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             await ToastService.Error("图片上传失败", "超过1MB的图片请上传到相册");
             return;

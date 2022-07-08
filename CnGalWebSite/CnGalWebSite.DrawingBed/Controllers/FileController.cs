@@ -25,59 +25,55 @@ namespace CnGalWebSite.DrawingBed.Controllers
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
             _fileService = fileService;
+        
         }
 
+        /// <summary>
+        /// 上传图片
+        /// </summary>
+        /// <param name="files"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<Result>> TransferDepositFile(TransferDepositFileModel model)
-        {
-            string url = "";
-            if (model.Url.Contains("image.cngal.org") || model.Url.Contains("pic.cngal.top"))
-            {
-                url = model.Url;
-            }
-            else
-            {
-                url = await _fileService.TransferDepositFile(model);
-            }
-
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                return new Result { Successful = false, Error = "文件上传失败" };
-            }
-            else
-            {
-                return new Result { Successful = true, Error = url };
-            }
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<VditorUploadResult>> VditorUploadAsync([FromForm] List<IFormFile> files)
+        public async Task<ActionResult<List<UploadResult>>> UploadAsync([FromForm] List<IFormFile> files, [FromQuery] double x, [FromQuery] double y)
         {
             if (files.Count == 0)
             {
                 files.AddRange(HttpContext.Request.Form.Files);
             }
-            var model = new VditorUploadResult();
+            var model = new List<UploadResult>();
             foreach (var item in files)
             {
-                var url = await _fileService.UploadFormFile(item);
+                var url = await _fileService.UploadFormFile(item,x,y);
                 if (string.IsNullOrWhiteSpace(url))
                 {
-                    model.date.errFiles.Add(item.FileName);
-                    model.code = 400;
+                    model.Add(new UploadResult
+                    {
+                        Uploaded = false
+                    });
                 }
                 else
                 {
-                    model.date.succMap.Add(new KeyValuePair<string, string>(item.FileName, url));
+                    model.Add(new UploadResult
+                    {
+                        Uploaded = true,
+                        FileName = item.FileName,
+                        FileURL = url
+                    });
                 }
             }
 
             return model;
         }
 
-
+        /// <summary>
+        /// 转存图片
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<LinkToImgModel>> linkToImgUrlAsync(string url)
+        public async Task<ActionResult<LinkToImgResult>> linkToImgUrlAsync([FromQuery] string url, [FromQuery] double x, [FromQuery] double y)
         {
             if (string.IsNullOrWhiteSpace(url))
             {
@@ -108,31 +104,27 @@ namespace CnGalWebSite.DrawingBed.Controllers
             }
             else
             {
-                res = await _fileService.TransferDepositFile(new TransferDepositFileModel { Url = url });
+                res = await _fileService.TransferDepositFile(url, x, y);
 
             }
 
             if (string.IsNullOrWhiteSpace(res))
             {
-                return new LinkToImgModel
+                return new LinkToImgResult
                 {
-                    code = 400,
-                    msg = "图片转存失败",
-                    date = new LinkToImgData
-                    {
-                        originalURL = url,
-                    }
+                    Successful = false,
+                    OriginalUrl = url,
+
                 };
             }
             else
             {
-                return new LinkToImgModel
+                return new LinkToImgResult
                 {
-                    date = new LinkToImgData
-                    {
-                        originalURL = url,
-                        url = res
-                    }
+                    OriginalUrl = url,
+                    Url = res,
+                    Successful = true,
+
                 };
             }
         }
