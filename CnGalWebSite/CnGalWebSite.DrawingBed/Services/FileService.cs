@@ -1,47 +1,44 @@
-﻿using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Files;
+﻿using CnGalWebSite.DataModel.ViewModel.Files;
 using CnGalWebSite.Helper.Helper;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-using System;
-using System.IO;
-using System.Reflection;
-using System.Security.Policy;
 
 namespace CnGalWebSite.DrawingBed.Services
 {
-    public class FileService:IFileService
+    public class FileService : IFileService
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
-        private string _tempPath = "";
+        private readonly string _tempPath = "";
+        private readonly ILogger<FileService> _logger;
 
-        public FileService(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
+        public FileService(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ILogger<FileService> logger)
         {
             _clientFactory = clientFactory;
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
+            _logger = logger;
 
             _tempPath = Path.Combine(_webHostEnvironment.WebRootPath, "temp", "images");
         }
 
-        public async Task<string> TransferDepositFile(TransferDepositFileModel model)
+        public async Task<string> TransferDepositFile(string url,double x=0,double y=0)
         {
-            string pathSaveFile=null;
+            string pathSaveFile = null;
             string pathCutFile = null;
             string pathCompressFile = null;
             try
             {
 
-                pathSaveFile = await SaveFileFromUrl(model.Url);
-                pathCutFile = CutLocalFile(pathSaveFile, model.X, model.Y);
+                pathSaveFile = await SaveFileFromUrl(url);
+                pathCutFile = CutLocalFile(pathSaveFile, x, y);
                 pathCompressFile = CompressFile(pathCutFile);
                 return await UploadLocalFileToServer(pathCompressFile);
             }
             catch (Exception ex)
             {
-                OutputHelper.PressError(ex, "外部链接转存失败：" + model.Url, "", "");
+                _logger.LogError(ex, "外部链接转存失败：{url}", url);
                 return null;
             }
             finally
@@ -53,7 +50,7 @@ namespace CnGalWebSite.DrawingBed.Services
 
         }
 
-        public async Task<string> UploadFormFile(IFormFile file)
+        public async Task<string> UploadFormFile(IFormFile file, double x = 0, double y = 0)
         {
             string pathSaveFile = null;
             string pathCompressFile = null;
@@ -61,12 +58,15 @@ namespace CnGalWebSite.DrawingBed.Services
             {
 
                 pathSaveFile = SaveFormFile(file);
-                pathCompressFile = CompressFile(pathSaveFile);
+
+                var pathCutFile = CutLocalFile(pathSaveFile, x, y);
+
+                pathCompressFile = CompressFile(pathCutFile);
                 return await UploadLocalFileToServer(pathCompressFile);
             }
             catch (Exception ex)
             {
-                OutputHelper.PressError(ex, "上传文件失败：" + file.Name, "", "");
+                _logger.LogError(ex, "上传文件失败：{file}" ,file.Name);
                 return null;
             }
             finally
@@ -93,48 +93,33 @@ namespace CnGalWebSite.DrawingBed.Services
             var response = await client.PostAsync(url, content);
 
             var newUploadResults = await response.Content.ReadAsStringAsync();
-            if (response.StatusCode == System.Net.HttpStatusCode.OK && string.IsNullOrWhiteSpace(newUploadResults) == false && newUploadResults.Contains("http"))
-            {
-
-                return newUploadResults.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
-            }
-            else
-            {
-                return null;
-            }
+            return response.StatusCode == System.Net.HttpStatusCode.OK && string.IsNullOrWhiteSpace(newUploadResults) == false && newUploadResults.Contains("http")
+                ? newUploadResults.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/")
+                : null;
         }
 
         private static string GetFileSuffixName(string path)
-{
+        {
             var temp = path.Split('.');
-            var Suffix = "";
-            if (temp.Length == 1)
-            {
-                Suffix = "png";
-            }
-            else
-            {
-                Suffix = temp[^1];
-            }
-
+            var Suffix = temp.Length == 1 ? "png" : temp[^1];
             return Suffix.Length > 4 ? "png" : Suffix;
         }
 
         private string SaveFormFile(IFormFile file)
         {
-            OutputHelper.Write(OutputLevel.Infor, "开始保存：" + file.FileName);
 
             var tempName = Guid.NewGuid().ToString() + "." + GetFileSuffixName(file.FileName);
             //保存图片到本地
             var newPath = Path.Combine(_tempPath, tempName);
             SaveFile(file, newPath);
 
+            _logger.LogInformation("保存客户端传输的图片：{file}" ,file.FileName);
+
             return newPath;
         }
 
         public async Task<string> SaveFileFromUrl(string url)
         {
-            OutputHelper.Write(OutputLevel.Infor, "开始上传：" + url);
 
             using var client = _clientFactory.CreateClient();
 
@@ -150,31 +135,19 @@ namespace CnGalWebSite.DrawingBed.Services
             var newPath = Path.Combine(_tempPath, tempName);
             SaveFile(image, newPath);
 
+            _logger.LogInformation( "下载远程链接里的图片：{file}" ,url);
+
             return newPath;
         }
 
         public string CutLocalFile(string path, double x = 0, double y = 0)
         {
-            if (x == 0 && y == 0)
-            {
-                return path;
-            }
-          
-
-           
-            return CutImage(path, x, y);
+            return x == 0 && y == 0 ? path : CutImage(path, x, y);
         }
 
         public string CompressFile(string path)
         {
-            if ((new FileInfo(path)).Length > 2 * 1024 * 1024)
-            {
-                return GetPicThumbnail(path, 0.7);
-            }
-            else
-            {
-                return path;
-            }
+            return new FileInfo(path).Length > 2 * 1024 * 1024 ? GetPicThumbnail(path, 0.7) : path;
         }
 
         private static string GetFileBase64(string path)
@@ -185,11 +158,11 @@ namespace CnGalWebSite.DrawingBed.Services
             {
                 //读入一个字节
                 //读写指针移到距开头10个字节处
-                fsForRead.Seek(0, SeekOrigin.Begin);
+                _ = fsForRead.Seek(0, SeekOrigin.Begin);
                 var bs = new byte[fsForRead.Length];
                 var log = Convert.ToInt32(fsForRead.Length);
                 //从文件中读取10个字节放到数组bs中
-                fsForRead.Read(bs, 0, log);
+                _ = fsForRead.Read(bs, 0, log);
                 base64Str = Convert.ToBase64String(bs);
 
                 return base64Str;
@@ -227,7 +200,7 @@ namespace CnGalWebSite.DrawingBed.Services
         /// <param name="oldPath"></param>
         /// <param name="newPath"></param>
         /// <param name="proportion"></param>
-        private string GetPicThumbnail(string path,double proportion)
+        private string GetPicThumbnail(string path, double proportion)
         {
             var newPath = Path.Combine(_tempPath, Guid.NewGuid().ToString() + "." + GetFileSuffixName(path));
             using (var image = Image.Load(path))
@@ -246,7 +219,7 @@ namespace CnGalWebSite.DrawingBed.Services
         /// <param name="newPath"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        private  string CutImage(string path, double x = 0, double y = 0)
+        private string CutImage(string path, double x = 0, double y = 0)
         {
             var newPath = Path.Combine(_tempPath, Guid.NewGuid().ToString() + "." + GetFileSuffixName(path));
 
@@ -272,11 +245,11 @@ namespace CnGalWebSite.DrawingBed.Services
             };
         }
 
-        private static bool DeleteFiles(string path)
+        private bool DeleteFiles(string path)
         {
             if (Directory.Exists(path) == false)
             {
-                Console.WriteLine("Path is not Existed!");
+                _logger.LogError("要删除的路径不存在");
                 return false;
             }
             var dir = new DirectoryInfo(path);
@@ -295,7 +268,7 @@ namespace CnGalWebSite.DrawingBed.Services
                         {
                             // Console.WriteLine(item);
 
-                            DeleteFiles(dir.ToString() + "\\" + item.ToString());
+                            _ = DeleteFiles(dir.ToString() + "\\" + item.ToString());
                         }
                     }
                 }
@@ -303,9 +276,9 @@ namespace CnGalWebSite.DrawingBed.Services
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Console.WriteLine("Delete Failed!");
+                _logger.LogError(ex, "删除文件夹失败");
                 return false;
 
             }
@@ -315,7 +288,7 @@ namespace CnGalWebSite.DrawingBed.Services
         }
         private static void DeleteFile(string path)
         {
-            if(string.IsNullOrWhiteSpace(path))
+            if (string.IsNullOrWhiteSpace(path))
             {
                 return;
             }

@@ -169,26 +169,24 @@ namespace CnGalWebSite.APIServer.Application.Files
                 using var client = _clientFactory.CreateClient();
                 //client.Timeout = TimeSpan.FromSeconds(30);
 
-                var result = await client.PostAsJsonAsync(_configuration["TransferDepositFileAPI"] + "api/files/TransferDepositFile", new TransferDepositFileModel
-                {
-                    Url = url,
-                    X = x,
-                    Y = y
-                });
+                var result = await client.PostAsJsonAsync($"{_configuration["TransferDepositFileAPI"]}api/files/linkToImgUrl?url={url}&x={x}&y={y}", new TransferDepositFileModel());
                 var jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var obj = System.Text.Json.JsonSerializer.Deserialize<LinkToImgResult>(jsonContent, ToolHelper.options);
 
                 if (obj.Successful)
                 {
-                    return obj.Error.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
+                    _logger.LogInformation("转存图片成功：{url}", url);
+                    return obj.OriginalUrl;
                 }
                 else
                 {
+                    _logger.LogError("转存图片失败：{url}", url);
                     return url;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex,"转存图片失败：{url}", url);
                 return url;
             }
 

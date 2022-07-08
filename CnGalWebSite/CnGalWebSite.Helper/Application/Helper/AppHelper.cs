@@ -1,110 +1,116 @@
-﻿using CnGalWebSite.DataModel.Helper;
+﻿using BootstrapBlazor.Components;
+using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Files;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
 using Microsoft.AspNetCore.Components.Forms;
+using System.Drawing;
+using System;
 using System.Net.Http.Json;
+using System.Security.Policy;
 using System.Text.Json;
+using static System.Net.WebRequestMethods;
+using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.DataModel.Application.Helper
 {
     public class AppHelper : IAppHelper
     {
         private readonly HttpClient _httpClient;
+        private readonly ILogger<AppHelper> _logger;
 
-        public AppHelper(HttpClient httpClient)
+        public AppHelper(HttpClient httpClient, ILogger<AppHelper> logger)
         {
             _httpClient = httpClient;
+            _logger = logger;
         }
 
-        public async Task<List<UploadResult>> UploadFilesAsync(List<IBrowserFile> files, long maxFileSize, int maxAllowedFiles, string url)
+        public async Task<UploadResult> UploadFilesAsync(IBrowserFile file, ImageAspectType type)
         {
-            var upload = false;
-
             using var content = new MultipartFormDataContent();
-
-            foreach (var file in files)
-            {
-                var fileContent = new StreamContent(file.OpenReadStream(file.Size));
-
-                if (file.Size < maxFileSize)
-                {
-                    content.Add(
-                        content: fileContent,
-                        name: "\"files\"",
-                        fileName: file.Name);
-
-                    upload = true;
-                }
-            }
-
-            if (upload)
-            {
-                var response = await _httpClient.PostAsync(url, content);
-
-                var newUploadResults = await response.Content
-                    .ReadFromJsonAsync<List<UploadResult>>();
-
-                return newUploadResults;
-            }
-            else
-            {
-                return new List<UploadResult> { new UploadResult { Uploaded = false, Error = "文件没有上传" } };
-            }
+            using var fileContent = new StreamContent(file.OpenReadStream(file.Size));
+            return await UploadFilesAsync(fileContent, file.Name, type);
         }
 
-        public async Task<List<UploadResult>> UploadFilesAsync(string base64, ImageAspectType type)
+        public async Task<UploadResult> UploadFilesAsync(byte[] bytes, string fileName, ImageAspectType type)
         {
             //复制数据
-            var model = new ImageBase64UploadModel
-            {
-                Base64Str = base64
-            };
+            using var content = new MultipartFormDataContent();
+            using var fileContent = new StreamContent(new MemoryStream(bytes));
+            return await UploadFilesAsync(fileContent, fileName, type);
+        }
+
+        public async Task<UploadResult> UploadFilesAsync(StreamContent steam, string fileName, ImageAspectType type)
+        {
+            using var content = new MultipartFormDataContent();
+
+            double x, y;
+            content.Add(
+                content: steam,
+                name: "\"files\"",
+                fileName: fileName);
+
             switch (type)
             {
                 case ImageAspectType._1_1:
-                    model.Height = 1;
-                    model.Width = 1;
+                    x = y = 1;
                     break;
                 case ImageAspectType._16_9:
-                    model.Width = 460;
-                    model.Height = 215;
+                    x = 460;
+                    y = 215;
 
                     break;
                 case ImageAspectType._9_16:
-                    model.Width = 9;
-                    model.Height = 16;
+                    x = 9;
+                    y = 16;
                     break;
                 case ImageAspectType._4_1A2:
-                    model.Width = 4;
-                    model.Height = 1.2;
+                    x = 4;
+                    y = 1.2;
 
                     break;
+                default:
+                    x = y = 0;
+                    break;
+            }
+            var response = await _httpClient.PostAsync($"{ToolHelper.ImageApiPath}api/files/Upload?x={x}&y={y}", content);
+
+            var newUploadResults = await response.Content
+                .ReadFromJsonAsync<List<UploadResult>>();
+
+            var result= newUploadResults.FirstOrDefault();
+            if(result.Uploaded)
+            {
+                await AddUserLoadedFileInfor(result.FileURL, 0);
             }
 
-            var result = await _httpClient.PostAsJsonAsync<ImageBase64UploadModel>(ToolHelper.WebApiPath + "api/files/PostFileBase64", model);
-            var jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<List<UploadResult>>(jsonContent, ToolHelper.options);
-
-            return obj;
+            return result;
         }
-
-
         /// <summary>
-        /// 查IP国家/地区
+        /// 向用户文件管理添加信息
         /// </summary>
-        /// <param name="strIP"></param>
-        /// <returns></returns>
-        public async Task<string> GetIPCountiy(string strIP = "")
+        public async Task AddUserLoadedFileInfor(string url,long size)
         {
             try
             {
-                var Text = await _httpClient.GetStringAsync(ToolHelper.WebApiPath + "api/home/GetIPCitys/" + strIP);
-                return Text;
+                ImageInforTipViewModel model = new ImageInforTipViewModel
+                {
+                    FileName = url,
+                    FileSize = size,
+                };
+
+                var result = await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/files/AddUserLoadedFileInfor", model);
+                string jsonContent = result.Content.ReadAsStringAsync().Result;
+                Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                //判断结果
+                if (obj.Successful == false)
+                {
+                    _logger.LogError("保存上传文件信息失败：{name}",url);
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return "未知";
+                _logger.LogError(ex,"保存上传文件信息失败：{name}", url);
             }
         }
 

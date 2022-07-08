@@ -4,8 +4,8 @@ namespace CnGalWebSite.DrawingBed.Services
 {
     public interface IFileService
     {
-        Task<string> TransferDepositFile(TransferDepositFileModel model);
+        Task<string> TransferDepositFile(string url, double x = 0, double y = 0);
 
-        Task<string> UploadFormFile(IFormFile file);
+        Task<string> UploadFormFile(IFormFile file, double x = 0, double y = 0);
     }
 }

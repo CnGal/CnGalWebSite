@@ -12,14 +12,8 @@
         {
             @if (IsMustCropper)
             {
-                <div class="d-ssr">
+                <div>
                     <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark green pointer mb-3 me-3"><i class="fa fa-fw fa-upload" aria-hidden="true"></i> @Text</label>
-                </div>
-                <div class="d-wasm">
-
-                    <ButtonUpload TValue="string" Accept="image/gif, image/jpeg, image/jpg, image/png" BrowserButtonIcon="fa fa-fw fa-upload" DefaultFileList="uploadFiles" class="me-3"
-                                  OnChange="@OnCardUploadMain" OnDelete="@(fileName => Task.FromResult(true))" BrowserButtonText="@Text" ShowLabel="false"></ButtonUpload>
-
                 </div>
             }
             else
@@ -29,17 +23,9 @@
         }
         else
         {
-            <div class="d-ssr">
+            <div>
                 <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark pointer green mb-3 me-3"><i class="fa fa-fw fa-upload" aria-hidden="true"></i> @Text</label>
             </div>
-
-            <div class="d-wasm">
-
-                <ButtonUpload TValue="string" Accept="image/gif, image/jpeg, image/jpg, image/png" BrowserButtonIcon="fa fa-fw fa-upload" DefaultFileList="uploadFiles" class="me-3"
-                              OnChange="@OnCardUploadMain" OnDelete="@(fileName => Task.FromResult(true))" BrowserButtonText="@Text" ShowLabel="false"></ButtonUpload>
-
-            </div>
-
         }
 
         @if (string.IsNullOrWhiteSpace(ImagePath) == false)
@@ -133,21 +119,17 @@
     {
         try
         {
-            //判断类型
-            string url = "api/files/postfile";
-            url += Type.GetDisplayName();
-
-            List<UploadResult> obj = await _appHelper.UploadFilesAsync(new List<IBrowserFile> { file.File }, 15 * 1024 * 1024, 1, ToolHelper.WebApiPath + url);
-            if (obj[0].Uploaded == true)
+            var obj = await _appHelper.UploadFilesAsync(file.File, Type);
+            if (obj.Uploaded == true)
             {
-                ImagePath = obj[0].FileURL;
-                await ImagePathChanged.InvokeAsync(obj[0].FileURL);
+                ImagePath = obj.FileURL;
+                await ImagePathChanged.InvokeAsync(obj.FileURL);
 
                 StateHasChanged();
             }
             else
             {
-                await ToastService.Error("图片上传失败", $"<{file.FileName}> " + obj[0].Error);
+                await ToastService.Error("图片上传失败", $"<{file.FileName}> " + obj.Error);
             }
 
         }

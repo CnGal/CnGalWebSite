@@ -1,5 +1,6 @@
 ﻿@inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
+@inject IAppHelper _appHelper
 
 
 <MMarkdown Options="_options" Value="@Context" ValueChanged="ValueChanged" @ref="mMarkdown" Class="@Class">
@@ -36,18 +37,18 @@
             _options.Add("height", 800);
         }
         _options.Add("mode", Mode.ToString());
-        if(_dataCacheService.ThemeSetting.IsDark)
+        if (_dataCacheService.ThemeSetting.IsDark)
         {
             _options.Add("theme", "dark");
         }
         _options.Add("width", "100%");
         _options.Add("upload", new
         {
-            url = ToolHelper.ImageApiPath + "/api/files/VditorUpload",
+            url = ToolHelper.ImageApiPath + "api/files/Upload",
             max = 10 * 1024 * 1024,
             accept = "image/*",
             multiple = true,
-            linkToImgUrl = ToolHelper.ImageApiPath + "/api/files/linkToImgUrl"
+            linkToImgUrl = ToolHelper.ImageApiPath + "api/files/linkToImgUrl"
         });
 
         base.OnInitialized();
@@ -80,13 +81,17 @@
     {
         try
         {
-            var model = JsonSerializer.Deserialize<VditorUploadResult>(res, ToolHelper.options);
+            var model = JsonSerializer.Deserialize<List<UploadResult>>(res, ToolHelper.options);
 
-            foreach (var item in model.date.succMap)
+            foreach (var item in model)
             {
                 if (mMarkdown != null)
                 {
-                    await mMarkdown.InsertValueAsync($"\n![]({item.Value})\n");
+                    await mMarkdown.InsertValueAsync($"\n![]({item.FileURL})\n");
+
+                    //向用户文件管理添加信息
+                    await _appHelper.AddUserLoadedFileInfor(item.FileURL, 0);
+
                 }
             }
         }
@@ -102,11 +107,15 @@
     {
         try
         {
-            var model = JsonSerializer.Deserialize<LinkToImgModel>(res, ToolHelper.options);
-            if (mMarkdown != null && model.date.url != model.date.originalURL && string.IsNullOrWhiteSpace(model.date.url) == false && string.IsNullOrWhiteSpace(model.date.originalURL) == false)
+            var model = JsonSerializer.Deserialize<LinkToImgResult>(res, ToolHelper.options);
+            if (mMarkdown != null && model.Url != model.OriginalUrl && string.IsNullOrWhiteSpace(model.Url) == false && string.IsNullOrWhiteSpace(model.OriginalUrl) == false)
             {
-                Context = Context.Replace(model.date.originalURL, model.date.url);
+                Context = Context.Replace(model.OriginalUrl, model.Url);
                 await ContextChanged.InvokeAsync(Context);
+
+                //向用户文件管理添加信息
+                await _appHelper.AddUserLoadedFileInfor(model.Url, 0);
+
             }
         }
         catch
