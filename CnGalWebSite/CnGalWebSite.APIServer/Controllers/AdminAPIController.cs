@@ -865,10 +865,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var url1 = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/06/30/0fbc4950e06e.png");
-                var url2 = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/07/01/9b627a822af1.png");
-                var url3 = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/07/01/ac2ebf501a9b.png");
-                var url4 = await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/07/01/7c6a07dfec91.png");
+                var url1 = await _fileService.SaveImageAsync("https://pica.zhimg.com/v2-84a29f84b7e4fb051f177a3e3fc516c4_1440w.jpg", _configuration["NewsAdminId"]);
 
                 return new Result { Successful = true };
             }

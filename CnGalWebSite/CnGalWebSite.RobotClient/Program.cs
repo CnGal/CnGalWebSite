@@ -1,8 +1,10 @@
 ﻿using CnGalWebSite.Helper.Helper;
 using CnGalWebSite.RobotClient;
-using MeowMiraiLib;
-using MeowMiraiLib.Msg;
 using MeowMiraiLib.Msg.Type;
+using CnGalWebSite.DataModel.Model;
+using System.Linq.Dynamic.Core.Tokenizer;
+using Masuda.Net;
+using Masuda.Net.HelpMessage;
 
 var httpClient = new HttpClient();
 var cacheX = new CacheX();
@@ -42,19 +44,119 @@ Console.WriteLine("->初始化消息处理模块");
 var messageX = new MessageX(settingX.BasicSetting, httpClient, replyX.Replies, cacheX.ReplyCache, settingX.MessageArgs, faceX.Faces, sensitiveWordX);
 
 var clientX = new ClientX(settingX.BasicSetting, messageX, groupX, settingX.MessageArgs);
-
-try
+    try
+    {
+        Console.WriteLine("->初始化 SDK 客户端");
+        clientX.Init();
+    }
+    catch (Exception ex)
+    {
+        OutputHelper.PressError(ex, "初始化 SDK 客户端失败", "配置文件错误或 依赖项 未正确启动");
+    }
+var miraiTask = Task.Run(async () =>
 {
-    Console.WriteLine("->初始化 Mirai 客户端");
-    clientX.Init();
-}
-catch (Exception ex)
+
+
+
+    var c = clientX.MiraiClient;
+
+    _ = c.ConnectAsync();
+
+    //定时任务计时器
+    System.Timers.Timer t = new(1000 * 60); //每一分钟查看一次
+    t.Start(); //启动计时器
+    t.Elapsed += async (s, e) =>
+    {
+        var message = eventX.GetCurrentTimeEvent();
+        if (string.IsNullOrWhiteSpace(message) == false)
+        {
+            var result = await messageX.ProcMessageAsync(RobotReplyRange.Group,message, "", null, 0, null);
+
+            if (result != null)
+            {
+                foreach (var item in groupX.Groups)
+                {
+                    result.SendTo = item.GroupId;
+                    clientX.SendMessage(result);
+                }
+            }
+        }
+    };
+
+    //随机任务计时器
+    System.Timers.Timer t2 = new(1000 * 60); //每一分钟查看一次
+    t2.Start(); //启动计时器
+    t2.Elapsed += async (s, e) =>
+    {
+        var message = eventX.GetProbabilityEvents();
+        if (string.IsNullOrWhiteSpace(message) == false)
+        {
+            var result = await messageX.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null);
+
+            if (result != null)
+            {
+                foreach (var item in groupX.Groups)
+                {
+                    result.SendTo = item.GroupId;
+                    clientX.SendMessage(result);
+                }
+            }
+        }
+    };
+
+    c.OnFriendMessageReceive += async (s, e) =>
+    {
+        try
+        {
+            await clientX.ReplyFromFriendAsync(s, e);
+        }
+        catch (Exception ex)
+        {
+            OutputHelper.PressError(ex);
+        }
+
+    };
+    //c.OnTempMessageReceive+= async (s, e) =>
+    //{
+    //    try
+    //    {
+    //        await clientX.ReplyFromTempAsync(s, e, CnGalWebSite.DataModel.Model.RobotReplyRange.Friend);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        OutputHelper.PressError(ex);
+    //    }
+
+    //};
+
+    c.OnGroupMessageReceive += async (s, e) =>
+    {
+        try
+        {
+            await clientX.ReplyFromGroupAsync(s, e);
+        }
+        catch (Exception ex)
+        {
+            OutputHelper.PressError(ex);
+        }
+
+    };
+
+    while (true)
+    {
+        await Task.Delay(10000);
+    }
+
+});
+var masudaTask = Task.Run(async () =>
 {
-    OutputHelper.PressError(ex, "初始化 Mirai 客户端失败", "配置文件错误或 Mirai 未正确启动");
-}
 
-var c = clientX.MiraiClient;
+    while (true)
+    {
+        await Task.Delay(10000);
+    }
 
+});
 
 //定时刷新数据定时器
 if (settingX.BasicSetting.IntervalTime > 0)
@@ -66,92 +168,20 @@ if (settingX.BasicSetting.IntervalTime > 0)
         await replyX.RefreshAsync();
         await eventX.RefreshAsync();
         await faceX.RefreshAsync();
-    }
 }
+}
+// 现以加入默认配置 私域 简洁初始化
+MasudaBot MasudaBot2
+    = new(102013323, "0vd9SZUDMMFyVpyv", "SpFFlqNMSxpeh4I0OWtOgp9gor6cZK4I", BotType.Private);
 
-c.ConnectAsync();
-
-//定时任务计时器
-System.Timers.Timer t = new(1000 * 60); //每一分钟查看一次
-t.Start(); //启动计时器
-t.Elapsed += async (s, e) =>
+// 普通消息事件注册(需要私域)
+MasudaBot2.MessageAction += async (bot, msg, type) =>
 {
-    var message = eventX.GetCurrentTimeEvent();
-    if (string.IsNullOrWhiteSpace(message) == false)
-    {
-        var result = await messageX.ProcMessageAsync(message, "", null, 0, null);
-
-        if (result != null)
-        {
-            foreach (var item in groupX.Groups)
-{
-                var j=result.SendToGroup(item.GroupId, c);
-                Console.WriteLine(j);
-            }
-        }
-    }
-};
-
-//随机任务计时器
-System.Timers.Timer t2 = new(1000 * 60); //每一分钟查看一次
-t2.Start(); //启动计时器
-t2.Elapsed += async (s, e) =>
-{
-    var message = eventX.GetProbabilityEvents();
-    if (string.IsNullOrWhiteSpace(message) == false)
-    {
-        var result = await messageX.ProcMessageAsync(message, "", null, 0, null);
-
-        if (result != null)
-        {
-            foreach (var item in groupX.Groups)
-            {
-                var j = result.SendToGroup(item.GroupId, c);
-                Console.WriteLine(j);
-            }
-        }
-    }
-};
-
-//c.OnTempMessageReceive+= async (s, e) =>
-//{
-//    try
-//    {
-//        await clientX.ReplyFromTempAsync(s, e, CnGalWebSite.DataModel.Model.RobotReplyRange.Friend);
-//    }
-//    catch (Exception ex)
-//    {
-//        OutputHelper.PressError(ex);
-//    }
-
-//};
-
-
-c.OnFriendMessageReceive +=  async (s, e) =>
-{
-    try
-    {
-        await clientX.ReplyFromFriendAsync(s, e, CnGalWebSite.DataModel.Model.RobotReplyRange.Friend);
-    }
-    catch (Exception ex)
-    {
-        OutputHelper.PressError(ex);
-    }
-
-};
-
-
-c.OnGroupMessageReceive +=  async (s, e) =>
-{
-    try
-    {
-        await clientX.ReplyFromGroupAsync(s, e, CnGalWebSite.DataModel.Model.RobotReplyRange.Group);
-    }
-    catch (Exception ex)
-    {
-        OutputHelper.PressError(ex);
-    }
-
+    // 回复文本
+    await bot.ReplyMessageAsync(msg, "muda");
+    // 组合消息
+    await bot.ReplyMessageAsync(msg, new PlainMessage("muda"), new AtMessage(msg.Author.Id));
+    //
 };
 
 while (true)

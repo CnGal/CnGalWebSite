@@ -1,12 +1,17 @@
 ﻿using BootstrapBlazor.Components;
+using CnGalWebSite.DataModel.Application.Dtos;
+using CnGalWebSite.DataModel.Application.Examines.Dtos;
 using CnGalWebSite.DataModel.Helper;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Others;
@@ -171,6 +176,34 @@ namespace CnGalWebSite.Shared.Service
         /// 评论缓存
         /// </summary>
         public IPageModelCatche<CommentCacheModel> CommentDataCatche { get; set; }
+        /// <summary>
+        /// 用户个人空间缓存
+        /// </summary>
+        public IPageModelCatche<PersonalSpaceViewModel> PersonalSpaceDataCatche { get; set; }
+        /// <summary>
+        /// 用户游玩记录列表缓存
+        /// </summary>
+        public IPageModelCatche<List<GameRecordViewModel>> UserGameRecordDataCatche { get; set; }
+        /// <summary>
+        /// 用户Steam信息缓存
+        /// </summary>
+        public IPageModelCatche<List<SteamUserInfor>> UserSteamInforDataCatche { get; set; }
+        /// <summary>
+        /// 用户文章列表缓存
+        /// </summary>
+        public IPageModelCatche<UserArticleListModel> UserArticleListDataCatche { get; set; }
+        /// <summary>
+        /// 用户编辑记录列表缓存
+        /// </summary>
+        public IPageModelCatche<PagedResultDto<ExaminedNormalListModel>> UserExaminesDataCatche { get; set; }
+        /// <summary>
+        /// 用户收藏夹列表缓存
+        /// </summary>
+        public IPageModelCatche<FavoriteFoldersViewModel> UserFavoriteFoldersDataCatche { get; set; }
+        /// <summary>
+        /// 用户收藏对象列表缓存
+        /// </summary>
+        public IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> UserFavoriteObjectsDataCatche { get; set; }
 
         public List<DocumentViewModel> DocumentsCatche { get; set; } = new List<DocumentViewModel>();
         /// <summary>
@@ -231,6 +264,10 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public CommentViewModel DetailComment { get; set; } = new CommentViewModel();
         /// <summary>
+        /// 个人主页缓存
+        /// </summary>
+        public SpaceViewCacheModel SpaceViewCache { get; set; } = new SpaceViewCacheModel();
+        /// <summary>
         /// 动态汇总缓存
         /// </summary>
         public NewsSummaryCacheModel NewsSummaryCache { get; set; } = new NewsSummaryCacheModel();
@@ -262,6 +299,13 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<ChartDataSource> chartDataCatche,
         IPageModelCatche<LineChartModel> lineChartDataCatche,
         IPageModelCatche<CommentCacheModel> commentDataCatche,
+        IPageModelCatche<PersonalSpaceViewModel> personalSpaceDataCatche,
+        IPageModelCatche<List<GameRecordViewModel>> userGameRecordDataCatche,
+        IPageModelCatche<List<SteamUserInfor>> userSteamInforDataCatche,
+        IPageModelCatche<UserArticleListModel> userArticleListDataCatche,
+        IPageModelCatche<PagedResultDto<ExaminedNormalListModel>> userExaminesDataCatche,
+        IPageModelCatche<FavoriteFoldersViewModel> userFavoriteFoldersDataCatche,
+        IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> userFavoriteObjectsDataCatche,
         IPageModelCatche<PlayedGameOverviewModel> playedGameOverviewDataCatche)
         {
             _httpClient = httpClient;
@@ -278,6 +322,13 @@ namespace CnGalWebSite.Shared.Service
             (TagContrastEditRecordViewCatche = tagContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/tags/GetContrastEditRecordViews/");
             (PlayedGameOverviewDataCatche = playedGameOverviewDataCatche).Init(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameOverview/");
             (CommentDataCatche = commentDataCatche).Init(ToolHelper.WebApiPath + "api/comments/GetComments/");
+            (PersonalSpaceDataCatche = personalSpaceDataCatche).Init(ToolHelper.WebApiPath + "api/space/getuserview/");
+            (UserGameRecordDataCatche = userGameRecordDataCatche).Init(ToolHelper.WebApiPath + "api/playedgame/GetUserGameRecords/");
+            (UserSteamInforDataCatche = userSteamInforDataCatche).Init(ToolHelper.WebApiPath + "api/steam/GetUserSteamInfor/");
+            (UserArticleListDataCatche = userArticleListDataCatche).Init(ToolHelper.WebApiPath + "api/space/GetUserArticles/");
+            (UserExaminesDataCatche = userExaminesDataCatche).Init(ToolHelper.WebApiPath + "api/space/GetUserEditRecord");
+            (UserFavoriteFoldersDataCatche = userFavoriteFoldersDataCatche).Init(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/");
+            (UserFavoriteObjectsDataCatche = userFavoriteObjectsDataCatche).Init(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteObjectList");
 
             (ChartDataCatche = chartDataCatche).Init("", true);
             (LineChartDataCatche = lineChartDataCatche).Init("");

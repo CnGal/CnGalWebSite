@@ -175,8 +175,8 @@ namespace CnGalWebSite.APIServer.Application.Files
 
                 if (obj.Successful)
                 {
-                    _logger.LogInformation("转存图片成功：{url}", url);
-                    return obj.OriginalUrl;
+                    _logger.LogInformation("转存图片成功：{url}", obj.Url);
+                    return obj.Url;
                 }
                 else
                 {

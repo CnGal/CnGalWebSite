@@ -84,7 +84,7 @@ namespace CnGalWebSite.RobotClient
         /// <param name="name"></param>
         /// <returns></returns>
         /// <exception cref="ArgError"></exception>
-        public async Task<Message[]> ProcMessageAsync(string reply, string message, string regex,long qq,string name)
+        public async Task<SendMessageModel> ProcMessageAsync(RobotReplyRange range,string reply, string message, string regex,long qq,string name)
         {
 
             var args = new List<KeyValuePair<string, string>>();
@@ -132,7 +132,20 @@ namespace CnGalWebSite.RobotClient
             {
                 reply = reply.Replace(item.Key, item.Value);
             }
-            return ProcMessageArray(reply);
+
+            if(range== RobotReplyRange.Channel)
+            {
+                return null;
+            }
+            else
+            {
+
+                return new SendMessageModel
+                {
+                    MiraiMessage = ProcMessageToMirai(reply),
+                    Range = range
+                };
+            }
         }
 
         /// <summary>
@@ -140,7 +153,7 @@ namespace CnGalWebSite.RobotClient
         /// </summary>
         /// <param name="vaule"></param>
         /// <returns></returns>
-        public Message[] ProcMessageArray(string vaule)
+        public Message[] ProcMessageToMirai(string vaule)
         {
             if (string.IsNullOrWhiteSpace(vaule))
             {
@@ -361,5 +374,14 @@ namespace CnGalWebSite.RobotClient
         {
             Error = error;
         }
+    }
+
+    public class SendMessageModel
+    {
+        public RobotReplyRange Range { get; set; }
+
+        public long SendTo { get; set; }
+
+        public Message[] MiraiMessage { get; set; } = Array.Empty<Message>();
     }
 }

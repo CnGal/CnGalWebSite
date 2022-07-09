@@ -1,11 +1,15 @@
 ﻿using BootstrapBlazor.Components;
+using CnGalWebSite.DataModel.Application.Dtos;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.Others;
@@ -97,6 +101,20 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<CommentCacheModel> CommentDataCatche { get; set; }
 
+        IPageModelCatche<PersonalSpaceViewModel> PersonalSpaceDataCatche { get; set; }
+
+        IPageModelCatche<List<GameRecordViewModel>> UserGameRecordDataCatche { get; set; }
+
+        IPageModelCatche<List<SteamUserInfor>> UserSteamInforDataCatche { get; set; }
+
+        IPageModelCatche<UserArticleListModel> UserArticleListDataCatche { get; set; }
+
+        IPageModelCatche<PagedResultDto<ExaminedNormalListModel>> UserExaminesDataCatche { get; set; }
+
+        IPageModelCatche<FavoriteFoldersViewModel> UserFavoriteFoldersDataCatche { get; set; }
+
+        IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> UserFavoriteObjectsDataCatche { get; set; }
+
         List<DocumentViewModel> DocumentsCatche { get; set; }
 
         List<RandomTagModel> RandomTagsCatche { get; set; }
@@ -126,6 +144,9 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
 
         DiscountPageHelper DiscountPageCatcheHelper { get; set; }
+
+        SpaceViewCacheModel SpaceViewCache { get; set; }
+
 
         Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>> GetHomePageListCardMode(string apiUrl, string type, int maxCount, bool isRefresh);
 

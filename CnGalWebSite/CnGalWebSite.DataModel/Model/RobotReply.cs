@@ -40,6 +40,8 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "群聊")]
         Group,
         [Display(Name = "私聊")]
-        Friend
+        Friend,
+        [Display(Name = "频道")]
+        Channel,
     }
 }
