@@ -15,4 +15,11 @@
 @code{
     [Parameter]
     public string Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //清空当前缓存
+        _dataCacheService.PersonalSpaceDataCatche.Clean(Id);
+        _dataCacheService.PlayedGameOverviewDataCatche.Clean(Id);
+    }
 }

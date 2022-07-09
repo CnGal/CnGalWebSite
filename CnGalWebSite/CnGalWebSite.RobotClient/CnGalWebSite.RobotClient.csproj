@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Electronicute.MeowMiraiLib" Version="7.0.0" />
+    <PackageReference Include="Masuda.Net" Version="6.0.12" />
   </ItemGroup>
 
   <ItemGroup>

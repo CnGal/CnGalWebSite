@@ -3,23 +3,30 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
+@inject IDataCacheService _dataCacheService
+
 <div>
-    <div class=" rounded shadow-sm  bg-opacity rounded ps-3 pe-3 pt-2 pb-2 mb-3" style="display: flex; flex-direction: row; justify-content: space-between;">
-        <h5 class="fw-bold font-color m-0"><i class="fa fa-file-text-o"></i>&nbsp;&nbsp;游玩记录</h5>
-        @if (IsCurrentUser)
-        {
-            <div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="fa fa-fw fa-file-text-o" Class="mb-4" Outline>
+        <ButtonContent>
+            @if (IsCurrentUser)
+            {
                 @if (string.IsNullOrWhiteSpace(SteamId))
                 {
-                    <Button OnClick="OnEditSteam" class="me-2" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-link" Text="绑定Steam账号" />
+                    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnEditSteam">
+                        <MIcon Left>mdi-steam </MIcon>
+                        绑定Steam账号
+                    </MButton>
                 }
+                else
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="刷新" Icon="mdi-refresh" IsAsync OnClick="OnRefresh" />
+
+                }
+            }
 
 
-                <Button OnClick="OnRefresh" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" IsAsync="true" Icon="fa fa-rotate-left" Text="刷新" />
-            </div>
-        }
-
-    </div>
+        </ButtonContent>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     @if (isReady)
     {
         <CnGalWebSite.Shared.Component.PlayedGames.SteamUserInforCard GameRecords="GameRecords" SteamUserInfors="SteamUserInfors" />
@@ -31,7 +38,7 @@
         }
         else
         {
-            <CnGalWebSite.Shared.Component.PlayedGames.ListGameRecordCard Model="GameRecords" IsCurrentUser="IsCurrentUser"/>
+            <CnGalWebSite.Shared.Component.PlayedGames.ListGameRecordCard Model="GameRecords" IsCurrentUser="IsCurrentUser" />
         }
     }
     else
@@ -41,7 +48,7 @@
         </div>
     }
 </div>
-
+<CnGalWebSite.Shared.Component.PlayedGames.EditUserSteamInforTip @ref="editUserSteamInforTip" OnChanged="OnChanged"/>
 @code {
 
     [Parameter]
@@ -54,6 +61,8 @@
 
     public List<GameRecordViewModel> GameRecords = new List<GameRecordViewModel>();
     public List<SteamUserInfor> SteamUserInfors = new List<SteamUserInfor>();
+
+    CnGalWebSite.Shared.Component.PlayedGames.EditUserSteamInforTip editUserSteamInforTip;
     [Parameter]
     public bool IsCurrentUser { get; set; }
 
@@ -61,10 +70,15 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await Refresh();
+    }
+
+    public async Task Refresh()
+    {
         try
         {
-            GameRecords = await Http.GetFromJsonAsync<List<GameRecordViewModel>>(ToolHelper.WebApiPath + "api/playedgame/GetUserGameRecords/" + UserId);
-            SteamUserInfors = await Http.GetFromJsonAsync<List<SteamUserInfor>>(ToolHelper.WebApiPath + "api/steam/GetUserSteamInfor/" + UserId);
+            GameRecords = await _dataCacheService.UserGameRecordDataCatche.GetCatche(UserId);
+            SteamUserInfors = await _dataCacheService.UserSteamInforDataCatche.GetCatche(UserId);
             isReady = true;
         }
         catch (Exception ex)
@@ -75,17 +89,17 @@
 
     public async Task OnEditSteam()
     {
-        var option = new DialogOption()
+        if(editUserSteamInforTip!=null)
         {
-            Title = "绑定Steam账号"
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<PlayedGames.EditUserSteamInforTip>(new Dictionary<string, object>
-        {
-            [nameof(PlayedGames.EditUserSteamInforTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-            [nameof(PlayedGames.EditUserSteamInforTip.OnChanged)] = EventCallback.Factory.Create<string>(this, async (s) => { SteamId = s; await OnRefresh(); }),
+            await editUserSteamInforTip.Refresh(true);
+        }
 
-        }).Render();
-        await DialogService.Show(option);
+    }
+
+    public async Task OnChanged(string steamId)
+    {
+        SteamId = steamId;
+        await OnRefresh();
     }
 
     public async Task OnRefresh()
@@ -95,7 +109,9 @@
             var model = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/playedgame/RefreshPlayedGameSteamInfor");
             if (model.Successful)
             {
-                await OnInitializedAsync();
+                _dataCacheService.UserGameRecordDataCatche.Clean(UserId);
+                _dataCacheService.UserSteamInforDataCatche.Clean(UserId);
+                await Refresh();
                 await ToastService.Success("刷新成功", "刷新成功");
                 StateHasChanged();
             }

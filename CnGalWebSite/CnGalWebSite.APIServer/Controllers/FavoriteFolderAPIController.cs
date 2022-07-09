@@ -401,12 +401,11 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        public async Task<PagedResultDto<FavoriteObjectAloneViewModel>> GetUserFavoriteObjectListAsync(PagedSortedAndFilterInput input)
+        [HttpGet]
+        public async Task<PagedResultDto<FavoriteObjectAloneViewModel>> GetUserFavoriteObjectListAsync( [FromQuery] int maxResultCount, [FromQuery] int currentPage, [FromQuery] long folderId)
         {
             var currentUser = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            var id = long.Parse(input.FilterText);
-            var favoriteFolder = await _favoriteFolderRepository.GetAll().Include(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == id);
+            var favoriteFolder = await _favoriteFolderRepository.GetAll().Include(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == folderId);
             if (favoriteFolder == null || favoriteFolder.ApplicationUser == null)
             {
                 return null;
@@ -440,7 +439,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
             }
 
-            return await _favoriteObjectService.GetPaginatedResult(input, id);
+            return await _favoriteObjectService.GetPaginatedResult(new PagedSortedAndFilterInput
+            {
+                CurrentPage = currentPage,
+                MaxResultCount = maxResultCount,
+            }, folderId);
         }
 
         [HttpGet("{id}/{type}")]

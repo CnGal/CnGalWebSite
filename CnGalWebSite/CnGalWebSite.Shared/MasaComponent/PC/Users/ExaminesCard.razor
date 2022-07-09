@@ -2,26 +2,16 @@
 @inject IDataCacheService _dataCacheService
 
 
-    <div class="row">
-        <div class="col-12 col-md-6">
-            <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h2 class="fw-bold m-0 font-color h5"><i class="fa fa-filter"></i>&nbsp;&nbsp;筛选</h2>
-                </div>
-                <Select TValue="ExaminedNormalListPassType" Value="ScreenType" ValueChanged="OnScreenTypeChanged" style="width:120px"></Select>
-            </div>
-
+<div class="rounded shadow-sm  bg-opacity mb-4">
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-8">
+        <div class="ps-4 pe-4" style="max-width: 300px; width: 100%;">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="ScreenType" ValueChanged="OnScreenTypeChanged" TValue="ExaminedNormalListPassType" Lable="筛选" Class="pt-0" />
         </div>
-        <div class="col-12 col-md-6">
-            <div class="rounded shadow-sm bg-opacity rounded mb-3  p-3 pt-2 pb-2" style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h2 class="fw-bold  m-0 font-color h5"><i class="fa fa-sort-amount-desc"></i>&nbsp;&nbsp;排序</h2>
-                </div>
-                <Select TValue="ExaminedNormalListSortType" Value="OrderType" ValueChanged="OnOrderTypeChangedChanged" style="width:120px"></Select>
-            </div>
-
+        <div class="ps-4 pe-4" style="max-width: 300px; width: 100%;">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="OrderType" ValueChanged="OnOrderTypeChangedChanged" TValue="ExaminedNormalListSortType" Lable="排序" Class="pt-0" />
         </div>
     </div>
+</div>
 
     <div>
         @foreach (var examine in pagedResultDto.Data)
@@ -142,7 +132,6 @@
 
     public string Sorting { get; set; } = "Id desc";
     public string ScreeningConditions { get; set; } = "All";
-    public int PageIndex { get; set; } = 1;
 
     public PagedResultDto<ExaminedNormalListModel> pagedResultDto = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<ExaminedNormalListModel>();
     public ExaminedNormalListPassType ScreenType { get; set; }
@@ -169,6 +158,8 @@
         }
         await OnPageClick(1);
     }
+
+
     public async Task OnOrderTypeChangedChanged(ExaminedNormalListSortType type)
     {
         OrderType = type;
@@ -181,32 +172,26 @@
                 Sorting = "PassedTime desc";
                 break;
         }
-        await OnPageClick(PageIndex);
-
+        await OnPageClick(_dataCacheService.SpaceViewCache.ExaminesCurrentPage);
     }
 
     protected override async Task OnInitializedAsync()
     {
+        if(_dataCacheService.SpaceViewCache.UserId!=Id)
+        {
+            _dataCacheService.SpaceViewCache.UserId = Id;
+            _dataCacheService.SpaceViewCache.ExaminesCurrentPage = 1;
+        }
         //获取审核列表
-        await OnPageClick(1);
+        await OnPageClick(_dataCacheService.SpaceViewCache.ExaminesCurrentPage);
     }
 
     private async Task OnPageClick(int pageIndex)
     {
-        PageIndex = pageIndex;
+        _dataCacheService.SpaceViewCache.ExaminesCurrentPage = pageIndex;
         try
         {
-            var result = await Http.PostAsJsonAsync<GetExamineInput>(ToolHelper.WebApiPath + "api/space/GetUserEditRecord", new GetExamineInput
-            {
-                UserId = Id,
-                Sorting = Sorting,
-                MaxResultCount = 10,
-                CurrentPage = pageIndex,
-                ScreeningConditions = ScreeningConditions
-            });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            pagedResultDto = JsonSerializer.Deserialize<PagedResultDto<ExaminedNormalListModel>>(jsonContent, ToolHelper.options);
-
+            pagedResultDto = await _dataCacheService.UserExaminesDataCatche.GetCatche($"?userId={Id}&sorting={Sorting}&maxResultCount={10}&currentPage={pageIndex}&ScreeningConditions={ScreeningConditions}");
             StateHasChanged();
         }
         catch (Exception ex)

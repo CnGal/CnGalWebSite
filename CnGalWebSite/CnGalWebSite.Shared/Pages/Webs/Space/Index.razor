@@ -43,7 +43,7 @@ else
                 <div>
 
                     <div class="rounded  shadow-sm bg-opacity mb-4">
-                        <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
+                        <MTabs Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive ValueChanged="TabValueChanged"
                                Color="@_dataCacheService.ThemeSetting.Theme">
 
                             <MTab Value="1">
@@ -151,7 +151,7 @@ else
                             @if (Model.IsCurrentUser || Model.IsShowFavorites)
                             {
                                 <MTabItem Value="5">
-                                    <FavoriteFoldersViewTip UserId="@Model.Id" OnClickUrl="OnClickUrl" IsCurrentUser="Model.IsCurrentUser"></FavoriteFoldersViewTip>
+                                    <FavoriteFoldersViewTip UserId="@Model.Id" IsCurrentUser="Model.IsCurrentUser"></FavoriteFoldersViewTip>
                                 </MTabItem>
                             }
 
@@ -272,6 +272,8 @@ else
 
         try
         {
+            TabIndex = _dataCacheService.SpaceViewCache.TabIndex;
+
             isReady = false;
             isNotFound = false;
 
@@ -283,7 +285,7 @@ else
             }
 
             //获取用户基本信息
-            Model = await Http.GetFromJsonAsync<PersonalSpaceViewModel>(ToolHelper.WebApiPath + "api/space/getuserview/" + Id);
+            Model =await _dataCacheService.PersonalSpaceDataCatche.GetCatche(Id);
 
             if (Model.IsCurrentUser)
             {
@@ -325,15 +327,10 @@ else
         }
     }
 
-    public async void OnClickUrl(NavigateModel model)
+    public Task TabValueChanged(StringNumber index)
     {
-        try
-        {
-            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
-        }
-        catch
-        {
-            await ToastService.Error("导航失败", "请尝试刷新页面");
-        }
+        _dataCacheService.SpaceViewCache.TabIndex = index.ToInt32();
+        TabIndex = index;
+        return Task.CompletedTask;
     }
 }

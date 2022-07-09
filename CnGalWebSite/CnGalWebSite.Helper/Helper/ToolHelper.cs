@@ -27,6 +27,7 @@ namespace CnGalWebSite.DataModel.Helper
         //public const string WebApiPath = "https://www.cngal.org/";
 
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";
+        public static bool IsWASM => WebApiPath == "https://www.cngal.org/";
 
         public const string ImageApiPath = "https://api.cngal.top/";
         //public const string ImageApiPath = "http://localhost:5098/";

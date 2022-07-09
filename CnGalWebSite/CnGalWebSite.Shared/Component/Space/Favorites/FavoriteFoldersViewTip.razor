@@ -1,23 +1,24 @@
 ﻿@inject HttpClient Http
 @inject ToastService? ToastService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 
-@if (ViewOnFavoriteFolderId!=0)
+@if (_dataCacheService.SpaceViewCache.ViewOnFavoriteFolderId != 0)
 {
-    <FavoriteObjectsViewTip Input="FavoriteObjectInput" OnClickUrl="OnClickUrl" OnReturn="OnReturn" Title="@Title" Id="ViewOnFavoriteFolderId" IsCurrentUser="IsCurrentUser" ></FavoriteObjectsViewTip>
+    <FavoriteObjectsViewTip OnReturn="OnReturn" Title="@_dataCacheService.SpaceViewCache.ViewOnFavoriteFolderName" Id="_dataCacheService.SpaceViewCache.ViewOnFavoriteFolderId" IsCurrentUser="IsCurrentUser"></FavoriteObjectsViewTip>
 }
 else
 {
-<div class=" rounded shadow-sm  bg-opacity rounded ps-3 pe-3 pt-2 pb-2 mb-2" style="display: flex; flex-direction: row; justify-content: space-between;">
-    <h5 class="fw-bold font-color m-0"><i class="fa fa-folder-open"></i>&nbsp;&nbsp;收藏夹</h5>
-    @if (IsCurrentUser)
-    {
-        <Button @onclick="OnManage" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-pencil-square" Text="管理"/>
-    }
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="收藏夹" Icon="fa fa-fw fa-folder-open" Class="mb-4" Outline>
+        <ButtonContent>
+            @if (IsCurrentUser)
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="编辑" Icon="mdi-pencil" OnClick="OnManage" />
 
-</div>
+            }
+        </ButtonContent>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     @if (Model != null && Model.Favorites != null)
     {
         foreach (var item in Model.Favorites)
@@ -32,19 +33,14 @@ else
     public FavoriteFoldersViewModel Model { get; set; }
 
     public PagedSortedAndFilterInput FavoriteObjectInput { get; set; } = new PagedSortedAndFilterInput();
-    [Parameter]
-    public EventCallback<NavigateModel> OnClickUrl { get; set; }
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-
 
     [Parameter]
     public string UserId { get; set; }
     [Parameter]
     public bool IsCurrentUser { get; set; }
-
-    public long ViewOnFavoriteFolderId { get; set; }
-    public string Title { get; set; }
 
     public async Task Refresh(string id)
     {
@@ -56,15 +52,21 @@ else
     {
         try
         {
+            if (UserId != _dataCacheService.SpaceViewCache.UserId)
+            {
+                _dataCacheService.SpaceViewCache.UserId = UserId;
+                _dataCacheService.SpaceViewCache.ViewOnFavoriteFolderId = 0;
+            }
+
             if (string.IsNullOrWhiteSpace(UserId))
             {
                 return;
             }
-            Model = await Http.GetFromJsonAsync<FavoriteFoldersViewModel>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/" + UserId);
+            Model = await _dataCacheService.UserFavoriteFoldersDataCatche.GetCatche(UserId);
 
             StateHasChanged();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "获取收藏夹列表失败");
         }
@@ -72,24 +74,19 @@ else
 
     public void OnClickFolder(FavoriteFolderAloneModel model)
     {
-        ViewOnFavoriteFolderId = model.Id;
-        FavoriteObjectInput.FilterText = model.Id.ToString();
-        Title = model.Name;
+        _dataCacheService.SpaceViewCache.ViewOnFavoriteFolderId = model.Id;
+        _dataCacheService.SpaceViewCache.ViewOnFavoriteFolderName = model.Name;
         StateHasChanged();
     }
 
     public void OnReturn()
     {
-        ViewOnFavoriteFolderId = 0;
+        _dataCacheService.SpaceViewCache.ViewOnFavoriteFolderId = 0;
         StateHasChanged();
     }
-    public async Task OnManage()
+    public Task OnManage()
     {
-        await OnClickUrl.InvokeAsync(new NavigateModel
-        {
-            Title = "管理收藏夹列表",
-            Icon = "fa fa-folder-open",
-            Url = "/space/EditSpaceFavoriteFolders/" + UserId
-        });
+        NavigationManager.NavigateTo("/space/EditSpaceFavoriteFolders/" + UserId);
+        return Task.CompletedTask;
     }
 }

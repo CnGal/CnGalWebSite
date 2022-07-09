@@ -1,114 +1,97 @@
 ﻿@inject HttpClient Http
 @inject ToastService? ToastService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
-<div class=" rounded shadow-sm  bg-opacity rounded ps-3 pe-3 pt-2 pb-2 mb-2" style="display: flex; flex-direction: row; justify-content: space-between;">
-    <h5 class="fw-bold font-color m-0" ><i class="fa fa-folder-open"></i>&nbsp;&nbsp;@Title</h5>
-    <div class="float: right">
-        @if (IsCurrentUser)
-        {
-            <Button @onclick="OnManage" class=" me-2" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-pencil-square" Text="管理"/>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@Title" Icon="fa fa-fw fa-folder-open" Class="mb-4" Outline>
+    <ButtonContent>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="返回" Icon="mdi-keyboard-backspace " OnClick="OnReturn" />
+    </ButtonContent>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
-        }
-        <Button @onclick="OnReturn" Color="Color.Dark" IsOutline="true" Size="Size.ExtraSmall" Icon="fa fa-rotate-left" Text="返回"/>
-    </div>
-   
 
-</div>
-
-@if (is404 == true)
-{
-    <NotFoundTip IsNeedLayput="true"></NotFoundTip>
-}
 
 <div>
-
-    <Virtualize ItemsProvider="@LoadArticles" @ref="virtualize">
+    @foreach (var item in pagedResultDto.Data)
+    {
         <div class="mb-3">
-            @if (context.entry != null)
+            @if (item.entry != null)
             {
-                <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="context.entry" ColorNum="main" />
+                <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.entry" ColorNum="main" />
 
             }
-            else if (context.article != null)
+            else if (item.article != null)
             {
-                <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="context.article" />
+                <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item.article" />
             }
-            else if (context.periphery != null)
+            else if (item.periphery != null)
             {
-                <CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip Model="context.periphery" />
+                <CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip Model="item.periphery" />
             }
         </div>
-     
-    </Virtualize>
+
+    }
+
+
 </div>
 
+@if (pagedResultDto.TotalPages > 1)
+{
+    <MPagination Value="@pagedResultDto.CurrentPage" Class="my-4" Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
+}
+@if (pagedResultDto.Data.Count == 0&&isReady)
+{
+    <div class="mb-3">
+        <NotFoundTip IsNeedLayput="true" />
+    </div>
 
-
+}
 @code {
-    [Parameter]
-    public PagedSortedAndFilterInput Input { get; set; }
+
+    public PagedResultDto<FavoriteObjectAloneViewModel> pagedResultDto { get; set; } = new PagedResultDto<FavoriteObjectAloneViewModel>();
     [Parameter]
     public string Title { get; set; }
     [Parameter]
     public long Id { get; set; }
     [Parameter]
     public bool IsCurrentUser { get; set; }
+    bool isReady;
 
-    [NotNull]
-    public Virtualize<FavoriteObjectAloneViewModel>? virtualize { get; set; }
-    [Parameter]
-    public EventCallback<NavigateModel> OnClickUrl { get; set; }
     [Parameter]
     public EventCallback OnReturn { get; set; }
-
-    private bool is404 = false;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    private async Task<PagedResultDto<FavoriteObjectAloneViewModel>> OnGetNewItems()
+    protected override async Task OnInitializedAsync()
     {
+        if (_dataCacheService.SpaceViewCache.PageFavoriteFolderId != Id)
+        {
+            _dataCacheService.SpaceViewCache.PageFavoriteFolderId = Id;
+            _dataCacheService.SpaceViewCache.FavoriteObjectsCurrentPage = 1;
+        }
+        //获取审核列表
+        await OnPageClick(_dataCacheService.SpaceViewCache.FavoriteObjectsCurrentPage);
+        isReady = true;
+    }
+
+    private async Task OnPageClick(int pageIndex)
+    {
+        _dataCacheService.SpaceViewCache.FavoriteObjectsCurrentPage = pageIndex;
         try
         {
-            var result = await Http.PostAsJsonAsync<PagedSortedAndFilterInput>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteObjectList", Input);
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<PagedResultDto<FavoriteObjectAloneViewModel>>(jsonContent, ToolHelper.options);
+            pagedResultDto = await _dataCacheService.UserFavoriteObjectsDataCatche.GetCatche($"?maxResultCount={10}&currentPage={pageIndex}&folderId={Id}");
+            StateHasChanged();
         }
         catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "无法获取收藏夹内容");
-            return new PagedResultDto<FavoriteObjectAloneViewModel> { Data = new List<FavoriteObjectAloneViewModel>() };
         }
     }
 
-    private async ValueTask<ItemsProviderResult<FavoriteObjectAloneViewModel>> LoadArticles(ItemsProviderRequest request)
+    public Task OnManage()
     {
-        Input.CurrentPage = request.StartIndex;
-        Input.MaxResultCount = request.Count;
-        var articles = await OnGetNewItems();
-
-        if (is404 != (articles.TotalCount == 0))
-        {
-            is404 = (articles.TotalCount == 0);
-            StateHasChanged();
-        }
-
-        return new ItemsProviderResult<FavoriteObjectAloneViewModel>(articles.Data, articles.TotalCount);
-    }
-
-    public async Task RefreshDataAsync()
-    {
-        await virtualize.RefreshDataAsync();
-    }
-    public async Task OnManage()
-    {
-        await OnClickUrl.InvokeAsync(new NavigateModel
-        {
-            Title = "管理收藏夹",
-            Icon = "fa fa-folder-open",
-            Url = "/space/EditSpaceFavoriteObjects/" + Id + "/" + ToolHelper.Base64EncodeName(Title)
-        });
+        NavigationManager.NavigateTo("/space/EditSpaceFavoriteObjects/" + Id + "/" + ToolHelper.Base64EncodeName(Title));
+        return Task.CompletedTask;
     }
 }

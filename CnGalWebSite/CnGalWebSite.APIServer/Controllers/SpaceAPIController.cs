@@ -239,10 +239,17 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        public async Task<PagedResultDto<ExaminedNormalListModel>> GetUserEditRecordAsync(GetExamineInput input)
+        [HttpGet]
+        public async Task<PagedResultDto<ExaminedNormalListModel>> GetUserEditRecordAsync([FromQuery]string userId, [FromQuery]string sorting, [FromQuery]int maxResultCount, [FromQuery] int currentPage, [FromQuery]string screeningConditions)
         {
-            return await _examineService.GetPaginatedResult(input, 0, input.UserId);
+            return await _examineService.GetPaginatedResult(new GetExamineInput
+            {
+                ScreeningConditions = screeningConditions,
+                Sorting = sorting,
+                CurrentPage = currentPage,
+                MaxResultCount = maxResultCount,
+                UserId = userId
+            }, 0, userId);
         }
 
         [HttpGet]
@@ -732,6 +739,21 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
             return new Result { Successful = true, Error = await _userService.GenerateBindGroupQQCode(user) };
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserArticleListModel>> GetUserArticles(string id)
+        {
+            var articles = await _articleRepository.GetAll().Include(s=>s.CreateUser).AsNoTracking().Where(s => s.CreateUserId == id).ToListAsync();
+
+            var model =new UserArticleListModel();
+            foreach (var item in articles.OrderByDescending(s=>s.Id))
+            {
+                model.Items.Add(_appHelper.GetArticleInforTipViewModel(item));
+            }
+
+            return model;
         }
 
     }

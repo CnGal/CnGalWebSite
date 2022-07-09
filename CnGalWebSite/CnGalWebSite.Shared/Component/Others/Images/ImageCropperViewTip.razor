@@ -12,7 +12,7 @@
     <div class="card-body py-0">
         <Cropper CropperHeight="300" InitCropWidth="200" InitCropHeight="200" MaxCropedHeight="1080" MaxCropedWidth="1920"
                  @ref="cropper"
-                 PureCSharpProcessing
+                 PureCSharpProcessing="!ToolHelper.IsWASM"
                  AspectRatio="AspectRatio"
                  RequireAspectRatio="@IsAspectRatioEnabled"
                  InputId="@Id"

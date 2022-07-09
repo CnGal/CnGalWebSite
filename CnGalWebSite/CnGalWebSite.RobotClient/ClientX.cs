@@ -13,7 +13,7 @@ namespace CnGalWebSite.RobotClient
         private readonly MessageX _messageX;
         private readonly GroupX _groupX;
         public MeowMiraiLib.Client MiraiClient { get; set; }
-        private readonly List<PostLog> _post = new List<PostLog>();
+        private readonly List<PostLog> _post = new();
         private readonly List<MessageArg> _messageArgs;
 
         public ClientX(Setting setting, MessageX messageX, GroupX groupX, List<MessageArg> messageArgs)
@@ -36,106 +36,22 @@ namespace CnGalWebSite.RobotClient
         /// <param name="e"></param>
         /// <param name="range"></param>
         /// <returns></returns>
-        public async Task ReplyFromFriendAsync(FriendMessageSender s, Message[] e, RobotReplyRange range)
+        public async Task ReplyFromFriendAsync(FriendMessageSender s, Message[] e)
         {
-            var message = e.MGetPlainString();
-            var sendto = s.id;
-            var at = e.FirstOrDefault(s => s.type == "At");
-            if (at != null)
-            {
-                var atTarget = (at as At).target;
-                message += "[@" + atTarget.ToString() + "]";
-            }
-
-
-            //尝试找出所有匹配的回复
-            var reply = _messageX.GetAutoReply(message, range);
-
-            if (reply == null)
-            {
-                return;
-            }
-
-            var result = new Message[] { };
-            try
-            {
-                result = await _messageX.ProcMessageAsync(reply.Value, message, reply.Key, sendto, s.nickname);
-            }
-            catch (ArgError ae)
-            {
-                if (_setting.WarningQQGroup > 0)
-                {
-                    //发送警告
-                    var j = await new GroupMessage(_setting.WarningQQGroup, new Message[] { new Plain(ae.Error) }).SendAsync(MiraiClient);
-                    Console.WriteLine(j);
-
-                }
-            }
-
-
-            if (result != null)
-            {
-                //判断该用户是否连续10次互动 1分钟内
-                var singleCount = _post.Count(x => (DateTime.Now.ToCstTime() - x.PostTime).TotalMinutes <= 1 && x.QQ == s.id);
-                var totalCount = _post.Count(x => (DateTime.Now.ToCstTime() - x.PostTime).TotalMinutes <= 1);
-
-                if (singleCount == _setting.SingleLimit)
-                {
-                    result = await _messageX.ProcMessageAsync($"[黑化微笑][@{s.id}]如果恶意骚扰人家的话，我会请你离开哦…", null, null, sendto, s.nickname);
-                }
-                else if (singleCount > _setting.SingleLimit)
-                {
-                    return;
-                }
-
-                if (singleCount == _setting.TotalLimit)
-                {
-                    result = await _messageX.ProcMessageAsync($"核心温度过高，正在冷却......", null, null, sendto, s.nickname);
-                }
-                else if (singleCount > _setting.TotalLimit)
-                {
-                    return;
-                }
-
-                _post.Add(new PostLog
-                {
-                    Message = message,
-                    PostTime = DateTime.Now.ToCstTime(),
-                    QQ = s.id,
-                    Reply = reply.Value
-                });
-
-                var j = result.SendToFriend(sendto, MiraiClient);
-                Console.WriteLine(j);
-            }
+            await ReplyMessageAsync(RobotReplyRange.Friend, ConversionMeaasge(e), s.id, s.id, s.nickname);
         }
 
-        /// <summary>
-        /// 回复群聊消息
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="e"></param>
-        /// <param name="range"></param>
-        /// <returns></returns>
-        public async Task ReplyFromGroupAsync(GroupMessageSender s, Message[] e, RobotReplyRange range)
+        public async Task ReplyFromGroupAsync(GroupMessageSender s, Message[] e)
         {
-            var message = e.MGetPlainString();
-            var sendto = s.group.id;
-            var at = e.FirstOrDefault(s => s.type == "At");
-            if (at != null)
-            {
-                var atTarget = (at as At).target;
-                message += "[@" + atTarget.ToString() + "]";
-            }
-            var group = _groupX.Groups.FirstOrDefault(s => s.GroupId == sendto);
             //忽略未关注的群聊
-            if (group==null)
+            var group = _groupX.Groups.FirstOrDefault(x => x.GroupId == s.group.id);
+            if (group == null)
             {
                 return;
             }
-
             //检查是否符合强制匹配
-            if(group.ForceMatch)
+            var message = ConversionMeaasge(e);
+            if (group.ForceMatch)
             {
                 var name = _messageArgs.FirstOrDefault();
                 if (name != null && message.Contains(name.Value) == false)
@@ -143,71 +59,139 @@ namespace CnGalWebSite.RobotClient
                     return;
                 }
             }
+            await ReplyMessageAsync(RobotReplyRange.Group, message, s.group.id, s.id, s.memberName);
+        }
 
+        private string ConversionMeaasge(Message[] e)
+        {
+            var message = e.MGetPlainString();
+            var at = e.FirstOrDefault(s => s.type == "At");
+            if (at != null)
+            {
+                var atTarget = (at as At).target;
+                message += "[@" + atTarget.ToString() + "]";
+            }
+            return message;
+        }
+
+        /// <summary>
+        /// 回复消息
+        /// </summary>
+        private async Task ReplyMessageAsync(RobotReplyRange range, string message, long sendto, long memberId, string memberName)
+        {
             //尝试找出所有匹配的回复
-            var reply = _messageX.GetAutoReply(message,range);
+            var reply = _messageX.GetAutoReply(message, range);
 
             if (reply == null)
             {
                 return;
             }
+            var result = new SendMessageModel();
 
-            var result = new Message[] { };
-            try
+            if (range == RobotReplyRange.Channel)
             {
-                result = await _messageX.ProcMessageAsync(reply.Value, message, reply.Key, s.id, s.memberName);
 
             }
-            catch (ArgError ae)
+            else
             {
-                if (_setting.WarningQQGroup > 0)
+                try
                 {
-                    //发送警告
-                    var j = await new GroupMessage(_setting.WarningQQGroup, new Message[] { new Plain(ae.Error) }).SendAsync(MiraiClient);
-                    Console.WriteLine(j);
-
+                    //处理消息
+                    result = await _messageX.ProcMessageAsync(range, reply.Value, message, reply.Key, memberId, memberName);
+                }
+                catch (ArgError ae)
+                {
+                    if (_setting.WarningQQGroup > 0)
+                    {
+                        //发送警告
+                        var j = await new GroupMessage(_setting.WarningQQGroup, new Message[] { new Plain(ae.Error) }).SendAsync(MiraiClient);
+                        Console.WriteLine(j);
+                    }
                 }
             }
 
 
             if (result != null)
             {
-
-                //判断该用户是否连续10次互动 1分钟内
-                var singleCount = _post.Count(x => (DateTime.Now.ToCstTime() - x.PostTime).TotalMinutes <= 1 && x.QQ == s.id);
-                var totalCount = _post.Count(x => (DateTime.Now.ToCstTime() - x.PostTime).TotalMinutes <= 1);
-
-                if (singleCount == _setting.SingleLimit)
+                //检查上限
+                if (await CheckLimit(range, sendto, memberId, memberName) == false)
                 {
-                    result = await _messageX.ProcMessageAsync($"[黑化微笑][@{s.id}]如果恶意骚扰人家的话，我会请你离开哦…", null, null, s.id, s.memberName);
+                    //发送消息
+                    result.SendTo = sendto;
+                    SendMessage(result);
                 }
-                else if (singleCount > _setting.SingleLimit)
-                {
-                    return;
-                }
+            }
+            //添加发送记录
+            _post.Add(new PostLog
+            {
+                Message = message,
+                PostTime = DateTime.Now.ToCstTime(),
+                QQ = memberId,
+                Reply = reply.Value
+            });
+        }
 
-                if (singleCount == _setting.TotalLimit)
-                {
-                    result = await _messageX.ProcMessageAsync($"核心温度过高，正在冷却......", null, null, s.id, s.memberName);
-                }
-                else if (singleCount > _setting.TotalLimit)
-                {
-                    return;
-                }
+        /// <summary>
+        /// 检查是否超过限制
+        /// </summary>
+        /// <param name="sendto"></param>
+        /// <param name="memberId"></param>
+        /// <param name="memberName"></param>
+        /// <returns>是否超过限制</returns>
+        private async Task<bool> CheckLimit(RobotReplyRange range, long sendto, long memberId, string memberName)
+        {
+            //判断该用户是否连续10次互动 1分钟内
+            var singleCount = _post.Count(x => (DateTime.Now.ToCstTime() - x.PostTime).TotalMinutes <= 1 && x.QQ == memberId);
+            var totalCount = _post.Count(x => (DateTime.Now.ToCstTime() - x.PostTime).TotalMinutes <= 1);
 
-                //添加发送记录
-                _post.Add(new PostLog
-                {
-                    Message = message,
-                    PostTime = DateTime.Now.ToCstTime(),
-                    QQ = s.id,
-                    Reply = reply.Value
-                });
-                var j = result.SendToGroup(sendto, MiraiClient);
+
+            if (singleCount == _setting.SingleLimit)
+            {
+                var result = await _messageX.ProcMessageAsync(range, $"[黑化微笑][@{memberId}]如果恶意骚扰人家的话，我会请你离开哦…", null, null, memberId, memberName);
+                result.SendTo = sendto;
+                SendMessage(result);
+                return true;
+            }
+            else if (singleCount > _setting.SingleLimit)
+            {
+                return true;
+            }
+
+            if (singleCount == _setting.TotalLimit)
+            {
+                var result = await _messageX.ProcMessageAsync(range, $"核心温度过高，正在冷却......", null, null, memberId, memberName);
+                result.SendTo = sendto;
+                SendMessage(result);
+                return true;
+            }
+            else if (singleCount > _setting.TotalLimit)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public void SendMessage(SendMessageModel model)
+        {
+            if (model.Range == RobotReplyRange.Channel)
+            {
+
+            }
+            else if (model.Range == RobotReplyRange.Friend)
+            {
+                var j = model.MiraiMessage.SendToFriend(model.SendTo, MiraiClient);
+                Console.WriteLine(j);
+            }
+            else
+            {
+                var j = model.MiraiMessage.SendToGroup(model.SendTo, MiraiClient);
                 Console.WriteLine(j);
             }
         }
     }
+
+
 
     public class PostLog
     {
