@@ -1,10 +1,6 @@
-﻿using CnGalWebSite.Helper.Helper;
+﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.Helper.Helper;
 using CnGalWebSite.RobotClient;
-using MeowMiraiLib.Msg.Type;
-using CnGalWebSite.DataModel.Model;
-using System.Linq.Dynamic.Core.Tokenizer;
-using Masuda.Net;
-using Masuda.Net.HelpMessage;
 
 var httpClient = new HttpClient();
 var cacheX = new CacheX();
@@ -44,20 +40,23 @@ Console.WriteLine("->初始化消息处理模块");
 var messageX = new MessageX(settingX.BasicSetting, httpClient, replyX.Replies, cacheX.ReplyCache, settingX.MessageArgs, faceX.Faces, sensitiveWordX);
 
 var clientX = new ClientX(settingX.BasicSetting, messageX, groupX, settingX.MessageArgs);
+
+var miraiTask = Task.Run(async () =>
+{
+    if (settingX.BasicSetting.IsOnNormal != true)
+    {
+        return;
+    }
+
     try
     {
-        Console.WriteLine("->初始化 SDK 客户端");
-        clientX.Init();
+        Console.WriteLine("->初始化 Mirai 客户端");
+        clientX.InitMirai();
     }
     catch (Exception ex)
     {
-        OutputHelper.PressError(ex, "初始化 SDK 客户端失败", "配置文件错误或 依赖项 未正确启动");
+        OutputHelper.PressError(ex, "初始化 Mirai 客户端失败", "配置文件错误或 依赖项 未正确启动");
     }
-var miraiTask = Task.Run(async () =>
-{
-
-
-
     var c = clientX.MiraiClient;
 
     _ = c.ConnectAsync();
@@ -70,14 +69,14 @@ var miraiTask = Task.Run(async () =>
         var message = eventX.GetCurrentTimeEvent();
         if (string.IsNullOrWhiteSpace(message) == false)
         {
-            var result = await messageX.ProcMessageAsync(RobotReplyRange.Group,message, "", null, 0, null);
+            var result = await messageX.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null);
 
             if (result != null)
             {
                 foreach (var item in groupX.Groups)
                 {
                     result.SendTo = item.GroupId;
-                    clientX.SendMessage(result);
+                    await clientX.SendMessage(result);
                 }
             }
         }
@@ -98,7 +97,7 @@ var miraiTask = Task.Run(async () =>
                 foreach (var item in groupX.Groups)
                 {
                     result.SendTo = item.GroupId;
-                    clientX.SendMessage(result);
+                    await clientX.SendMessage(result);
                 }
             }
         }
@@ -150,7 +149,33 @@ var miraiTask = Task.Run(async () =>
 });
 var masudaTask = Task.Run(async () =>
 {
+    if (settingX.BasicSetting.IsOnChannel != true)
+    {
+        return;
+    }
 
+    try
+    {
+        Console.WriteLine("->初始化 Masuda 客户端");
+        clientX.InitMasuda();
+    }
+    catch (Exception ex)
+    {
+        OutputHelper.PressError(ex, "初始化 Masuda 客户端失败", "配置文件错误或 依赖项 未正确启动");
+    }
+
+    // 普通消息事件注册(需要私域)
+    clientX.MasudaClient.MessageAction += async (bot, msg, type) =>
+    {
+        try
+        {
+            await clientX.ReplyFromChannelAsync(msg);
+        }
+        catch (Exception ex)
+        {
+            OutputHelper.PressError(ex);
+        }
+    };
     while (true)
     {
         await Task.Delay(10000);
@@ -168,21 +193,9 @@ if (settingX.BasicSetting.IntervalTime > 0)
         await replyX.RefreshAsync();
         await eventX.RefreshAsync();
         await faceX.RefreshAsync();
+    }
 }
-}
-// 现以加入默认配置 私域 简洁初始化
-MasudaBot MasudaBot2
-    = new(102013323, "0vd9SZUDMMFyVpyv", "SpFFlqNMSxpeh4I0OWtOgp9gor6cZK4I", BotType.Private);
 
-// 普通消息事件注册(需要私域)
-MasudaBot2.MessageAction += async (bot, msg, type) =>
-{
-    // 回复文本
-    await bot.ReplyMessageAsync(msg, "muda");
-    // 组合消息
-    await bot.ReplyMessageAsync(msg, new PlainMessage("muda"), new AtMessage(msg.Author.Id));
-    //
-};
 
 while (true)
 {

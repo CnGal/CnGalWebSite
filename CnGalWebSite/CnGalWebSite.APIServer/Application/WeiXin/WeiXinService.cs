@@ -164,7 +164,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             return await GetEntryInfor(entryIds[index], plainText, showLink);
         }
 
-        public async Task<string> GetEntryInfor(int id, bool plainText = false, bool showLink = false)
+        public async Task<string> GetEntryInfor(int id, bool plainText = false, bool showLink = false,bool showOutlink=true)
         {
             var entry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Information)
@@ -242,7 +242,9 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                     {
                         sb.AppendLine($"{steam.RecommendationRate}% 好评（{steam.EvaluationCount}条评测）");
                     }
-                    if (plainText)
+                    if(showOutlink)
+                    {
+ if (plainText)
                     {
                         sb.AppendLine($"https://store.steampowered.com/app/{steamId}");
                     }
@@ -251,6 +253,8 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                         sb.AppendLine($"<a href=\"https://store.steampowered.com/app/{steamId}\">Steam商店页面</a>");
 
                     }
+                    }
+                   
 
                     if (entry.EntryRelationFromEntryNavigation.Any(s => s.ToEntryNavigation.Type == EntryType.Role))
                     {

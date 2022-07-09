@@ -72,17 +72,75 @@ namespace CnGalWebSite.RobotClient
 
         public void Verify()
         {
-            if (string.IsNullOrWhiteSpace(BasicSetting.VerifyKey))
+            if (BasicSetting.IsOnNormal == null)
             {
-                Console.WriteLine("请输入 VerifyKey");
-                BasicSetting.VerifyKey = Console.ReadLine();
+                Console.WriteLine("是否开启普通群聊功能？(Y/N, default: Y)");
+                var str = Console.ReadLine();
+                if (str.ToUpper() != "N")
+                {
+                    BasicSetting.IsOnNormal = true;
+                }
+                else
+                {
+                    BasicSetting.IsOnNormal = false;
+                }
+            }
+            if (BasicSetting.IsOnChannel == null)
+            {
+                Console.WriteLine("是否开启频道功能？(Y/N, default: Y)");
+                var str = Console.ReadLine();
+                if (str.ToUpper() != "N")
+                {
+                    BasicSetting.IsOnChannel = true;
+                }
+                else
+                {
+                    BasicSetting.IsOnChannel = false;
+                }
             }
 
-            if (string.IsNullOrWhiteSpace(BasicSetting.QQ))
+            if (BasicSetting.IsOnNormal == true)
             {
-                Console.WriteLine("请输入 QQ号");
-                BasicSetting.QQ = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(BasicSetting.NormalVerifyKey))
+                {
+                    Console.WriteLine("请输入 VerifyKey");
+                    BasicSetting.NormalVerifyKey = Console.ReadLine();
+                }
+
+                if (string.IsNullOrWhiteSpace(BasicSetting.QQ))
+                {
+                    Console.WriteLine("请输入 QQ号");
+                    BasicSetting.QQ = Console.ReadLine();
+                }
             }
+            if (BasicSetting.IsOnChannel == true)
+            {
+                if (BasicSetting.ChannelAppId==0)
+                {
+                    Console.WriteLine("请输入 AppId");
+                    var id = 0;
+                    while( !int.TryParse( Console.ReadLine(), out id))
+                    {
+                        Console.WriteLine("请输入纯数字");
+                    }
+
+                    BasicSetting.ChannelAppId = id;
+                }
+
+                if (string.IsNullOrWhiteSpace(BasicSetting.ChannelAppKey))
+                {
+                    Console.WriteLine("请输入 AppKey");
+                    BasicSetting.ChannelAppKey = Console.ReadLine();
+                }
+
+                if (string.IsNullOrWhiteSpace(BasicSetting.ChannelToken))
+                {
+                    Console.WriteLine("请输入 Token");
+                    BasicSetting.ChannelToken = Console.ReadLine();
+                }
+            }
+
+            Console.WriteLine($"{(BasicSetting.IsOnNormal == true ? "已开启" : "已关闭")}普通群聊功能，{(BasicSetting.IsOnChannel == true ? "已开启" : "已关闭")}频道功能");
 
             SaveBasicSetting();
         }
@@ -119,7 +177,13 @@ namespace CnGalWebSite.RobotClient
     {
         public string MiraiUrl { get; set; } = "localhost:8080";
 
-        public string VerifyKey { get; set; }
+        public bool? IsOnNormal { get; set; }
+        public bool? IsOnChannel { get; set; }
+
+        public string NormalVerifyKey { get; set; }
+        public int ChannelAppId { get; set; }
+        public string ChannelAppKey { get; set; }
+        public string ChannelToken { get; set; }
 
         public string RootPath { get; set; } = "Data";
 

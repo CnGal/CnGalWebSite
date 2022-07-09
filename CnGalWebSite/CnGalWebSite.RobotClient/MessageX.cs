@@ -3,6 +3,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Robots;
 using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.Helper.Helper;
+using Masuda.Net.HelpMessage;
 using MeowMiraiLib.Msg.Sender;
 using MeowMiraiLib.Msg.Type;
 using System.Net.Http.Json;
@@ -135,7 +136,11 @@ namespace CnGalWebSite.RobotClient
 
             if(range== RobotReplyRange.Channel)
             {
-                return null;
+                return new SendMessageModel
+                {
+                    MasudaMessage = ProcMessageToMasuda(reply),
+                    Range = range
+                };
             }
             else
             {
@@ -224,6 +229,85 @@ namespace CnGalWebSite.RobotClient
                 return messages.ToArray();
             }
         }
+        /// <summary>
+        /// 将纯文本回复转换成可发送的消息数组
+        /// </summary>
+        /// <param name="vaule"></param>
+        /// <returns></returns>
+        public MessageBase[] ProcMessageToMasuda(string vaule)
+        {
+            if (string.IsNullOrWhiteSpace(vaule))
+            {
+                return null;
+            }
+
+            var messages = new List<MessageBase>();
+
+            while (true)
+            {
+                if (vaule.Contains("[image="))
+                {
+                    var imageStr = vaule.MidStrEx("[image=", "]");
+
+                    if (string.IsNullOrWhiteSpace(imageStr) == false)
+                    {
+                        vaule = vaule.Replace("[image=" + imageStr + "]", "");
+                        //修正一部分图片链接缺省协议
+                        if (imageStr.Contains("http") == false)
+                        {
+                            imageStr = "https:" + imageStr;
+                        }
+                        messages.Add(new ImageMessage(url: imageStr.Replace("http://image.cngal.org/", "https://image.cngal.org/")));
+                    }
+                }
+                else if (vaule.Contains("[声音="))
+                {
+                    //var voiceStr = vaule.MidStrEx("[声音=", "]");
+
+                    //if (string.IsNullOrWhiteSpace(voiceStr) == false)
+                    //{
+                    //    vaule = vaule.Replace("[声音=" + voiceStr + "]", "");
+                    //    messages.Add(new Voice(url: voiceStr.Replace("http://res.cngal.org/", "https://res.cngal.org/")));
+
+                    //}
+
+                    return null;
+                }
+
+                else if (vaule.Contains("[@"))
+                {
+                    var idStr = vaule.MidStrEx("[@", "]");
+                    if (long.TryParse(idStr, out var id))
+                    {
+
+                        vaule = vaule.Replace("[@" + idStr + "]", "");
+                        messages.Add(new AtMessage(idStr));
+                    }
+                }
+                else
+                {
+                    break;
+                }
+
+
+            }
+
+
+            if (string.IsNullOrWhiteSpace(vaule) == false)
+            {
+                messages.Add(new PlainMessage(vaule));
+            }
+
+            if (string.IsNullOrWhiteSpace(vaule) && messages.Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return messages.ToArray();
+            }
+        }
+
 
         /// <summary>
         /// 执行参数替换
@@ -383,5 +467,7 @@ namespace CnGalWebSite.RobotClient
         public long SendTo { get; set; }
 
         public Message[] MiraiMessage { get; set; } = Array.Empty<Message>();
+
+        public MessageBase[] MasudaMessage { get;set; }
     }
 }

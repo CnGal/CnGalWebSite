@@ -15,7 +15,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
         Task<string> GetNewestEditGames();
 
-        Task<string> GetEntryInfor(int id, bool plainText = false, bool showLink = false);
+        Task<string> GetEntryInfor(int id, bool plainText = false, bool showLink = false, bool showOutlink = true);
 
         Task<string> GetRandom(bool plainText = false, bool showLink = false);
 
