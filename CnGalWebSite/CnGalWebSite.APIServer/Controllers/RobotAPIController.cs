@@ -717,11 +717,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (entry.Name != entryName && entry.DisplayName != entryName)
                     {
-                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true, true)).DeleteHtmlLinks() + "\n（看板娘不太确定是不是这个词条哦~" };
+                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true, true,model.SenderId!=0)).DeleteHtmlLinks() + "\n（看板娘不太确定是不是这个词条哦~" };
                     }
                     else
                     {
-                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true, true)).DeleteHtmlLinks() };
+                        return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true, true, model.SenderId != 0)).DeleteHtmlLinks() };
                     }
                 }
             }
