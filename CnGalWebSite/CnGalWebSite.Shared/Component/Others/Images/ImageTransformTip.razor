@@ -1,4 +1,5 @@
 ﻿@inject HttpClient Http
+@inject IAppHelper _appHelper
 
 <div class="@Class">
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="转存图片并整理格式" IsAsync="true" OnClick="OnClick" Icon="mdi-transit-connection-variant " Color="green" />
@@ -14,14 +15,15 @@
 
     public async Task OnClick()
     {
-        if(string.IsNullOrWhiteSpace(Text))
+        if (string.IsNullOrWhiteSpace(Text))
         {
             return;
         }
 
         System.Text.StringBuilder sb = new System.Text.StringBuilder(Text);
+        sb.Replace("media.st.dl.pinyuncloud.com", "media.st.dl.eccdnx.com");
         //提取全部图片
-        var oldImages = ToolHelper.GetImageLinks(Text);
+        var oldImages = ToolHelper.GetImageLinks(sb.ToString());
         //判断外部图片
         oldImages.RemoveAll(s => s.Contains("image.cngal.org") || s.Contains("pic.cngal.top"));
         //依次转存
@@ -29,17 +31,24 @@
         foreach (var item in oldImages)
         {
 
-            var result = await Http.PostAsJsonAsync(ToolHelper.ImageApiPath + "api/files/TransferDepositFile", new TransferDepositFileModel
+            var result = await Http.PostAsJsonAsync(ToolHelper.ImageApiPath + "api/files/linkToImgUrl", new TransferDepositFileModel
             {
                 Url = item,
             });
-            var jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-
-            if (obj.Successful)
+            if (result.IsSuccessStatusCode)
             {
-                sb.Replace(item, obj.Error);
+                var jsonContent = result.Content.ReadAsStringAsync().Result;
+                var obj = JsonSerializer.Deserialize<LinkToImgResult>(jsonContent, ToolHelper.options);
+
+                if (obj.Successful)
+                {
+                    //向用户文件管理添加信息
+                    await _appHelper.AddUserLoadedFileInfor(obj.Url, 0);
+
+                    sb.Replace(item, obj.Url);
+                }
             }
+
         }
         //保存
         sb.Replace("<br>", "\n");

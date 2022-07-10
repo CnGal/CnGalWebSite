@@ -283,7 +283,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             }
 
             //编辑者
-            if (await _examineRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true && s.Operation != Operation.UserMainPage && s.Operation != Operation.EditUserMain && s.Operation != Operation.PubulishComment)
+            if (await _examineRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true && s.Operation != Operation.UserMainPage && s.Operation != Operation.EditUserMain && s.Operation != Operation.PubulishComment && s.Operation != Operation.EditPlayedGameMain)
                 && await _rankUserRepository.GetAll().AnyAsync(s => s.Rank.Name == "编辑者" && s.ApplicationUserId == user.Id) == false)
             {
                 //获取头衔

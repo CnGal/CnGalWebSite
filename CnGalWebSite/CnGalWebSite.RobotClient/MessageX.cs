@@ -295,7 +295,7 @@ namespace CnGalWebSite.RobotClient
 
             if (string.IsNullOrWhiteSpace(vaule) == false)
             {
-                messages.Add(new PlainMessage(vaule));
+                messages.Add(new PlainMessage(vaule.TrimStart('\n')));
             }
 
             if (string.IsNullOrWhiteSpace(vaule) && messages.Count == 0)
