@@ -140,7 +140,7 @@ namespace CnGalWebSite.RobotClient
                 }
             }
 
-            Console.WriteLine($"{(BasicSetting.IsOnNormal == true ? "已开启" : "已关闭")}普通群聊功能，{(BasicSetting.IsOnChannel == true ? "已开启" : "已关闭")}频道功能");
+            Console.WriteLine($"->{(BasicSetting.IsOnNormal == true ? "已开启" : "已关闭")}普通群聊功能，{(BasicSetting.IsOnChannel == true ? "已开启" : "已关闭")}频道功能");
 
             SaveBasicSetting();
         }

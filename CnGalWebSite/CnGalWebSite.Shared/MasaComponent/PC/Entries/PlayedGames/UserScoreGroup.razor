@@ -135,7 +135,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        Items = Model.UserScores.Random();
+        Items = Model.UserScores;
     }
 
     public async Task OnClickUser(PlayedGameUserScoreModel model)

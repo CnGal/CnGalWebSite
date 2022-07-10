@@ -45,12 +45,18 @@
                 </MCardText>
 
             }
+            <MCardText>
+                <UserScoreGroup Model="Model" OnEdit="OnClickEditGameRecored" ShowBlankAction="ShowBlankAction" />
+            </MCardText>
 
         }
+                    else
+                    {
+                        <MCardText Style="display: flex; min-height: 200px; justify-content: center; align-items: center;">
+                            <MProgressCircular Size="40" Indeterminate Color="@_dataCacheService.ThemeSetting.Theme"></MProgressCircular>
+                        </MCardText>
+                    }
 
-        <MCardText>
-            <UserScoreGroup Model="Model" OnEdit="OnClickEditGameRecored" ShowBlankAction="ShowBlankAction" />
-        </MCardText>
         <MCardActions Class="pb-4 pe-6 ps-6 pt-6">
             <MSpacer></MSpacer>
             @if (ShowBlankAction == false && Model.IsCurrentUserScoreExist == false)
@@ -98,11 +104,13 @@
 
     public async Task Refresh(bool dialog, PlayedGameOverviewModel model)
     {
-        Dialog = dialog;
         Model = model;
+        Dialog = dialog;
         StateHasChanged();
 
         await Task.Delay(500);
+
+
         showChart = true;
 
         StateHasChanged();
@@ -130,6 +138,7 @@
         try
         {
             Model = await _dataCacheService.PlayedGameOverviewDataCatche.GetCatche(Model.Game.Id.ToString(), true);
+            Model.UserScores.Random();
             StateHasChanged();
         }
         catch (Exception ex)

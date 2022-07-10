@@ -50,12 +50,18 @@ namespace CnGalWebSite.RobotClient
 
         public async Task ReplyFromChannelAsync(Masuda.Net.Models.Message e)
         {
-            //过滤非水区的发言
-            if ((await MasudaClient.GetChannelAsync( e.ChannelId)).Name.Contains("水区"))
-            {
-                await ReplyMessageAsync(RobotReplyRange.Channel, MessageHelper.GetPureMessage(e.Content),0,0,e.Author.Username,e);
+            ////过滤非水区的发言
+            //if ((await MasudaClient.GetChannelAsync( e.ChannelId)).Name.Contains("水区"))
+            //{
 
+            //}
+            var messgae = MessageHelper.GetPureMessage(e.Content);
+            if(string.IsNullOrWhiteSpace(messgae))
+            {
+                return;
             }
+            await ReplyMessageAsync(RobotReplyRange.Channel, MessageHelper.GetPureMessage(e.Content),0,0,e.Author.Username,e);
+
         }
 
         public async Task ReplyFromGroupAsync(GroupMessageSender s, MeowMiraiLib.Msg.Type.Message[] e)

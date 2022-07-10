@@ -64,7 +64,6 @@
         catch { }
         url = url.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
         //向用户文件管理添加信息
-
         await _appHelper.AddUserLoadedFileInfor(url, size);
 
         await OnUploadedImage.InvokeAsync(url);
