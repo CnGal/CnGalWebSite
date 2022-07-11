@@ -124,7 +124,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             // 处理 SearchText 模糊搜索
             if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                items = items.Where(item => (item.ApplicationUserId?.Contains(options.SearchText) ?? false));
+                items = items.Where(item => item.ApplicationUserId?.Contains(options.SearchText) ?? false);
             }
 
 
@@ -180,7 +180,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             // 处理 SearchText 模糊搜索
             if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                items = items.Where(item => (item.Rank.Name?.Contains(options.SearchText) ?? false));
+                items = items.Where(item => item.Rank.Name?.Contains(options.SearchText) ?? false);
             }
 
             // 排序
@@ -248,7 +248,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
                     });
                 }
                 //颁发新头衔
-                await _rankUserRepository.InsertAsync(new RankUser
+                _ = await _rankUserRepository.InsertAsync(new RankUser
                 {
                     ApplicationUserId = user.Id,
                     RankId = rank.Id,
@@ -274,7 +274,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
 
                 }
                 //颁发新头衔
-                await _rankUserRepository.InsertAsync(new RankUser
+                _ = await _rankUserRepository.InsertAsync(new RankUser
                 {
                     ApplicationUserId = user.Id,
                     RankId = rank.Id,
@@ -283,29 +283,32 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             }
 
             //编辑者
-            if (await _examineRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true && s.Operation != Operation.UserMainPage && s.Operation != Operation.EditUserMain && s.Operation != Operation.PubulishComment && s.Operation != Operation.EditPlayedGameMain)
-                && await _rankUserRepository.GetAll().AnyAsync(s => s.Rank.Name == "编辑者" && s.ApplicationUserId == user.Id) == false)
+            if (await _examineRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true && s.Operation != Operation.UserMainPage && s.Operation != Operation.EditUserMain && s.Operation != Operation.PubulishComment && s.Operation != Operation.EditPlayedGameMain))
             {
-                //获取头衔
-                var rank = await _rankRepository.GetAll().FirstOrDefaultAsync(s => s.Name == "编辑者");
-                if (rank == null)
+                if (await _rankUserRepository.GetAll().AnyAsync(s => s.Rank.Name == "编辑者" && s.ApplicationUserId == user.Id) == false)
                 {
-                    rank = await _rankRepository.InsertAsync(new Rank
+                    //获取头衔
+                    var rank = await _rankRepository.GetAll().FirstOrDefaultAsync(s => s.Name == "编辑者");
+                    if (rank == null)
                     {
-                        Name = "编辑者",
-                        Text = "编辑者",
-                        CSS = "bg-success",
-                        CreateTime = nowTime,
-                        LastEditTime = nowTime,
+                        rank = await _rankRepository.InsertAsync(new Rank
+                        {
+                            Name = "编辑者",
+                            Text = "编辑者",
+                            CSS = "bg-success",
+                            CreateTime = nowTime,
+                            LastEditTime = nowTime,
+                        });
+                    }
+                    //颁发新头衔
+                    _ = await _rankUserRepository.InsertAsync(new RankUser
+                    {
+                        ApplicationUserId = user.Id,
+                        RankId = rank.Id,
+                        Time = nowTime
                     });
                 }
-                //颁发新头衔
-                await _rankUserRepository.InsertAsync(new RankUser
-                {
-                    ApplicationUserId = user.Id,
-                    RankId = rank.Id,
-                    Time = nowTime
-                });
+
             }
             else
             {
@@ -321,7 +324,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
                 if (ranks.Count(s => s.Rank.Name == rank.Rank.Name) > 1)
                 {
                     await _rankUserRepository.DeleteAsync(rank);
-                    ranks.Remove(rank);
+                    _ = ranks.Remove(rank);
                 }
             }
         }
@@ -412,7 +415,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             }
 
             //应用修改项
-            await _rankUserRepository.GetRangeUpdateTable().Where(s => ids.Contains(s.Id)).Set(s => s.IsHidden, b => !b.IsHidden).ExecuteAsync();
+            _ = await _rankUserRepository.GetRangeUpdateTable().Where(s => ids.Contains(s.Id)).Set(s => s.IsHidden, b => !b.IsHidden).ExecuteAsync();
         }
     }
 }
