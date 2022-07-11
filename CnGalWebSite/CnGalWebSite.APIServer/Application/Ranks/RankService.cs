@@ -307,6 +307,11 @@ namespace CnGalWebSite.APIServer.Application.Ranks
                     Time = nowTime
                 });
             }
+            else
+            {
+                //删除旧头衔
+                await _rankUserRepository.DeleteAsync(s => s.ApplicationUserId == user.Id && s.Rank.Name.Contains("编辑者"));
+            }
 
             //去重
             var ranks = await _rankUserRepository.GetAll().Include(s => s.Rank).Where(s => s.ApplicationUserId == user.Id).ToListAsync();
