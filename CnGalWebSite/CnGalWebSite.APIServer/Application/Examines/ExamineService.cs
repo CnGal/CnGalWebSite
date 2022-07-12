@@ -105,18 +105,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "")
         {
-            IQueryable<Examine> query = null;
-            if (entryId > 0)
-            {
-                query = _examineRepository.GetAll().AsNoTracking().Where(s => s.EntryId == entryId && s.IsPassed == true);
-            }
-            else
-            {
-                query = string.IsNullOrWhiteSpace(userId) == false
+            var query = entryId > 0
+                ? _examineRepository.GetAll().AsNoTracking().Where(s => s.EntryId == entryId && s.IsPassed == true)
+                : string.IsNullOrWhiteSpace(userId) == false
                     ? _examineRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == userId)
                     : _examineRepository.GetAll().AsNoTracking();
-
-            }
 
             //判断是否是条件筛选
             if (!string.IsNullOrWhiteSpace(input.ScreeningConditions))
@@ -175,8 +168,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 }
                 query = query.Where(s => s.ApplicationUser.UserName.Contains(input.FilterText)
                   || s.Context.Contains(input.FilterText)
-                  || s.Entry != null && s.Entry.Name.Contains(input.FilterText)
-                  || s.Article != null && s.Article.Name.Contains(input.FilterText)
+                  || (s.Entry != null && s.Entry.Name.Contains(input.FilterText))
+                  || (s.Article != null && s.Article.Name.Contains(input.FilterText))
                   || s.Operation == operation);
             }
             //统计查询数据的总条数
@@ -2593,7 +2586,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var admin = new ApplicationUser
             {
                 Id = _configuration["ExamineAdminId"],
-                UserName="看板娘"
+                UserName = "看板娘"
             };
             //反向关联 文章
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Article))
@@ -2839,9 +2832,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         PostTime = DateTime.Now.ToCstTime(),
                         Image = user.PhotoPath,
                         // Rank = "系统",
-                        Text = "在主题『" + (comment.Article?.DisplayName??comment.Entry?.DisplayName??comment.Periphery?.DisplayName??comment.Vote?.DisplayName??comment.Lottery?.DisplayName??comment.UserSpaceCommentManager?.ApplicationUser?.UserName) + "』你的评论『" + _appHelper.GetStringAbbreviation(comment.ParentCodeNavigation.Text, 20) + "』下回复了你『\n" + examine.Text + "\n』",
+                        Text = "在主题『" + (comment.Article?.DisplayName ?? comment.Entry?.DisplayName ?? comment.Periphery?.DisplayName ?? comment.Vote?.DisplayName ?? comment.Lottery?.DisplayName ?? comment.UserSpaceCommentManager?.ApplicationUser?.UserName) + "』你的评论『" + _appHelper.GetStringAbbreviation(comment.ParentCodeNavigation.Text, 20) + "』下回复了你『\n" + examine.Text + "\n』",
                         Type = MessageType.CommentReply,
-                        Link = comment.ArticleId!=null? $"articles/index/{ comment.ArticleId}" :(comment.EntryId != null ? $"entries/index/{comment.EntryId}" : (comment.PeripheryId != null ? $"peripheries/index/{comment.PeripheryId}" : (comment.VoteId != null ? $"votes/index/{comment.VoteId}" : (comment.LotteryId != null ? $"lotteries/index/{comment.LotteryId}":"" )))),
+                        Link = comment.ArticleId != null ? $"articles/index/{comment.ArticleId}" : (comment.EntryId != null ? $"entries/index/{comment.EntryId}" : (comment.PeripheryId != null ? $"peripheries/index/{comment.PeripheryId}" : (comment.VoteId != null ? $"votes/index/{comment.VoteId}" : (comment.LotteryId != null ? $"lotteries/index/{comment.LotteryId}" : "")))),
                         ApplicationUserId = comment.ParentCodeNavigation.ApplicationUser.Id,
                         AdditionalInfor = comment.Id.ToString()
                     };
@@ -2849,7 +2842,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
             if (message != null)
             {
-                await _messageRepository.InsertAsync(message);
+                _ = await _messageRepository.InsertAsync(message);
 
             } //缓存评论数
             var tempCount = 0;
@@ -2857,23 +2850,23 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 case CommentType.CommentArticle:
                     tempCount = await _commentRepository.CountAsync(s => s.ArticleId == comment.ArticleId);
-                    await _articleRepository.GetRangeUpdateTable().Where(s => s.Id == comment.ArticleId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    _ = await _articleRepository.GetRangeUpdateTable().Where(s => s.Id == comment.ArticleId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
                     break;
                 case CommentType.CommentEntries:
                     tempCount = await _commentRepository.CountAsync(s => s.EntryId == comment.EntryId);
-                    await _entryRepository.GetRangeUpdateTable().Where(s => s.Id == comment.EntryId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    _ = await _entryRepository.GetRangeUpdateTable().Where(s => s.Id == comment.EntryId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
                     break;
                 case CommentType.CommentPeriphery:
                     tempCount = await _commentRepository.CountAsync(s => s.PeripheryId == comment.PeripheryId);
-                    await _peripheryRepository.GetRangeUpdateTable().Where(s => s.Id == comment.PeripheryId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    _ = await _peripheryRepository.GetRangeUpdateTable().Where(s => s.Id == comment.PeripheryId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
                     break;
                 case CommentType.CommentVote:
                     tempCount = await _commentRepository.CountAsync(s => s.VoteId == comment.VoteId);
-                    await _voteRepository.GetRangeUpdateTable().Where(s => s.Id == comment.VoteId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    _ = await _voteRepository.GetRangeUpdateTable().Where(s => s.Id == comment.VoteId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
                     break;
                 case CommentType.CommentLottery:
                     tempCount = await _commentRepository.CountAsync(s => s.LotteryId == comment.LotteryId);
-                    await _lotteryRepository.GetRangeUpdateTable().Where(s => s.Id == comment.LotteryId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    _ = await _lotteryRepository.GetRangeUpdateTable().Where(s => s.Id == comment.LotteryId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
                     break;
             }
         }
@@ -2945,7 +2938,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
 
             //log
-            _logger.LogInformation("{User}({Id})对 词条 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, entry.Name,entry.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+            _logger.LogInformation("{User}({Id})对 词条 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, entry.Name, entry.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
         }
 
         public async Task<bool> UniversalEstablishExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
@@ -3050,7 +3043,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 }
             }
             //log
-            _logger.LogInformation("{User}({Id})对 文章 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, article.Name,article.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+            _logger.LogInformation("{User}({Id})对 文章 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, article.Name, article.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
         }
 
@@ -3214,7 +3207,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
 
             //log
-            _logger.LogInformation("{User}({Id})对 标签 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, tag.Name,tag.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+            _logger.LogInformation("{User}({Id})对 标签 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, tag.Name, tag.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
         }
 
@@ -3323,7 +3316,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
 
             //log
-            _logger.LogInformation("{User}({Id})对 消歧义页 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, disambig.Name,disambig.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+            _logger.LogInformation("{User}({Id})对 消歧义页 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, disambig.Name, disambig.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
         }
 
@@ -3374,7 +3367,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
 
             //log
-            _logger.LogInformation("{User}({Id})对个人资料进行{Operation}操作{Admin}", user.UserName, user.Id,operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+            _logger.LogInformation("{User}({Id})对个人资料进行{Operation}操作{Admin}", user.UserName, user.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
         }
 
@@ -3482,7 +3475,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
 
             //log
-            _logger.LogInformation("{User}({Id})对 周边 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, periphery.Name,periphery.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+            _logger.LogInformation("{User}({Id})对 周边 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, periphery.Name, periphery.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
         }
 
@@ -3503,7 +3496,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
             }
             else
             {
@@ -3519,7 +3512,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     Note = note
                 };
                 //添加到审核列表
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
             }
         }
 
@@ -3540,7 +3533,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                await _examineRepository.InsertAsync(examine);
+                _ = await _examineRepository.InsertAsync(examine);
             }
             else
             {
@@ -4736,7 +4729,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
         }
 
-        private async Task ExaminesCompletionEntry(Entry newEntry, Entry currentEntry)
+        public async Task ExaminesCompletionEntry(Entry newEntry, Entry currentEntry)
         {
             var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
 
@@ -4766,7 +4759,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
         }
 
-        private async Task ExaminesCompletionArticle(Article newArticle, Article currentArticle)
+        public async Task ExaminesCompletionArticle(Article newArticle, Article currentArticle)
         {
             var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
 

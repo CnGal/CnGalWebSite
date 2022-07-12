@@ -409,5 +409,11 @@ namespace CnGalWebSite.APIServer.ExamineX
         Task ExamineEditPlayedGameMainAsync(PlayedGame playedGame, PlayedGameMain examine);
 
         Task UniversalEditPlayedGameExaminedAsync(PlayedGame playedGame, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
+
+        Task<object> GenerateModelFromExamines(List<Examine> examines);
+
+        Task ExaminesCompletionEntry(Entry newEntry, Entry currentEntry);
+
+        Task ExaminesCompletionArticle(Article newArticle, Article currentArticle);
     }
 }
