@@ -21,6 +21,7 @@ using CnGalWebSite.APIServer.Application.WeiXin;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.APIServer.Model;
+using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
@@ -41,7 +42,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -315,7 +315,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         {
                             if (item.IsSelected == false)
                             {
-                                await _userManager.RemoveFromRoleAsync(user, infor);
+                                _ = await _userManager.RemoveFromRoleAsync(user, infor);
                                 isAdd = true;
                                 break;
                             }
@@ -323,7 +323,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                     if (isAdd == false && item.IsSelected == true)
                     {
-                        await _userManager.AddToRoleAsync(user, item.Name);
+                        _ = await _userManager.AddToRoleAsync(user, item.Name);
                     }
                 }
             }
@@ -331,12 +331,9 @@ namespace CnGalWebSite.APIServer.Controllers
             //更新数据
             var result = await _userManager.UpdateAsync(user);
 
-            if (result.Succeeded)
-            {
-                return new Result { Successful = true };
-            }
-
-            return new Result { Successful = false, Error = result.Errors.ToList()[0].Description };
+            return result.Succeeded
+                ? (ActionResult<Result>)new Result { Successful = true }
+                : (ActionResult<Result>)new Result { Successful = false, Error = result.Errors.ToList()[0].Description };
         }
 
         /// <summary>
@@ -699,7 +696,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 foreach (var item in model.Carousels)
                 {
-                    await _carouselRepository.InsertAsync(new Carousel
+                    _ = await _carouselRepository.InsertAsync(new Carousel
                     {
                         Image = item.ImagePath == "background.png" ? "" : item.ImagePath,
                         Link = item.Link,
@@ -758,7 +755,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 foreach (var item in model.FriendLinks)
                 {
-                    await _friendLinkRepository.InsertAsync(new FriendLink
+                    _ = await _friendLinkRepository.InsertAsync(new FriendLink
                     {
                         Image = item.ImagePath == "background.png" ? "" : item.ImagePath,
                         Name = item.Name,
@@ -820,7 +817,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 if (entry != null)
                 {
                     entry.Priority = 10 + num;
-                    await _entryRepository.UpdateAsync(entry);
+                    _ = await _entryRepository.UpdateAsync(entry);
                     num--;
                 }
                 else
@@ -865,8 +862,141 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var url1 = await _fileService.SaveImageAsync("https://pica.zhimg.com/v2-84a29f84b7e4fb051f177a3e3fc516c4_1440w.jpg", _configuration["NewsAdminId"]);
+                var user = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
 
+                _ = await _entryRepository.GetRangeUpdateTable().Where(s => s.MainPicture != null && s.MainPicture.Contains("default")).Set(s => s.MainPicture, b => null).ExecuteAsync();
+                await _articleRepository.GetRangeUpdateTable().Where(s => s.MainPicture != null && s.MainPicture.Contains("default")).Set(s => s.MainPicture, b => null).ExecuteAsync();
+
+
+                //补全词条
+                var entryIds = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Role).Select(s => s.Id).ToListAsync();
+                foreach (var entryId in entryIds)
+                {
+                    var entry = await _entryRepository.GetAll()
+                     .Include(s => s.Outlinks)
+                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
+                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                     .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
+                     .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
+                     .FirstOrDefaultAsync(s => s.Id == entryId);
+                    //获取通过审核记录叠加的旧模型
+                    var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.EntryId == entry.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
+                    _ = exammines.RemoveAll(s => s.ApplicationUserId == "a27c27d9-8c42-49f4-a315-05a167e1a6d4" && s.PassedTime?.Date == new DateTime(2022, 7, 12) && (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishAddInfor));
+                    var examineModel = exammines.Any() ? await _examineService.GenerateModelFromExamines(exammines) : throw new Exception("未找到该词条");
+                    //应用审核记录
+                    var examinesNew = _entryService.ExaminesCompletion(entry, examineModel as Entry);
+
+                    examinesNew = examinesNew.OrderBy(s => s.Value).ToList();
+                    foreach (var item in examinesNew)
+                    {
+
+                        var resulte = "";
+                        if (item.Value == Operation.EstablishMainPage)
+                        {
+                            resulte = item.Key as string;
+                        }
+                        else
+                        {
+                            using TextWriter text = new StringWriter();
+                            var serializer = new JsonSerializer();
+                            serializer.Serialize(text, item.Key);
+                            resulte = text.ToString();
+                        }
+
+
+                        switch (item.Value)
+                        {
+                            case Operation.EstablishMain:
+                                await _examineService.ExamineEstablishMainAsync(entry, item.Key as ExamineMain);
+                                break;
+                            case Operation.EstablishAddInfor:
+                                await _examineService.ExamineEstablishAddInforAsync(entry, item.Key as EntryAddInfor);
+                                break;
+                            case Operation.EstablishMainPage:
+                                await _examineService.ExamineEstablishMainPageAsync(entry, item.Key as string);
+                                break;
+                            case Operation.EstablishImages:
+                                await _examineService.ExamineEstablishImagesAsync(entry, item.Key as EntryImages);
+                                break;
+                            case Operation.EstablishRelevances:
+                                await _examineService.ExamineEstablishRelevancesAsync(entry, item.Key as EntryRelevances);
+                                break;
+                            case Operation.EstablishTags:
+                                await _examineService.ExamineEstablishTagsAsync(entry, item.Key as EntryTags);
+                                break;
+                            default:
+                                throw new Exception("不支持的类型");
+                        }
+
+                        _ = await _examineService.UniversalEstablishExaminedAsync(entry, user, true, resulte, item.Value, "撤销错误修改的数据");
+                        await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, item.Value);
+
+                        _logger.LogInformation("撤销错误修改 词条 - {name}({id}) 的数据", entry.Name, entry.Id);
+
+                    }
+                }
+                //补全文章
+                var articleIds = await _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
+                foreach (var articleId in articleIds)
+                {
+                    var article = await _articleRepository.GetAll()
+                     .Include(s => s.Outlinks)
+                     .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
+                     .Include(s => s.Entries)
+                     .FirstOrDefaultAsync(s => s.Id == articleId);
+                    //获取通过审核记录叠加的旧模型
+
+                    var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.ArticleId == article.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
+                    _ = exammines.RemoveAll(s => s.ApplicationUserId == "a27c27d9-8c42-49f4-a315-05a167e1a6d4" && s.PassedTime?.Date == new DateTime(2022, 7, 12) && (s.Operation == Operation.EditArticleMain));
+                    var examineModel = exammines.Any() ? await _examineService.GenerateModelFromExamines(exammines) : throw new Exception("未找到该文章");
+
+                    //应用审核记录
+                    var examinesNew = _articleService.ExaminesCompletion(article, examineModel as Article);
+
+                    examinesNew = examinesNew.OrderBy(s => s.Value).ToList();
+                    foreach (var item in examinesNew)
+                    {
+
+                        var resulte = "";
+                        if (item.Value == Operation.EditArticleMainPage)
+                        {
+                            resulte = item.Key as string;
+                        }
+                        else
+                        {
+                            using TextWriter text = new StringWriter();
+                            var serializer = new JsonSerializer();
+                            serializer.Serialize(text, item.Key);
+                            resulte = text.ToString();
+                        }
+                        switch (item.Value)
+                        {
+                            case Operation.EditArticleMain:
+                                await _examineService.ExamineEditArticleMainAsync(article, item.Key as ExamineMain);
+                                break;
+                            case Operation.EditArticleMainPage:
+                                await _examineService.ExamineEditArticleMainPageAsync(article, item.Key as string);
+                                break;
+                            case Operation.EditArticleRelevanes:
+                                await _examineService.ExamineEditArticleRelevancesAsync(article, item.Key as ArticleRelevances);
+                                break;
+
+                            default:
+                                throw new Exception("不支持的类型");
+                        }
+
+                        _ = await _examineService.UniversalCreateArticleExaminedAsync(article, user, true, resulte, item.Value, "撤销错误修改的数据");
+                        await _appHelper.AddUserContributionValueAsync(user.Id, article.Id, item.Value);
+
+                        _logger.LogInformation("撤销错误修改 文章 - {name}({id}) 的数据", article.Name, article.Id);
+
+                    }
+
+                }
+
+                //删除审核记录
+                await _examineRepository.DeleteRangeAsync(s => s.ApplicationUserId == "a27c27d9-8c42-49f4-a315-05a167e1a6d4" && s.PassedTime != null && s.PassedTime.Value.Date == new DateTime(2022, 7, 12) && (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EditArticleMain));
+                _logger.LogInformation("删除错误地生成的审核记录");
                 return new Result { Successful = true };
             }
             catch (Exception ex)

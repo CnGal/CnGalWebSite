@@ -1,10 +1,9 @@
 ﻿using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using Masuda.Net;
 using MeowMiraiLib.Msg;
 using MeowMiraiLib.Msg.Sender;
 using MeowMiraiLib.Msg.Type;
-using Masuda.Net;
-using Masuda.Net.HelpMessage;
 
 namespace CnGalWebSite.RobotClient
 {
@@ -50,17 +49,19 @@ namespace CnGalWebSite.RobotClient
 
         public async Task ReplyFromChannelAsync(Masuda.Net.Models.Message e)
         {
-            ////过滤非水区的发言
-            //if ((await MasudaClient.GetChannelAsync( e.ChannelId)).Name.Contains("水区"))
-            //{
+            //过滤非水区的发言
+            if ((await MasudaClient.GetChannelAsync(e.ChannelId)).Name.Contains("水区") == false)
+            {
 
-            //}
+                return;
+            }
+
             var messgae = MessageHelper.GetPureMessage(e.Content);
-            if(string.IsNullOrWhiteSpace(messgae))
+            if (string.IsNullOrWhiteSpace(messgae))
             {
                 return;
             }
-            await ReplyMessageAsync(RobotReplyRange.Channel, MessageHelper.GetPureMessage(e.Content),0,0,e.Author.Username,e);
+            await ReplyMessageAsync(RobotReplyRange.Channel, MessageHelper.GetPureMessage(e.Content), 0, 0, e.Author.Username, e);
 
         }
 
@@ -100,7 +101,7 @@ namespace CnGalWebSite.RobotClient
         /// <summary>
         /// 回复消息
         /// </summary>
-        private async Task ReplyMessageAsync(RobotReplyRange range, string message, long sendto, long memberId, string memberName, Masuda.Net.Models.Message e=null)
+        private async Task ReplyMessageAsync(RobotReplyRange range, string message, long sendto, long memberId, string memberName, Masuda.Net.Models.Message e = null)
         {
             //尝试找出所有匹配的回复
             var reply = _messageX.GetAutoReply(message, range);
@@ -112,20 +113,20 @@ namespace CnGalWebSite.RobotClient
             var result = new SendMessageModel();
 
 
-                try
+            try
+            {
+                //处理消息
+                result = await _messageX.ProcMessageAsync(range, reply.Value, message, reply.Key, memberId, memberName);
+            }
+            catch (ArgError ae)
+            {
+                if (_setting.WarningQQGroup > 0)
                 {
-                    //处理消息
-                    result = await _messageX.ProcMessageAsync(range, reply.Value, message, reply.Key, memberId, memberName);
+                    //发送警告
+                    var j = await new GroupMessage(_setting.WarningQQGroup, new MeowMiraiLib.Msg.Type.Message[] { new Plain(ae.Error) }).SendAsync(MiraiClient);
+                    Console.WriteLine(j);
                 }
-                catch (ArgError ae)
-                {
-                    if (_setting.WarningQQGroup > 0)
-                    {
-                        //发送警告
-                        var j = await new GroupMessage(_setting.WarningQQGroup, new MeowMiraiLib.Msg.Type.Message[] { new Plain(ae.Error) }).SendAsync(MiraiClient);
-                        Console.WriteLine(j);
-                    }
-                }
+            }
 
 
             if (result != null)
@@ -135,7 +136,7 @@ namespace CnGalWebSite.RobotClient
                 {
                     //发送消息
                     result.SendTo = sendto;
-                   await SendMessage(result, e);
+                    await SendMessage(result, e);
                 }
             }
             //添加发送记录
@@ -155,7 +156,7 @@ namespace CnGalWebSite.RobotClient
         /// <param name="memberId"></param>
         /// <param name="memberName"></param>
         /// <returns>是否超过限制</returns>
-        private async Task<bool> CheckLimit(RobotReplyRange range,long memberId, string memberName, Masuda.Net.Models.Message msg = null)
+        private async Task<bool> CheckLimit(RobotReplyRange range, long memberId, string memberName, Masuda.Net.Models.Message msg = null)
         {
             //判断该用户是否连续10次互动 1分钟内
             var singleCount = _post.Count(x => (DateTime.Now.ToCstTime() - x.PostTime).TotalMinutes <= 1 && x.QQ == memberId);
@@ -191,7 +192,7 @@ namespace CnGalWebSite.RobotClient
         {
             if (model.Range == RobotReplyRange.Channel)
             {
-                await MasudaClient.ReplyMessageAsync(msg, model.MasudaMessage);
+                _ = await MasudaClient.ReplyMessageAsync(msg, model.MasudaMessage);
             }
             else if (model.Range == RobotReplyRange.Friend)
             {

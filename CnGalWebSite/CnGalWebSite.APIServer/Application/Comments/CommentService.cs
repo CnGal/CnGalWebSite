@@ -445,12 +445,12 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     comment.EntryId = replyComment.Entry?.Id;
                     comment.UserSpaceCommentManager = replyComment.UserSpaceCommentManager;
                     comment.UserSpaceCommentManagerId = replyComment.UserSpaceCommentManager?.Id;
-                    comment.Lottery = lottery;
-                    comment.LotteryId = lottery?.Id;
-                    comment.Vote = vote;
-                    comment.VoteId= vote?.Id;
-                    comment.Periphery = periphery;
-                    comment.PeripheryId = periphery?.Id;
+                    comment.Lottery = replyComment.Lottery;
+                    comment.LotteryId = replyComment.Lottery?.Id;
+                    comment.Vote = replyComment.Vote;
+                    comment.VoteId= replyComment.Vote?.Id;
+                    comment.Periphery = replyComment.Periphery;
+                    comment.PeripheryId = replyComment.Periphery?.Id;
                     comment.ParentCodeNavigation = replyComment;
                     break;
             }
