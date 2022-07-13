@@ -49,7 +49,10 @@ else
                     编辑<MIcon>mdi-pencil</MIcon>
                 </MTab>
                 <MTab Value="2">
-                    参与者<MIcon>mdi-account-multiple </MIcon>
+                    参与<MIcon>mdi-account-multiple </MIcon>
+                </MTab>
+                <MTab Value="3">
+                    中奖<MIcon>mdi-gift</MIcon>
                 </MTab>
             </MTabs>
         </div>
@@ -63,6 +66,12 @@ else
             <MTabItem Value="2">
                 <div class="  rounded shadow-sm p-3 bg-opacity">
                     <CnGalWebSite.Shared.Component.Lotteries.EditPage.ListLotteryUserTip Id="Model.Id" />
+                </div>
+
+            </MTabItem>
+            <MTabItem Value="3">
+                <div class="  rounded shadow-sm p-3 bg-opacity">
+                    <CnGalWebSite.Shared.Component.Lotteries.EditPage.ListWinnerCard Id="Model.Id" />
                 </div>
 
             </MTabItem>

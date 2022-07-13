@@ -1,18 +1,53 @@
 ﻿@inject HttpClient Http
+@inject ToastService ToastService
 
 <div>
-      
-            <Table TItem="ListLotteryUserAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelArticle" ShowSearch="true" @ref="TableRows"
-                   ShowExtendButtons="true" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-                   ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-                <TableColumns>
-                    <TableColumn @bind-Field="@context.Number" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
-                    <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
-                    <TableColumn @bind-Field="@context.Id" Searchable="true" TextWrap="true" Width="400" />
-                </TableColumns>
-            </Table>
-</div>
 
+    <Table TItem="ListLotteryUserAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelArticle" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true ExtendButtonColumnWidth="80" 
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableToolbarTemplate>
+            <TableToolbarButton TItem="ListLotteryUserAloneModel" Color="Color.Success" Icon="fa fa-fw fa-upload" Text="导出数据" OnClickCallback="OnExport" IsAsync="true" />
+            <TableToolbarButton TItem="ListLotteryUserAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListLotteryUserAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
+
+        </TableToolbarTemplate>
+
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Number" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
+            <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
+            <TableColumn @bind-Field="@context.UserId" Searchable="true" TextWrap="true" Width="400" />
+            <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="95" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" IsShow="!context.IsHidden" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.LotteryUserId }, true, true))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-link" Text="显示" IsAsync="true" IsShow="context.IsHidden" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.LotteryUserId }, false, true))" />
+        </RowButtonTemplate>
+
+    </Table>
+</div>
+@if (export)
+{
+    <MDialog @bind-Value="export"
+             MaxWidth="500">
+        <MCard>
+            <MCardTitle Class="text-h5">
+                导出抽奖数据
+            </MCardTitle>
+            <MCardText Style=" white-space: break-spaces;">
+                    @exportString
+            </MCardText>
+            <MCardActions>
+                <MSpacer></MSpacer>
+                <MButton Color="green darken-1"
+                         Text
+                         OnClick="()=> export = false">
+                    关闭
+                </MButton>
+            </MCardActions>
+        </MCard>
+    </MDialog>
+}
 @code {
     [Parameter]
     public long Id { get; set; }
@@ -28,6 +63,9 @@
     private ListLotteryUserAloneModel SearchModelArticle { get; set; } = new ListLotteryUserAloneModel();
 
     private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    bool export;
+    string exportString;
+
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -54,5 +92,123 @@
             ErrorHandler.ProcessError(ex, "无法获取参加抽奖的用户列表");
             return new QueryData<ListLotteryUserAloneModel>();
         }
+    }
+
+    private async Task OnRowEditIsHiddenClick(long[] ids, bool isHidden, bool showMessage)
+    {
+        string tempString = isHidden == true ? "隐藏" : "显示";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<HiddenLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/HiddenLotteryUser", new HiddenLotteryModel { Ids = ids, IsHidden = isHidden });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "用户失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "用户成功", tempString + "用户成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "用户失败");
+        }
+    }
+
+    private async Task OnHiddenClick(IEnumerable<ListLotteryUserAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改用户显示状态", "请选中用户");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.LotteryUserId).ToArray(), true, false);
+
+        await ToastService.Success("隐藏词条成功", "隐藏词条成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnUnHiddenClick(IEnumerable<ListLotteryUserAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有修改用户显示状态", "请选中用户");
+            return;
+        }
+
+        await OnRowEditIsHiddenClick(items.Select(s => s.LotteryUserId).ToArray(), false, false);
+
+        await ToastService.Success("显示用户成功", "显示用户成功");
+        await TableRows.QueryAsync();
+    }
+
+    public async Task OnExport(IEnumerable<ListLotteryUserAloneModel> items)
+    {
+        try
+        {
+
+            var data = await Http.GetFromJsonAsync<DrawLotteryDataModel>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryData/" + Id);
+            var model = new ExportLotteryDataModel();
+            var prizeId = 1;
+            var ticketId = 1;
+            foreach (var item in data.Awards)
+            {
+                for(var i =0;i<item.TotalCount;i++)
+                {
+                    var prize = new ExportLotteryPrizeModel
+                    {
+                        id = prizeId++,
+                        name = item.Name,
+                        sponsor = item.Sponsor
+                    };
+                    model.prizes.Add(prize);
+
+                    if(item.WinningUsers.Count>i)
+                    {
+                        var ticket = new ExportLotteryTicketModel
+                        {
+                            id = ticketId++,
+                            nickname = item.WinningUsers[i].Name
+                        };
+                        model.tickets.Add(ticket);
+
+                        model.winners.Add(new ExportLotteryWinnerModel
+                        {
+                            prizeId = prize.id.ToString(),
+                            ticket = ticket.id.ToString()
+                        });
+                    }
+                }
+            }
+            foreach(var item in data.NotWinningUsers)
+            {
+                model.tickets.Add(new ExportLotteryTicketModel
+                {
+                    id = ticketId++,
+                    nickname = item.Name
+                });
+            }
+            exportString = Newtonsoft.Json.JsonConvert.SerializeObject(model, Newtonsoft.Json.Formatting.Indented);
+
+            export = true;
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取参加抽奖的用户列表");
+        }
+        export = true;
+        StateHasChanged();
     }
 }

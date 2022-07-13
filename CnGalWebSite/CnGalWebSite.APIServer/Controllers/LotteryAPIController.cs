@@ -94,11 +94,12 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         Id = s.ApplicationUserId,
                         Name = s.ApplicationUser.UserName,
-                        Number = s.Number
+                        Number = s.Number,
+                        IsHidden=s.IsHidden
                     }).ToList()
                 };
 
-                foreach (var item in lottery.Awards)
+                foreach (var item in lottery.Awards.OrderByDescending(s=>s.Priority))
                 {
                     model.Awards.Add(new LotteryAwardDataModel
                     {
@@ -117,7 +118,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 //排除管理员
                 var users = new List<LotteryUserDataModel>();
 
-                foreach (var temp in model.NotWinningUsers)
+                foreach (var temp in model.NotWinningUsers.Where(s => s.IsHidden == false))
                 {
                     var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == temp.Id);
                     if (await _userManager.IsInRoleAsync(user, "Admin")==false)
@@ -329,7 +330,7 @@ namespace CnGalWebSite.APIServer.Controllers
                                 }
 
 
-                                if (award.LotteryPrize != null)
+                                if (award.LotteryPrize != null&&string.IsNullOrWhiteSpace(award.LotteryPrize.Context)==false)
                                 {
                                     model.State = UserLotteryState.Shipped;
                                 }
@@ -795,6 +796,92 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return dtos;
         }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<List<WinnerDataModel>>> GetWinnerDatas(long id)
+        {
+            var lottery = await _lotteryRepository.GetAll().AsNoTracking()
+                           .Include(s => s.Awards).ThenInclude(s => s.WinningUsers).ThenInclude(s=>s.LotteryPrize)
+                           .Include(s => s.Awards).ThenInclude(s => s.WinningUsers).ThenInclude(s=>s.ApplicationUser).ThenInclude(s=>s.UserAddress)
+                           .FirstOrDefaultAsync(s => s.Id == id);
+            var model = new List<WinnerDataModel>();
+
+            foreach (var item in lottery.Awards)
+            {
+                foreach(var temp in item.WinningUsers)
+                {
+                    model.Add(new WinnerDataModel
+                    {
+                        AwardId = item.Id,
+                        ActivationCode = item.Type == LotteryAwardType.ActivationCode ? temp.LotteryPrize?.Context : null,
+                        TrackingNumber = item.Type == LotteryAwardType.RealThing ? temp.LotteryPrize?.Context : null,
+                        AwardName = item.Name,
+                        Email = temp.ApplicationUser.Email,
+                        PrizeId = temp.LotteryPrize?.Id ?? 0,
+                        UserId = temp.ApplicationUser.Id,
+                        UserName=temp.ApplicationUser.UserName,
+                        AwardType=item.Type,
+                        Number=temp.Number,
+                        Address = temp.ApplicationUser.UserAddress?.Address,
+                        Phone = temp.ApplicationUser.UserAddress?.PhoneNumber,
+                        RealName = temp.ApplicationUser.UserAddress?.RealName,
+                    });
+                }
+            }
+
+            return model;
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [HttpPost]
+        public async Task<ActionResult<Result>> EditUserPrize(EditUserPrizeModel model)
+        {
+            //检查用户是否中奖
+            if(await _lotteryAwardRepository.GetAll().AnyAsync(s=>s.Id==model.LotteryAwardId&&s.WinningUsers.Any(s=>s.ApplicationUserId==model.UserId))==false)
+            {
+                return new Result { Error = "未找到该中奖用户" };
+            }
+
+            var user = await _lotteryUserRepository.GetAll().FirstOrDefaultAsync(s => s.LotteryAwardId == model.LotteryAwardId && s.ApplicationUserId == model.UserId);
+            if(user == null)
+            {
+                return new Result { Error = "未找到该中奖用户" };
+            }
+
+            var prize = await _lotteryPrizeRepository.GetAll().Include(s=>s.LotteryAward).Include(s=>s.LotteryUser).FirstOrDefaultAsync(s => s.LotteryAwardId == model.LotteryAwardId && s.LotteryUserId == user.Id);
+
+            if(prize==null)
+            {
+                await _lotteryPrizeRepository.InsertAsync(new LotteryPrize
+                {
+                    Context = model.Context,
+                    LotteryAwardId = model.LotteryAwardId,
+                    LotteryUserId = user.Id
+                });
+            }
+            else
+            {
+                prize.Context = model.Context;
+                await _lotteryPrizeRepository.UpdateAsync(prize);
+            }
+
+            return new Result { Successful = true };
+        }
+
+        /// <summary>
+        /// 修改用户能否被抽取
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [HttpPost]
+        public async Task<ActionResult<Result>> HiddenLotteryUserAsync(HiddenLotteryModel model)
+        {
+            await _lotteryUserRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            return new Result { Successful = true };
+        }
+
 
     }
 }
