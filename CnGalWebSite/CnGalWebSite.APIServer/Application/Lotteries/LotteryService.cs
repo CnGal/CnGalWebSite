@@ -121,9 +121,9 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             {
                 items = items.Where(item => item.ApplicationUser.UserName.Contains(searchModel.Name, StringComparison.OrdinalIgnoreCase));
             }
-            if (!string.IsNullOrWhiteSpace(searchModel.Id))
+            if (!string.IsNullOrWhiteSpace(searchModel.UserId))
             {
-                items = items.Where(item => item.ApplicationUserId.Contains(searchModel.Id, StringComparison.OrdinalIgnoreCase));
+                items = items.Where(item => item.ApplicationUserId.Contains(searchModel.UserId, StringComparison.OrdinalIgnoreCase));
             }
 
 
@@ -156,9 +156,11 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             {
                 resultItems.Add(new ListLotteryUserAloneModel
                 {
-                    Id = item.ApplicationUser.Id,
+                    UserId = item.ApplicationUser.Id,
                     Name = item.ApplicationUser.UserName,
                     Number = item.Number,
+                    LotteryUserId=item.Id,
+                    IsHidden=item.IsHidden
                 });
             }
 

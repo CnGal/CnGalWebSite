@@ -150,7 +150,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = "发送验证码的过程中发生错误，" + result_2 };
                 }
 
-                //成功登入 记录ip
+                //成功注册 记录ip
                 try
                 {
                     await _operationRecordService.AddOperationRecord(OperationRecordType.Registe, user.Id, user, model.Identification, HttpContext);

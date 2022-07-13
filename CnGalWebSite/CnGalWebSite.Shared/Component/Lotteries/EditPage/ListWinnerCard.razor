@@ -1,0 +1,245 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@inject ToastService? ToastService
+
+@if (!isReady)
+{
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+    <div class="mt-2">
+    </div>
+    <SkeletonParagraph />
+}
+else
+{
+    <Table TItem="WinnerDataModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true ExtendButtonColumnWidth="80" FixedExtendButtonsColumn="true"
+           OnQueryAsync="@OnQueryStaffAsync" SearchModel="@SearchModelStaff" ShowSearch="true" ShowLoading="true"  ShowExtendButtons="true" 
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Number" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
+            <TableColumn @bind-Field="@context.UserName" Filterable Sortable Searchable DefaultSort TextWrap Width="180" />
+            <TableColumn @bind-Field="@context.Email" Filterable Sortable Searchable TextWrap Width="200" />
+            <TableColumn @bind-Field="@context.AwardType" Filterable Sortable Searchable TextWrap Width="100" />
+            <TableColumn @bind-Field="@context.AwardName" Filterable Sortable Searchable TextWrap Width="200" />
+            <TableColumn @bind-Field="@context.ActivationCode" Filterable Sortable Searchable TextWrap Width="220" />
+            <TableColumn @bind-Field="@context.TrackingNumber" Filterable Sortable Searchable TextWrap Width="200" />
+            <TableColumn @bind-Field="@context.RealName" Filterable Sortable Searchable TextWrap Width="200" />
+            <TableColumn @bind-Field="@context.Phone" Filterable Sortable Searchable TextWrap Width="200" />
+            <TableColumn @bind-Field="@context.Address" Filterable Sortable Searchable TextWrap Width="200" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => OnEdit(context))" IsShow="!(context.AwardType== LotteryAwardType.RealThing&&string.IsNullOrWhiteSpace( context.TrackingNumber))&&context.AwardType!= LotteryAwardType.Integral" />
+
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-up" Text="发货" IsAsync="true" OnClickWithoutRender="@(() => OnEdit(context ))" IsShow="context.AwardType== LotteryAwardType.RealThing&&string.IsNullOrWhiteSpace( context.TrackingNumber)" />
+        </RowButtonTemplate>
+
+    </Table>
+
+}
+
+<MDialog @bind-Value="Dialog"
+         Width="600">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            编辑奖品
+        </MCardTitle>
+        <MCardText>
+            输入完毕后点击保存即可生效
+        </MCardText>
+
+        <MCardText>
+            @if (currentWinner.AwardType == LotteryAwardType.ActivationCode)
+            {
+                <MTextField @bind-Value="tempStr" Label="激活码" Color="@_dataCacheService.ThemeSetting.Theme" />
+
+            }
+            else
+            {
+                <MTextField @bind-Value="tempStr" Label="快递单号" Color="@_dataCacheService.ThemeSetting.Theme" />
+            }
+        </MCardText>
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+            <MSpacer></MSpacer>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="保存" IsAsync="true" OnClick="OnSubmit" Icon="mdi-check" Color="green" TextStyle />
+        </MCardActions>
+    </MCard>
+</MDialog>
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+
+
+
+    private IEnumerable<int> PageItems => new int[] { 20, 40, 80, 200, 1000 };
+
+    private bool isReady = false;
+    public List<WinnerDataModel> Model { get; set; } = new List<WinnerDataModel>();
+
+    private static readonly ConcurrentDictionary<Type, Func<IEnumerable<WinnerDataModel>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<WinnerDataModel>>> SortLambdaCacheStaff = new();
+    private WinnerDataModel SearchModelStaff { get; set; } = new WinnerDataModel();
+
+    bool Dialog { get; set; }
+
+    WinnerDataModel currentWinner { get; set; } = new WinnerDataModel();
+    string tempStr;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
+            Model = await Http.GetFromJsonAsync<List<WinnerDataModel>>(ToolHelper.WebApiPath + "api/lotteries/GetWinnerDatas/" + Id);
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取中奖用户列表");
+        }
+    }
+
+    public async Task OnEdit(WinnerDataModel model)
+    {
+        currentWinner = model;
+        if (currentWinner.AwardType == LotteryAwardType.ActivationCode)
+        {
+            tempStr = currentWinner.ActivationCode;
+        }
+        else
+        {
+            tempStr = currentWinner.TrackingNumber;
+        }
+        Dialog = true;
+        StateHasChanged();
+    }
+
+    public async Task OnSubmit()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditUserPrizeModel>(ToolHelper.WebApiPath + "api/lotteries/EditUserPrize", new EditUserPrizeModel
+            {
+                Context = tempStr,
+                LotteryAwardId = currentWinner.AwardId,
+                UserId = currentWinner.UserId
+            });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var res = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            if (res.Successful)
+            {
+                if (currentWinner.AwardType == LotteryAwardType.ActivationCode)
+                {
+                    currentWinner.ActivationCode = tempStr;
+                }
+                else
+                {
+                    currentWinner.TrackingNumber = tempStr;
+                }
+                Dialog = false;
+                StateHasChanged();
+                await ToastService.Success("编辑奖品成功", "成功编辑奖品");
+            }
+            else
+            {
+                await ToastService.Success("编辑奖品失败", res.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "编辑用户奖品失败");
+        }
+    }
+
+    private Task<QueryData<WinnerDataModel>> OnQueryStaffAsync(QueryPageOptions options)
+    {
+
+        IEnumerable<WinnerDataModel> items = Model;
+        // 处理高级搜索
+        if (!string.IsNullOrWhiteSpace(SearchModelStaff.UserName))
+        {
+            items = items.Where(item => item.UserName?.Contains(SearchModelStaff.UserName, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchModelStaff.UserId))
+        {
+            items = items.Where(item => item.UserId?.Contains(SearchModelStaff.UserId, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchModelStaff.AwardName))
+        {
+            items = items.Where(item => item.AwardName?.Contains(SearchModelStaff.AwardName, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchModelStaff.ActivationCode))
+        {
+            items = items.Where(item => item.ActivationCode?.Contains(SearchModelStaff.ActivationCode, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        if (!string.IsNullOrWhiteSpace(SearchModelStaff.TrackingNumber))
+        {
+            items = items.Where(item => item.TrackingNumber?.Contains(SearchModelStaff.TrackingNumber, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+        if (!string.IsNullOrWhiteSpace(SearchModelStaff.Email))
+        {
+            items = items.Where(item => item.Email?.Contains(SearchModelStaff.Email, StringComparison.OrdinalIgnoreCase) ?? false);
+        }
+
+        // 处理 Searchable=true 列与 SeachText 模糊搜索
+        if (options.Searchs.Any())
+        {
+            items = items.Where(options.Searchs.GetFilterFunc<WinnerDataModel>(FilterLogic.Or));
+        }
+        else
+        {
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.UserName?.Contains(options.SearchText) ?? false)
+                             || (item.UserId?.Contains(options.SearchText) ?? false)
+                             || (item.AwardName?.Contains(options.SearchText) ?? false)
+                             || (item.TrackingNumber?.Contains(options.SearchText) ?? false)
+                             || (item.ActivationCode?.Contains(options.SearchText) ?? false)
+                             || (item.Email?.Contains(options.SearchText) ?? false));
+            }
+        }
+        // 过滤
+        var isFiltered = false;
+        if (options.Filters.Any())
+        {
+            items = items.Where(options.Filters.GetFilterFunc<WinnerDataModel>());
+            isFiltered = true;
+        }
+
+        // 排序
+        var isSorted = false;
+        if (!string.IsNullOrWhiteSpace(options.SortName))
+        {
+            // 外部未进行排序，内部自动进行排序处理
+            var invoker = SortLambdaCacheStaff.GetOrAdd(typeof(WinnerDataModel), key => LambdaExtensions.GetSortLambda<WinnerDataModel>().Compile());
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+            isSorted = true;
+        }
+
+        // 设置记录总数
+        var total = items.Count();
+
+        // 内存分页
+        items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
+
+        return Task.FromResult(new QueryData<WinnerDataModel>()
+        {
+            Items = items,
+            TotalCount = total,
+            IsSorted = isSorted,
+            IsFiltered = isFiltered
+        });
+    }
+
+}

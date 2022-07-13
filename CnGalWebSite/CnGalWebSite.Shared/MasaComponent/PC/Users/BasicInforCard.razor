@@ -42,7 +42,7 @@
 
         @if (Model.Birthday != null)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-birthday-cake" Text="@("生日："+Model.Birthday.Value.ToString("M") )" Class="col-12" /> <br />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-birthday-cake" Text="@("生日："+Model.Birthday.Value.ToString("M月d日") )" Class="col-12" /> <br />
 
         }
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-hourglass-2" Text="@("在线时间："+ Model.OnlineTime.ToString("0.0")+"小时")" Class="col-12" /> <br />

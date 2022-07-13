@@ -16,12 +16,16 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
     }
     public class ListLotteryUserAloneModel
     {
+        public long LotteryUserId { get; set; }
+
         [Display(Name = "号码")]
         public int Number { get; set; }
         [Display(Name = "用户名")]
         public string Name { get; set; }
         [Display(Name = "Id")]
-        public string Id { get; set; }
+        public string UserId { get; set; }
+        [Display(Name = "是否隐藏")]
+        public bool IsHidden { get; set; }
     }
 
     public class LotteryUsersPagesInfor

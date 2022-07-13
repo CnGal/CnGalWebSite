@@ -45,5 +45,32 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         public string Name { get; set; }
         public string Id { get; set; }
         public int Number { get; set; }
+        public bool IsHidden { get; set; }
+    }
+
+    public class ExportLotteryDataModel
+    {
+        public List<ExportLotteryWinnerModel> winners = new List<ExportLotteryWinnerModel>();
+        public List<ExportLotteryPrizeModel> prizes = new List<ExportLotteryPrizeModel>();
+        public List<ExportLotteryTicketModel> tickets = new List<ExportLotteryTicketModel>();
+    }
+
+    public class ExportLotteryWinnerModel
+    {
+        public string ticket { get; set; }
+        public string prizeId { get; set; }
+    }
+
+    public class ExportLotteryPrizeModel
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public string sponsor { get; set; }
+    }
+
+    public class ExportLotteryTicketModel
+    {
+        public int id { get; set; }
+        public string nickname { get; set; }
     }
 }

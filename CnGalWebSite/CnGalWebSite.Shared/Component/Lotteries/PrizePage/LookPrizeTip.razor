@@ -12,12 +12,12 @@
     {
         @if (Model.Type == LotteryAwardType.ActivationCode)
         {
-            <p>激活码：@Model.Context</p>
+            <span style="font-size:large;">激活码：@Model.Context</span>
 
         }
         else if (Model.Type == LotteryAwardType.RealThing)
         {
-            <p>单号：@Model.Context</p>
+            <span style="font-size:large;">单号：@Model.Context</span>
 
         }
     }
