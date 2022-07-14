@@ -1,9 +1,11 @@
 ﻿using CnGalWebSite.APIServer.Application.PlayedGames;
+using CnGalWebSite.APIServer.Controllers;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +24,11 @@ namespace CnGalWebSite.APIServer.Application.Tables
         private readonly IRepository<RoleInforTableModel, long> _roleInforTableModelRepository;
         private readonly IRepository<SteamInforTableModel, long> _steamInforTableModelRepository;
         private readonly IPlayedGameService _playedGameService;
+        private readonly ILogger<TableService> _logger;
 
         public TableService(IRepository<BasicInforTableModel, long> basicInforTableModelRepository, IRepository<Entry, int> entryRepository, IPlayedGameService playedGameService,
         IRepository<GroupInforTableModel, long> groupInforTableModelRepository, IRepository<MakerInforTableModel, long> makerInforTableModelRepository,
-        IRepository<StaffInforTableModel, long> staffInforTableModelRepository, IRepository<RoleInforTableModel, long> roleInforTableModelRepository,
+        IRepository<StaffInforTableModel, long> staffInforTableModelRepository, IRepository<RoleInforTableModel, long> roleInforTableModelRepository, ILogger<TableService> logger,
         IRepository<SteamInforTableModel, long> steamInforTableModelRepository, IRepository<SteamInfor, long> steamInforRepository)
         {
             _entryRepository = entryRepository;
@@ -37,6 +40,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             _steamInforTableModelRepository = steamInforTableModelRepository;
             _steamInforRepository = steamInforRepository;
             _playedGameService = playedGameService;
+            _logger = logger;
         }
 
         public async Task UpdateBasicInforListAsync()
@@ -500,7 +504,14 @@ namespace CnGalWebSite.APIServer.Application.Tables
                                 tableModel.CV = item.DisplayValue;
                                 break;
                             case "性别":
-                                tableModel.Gender = (GenderType)Enum.Parse(typeof(GenderType), item.DisplayValue);
+                                if (Enum.TryParse(typeof(GenderType), item.DisplayValue, true, out object gender))
+                                {
+                                    tableModel.Gender = (GenderType)gender;
+                                }
+                                else
+                                {
+                                    _logger.LogWarning("角色 - {name}({id}) 性别（{gender}）无法识别", infor.Name, infor.Id, item.DisplayValue);
+                                }
                                 break;
                             case "身材数据":
                                 tableModel.FigureData = item.DisplayValue;
