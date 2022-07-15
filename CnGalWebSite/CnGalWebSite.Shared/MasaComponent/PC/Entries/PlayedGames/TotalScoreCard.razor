@@ -36,6 +36,57 @@
             return;
         }
 
+        model.Legend.Data.Clear();
+        model.Legend.Data.Add("所有");
+        model.Legend.Data.Add("过滤后");
+        if(model.Series.Any()==false)
+        {
+            model.Series.Add(new EChartsRadarOptionSery
+            {
+                Name = "评分"
+            });
+
+        }
+        var series = model.Series.First().Data;
+        series.Clear();
+        series.Add(new EChartsRadarOptionSeryData
+        {
+            Name = "所有",
+            Value = new List<double>
+            {
+                Math.Round(Model.GameTotalScores.SystemSocre, 2), Math.Round(Model.GameTotalScores.CVSocre, 2), Math.Round( Model.GameTotalScores.ScriptSocre, 2), Math.Round( Model.GameTotalScores.ShowSocre, 2),  Math.Round(Model.GameTotalScores.PaintSocre, 2),  Math.Round(Model.GameTotalScores.MusicSocre, 2)
+            }
+        });
+        series.Add(new EChartsRadarOptionSeryData
+        {
+            Name = "过滤后",
+            Value = new List<double>
+            {
+                Math.Round(Model.GameReviewsScores.SystemSocre, 2),  Math.Round(Model.GameReviewsScores.CVSocre, 2),  Math.Round(Model.GameReviewsScores.ScriptSocre, 2), Math.Round( Model.GameReviewsScores.ShowSocre, 2),  Math.Round(Model.GameReviewsScores.PaintSocre, 2), Math.Round( Model.GameReviewsScores.MusicSocre, 2)
+            }
+        });
+
+
+
+        var myscores = Model.UserScores.FirstOrDefault(s => s.User.Id == Model.CurrentUserId && s.Socres.IsScored);
+        if (myscores != null)
+        {
+            model.Legend.Data.Add("我的");
+            series.Add(new EChartsRadarOptionSeryData
+            {
+                Name = "我的",
+                Value = new List<double>
+                {
+                    Math.Round(myscores.Socres.SystemSocre, 2), Math.Round(myscores.Socres.CVSocre, 2), Math.Round(myscores.Socres.ScriptSocre, 2),Math.Round( myscores.Socres.ShowSocre, 2), Math.Round(myscores.Socres.PaintSocre, 2), Math.Round(myscores.Socres.MusicSocre, 2)
+                }
+            });
+        }
+
+        //计算最大值
+        var min = series.Min(s => s.Value.Min());
+        var max = series.Max(s => s.Value.Max());
+
+
         if (model.Radar.Indicator.Any() == false)
         {
             model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
@@ -67,50 +118,15 @@
                 Name = "音乐"
             });
 
-            model.Series.Add(new EChartsRadarOptionSery
-            {
-                Name = "评分"
-            });
-        }
-        model.Legend.Data.Clear();
-        model.Legend.Data.Add("所有");
-        model.Legend.Data.Add("过滤后");
-
-        var series = model.Series.First().Data;
-        series.Clear();
-        series.Add(new EChartsRadarOptionSeryData
-        {
-            Name = "所有",
-            Value = new List<double>
-    {
-                Math.Round(Model.GameTotalScores.SystemSocre, 2), Math.Round(Model.GameTotalScores.CVSocre, 2), Math.Round( Model.GameTotalScores.ScriptSocre, 2), Math.Round( Model.GameTotalScores.ShowSocre, 2),  Math.Round(Model.GameTotalScores.PaintSocre, 2),  Math.Round(Model.GameTotalScores.MusicSocre, 2)
-            }
-        });
-        series.Add(new EChartsRadarOptionSeryData
-        {
-            Name = "过滤后",
-            Value = new List<double>
-    {
-                Math.Round(Model.GameReviewsScores.SystemSocre, 2),  Math.Round(Model.GameReviewsScores.CVSocre, 2),  Math.Round(Model.GameReviewsScores.ScriptSocre, 2), Math.Round( Model.GameReviewsScores.ShowSocre, 2),  Math.Round(Model.GameReviewsScores.PaintSocre, 2), Math.Round( Model.GameReviewsScores.MusicSocre, 2)
-            }
-        });
 
 
-
-        var myscores = Model.UserScores.FirstOrDefault(s => s.User.Id == Model.CurrentUserId && s.Socres.IsScored);
-        if (myscores != null)
-        {
-            model.Legend.Data.Add("我的");
-            series.Add(new EChartsRadarOptionSeryData
-            {
-                Name = "我的",
-                Value = new List<double>
-        {
-                    Math.Round(myscores.Socres.SystemSocre, 2), Math.Round(myscores.Socres.CVSocre, 2), Math.Round(myscores.Socres.ScriptSocre, 2),Math.Round( myscores.Socres.ShowSocre, 2), Math.Round(myscores.Socres.PaintSocre, 2), Math.Round(myscores.Socres.MusicSocre, 2)
-                }
-            });
         }
 
+        foreach (var item in model.Radar.Indicator)
+        {
+            item.Min = min - 1;
+            item.Max = max + 0.1;
+        }
         if (Model.IsDubbing == false)
         {
             series[0].Value.RemoveAt(1);
