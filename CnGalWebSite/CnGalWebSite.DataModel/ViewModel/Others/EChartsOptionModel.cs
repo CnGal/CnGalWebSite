@@ -128,6 +128,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
     {
         public string Name { get; set; }
         public double Max { get; set; } = 10;
+        public double Min { get; set; } = 0;
     }
     public class EChartsRadarOptionSery
     {
