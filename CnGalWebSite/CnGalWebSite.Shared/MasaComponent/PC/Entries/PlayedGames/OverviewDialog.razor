@@ -50,12 +50,12 @@
             </MCardText>
 
         }
-                    else
-                    {
-                        <MCardText Style="display: flex; min-height: 200px; justify-content: center; align-items: center;">
-                            <MProgressCircular Size="40" Indeterminate Color="@_dataCacheService.ThemeSetting.Theme"></MProgressCircular>
-                        </MCardText>
-                    }
+        else
+        {
+            <MCardText Style="display: flex; min-height: 200px; justify-content: center; align-items: center;">
+                <MProgressCircular Size="40" Indeterminate Color="@_dataCacheService.ThemeSetting.Theme"></MProgressCircular>
+            </MCardText>
+        }
 
         <MCardActions Class="pb-4 pe-6 ps-6 pt-6">
             <MSpacer></MSpacer>
@@ -96,6 +96,7 @@
 
     bool Dialog { get; set; }
     bool showChart { get; set; }
+    int gameId { get; set; }
 
     CnGalWebSite.Shared.Component.PlayedGames.EditGameRecordTip editGameRecordTip;
 
@@ -106,6 +107,13 @@
     {
         Model = model;
         Dialog = dialog;
+        if(gameId!=model.Game.Id)
+        {
+            showChart = false;
+        }
+
+        gameId = model.Game.Id;
+
         StateHasChanged();
 
         await Task.Delay(500);

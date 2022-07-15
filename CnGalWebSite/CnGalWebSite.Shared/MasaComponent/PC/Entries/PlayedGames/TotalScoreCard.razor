@@ -37,9 +37,7 @@
         }
 
         model.Legend.Data.Clear();
-        model.Legend.Data.Add("所有");
-        model.Legend.Data.Add("过滤后");
-        if(model.Series.Any()==false)
+        if (model.Series.Any() == false)
         {
             model.Series.Add(new EChartsRadarOptionSery
             {
@@ -49,22 +47,31 @@
         }
         var series = model.Series.First().Data;
         series.Clear();
-        series.Add(new EChartsRadarOptionSeryData
+        if(Model.GameTotalScores.IsScored)
         {
-            Name = "所有",
-            Value = new List<double>
+            model.Legend.Data.Add("所有");
+            series.Add(new EChartsRadarOptionSeryData
             {
-                Math.Round(Model.GameTotalScores.SystemSocre, 2), Math.Round(Model.GameTotalScores.CVSocre, 2), Math.Round( Model.GameTotalScores.ScriptSocre, 2), Math.Round( Model.GameTotalScores.ShowSocre, 2),  Math.Round(Model.GameTotalScores.PaintSocre, 2),  Math.Round(Model.GameTotalScores.MusicSocre, 2)
-            }
-        });
-        series.Add(new EChartsRadarOptionSeryData
+                Name = "所有",
+                Value = new List<double>
+                {
+                    Math.Round(Model.GameTotalScores.SystemSocre, 2), Math.Round(Model.GameTotalScores.CVSocre, 2), Math.Round( Model.GameTotalScores.ScriptSocre, 2), Math.Round( Model.GameTotalScores.ShowSocre, 2),  Math.Round(Model.GameTotalScores.PaintSocre, 2),  Math.Round(Model.GameTotalScores.MusicSocre, 2)
+                }
+            });
+        }
+        if (Model.GameReviewsScores.IsScored)
         {
-            Name = "过滤后",
-            Value = new List<double>
+            model.Legend.Data.Add("过滤后");
+
+            series.Add(new EChartsRadarOptionSeryData
             {
-                Math.Round(Model.GameReviewsScores.SystemSocre, 2),  Math.Round(Model.GameReviewsScores.CVSocre, 2),  Math.Round(Model.GameReviewsScores.ScriptSocre, 2), Math.Round( Model.GameReviewsScores.ShowSocre, 2),  Math.Round(Model.GameReviewsScores.PaintSocre, 2), Math.Round( Model.GameReviewsScores.MusicSocre, 2)
-            }
-        });
+                Name = "过滤后",
+                Value = new List<double>
+                {
+                    Math.Round(Model.GameReviewsScores.SystemSocre, 2),  Math.Round(Model.GameReviewsScores.CVSocre, 2),  Math.Round(Model.GameReviewsScores.ScriptSocre, 2), Math.Round( Model.GameReviewsScores.ShowSocre, 2),  Math.Round(Model.GameReviewsScores.PaintSocre, 2), Math.Round( Model.GameReviewsScores.MusicSocre, 2)
+                }
+            });
+        }
 
 
 
@@ -76,7 +83,7 @@
             {
                 Name = "我的",
                 Value = new List<double>
-                {
+            {
                     Math.Round(myscores.Socres.SystemSocre, 2), Math.Round(myscores.Socres.CVSocre, 2), Math.Round(myscores.Socres.ScriptSocre, 2),Math.Round( myscores.Socres.ShowSocre, 2), Math.Round(myscores.Socres.PaintSocre, 2), Math.Round(myscores.Socres.MusicSocre, 2)
                 }
             });
@@ -86,45 +93,40 @@
         var min = series.Min(s => s.Value.Min());
         var max = series.Max(s => s.Value.Max());
 
+        model.Radar.Indicator.Clear();
 
-        if (model.Radar.Indicator.Any() == false)
+        model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+        {
+            Name = "程序"
+        });
+        if (Model.IsDubbing)
         {
             model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
             {
-                Name = "程序"
+                Name = "配音"
             });
-            if (Model.IsDubbing)
-            {
-                model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
-                {
-                    Name = "配音"
-                });
-            }
-            model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
-            {
-                Name = "剧本"
-            });
-            model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
-            {
-                Name = "演出"
-            });
-            model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
-            {
-                Name = "美术"
-            });
-
-            model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
-            {
-                Name = "音乐"
-            });
-
-
-
         }
+        model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+        {
+            Name = "剧本"
+        });
+        model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+        {
+            Name = "演出"
+        });
+        model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+        {
+            Name = "美术"
+        });
+
+        model.Radar.Indicator.Add(new EChartsRadarOptionIndicator
+        {
+            Name = "音乐"
+        });
 
         foreach (var item in model.Radar.Indicator)
         {
-            item.Min = min - 1;
+            item.Min = min - 1 < 0 ? 0 : min - 1;
             item.Max = max + 0.1;
         }
         if (Model.IsDubbing == false)
