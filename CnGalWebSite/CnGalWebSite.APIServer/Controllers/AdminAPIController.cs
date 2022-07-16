@@ -862,9 +862,12 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var game = await _playedGameRepository.FirstOrDefaultAsync(s => s.Id == 1751);
-                game.CVSocre = 10;
-                await _playedGameRepository.UpdateAsync(game);
+                var articles = await _articleRepository.GetAll().Where(s => s.MainPicture.Contains("media.st.dl.pinyuncloud.com")).ToListAsync();
+                foreach(var item in articles)
+                {
+                    item.MainPicture = item.MainPicture.Replace("media.st.dl.pinyuncloud.com", "media.st.dl.eccdnx.com");
+                    await _articleRepository.UpdateAsync(item);
+                }
                 return new Result { Successful = true };
             }
             catch (Exception ex)
