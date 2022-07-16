@@ -90,8 +90,8 @@
 
     public async Task<string> CVRateFormatter(object cut)
     {
-        string res = ((double)((BootstrapBlazor.Components.TableColumnContext<ListPlayedGameAloneModel, System.Object>)cut).Value).ToString("0.00");
-        if (res == "-1.00")
+        string res = ((double)((BootstrapBlazor.Components.TableColumnContext<ListPlayedGameAloneModel, System.Object>)cut).Value).ToString();
+        if (res == "-1")
         {
             res = "无配音";
         }
