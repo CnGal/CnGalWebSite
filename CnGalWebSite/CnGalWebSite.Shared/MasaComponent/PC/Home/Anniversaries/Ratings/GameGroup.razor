@@ -150,6 +150,7 @@
             try
             {
                 var temp = await _dataCacheService.PlayedGameOverviewDataCatche.GetCatche(model.Id.ToString(), true);
+                temp.UserScores.Random();
                 await overviewDialog.Refresh(true, temp);
             }
             catch (Exception ex)

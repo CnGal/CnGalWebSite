@@ -12,6 +12,7 @@ using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.EntityFrameworkCore;
 using Nest;
 using Newtonsoft.Json;
+using NuGet.Packaging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -170,8 +171,21 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         {
             //获取所有评分
             var globalAllScores = await _playedGameRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entry).ThenInclude(s => s.Tags)
                 .Where(s => s.ShowPublicly)
                  .Where(s => s.CVSocre != 0 && s.ShowSocre != 0 && s.SystemSocre != 0 && s.MusicSocre != 0 && s.PaintSocre != 0 && s.TotalSocre != 0 && s.ScriptSocre != 0)
+                 .Select(s => new PlayedGame
+                 {
+                     CVSocre = (s.Entry.Tags != null && s.Entry.Tags.Any(s => s.Name == "无配音")) ? -1 : s.CVSocre,
+                     MusicSocre = s.MusicSocre,
+                     PaintSocre = s.PaintSocre,
+                     ScriptSocre = s.ScriptSocre,
+                     ShowSocre = s.ShowSocre,
+                     SystemSocre = s.SystemSocre,
+                     TotalSocre = s.TotalSocre,
+                     PlayImpressions = s.PlayImpressions,
+                     EntryId = s.EntryId,
+                 })
                 .ToListAsync();
 
             //过滤评分
@@ -209,7 +223,7 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
         {
             var globalDistribution = new Dictionary<PlayedGameScoreType, long[]>();
 
-            globalDistribution.Add(PlayedGameScoreType.CV, GetDistribution(scores.Where(s=>s.CVSocre>0).Select(s => s.CVSocre)));
+            globalDistribution.Add(PlayedGameScoreType.CV, GetDistribution(scores.Where(s => s.CVSocre > 0).Select(s => s.CVSocre)));
             globalDistribution.Add(PlayedGameScoreType.Show, GetDistribution(scores.Select(s => s.ShowSocre)));
             globalDistribution.Add(PlayedGameScoreType.System, GetDistribution(scores.Select(s => s.SystemSocre)));
             globalDistribution.Add(PlayedGameScoreType.Music, GetDistribution(scores.Select(s => s.MusicSocre)));
@@ -255,6 +269,7 @@ namespace CnGalWebSite.APIServer.Application.PlayedGames
                 if (scores.Any() == false)
                 {
                     await _gameScoreTableRepository.DeleteAsync(model);
+                    return;
                 }
             }
             model.GameName = name;
