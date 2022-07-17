@@ -634,51 +634,42 @@ namespace CnGalWebSite.APIServer.Application.Tables
 
         public async Task UpdateSteamInforListAsync()
         {
-            //通过Id获取
-            var Infors = new List<SteamInforTableModel>();
             //循环添加
-            var steamList = await _steamInforRepository.GetAll().AsNoTracking().Include(s => s.Entry).ToListAsync();
-            foreach (var item in steamList)
-            {
-                var steamInfor = item;
-                if (steamInfor != null && steamInfor.Entry != null)
+            var steamList = await _steamInforRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entry)
+                .Where(s=>s.Entry.IsHidden==false&&string.IsNullOrWhiteSpace(s.Entry.Name)==false)
+                .Select(s => new SteamInforTableModel
                 {
-                    var steam = new SteamInforTableModel
-                    {
-                        SteamId = steamInfor.SteamId,
-                        OriginalPrice = steamInfor.OriginalPrice,
-                        PriceNow = steamInfor.PriceNow,
-                        CutNow = steamInfor.CutNow,
-                        PriceLowest = steamInfor.PriceLowest,
-                        CutLowest = steamInfor.CutLowest,
-                        LowestTime = steamInfor.LowestTime,
-                        EvaluationCount = steamInfor.EvaluationCount,
-                        RecommendationRate = steamInfor.RecommendationRate,
-                    };
-                    if (item.Entry != null)
-                    {
-                        steam.EntryId = item.Entry.Id;
-                        steam.Name = item.Entry.Name;
-                    }
-                    Infors.Add(steam);
-                }
-            }
+                    SteamId = s.SteamId,
+                    CutLowest = s.CutLowest,
+                    CutNow = s.CutNow,
+                    EntryId = s.Entry.Id,
+                    EvaluationCount = s.EvaluationCount,
+                    LowestTime = s.LowestTime,
+                    Name = s.Entry.Name,
+                    OriginalPrice = s.OriginalPrice,
+                    PriceLowest = s.PriceLowest,
+                    PriceNow = s.PriceNow,
+                    RecommendationRate = s.RecommendationRate
+                })
+                .ToListAsync();
+
             //与数据中现有的项目对比
             //删除不存在的项目
-            var currentIds = Infors.Select(s => s.EntryId);
+            var currentIds = steamList.Select(s => s.SteamId);
 
-            await _steamInforTableModelRepository.DeleteRangeAsync(s => currentIds.Contains(s.EntryId) == false);
+            await _steamInforTableModelRepository.DeleteRangeAsync(s => currentIds.Contains(s.SteamId) == false);
             //添加不存在的项目
-            var oldIds = await _steamInforTableModelRepository.GetAll().Select(s => s.EntryId).ToListAsync();
+            var oldIds = await _steamInforTableModelRepository.GetAll().Select(s => s.SteamId).ToListAsync();
 
-            var newItems = Infors.Where(s => oldIds.Contains(s.EntryId) == false);
+            var newItems = steamList.Where(s => oldIds.Contains(s.SteamId) == false);
             foreach (var item in newItems)
             {
                 await _steamInforTableModelRepository.InsertAsync(item);
             }
             //对已存在的项目进行更新
-            var currentItems = Infors.Where(s => oldIds.Contains(s.EntryId)).ToList();
-            var oldItems = await _steamInforTableModelRepository.GetAll().Where(s => oldIds.Contains(s.EntryId)).ToListAsync();
+            var currentItems = steamList.Where(s => oldIds.Contains(s.SteamId)).ToList();
+            var oldItems = await _steamInforTableModelRepository.GetAll().Where(s => oldIds.Contains(s.SteamId)).ToListAsync();
             foreach (var item in oldItems)
             {
                 var temp = currentItems.Find(s => s.EntryId == item.EntryId);
