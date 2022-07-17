@@ -672,15 +672,15 @@ namespace CnGalWebSite.APIServer.Application.Tables
             var oldItems = await _steamInforTableModelRepository.GetAll().Where(s => oldIds.Contains(s.SteamId)).ToListAsync();
             foreach (var item in oldItems)
             {
-                var temp = currentItems.Find(s => s.EntryId == item.EntryId);
+                var temp = currentItems.Find(s => s.SteamId == item.SteamId);
                 temp.Id = item.Id;
 
-                if (item.Name != temp.Name || item.SteamId != temp.SteamId || item.OriginalPrice != temp.OriginalPrice
+                if (item.Name != temp.Name || item.EntryId != temp.EntryId || item.OriginalPrice != temp.OriginalPrice
                     || item.PriceNow != temp.PriceNow || item.CutNow != temp.CutNow || item.PriceLowest != temp.PriceLowest || item.CutLowest != temp.CutLowest
                     || item.LowestTime != temp.LowestTime || item.EvaluationCount != temp.EvaluationCount || item.RecommendationRate != temp.RecommendationRate)
                 {
                     item.Name = temp.Name;
-                    item.SteamId = temp.SteamId;
+                    item.EntryId = temp.EntryId;
                     item.OriginalPrice = temp.OriginalPrice;
                     item.PriceNow = temp.PriceNow;
                     item.CutNow = temp.CutNow;
