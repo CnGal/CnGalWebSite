@@ -16,7 +16,6 @@
             主页一般情况下留空，会根据包含的动态进行动态解析生成，也可以用特殊语法控制显示
         </MCardText>
 
-        <Scroll style="max-height:600px;" class="ps-6 pe-6">
             @if (isReady)
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="正文" Class="mb-4" Collapable Outline OutlineHead>
@@ -74,8 +73,6 @@
                     </div>
                 </div>
             }
-
-        </Scroll>
         <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
             @if (isReady)
             {
