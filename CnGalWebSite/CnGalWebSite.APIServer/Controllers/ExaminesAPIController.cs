@@ -786,6 +786,21 @@ namespace CnGalWebSite.APIServer.Controllers
                     ApplicationUserId = user.Id
                 });
             }
+            else if (playedGame != null)
+            {
+                await _messageRepository.InsertAsync(new Message
+                {
+                    Title = (examine.IsPassed ?? false) ? "游玩记录审核通过提醒" : "游玩记录驳回提醒",
+                    PostTime = DateTime.Now.ToCstTime(),
+                    Image = "default/logo.png",
+                    Rank = "系统",
+                    Text = "你的游玩记录被管理员『" + userAdmin.UserName + "』" + ((examine.IsPassed ?? false) ? "通过，感谢你为CnGal资料站做出的贡献" : "驳回") + (string.IsNullOrWhiteSpace(examine.Comments) ? "" : "，批注『" + examine.Comments + "』"),
+                    Link = "entries/index/" + playedGame.EntryId,
+                    LinkTitle = playedGame.Entry?.Name,
+                    Type = (examine.IsPassed ?? false) ? MessageType.ExaminePassed : MessageType.ExamineUnPassed,
+                    ApplicationUserId = user.Id
+                });
+            }
             else
             {
                 await _messageRepository.InsertAsync(new Message

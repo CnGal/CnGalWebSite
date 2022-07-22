@@ -15,7 +15,7 @@ namespace CnGalWebSite.Helper.ViewModel.Comments
 
         public int MaxCount { get; set; } = 8;
 
-        public int TotalPages => (Items.Count / MaxCount) + 1 - (Items.Count == MaxCount ? 1 : 0);
+        public int TotalPages => ((Items.Count - 1) / MaxCount) + 1;
 
         public int CurrentPage { get; set; } = 1;
 

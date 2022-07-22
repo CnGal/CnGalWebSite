@@ -30,7 +30,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        TotalPages = Model.Count / MaxCount + 1;
+        TotalPages = (Model.Count-1) / MaxCount + 1;
     }
 
     private Task OnPageClick(int pageIndex)

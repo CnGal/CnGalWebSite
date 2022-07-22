@@ -9,7 +9,7 @@ namespace CnGalWebSite.Helper.ViewModel.Articles
 
         public int MaxCount { get; set; } = 10;
 
-        public int TotalPages => (Items.Count / MaxCount) + 1;
+        public int TotalPages => ((Items.Count - 1) / MaxCount) + 1;
 
         public int CurrentPage { get; set; } = 1;
 
