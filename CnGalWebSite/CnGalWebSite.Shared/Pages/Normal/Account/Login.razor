@@ -165,13 +165,13 @@
     {
         try
         {
+            Model.isNeedVerification = true;
+
             Model.Verification = model;
             if(deviceIdentification!=null)
             {
                 Model.Identification =await deviceIdentification.GetDeviceIdentificationModel();
             }
-
-            Model.isNeedVerification = false;
 
             var result = await AuthService.Login(Model);
 

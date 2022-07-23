@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 
 namespace CnGalWebSite.APIServer.Application.Lotteries
@@ -113,17 +114,27 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
         public Task<QueryData<ListLotteryUserAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListLotteryUserAloneModel searchModel, long lotteryId)
         {
             var items = _lotteryUserRepository.GetAll()
-                .Include(s => s.ApplicationUser)
-                .Where(s => s.LotteryId == lotteryId).AsNoTracking();
+                .Include(s => s.ApplicationUser).ThenInclude(s => s.OperationRecords)
+                .Where(s => s.LotteryId == lotteryId)
+                .Select(s => new
+                {
+                    UserId = s.ApplicationUser.Id,
+                    Name = s.ApplicationUser.UserName,
+                    Number = s.Number,
+                    LotteryUserId = s.Id,
+                    IsHidden = s.IsHidden,
+                    OperationRecords = s.ApplicationUser.OperationRecords.Where(s => s.Type == OperationRecordType.Lottery && s.ObjectId == lotteryId.ToString())
+                })
+                .AsNoTracking();
 
             // 处理高级搜索
             if (!string.IsNullOrWhiteSpace(searchModel.Name))
             {
-                items = items.Where(item => item.ApplicationUser.UserName.Contains(searchModel.Name, StringComparison.OrdinalIgnoreCase));
+                items = items.Where(item => item.Name.Contains(searchModel.Name, StringComparison.OrdinalIgnoreCase));
             }
             if (!string.IsNullOrWhiteSpace(searchModel.UserId))
             {
-                items = items.Where(item => item.ApplicationUserId.Contains(searchModel.UserId, StringComparison.OrdinalIgnoreCase));
+                items = items.Where(item => item.UserId.Contains(searchModel.UserId, StringComparison.OrdinalIgnoreCase));
             }
 
 
@@ -131,8 +142,8 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             // 处理 SearchText 模糊搜索
             if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                items = items.Where(item => item.ApplicationUser.UserName.Contains(options.SearchText)
-                             || item.ApplicationUserId.Contains(options.SearchText));
+                items = items.Where(item => item.Name.Contains(options.SearchText)
+                             || item.UserId.Contains(options.SearchText));
             }
 
 
@@ -140,7 +151,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
-                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+                items = items.OrderBy(s => s.LotteryUserId).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
 
@@ -156,11 +167,13 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             {
                 resultItems.Add(new ListLotteryUserAloneModel
                 {
-                    UserId = item.ApplicationUser.Id,
-                    Name = item.ApplicationUser.UserName,
+                    UserId = item.UserId,
+                    Name = item.Name,
                     Number = item.Number,
-                    LotteryUserId=item.Id,
-                    IsHidden=item.IsHidden
+                    LotteryUserId=item.LotteryUserId,
+                    IsHidden=item.IsHidden,
+                    Cookie = item.OperationRecords.FirstOrDefault()?.Cookie,
+                    Ip = item.OperationRecords.FirstOrDefault()?.Ip,
                 });
             }
 

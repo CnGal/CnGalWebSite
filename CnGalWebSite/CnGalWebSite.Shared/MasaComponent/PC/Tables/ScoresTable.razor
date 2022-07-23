@@ -24,21 +24,21 @@ else
             <TableColumn @bind-Field="@context.GameId" Filterable Sortable Width="100" TextWrap Fixed />
             <TableColumn @bind-Field="@context.GameName" Filterable Sortable Searchable Width="200" TextWrap />
 
-            <TableColumn @bind-Field="@context.AllTotalSocre" Sortable Filterable Searchable FormatString="0.00" Width="150" />
-            <TableColumn @bind-Field="@context.AllCVSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" Formatter="CVRateFormatter" />
-            <TableColumn @bind-Field="@context.AllSystemSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.AllShowSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.AllPaintSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.AllScriptSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.AllMusicSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+            <TableColumn @bind-Field="@context.AllTotalSocre" Sortable Filterable Searchable FormatString="0.00000" Width="150" />
+            <TableColumn @bind-Field="@context.AllCVSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" Formatter="CVRateFormatter" />
+            <TableColumn @bind-Field="@context.AllSystemSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
+            <TableColumn @bind-Field="@context.AllShowSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
+            <TableColumn @bind-Field="@context.AllPaintSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
+            <TableColumn @bind-Field="@context.AllScriptSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
+            <TableColumn @bind-Field="@context.AllMusicSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
 
-            <TableColumn @bind-Field="@context.FilterTotalSocre" Sortable Filterable Searchable FormatString="0.00" Width="180" />
-            <TableColumn @bind-Field="@context.FilterCVSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" Formatter="CVRateFormatter" />
-            <TableColumn @bind-Field="@context.FilterSystemSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.FilterShowSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.FilterPaintSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.FilterScriptSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
-            <TableColumn @bind-Field="@context.FilterMusicSocre" Sortable Filterable Searchable FormatString="0.00" Width="100" />
+            <TableColumn @bind-Field="@context.FilterTotalSocre" Sortable Filterable Searchable FormatString="0.00000" Width="180" />
+            <TableColumn @bind-Field="@context.FilterCVSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" Formatter="CVRateFormatter" />
+            <TableColumn @bind-Field="@context.FilterSystemSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
+            <TableColumn @bind-Field="@context.FilterShowSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
+            <TableColumn @bind-Field="@context.FilterPaintSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
+            <TableColumn @bind-Field="@context.FilterScriptSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
+            <TableColumn @bind-Field="@context.FilterMusicSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
         </TableColumns>
         <RowButtonTemplate>
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.GameId))" />
@@ -84,8 +84,8 @@ else
 
     public async Task<string> CVRateFormatter(object cut)
     {
-        string res = ((double)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.GameScoreTableModel, System.Object>)cut).Value).ToString("0.00");
-        if (res == "-1.00")
+        string res = ((double)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.GameScoreTableModel, System.Object>)cut).Value).ToString("0.00000");
+        if (res == "-1.00000")
         {
             res = "无配音";
         }

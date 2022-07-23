@@ -12,6 +12,8 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
 
         Task AddOperationRecord(OperationRecordType type, string objectId, ApplicationUser user, DeviceIdentificationModel model, HttpContext context);
 
+        Task<bool> CheckOperationRecord(OperationRecordType type, string objectId, ApplicationUser user, DeviceIdentificationModel model, HttpContext context);
+
         string GetIp(HttpContext context, string userIp);
     }
 }

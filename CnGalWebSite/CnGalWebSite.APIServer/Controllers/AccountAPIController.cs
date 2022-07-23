@@ -111,6 +111,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     PersonalSignature = "哇，这里什么都没有呢",
                     MainPageContext = "### 哇，这里什么都没有呢",
                     RegistTime = DateTime.Now.ToCstTime(),
+                    LastChangePasswordTime= DateTime.Now.ToCstTime(),
+                    LastOnlineTime= DateTime.Now.ToCstTime(),
                     Birthday = null
                 };
                 result = await _userManager.CreateAsync(user, model.Password);
@@ -246,7 +248,7 @@ namespace CnGalWebSite.APIServer.Controllers
             if (result.Succeeded)
             {
                 //判断用户是否需要验证
-                if (model.isNeedVerification && user.IsPassedVerification == false && user.RegistTime > DateTime.ParseExact("2021-09-01", "yyyy-MM-dd", null))
+                if (model.isNeedVerification && user.IsPassedVerification == false && user.RegistTime >new DateTime(2021,9,11))
                 {
                     return new LoginResult { Code = LoginResultCode.FailedRealNameValidation, ErrorDescribe = "没有通过身份验证", Token = await _appHelper.GetUserJWTokenAsync(user) };
                 }

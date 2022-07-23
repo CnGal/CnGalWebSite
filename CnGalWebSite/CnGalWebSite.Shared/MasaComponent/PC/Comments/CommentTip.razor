@@ -42,7 +42,7 @@
     public CommentCacheModel Model = new CommentCacheModel();
     CommentListView commentListView;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         if (CanComment)
         {
