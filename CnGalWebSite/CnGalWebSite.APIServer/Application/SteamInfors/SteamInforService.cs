@@ -54,12 +54,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
 
             steamInfor = await UpdateSteamInfor(steamId, entryId);
-            if (steamInfor == null)
-            {
-                return null;
-            }
-
-            return steamInfor;
+            return steamInfor == null ? null : steamInfor;
         }
 
         public async Task UpdateAllGameSteamInfor()
@@ -68,7 +63,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
             foreach (var item in steams)
             {
-                await UpdateSteamInfor(item, 0);
+                _ = await UpdateSteamInfor(item, 0);
             }
 
         }
@@ -79,7 +74,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
             foreach (var item in steamIds)
             {
-                await UpdateSteamUserInfor(item);
+                _ = await UpdateSteamUserInfor(item);
             }
         }
 
@@ -162,14 +157,11 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
             //获取已存在的信息
             var steam = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
-            if (steam == null)
+            steam ??= new SteamInfor
             {
-                steam = new SteamInfor
-                {
-                    EntryId = entryId,
-                    SteamId = steamId,
-                };
-            }
+                EntryId = entryId,
+                SteamId = steamId,
+            };
 
             //更新数据 支持小数点 将真实价格*100储存 即1500表示15元
 
@@ -230,17 +222,10 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 //计算史低价格
                 if (steamLowestJson.price != -1)
                 {
-                    if (steam.CutLowest >= 0)
-                    {
-                        steam.PriceLowest = (int)(steam.OriginalPrice * (1 - ((double)steam.CutLowest / 100)));
-                    }
-                    else
-                    {
-                        steam.PriceLowest = steam.OriginalPrice;
-                    }
+                    steam.PriceLowest = steam.CutLowest >= 0 ? (int)(steam.OriginalPrice * (1 - ((double)steam.CutLowest / 100))) : steam.OriginalPrice;
 
                     //比较是否偏差较大
-                    if (Math.Abs(steam.PriceLowest / 100 - steamLowestJson.price) > 2)
+                    if (Math.Abs((steam.PriceLowest / 100) - steamLowestJson.price) > 2)
                     {
                         steam.PriceLowest = steamLowestJson.price * 100;
                     }
@@ -263,7 +248,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 steam.CutNow = 0;
                 steam.PriceNowString = "¥ " + ((double)steam.PriceNow / 100).ToString("0.00");
             }
-            if (steamId == 1827680 || steamId == 1903370 || steamId == 1874810 || steamId == 1933640 || steamId == 1840590 || steamId == 1988630||steamId== 1984350)
+            if (steamId is 1827680 or 1903370 or 1874810 or 1933640 or 1840590 or 1988630 or 1984350 or 2074780)
             {
                 steam.PriceNow = 0;
                 steam.CutNow = 0;
@@ -289,11 +274,11 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
             if (steam.Id == 0)
             {
-                await _steamInforRepository.InsertAsync(steam);
+                _ = await _steamInforRepository.InsertAsync(steam);
             }
             else
             {
-                await _steamInforRepository.UpdateAsync(steam);
+                _ = await _steamInforRepository.UpdateAsync(steam);
             }
 
             return steam;
@@ -349,13 +334,13 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     item.IsInSteam = false;
                 }
 
-                await _playedGameRepository.UpdateAsync(item);
+                _ = await _playedGameRepository.UpdateAsync(item);
             }
 
             //添加新游戏
             foreach (var item in steams.Where(s => userGames.Select(s => s.EntryId).Contains(s.EntryId) == false))
             {
-                await _playedGameRepository.InsertAsync(new PlayedGame
+                _ = await _playedGameRepository.InsertAsync(new PlayedGame
                 {
                     IsInSteam = true,
                     PlayDuration = steamGames.games.FirstOrDefault(s => s.appid == item.SteamId)?.playtime_forever ?? 0,
@@ -368,14 +353,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
 
 
-            if (isError)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return !isError;
 
 
 
@@ -391,20 +369,9 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             document.LoadHtml(content);
 
             var node = document.GetElementbyId("userReviews");
-            var text = "";
-            if (node.ChildNodes.Count > 3)
-            {
-                text = node.ChildNodes[3].ChildNodes[3].ChildNodes[5].InnerText;
-
-            }
-            else
-            {
-                text = node.ChildNodes[1].ChildNodes[3].ChildNodes[5].InnerText;
-
-            }
-
-
-
+            var text = node.ChildNodes.Count > 3
+                ? node.ChildNodes[3].ChildNodes[3].ChildNodes[5].InnerText
+                : node.ChildNodes[1].ChildNodes[3].ChildNodes[5].InnerText;
             var countStr = ToolHelper.MidStrEx(text, "the ", " ").Replace(",", "");
             var rateStr = ToolHelper.MidStrEx(text, " ", "% ");
             return new SteamEvaluation
@@ -435,10 +402,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
             var player = steamUser.response.players[0];
             var user = await _steamUserInforRepository.FirstOrDefaultAsync(s => s.SteamId == SteamId);
-            if (user == null)
-            {
-                user = new SteamUserInfor();
-            }
+            user ??= new SteamUserInfor();
 
             user.SteamId = SteamId;
             user.Name = player.personaname;
@@ -446,11 +410,11 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
             if (user.Id == 0)
             {
-                await _steamUserInforRepository.InsertAsync(user);
+                _ = await _steamUserInforRepository.InsertAsync(user);
             }
             else
             {
-                await _steamUserInforRepository.UpdateAsync(user);
+                _ = await _steamUserInforRepository.UpdateAsync(user);
             }
             return user;
         }

@@ -24,6 +24,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Lotteries
         public string Name { get; set; }
         [Display(Name = "Id")]
         public string UserId { get; set; }
+        [Display(Name = "Cookie")]
+        public string Cookie { get; set; }
+        [Display(Name = "Ip")]
+        public string Ip { get; set; }
         [Display(Name = "是否隐藏")]
         public bool IsHidden { get; set; }
     }

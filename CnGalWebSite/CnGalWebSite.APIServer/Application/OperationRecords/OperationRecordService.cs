@@ -129,6 +129,20 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
             await _operationRecordRepository.UpdateAsync(item);
         }
 
+        public async Task<bool> CheckOperationRecord(OperationRecordType type, string objectId, ApplicationUser user, DeviceIdentificationModel model, HttpContext context)
+        {
+            if (string.IsNullOrEmpty(model.Cookie) || string.IsNullOrWhiteSpace(model.Ip))
+            {
+                throw new Exception("身份验证参数不能为空");
+            }
+
+            model.Ip = GetIp(context, model.Ip);
+
+            return await _operationRecordRepository.GetAll().AnyAsync(s => s.Type == type && s.ObjectId == objectId && (s.Cookie == model.Cookie || s.Ip == model.Ip));
+
+        }
+
+
         public string GetIp(HttpContext context, string userIp)
         {
             var ip = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();

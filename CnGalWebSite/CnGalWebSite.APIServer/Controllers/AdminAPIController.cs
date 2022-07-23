@@ -26,6 +26,7 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Tables;
@@ -105,6 +106,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<SearchCache, long> _searchCacheRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IRepository<SteamInforTableModel, long> _steamInforTableModelRepository;
+        private readonly IRepository<OperationRecord, long> _operationRecordRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IChartService _chartService;
         private readonly ILogger<AdminAPIController> _logger;
@@ -121,7 +123,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, ILogger<AdminAPIController> logger,
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository,
-        IRepository<LotteryPrize, long> lotteryPrizeRepository)
+        IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -180,6 +182,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _playedGameRepository = playedGameRepository;
             _logger = logger;
             _steamInforTableModelRepository = steamInforTableModelRepository;
+            _operationRecordRepository = operationRecordRepository;
         }
 
         /// <summary>
@@ -862,12 +865,48 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var articles = await _articleRepository.GetAll().Where(s => s.MainPicture.Contains("media.st.dl.pinyuncloud.com")).ToListAsync();
-                foreach(var item in articles)
+                var items = _lotteryUserRepository.GetAll()
+                               .Include(s => s.ApplicationUser).ThenInclude(s => s.OperationRecords)
+                               .Where(s => s.LotteryId == 3)
+                               .Select(s => new
+                               {
+                                   UserId = s.ApplicationUser.Id,
+                                   Name = s.ApplicationUser.UserName,
+                                   Number = s.Number,
+                                   LotteryUserId = s.Id,
+                                   IsHidden = s.IsHidden,
+                                   OperationRecords = s.ApplicationUser.OperationRecords.Where(s => s.Type == OperationRecordType.Lottery && s.ObjectId == "3")
+                               })
+                               .AsNoTracking();
+
+                var resultItems = new List<ListLotteryUserAloneModel>();
+
+                foreach (var item in items.ToList())
                 {
-                    item.MainPicture = item.MainPicture.Replace("media.st.dl.pinyuncloud.com", "media.st.dl.eccdnx.com");
-                    await _articleRepository.UpdateAsync(item);
+                    resultItems.Add(new ListLotteryUserAloneModel
+                    {
+                        UserId = item.UserId,
+                        Name = item.Name,
+                        Number = item.Number,
+                        LotteryUserId = item.LotteryUserId,
+                        IsHidden = item.IsHidden,
+                        Cookie = item.OperationRecords.FirstOrDefault()?.Cookie,
+                        Ip = item.OperationRecords.FirstOrDefault()?.Ip,
+                    });
                 }
+
+                foreach (var item in resultItems)
+                {
+                    if ((await _operationRecordRepository.GetAll().CountAsync(s => s.Type == OperationRecordType.Lottery && s.ObjectId == "3" && (s.Ip == item.Ip || s.Cookie == item.Cookie)))>1)
+                    {
+                        await _lotteryUserRepository.GetRangeUpdateTable().Where(s => s.Id == item.LotteryUserId).Set(s => s.IsHidden, b => true).ExecuteAsync();
+                    }
+                    else
+                    {
+                        await _lotteryUserRepository.GetRangeUpdateTable().Where(s => s.Id == item.LotteryUserId).Set(s => s.IsHidden, b => false).ExecuteAsync();
+                    }
+                }
+
                 return new Result { Successful = true };
             }
             catch (Exception ex)

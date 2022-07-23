@@ -14,9 +14,11 @@
         </TableToolbarTemplate>
 
         <TableColumns>
-            <TableColumn @bind-Field="@context.Number" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
-            <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
-            <TableColumn @bind-Field="@context.UserId" Searchable="true" TextWrap="true" Width="400" />
+            <TableColumn @bind-Field="@context.Number" Sortable DefaultSort="true" Fixed="true" Width="60" />
+            <TableColumn @bind-Field="@context.Name" Sortable Searchable="true" TextWrap="true" Width="200" />
+            <TableColumn @bind-Field="@context.UserId" Sortable Searchable TextWrap="true" Width="400" />
+            <TableColumn @bind-Field="@context.Cookie"  TextWrap="true" Width="400" />
+            <TableColumn @bind-Field="@context.Ip"  TextWrap="true" Width="400" />
             <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="95" />
         </TableColumns>
         <RowButtonTemplate>
