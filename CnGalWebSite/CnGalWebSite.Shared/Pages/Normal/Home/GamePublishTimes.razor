@@ -155,14 +155,22 @@
 
     public Task DateChanged(DateOnly date)
     {
-        Date = date;
-        Year = date.Year;
-        Month = date.Month;
-        NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object>
+        try
         {
-            ["year"] = date.Year,
-            ["month"] = date.Month
-        }));
+            Date = date;
+            Year = date.Year;
+            Month = date.Month;
+            NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object>
+            {
+                ["year"] = date.Year,
+                ["month"] = date.Month
+            }));
+
+        }
+        catch
+        {
+
+        }
 
         return Task.CompletedTask;
     }
