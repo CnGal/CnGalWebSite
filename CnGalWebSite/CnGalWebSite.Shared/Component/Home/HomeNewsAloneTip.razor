@@ -3,25 +3,23 @@
 
 
 <div style="display:flex;">
-    <div  style="display: flex;align-items: center;" @onclick="@(() =>OnClickUser.InvokeAsync(Model))">
+    <a  style="display: flex;align-items: center;" href="@(Model.GroupId == -1?("/space/index/" + Model.UserId):("/entries/index/" + Model.GroupId + "/10"))">
         <img class="shadow-sm -sm" src="@Model.Image" alt="@Model.Title" style="height: 50px;width: 50px;border-radius: 50%;" />
-    </div>
-    <div  class="comment-tx-div" style=" flex: 1 1 auto; width: 0;" @onclick="@(()=>OnClickNews.InvokeAsync(Model))">
+    </a>
+    <a  class="comment-tx-div a-font-color" style=" flex: 1 1 auto; width: 0;" @onclick="@(()=>OnClickNews.InvokeAsync(Model))" href="@(string.IsNullOrWhiteSpace(Model.Link) ? ("/articles/index/" + Model.ArticleId) : Model.Link)" target="@(string.IsNullOrWhiteSpace(Model.Link)?"":"_blank")">
         <div  class="new-row-warp no-margin">
             <div class="comment-tag me-2 bg-main" >@Model.Type</div>
             <div class="comment-username a-font-color me-2">@Model.Title</div>
             <div class="comment-username" style="color:gray">@Model.Time.ToTimeFromNowString()</div>
         </div>
         <div class="comment-time text-truncate" style="width: 100%;">@Model.Text</div>
-    </div>
+    </a>
 </div>
 
 
 @code {
     [Parameter]
     public HomeNewsAloneViewModel Model { get; set; }
-    [Parameter]
-    public EventCallback<HomeNewsAloneViewModel> OnClickUser { get; set; }
     [Parameter]
     public EventCallback<HomeNewsAloneViewModel> OnClickNews { get; set; }
 }

@@ -8,7 +8,6 @@
             Style="right:0;bottom:0"
             >
     <ActivatorContent Context="m">
-        
         <MTooltip Bottom>
             <ActivatorContent Context="c">
                 @{
@@ -16,11 +15,22 @@
                     m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                 }
-                <MButton Color="@_dataCacheService.ThemeSetting.Theme" Dark Small Fab @attributes="@attrs" OnClick="OnClick">
-                    <MIcon>
-                        @Icon
-                    </MIcon>
-                </MButton>
+                @if (_dataCacheService.ThemeSetting.IsDark)
+                {
+                    <MButton Small Fab @attributes="@attrs" OnClick="OnClick">
+                        <MIcon>
+                            @Icon
+                        </MIcon>
+                    </MButton>
+                }
+                else
+                {
+                    <MButton Color="@_dataCacheService.ThemeSetting.Theme" Dark Small Fab @attributes="@attrs" OnClick="OnClick">
+                        <MIcon>
+                            @Icon
+                        </MIcon>
+                    </MButton>
+                }
             </ActivatorContent>
             <ChildContent>
                 <span>@Text</span>
