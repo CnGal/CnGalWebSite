@@ -160,15 +160,23 @@ else
                 <span style="color: gray;" class="pb-3">
 
                     <i class="fa fa-calendar fa-fw"></i>&nbsp;
-                    @if (Model.PublishTime == null || Model.PublishTime.Value > DateTime.Now.ToCstTime())
+                    @if (Model.PublishTime == null)
                     {
-                        <span class="article-home-infor-text">未发售&nbsp;&nbsp;&nbsp;</span>
+                        <span class="article-home-infor-text">未知&nbsp;&nbsp;&nbsp;</span>
                     }
                     else
                     {
-                        <span class="article-home-infor-text">@((Model.Type== EntryType.Game?Model.PublishTime.Value: Model.LastEditTime).ToString("yyyy-MM-dd"))&nbsp;&nbsp;&nbsp;</span>
+                        @if (Model.PublishTime.Value > DateTime.Now.ToCstTime() && ForcedShowPublishTime == false)
+                        {
+                            <span class="article-home-infor-text">未发售&nbsp;&nbsp;&nbsp;</span>
+                        }
+                        else
+                        {
+                            <span class="article-home-infor-text">@((Model.Type== EntryType.Game?Model.PublishTime.Value: Model.LastEditTime).ToString("yyyy-MM-dd"))&nbsp;&nbsp;&nbsp;</span>
 
+                        }
                     }
+
 
                     <i class="fa fa-commenting-o fa-fw"></i>
                     <span class="article-home-infor-text">@(Model.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
@@ -193,4 +201,6 @@ else
     public string ColorNum { get; set; }
     [Parameter]
     public bool IsEdit { get; set; }
+    [Parameter]
+    public bool ForcedShowPublishTime { get; set; }
 }
