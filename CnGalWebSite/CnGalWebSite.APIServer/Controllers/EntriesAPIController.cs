@@ -1372,5 +1372,23 @@ namespace CnGalWebSite.APIServer.Controllers
             var name_ = ToolHelper.Base64DecodeName(name);
             return await _entryRepository.GetAll().AsNoTracking().Where(s => s.Name == name_).Select(s => s.Id).FirstOrDefaultAsync();
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<EntryInforTipViewModel>>> GetPublishGamesByTime([FromQuery]int year, [FromQuery]int month)
+        {
+            var games = await _entryRepository.GetAll().AsNoTracking()
+                .Where(s => s.PubulishTime != null && s.PubulishTime.Value.Year == year && s.PubulishTime.Value.Month == month)
+                .Where(s => s.Information.Where(s => s.DisplayName == "发行时间备注").Any(s => string.IsNullOrWhiteSpace(s.DisplayValue) == false) == false)
+                .ToListAsync();
+
+            var model = new List<EntryInforTipViewModel>();
+            foreach(var item in games)
+            {
+                model.Add(await _appHelper.GetEntryInforTipViewModel(item));
+            }
+
+            return model;
+        }
     }
 }

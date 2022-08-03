@@ -20,6 +20,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Search
         public string BriefIntroduction { get; set; }
         [Display(Name = "最后编辑时间")]
         public DateTime LastEditTime { get; set; }
+        /// <summary>
+        /// 仅游戏词条
+        /// </summary>
+        [Display(Name = "发行时间")]
+        public DateTime? PublishTime { get; set; }
         [Display(Name = "阅读数")]
         public int ReaderCount { get; set; }
         [Display(Name = "评论数")]

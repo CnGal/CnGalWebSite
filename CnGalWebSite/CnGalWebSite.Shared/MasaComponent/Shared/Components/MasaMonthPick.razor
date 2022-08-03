@@ -1,0 +1,65 @@
+﻿@inject IDataCacheService _dataCacheService
+
+
+<MMenu @bind-Value="_menu"
+       CloseOnContentClick="false"
+       Transition="scale-transition"
+       OffsetY  
+       MaxWidth="290"
+       MinWidth="@("auto")">
+    <ActivatorContent>
+        <MTextField @bind-Value="_str" Color="@_dataCacheService.ThemeSetting.Theme"
+                                PrependIcon="mdi-calendar"
+                    Readonly
+                    @attributes="context.Attrs"></MTextField>
+    </ActivatorContent>
+    <ChildContent>
+        <MDatePicker @bind-Value="_date" Color="@_dataCacheService.ThemeSetting.Theme"
+                     Type="DatePickerType.Month"
+                     NoTitle Locale="zh-CN"
+                     Scrollable>
+            <MSpacer></MSpacer>
+            <MButton Text Color="@_dataCacheService.ThemeSetting.Theme"
+                     OnClick="MenuCancel">
+                取消
+            </MButton>
+            <MButton Text Color="@_dataCacheService.ThemeSetting.Theme"
+                     OnClick="MenuOk">
+               确定
+            </MButton>
+        </MDatePicker>
+    </ChildContent>
+</MMenu>
+
+@code {
+    [Parameter]
+    public DateOnly Date { get; set; }
+    [Parameter]
+    public EventCallback<DateOnly> DateChanged { get; set; }
+
+    private DateOnly _prevDate = DateOnly.FromDateTime(DateTime.Now);
+    private DateOnly _date = DateOnly.FromDateTime(DateTime.Now);
+    private bool _menu;
+    private string _str;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _date = _prevDate = Date;
+        _str = _date.ToString("yyyy年M月");
+    }
+
+    public void MenuCancel()
+    {
+        _date = _prevDate;
+        _menu = false;
+    }
+
+    public void MenuOk()
+    {
+        _prevDate = _date;
+        _str = _date.ToString("yyyy年M月");
+        _menu = false;
+        DateChanged.InvokeAsync(_date);
+
+    }
+}

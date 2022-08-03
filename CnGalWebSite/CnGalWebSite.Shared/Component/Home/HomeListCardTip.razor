@@ -18,7 +18,7 @@
     </ButtonContent>
     <ChildContent>
         <div class="row">
-            @foreach (var item in Items.Take(12))
+            @foreach (var item in Items.Take(MaxCount))
             {
                 <div class="col-12 col-md-4 col-lg-3 col-xl-2 mb-2">
                     <HomeCardViewTip Icon="fa fa-codepen" Image="@item.Image" ReadCount="item.ReadCount" CommentCount="item.CommentCount" ShowCount="ShowCount" Outlink="Outlink"
@@ -50,6 +50,8 @@
     public string Type { get; set; }
     [Parameter]
     public string APIUrl { get; set; }
+    [Parameter]
+    public int MaxCount { get; set; } = 12;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -60,7 +62,7 @@
         try
         {
             //获取主页信息
-            Items = await _dataCacheService.GetHomePageListCardMode(APIUrl, Type, 12, false);
+            Items = await _dataCacheService.GetHomePageListCardMode(APIUrl, Type, MaxCount, false);
             StateHasChanged();
         }
         catch (Exception ex)

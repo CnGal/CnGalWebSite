@@ -85,6 +85,8 @@
             else
             {
                 await ToastService.Success("编辑用户Steam信息成功", "编辑用户Steam信息成功");
+                Dialog = false;
+                StateHasChanged(); 
                 await OnChanged.InvokeAsync(Model.SteamId);
 
             }

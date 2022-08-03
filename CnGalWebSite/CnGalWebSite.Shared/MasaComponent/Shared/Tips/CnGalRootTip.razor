@@ -45,6 +45,10 @@
             {
                 await _dataCacheService.RefreshApp.InvokeAsync();
             }
+            if (floatToolTip != null)
+            {
+                await floatToolTip.Refresh();
+            }
             StateHasChanged();
         }
     }

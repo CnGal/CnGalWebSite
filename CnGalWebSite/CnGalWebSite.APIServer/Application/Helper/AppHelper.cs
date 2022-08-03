@@ -740,6 +740,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 LastEditTime = entry.LastEditTime,
                 ReaderCount = entry.ReaderCount,
                 CommentCount = entry.CommentCount,
+                PublishTime=entry.PubulishTime,
                 AddInfors = new List<EntryInforTipAddInforModel>()
             };
 
@@ -780,7 +781,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                     }
                     //查找登场游戏
                     var gameNames = new List<StaffNameModel>();
-                    foreach (var nav in entry.EntryRelationFromEntryNavigation)
+                    foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s=>s.ToEntryNavigation.IsHidden==false))
                     {
                         var item = nav.ToEntryNavigation;
                         if (item.Type == EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)
@@ -810,7 +811,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 {
                     //查找参与作品
                     var gameNames = new List<StaffNameModel>();
-                    foreach (var nav in entry.EntryRelationFromEntryNavigation)
+                    foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
                     {
                         var item = nav.ToEntryNavigation;
                         if (item.Type == EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)
@@ -839,7 +840,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 {
                     //查找参与作品
                     var gameNames = new List<StaffNameModel>();
-                    foreach (var nav in entry.EntryRelationFromEntryNavigation)
+                    foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
                     {
                         var item = nav.ToEntryNavigation;
                         if (item.Type == EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)

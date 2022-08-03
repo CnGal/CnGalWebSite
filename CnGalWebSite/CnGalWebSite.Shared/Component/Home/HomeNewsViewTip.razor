@@ -19,7 +19,7 @@
             @foreach (var item in Items.Take(6))
             {
                 <div class="mb-3 col-12 col-lg-6 pointer">
-                    <HomeNewsAloneTip Model="item" OnClickNews="OnClickNews" OnClickUser="OnClickUser"/>
+                    <HomeNewsAloneTip Model="item" OnClickNews="OnClickNews"/>
                 </div>
             }
         </div>
@@ -80,19 +80,6 @@
         }
     }
 
-    public async Task OnClickUser(HomeNewsAloneViewModel model)
-    {
-
-        if (model.GroupId == -1)
-        {
-            NavigationManager.NavigateTo(Provider, "/space/index/" + model.UserId, model.Title, "fa fa-star-o");
-        }
-        else
-        {
-            NavigationManager.NavigateTo(Provider, "/entries/index/" + model.GroupId + "/10", model.Title, "fa fa-codepen");
-        }
-
-    }
     public Task OnClickMore()
     {
         NavigationManager.NavigateTo("/articles/news");

@@ -734,4 +734,11 @@ input.form-control{
 }
 .theme--dark.m-application {
     color: #c9d1d9;
+    background-color:transparent;
+}
+
+/*评论回复*/
+.comment-layout-child {
+    width: 100%;
+    background-color: rgba(58,58,58,.7) !important;
 }

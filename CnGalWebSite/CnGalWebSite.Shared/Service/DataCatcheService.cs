@@ -204,6 +204,10 @@ namespace CnGalWebSite.Shared.Service
         /// 用户收藏对象列表缓存
         /// </summary>
         public IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> UserFavoriteObjectsDataCatche { get; set; }
+        /// <summary>
+        /// 游戏发售时间列表缓存
+        /// </summary>
+        public IPageModelCatche<List<EntryInforTipViewModel>> PublishGameTimesDataCatche { get; set; }
 
         public List<DocumentViewModel> DocumentsCatche { get; set; } = new List<DocumentViewModel>();
         /// <summary>
@@ -306,7 +310,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<PagedResultDto<ExaminedNormalListModel>> userExaminesDataCatche,
         IPageModelCatche<FavoriteFoldersViewModel> userFavoriteFoldersDataCatche,
         IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> userFavoriteObjectsDataCatche,
-        IPageModelCatche<PlayedGameOverviewModel> playedGameOverviewDataCatche)
+        IPageModelCatche<PlayedGameOverviewModel> playedGameOverviewDataCatche,
+        IPageModelCatche<List<EntryInforTipViewModel>> publishGameTimesDataCatche)
         {
             _httpClient = httpClient;
             (EntryIndexPageCatche = entryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/entries/GetEntryView/");
@@ -329,14 +334,14 @@ namespace CnGalWebSite.Shared.Service
             (UserExaminesDataCatche = userExaminesDataCatche).Init(ToolHelper.WebApiPath + "api/space/GetUserEditRecord");
             (UserFavoriteFoldersDataCatche = userFavoriteFoldersDataCatche).Init(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/");
             (UserFavoriteObjectsDataCatche = userFavoriteObjectsDataCatche).Init(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteObjectList");
+            (PublishGameTimesDataCatche = publishGameTimesDataCatche).Init(ToolHelper.WebApiPath + "api/entries/GetPublishGamesByTime");
 
             (ChartDataCatche = chartDataCatche).Init("", true);
             (LineChartDataCatche = lineChartDataCatche).Init("");
             HomePageNewsCatche = homePageNewsCatche;
             HomePageCarouselsCatche = homePageCarouselsCatche;
             SearchViewCatche = searchViewCatche;
-            _navigationManager= navigationManager;
-
+            _navigationManager = navigationManager;
         }
 
         public async Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>> GetHomePageListCardMode(string apiUrl, string type, int maxCount, bool isRefresh)

@@ -104,10 +104,11 @@
     }
 
 
-    public async Task ModalCancel()
+    public Task ModalCancel()
     {
         dialog = false;
         _dates = _predates;
+        return Task.CompletedTask;
     }
 
     public async Task ModalOK()
