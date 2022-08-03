@@ -1378,6 +1378,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<List<EntryInforTipViewModel>>> GetPublishGamesByTime([FromQuery]int year, [FromQuery]int month)
         {
             var games = await _entryRepository.GetAll().AsNoTracking()
+                .Where(s=>s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false)
                 .Where(s => s.PubulishTime != null && s.PubulishTime.Value.Year == year && s.PubulishTime.Value.Month == month)
                 .Where(s => s.Information.Where(s => s.DisplayName == "发行时间备注").Any(s => string.IsNullOrWhiteSpace(s.DisplayValue) == false) == false)
                 .ToListAsync();

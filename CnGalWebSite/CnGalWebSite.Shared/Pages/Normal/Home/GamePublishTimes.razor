@@ -117,7 +117,7 @@
         {
             if (Year == 0 || Month == 0 || Month > 12)
             {
-               await DateChanged(DateOnly.FromDateTime(DateTime.Now));
+                await DateChanged(DateOnly.FromDateTime(DateTime.Now));
 
             }
             else
@@ -156,6 +156,8 @@
     public Task DateChanged(DateOnly date)
     {
         Date = date;
+        Year = date.Year;
+        Month = date.Month;
         NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object>
         {
             ["year"] = date.Year,
