@@ -987,7 +987,7 @@ body {
 }
 /*视觉反馈*/
 a:focus-visible {
-    outline: thin dotted color;
+    outline: thin dotted;
 }
 
 .ContributionCalendar-day {

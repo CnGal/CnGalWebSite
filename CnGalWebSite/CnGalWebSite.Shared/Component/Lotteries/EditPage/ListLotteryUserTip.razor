@@ -162,7 +162,6 @@
             var data = await Http.GetFromJsonAsync<DrawLotteryDataModel>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryData/" + Id);
             var model = new ExportLotteryDataModel();
             var prizeId = 1;
-            var ticketId = 1;
             foreach (var item in data.Awards)
             {
                 for(var i =0;i<item.TotalCount;i++)
@@ -179,7 +178,7 @@
                     {
                         var ticket = new ExportLotteryTicketModel
                         {
-                            id = ticketId++,
+                            id = item.WinningUsers[i].Number,
                             nickname = item.WinningUsers[i].Name
                         };
                         model.tickets.Add(ticket);
@@ -196,7 +195,7 @@
             {
                 model.tickets.Add(new ExportLotteryTicketModel
                 {
-                    id = ticketId++,
+                    id = item.Number,
                     nickname = item.Name
                 });
             }
