@@ -67,17 +67,6 @@
         {
 
         }
-
-        var link = string.IsNullOrWhiteSpace(model.Link) ? ("/articles/index/" + model.ArticleId) : model.Link;
-        bool isOpenNew = string.IsNullOrWhiteSpace(model.Link) == false;
-        if (isOpenNew)
-        {
-            OpenNewPage(link);
-        }
-        else
-        {
-            NavigationManager.NavigateTo(Provider, link, model.Text, "fa fa-newspaper-o");
-        }
     }
 
     public Task OnClickMore()
