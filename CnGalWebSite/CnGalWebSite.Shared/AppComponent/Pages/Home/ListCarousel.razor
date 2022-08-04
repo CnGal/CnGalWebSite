@@ -4,17 +4,15 @@
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
 
-<div class="mb-3">
-    <BootstrapBlazor.Components.Carousel Images="@Images" IsFade="true" OnClick="OnClick" class="h-100 rounded shadow-sm"></BootstrapBlazor.Components.Carousel>
+<div class="mb-3 rounded shadow-sm">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaCarousel Model="Images" OnClick="OnClick" HideDelimiters/>
+
 </div>
 
 @code {
-    private List<string> Images = new List<string>();
+    private List<CarouselViewModel> Images = new List<CarouselViewModel>();
     private List<CarouselViewModel> Carousels { get; set; } = new List<CarouselViewModel>();
 
-    public bool IsSmallScreen { get; set; }
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; } = true;
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
@@ -28,15 +26,15 @@
 
             Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView", true);
 
-            Images = Carousels.OrderByDescending(s => s.Priority).Take(3).Select(s => s.Image).ToList();
+            Images = Carousels.OrderByDescending(s => s.Priority).Take(3).ToList();
             if (Carousels.Count >= 6)
             {
-                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x) == false).ToList().Random().Take(3).Select(s => s.Image));
+                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x.Image) == false).ToList().Random().Take(3));
 
             }
             else
             {
-                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x) == false).Select(s => s.Image));
+                Images.AddRange(Carousels.Where(s => Images.Any(x => s.Image == x.Image) == false));
             }
         }
         catch (Exception ex)
@@ -46,27 +44,17 @@
     }
 
 
-    private async Task OnClick(string imageUrl)
+
+    private async Task OnClick(CarouselViewModel model)
     {
-        //查找图片对应的Link
-
-        var img = Carousels.FirstOrDefault(s => s.Image == imageUrl);
-        if (img == null)
-        {
-            return;
-        }
-
         try
         {
-            await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", img.Note ?? img.Link, "1", "click");
+            await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", model.Note ?? model.Link, "1", "click");
         }
         catch (Exception exc)
         {
 
         }
-
-        await _dataCacheService.OpenNewPage.InvokeAsync(img.Link);
-
     }
 
 }

@@ -2266,7 +2266,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             {
                 Images.Add(new EditImageAloneModel
                 {
-                    Url = _appHelper.GetImagePath(item.Url, ""),
+                    Image = _appHelper.GetImagePath(item.Url, ""),
                     Modifier = item.Modifier,
                     Note = item.Note
                 });
@@ -2634,7 +2634,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                 newEntry.Pictures.Add(new EntryPicture
                 {
-                    Url = item.Url,
+                    Url = item.Image,
                     Modifier = item.Modifier,
                     Note = item.Note
                 });

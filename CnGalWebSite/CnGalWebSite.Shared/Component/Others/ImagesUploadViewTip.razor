@@ -85,7 +85,7 @@
                 Index = index,
                 Pictures = images.Select(s => new EditImageAloneModel
                 {
-                    Url = s.Image
+                    Image = s.Image
                 }).ToList()
             });
         }

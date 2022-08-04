@@ -275,17 +275,17 @@ namespace CnGalWebSite.APIServer.Controllers
                 //检查图片链接 是否包含外链
                 foreach (var item in model.Images.Images)
                 {
-                    if (item.Url.Contains("image.cngal.org") == false && item.Url.Contains("pic.cngal.top") == false)
+                    if (item.Image.Contains("image.cngal.org") == false && item.Image.Contains("pic.cngal.top") == false)
                     {
-                        return new Result { Successful = false, Error = "相册中不能添加外部图片：" + item.Url };
+                        return new Result { Successful = false, Error = "相册中不能添加外部图片：" + item.Image };
                     }
                 }
                 //检查是否重复
                 foreach (var item in model.Images.Images)
                 {
-                    if (model.Images.Images.Count(s => s.Url == item.Url) > 1)
+                    if (model.Images.Images.Count(s => s.Image == item.Image) > 1)
                     {
-                        return new Result { Error = "图片链接不能重复，重复的链接：" + item.Url, Successful = false };
+                        return new Result { Error = "图片链接不能重复，重复的链接：" + item.Image, Successful = false };
 
                     }
                 }
@@ -504,7 +504,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 Images.Add(new EditImageAloneModel
                 {
-                    Url = _appHelper.GetImagePath(item.Url, ""),
+                    Image = _appHelper.GetImagePath(item.Url, ""),
                     Modifier = item.Modifier,
                     Note = item.Note
                 });
@@ -538,17 +538,17 @@ namespace CnGalWebSite.APIServer.Controllers
             //检查图片链接 是否包含外链
             foreach (var item in model.Images)
             {
-                if (item.Url.Contains("image.cngal.org") == false && item.Url.Contains("pic.cngal.top") == false)
+                if (item.Image.Contains("image.cngal.org") == false && item.Image.Contains("pic.cngal.top") == false)
                 {
-                    return new Result { Successful = false, Error = "相册中不能添加外部图片：" + item.Url };
+                    return new Result { Successful = false, Error = "相册中不能添加外部图片：" + item.Image };
                 }
             }
             //检查是否重复
             foreach (var item in model.Images)
             {
-                if (model.Images.Count(s => s.Url == item.Url) > 1)
+                if (model.Images.Count(s => s.Image == item.Image) > 1)
                 {
-                    return new Result { Error = "图片链接不能重复，重复的链接：" + item.Url, Successful = false };
+                    return new Result { Error = "图片链接不能重复，重复的链接：" + item.Image, Successful = false };
 
                 }
             }

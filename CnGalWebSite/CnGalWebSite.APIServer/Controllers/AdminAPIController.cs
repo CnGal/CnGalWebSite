@@ -659,10 +659,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<EditCarouselsViewModel>> EditCarouselsAsync()
         {
             //根据类别生成首个视图模型
-            var model = new EditCarouselsViewModel
-            {
-                Carousels = new List<CarouselModel>()
-            };
+            var model = new EditCarouselsViewModel();
             var carousels = await _carouselRepository.GetAll().OrderByDescending(s => s.Priority).ToListAsync();
             foreach (var item in carousels)
             {
@@ -671,7 +668,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Link = item.Link,
                     Priority = item.Priority,
                     Note = item.Note,
-                    ImagePath = _appHelper.GetImagePath(item.Image, "")
+                    Image = _appHelper.GetImagePath(item.Image, "")
                 });
 
             }
@@ -701,7 +698,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     _ = await _carouselRepository.InsertAsync(new Carousel
                     {
-                        Image = item.ImagePath == "background.png" ? "" : item.ImagePath,
+                        Image = item.Image,
                         Link = item.Link,
                         Priority = item.Priority,
                         Note = item.Note,
@@ -731,7 +728,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Link = item.Link,
                     Name = item.Name,
                     Priority = item.Priority,
-                    ImagePath = _appHelper.GetImagePath(item.Image, "app.png")
+                    Image = _appHelper.GetImagePath(item.Image, "app.png")
                 });
             }
             return model;
@@ -760,7 +757,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     _ = await _friendLinkRepository.InsertAsync(new FriendLink
                     {
-                        Image = item.ImagePath == "background.png" ? "" : item.ImagePath,
+                        Image = item.Image,
                         Name = item.Name,
                         Link = item.Link,
                         Priority = item.Priority

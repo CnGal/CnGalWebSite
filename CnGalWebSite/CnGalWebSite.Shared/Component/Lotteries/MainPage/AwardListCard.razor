@@ -33,7 +33,7 @@
                 Index = Model.IndexOf(model),
                 Pictures = Model.Select(s => new EditImageAloneModel
                 {
-                    Url = s.Image,
+                    Image = s.Image,
                     Note = s.Name
                 }).ToList()
             });

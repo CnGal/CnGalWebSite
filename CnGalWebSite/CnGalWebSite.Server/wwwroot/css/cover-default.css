@@ -347,3 +347,6 @@ input.te-image-file-input {
 .theme--light.m-tabs > .m-tabs-bar {
     background-color: transparent;
 }
+.theme--light.m-tabs-items {
+    background-color: transparent;
+}

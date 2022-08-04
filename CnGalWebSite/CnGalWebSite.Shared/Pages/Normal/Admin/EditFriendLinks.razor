@@ -31,7 +31,7 @@
     else
     {
         <div class=" rounded shadow-sm  bg-opacity p-4">
-            <EditFriendLinksListViewTip Images="Model.FriendLinks"></EditFriendLinksListViewTip>
+            <ImagesListEditorViewTip Model="Model.FriendLinks" TValue="FriendLinkModel"/>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="完成" IsAsync="true" OnClick="OnSubmit" Icon="mdi-check" Color="green" Class="mt-4" />
         </div>
 
@@ -75,12 +75,12 @@
             //检查
             for (int i = 0; i < Model.FriendLinks.Count; i++)
             {
-                if (string.IsNullOrWhiteSpace(Model.FriendLinks[i].ImagePath))
+                if (string.IsNullOrWhiteSpace(Model.FriendLinks[i].Image))
                 {
                     await ToastService.Error("编辑友情链接失败", "请输入图片链接");
                     return;
                 }
-                if (Model.FriendLinks[i].ImagePath == "background.png")
+                if (Model.FriendLinks[i].Image == "background.png")
                 {
                     await ToastService.Error("编辑友情链接失败", "不能使用默认图片");
                     return;

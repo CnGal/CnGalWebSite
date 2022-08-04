@@ -58,8 +58,6 @@ else
     private bool isReady = false;
     private IEnumerable<string> EntryItems { get; set; } = new string[1] { "" };
 
-
-    private ImagesListEditorViewTip ImagesListEditorView;
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
     AutoSaveTip<EditTagChildEntriesViewModel> autoSave { get; set; }

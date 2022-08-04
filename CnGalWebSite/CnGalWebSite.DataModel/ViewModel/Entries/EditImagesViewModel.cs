@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Entries;
+﻿using CnGalWebSite.DataModel.ViewModel.Base;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel
@@ -8,15 +9,10 @@ namespace CnGalWebSite.DataModel.ViewModel
         public List<EditImageAloneModel> Images { get; set; } = new List<EditImageAloneModel>();
     }
 
-    public class EditImageAloneModel
+    public class EditImageAloneModel: BaseImageEditModel
     {
         [Display(Name = "分类")]
         public string Modifier { get; set; }
-        [Display(Name = "备注")]
-        public string Note { get; set; }
-        [Display(Name = "链接")]
-        [Required(ErrorMessage = "请输入链接")]
-        public string Url { get; set; }
     }
 
     public class ImagesUploadAloneModel

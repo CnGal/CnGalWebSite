@@ -163,10 +163,6 @@ namespace CnGalWebSite.Shared.Service
         /// <summary>
         /// 图表缓存
         /// </summary>
-        public IPageModelCatche<ChartDataSource> ChartDataCatche { get; set; }
-        /// <summary>
-        /// 图表缓存
-        /// </summary>
         public IPageModelCatche<LineChartModel> LineChartDataCatche { get; set; }
         /// <summary>
         /// 图表缓存
@@ -300,7 +296,6 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<TagContrastEditRecordViewModel> tagContrastEditRecordViewCatche,
         IPageModelCatche<EntryContrastEditRecordViewModel> entryContrastEditRecordViewCatche,
         IPageModelCatche<SearchViewModel> searchViewCatche,
-        IPageModelCatche<ChartDataSource> chartDataCatche,
         IPageModelCatche<LineChartModel> lineChartDataCatche,
         IPageModelCatche<CommentCacheModel> commentDataCatche,
         IPageModelCatche<PersonalSpaceViewModel> personalSpaceDataCatche,
@@ -336,7 +331,6 @@ namespace CnGalWebSite.Shared.Service
             (UserFavoriteObjectsDataCatche = userFavoriteObjectsDataCatche).Init(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteObjectList");
             (PublishGameTimesDataCatche = publishGameTimesDataCatche).Init(ToolHelper.WebApiPath + "api/entries/GetPublishGamesByTime");
 
-            (ChartDataCatche = chartDataCatche).Init("", true);
             (LineChartDataCatche = lineChartDataCatche).Init("");
             HomePageNewsCatche = homePageNewsCatche;
             HomePageCarouselsCatche = homePageCarouselsCatche;
