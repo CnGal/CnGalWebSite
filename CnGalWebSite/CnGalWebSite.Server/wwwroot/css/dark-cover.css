@@ -742,3 +742,6 @@ input.form-control{
     width: 100%;
     background-color: rgba(58,58,58,.7) !important;
 }
+.theme--dark.m-tabs-items {
+    background-color: transparent;
+}

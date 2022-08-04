@@ -1,4 +1,7 @@
-﻿@inject HttpClient Http
+﻿@typeparam TValue where TValue : BaseImageEditModel , new()
+
+
+@inject HttpClient Http
 @inject ExamineService _examineService
 @inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
@@ -8,39 +11,39 @@
 
 
 <ImageUpLoadButton OnUploadedImage="AddImage" />
-@if(Images.Count!=0)
-            {
-<div class="row mt-3">
-    @for (int i = 0; i < Images.Count; i++)
-    {
-        int temp = i;
-        <div class="col-12 col-md-6 col-xl-4 col-xxl-3 col mb-3">
-            <div class="card ps-3 pt-2 pb-2 pe-3 h-100" style="background-color:transparent">
-                <div class="h-100">
-                    <div>
-                        <img src="@Images[i].Url" class="card-img" alt="...">
-                    </div>
-                    <div class=" mt-2">
-                        <p class="text-center" style="font-size: medium; word-break: break-word; ">
-                            @(Images[i].Note??"")
-                        </p>
-                    </div>
+@if (Model.Count != 0)
+{
+    <div class="row mt-3">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            int temp = i;
+            <div class="col-12 col-md-6 col-xl-4 col-xxl-3 col mb-3">
+                <div class="card ps-3 pt-2 pb-2 pe-3 h-100" style="background-color:transparent">
+                    <div class="h-100">
+                        <div>
+                            <img src="@Model[i].Image" class="card-img" alt="...">
+                        </div>
+                        <div class=" mt-2">
+                            <p class="text-center" style="font-size: medium; word-break: break-word; ">
+                                @(Model[i].Note??"")
+                            </p>
+                        </div>
 
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <Button Color="Color.Success" IsOutline="true" Size="Size.Small" Icon="fa fa-pencil" Text="编辑" ButtonType="ButtonType.Button" @onclick="@(()=> EditImage(temp))"></Button>
-                    <Button Color="Color.Danger" IsOutline="true" Size="Size.Small" Icon="fa fa-trash-o" Text="删除" ButtonType="ButtonType.Button" @onclick="@(()=> DeleteImage(temp))"></Button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <Button Color="Color.Success" IsOutline="true" Size="Size.Small" Icon="fa fa-pencil" Text="编辑" ButtonType="ButtonType.Button" @onclick="@(()=> EditImage(temp))"></Button>
+                        <Button Color="Color.Danger" IsOutline="true" Size="Size.Small" Icon="fa fa-trash-o" Text="删除" ButtonType="ButtonType.Button" @onclick="@(()=> DeleteImage(temp))"></Button>
+                    </div>
                 </div>
             </div>
-        </div>
-    }
-</div>
-            }
+        }
+    </div>
+}
 
 
 @code {
     [Parameter]
-    public List<EditImageAloneModel> Images { get; set; } = new List<EditImageAloneModel>();
+    public List<TValue> Model { get; set; } = new List<TValue>();
 
     [Inject]
     [NotNull]
@@ -48,20 +51,20 @@
 
     public async Task DeleteImage(int i)
     {
-        Images.RemoveAt(i);
+        Model.RemoveAt(i);
         StateHasChanged();
         await ToastService.Success("删除成功", "成功删除图片");
     }
     public async Task EditImage(int i)
     {
-        var items = Utility.GenerateEditorItems<EditImageAloneModel>();
+        var items = Utility.GenerateEditorItems<TValue>();
         // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
         //item.Data = Foo.GenerateHobbys(Localizer);
 
-        var option = new EditDialogOption<EditImageAloneModel>()
+        var option = new EditDialogOption<TValue>()
         {
             Title = "编辑图片",
-            Model = Images[i],
+            Model = Model[i],
             Items = items,
             OnCloseAsync = () =>
             {
@@ -71,7 +74,7 @@
             OnEditAsync = async context =>
             {
                 // Trace.Log("保存按钮被点击");
-                Images[i] = (EditImageAloneModel)context.Model;
+                Model[i] = (TValue)context.Model;
                 StateHasChanged();
                 await ToastService.Success("修改成功", "成功修改图片");
                 return true;
@@ -82,11 +85,9 @@
     }
     public Task AddImage(string url)
     {
-        Images.Add(new EditImageAloneModel
+        Model.Add(new TValue
         {
-            Url=url,
-            Modifier="",
-            Note=""
+            Image = url
         });
         StateHasChanged();
         return Task.CompletedTask;

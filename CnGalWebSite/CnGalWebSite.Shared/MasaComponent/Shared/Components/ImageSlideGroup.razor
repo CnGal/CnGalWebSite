@@ -10,7 +10,7 @@
             <MWindowItem Value="@Model.IndexOf(item)" >
                 <MResponsive AspectRatio="16/9D">
                     <MCard Style=" display: contents; "  OnClick="OnClickImage">
-                        <div style="@($"background-image: url({item.Url});")" class="image-contain">
+                        <div style="@($"background-image: url({item.Image});")" class="image-contain">
 
                         </div>
                     </MCard>
@@ -24,7 +24,7 @@
         {
             <MSlideItem>
                 <MCard Class="mt-4 me-4 mb-2" Height="90" Width="160" OnClick="@(()=>{ if (!context.Active) context.Toggle.Invoke();})" RefBack="context.Ref">
-                    <div style="@($"background-image: url({item.Url});")" class="@((context.Active?"active":"")+" image-overlays ")">
+                    <div style="@($"background-image: url({item.Image});")" class="@((context.Active?"active":"")+" image-overlays ")">
 
                     </div>
                 </MCard>
@@ -45,7 +45,7 @@
     {
         if (_dataCatcheService.IsApp)
         {
-            await _dataCatcheService.OpenNewPage.InvokeAsync(Model[Index.ToInt32()].Url);
+            await _dataCatcheService.OpenNewPage.InvokeAsync(Model[Index.ToInt32()].Image);
         }
         else
         {

@@ -29,7 +29,7 @@
                 Pictures = Model.Select(s => new EditImageAloneModel
                 {
                     Note = s.Note,
-                    Url = s.Url
+                    Image = s.Url
                 }).ToList()
             });
         }

@@ -93,8 +93,6 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<LotteryViewModel> LotteryIndexPageCatche { get; set; }
 
-        IPageModelCatche<ChartDataSource> ChartDataCatche { get; set; }
-
         IPageModelCatche<LineChartModel> LineChartDataCatche { get; set; }
 
         IPageModelCatche<PlayedGameOverviewModel> PlayedGameOverviewDataCatche { get; set; }

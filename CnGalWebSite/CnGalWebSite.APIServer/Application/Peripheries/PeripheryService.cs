@@ -932,7 +932,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
 
                 newPeriphery.Pictures.Add(new EntryPicture
                 {
-                    Url = item.Url,
+                    Url = item.Image,
                     Modifier = item.Modifier,
                     Note = item.Note
                 });

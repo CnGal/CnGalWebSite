@@ -32,7 +32,7 @@
     else
     {
         <div class=" rounded shadow-sm  bg-opacity p-4">
-            <EditCarouselsListViewTip Images="Model.Carousels"></EditCarouselsListViewTip>
+            <ImagesListEditorViewTip Model="Model.Carousels" TValue="CarouselModel"/>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="完成" IsAsync="true" OnClick="OnSubmit" Icon="mdi-check" Color="green" Class="mt-4" />
         </div>
 
@@ -76,7 +76,7 @@
             //检查
             for (int i = 0; i < Model.Carousels.Count; i++)
             {
-                if (string.IsNullOrWhiteSpace(Model.Carousels[i].ImagePath))
+                if (string.IsNullOrWhiteSpace(Model.Carousels[i].Image))
                 {
                     await ToastService.Error("编辑轮播图失败", "请输入图片链接");
                     return;

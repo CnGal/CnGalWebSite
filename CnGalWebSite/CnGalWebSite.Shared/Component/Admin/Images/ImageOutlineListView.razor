@@ -103,7 +103,7 @@ else
                 Index = Model.Data.IndexOf(model),
                 Pictures = Model.Data.Select(s => new EditImageAloneModel
                 {
-                    Url = s.FileName
+                    Image = s.FileName
                 }).ToList()
             });
         }
