@@ -5,8 +5,13 @@
 
 @if (isReady)
 {
+    @if (IsGameView)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边" Icon="fa fa-fw fa-shopping-basket" Outline />
+    }
     @if (Model.Peripheries.Count != 0)
     {
+
         <div class="@(Outline ? "":" rounded shadow-sm  bg-opacity p-3 " +Class)">
             @if (Model.Type == PeripheryOverviewHeadType.GameOrGroup || Model.Type == PeripheryOverviewHeadType.RoleOrStaff)
             {
@@ -77,9 +82,24 @@
             }
 
         </div>
-
-
-
+    }
+    else
+    {
+        if (IsGameView)
+        {
+            <AuthorizeView>
+                <Authorized>
+                    <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4 ">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="创建周边" OnClick="@(()=>NavigationManager.NavigateTo("/peripheries/createperiphery"))" Icon="mdi-plus" />
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 mb-4">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后创建周边" OnClick="OnLoginClick" Icon="mdi-login" />
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+        }
     }
 
 }
@@ -98,6 +118,8 @@ else
     public bool IsEdit { get; set; }
     [Parameter]
     public bool Outline { get; set; }
+    [Parameter]
+    public bool IsGameView { get; set; }
     [Parameter]
     public string Class { get; set; }
 
@@ -127,6 +149,12 @@ else
         {
             isReady = true;
         }
+    }
+
+    public Task OnLoginClick()
+    {
+        NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+        return Task.CompletedTask;
     }
 
 }

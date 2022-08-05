@@ -872,6 +872,10 @@ namespace CnGalWebSite.DataModel.Helper
                     {
                         pt.SetValue(data, (ArticleType)int.Parse(item.Value), null);
                     }
+                    else if (pt.PropertyType == typeof(PeripheryType))
+                    {
+                        pt.SetValue(data, (PeripheryType)int.Parse(item.Value), null);
+                    }
                     else if (pt.PropertyType == typeof(DateTime))
                     {
                         pt.SetValue(data, DateTime.FromBinary(long.Parse(item.Value)), null);
@@ -903,7 +907,7 @@ namespace CnGalWebSite.DataModel.Helper
             var t = currentItem.GetType();
             var pts = t.GetProperties();
             foreach (var item in pts.Where(s => s.PropertyType == typeof(string) || s.PropertyType == typeof(DateTime) || s.PropertyType == typeof(DateTime?)
-            || s.PropertyType == typeof(EntryType) || s.PropertyType == typeof(ArticleType) || s.PropertyType == typeof(bool) || s.PropertyType == typeof(int)))
+            || s.PropertyType == typeof(EntryType) || s.PropertyType == typeof(ArticleType) || s.PropertyType == typeof(PeripheryType) || s.PropertyType == typeof(bool) || s.PropertyType == typeof(int)))
             {
                 //特殊字段跳过
                 if (item.Name == "MainPage" || item.Name == "CreateTime" || item.Name == "LastEditTime" || item.Name == "CreateUserId")
@@ -945,7 +949,7 @@ namespace CnGalWebSite.DataModel.Helper
                             Value = ((DateTime?)newValue)?.ToBinary().ToString()
                         });
                     }
-                    else if (item.PropertyType == typeof(ArticleType) || item.PropertyType == typeof(EntryType))
+                    else if (item.PropertyType == typeof(ArticleType))
                     {
                         model.Add(new ExamineMainAlone
                         {
@@ -959,6 +963,14 @@ namespace CnGalWebSite.DataModel.Helper
                         {
                             Key = item.Name,
                             Value = ((int)(EntryType)newValue).ToString()
+                        });
+                    }
+                    else if (item.PropertyType == typeof(PeripheryType))
+                    {
+                        model.Add(new ExamineMainAlone
+                        {
+                            Key = item.Name,
+                            Value = ((int)(PeripheryType)newValue).ToString()
                         });
                     }
                     else if (item.PropertyType == typeof(string))

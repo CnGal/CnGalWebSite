@@ -38,7 +38,7 @@
                         <TableToolbarButton TItem="ListPeripheryAloneModel" Color="Color.Success" Icon="fa fa-comments-o" Text="关闭评论" OnClickCallback="OnCanNotCommentClick" IsAsync="true" />
                     </TableToolbarTemplate>
                     <TableColumns>
-                        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
+                        <TableColumn @bind-Field="@context.Id" Sortable DefaultSort Fixed Width="60" DefaultSortOrder="SortOrder.Desc" />
                         <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
                         <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" TextWrap="true" Width="400" />
                         <TableColumn @bind-Field="@context.Author" Sortable="true" Searchable="true" Width="120" TextWrap="true" />

@@ -23,7 +23,7 @@ namespace CnGalWebSite.HistoryData.Model
         /// <summary>
         /// 主图
         /// </summary>
-        public string MainPicture { get; set; }
+        public string Image { get; set; }
         /// <summary>
         /// 背景图
         /// </summary>
@@ -147,7 +147,7 @@ namespace CnGalWebSite.HistoryData.Model
     }
     public enum PeripheryType
     {
-        [Display(Name = "其他")]
+        [Display(Name = "其他周边类型")]
         None,
         [Display(Name = "设定集或画册等")]
         SetorAlbumEtc,
@@ -155,5 +155,19 @@ namespace CnGalWebSite.HistoryData.Model
         Ost,
         [Display(Name = "套装")]
         Set,
+        [Display(Name = "激活码")]
+        ActivationCode,
+        [Display(Name = "色纸")]
+        ColoredPaper,
+        [Display(Name = "徽章")]
+        Badge,
+        [Display(Name = "明信片")]
+        Postcard,
+        [Display(Name = "挂画")]
+        HangPainting,
+        [Display(Name = "钥匙扣")]
+        Keychain,
+        [Display(Name = "书签")]
+        Bookmark,
     }
 }

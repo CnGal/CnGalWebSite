@@ -12,7 +12,7 @@
 
     @if (_dataCacheService.ThemeSetting.IsCommentUseMarkdown)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMarkdown @bind-Context="Text" Mode="MarkdownEditorMode.wysiwyg" Class="mb-4 mt-4" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMarkdown @bind-Context="@Text" Mode="MarkdownEditorMode.wysiwyg" Class="mb-4 mt-4" />
     }
     else
     {

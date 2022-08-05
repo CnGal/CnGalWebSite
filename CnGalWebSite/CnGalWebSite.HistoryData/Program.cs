@@ -6,10 +6,12 @@ using Spire.Xls;
 using Spire.Xls.Core;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -19,14 +21,9 @@ namespace CnGalWebSite.HistoryData
     {
         public static string GetStringValue(this IWorksheet sheet, string index)
         {
-            if (sheet.Range[index].Value2 != null && !string.IsNullOrWhiteSpace(sheet.Range[index].Value2.ToString()))
-            {
-                return sheet.Range[index].Value2.ToString();
-            }
-            else
-            {
-                return null;
-            }
+            return sheet.Range[index].Value2 != null && !string.IsNullOrWhiteSpace(sheet.Range[index].Value2.ToString())
+                ? sheet.Range[index].Value2.ToString()
+                : null;
         }
     }
     public class Program
@@ -237,9 +234,9 @@ namespace CnGalWebSite.HistoryData
             var tempStr1 = "";
             foreach (var item in Urls)
             {
-                tempStr1 += ("location " + item.OldUrl + " {\n");
-                tempStr1 += ("    return 301 " + item.NewUrl + ";\n");
-                tempStr1 += ("}\n");
+                tempStr1 += "location " + item.OldUrl + " {\n";
+                tempStr1 += "    return 301 " + item.NewUrl + ";\n";
+                tempStr1 += "}\n";
             }
             sw.WriteLine(tempStr1);
             sw.Close();
@@ -252,7 +249,7 @@ namespace CnGalWebSite.HistoryData
             tempStr1 = "";
             foreach (var item in Urls)
             {
-                tempStr1 += ("https://www.cngal.org" + item.OldUrl + " https://www.cngal.org" + item.NewUrl + "\n");
+                tempStr1 += "https://www.cngal.org" + item.OldUrl + " https://www.cngal.org" + item.NewUrl + "\n";
             }
             sw1.WriteLine(tempStr1);
             sw1.Close();
@@ -285,30 +282,37 @@ namespace CnGalWebSite.HistoryData
         /// </summary>
         private static void ImprotPeripheries()
         {
-            Directory.CreateDirectory(path + "\\输出文件夹");
-            Directory.CreateDirectory(path + "\\输出文件夹\\图片");
+            _ = Directory.CreateDirectory(path + "\\输出文件夹");
+            _ = Directory.CreateDirectory(path + "\\输出文件夹\\图片");
             //第一步 加载表格
             var linshi_ = new Workbook();
             linshi_.LoadFromFile(path + "\\数据源文件夹\\周边.xlsx");
             PeripheriesSheet = linshi_.Worksheets[0];
 
-
+            //第一步 从基本信息表中创建周边套装
+            for (var i = 3; i <= 219; i++)
+            {
+                CreatePheripherySet(PeripheriesSheet, i);
+                Console.WriteLine("[第一步]   <" + (i - 2) + ">");
+            }
             //第二步 从基本信息表中创建周边
-            for (var i = 3; i <= 5; i++)
+            for (var i = 3; i <= 219; i++)
             {
                 peripheries.Add(CreatePeripheriy(PeripheriesSheet, i));
                 Console.WriteLine("[第二步]   <" + (i - 2) + ">");
             }
 
+
+
             //第二步 添加关联词条
-            for (var i = 3; i <= 5; i++)
+            for (var i = 3; i <= 219; i++)
             {
                 GetRelatedEntry(PeripheriesSheet, i);
                 Console.WriteLine("[第三步]   <" + (i - 2) + ">");
             }
 
             //第三步 添加关联周边
-            for (var i = 3; i <= 5; i++)
+            for (var i = 3; i <= 219; i++)
             {
                 GetRelatedPeriphery(PeripheriesSheet, i);
                 Console.WriteLine("[第四步]   <" + (i - 2) + ">");
@@ -324,7 +328,39 @@ namespace CnGalWebSite.HistoryData
             Console.WriteLine("=====================================");
             Console.WriteLine("             处理完成                ");
             Console.WriteLine("=====================================");
-            Console.ReadKey();
+            _ = Console.ReadKey();
+        }
+
+        public static void CreatePheripherySet(IWorksheet sheet, int index)
+        {
+            //查找是否同名
+            var name = sheet.GetStringValue("G" + index);
+            if (name == null)
+            {
+                return;
+            }
+            var prices = sheet.GetStringValue("F" + index)?.Split('，');
+            var priceIndex = 0;
+            foreach (var item in name.Replace("，", ",").Replace("、", ",").Split(','))
+            {
+                var temp = "《" + item.Trim(' ').Replace(" ", "》");
+                if (item.Contains("《"))
+                {
+                    temp = item;
+                }
+
+                if (peripheries.Any(s => s.Name == temp) == false)
+                {
+                    var model = new Periphery
+                    {
+                        Name = temp,
+                        Type = PeripheryType.Set,
+                        Price= prices[priceIndex++],
+                        Image= sheet.GetStringValue("D" + index)
+                    };
+                    peripheries.Add(model);
+                }
+            }
         }
 
         public static Periphery CreatePeripheriy(IWorksheet sheet, int index)
@@ -345,47 +381,60 @@ namespace CnGalWebSite.HistoryData
             model.Name = name;
 
             //导入基本信息
-            model.DisplayName = sheet.GetStringValue("B" + index) ?? model.Name;
+            //model.DisplayName = sheet.GetStringValue("B" + index) ?? model.Name;
             model.BriefIntroduction = sheet.GetStringValue("C" + index);
-            model.MainPicture = sheet.GetStringValue("D" + index);
+            model.Image = sheet.GetStringValue("D" + index);
+            if (model.Image != null && model.Image.Contains("http") == false)
+            {
+                model.Image = null;
+            }
             model.SaleLink = sheet.GetStringValue("E" + index);
-            model.Price = sheet.GetStringValue("F" + index);
+            //model.Price = sheet.GetStringValue("F" + index);
 
             var type = sheet.GetStringValue("H" + index);
-            if (type.Contains("画册"))
-            {
-                model.Type = PeripheryType.SetorAlbumEtc;
-            }
-            if (type.Contains("设定集"))
-            {
-                model.Type = PeripheryType.SetorAlbumEtc;
-            }
-            if (type.Contains("原声集"))
-            {
-                model.Type = PeripheryType.Ost;
-            }
-            if (type.Contains("套装"))
-            {
-                model.Type = PeripheryType.Set;
-            }
+
+            model.Type = GetGeneralType(type);
+
 
             model.Size = sheet.GetStringValue("I" + index);
             model.Category = sheet.GetStringValue("J" + index);
+
+            if (model.Type == PeripheryType.None)
+            {
+                model.Type = GetGeneralType(model.Category);
+            }
+
+
             model.Brand = sheet.GetStringValue("K" + index);
             model.Author = sheet.GetStringValue("L" + index);
             model.Material = sheet.GetStringValue("M" + index);
             model.IndividualParts = sheet.GetStringValue("N" + index);
             model.IsReprint = sheet.GetStringValue("O" + index) == "是";
             model.IsAvailableItem = sheet.GetStringValue("P" + index) == "是";
-            int.TryParse(sheet.GetStringValue("Q" + index), out var count);
+            _ = int.TryParse(sheet.GetStringValue("Q" + index), out var count);
             model.PageCount = count;
-            int.TryParse(sheet.GetStringValue("R" + index), out count);
+            _ = int.TryParse(sheet.GetStringValue("R" + index), out count);
             model.SongCount = count;
             model.LastEditTime = DateTime.Now;
             //读取相关词条
 
             return model;
         }
+
+        public static PeripheryType GetGeneralType(string text)
+        {
+            foreach (var item in Enum.GetValues(typeof(PeripheryType)))
+            {
+                var temp = (PeripheryType)item;
+                if (text == temp.GetDisplayName())
+                {
+                    return temp;
+                }
+            }
+
+            return PeripheryType.None;
+        }
+
 
         public static void GetRelatedEntry(IWorksheet sheet, int index)
         {
@@ -429,7 +478,13 @@ namespace CnGalWebSite.HistoryData
             var entryNames = entriesString.Replace("，", ",").Replace("、", ",").Split(',');
             foreach (var entryName in entryNames)
             {
-                var entry = peripheries.FirstOrDefault(s => s.Name == entryName);
+                var temp = "《" + entryName.Trim(' ').Replace(" ", "》");
+                if(entryName.Contains("《"))
+                {
+                    temp = entryName;
+                }
+
+                var entry = peripheries.FirstOrDefault(s => s.Name == temp);
                 if (entry != null)
                 {
                     model.Peripheries.Add(entry.Name);
@@ -443,8 +498,8 @@ namespace CnGalWebSite.HistoryData
         /// </summary>
         private static void Chushihua()
         {
-            Directory.CreateDirectory(path + "\\输出文件夹");
-            Directory.CreateDirectory(path + "\\输出文件夹\\图片");
+            _ = Directory.CreateDirectory(path + "\\输出文件夹");
+            _ = Directory.CreateDirectory(path + "\\输出文件夹\\图片");
             //第一步 加载表格
             var linshi_ = new Workbook();
             linshi_.LoadFromFile(path + "\\数据源文件夹\\基础.xlsx");
@@ -490,7 +545,7 @@ namespace CnGalWebSite.HistoryData
                     var groupName = groupNames.Replace(", ", ",").Replace("，", ",").Replace("、", ",").Split(',');
                     foreach (var item in groupName)
                     {
-                        CreateEntryGroup(i, biaoge_jichu, item);
+                        _ = CreateEntryGroup(i, biaoge_jichu, item);
                     }
                     Console.WriteLine("[第四步]   <" + i + ">");
 
@@ -511,7 +566,7 @@ namespace CnGalWebSite.HistoryData
             {
                 if (biaoge_juese.Range["A" + i].Value2 != null && !string.IsNullOrWhiteSpace(biaoge_juese.Range["A" + i].Value2.ToString()))
                 {
-                    CreateEntryRole(i, biaoge_juese);
+                    _ = CreateEntryRole(i, biaoge_juese);
                     Console.WriteLine("[第六步]   <" + i + ">");
 
                 }
@@ -553,7 +608,7 @@ namespace CnGalWebSite.HistoryData
                 serializer.Serialize(file, users);
             }
             Console.WriteLine("导出数据成功！");
-            Console.ReadLine();
+            _ = Console.ReadLine();
         }
 
         public static void SaveArticle()
@@ -863,7 +918,7 @@ namespace CnGalWebSite.HistoryData
                     }
                     else
                     {
-                        await DownLoadFile("https:" + url, savePath);
+                        _ = await DownLoadFile("https:" + url, savePath);
                     }
 
 
@@ -879,17 +934,9 @@ namespace CnGalWebSite.HistoryData
             {
                 return GenderType.Man;
             }
-            else if (str == "女")
-            {
-                return GenderType.Women;
-            }
-            else if (str == "")
-            {
-                return GenderType.None;
-            }
             else
             {
-                return GenderType.Other;
+                return str == "女" ? GenderType.Women : str == "" ? GenderType.None : GenderType.Other;
             }
         }
 
@@ -1338,17 +1385,9 @@ namespace CnGalWebSite.HistoryData
             {
                 return PositionGeneralType.LaterStage;
             }
-            else if (str == "主催")
-            {
-                return PositionGeneralType.MainUrge;
-            }
-            else if (str == "策划")
-            {
-                return PositionGeneralType.Plan;
-            }
             else
             {
-                return PositionGeneralType.Other;
+                return str == "主催" ? PositionGeneralType.MainUrge : str == "策划" ? PositionGeneralType.Plan : PositionGeneralType.Other;
             }
 
         }
@@ -1507,15 +1546,15 @@ namespace CnGalWebSite.HistoryData
             }
 
             //第二步 读取标题和简介
-            var entry = new Entry()
+            var entry = new Entry
             {
                 Information = new List<BasicEntryInformation>(),
                 Relevances = new List<EntryRelevance>(),
                 //   Tags = new List<string>(),
                 Pictures = new List<EntryPicture>(),
-                Type = EntryType.Game
+                Type = EntryType.Game,
+                Name = worksheet.Range["C" + hang].Value2.ToString()
             };
-            entry.Name = worksheet.Range["C" + hang].Value2.ToString();
             if (worksheet.Range["P" + hang].Value2 != null && worksheet.Range["P" + hang].Value2.ToString() != "")
             {
                 entry.BriefIntroduction = worksheet.Range["P" + hang].Value2.ToString();
@@ -1731,13 +1770,9 @@ namespace CnGalWebSite.HistoryData
                         {
                             continue;
                         }
-                        else if (infor.Length == 1)
-                        {
-                            link = infor[0];
-                        }
                         else
                         {
-                            link = infor[1].Replace(")", "");
+                            link = infor.Length == 1 ? infor[0] : infor[1].Replace(")", "");
                         }
                         entry.Relevances.Add(new EntryRelevance
                         {
@@ -1751,6 +1786,26 @@ namespace CnGalWebSite.HistoryData
             }
         }
 
+    }
+
+    public static class DisplayNameExtension
+    {
+        /// <summary>
+        /// 获得枚举的displayName
+        /// </summary>
+        /// <param name="eum"></param>
+        /// <returns></returns>
+        public static string GetDisplayName(this Enum eum)
+        {
+            if (eum == null)
+            {
+                return string.Empty;
+            }
+            var type = eum.GetType();
+            var field = type.GetField(eum.ToString());
+            var obj = (DisplayAttribute)field.GetCustomAttribute(typeof(DisplayAttribute));
+            return obj?.Name ?? "";
+        }
     }
 
 }

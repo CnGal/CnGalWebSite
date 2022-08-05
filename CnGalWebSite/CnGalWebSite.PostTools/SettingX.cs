@@ -16,6 +16,8 @@ namespace CnGalWebSite.PostTools
 
         public string MergeEntriesFileName { get; set; } = "MergeEntries.txt";
 
+        public string ImportPeripheriesFileName { get; set; } = "ImportPeripheries.json";
+
         public string TempPath { get; set; } = "Data";
 
         public string TransferDepositFileAPI { get; set; } = "https://api.cngal.top/";

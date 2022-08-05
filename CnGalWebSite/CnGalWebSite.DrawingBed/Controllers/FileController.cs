@@ -3,10 +3,7 @@ using CnGalWebSite.DataModel.ViewModel.Files;
 using CnGalWebSite.DrawingBed.Services;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace CnGalWebSite.DrawingBed.Controllers
 {
@@ -25,7 +22,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
             _fileService = fileService;
-        
+
         }
 
         /// <summary>
@@ -45,7 +42,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             var model = new List<UploadResult>();
             foreach (var item in files)
             {
-                var url = await _fileService.UploadFormFile(item,x,y);
+                var url = await _fileService.UploadFormFile(item, x, y);
                 if (string.IsNullOrWhiteSpace(url))
                 {
                     model.Add(new UploadResult
@@ -82,11 +79,11 @@ namespace CnGalWebSite.DrawingBed.Controllers
                 request.EnableBuffering();
                 var postJson = "";
                 var stream = HttpContext.Request.Body;
-                long? length = HttpContext.Request.ContentLength;
-                if (length != null && length > 0)
+                var length = HttpContext.Request.ContentLength;
+                if (length is not null and > 0)
                 {
                     // 使用这个方式读取，并且使用异步
-                    StreamReader streamReader = new StreamReader(stream, Encoding.UTF8);
+                    var streamReader = new StreamReader(stream, Encoding.UTF8);
                     postJson = streamReader.ReadToEndAsync().Result;
                 }
 
@@ -97,36 +94,24 @@ namespace CnGalWebSite.DrawingBed.Controllers
 
 
 
-            string res = "";
-            if (url.Contains("image.cngal.org") || url.Contains("pic.cngal.top"))
-            {
-                res = url;
-            }
-            else
-            {
-                res = await _fileService.TransferDepositFile(url, x, y);
+            var res = (url.Contains("image.cngal.org") || url.Contains("pic.cngal.top")) && x == 0 && y == 0
+                ? url
+                : await _fileService.TransferDepositFile(url, x, y);
 
-            }
-
-            if (string.IsNullOrWhiteSpace(res))
-            {
-                return new LinkToImgResult
+            return string.IsNullOrWhiteSpace(res)
+                ? (ActionResult<LinkToImgResult>)new LinkToImgResult
                 {
                     Successful = false,
                     OriginalUrl = url,
 
-                };
-            }
-            else
-            {
-                return new LinkToImgResult
+                }
+                : (ActionResult<LinkToImgResult>)new LinkToImgResult
                 {
                     OriginalUrl = url,
                     Url = res,
                     Successful = true,
 
                 };
-            }
         }
 
     }

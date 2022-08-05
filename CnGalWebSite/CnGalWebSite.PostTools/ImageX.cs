@@ -4,12 +4,7 @@ using CnGalWebSite.DataModel.ViewModel.Files;
 using CnGalWebSite.DataModel.ViewModel.HistoryData;
 using CnGalWebSite.Helper.Helper;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CnGalWebSite.PostTools
 {
@@ -17,7 +12,7 @@ namespace CnGalWebSite.PostTools
     {
         private readonly HttpClient client;
         private readonly SettingX setting;
-        public readonly List<OriginalImageToDrawingBedUrl> images = new List<OriginalImageToDrawingBedUrl>();
+        public readonly List<OriginalImageToDrawingBedUrl> images = new();
 
 
         public ImageX(HttpClient _client, SettingX _setting)
@@ -32,11 +27,9 @@ namespace CnGalWebSite.PostTools
             {
                 var path = Path.Combine(setting.TempPath, "images.json");
 
-                using (var file = File.OpenText(path))
-                {
-                    var serializer = new JsonSerializer();
-                    images.AddRange((List<OriginalImageToDrawingBedUrl>)serializer.Deserialize(file, typeof(List<OriginalImageToDrawingBedUrl>)));
-                }
+                using var file = File.OpenText(path);
+                var serializer = new JsonSerializer();
+                images.AddRange((List<OriginalImageToDrawingBedUrl>)serializer.Deserialize(file, typeof(List<OriginalImageToDrawingBedUrl>)));
             }
             catch
             {
@@ -48,18 +41,16 @@ namespace CnGalWebSite.PostTools
         {
             var path = Path.Combine(setting.TempPath, "images.json");
 
-            using (var file = File.CreateText(path))
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(file, images);
-            }
+            using var file = File.CreateText(path);
+            var serializer = new JsonSerializer();
+            serializer.Serialize(file, images);
         }
 
         public async Task<string> UploadImageAsync(string url, double x = 0, double y = 0)
         {
             try
             {
-                var result = await client.PostAsJsonAsync(setting.TransferDepositFileAPI + "api/files/TransferDepositFile", new TransferDepositFileModel
+                var result = await client.PostAsJsonAsync(setting.TransferDepositFileAPI + $"api/files/linkToImgUrl?url={url}&x={x}&y={y}", new TransferDepositFileModel
                 {
                     Url = url,
                     X = x,
@@ -67,11 +58,11 @@ namespace CnGalWebSite.PostTools
                 });
 
                 var jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+                var obj = System.Text.Json.JsonSerializer.Deserialize<LinkToImgResult>(jsonContent, ToolHelper.options);
 
                 if (obj.Successful)
                 {
-                    var temp = obj.Error.Replace("http://local.host/", "https://pic.cngal.top/");
+                    var temp = obj.Url;
                     Console.WriteLine("上传完成：" + temp);
 
                     return temp;
@@ -82,14 +73,14 @@ namespace CnGalWebSite.PostTools
                     return url;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return url;
             }
 
         }
 
-        public async Task CutImage(OutlinkArticleModel model)
+        public async Task CutImage(ImageModel model)
         {
             if (string.IsNullOrWhiteSpace(model.Image) == false && model.IsCutImage == false)
             {
@@ -160,5 +151,12 @@ namespace CnGalWebSite.PostTools
                 return image.NewUrl;
             }
         }
+    }
+
+    public class ImageModel
+    {
+        public string Image { get; set; }
+
+        public bool IsCutImage { get; set; }
     }
 }
