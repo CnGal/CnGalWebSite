@@ -450,7 +450,7 @@ namespace CnGalWebSite.PostTools
         }
     }
 
-    public class OutlinkArticleModel
+    public class OutlinkArticleModel: ImageModel
     {
         public long Id { get; set; }
 
@@ -461,10 +461,6 @@ namespace CnGalWebSite.PostTools
         public string Url { get; set; }
 
         public string MainPage { get; set; }
-
-        public string Image { get; set; }
-
-        public bool IsCutImage { get; set; }
 
         public DateTime PublishTime { get; set; }
 

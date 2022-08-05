@@ -11,6 +11,7 @@ namespace CnGalWebSite.PostTools
     {
         public readonly List<OutlinkArticleModel> articles = new List<OutlinkArticleModel>();
         public readonly List<MergeEntryModel> mergeEntries = new List<MergeEntryModel>();
+        public readonly List<ImportPeripheryModel> importPeripheries = new List<ImportPeripheryModel>();
         private readonly SettingX setting;
         private readonly HttpClient client;
 
@@ -40,6 +41,13 @@ namespace CnGalWebSite.PostTools
                     mergeEntries.AddRange((List<MergeEntryModel>)serializer.Deserialize(file, typeof(List<MergeEntryModel>)));
                 }
 
+                path = Path.Combine(setting.TempPath, "ImportPeripheries.json");
+                using (var file = File.OpenText(path))
+                {
+                    var serializer = new JsonSerializer();
+                    importPeripheries.AddRange((List<ImportPeripheryModel>)serializer.Deserialize(file, typeof(List<ImportPeripheryModel>)));
+                }
+
             }
             catch
             {
@@ -63,6 +71,14 @@ namespace CnGalWebSite.PostTools
             {
                 var serializer = new JsonSerializer();
                 serializer.Serialize(file, mergeEntries);
+            }
+
+            path = Path.Combine(setting.TempPath, "ImportPeripheries.json");
+
+            using (var file = File.CreateText(path))
+            {
+                var serializer = new JsonSerializer();
+                serializer.Serialize(file, importPeripheries);
             }
         }
     }

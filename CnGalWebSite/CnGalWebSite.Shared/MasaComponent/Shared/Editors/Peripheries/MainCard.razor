@@ -18,10 +18,11 @@
         </div>
 
         <div class="row">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
             <div class="form-group col-12  col-sm-6">
                 <Select @bind-Value="Model.Type" />
             </div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.DisplayNameCard @bind-Name="Model.Name" @bind-DisplayName="Model.DisplayName" Class="form-group col-12 col-sm-6" />
+
             <div class="form-group col-12  col-sm-6">
                 <BootstrapInput @bind-Value="Model.Category" />
             </div>

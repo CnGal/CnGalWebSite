@@ -92,7 +92,7 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public int PageCount { get; set; }
         #endregion
-        #region 设定集
+        #region 原声集
         /// <summary>
         /// 歌曲数
         /// </summary>
@@ -210,5 +210,19 @@ namespace CnGalWebSite.DataModel.Model
         Ost,
         [Display(Name = "套装")]
         Set,
+        [Display(Name = "激活码")]
+        ActivationCode,
+        [Display(Name = "色纸")]
+        ColoredPaper,
+        [Display(Name = "徽章")]
+        Badge,
+        [Display(Name = "明信片")]
+        Postcard,
+        [Display(Name = "挂画")]
+        HangPainting,
+        [Display(Name = "钥匙扣")]
+        Keychain,
+        [Display(Name = "书签")]
+        Bookmark,
     }
 }

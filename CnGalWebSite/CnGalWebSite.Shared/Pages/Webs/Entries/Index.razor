@@ -150,7 +150,7 @@ else
                             </MTabItem>
                             <MTabItem Value="2">
                                 <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke"></EntryRelevancesNormalListViewTip>
-                                <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" />
+                                <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" IsGameView="EntryView.Type == EntryType.Game"/>
                             </MTabItem>
 
                             @if (EntryView.Staffs.Count > 0)
@@ -192,7 +192,7 @@ else
                         }
                         <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke" RightDisplay />
 
-                        <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" Class="mb-4" />
+                        <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" Class="mb-4" IsGameView="EntryView.Type == EntryType.Game"/>
                         <div>
                             @if (EntryView.CanComment)
                             {
