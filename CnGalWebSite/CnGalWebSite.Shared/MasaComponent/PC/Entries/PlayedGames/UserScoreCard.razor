@@ -27,7 +27,7 @@
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="(int)Model.Socres.TotalSocre" Lable="总评" />
             <div style="color:gray;" class="pb-2">
-                @($"音乐{Model.Socres.MusicSocre}分,美术{Model.Socres.PaintSocre}分,剧本{Model.Socres.ScriptSocre}分,演出{Model.Socres.ShowSocre}分,程序{Model.Socres.SystemSocre}分"+(IsDubbing? $",配音{Model.Socres.CVSocre}分" : ""))
+                @($"音乐{Model.Socres.MusicSocre}分,美术{Model.Socres.PaintSocre}分,剧本{Model.Socres.ScriptSocre}分,演出{Model.Socres.ShowSocre}分,程序{Model.Socres.SystemSocre}分"+((IsDubbing&& Model.Socres.CVSocre>0) ? $",配音{Model.Socres.CVSocre}分" : ""))
             </div>
             <div itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
                 <meta itemprop="worstRating" content="1">

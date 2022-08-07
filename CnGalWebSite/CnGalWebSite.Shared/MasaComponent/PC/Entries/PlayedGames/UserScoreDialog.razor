@@ -9,31 +9,34 @@
     <MCard>
 
         <MCardText Class="pt-6">
-
-            <div class="d-flex mb-2" @onclick="@(()=>OnNav("/space/index/"+@Model.User.Id))">
-                <img loading="lazy" class="shadow-sm" src="@Model.User.PhotoPath" style="height: 50px;width: 50px;border-radius: 50%;" />
-                <div class="comment-tx-div">
-                    <div class="new-row-warp no-margin">
-                        @foreach (var item in Model.User.Ranks)
-                        {
-                            <RankAloneViewTip Model="item"></RankAloneViewTip>
-                        }
+            <div style="display: flex; justify-content: space-between;">
+                <div class="d-flex mb-2" @onclick="@(()=>OnNav("/space/index/"+@Model.User.Id))">
+                    <img loading="lazy" class="shadow-sm" src="@Model.User.PhotoPath" style="height: 50px;width: 50px;border-radius: 50%;" />
+                    <div class="comment-tx-div">
+                        <div class="new-row-warp no-margin">
+                            @foreach (var item in Model.User.Ranks)
+                            {
+                                <RankAloneViewTip Model="item"></RankAloneViewTip>
+                            }
+                        </div>
+                        <div class="a-font-color text-truncate-1">@Model.User.Name</div>
                     </div>
-                    <div class="a-font-color text-truncate-1">@Model.User.Name</div>
                 </div>
+                <BadgesViewCard Model="Model.User.Ranks" />
             </div>
+
 
             @if (Model.Socres.IsScored)
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="(int)Model.Socres.TotalSocre" Lable="总评" />
                 <div style="color:gray;" class="pb-2">
-                    @($"音乐{Model.Socres.MusicSocre}分,美术{Model.Socres.PaintSocre}分,剧本{Model.Socres.ScriptSocre}分,演出{Model.Socres.ShowSocre}分,程序{Model.Socres.SystemSocre}分"+(isDubbing? $",配音{Model.Socres.CVSocre}分" : ""))
+                    @($"音乐{Model.Socres.MusicSocre}分,美术{Model.Socres.PaintSocre}分,剧本{Model.Socres.ScriptSocre}分,演出{Model.Socres.ShowSocre}分,程序{Model.Socres.SystemSocre}分"+((isDubbing && Model.Socres.CVSocre > 0) ? $",配音{Model.Socres.CVSocre}分" : ""))
                 </div>
             }
 
             @if (string.IsNullOrWhiteSpace(Model.PlayImpressions) == false)
             {
-                <div style="word-break: break-all; white-space: break-spaces;">评语：@Model.PlayImpressions</div>
+                <div class=" a-font-color" style="word-break: break-all; white-space: break-spaces;">评语：@Model.PlayImpressions</div>
             }
         </MCardText>
 

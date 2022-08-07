@@ -5,6 +5,7 @@
 
 <div class=" ps-4 pe-4 pt-3 pb-3 mt-3 @(IsChild ? "comment-layout-child" : " bg-opacity") shadow-sm rounded " style="cursor:default">
     <div>
+
         <UserRankTextViewTip UserId="@Model.ApplicationUserId" UserName="@Model.UserName" Image="@Model.UserImage" Ranks="@Model.Ranks" Text="@Model.CommentTime.ToString("yyyy年M月d日 H:mm")"></UserRankTextViewTip>
         <div class="mt-2">
             <MarkdownViewTip IsNeedHighlight="true" Text="@(ReplyTip+Model.Text)"/>

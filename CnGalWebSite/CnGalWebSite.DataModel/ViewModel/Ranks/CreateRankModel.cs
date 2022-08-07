@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CnGalWebSite.DataModel.Model;
+using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Ranks
 {
     public class CreateRankModel
@@ -11,5 +12,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Ranks
         public string CSS { get; set; }
         [Display(Name = "Styles")]
         public string Styles { get; set; }
+        [Display(Name = "图片")]
+        public string Image { get; set; }
+        [Display(Name = "类型")]
+        public RankType Type { get; set; }
+
     }
 }

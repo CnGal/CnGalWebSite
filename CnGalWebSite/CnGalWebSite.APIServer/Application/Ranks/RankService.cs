@@ -93,7 +93,9 @@ namespace CnGalWebSite.APIServer.Application.Ranks
                     LastEditTime = item.LastEditTime,
                     Text = item.Text,
                     Priority = item.Priority,
-                    Count = item.RankUsers.Count
+                    Count = item.RankUsers.Count,
+                    Type=item.Type,
+                    Image=item.Image,
                 });
             }
 
@@ -369,6 +371,8 @@ namespace CnGalWebSite.APIServer.Application.Ranks
                     CSS = item.CSS,
                     Name = item.Name,
                     Text = item.Text,
+                    Image=item.Image,
+                    Type = item.Type,
                 };
                 model.Add(temp);
             }

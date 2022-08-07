@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+﻿using BlazorComponent;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.PlayedGames;
 using CnGalWebSite.APIServer.Application.SteamInfors;
@@ -481,6 +482,48 @@ namespace CnGalWebSite.APIServer.Controllers
             var dtos = await _playedGameService.GetPaginatedResult(input.Options, input.SearchModel);
 
             return dtos;
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<PlayedGameUserScoreRandomModel>>> GetRandomUserScoresAsync()
+        {
+            var games = await _playedGameRepository.GetAll().AsNoTracking()
+                .Include(s => s.ApplicationUser)
+                .Include(s => s.Entry).ThenInclude(s => s.Tags)
+                .OrderBy(x => EF.Functions.Random())
+                .Where(s => s.ShowPublicly && s.MusicSocre != 0 && s.PaintSocre != 0 && s.CVSocre != 0 && s.SystemSocre != 0 && s.ScriptSocre != 0 && s.TotalSocre != 0 && s.CVSocre != 0 && string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength)
+                .Take(50)
+                .ToListAsync();
+            var model = new List<PlayedGameUserScoreRandomModel>();
+            foreach (var item in games)
+            {
+
+                var temp = new PlayedGameUserScoreRandomModel
+                {
+                    Socres = new PlayedGameScoreModel
+                    {
+                        ScriptSocre = item.ScriptSocre,
+                        ShowSocre = item.ShowSocre,
+                        MusicSocre = item.MusicSocre,
+                        PaintSocre = item.PaintSocre,
+                        TotalSocre = item.TotalSocre,
+                        SystemSocre = item.SystemSocre,
+                        CVSocre = item.CVSocre,
+
+                    },
+                    LastEditTime = item.LastEditTime,
+                    PlayImpressions = item.PlayImpressions,
+                    User = await _userService.GetUserInforViewModel(item.ApplicationUser, true),
+                    GameId = item.Entry.Id,
+                    GameName = item.Entry.Name,
+                    IsDubbing = !(item.Entry.Tags != null && item.Entry.Tags.Any(s => s.Name == "无配音"))
+                };
+
+                model.Add(temp);
+            }
+
+            return model;
         }
 
     }

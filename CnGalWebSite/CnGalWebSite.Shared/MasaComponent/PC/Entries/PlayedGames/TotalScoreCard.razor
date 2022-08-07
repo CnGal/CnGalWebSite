@@ -132,7 +132,10 @@
         if (Model.IsDubbing == false)
         {
             series[0].Value.RemoveAt(1);
-            series[1].Value.RemoveAt(1);
+            if(series.Count>1)
+            {
+                series[1].Value.RemoveAt(1);
+            }
             if (series.Count > 2)
             {
                 series[2].Value.RemoveAt(1);

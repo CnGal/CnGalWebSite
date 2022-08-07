@@ -1,4 +1,5 @@
 ﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCatcheService
 
 <div>
 
@@ -10,27 +11,10 @@
 
         @if (HiddenTitle == false)
         {
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <h1 class="fw-bold text-center h3 mb-8" itemprop="headline">@Model.Name</h1>
-                <div itemprop="author" itemscope itemtype="http://schema.org/Person">
-                    <a href="@("/space/index/"+Model.UserInfor.Id)" style=" display: flex; flex-direction: column; align-items: center;" class="a-font-color mb-2" itemprop="url">
-                        <img src="@Model.UserInfor.PhotoPath" alt="@Model.UserInfor.Name" style="width:50px;border-radius:50%;" class="mb-2" itemprop="image" />
-                        <div class="d-flex" style=" align-items: center;">
-                            <span style="font-size: large; font-weight: bold; " itemprop="name">
-                                @Model.UserInfor.Name
-                            </span>
-                            @if (Model.UserInfor.Ranks != null)
-                            {
-                                @foreach (var item in Model.UserInfor.Ranks)
-                                {
-                                    <RankAloneViewTip Model="item" Class="ms-2"></RankAloneViewTip>
-                                }
-                            }
-                        </div>
-                    </a>
-                </div>
+            <div style="display: flex; flex-direction: column; ">
+                <h1 class="fw-bold  h3 mb-8" itemprop="headline">@Model.Name</h1>
 
-                <div style="color:gray;text-align: center;">
+                <div style="color:gray;" class="mb-8">
                     <i class="fa fa-calendar fa-fw "></i>
                     <span>@((Model.CreateTime.Year<1900?Model.LastEditTime: Model.CreateTime).ToString("yyyy-MM-dd"))</span>&nbsp;&nbsp;&nbsp;
                     <i class="fa fa-eye fa-fw "></i>
@@ -38,6 +22,40 @@
                     <i class="fa fa-thumbs-o-up fa-fw "></i>
                     <span>@(Model.ThumbsUpCount + "人点赞")&nbsp; &nbsp; &nbsp;</span>
                 </div>
+
+
+                <div itemprop="author" itemscope itemtype="http://schema.org/Person">
+                    <div style="display: flex; flex-wrap: wrap;">
+                        <a href="@("/space/index/"+Model.UserInfor.Id)" style=" display: flex; flex-direction: row; align-items: center;" class="a-font-color mb-2 me-4" itemprop="url">
+
+                            <img src="@Model.UserInfor.PhotoPath" alt="@Model.UserInfor.Name" style="width:50px;border-radius:50%;" itemprop="image" />
+                            <div style="display: flex; flex-direction: column;" class="ms-4">
+
+                                <div style=" display: flex; flex-wrap: wrap; ">
+                                    @if (Model.UserInfor.Ranks != null)
+                                    {
+                                        @foreach (var item in Model.UserInfor.Ranks)
+                                        {
+                                            <RankAloneViewTip Model="item" Class="me-2 mb-1"></RankAloneViewTip>
+                                        }
+                                    }
+                                </div>
+                                <span style="font-size: large; font-weight: bold; " itemprop="name">
+                                    @Model.UserInfor.Name
+                                </span>
+                            </div>
+                        </a>
+
+                        <BadgesViewCard Model="Model.UserInfor.Ranks" />
+
+                    </div>
+                      
+                      
+
+                </div>
+
+                <hr/>
+
             </div>
         }
 

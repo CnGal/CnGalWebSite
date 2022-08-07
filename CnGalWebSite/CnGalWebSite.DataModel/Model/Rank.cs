@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 namespace CnGalWebSite.DataModel.Model
 {
     public class Rank
@@ -14,9 +16,13 @@ namespace CnGalWebSite.DataModel.Model
 
         public string Styles { get; set; }
 
+        public string Image { get; set; }
+
         public bool IsHidden { get; set; } = false;
 
         public int Priority { get; set; } = 0;
+
+        public RankType Type { get; set; }
 
         public ICollection<RankUser> RankUsers { get; set; }
 
@@ -24,6 +30,16 @@ namespace CnGalWebSite.DataModel.Model
         public DateTime CreateTime { get; set; }
         public DateTime LastEditTime { get; set; }
     }
+
+    public enum RankType
+    {
+        [Display(Name = "头衔")]
+        Rank,
+        [Display(Name = "徽章")]
+        Badge,
+
+    }
+
 
     public class RankUser
     {

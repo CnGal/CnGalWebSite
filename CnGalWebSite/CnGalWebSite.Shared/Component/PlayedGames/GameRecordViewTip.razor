@@ -26,7 +26,11 @@
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.ScriptSocre" Lable="剧本" />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.ShowSocre" Lable="演出" />
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.SystemSocre" Lable="程序" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.CVSocre" Lable="配音" />
+                @if (Model.CVSocre > 0 && Model.IsDubbing)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.CVSocre" Lable="配音" />
+
+                }
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating Disable Value="Model.TotalSocre" Lable="总评" />
 
 

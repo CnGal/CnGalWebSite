@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 
 namespace CnGalWebSite.APIServer.Application.Lotteries
@@ -120,9 +119,9 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                 {
                     UserId = s.ApplicationUser.Id,
                     Name = s.ApplicationUser.UserName,
-                    Number = s.Number,
+                    s.Number,
                     LotteryUserId = s.Id,
-                    IsHidden = s.IsHidden,
+                    s.IsHidden,
                     OperationRecords = s.ApplicationUser.OperationRecords.Where(s => s.Type == OperationRecordType.Lottery && s.ObjectId == lotteryId.ToString())
                 })
                 .AsNoTracking();
@@ -170,8 +169,8 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                     UserId = item.UserId,
                     Name = item.Name,
                     Number = item.Number,
-                    LotteryUserId=item.LotteryUserId,
-                    IsHidden=item.IsHidden,
+                    LotteryUserId = item.LotteryUserId,
+                    IsHidden = item.IsHidden,
                     Cookie = item.OperationRecords.FirstOrDefault()?.Cookie,
                     Ip = item.OperationRecords.FirstOrDefault()?.Ip,
                 });
@@ -193,9 +192,9 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             {
                 var prize = await _lotteryPrizeRepository.FirstOrDefaultAsync(s => s.LotteryAwardId == award.Id && s.LotteryUserId == null);
                 prize.LotteryUserId = user.Id;
-                await _lotteryPrizeRepository.UpdateAsync(prize);
+                _ = await _lotteryPrizeRepository.UpdateAsync(prize);
             }
-            await _lotteryUserRepository.UpdateAsync(user);
+            _ = await _lotteryUserRepository.UpdateAsync(user);
 
             if (award.Integral != 0)
             {
@@ -217,7 +216,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
 
             foreach (var item in lottery.Awards)
             {
-                NotWinnningUser.RemoveAll(s => item.WinningUsers.Select(s => s.ApplicationUserId).ToList().Contains(s.ApplicationUserId));
+                _ = NotWinnningUser.RemoveAll(s => item.WinningUsers.Select(s => s.ApplicationUserId).ToList().Contains(s.ApplicationUserId));
             }
 
             foreach (var item in lottery.Awards)
@@ -227,15 +226,23 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                     return false;
                 }
 
-                if (item.Count > item.WinningUsers.Count)
+                while (true)
                 {
-                    var index = new Random().Next(0, NotWinnningUser.Count);
-                    var winnningUser = NotWinnningUser[index];
+                    if (item.Count > item.WinningUsers.Count)
+                    {
+                        var index = new Random().Next(0, NotWinnningUser.Count);
+                        var winnningUser = NotWinnningUser[index];
 
-                    item.WinningUsers.Add(winnningUser);
-                    NotWinnningUser.Remove(winnningUser);
+                        item.WinningUsers.Add(winnningUser);
+                        _ = NotWinnningUser.Remove(winnningUser);
 
-                    await SendPrizeToWinningUser(winnningUser, item);
+                        await SendPrizeToWinningUser(winnningUser, item);
+                    }
+                    else
+                    {
+                        break;
+                    }
+
                 }
             }
 
@@ -276,7 +283,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                 {
                     lottery = await _lotteryRepository.GetAll().FirstOrDefaultAsync(s => s.Id == item);
                     lottery.IsEnd = true;
-                    await _lotteryRepository.UpdateAsync(lottery);
+                    _ = await _lotteryRepository.UpdateAsync(lottery);
                 }
             }
         }
@@ -300,7 +307,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
 
             lottery.IsEnd = false;
 
-            await _lotteryRepository.UpdateAsync(lottery);
+            _ = await _lotteryRepository.UpdateAsync(lottery);
         }
     }
 }
