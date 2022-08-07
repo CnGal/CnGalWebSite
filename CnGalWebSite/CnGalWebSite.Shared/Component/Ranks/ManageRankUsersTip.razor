@@ -3,41 +3,38 @@
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
-<div class="">
-        <div class="mb-4" style="padding-right: 0;padding-left: 0;">
-            <div class=" rounded shadow-sm -lg p-4 bg-opacity">
-                <h3 class="fw-bold">@Title</h3>
-                <h5 class="text-truncate mb-4 fw-bold">@Subtitle</h5>
-                <hr />
-                <Table TItem="ListRankUserAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
-                       ShowExtendButtons="true" ExtendButtonColumnWidth="170" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-                       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-                    <TableToolbarTemplate>
-                        <TableToolbarButton TItem="ListUserRankAloneModel" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListUserRankAloneModel" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListRankUserAloneModel" Color="Color.Danger" Icon="fa fa-close" Text="删除" OnClickCallback="OnDeleteClick" IsAsync="true" />
-                    </TableToolbarTemplate>
-                    <TableColumns>
-                        <TableColumn @bind-Field="@context.UserId" Sortable="true"  Fixed="true" Width="300" />
-                        <TableColumn @bind-Field="@context.UserName" Searchable="true" Sortable="true" Width="200" TextWrap="true"/>
-                        <TableColumn @bind-Field="@context.Time" Sortable="true" Searchable="true" Width="150" FormatString="yyyy-MM-dd HH:mm" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc"/>
-                        <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
-                    </TableColumns>
-                    <RowButtonTemplate>
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookLink( context.UserId , context.UserName))" />
 
-                              <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" IsShow="context.IsHidden"
-                                               Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" />
-                   
-                              <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" IsShow="!context.IsHidden"
-                                               Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" />
-                        
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-trash" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new string[] { context.UserId },true))" />
-                    </RowButtonTemplate>
-                </Table>
-            </div>
-        </div>
-</div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-users" Title="@Title" Class="mb-4">
+    <Table TItem="ListRankUserAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="170" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableToolbarTemplate>
+            <TableToolbarButton TItem="ListRankUserAloneModel" Color="Color.Warning" Icon="fa fa-plus" Text="添加" OnClickCallback="@((IEnumerable<ListRankUserAloneModel> items)=> { return OnAddRankUser(); })" IsAsync="true" />
+            <TableToolbarButton TItem="ListRankUserAloneModel" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListRankUserAloneModel" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListRankUserAloneModel" Color="Color.Danger" Icon="fa fa-close" Text="删除" OnClickCallback="OnDeleteClick" IsAsync="true" />
+        </TableToolbarTemplate>
+        <TableColumns>
+            <TableColumn @bind-Field="@context.UserId" Sortable="true" Fixed="true" Width="300" />
+            <TableColumn @bind-Field="@context.UserName" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Time" Sortable="true" Searchable="true" Width="150" FormatString="yyyy-MM-dd HH:mm" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" />
+            <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookLink( context.UserId , context.UserName))" />
+
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" IsShow="context.IsHidden"
+                             Icon="fa fa-map-signs" Text="显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, false, true))" />
+
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" IsShow="!context.IsHidden"
+                             Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, true, true))" />
+
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-trash" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new string[] { context.UserId },true))" />
+        </RowButtonTemplate>
+    </Table>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+
 
 @code {
     [Parameter]
@@ -83,7 +80,7 @@
     private Task LookLink(string userId, string name)
     {
 
-        NavigationManager.NavigateTo(Provider,"/space/index/" + userId, name, "fa fa-star-o");
+        NavigationManager.NavigateTo(Provider, "/space/index/" + userId, name, "fa fa-star-o");
         return Task.CompletedTask;
     }
 
@@ -155,13 +152,13 @@
                 }
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, tempString + "失败");
         }
     }
 
-    private async Task OnHiddenClick(IEnumerable<ListUserRankAloneModel> items)
+    private async Task OnHiddenClick(IEnumerable<ListRankUserAloneModel> items)
     {
         if (items.Count() == 0)
         {
@@ -174,7 +171,7 @@
         await ToastService.Success("显示成功", "开启成功");
         await TableRows.QueryAsync();
     }
-    private async Task OnUnHiddenClick(IEnumerable<ListUserRankAloneModel> items)
+    private async Task OnUnHiddenClick(IEnumerable<ListRankUserAloneModel> items)
     {
         if (items.Count() == 0)
         {
@@ -188,5 +185,62 @@
         await TableRows.QueryAsync();
     }
 
+    [Inject]
+    [NotNull]
+    private DialogService? DialogService { get; set; }
+    public async Task OnAddRankUser()
+    {
+        AddUserRankModel model = new AddUserRankModel
+        {
+            RankId = Id
+        };
+        var items = Utility.GenerateEditorItems<AddUserRankModel>();
+        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
+        //item.Data = Foo.GenerateHobbys(Localizer);
 
+        var option = new EditDialogOption<AddUserRankModel>()
+        {
+            Title = "添加头衔用户",
+            Model = model,
+            Items = items,
+            OnCloseAsync = () =>
+            {
+                //Trace.Log("关闭按钮被点击");
+                return Task.CompletedTask;
+            },
+            OnEditAsync = async context =>
+            {
+                return await AddRankUser((AddUserRankModel)context.Model);
+            }
+        };
+
+        await DialogService.ShowEditDialog(option);
+    }
+
+    private async Task<bool> AddRankUser(AddUserRankModel model)
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<AddUserRankModel>(ToolHelper.WebApiPath + "api/ranks/AddUserRank", model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("添加头衔用户失败", obj.Error);
+                return false;
+            }
+            else
+            {
+                await ToastService.Success("添加头衔用户成功", "添加头衔用户成功");
+                await TableRows.QueryAsync();
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "添加头衔用户失败");
+            return false;
+        }
+
+    }
 }

@@ -1,0 +1,19 @@
+﻿@if (Model.Any(s => s.Type == RankType.Badge))
+{
+    <div class="@Class" style="@Styles">
+        @foreach (var item in Model.Where(s=>s.Type== RankType.Badge))
+        {
+            <img src="@item.Image" alt="@item.Text" style="width:50px;height:50px;" class="ms-2"/>
+        }
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public List<RankViewModel> Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public string Styles { get; set; }
+}

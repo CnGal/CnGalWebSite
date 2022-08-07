@@ -862,47 +862,10 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var items = _lotteryUserRepository.GetAll()
-                               .Include(s => s.ApplicationUser).ThenInclude(s => s.OperationRecords)
-                               .Where(s => s.LotteryId == 3)
-                               .Select(s => new
-                               {
-                                   UserId = s.ApplicationUser.Id,
-                                   Name = s.ApplicationUser.UserName,
-                                   Number = s.Number,
-                                   LotteryUserId = s.Id,
-                                   IsHidden = s.IsHidden,
-                                   OperationRecords = s.ApplicationUser.OperationRecords.Where(s => s.Type == OperationRecordType.Lottery && s.ObjectId == "3")
-                               })
-                               .AsNoTracking();
-
-                var resultItems = new List<ListLotteryUserAloneModel>();
-
-                foreach (var item in items.ToList())
-                {
-                    resultItems.Add(new ListLotteryUserAloneModel
-                    {
-                        UserId = item.UserId,
-                        Name = item.Name,
-                        Number = item.Number,
-                        LotteryUserId = item.LotteryUserId,
-                        IsHidden = item.IsHidden,
-                        Cookie = item.OperationRecords.FirstOrDefault()?.Cookie,
-                        Ip = item.OperationRecords.FirstOrDefault()?.Ip,
-                    });
-                }
-
-                foreach (var item in resultItems)
-                {
-                    if ((await _operationRecordRepository.GetAll().CountAsync(s => s.Type == OperationRecordType.Lottery && s.ObjectId == "3" && (s.Ip == item.Ip || s.Cookie == item.Cookie)))>1)
-                    {
-                        await _lotteryUserRepository.GetRangeUpdateTable().Where(s => s.Id == item.LotteryUserId).Set(s => s.IsHidden, b => true).ExecuteAsync();
-                    }
-                    else
-                    {
-                        await _lotteryUserRepository.GetRangeUpdateTable().Where(s => s.Id == item.LotteryUserId).Set(s => s.IsHidden, b => false).ExecuteAsync();
-                    }
-                }
+                var lottery = await _lotteryRepository.FirstOrDefaultAsync(s => s.Id == 4);
+                lottery.IsEnd = false;
+                await _lotteryRepository.UpdateAsync(lottery);
+                await _lotteryService.DrawAllLottery();
 
                 return new Result { Successful = true };
             }

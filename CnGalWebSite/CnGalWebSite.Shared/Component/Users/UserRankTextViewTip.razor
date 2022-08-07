@@ -1,52 +1,66 @@
 ﻿@inject HttpClient Http
 @inject ToastService? ToastService
+@inject IDataCacheService _dataCatcheService
 
-@if (IsRight)
-{
-    <div style="display: flex; justify-content: flex-end;">
+<div style="display: flex; justify-content: space-between;">
+    @if (IsRight)
+    {
+        <div style="display: flex; justify-content: flex-end;">
 
-        <div class="comment-tx-div">
-            <div style=" display: flex; flex-wrap: wrap; justify-content: flex-end;">
-                @if (Time != null)
-                {
-                    <div class="comment-username" style="color:gray;">@Time?.ToTimeFromNowString()</div>
-                }
-                <div class="comment-username a-font-color me-2 ms-2">@UserName</div>
-                @foreach (var item in Ranks)
-                {
-                    <RankAloneViewTip Model="item"></RankAloneViewTip>
-                }
+            <div class="comment-tx-div">
+                <div style=" display: flex; flex-wrap: wrap; justify-content: flex-end;">
+                    @if (Time != null)
+                    {
+                        <div class="comment-username" style="color:gray;">@Time?.ToTimeFromNowString()</div>
+                    }
+                    <div class="comment-username a-font-color me-2 ms-2">@UserName</div>
+                    @foreach (var item in Ranks)
+                    {
+                        <RankAloneViewTip Model="item"></RankAloneViewTip>
+                    }
+                </div>
+                <span class="me-2">@Text</span>
+
             </div>
-            <span class="me-2">@Text</span>
-
-        </div>
-        <a href="@("/space/index/"+UserId)" style="display: flex;align-items: center;">
-            <img class="shadow-sm" src="@Image" style="height: 50px;width: 50px;border-radius: 50%;" />
-        </a>
-    </div>
-}
-else
-{
-    <div style="display:flex;">
-        <a href="@("/space/index/"+UserId)" style="display: flex;align-items: center;">
-            <img class="shadow-sm" src="@Image" style="height: 50px;width: 50px;border-radius: 50%;" />
-        </a>
-        <div class="comment-tx-div">
-            <a href="@("/space/index/"+UserId)" class="new-row-warp no-margin">
-                @foreach (var item in Ranks)
-                {
-                    <RankAloneViewTip Model="item"></RankAloneViewTip>
-                }
-                <div class="comment-username a-font-color me-2">@UserName</div>
-                @if (Time != null)
-                {
-                    <div class="comment-username" style="color:gray;">@Time?.ToTimeFromNowString()</div>
-                }
+            <a href="@("/space/index/"+UserId)" style="display: flex;align-items: center;">
+                <img class="shadow-sm" src="@Image" style="height: 50px;width: 50px;border-radius: 50%;" />
             </a>
-            <span>@Text</span>
         </div>
-    </div>
+    }
+    else
+    {
+        <div style="display:flex;">
+            <a href="@("/space/index/"+UserId)" style="display: flex;align-items: center;">
+                <img class="shadow-sm" src="@Image" style="height: 50px;width: 50px;border-radius: 50%;" />
+            </a>
+            <div class="comment-tx-div">
+                <a href="@("/space/index/"+UserId)" class="new-row-warp no-margin">
+                    @foreach (var item in Ranks)
+                    {
+                        <RankAloneViewTip Model="item"></RankAloneViewTip>
+                    }
+                    <div class="comment-username a-font-color me-2">@UserName</div>
+                    @if (Time != null)
+                    {
+                        <div class="comment-username" style="color:gray;">@Time?.ToTimeFromNowString()</div>
+                    }
+                </a>
+                <span>@Text</span>
+            </div>
+        </div>
+    }
+    @if (_dataCatcheService.IsApp == false)
+    {
+        <BadgesViewCard Model="Ranks" />
+
+    }
+</div>
+@if (_dataCatcheService.IsApp)
+{
+    <BadgesViewCard Model="Ranks" Class="mt-4" Styles=" display: flex;justify-content: flex-end;"/>
+
 }
+
 
 
 

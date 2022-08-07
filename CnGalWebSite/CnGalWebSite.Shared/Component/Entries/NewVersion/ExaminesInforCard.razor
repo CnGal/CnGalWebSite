@@ -24,7 +24,7 @@
                                 <div style=" display: flex; flex-wrap: wrap; ">
                                     @foreach (var item in item.Ranks)
                                     {
-                                        <RankAloneViewTip Model="item"></RankAloneViewTip>
+                                        <RankAloneViewTip Model="item" ForceDisplayBadge></RankAloneViewTip>
                                     }
                                     <div class="comment-username a-font-color me-2">@item.UserName</div>
 
@@ -45,7 +45,7 @@
 
                                     @foreach (var item in item.Ranks)
                                     {
-                                        <RankAloneViewTip Model="item"></RankAloneViewTip>
+                                        <RankAloneViewTip Model="item" ForceDisplayBadge></RankAloneViewTip>
                                     }
                                 </div>
                                 <span class="me-2" style="text-align: end;">@item.Operation.GetDisplayName()</span>

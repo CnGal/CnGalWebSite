@@ -49,7 +49,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 CreateTime = DateTime.Now.ToCstTime(),
                 LastEditTime = DateTime.Now.ToCstTime(),
                 Name = model.Name,
-                Text = model.Text
+                Text = model.Text,
+                Type = model.Type,
+                Image = model.Image
             };
             await _rankRepository.InsertAsync(rank);
 
@@ -82,7 +84,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 Styles = rank.Styles,
                 Name = rank.Name,
                 Text = rank.Text,
-                Id = rank.Id
+                Id = rank.Id,
+                Type=rank.Type,
+                Image=rank.Image
             };
 
             return model;
@@ -108,6 +112,8 @@ namespace CnGalWebSite.APIServer.Controllers
             rank.CSS = model.CSS;
             rank.Styles = model.Styles;
             rank.Text = model.Text;
+            rank.Type = model.Type;
+            rank.Image = model.Image;
 
             await _rankRepository.UpdateAsync(rank);
 

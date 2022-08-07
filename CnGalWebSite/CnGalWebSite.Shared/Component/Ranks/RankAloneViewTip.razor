@@ -1,8 +1,14 @@
-﻿<span class="@($"comment-tag {Class} {Model.CSS}")" style="@Model.Styles">@Model.Text</span>
+﻿@if (Model.Type == RankType.Rank || ForceDisplayBadge)
+{
+    <span class="@($"comment-tag {Class} {Model.CSS}")" style="@Model.Styles">@Model.Text</span>
+
+}
 
 @code {
     [Parameter]
     public RankViewModel Model { get; set; }
+    [Parameter]
+    public bool ForceDisplayBadge { get; set; }
     [Parameter]
     public string Class { get; set; } = "me-2";
 }

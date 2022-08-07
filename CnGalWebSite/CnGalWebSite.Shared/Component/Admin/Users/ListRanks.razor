@@ -21,13 +21,15 @@
     </TableToolbarTemplate>
     <TableColumns>
         <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-        <TableColumn @bind-Field="@context.Name" Searchable="true" Sortable="true" Width="120" />
-        <TableColumn @bind-Field="@context.Text" Searchable="true" TextWrap="true" Width="120" />
-        <TableColumn @bind-Field="@context.Priority" Searchable="true" TextWrap="true" Width="120" />
-        <TableColumn @bind-Field="@context.Count" Searchable="true" TextWrap="true" Width="120" />
+        <TableColumn @bind-Field="@context.Name" TextWrap Searchable="true" Sortable Width="120" />
+        <TableColumn @bind-Field="@context.Text" TextWrap Searchable="true" Width="120" />
+        <TableColumn @bind-Field="@context.Type" Sortable TextWrap="true" Width="120" />
+        <TableColumn @bind-Field="@context.Priority" Sortable Searchable="true" TextWrap="true" Width="120" />
+        <TableColumn @bind-Field="@context.Count" Sortable Searchable="true" TextWrap="true" Width="120" />
 
         <TableColumn @bind-Field="@context.CSS" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
         <TableColumn @bind-Field="@context.Styles" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
+        <TableColumn @bind-Field="@context.Image" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
         <TableColumn @bind-Field="@context.CreateTime" Sortable="true" TextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
         <TableColumn @bind-Field="@context.LastEditTime" Sortable="true" TextWrap="true" Width="150" FormatString="yyyy-MM-dd HH:mm" />
         <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
@@ -53,7 +55,7 @@
 
     private ListRankAloneModel SearchModelUser { get; set; } = new ListRankAloneModel();
 
-    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    private IEnumerable<int> PageItems => new int[] { 20, 40, 80, 200, 5000 };
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
@@ -239,7 +241,7 @@
 
         var option = new EditDialogOption<CreateRankModel>()
         {
-            Title = "添加新用户",
+            Title = "添加新头衔",
             Model = model,
             Items = items,
             OnCloseAsync = () =>

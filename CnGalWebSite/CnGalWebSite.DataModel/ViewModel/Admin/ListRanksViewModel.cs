@@ -1,4 +1,5 @@
 ﻿
+using CnGalWebSite.DataModel.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -22,6 +23,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         public string Name { get; set; }
         [Display(Name = "显示文本")]
         public string Text { get; set; }
+        [Display(Name = "类型")]
+        public RankType Type { get; set; }
         [Display(Name = "优先级")]
         public int Priority { get; set; }
         [Display(Name = "人数")]
@@ -30,6 +33,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         public string CSS { get; set; }
         [Display(Name = "Styles")]
         public string Styles { get; set; }
+        [Display(Name = "图片")]
+        public string Image { get; set; }
         [Display(Name = "创建时间")]
         public DateTime CreateTime { get; set; }
         [Display(Name = "最后编辑时间")]

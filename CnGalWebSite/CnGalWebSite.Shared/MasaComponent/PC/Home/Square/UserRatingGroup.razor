@@ -1,0 +1,79 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="随机评价" Icon="fa fa-fw fa-random" Class="mb-4">
+
+    <ButtonContent>
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
+            <MIcon Left>mdi-refresh  </MIcon>
+            换一批
+        </MButton>
+    </ButtonContent>
+    <ChildContent>
+        <MSlideGroup ShowArrows="true">
+            <ChildContent>
+                @foreach (var item in _dataCacheService.RandomUserScoresCatche.Take(12))
+                {
+                    <MSlideItem>
+                        <MCard Width="350" Class="p-2" Outlined Style="border:0;background-color:transparent"
+                               OnClick="@context.Toggle"
+                               RefBack="@context.Ref">
+                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.UserScoreCard Model="item" GameName="@item.GameName" OnClick="@(()=>OnClickUser(item))" IsDubbing="item.IsDubbing" />
+                        </MCard>
+                    </MSlideItem>
+                }
+            </ChildContent>
+
+        </MSlideGroup>
+    </ChildContent>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+<CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.UserScoreDialog @ref="userScoreDialog" />
+@code {
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.UserScoreDialog userScoreDialog;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await Refresh();
+    }
+
+
+    public async Task Refresh()
+    {
+        try
+        {
+            if (_dataCacheService.RandomUserScoresCatche.Count == 0)
+            {
+                _dataCacheService.RandomUserScoresCatche = await Http.GetFromJsonAsync<List<PlayedGameUserScoreRandomModel>>(ToolHelper.WebApiPath + "api/playedgame/GetRandomUserScores");
+            }
+            _dataCacheService.RandomUserScoresCatche.Random();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取随机用户评分列表失败");
+        }
+    }
+
+    public Task OnClickMore()
+    {
+        _dataCacheService.RandomUserScoresCatche.Random();
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+
+    public async Task OnClickUser(PlayedGameUserScoreRandomModel model)
+    {
+        if (userScoreDialog != null)
+        {
+            await userScoreDialog.Refresh(true, model, model.GameName, model.GameId, model.IsDubbing);
+        }
+    }
+}
