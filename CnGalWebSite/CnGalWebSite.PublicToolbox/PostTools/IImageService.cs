@@ -8,6 +8,6 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 {
     public interface IImageService
     {
-        Task<string> GetImage(string url);
+        Task<string> GetImage(string url, double x = 0, double y = 0);
     }
 }
