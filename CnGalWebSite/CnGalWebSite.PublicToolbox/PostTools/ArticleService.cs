@@ -98,7 +98,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
         {
             if (string.IsNullOrWhiteSpace(model.Image) == false && model.IsCutImage == false)
             {
-                model.Image = await _imageService.UploadImageAsync(model.Image, 460, 215);
+                model.Image = await _imageService.GetImage(model.Image, 460, 215);
                 model.IsCutImage = model.Image.Contains("image.cngal");
                 if (model.IsCutImage)
                 {
