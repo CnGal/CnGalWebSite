@@ -218,7 +218,7 @@ namespace CnGalWebSite.APIServer.Application.Files
 
                 if (result["code"].ToObject<int>() == 200)
                 {
-                    return result["data"]["url"].ToObject<string>() + "?" + url;
+                    return result["data"]["url"].ToObject<string>().Replace("tucang.cc", _configuration["CustomTucangCCUrl"]) + "?" + url;
                 }
                 else
                 {

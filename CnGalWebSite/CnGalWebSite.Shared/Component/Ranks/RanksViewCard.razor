@@ -1,0 +1,32 @@
+﻿@if (Outline)
+{
+    @foreach (var item in Model)
+    {
+        <RankAloneViewTip Model="item" ForceDisplayBadge="ForceDisplayBadge" Class="mt-1 mb-1 me-2"></RankAloneViewTip>
+    }
+}
+else
+{
+    <div class="@((NoLeftPandding?"":"ps-2 ")+Class) " style="@("display: flex; flex-wrap: wrap;"+(Center?"justify-content: center;":""))">
+        @foreach (var item in Model)
+        {
+            <RankAloneViewTip Model="item" ForceDisplayBadge="ForceDisplayBadge" Class="mt-1 mb-1 me-2"></RankAloneViewTip>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<RankViewModel> Model { get; set; }
+    [Parameter]
+    public bool ForceDisplayBadge { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
+    [Parameter]
+    public bool Center { get; set; }
+    [Parameter]
+    public bool NoLeftPandding { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+}
