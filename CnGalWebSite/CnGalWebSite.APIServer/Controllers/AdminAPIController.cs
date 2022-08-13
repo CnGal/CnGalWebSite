@@ -21,12 +21,10 @@ using CnGalWebSite.APIServer.Application.WeiXin;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.APIServer.Model;
-using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
-using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Tables;
@@ -38,10 +36,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -107,6 +103,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IRepository<SteamInforTableModel, long> _steamInforTableModelRepository;
         private readonly IRepository<OperationRecord, long> _operationRecordRepository;
+        private readonly IRepository<RankUser, long> _rankUsersRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IChartService _chartService;
         private readonly ILogger<AdminAPIController> _logger;
@@ -123,7 +120,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, ILogger<AdminAPIController> logger,
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository,
-        IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository)
+        IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -183,6 +180,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _logger = logger;
             _steamInforTableModelRepository = steamInforTableModelRepository;
             _operationRecordRepository = operationRecordRepository;
+            _rankUsersRepository = rankUsersRepository;
         }
 
         /// <summary>
@@ -862,10 +860,81 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var lottery = await _lotteryRepository.FirstOrDefaultAsync(s => s.Id == 4);
-                lottery.IsEnd = false;
-                await _lotteryRepository.UpdateAsync(lottery);
-                await _lotteryService.DrawAllLottery();
+
+                await _articleRepository.GetRangeUpdateTable().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("tucang.cc")).Set(s => s.MainPicture, b => b.MainPicture.Replace("tucang.cc", _configuration["CustomTucangCCUrl"])).ExecuteAsync();
+
+
+                var rank = await _rankRepository.FirstOrDefaultAsync(s => s.Name == "2022评选者");
+
+                if (rank == null)
+                {
+                    rank = new Rank
+                    {
+                        Name = "2022评选者",
+                        CSS = "bg-warning",
+                        Image = "https://tucang.cngal.top/api/image/show/bee0269e7e73f8d09cca262c22184b99?https://image.cngal.org/images/2022/08/13/cfe4935efc70.png",
+                        Text = "2022评选者",
+                        Type= RankType.Badge
+                    };
+
+                    rank = await _rankRepository.InsertAsync(rank);
+                }
+
+                var rankId = rank.Id;
+
+                _rankRepository.Clear();
+
+                var entries = await _entryRepository.GetAll()
+                    .Include(s => s.Information)
+                    .Where(s => s.Information.Any(s => s.DisplayName == "发行时间" && string.IsNullOrWhiteSpace(s.DisplayValue) == false))
+                    .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game)
+                    .ToListAsync();
+                foreach (var item in entries)
+                {
+                    var timeStr = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间")?.DisplayValue;
+                    try
+                    {
+                        item.PubulishTime = DateTime.ParseExact(timeStr, "yyyy年M月d日", null);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            item.PubulishTime = DateTime.ParseExact(timeStr, "yyyy/M/d", null);
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+                    }
+
+                    await _entryRepository.UpdateAsync(item);
+                    _logger.LogInformation("修改游戏 - {Name}({Id}) 的发行时间为 {Time}", item.Name, item.Id, item.PubulishTime.ToString());
+                }
+
+
+                var before = new DateTime(2022, 5, 31);
+                var after = new DateTime(2021, 5, 31);
+
+                var users = await _userRepository.GetAll().AsNoTracking()
+                    .Include(s => s.PlayedGames).ThenInclude(s=>s.Entry)
+                    .Include(s=>s.UserRanks)
+                    .Where(s => s.PlayedGames
+                        .Where(s => s.Entry.PubulishTime != null && s.Entry.Id != 139 && s.Entry.Id != 3412 && s.Entry.Id != 3835 && s.Entry.IsHidden == false && s.Entry.PubulishTime.Value.Date <= before.Date && s.Entry.PubulishTime.Value.Date >= after.Date)
+                        .Where(s => s.ShowPublicly && s.MusicSocre != 0 && s.PaintSocre != 0 && s.CVSocre != 0 && s.SystemSocre != 0 && s.ScriptSocre != 0 && s.TotalSocre != 0 && string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength)
+                        .Any())
+                    .Where(s=>s.UserRanks.Any(s=>s.RankId==rankId)==false)
+                    .Select(s=>s.Id)
+                    .ToListAsync();
+
+                foreach(var item in users)
+                {
+                    await _rankUsersRepository.InsertAsync(new RankUser
+                    {
+                        ApplicationUserId = item,
+                        RankId = rankId,
+                    });
+                }
 
                 return new Result { Successful = true };
             }

@@ -228,7 +228,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var games = await _playedGameRepository.GetAll().AsNoTracking()
                 .Include(s => s.ApplicationUser)
                 .Include(s=>s.Entry).ThenInclude(s=>s.Tags)
-                .Where(s =>  s.Entry.PubulishTime != null && s.Entry.Id != 139 && s.Entry.Id != 3412 && s.Entry.Id != 3835 && s.IsHidden==false && s.Entry.PubulishTime.Value.Date <= before.Date && s.Entry.PubulishTime.Value.Date >= after.Date)
+                .Where(s =>  s.Entry.PubulishTime != null && s.Entry.Id != 139 && s.Entry.Id != 3412 && s.Entry.Id != 3835 && s.Entry.IsHidden==false && s.Entry.PubulishTime.Value.Date <= before.Date && s.Entry.PubulishTime.Value.Date >= after.Date)
                 .Where(s =>s.ShowPublicly && s.MusicSocre != 0 && s.PaintSocre != 0 && s.CVSocre != 0 && s.SystemSocre != 0 && s.ScriptSocre != 0 && s.TotalSocre != 0 && s.CVSocre != 0 && string.IsNullOrWhiteSpace(s.PlayImpressions)==false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength)
                 .ToListAsync();
             var model = new List<PlayedGameUserScoreRandomModel>();

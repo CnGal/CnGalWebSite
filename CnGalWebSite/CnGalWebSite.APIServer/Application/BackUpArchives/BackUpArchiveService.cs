@@ -233,6 +233,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
                 BackUpArchiveId = backUpArchive.Id
             });
         }
+
         public async Task UpdateSitemap()
         {
             var path = Path.Combine(_webHostEnvironment.WebRootPath, "site.txt");

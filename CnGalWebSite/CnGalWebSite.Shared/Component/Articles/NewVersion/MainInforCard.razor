@@ -31,15 +31,7 @@
                             <img src="@Model.UserInfor.PhotoPath" alt="@Model.UserInfor.Name" style="width:50px;border-radius:50%;" itemprop="image" />
                             <div style="display: flex; flex-direction: column;" class="ms-4">
 
-                                <div style=" display: flex; flex-wrap: wrap; ">
-                                    @if (Model.UserInfor.Ranks != null)
-                                    {
-                                        @foreach (var item in Model.UserInfor.Ranks)
-                                        {
-                                            <RankAloneViewTip Model="item" Class="me-2 mb-1"></RankAloneViewTip>
-                                        }
-                                    }
-                                </div>
+                                <RanksViewCard Model="Model.UserInfor.Ranks" NoLeftPandding/>
                                 <span style="font-size: large; font-weight: bold; " itemprop="name">
                                     @Model.UserInfor.Name
                                 </span>

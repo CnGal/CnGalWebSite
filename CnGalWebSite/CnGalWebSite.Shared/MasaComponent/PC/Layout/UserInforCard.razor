@@ -5,13 +5,14 @@
     <div class="d-flex" style="align-items: center; flex-direction: column; ">
         <img src="@Model.PhotoPath" alt="@Model.Name" style="width:60px;border-radius:50%;" />
         <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
-            <span class="h6 fw-bold">@Model.Name</span>
-            <span>
+            <span class="h6 fw-bold mb-1">@Model.Name</span>
+          <RanksViewCard Model="Model.Ranks" ForceDisplayBadge Center/>
+            @*<span>
                 <i class="fa fa-diamond fa-fw"></i>
                 <span>积分：@Model.Integral</span>
                 <i class="fa fa-magic fa-fw ms-3"></i>
                 <span>Lv @ToolHelper.GetUserLevel(Model.Integral)</span>
-            </span>
+            </span>*@
         </div>
     </div>
     <MDivider Class="w-100"></MDivider>

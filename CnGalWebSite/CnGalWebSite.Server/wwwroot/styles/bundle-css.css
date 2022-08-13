@@ -369,6 +369,7 @@
 .new-row-warp {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
 }
 .real-time-p{
     color:gray;

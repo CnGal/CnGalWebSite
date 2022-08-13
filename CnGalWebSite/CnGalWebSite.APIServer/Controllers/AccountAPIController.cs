@@ -113,7 +113,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     RegistTime = DateTime.Now.ToCstTime(),
                     LastChangePasswordTime= DateTime.Now.ToCstTime(),
                     LastOnlineTime= DateTime.Now.ToCstTime(),
-                    Birthday = null
+                    Birthday = null,
+                    IsShowGameRecord = true
                 };
                 result = await _userManager.CreateAsync(user, model.Password);
                 try

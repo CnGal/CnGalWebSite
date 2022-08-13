@@ -5,7 +5,7 @@
 <div style="display: flex; justify-content: space-between;">
     @if (IsRight)
     {
-        <div style="display: flex; justify-content: flex-end;">
+        <div style="display: flex; justify-content: flex-end; align-items: center; ">
 
             <div class="comment-tx-div">
                 <div style=" display: flex; flex-wrap: wrap; justify-content: flex-end;">
@@ -14,10 +14,7 @@
                         <div class="comment-username" style="color:gray;">@Time?.ToTimeFromNowString()</div>
                     }
                     <div class="comment-username a-font-color me-2 ms-2">@UserName</div>
-                    @foreach (var item in Ranks)
-                    {
-                        <RankAloneViewTip Model="item"></RankAloneViewTip>
-                    }
+                    <RanksViewCard Model="Ranks" Outline/>
                 </div>
                 <span class="me-2">@Text</span>
 
@@ -29,16 +26,13 @@
     }
     else
     {
-        <div style="display:flex;">
+        <div style="display: flex; align-items: center;">
             <a href="@("/space/index/"+UserId)" style="display: flex;align-items: center;">
                 <img class="shadow-sm" src="@Image" style="height: 50px;width: 50px;border-radius: 50%;" />
             </a>
             <div class="comment-tx-div">
                 <a href="@("/space/index/"+UserId)" class="new-row-warp no-margin">
-                    @foreach (var item in Ranks)
-                    {
-                        <RankAloneViewTip Model="item"></RankAloneViewTip>
-                    }
+                    <RanksViewCard Model="Ranks" Outline/>
                     <div class="comment-username a-font-color me-2">@UserName</div>
                     @if (Time != null)
                     {

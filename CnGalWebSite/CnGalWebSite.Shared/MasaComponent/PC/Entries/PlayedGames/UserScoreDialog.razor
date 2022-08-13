@@ -10,18 +10,13 @@
 
         <MCardText Class="pt-6">
             <div style="display: flex; justify-content: space-between;">
-                <div class="d-flex mb-2" @onclick="@(()=>OnNav("/space/index/"+@Model.User.Id))">
+                <a class="d-flex mb-2 a-font-color" style=" align-items: center;" href="@("/space/index/"+@Model.User.Id)">
                     <img loading="lazy" class="shadow-sm" src="@Model.User.PhotoPath" style="height: 50px;width: 50px;border-radius: 50%;" />
                     <div class="comment-tx-div">
-                        <div class="new-row-warp no-margin">
-                            @foreach (var item in Model.User.Ranks)
-                            {
-                                <RankAloneViewTip Model="item"></RankAloneViewTip>
-                            }
-                        </div>
+                        <RanksViewCard  Model="Model.User.Ranks" NoLeftPandding/>
                         <div class="a-font-color text-truncate-1">@Model.User.Name</div>
                     </div>
-                </div>
+                </a>
                 <BadgesViewCard Model="Model.User.Ranks" />
             </div>
 

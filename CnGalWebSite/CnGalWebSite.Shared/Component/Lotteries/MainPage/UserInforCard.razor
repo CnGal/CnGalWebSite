@@ -5,10 +5,7 @@
         </div>
         <div class="comment-tx-div" style=" justify-content: center;">
             <div class="new-row-warp no-margin">
-                @foreach (var item in Model.Ranks)
-                {
-                    <RankAloneViewTip Model="item"></RankAloneViewTip>
-                }
+                <RanksViewCard Model="Model.Ranks" Outline/>
                 <div class="comment-username a-font-color me-2">@Model.UserName</div>
             </div>
             <div class="comment-time text-truncate-2" style="color: gray;">@Model.PersonalSignature</div>

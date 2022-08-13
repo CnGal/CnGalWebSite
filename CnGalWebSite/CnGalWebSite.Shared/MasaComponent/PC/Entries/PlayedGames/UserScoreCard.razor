@@ -3,15 +3,10 @@
 <div class="@((Outline?"":" rounded bg-opacity h-100 p-4 ")+(Clickable?"div-shadow":"shadow-sm"))" style="display: flex; flex-direction: column; justify-content: space-between;" @onclick="OnClick"
      itemprop="review" itemscope itemtype="https://schema.org/Review">
     <div>
-        <div class="d-flex mb-2">
+        <div class="d-flex mb-2" style=" align-items: center;">
             <img loading="lazy" class="shadow-sm" src="@Model.User.PhotoPath" style="height: 50px;width: 50px;border-radius: 50%;" />
             <div class="comment-tx-div">
-                <div class="new-row-warp no-margin">
-                    @foreach (var item in Model.User.Ranks)
-                    {
-                        <RankAloneViewTip Model="item"></RankAloneViewTip>
-                    }
-                </div>
+                <RanksViewCard  Model="Model.User.Ranks" ForceDisplayBadge NoLeftPandding/>
 
 
                 <div class="a-font-color text-truncate-1" itemprop="author" itemscope itemtype="http://schema.org/Person">

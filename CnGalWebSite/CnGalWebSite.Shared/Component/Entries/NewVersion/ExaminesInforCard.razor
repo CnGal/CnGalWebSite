@@ -21,11 +21,8 @@
                         @if (Model.IndexOf(item) % 2 == 0 || (_dataCacheService.IsApp || Model.Count < 3))
                         {
                             <div class="comment-tx-div">
-                                <div style=" display: flex; flex-wrap: wrap; ">
-                                    @foreach (var item in item.Ranks)
-                                    {
-                                        <RankAloneViewTip Model="item" ForceDisplayBadge></RankAloneViewTip>
-                                    }
+                                <div style=" display: flex; flex-wrap: wrap; align-items: center; ">
+                                   <RanksViewCard Model="item.Ranks" Outline ForceDisplayBadge/>
                                     <div class="comment-username a-font-color me-2">@item.UserName</div>
 
                                     <div class="comment-username" style="color:gray;">@item.ApplyTime.ToTimeFromNowString()</div>
@@ -38,15 +35,12 @@
                         else
                         {
                             <div class="comment-tx-div">
-                                <div style=" display: flex; flex-wrap: wrap; justify-content: flex-end;">
+                                <div style=" display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center;">
                                     <div class="comment-username" style="color:gray;">@item.ApplyTime.ToTimeFromNowString()</div>
 
                                     <div class="comment-username a-font-color me-2 ms-2">@item.UserName</div>
 
-                                    @foreach (var item in item.Ranks)
-                                    {
-                                        <RankAloneViewTip Model="item" ForceDisplayBadge></RankAloneViewTip>
-                                    }
+                                    <RanksViewCard Model="item.Ranks" Outline ForceDisplayBadge />
                                 </div>
                                 <span class="me-2" style="text-align: end;">@item.Operation.GetDisplayName()</span>
 
