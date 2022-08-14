@@ -54,7 +54,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
             _lotteryRepository = lotteryRepository;
         }
 
-        public async Task<List<CommentViewModel>> GetComments( CommentType type, string Id, string rankName, string ascriptionUserId,List<Comment> examineComments)
+        public async Task<List<CommentViewModel>> GetComments( CommentType type, string Id, string rankName, string ascriptionUserId,IEnumerable<Comment> examineComments)
         {
             //筛选出符合类型的所有评论
 
@@ -71,18 +71,23 @@ namespace CnGalWebSite.APIServer.Application.Comments
             {
                 case CommentType.CommentArticle:
                     query = query.Where(s => s.Type == type && s.ArticleId == tempId);
+                    examineComments = examineComments.Where(s => s.ParentCodeNavigation != null|| s.ArticleId == tempId);
                     break;
                 case CommentType.CommentEntries:
                     query = query.Where(s => s.Type == type && s.EntryId == tempId);
+                    examineComments = examineComments.Where(s => s.ParentCodeNavigation != null || s.EntryId == tempId);
                     break;
                 case CommentType.CommentPeriphery:
                     query = query.Where(s => s.Type == type && s.PeripheryId == tempId);
+                    examineComments = examineComments.Where(s => s.ParentCodeNavigation != null || s.PeripheryId == tempId);
                     break;
                 case CommentType.CommentVote:
                     query = query.Where(s => s.Type == type && s.VoteId == tempId);
+                    examineComments = examineComments.Where(s => s.ParentCodeNavigation != null || s.VoteId == tempId);
                     break;
                 case CommentType.CommentLottery:
                     query = query.Where(s => s.Type == type && s.LotteryId == tempId);
+                    examineComments = examineComments.Where(s => s.ParentCodeNavigation != null || s.LotteryId == tempId);
                     break;
                 case CommentType.CommentUser:
                     //
@@ -90,6 +95,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     if (userSpace != null)
                     {
                         query = query.Where(s => s.Type == type && s.UserSpaceCommentManagerId == userSpace.Id);
+                        examineComments = examineComments.Where(s => s.UserSpaceCommentManagerId == userSpace.Id);
                     }
                     else
                     {
@@ -109,8 +115,6 @@ namespace CnGalWebSite.APIServer.Application.Comments
             var tempQuery = await query.ToListAsync();
             //加载预览评论
             tempQuery.AddRange(examineComments.Where(s => s.ParentCodeNavigation == null));
-            //删除已加载的预览评论
-            examineComments.RemoveAll(s => s.ParentCodeNavigation == null);
 
             var models = new List<CommentViewModel>();
             foreach (var item in tempQuery)
@@ -128,7 +132,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
         /// <param name="ascriptionUserId">归属者Id</param>
         /// <param name="examineComments"></param>
         /// <returns></returns>
-        private async Task<CommentViewModel> CombinationDataAsync(Comment comment, string rankName, string ascriptionUserId, List<Comment> examineComments)
+        private async Task<CommentViewModel> CombinationDataAsync(Comment comment, string rankName, string ascriptionUserId, IEnumerable<Comment> examineComments)
         {
 
             var model = new CommentViewModel
@@ -177,7 +181,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
             }
         
             //递归初始化预览评论
-            foreach (var item in examineComments.Where(s => s.ParentCodeNavigation.Id == comment.Id))
+            foreach (var item in examineComments.Where(s =>s.ParentCodeNavigation!=null&& s.ParentCodeNavigation.Id == comment.Id))
             {
                 model.InverseParentCodeNavigation.Add(await CombinationDataAsync(item, rankName, ascriptionUserId, examineComments));
             }
