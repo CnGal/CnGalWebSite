@@ -860,81 +860,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-
-                await _articleRepository.GetRangeUpdateTable().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("tucang.cc")).Set(s => s.MainPicture, b => b.MainPicture.Replace("tucang.cc", _configuration["CustomTucangCCUrl"])).ExecuteAsync();
-
-
-                var rank = await _rankRepository.FirstOrDefaultAsync(s => s.Name == "2022评选者");
-
-                if (rank == null)
-                {
-                    rank = new Rank
-                    {
-                        Name = "2022评选者",
-                        CSS = "bg-warning",
-                        Image = "https://tucang.cngal.top/api/image/show/bee0269e7e73f8d09cca262c22184b99?https://image.cngal.org/images/2022/08/13/cfe4935efc70.png",
-                        Text = "2022评选者",
-                        Type= RankType.Badge
-                    };
-
-                    rank = await _rankRepository.InsertAsync(rank);
-                }
-
-                var rankId = rank.Id;
-
-                _rankRepository.Clear();
-
-                var entries = await _entryRepository.GetAll()
-                    .Include(s => s.Information)
-                    .Where(s => s.Information.Any(s => s.DisplayName == "发行时间" && string.IsNullOrWhiteSpace(s.DisplayValue) == false))
-                    .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game)
-                    .ToListAsync();
-                foreach (var item in entries)
-                {
-                    var timeStr = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间")?.DisplayValue;
-                    try
-                    {
-                        item.PubulishTime = DateTime.ParseExact(timeStr, "yyyy年M月d日", null);
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            item.PubulishTime = DateTime.ParseExact(timeStr, "yyyy/M/d", null);
-                        }
-                        catch
-                        {
-                            continue;
-                        }
-                    }
-
-                    await _entryRepository.UpdateAsync(item);
-                    _logger.LogInformation("修改游戏 - {Name}({Id}) 的发行时间为 {Time}", item.Name, item.Id, item.PubulishTime.ToString());
-                }
-
-
-                var before = new DateTime(2022, 5, 31);
-                var after = new DateTime(2021, 5, 31);
-
-                var users = await _userRepository.GetAll().AsNoTracking()
-                    .Include(s => s.PlayedGames).ThenInclude(s=>s.Entry)
-                    .Include(s=>s.UserRanks)
-                    .Where(s => s.PlayedGames
-                        .Where(s => s.Entry.PubulishTime != null && s.Entry.Id != 139 && s.Entry.Id != 3412 && s.Entry.Id != 3835 && s.Entry.IsHidden == false && s.Entry.PubulishTime.Value.Date <= before.Date && s.Entry.PubulishTime.Value.Date >= after.Date)
-                        .Where(s => s.ShowPublicly && s.MusicSocre != 0 && s.PaintSocre != 0 && s.CVSocre != 0 && s.SystemSocre != 0 && s.ScriptSocre != 0 && s.TotalSocre != 0 && string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength)
-                        .Any())
-                    .Where(s=>s.UserRanks.Any(s=>s.RankId==rankId)==false)
-                    .Select(s=>s.Id)
-                    .ToListAsync();
-
-                foreach(var item in users)
-                {
-                    await _rankUsersRepository.InsertAsync(new RankUser
-                    {
-                        ApplicationUserId = item,
-                        RankId = rankId,
-                    });
-                }
+                DateTime time = DateTime.Now.ToCstTime();
+                await _rankUsersRepository.GetRangeUpdateTable().Where(s => s.Id==14).Set(s => s.Time, b => time).ExecuteAsync();
 
                 return new Result { Successful = true };
             }
