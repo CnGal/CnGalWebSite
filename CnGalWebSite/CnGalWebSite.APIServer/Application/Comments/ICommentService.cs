@@ -12,7 +12,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
 {
     public interface ICommentService
     {
-        Task<List<CommentViewModel>> GetComments(CommentType type, string Id, string rankName, string ascriptionUserId, List<Comment> examineComments);
+        Task<List<CommentViewModel>> GetComments(CommentType type, string Id, string rankName, string ascriptionUserId, IEnumerable<Comment> examineComments);
 
         Task<QueryData<ListCommentAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListCommentAloneModel searchModel, CommentType type = CommentType.None, string objectId = "");
 
