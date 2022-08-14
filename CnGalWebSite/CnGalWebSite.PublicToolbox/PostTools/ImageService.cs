@@ -60,7 +60,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             var image = _imageRepository.GetAll().FirstOrDefault(s => s.OldUrl == url && s.X == x && s.Y == y);
             if (image == null)
             {
-                var newUrl = await UploadImageAsync(url);
+                var newUrl = await UploadImageAsync(url,x,y);
                 _ = await _imageRepository.InsertAsync(new OriginalImageToDrawingBedUrl
                 {
                     NewUrl = newUrl,
