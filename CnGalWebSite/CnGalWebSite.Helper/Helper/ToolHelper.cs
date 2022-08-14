@@ -1129,7 +1129,7 @@ namespace CnGalWebSite.DataModel.Helper
                 else
                 {
                     image = "default/" + defaultStr;
-                    return "https://app.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
+                    return "https://res.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
                 }
 
             }
@@ -1154,7 +1154,7 @@ namespace CnGalWebSite.DataModel.Helper
                 {
                     //http://localhost:51313/
                     //121.43.54.210
-                    return "https://app.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
+                    return "https://res.cngal.org/_content/CnGalWebSite.Shared/images/" + image;
                 }
             }
         }
