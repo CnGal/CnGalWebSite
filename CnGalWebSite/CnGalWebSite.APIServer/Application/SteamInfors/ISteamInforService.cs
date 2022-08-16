@@ -37,5 +37,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         Task<List<SteamUserInfor>> GetSteamUserInfors(List<string> steamids);
 
         Task<SteamInfor> GetSteamInforAsync(int steamId, int entryId = 0);
+
+        Task BatchUpdateGameSteamInfor(int count);
     }
 }
