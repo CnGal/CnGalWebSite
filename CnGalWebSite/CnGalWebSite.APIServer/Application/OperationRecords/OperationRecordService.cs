@@ -151,7 +151,8 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
                 ip = context.Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             }
 
-            if (ip == _configuration["InternalIp"])
+            //判断是否本地调用
+            if (ip == _configuration["InternalIp"]||ip.Contains("192.168"))
             {
                 ip = userIp ?? "";
             }
