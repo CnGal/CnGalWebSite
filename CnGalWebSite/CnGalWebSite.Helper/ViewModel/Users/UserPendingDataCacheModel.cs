@@ -12,7 +12,7 @@ namespace CnGalWebSite.Helper.ViewModel.Users
     {
         public StringNumber TabIndex { get; set; } = 1;
 
-        public int MaxCount { get; set; } = 10;
+        public int MaxCount { get; set; } = 12;
 
         public int TotalPages => ((Items.Count - 1) / MaxCount) + 1;
 

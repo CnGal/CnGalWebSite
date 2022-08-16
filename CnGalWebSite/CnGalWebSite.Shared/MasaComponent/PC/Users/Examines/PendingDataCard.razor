@@ -50,11 +50,10 @@
         {
             if (_dataCacheService.UserPendingDataCatche.Items.Any() == false)
             {
-                _dataCacheService.UserPendingDataCatche.Items = await Http.GetFromJsonAsync<List<UserPendingDataModel>>(ToolHelper.WebApiPath + "api/space/GetUserPendingData");
-                _dataCacheService.UserPendingDataCatche.Items = _dataCacheService.UserPendingDataCatche.Items.OrderByDescending(s => s.DisplayMode).ToList();
+                _dataCacheService.UserPendingDataCatche.Items =( await Http.GetFromJsonAsync<List<UserPendingDataModel>>(ToolHelper.WebApiPath + "api/space/GetUserPendingData")).OrderByDescending(s => s.DisplayMode).ToList();
             }
 
-            OnPageClick(1);
+            await OnPageClick(1);
 
             StateHasChanged();
         }
@@ -66,8 +65,8 @@
 
     private Task OnPageClick(int pageIndex)
     {
-        _dataCacheService.NewsSummaryCache.CurrentPage = pageIndex;
-        Model = _dataCacheService.UserPendingDataCatche.Items.Skip((_dataCacheService.UserPendingDataCatche.CurrentPage - 1) * _dataCacheService.UserPendingDataCatche.MaxCount).Take(_dataCacheService.UserPendingDataCatche.MaxCount).ToList();
+        _dataCacheService.UserPendingDataCatche.CurrentPage = pageIndex;
+        Model = _dataCacheService.UserPendingDataCatche.Items.OrderByDescending(s => s.DisplayMode).Skip((_dataCacheService.UserPendingDataCatche.CurrentPage - 1) * _dataCacheService.UserPendingDataCatche.MaxCount).Take(_dataCacheService.UserPendingDataCatche.MaxCount).ToList();
 
         StateHasChanged();
         return Task.CompletedTask;
