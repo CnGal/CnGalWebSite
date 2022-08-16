@@ -1,9 +1,11 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+﻿using CnGalWebSite.APIServer.Controllers;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -22,9 +24,10 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         private readonly IRepository<SteamUserInfor, long> _steamUserInforRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly ILogger<SteamInforService> _logger;
 
         public SteamInforService(IRepository<SteamInfor, long> steamInforRepository, IRepository<ApplicationUser, string> userRepository, IRepository<Entry, int> entryRepository,
-        IConfiguration configuration, IRepository<PlayedGame, long> playedGameRepository, IRepository<SteamUserInfor, long> steamUserInforRepository,
+        IConfiguration configuration, IRepository<PlayedGame, long> playedGameRepository, IRepository<SteamUserInfor, long> steamUserInforRepository, ILogger<SteamInforService> logger,
         IHttpClientFactory clientFactory)
         {
             _steamInforRepository = steamInforRepository;
@@ -34,6 +37,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             _clientFactory = clientFactory;
             _steamUserInforRepository = steamUserInforRepository;
             _entryRepository = entryRepository;
+            _logger = logger;
         }
 
         public async Task<SteamInfor> GetSteamInforAsync(int steamId, int entryId = 0)
@@ -54,7 +58,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
 
             steamInfor = await UpdateSteamInfor(steamId, entryId);
-            return steamInfor == null ? null : steamInfor;
+            return steamInfor ?? null;
         }
 
         public async Task UpdateAllGameSteamInfor()
@@ -67,6 +71,25 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
 
         }
+
+        public async Task BatchUpdateGameSteamInfor(int count)
+        {
+            var date = DateTime.Now.ToCstTime().Date;
+
+            var steams = await _steamInforRepository.GetAll().AsNoTracking()
+                .Where(s => s.UpdateTime.Date < date)
+                .OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.EntryId)
+                .Select(s => s.SteamId)
+                .Take(count)
+                .ToListAsync();
+
+            foreach (var item in steams)
+            {
+                _ = await UpdateSteamInfor(item, 0);
+            }
+
+        }
+
 
         public async Task UpdateAllUserSteamInfor()
         {
@@ -255,7 +278,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 steam.PriceNowString = "¥ 0.00";
             }
 
-
+            
             //获取评测
             if (steam.PriceNow >= 0)
             {
@@ -271,14 +294,13 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 }
             }
 
+            //最后更新时间
+            steam.UpdateTime = DateTime.Now.ToCstTime();
 
-            if (steam.Id == 0)
+            if (steam.EntryId != 0)
             {
-                _ = await _steamInforRepository.InsertAsync(steam);
-            }
-            else
-            {
-                _ = await _steamInforRepository.UpdateAsync(steam);
+                _ = steam.Id == 0 ? await _steamInforRepository.InsertAsync(steam) : await _steamInforRepository.UpdateAsync(steam);
+                _logger.LogInformation("更新 Id:{SteamId} 的Steam信息，关联词条Id:{EntryId}", steam.SteamId, steam.EntryId);
             }
 
             return steam;
@@ -408,14 +430,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             user.Name = player.personaname;
             user.Image = player.avatarfull.Replace("steamcdn-a.akamaihd.net", "cdn.cloudflare.steamstatic.com");
 
-            if (user.Id == 0)
-            {
-                _ = await _steamUserInforRepository.InsertAsync(user);
-            }
-            else
-            {
-                _ = await _steamUserInforRepository.UpdateAsync(user);
-            }
+            _ = user.Id == 0 ? await _steamUserInforRepository.InsertAsync(user) : await _steamUserInforRepository.UpdateAsync(user);
             return user;
         }
 

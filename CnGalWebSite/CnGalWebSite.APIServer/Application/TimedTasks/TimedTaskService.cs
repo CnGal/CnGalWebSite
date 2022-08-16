@@ -148,13 +148,22 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                 switch (item.Type)
                 {
                     case TimedTaskType.UpdateGameSteamInfor:
-                        await _steamInforService.UpdateAllGameSteamInfor();
+                        var maxNum = 20;
+                        try
+                        {
+                            if (string.IsNullOrWhiteSpace(item.Parameter) == false)
+                            {
+                                maxNum = int.Parse(item.Parameter);
+                            }
+                        }
+                        catch { }
+                        await _steamInforService.BatchUpdateGameSteamInfor(maxNum);
                         break;
                     case TimedTaskType.UpdateUserSteamInfor:
                         await _steamInforService.UpdateAllUserSteamInfor();
                         break;
                     case TimedTaskType.BackupEntry:
-                        var maxNum = 10;
+                        maxNum = 10;
                         try
                         {
                             if (string.IsNullOrWhiteSpace(item.Parameter) == false)

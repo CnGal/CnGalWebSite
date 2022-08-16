@@ -15,6 +15,7 @@ using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Search;
+using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Votes;
 using CnGalWebSite.APIServer.Application.WeiXin;
@@ -107,6 +108,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IChartService _chartService;
         private readonly ILogger<AdminAPIController> _logger;
+        private readonly ISteamInforService _steamInforService;
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
@@ -114,7 +116,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IWebHostEnvironment webHostEnvironment,
         UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
-        IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService,
+        IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService, ISteamInforService steamInforService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService, IRepository<Periphery, long> peripheryRepository,
         IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IPeripheryService peripheryService, IRepository<GameNews, long> gameNewsRepository, IRepository<SteamInforTableModel, long> steamInforTableModelRepository,
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
@@ -181,6 +183,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _steamInforTableModelRepository = steamInforTableModelRepository;
             _operationRecordRepository = operationRecordRepository;
             _rankUsersRepository = rankUsersRepository;
+            _steamInforService = steamInforService;
         }
 
         /// <summary>
@@ -860,11 +863,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                DateTime time = DateTime.Now.ToCstTime();
-                await _rankUsersRepository.GetRangeUpdateTable().Where(s => s.Id==14).Set(s => s.Time, b => time).ExecuteAsync();
-
-                await _entryRepository.GetRangeUpdateTable().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("tucang.cc")).Set(s => s.MainPicture, b => b.MainPicture.Replace("tucang.cc", _configuration["CustomTucangCCUrl"])).ExecuteAsync();
-
+                await _steamInforService.UpdateSteamInfor(2001090, 3911);
                 return new Result { Successful = true };
             }
             catch (Exception ex)

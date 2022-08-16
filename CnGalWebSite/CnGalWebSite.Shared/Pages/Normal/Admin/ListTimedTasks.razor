@@ -340,6 +340,12 @@
         var model = Utility.GenerateEditorItems<ListTimedTaskAloneModel>();
         // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
         //item.Data = Foo.GenerateHobbys(Localizer);
+        var editors = model.Where(s => s.PropertyType == typeof(DateTime) || s.PropertyType == typeof(DateTime?));
+        foreach (var temp in editors)
+        {
+            temp.ComponentParameters = new List<KeyValuePair<string, object>> { new KeyValuePair<string, object>("ViewMode", DatePickerViewMode.DateTime) };
+        }
+
         var option = new EditDialogOption<ListTimedTaskAloneModel>()
         {
             Title = item.Id == 0 ? "添加定时任务" : "编辑定时任务",
