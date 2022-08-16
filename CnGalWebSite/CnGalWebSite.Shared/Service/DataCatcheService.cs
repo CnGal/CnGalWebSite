@@ -27,6 +27,7 @@ using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.Extensions;
 using CnGalWebSite.Helper.ViewModel.Articles;
 using CnGalWebSite.Helper.ViewModel.Comments;
+using CnGalWebSite.Helper.ViewModel.Users;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -205,6 +206,13 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public IPageModelCatche<List<EntryInforTipViewModel>> PublishGameTimesDataCatche { get; set; }
 
+        /// <summary>
+        /// 用户待审核对象列表缓存
+        /// </summary>
+        public UserPendingDataCacheModel UserPendingDataCatche { get; set; } = new UserPendingDataCacheModel();
+        /// <summary>
+        /// 文档缓存
+        /// </summary>
         public List<DocumentViewModel> DocumentsCatche { get; set; } = new List<DocumentViewModel>();
         /// <summary>
         /// 免费游戏列表

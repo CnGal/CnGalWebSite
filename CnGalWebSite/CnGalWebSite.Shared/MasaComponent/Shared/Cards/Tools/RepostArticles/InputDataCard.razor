@@ -12,7 +12,7 @@
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="model.Type" TValue="ArticleType" Lable="类型"/>
         </div>
         <div class="col-12 col-sm-9 mb-4">
-            <MTextField Label="链接" @bind-Value="@model.Url" TValue="string"></MTextField>
+            <MTextField Label="链接" @bind-Value="@model.Url" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
         </div>
         <div class="col-12 mb-2">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="OnAdd" Icon="mdi-plus" />

@@ -79,6 +79,10 @@ else
                     <div class="row">
                         <MTabsItems @bind-Value="TabIndex">
                             <MTabItem Value="1">
+                                @if (Model.IsCurrentUser)
+                                {
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.Examines.PendingDataCard/>
+                                }
                                 @if (Model.IsCurrentUser || string.IsNullOrWhiteSpace(Model.MainPageContext) == false)
                                 {
                                     <div class="mb-4">

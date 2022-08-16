@@ -3,6 +3,7 @@ using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Space;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +24,18 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="isShowRanks">是否展示头衔</param>
         /// <returns></returns>
         Task<List<ExaminedNormalListModel>> GetExaminesToNormalListAsync(IQueryable<Examine> examines, bool isShowRanks);
-
+        /// <summary>
+        /// 获取用户待审核编辑 序列化后的对象列表
+        /// </summary>
+        /// <param name="Id">用户Id</param>
+        /// <returns></returns>
+        Task<List<UserPendingDataModel>> GetUserPendingData(string Id);
+        /// <summary>
+        /// 获取审核预览视图
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="examine"></param>
+        /// <returns></returns>
         Task<bool> GetExamineView(ExamineViewModel model, Examine examine);
         /// <summary>
         /// 处理 EstablishMain 审核成功后调用更新数据

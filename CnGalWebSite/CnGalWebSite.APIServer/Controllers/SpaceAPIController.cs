@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+﻿using CnGalWebSite.APIServer.Application.Entries;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Messages;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.SteamInfors;
@@ -66,6 +67,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _favoriteObjectRepository = favoriteObjectRepository;
             _steamInforService = steamInforService;
         }
+
         /// <summary>
         /// 通过Id获取用户的真实数据 
         /// </summary>
@@ -627,7 +629,10 @@ namespace CnGalWebSite.APIServer.Controllers
             return await _userService.GetUserEditInforBindModel(user);
         }
 
-
+        /// <summary>
+        /// 编辑个人收件地址
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<EditUserAddressModel>> EditUserAddress()
         {
@@ -754,6 +759,21 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             return model;
+        }
+
+
+        /// <summary>
+        /// 获取用户待审核的编辑对象列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<List<UserPendingDataModel>>> GetUserPendingData()
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            return await _examineService.GetUserPendingData(user.Id);
         }
 
     }
