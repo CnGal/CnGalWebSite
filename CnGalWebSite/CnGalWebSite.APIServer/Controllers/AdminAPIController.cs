@@ -863,6 +863,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 DateTime time = DateTime.Now.ToCstTime();
                 await _rankUsersRepository.GetRangeUpdateTable().Where(s => s.Id==14).Set(s => s.Time, b => time).ExecuteAsync();
 
+                await _entryRepository.GetRangeUpdateTable().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("tucang.cc")).Set(s => s.MainPicture, b => b.MainPicture.Replace("tucang.cc", _configuration["CustomTucangCCUrl"])).ExecuteAsync();
+
                 return new Result { Successful = true };
             }
             catch (Exception ex)

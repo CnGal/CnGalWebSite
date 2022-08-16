@@ -15,7 +15,7 @@
     </ButtonContent>
     <ChildContent>
         <div class="row">
-            @foreach (var item in Items)
+            @foreach (var item in Items.Take(MaxCount))
             {
                 <div class="col-6 col-md-4 mb-3">
                     <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@item"></CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard>
