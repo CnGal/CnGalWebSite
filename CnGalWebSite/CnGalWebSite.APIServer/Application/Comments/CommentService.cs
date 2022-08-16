@@ -461,7 +461,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
 
         }
 
-        public async Task UpdateCommentData(Comment comment, Examine examine)
+        public async Task UpdateCommentDataAsync(Comment comment, Examine examine)
         {
             switch (examine.Operation)
             {

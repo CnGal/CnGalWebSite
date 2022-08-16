@@ -19,8 +19,10 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Disambig;
+using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -371,6 +373,172 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
 
             return result;
+        }
+
+        public async Task<List<UserPendingDataModel>> GetUserPendingData(string Id)
+        {
+            var examines = await _examineRepository.GetAll().AsNoTracking()
+                .Where(s => s.ApplicationUserId ==Id && s.PassedTime == null)
+                .ToListAsync();
+
+
+
+            var model = new List<UserPendingDataModel>();
+
+            foreach (var item in examines)
+            {
+                if (item.Operation == Operation.EstablishMain)
+                {
+                    var infor = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == item.EntryId.Value);
+                    await _entryService.UpdateEntryDataAsync(infor, item);
+                    model.Add(new UserPendingDataModel
+                    {
+                        Id = infor.Id.ToString(),
+                        BriefIntroduction = infor.BriefIntroduction,
+                        DisplayMode = (infor.Type == EntryType.Game || infor.Type == EntryType.ProductionGroup) ? UserPendingDataDisplayMode.Main : UserPendingDataDisplayMode.Thum,
+                        MainPicture = _appHelper.GetImagePath(infor.MainPicture, (infor.Type == EntryType.Game || infor.Type == EntryType.ProductionGroup) ? "app.png" : "user.png"),
+                        Name = infor.Name,
+                        Thumbnail = _appHelper.GetImagePath(infor.Thumbnail, (infor.Type == EntryType.Game || infor.Type == EntryType.ProductionGroup) ? "app.png" : "user.png"),
+                        Type = ExaminedNormalListModelType.Entry
+                    });
+                }
+                else if (item.Operation == Operation.EditArticleMain)
+                {
+                    var infor = await _articleRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == item.ArticleId.Value);
+                    await _articleService.UpdateArticleData(infor, item);
+                    model.Add(new UserPendingDataModel
+                    {
+                        Id = infor.Id.ToString(),
+                        BriefIntroduction = infor.BriefIntroduction,
+                        DisplayMode =  UserPendingDataDisplayMode.Main,
+                        MainPicture = _appHelper.GetImagePath(infor.MainPicture, "certificate.png"),
+                        Name = infor.Name,
+                        Type = ExaminedNormalListModelType.Article
+                    });
+                }
+                else if (item.Operation == Operation.EditTagMain)
+                {
+                    var infor = await _tagRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == item.TagId.Value);
+                    await _tagService.UpdateTagDataAsync(infor, item);
+                    model.Add(new UserPendingDataModel
+                    {
+                        Id = infor.Id.ToString(),
+                        BriefIntroduction = infor.BriefIntroduction,
+                        DisplayMode = UserPendingDataDisplayMode.Main,
+                        MainPicture = _appHelper.GetImagePath(infor.MainPicture, "app.png"),
+                        Name = infor.Name,
+                        Type = ExaminedNormalListModelType.Tag
+                    });
+                }
+                else if (item.Operation == Operation.EditPeripheryMain)
+                {
+                    var infor = await _peripheryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == item.PeripheryId.Value);
+                    await _peripheryService.UpdatePeripheryDataAsync(infor, item);
+                    model.Add(new UserPendingDataModel
+                    {
+                        Id = infor.Id.ToString(),
+                        BriefIntroduction = infor.BriefIntroduction,
+                        DisplayMode = UserPendingDataDisplayMode.Main,
+                        MainPicture = _appHelper.GetImagePath(infor.MainPicture, "app.png"),
+                        Name = infor.Name,
+                        Type = ExaminedNormalListModelType.Periphery
+                    });
+                }
+                else if (item.Operation == Operation.EditPlayedGameMain)
+                {
+                    var infor = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.Entry).FirstOrDefaultAsync(s => s.Id == item.PlayedGameId.Value);
+
+                    _playedGameService.UpdatePlayedGameData(infor, item);
+
+                    model.Add(new UserPendingDataModel
+                    {
+                        Id = infor.Id.ToString(),
+                        BriefIntroduction = infor.PlayImpressions,
+                        Link = "/entries/index/" + infor.EntryId,
+                        DisplayMode = UserPendingDataDisplayMode.Text,
+                        MainPicture = _appHelper.GetImagePath(infor.Entry?.MainPicture, "app.png"),
+                        Name = $"『{infor.Entry?.Name}』游玩记录",
+                        Type = ExaminedNormalListModelType.PlayedGame
+                    });
+                }
+                else if (item.Operation == Operation.PubulishComment)
+                {
+                    var infor = await _commentRepository.GetAll().AsNoTracking()
+                        .Include(s => s.Entry)
+                        .Include(s=>s.Periphery)
+                        .Include(s=>s.Article)
+                        .Include(s=>s.Lottery)
+                        .Include(s=>s.ParentCodeNavigation)
+                        .FirstOrDefaultAsync(s => s.Id == item.CommentId.Value);
+
+                    await _commentService.UpdateCommentDataAsync(infor, item);
+
+                    var name = "";
+                    var image = "";
+                    var link = "";
+
+                    switch (infor.Type)
+                    {
+                        case CommentType.CommentEntries:
+                            name = infor.Entry?.Name;
+                            image = infor.Entry?.MainPicture;
+                            link = "/entries/index/" + infor.EntryId;
+                            break;
+                        case CommentType.CommentArticle:
+                            name = infor.Article?.Name;
+                            image = infor.Article?.MainPicture;
+                            link = "/artice/index/" + infor.ArticleId;
+                            break;
+                        case CommentType.CommentPeriphery:
+                            name = infor.Periphery?.Name;
+                            image = infor.Periphery?.MainPicture;
+                            link = "/peripheries/index/" + infor.PeripheryId;
+                            break;
+                        case CommentType.CommentLottery:
+                            name = infor.Lottery?.Name;
+                            image = infor.Lottery?.MainPicture;
+                            link = "/lotteies/index/" + infor.LotteryId;
+                            break;
+                        case CommentType.ReplyComment:
+                            name = infor.ParentCodeNavigation?.Text.Abbreviate(10);
+                           
+                            if(infor.EntryId!=null)
+                            {
+                                image = infor.Entry?.MainPicture;
+                                link = "/entries/index/" + infor.EntryId;
+                            }
+                            else if (infor.ArticleId != null)
+                            {
+                                image = infor.Article?.MainPicture;
+                                link = "/artices/index/" + infor.ArticleId;
+                            }
+                            else if (infor.PeripheryId != null)
+                            {
+                                image = infor.Periphery?.MainPicture;
+                                link = "/peripheries/index/" + infor.PeripheryId;
+                            }
+                            else if (infor.LotteryId != null)
+                            {
+                                image = infor.Lottery?.MainPicture;
+                                link = "/lotteies/index/" + infor.LotteryId;
+                            }
+                            break;
+                    }
+
+                    model.Add(new UserPendingDataModel
+                    {
+                        Id = infor.Id.ToString(),
+                        Link=link,
+                        BriefIntroduction = infor.Text,
+                        DisplayMode = UserPendingDataDisplayMode.Text,
+                        MainPicture = _appHelper.GetImagePath(image, "app.png"),
+                        Name =string.IsNullOrWhiteSpace(name)?"回复评论":$"评论『{name}』",
+                        Type = ExaminedNormalListModelType.Comment
+                    });
+                }
+            }
+
+            return model;
         }
 
         #region 获取审核记录视图
@@ -4724,7 +4892,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 //获取通过审核记录叠加的旧模型
                 var examineModel = await GenerateModelFromExamines(periphery);
                 //应用审核记录
-                await ExaminesCompletionTag(periphery, examineModel as Periphery);
+                await ExaminesCompletionPeriphery(periphery, examineModel as Periphery);
 
             }
         }
@@ -4815,7 +4983,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
         }
 
-        private async Task ExaminesCompletionTag(Periphery newPeriphery, Periphery currentPeriphery)
+        private async Task ExaminesCompletionPeriphery(Periphery newPeriphery, Periphery currentPeriphery)
         {
             var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
 

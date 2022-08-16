@@ -169,7 +169,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         Id = item.CommentId.Value
                     };
                     examinesComments.Add(temp);
-                    await _commentService.UpdateCommentData(temp, item);
+                    await _commentService.UpdateCommentDataAsync(temp, item);
                 }
             }
 

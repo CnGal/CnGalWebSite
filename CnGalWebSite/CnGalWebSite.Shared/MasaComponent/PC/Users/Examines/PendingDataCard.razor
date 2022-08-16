@@ -1,0 +1,76 @@
+﻿@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+
+@if (_dataCacheService.UserPendingDataCatche.Items.Any())
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="待审核的编辑" Icon="fa fa-fw  fa-pencil" Class="mb-4" Outline Collapable>
+        <div class="row">
+            @foreach (var item in Model.Where(s => s.DisplayMode == UserPendingDataDisplayMode.Main))
+            {
+                <div class="col-6 col-md-4 mb-4">
+                    <DataCard Model="item" />
+                </div>
+            }
+            <div class="col-12"></div>
+            @foreach (var item in Model.Where(s => s.DisplayMode == UserPendingDataDisplayMode.Thum))
+            {
+                <div class="col-6 col-md-4 col-lg-3 mb-4">
+                    <DataCard Model="item" />
+                </div>
+                }
+            <div class="col-12"></div>
+            @foreach (var item in Model.Where(s => s.DisplayMode == UserPendingDataDisplayMode.Text))
+            {
+                <div class="col-12 col-md-6 mb-4">
+                    <DataCard Model="item" />
+                </div>
+                }
+        </div>
+
+
+        @if (_dataCacheService.UserPendingDataCatche.TotalPages > 1)
+        {
+            <MPagination Value="@_dataCacheService.UserPendingDataCatche.CurrentPage" Class="my-4" Length="@_dataCacheService.UserPendingDataCatche.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+        }
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+
+@code {
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public List<UserPendingDataModel> Model { get; set; } = new List<UserPendingDataModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (_dataCacheService.UserPendingDataCatche.Items.Any() == false)
+            {
+                _dataCacheService.UserPendingDataCatche.Items = await Http.GetFromJsonAsync<List<UserPendingDataModel>>(ToolHelper.WebApiPath + "api/space/GetUserPendingData");
+                _dataCacheService.UserPendingDataCatche.Items = _dataCacheService.UserPendingDataCatche.Items.OrderByDescending(s => s.DisplayMode).ToList();
+            }
+
+            OnPageClick(1);
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取轮播图信息失败");
+        }
+    }
+
+    private Task OnPageClick(int pageIndex)
+    {
+        _dataCacheService.NewsSummaryCache.CurrentPage = pageIndex;
+        Model = _dataCacheService.UserPendingDataCatche.Items.Skip((_dataCacheService.UserPendingDataCatche.CurrentPage - 1) * _dataCacheService.UserPendingDataCatche.MaxCount).Take(_dataCacheService.UserPendingDataCatche.MaxCount).ToList();
+
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+}

@@ -16,7 +16,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
 
         Task<QueryData<ListCommentAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListCommentAloneModel searchModel, CommentType type = CommentType.None, string objectId = "");
 
-        Task UpdateCommentData(Comment comment, Examine examine);
+        Task UpdateCommentDataAsync(Comment comment, Examine examine);
 
         Task UpdateCommentDataMainAsync(Comment comment, CommentText examine);
     }

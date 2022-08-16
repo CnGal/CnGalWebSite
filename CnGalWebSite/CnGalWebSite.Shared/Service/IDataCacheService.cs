@@ -23,6 +23,7 @@ using CnGalWebSite.DataModel.ViewModel.Theme;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.ViewModel.Articles;
 using CnGalWebSite.Helper.ViewModel.Comments;
+using CnGalWebSite.Helper.ViewModel.Users;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -114,6 +115,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> UserFavoriteObjectsDataCatche { get; set; }
 
         IPageModelCatche<List<EntryInforTipViewModel>> PublishGameTimesDataCatche { get; set; }
+
+        UserPendingDataCacheModel UserPendingDataCatche { get; set; }
 
         List<DocumentViewModel> DocumentsCatche { get; set; }
 
