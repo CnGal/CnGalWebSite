@@ -268,9 +268,9 @@ namespace CnGalWebSite.APIServer.Controllers
                         await _examineService.ExamineEstablishImagesAsync(entry, entryImages);
                         break;
                     case Operation.EstablishRelevances:
-
                         entry = await _entryRepository.GetAll()
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                            .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                            .Include(s=>s.Outlinks)
                             .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
                         if (entry == null)
                         {
