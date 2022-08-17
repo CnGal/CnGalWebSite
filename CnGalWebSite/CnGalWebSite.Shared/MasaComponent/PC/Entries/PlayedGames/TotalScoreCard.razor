@@ -1,19 +1,29 @@
 ﻿@if (isReady)
 {
     <div class="@(Outline?"":"rounded shadow-sm  bg-opacity h-100")" style="display: flex; justify-content: center; height: 100%; flex-direction: column; ">
-        @if (Model.UserScores.Any(s => s.Socres.IsScored))
+        @if (isRuning)
         {
-            <div class="pb-2">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaRadarChart Model="model" MaxHeight="300" MaxWidth="270" />
+            <div class="mb-2" style=" display: flex; justify-content: center;">
+                正在同步评分......
             </div>
-
         }
         else
         {
-            <div class="mb-2" style=" display: flex; justify-content: center;">
-                暂无记录
-            </div>
+            @if (Model.UserScores.Any(s => s.Socres.IsScored))
+            {
+                <div class="pb-2">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaRadarChart Model="model" MaxHeight="300" MaxWidth="270" />
+                </div>
+
+            }
+            else
+            {
+                <div class="mb-2" style=" display: flex; justify-content: center;">
+                    暂无记录
+                </div>
+            }
         }
+
     </div>
 }
 
@@ -28,8 +38,10 @@
 
     EChartsRadarOptionModel model = new EChartsRadarOptionModel();
     bool isReady;
+    bool isRuning;
     protected override async Task OnParametersSetAsync()
     {
+        isRuning = false;
         if (Model.UserScores.Any(s => s.Socres.IsScored) == false)
         {
             isReady = true;
@@ -90,6 +102,12 @@
         }
 
         //计算最大值
+        if(series.Any(s=>s.Value.Any())==false)
+        {
+            isReady = true;
+            isRuning = true;
+            return;
+        }
         var min = series.Min(s => s.Value.Min());
         var max = series.Max(s => s.Value.Max());
 
