@@ -52,7 +52,6 @@ namespace CnGalWebSite.RobotClient
             //过滤非水区的发言
             if ((await MasudaClient.GetChannelAsync(e.ChannelId)).Name.Contains("水区") == false)
             {
-
                 return;
             }
 

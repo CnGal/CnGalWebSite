@@ -7,7 +7,7 @@ var cacheX = new CacheX();
 
 
 OutputHelper.Repeat();
-OutputHelper.WriteCenter("CnGal资料站 看板娘 v3.3.24", 1.8);
+OutputHelper.WriteCenter("CnGal资料站 看板娘 v3.3.27", 1.8);
 OutputHelper.Repeat();
 
 
