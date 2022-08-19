@@ -768,7 +768,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     "NewestEditGames" => await _weiXinService.GetNewestEditGames(true),
                     "NewestUnPublishGames" => await _weiXinService.GetNewestUnPublishGames(true),
                     "NewestPublishGames" => await _weiXinService.GetNewestPublishGames(true),
-                    "NewestNews" => await _weiXinService.GetNewestNews(true),
+                    "NewestNews" => await _weiXinService.GetNewestNews(true, model.SenderId != 0),
                     _ => ""
                 };
 
