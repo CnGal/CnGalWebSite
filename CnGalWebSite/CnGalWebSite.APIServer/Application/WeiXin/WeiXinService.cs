@@ -354,7 +354,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
         }
 
 
-        public async Task<string> GetNewestEditGames()
+        public async Task<string> GetNewestEditGames(bool plainText = false)
         {
             var tempDateTimeNow = DateTime.Now.ToCstTime();
 
@@ -373,17 +373,28 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
             foreach (var item in games)
             {
-                sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
+                if(plainText)
+                {
+                    sb.Append($"《{item.DisplayName}》 - {item.LastEditTime.ToTimeFromNowString()}\nhttps://www.cngal.org/entries/index/{item.Id}{(games.IndexOf(item) != games.Count - 1 ? "\n" : "")}");
+                }
+                else
+                {
+                    sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
 
-                sb.Append($" - {item.LastEditTime.ToTimeFromNowString()}");
+                    sb.Append($" - {item.LastEditTime.ToTimeFromNowString()}");
 
-                sb.AppendLine();
+                }
+
+                if (games.IndexOf(item) != games.Count - 1)
+                {
+                    sb.AppendLine();
+                }
             }
 
             return sb.ToString();
         }
 
-        public async Task<string> GetNewestNews()
+        public async Task<string> GetNewestNews(bool plainText = false)
         {
             var news = await _articleRepository.GetAll().Include(s => s.CreateUser)
               .Include(s => s.CreateUser)
@@ -397,18 +408,27 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 var infor = await _articleService.GetNewsModelAsync(item);
                 sb.Append($"【{infor.GroupName}】");
 
-                sb.Append($"<a href=\"{(string.IsNullOrWhiteSpace(infor.Link) ? ("https://www.cngal.org/articles/index/" + item.Id) : infor.Link)}\">《{item.DisplayName}》</a>");
+                if(plainText)
+                {
+                    sb.Append($"{item.DisplayName} - {infor.HappenedTime.ToTimeFromNowString()}\n{(string.IsNullOrWhiteSpace(infor.Link) ? ("https://www.cngal.org/articles/index/" + item.Id) : infor.Link)}{(news.IndexOf(item) != news.Count - 1 ? "\n" : "")}");
+                }
+                else
+                {
+                    sb.Append($"<a href=\"{(string.IsNullOrWhiteSpace(infor.Link) ? ("https://www.cngal.org/articles/index/" + item.Id) : infor.Link)}\">《{item.DisplayName}》</a>");
 
-                sb.Append($" - {infor.HappenedTime.ToTimeFromNowString()}");
+                    sb.Append($" - {infor.HappenedTime.ToTimeFromNowString()}");
 
-                sb.AppendLine();
-                sb.AppendLine();
+                }
+                if (news.IndexOf(item) != news.Count - 1)
+                {
+                    sb.AppendLine();
+                }
             }
 
             return sb.ToString();
         }
 
-        public async Task<string> GetNewestPublishGames()
+        public async Task<string> GetNewestPublishGames(bool plainText = false)
         {
             try
             {
@@ -423,9 +443,19 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 foreach (var item in games)
                 {
                     sb.Append($"【{item.PubulishTime?.ToString("M月d日")}】");
-                    sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
+                    if (plainText)
+                    {
+                        sb.Append($"《{item.DisplayName}》\nhttps://www.cngal.org/entries/index/{item.Id}{(games.IndexOf(item) != games.Count - 1 ? "\n" : "")}");
+                    }
+                    else
+                    {
+                        sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
+                    }
 
-                    sb.AppendLine();
+                    if (games.IndexOf(item) != games.Count - 1)
+                    {
+                        sb.AppendLine();
+                    }
                 }
 
                 return sb.ToString();
@@ -437,7 +467,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
         }
 
-        public async Task<string> GetNewestUnPublishGames()
+        public async Task<string> GetNewestUnPublishGames(bool plainText = false)
         {
             try
             {
@@ -451,11 +481,27 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 var sb = new StringBuilder();
                 foreach (var item in games)
                 {
-                    sb.Append($"【{item.PubulishTime?.ToString("M月d日")}】");
+                    var publishStr = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间备注" && string.IsNullOrWhiteSpace(s.DisplayValue) == false)?.DisplayValue;
+                    if(string.IsNullOrWhiteSpace(publishStr))
+                    {
+                        publishStr = item.PubulishTime?.ToString("M月d日");
+                    }
+                    sb.Append($"【{publishStr}】");
 
-                    sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
+                    if(plainText)
+                    {
+                        sb.Append($"《{item.DisplayName}》\nhttps://www.cngal.org/entries/index/{item.Id}{(games.IndexOf(item) != games.Count - 1 ? "\n" : "")}");
+                    }
+                    else
+                    {
+                        sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
+                    }
 
-                    sb.AppendLine();
+
+                    if (games.IndexOf(item) != games.Count - 1)
+                    {
+                        sb.AppendLine();
+                    }
                 }
 
                 return sb.ToString();

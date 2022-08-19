@@ -7,13 +7,13 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
         void CreateMenu();
 
-        Task<string> GetNewestPublishGames();
+        Task<string> GetNewestPublishGames(bool plainText = false);
 
-        Task<string> GetNewestUnPublishGames();
+        Task<string> GetNewestUnPublishGames(bool plainText = false);
 
-        Task<string> GetNewestNews();
+        Task<string> GetNewestNews(bool plainText = false);
 
-        Task<string> GetNewestEditGames();
+        Task<string> GetNewestEditGames(bool plainText = false);
 
         Task<string> GetEntryInfor(int id, bool plainText = false, bool showLink = false, bool showOutlink = true);
 
