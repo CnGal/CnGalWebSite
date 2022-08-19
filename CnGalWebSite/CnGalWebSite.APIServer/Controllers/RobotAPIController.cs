@@ -368,6 +368,7 @@ namespace CnGalWebSite.APIServer.Controllers
             robot.BeforeTime = model.BeforeTime;
             robot.Priority = model.Priority;
             robot.Range = model.Range;
+            robot.UpdateTime = DateTime.Now.ToCstTime();
 
             //保存
             if (model.Id == 0)
