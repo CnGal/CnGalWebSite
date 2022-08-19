@@ -394,7 +394,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             return sb.ToString();
         }
 
-        public async Task<string> GetNewestNews(bool plainText = false)
+        public async Task<string> GetNewestNews(bool plainText = false, bool showOutlink = true)
         {
             var news = await _articleRepository.GetAll().Include(s => s.CreateUser)
               .Include(s => s.CreateUser)
@@ -410,7 +410,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
                 if(plainText)
                 {
-                    sb.Append($"{item.DisplayName} - {infor.HappenedTime.ToTimeFromNowString()}\n{(string.IsNullOrWhiteSpace(infor.Link) ? ("https://www.cngal.org/articles/index/" + item.Id) : infor.Link)}{(news.IndexOf(item) != news.Count - 1 ? "\n" : "")}");
+                    sb.Append($"{item.DisplayName} - {infor.HappenedTime.ToTimeFromNowString()}\n{(string.IsNullOrWhiteSpace(infor.Link)||showOutlink==false ? ("https://www.cngal.org/articles/index/" + item.Id) : infor.Link)}{(news.IndexOf(item) != news.Count - 1 ? "\n" : "")}");
                 }
                 else
                 {

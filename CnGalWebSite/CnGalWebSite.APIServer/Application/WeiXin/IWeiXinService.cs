@@ -11,7 +11,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
         Task<string> GetNewestUnPublishGames(bool plainText = false);
 
-        Task<string> GetNewestNews(bool plainText = false);
+        Task<string> GetNewestNews(bool plainText = false, bool showOutlink = true);
 
         Task<string> GetNewestEditGames(bool plainText = false);
 
