@@ -96,8 +96,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             });
 
             bg.button.Add(subButton);
-
-            var result = CommonApi.CreateMenu(null, bg);
+            _ = CommonApi.CreateMenu(null, bg);
 
         }
 
@@ -105,17 +104,17 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine("o((>ω< ))o");
-            sb.AppendLine("这里是看板娘哦~~~欸嘿嘿~~~");
-            sb.AppendLine("你问我能干什么？");
-            sb.AppendLine("抱歉啦，毕竟刚刚从沉睡中醒来，还不是很熟悉这个世界呢");
-            sb.AppendLine("不过数据库还是能连接上的，试试下面的指令吧~");
-            sb.AppendLine();
-            sb.AppendLine("【随机推荐】【最新动态】【近期新作】【即将发售】【最新编辑】");
-            sb.AppendLine("【词条+Id】");
-            sb.AppendLine("例如：词条 1");
-            sb.AppendLine("【搜索+查找的内容】");
-            sb.Append("例如：搜索 CnGal");
+            _ = sb.AppendLine("o((>ω< ))o");
+            _ = sb.AppendLine("这里是看板娘哦~~~欸嘿嘿~~~");
+            _ = sb.AppendLine("你问我能干什么？");
+            _ = sb.AppendLine("抱歉啦，毕竟刚刚从沉睡中醒来，还不是很熟悉这个世界呢");
+            _ = sb.AppendLine("不过数据库还是能连接上的，试试下面的指令吧~");
+            _ = sb.AppendLine();
+            _ = sb.AppendLine("【随机推荐】【最新动态】【近期新作】【即将发售】【最新编辑】");
+            _ = sb.AppendLine("【词条+Id】");
+            _ = sb.AppendLine("例如：词条 1");
+            _ = sb.AppendLine("【搜索+查找的内容】");
+            _ = sb.Append("例如：搜索 CnGal");
 
             return sb.ToString();
         }
@@ -134,20 +133,20 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             {
                 if (item.entry != null)
                 {
-                    sb.AppendLine($"【{item.entry.Type.GetDisplayName()}】 <a href=\"https://www.cngal.org/entries/index/{item.entry.Id}\">{item.entry.DisplayName}</a>");
+                    _ = sb.AppendLine($"【{item.entry.Type.GetDisplayName()}】 <a href=\"https://www.cngal.org/entries/index/{item.entry.Id}\">{item.entry.DisplayName}</a>");
                 }
                 else if (item.article != null)
                 {
-                    sb.AppendLine($"【{item.article.Type.GetDisplayName()}】 <a href=\"https://www.cngal.org/articles/index/{item.article.Id}\">{item.article.DisplayName}</a>");
+                    _ = sb.AppendLine($"【{item.article.Type.GetDisplayName()}】 <a href=\"https://www.cngal.org/articles/index/{item.article.Id}\">{item.article.DisplayName}</a>");
                 }
                 else if (item.tag != null)
                 {
-                    sb.AppendLine($"【标签】 <a href=\"https://www.cngal.org/tags/index/{item.tag.Id}\">{item.tag.Name}</a>");
+                    _ = sb.AppendLine($"【标签】 <a href=\"https://www.cngal.org/tags/index/{item.tag.Id}\">{item.tag.Name}</a>");
 
                 }
                 else if (item.periphery != null)
                 {
-                    sb.AppendLine($"【周边】 <a href=\"https://www.cngal.org/peripheries/index/{item.periphery.Id}\">{item.periphery.Name}</a>");
+                    _ = sb.AppendLine($"【周边】 <a href=\"https://www.cngal.org/peripheries/index/{item.periphery.Id}\">{item.periphery.Name}</a>");
                 }
             }
 
@@ -164,7 +163,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             return await GetEntryInfor(entryIds[index], plainText, showLink);
         }
 
-        public async Task<string> GetEntryInfor(int id, bool plainText = false, bool showLink = false,bool showOutlink=true)
+        public async Task<string> GetEntryInfor(int id, bool plainText = false, bool showLink = false, bool showOutlink = true)
         {
             var entry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Information)
@@ -182,14 +181,14 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             {
                 if (string.IsNullOrWhiteSpace(entry.MainPicture) == false)
                 {
-                    sb.AppendLine($"[image={_appHelper.GetImagePath(entry.MainPicture, "app.png")}]");
+                    _ = sb.AppendLine($"[image={_appHelper.GetImagePath(entry.MainPicture, "app.png")}]");
 
                 }
                 else
                 {
                     if (string.IsNullOrWhiteSpace(entry.Thumbnail) == false)
                     {
-                        sb.AppendLine($"[image={_appHelper.GetImagePath(entry.Thumbnail, "app.png")}]");
+                        _ = sb.AppendLine($"[image={_appHelper.GetImagePath(entry.Thumbnail, "app.png")}]");
 
                     }
                 }
@@ -198,10 +197,10 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             var model = await _appHelper.GetEntryInforTipViewModel(entry);
 
 
-            sb.AppendLine($"{model.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/entries/index/{model.Id}\">{model.DisplayName}</a>");
+            _ = sb.AppendLine($"{model.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/entries/index/{model.Id}\">{model.DisplayName}</a>");
             if (string.IsNullOrWhiteSpace(model.BriefIntroduction) == false)
             {
-                sb.AppendLine($"{model.BriefIntroduction.Abbreviate(plainText ? 30 : 23)}");
+                _ = sb.AppendLine($"{model.BriefIntroduction.Abbreviate(plainText ? 30 : 23)}");
             }
 
 
@@ -211,63 +210,79 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 var steamIdStr = entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "Steam平台Id")?.DisplayValue;
                 if (steamIdStr != null && int.TryParse(steamIdStr, out var steamId))
                 {
-                    sb.AppendLine();
+                    _ = sb.AppendLine();
 
                     var steam = await _steamService.GetSteamInforAsync(steamId, model.Id);
                     if (steam.PriceNow > 0)
                     {
-                        sb.AppendLine($"当前价格：{steam.PriceNowString}{ (steam.CutNow == 0 ? "" : " - 折扣 " + steam.CutNow + "%")}");
+                        _ = sb.AppendLine($"当前价格：{steam.PriceNowString}{(steam.CutNow == 0 ? "" : " - 折扣 " + steam.CutNow + "%")}");
 
                         if (steam.CutLowest > 0)
                         {
-                            sb.AppendLine($"历史最低：{ steam.PriceLowestString}");
+                            _ = sb.AppendLine($"历史最低：{steam.PriceLowestString}");
                         }
                     }
                     else if (steam.PriceNow == 0)
                     {
-                        sb.AppendLine($"当前价格：¥ 0.00 - Free");
+                        _ = sb.AppendLine($"当前价格：¥ 0.00 - Free");
                     }
                     else if (steam.PriceNow == -1)
                     {
-                        sb.AppendLine($"未发售");
+                        _ = sb.AppendLine($"未发售");
 
 
                     }
                     else if (steam.PriceNow == -2)
                     {
-                        sb.AppendLine($"已下架");
+                        if (steam.OriginalPrice > 0)
+                        {
+                            _ = sb.AppendLine($"价格：{(steam.OriginalPrice / 100.0).ToString("0.00")}（数据未更新）");
+                        }
+                        else if (steam.OriginalPrice == 0)
+                        {
+                            _ = sb.AppendLine($"价格：¥ 0.00 - Free（数据未更新）");
+                        }
+                        else
+                        {
+                            _ = sb.AppendLine($"数据未更新");
+                        }
                     }
+                    else if (steam.PriceNow == -3)
+                    {
+                        _ = sb.AppendLine($"已下架");
+                    }
+
 
                     if (steam.EvaluationCount > 0)
                     {
-                        sb.AppendLine($"{steam.RecommendationRate}% 好评（{steam.EvaluationCount}条评测）");
+                        _ = sb.AppendLine($"{steam.RecommendationRate}% 好评（{steam.EvaluationCount}条评测）");
                     }
-                    if(showOutlink)
+                    if (showOutlink)
                     {
- if (plainText)
-                    {
-                        sb.AppendLine($"https://store.steampowered.com/app/{steamId}");
-                    }
-                    else
-                    {
-                        sb.AppendLine($"<a href=\"https://store.steampowered.com/app/{steamId}\">Steam商店页面</a>");
+                        if (plainText)
+                        {
+                            _ = sb.AppendLine($"https://store.steampowered.com/app/{steamId}");
+                        }
+                        else
+                        {
+                            _ = sb.AppendLine($"<a href=\"https://store.steampowered.com/app/{steamId}\">Steam商店页面</a>");
 
+                        }
                     }
-                    }
-                   
+
 
                     if (entry.EntryRelationFromEntryNavigation.Any(s => s.ToEntryNavigation.Type == EntryType.Role))
                     {
-                        sb.AppendLine();
-                        sb.Append($"登场角色：");
+                        _ = sb.AppendLine();
+                        _ = sb.Append($"登场角色：");
                         var roles = entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.Type == EntryType.Role).Select(s => s.ToEntryNavigation).ToList();
                         foreach (var item in roles)
                         {
                             if (roles.IndexOf(item) != 0)
                             {
-                                sb.Append('，');
+                                _ = sb.Append('，');
                             }
-                            sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">{item.DisplayName}</a>");
+                            _ = sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">{item.DisplayName}</a>");
                         }
                     }
                 }
@@ -277,23 +292,23 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
             foreach (var item in model.AddInfors)
             {
-                sb.AppendLine();
-                sb.Append($"{item.Modifier}：");
+                _ = sb.AppendLine();
+                _ = sb.Append($"{item.Modifier}：");
                 foreach (var temp in item.Contents)
                 {
                     if (item.Contents.IndexOf(temp) != 0)
                     {
-                        sb.Append('，');
+                        _ = sb.Append('，');
                     }
-                    sb.Append($"<a href=\"https://www.cngal.org/entries/index/{temp.Id}\">{temp.DisplayName}</a>");
+                    _ = sb.Append($"<a href=\"https://www.cngal.org/entries/index/{temp.Id}\">{temp.DisplayName}</a>");
                 }
 
             }
 
             if (showLink)
             {
-                sb.AppendLine();
-                sb.Append($"https://www.cngal.org/entries/index/{entry.Id}");
+                _ = sb.AppendLine();
+                _ = sb.Append($"https://www.cngal.org/entries/index/{entry.Id}");
             }
 
             return sb.ToString();
@@ -314,30 +329,30 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
             if (plainText && string.IsNullOrWhiteSpace(article.MainPicture) == false)
             {
-                sb.AppendLine($"[image={_appHelper.GetImagePath(article.MainPicture, "Certificate.png")}]");
+                _ = sb.AppendLine($"[image={_appHelper.GetImagePath(article.MainPicture, "Certificate.png")}]");
             }
 
 
-            sb.AppendLine($"{article.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/articles/index/{article.Id}\">{article.Name}</a>");
+            _ = sb.AppendLine($"{article.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/articles/index/{article.Id}\">{article.Name}</a>");
             if (string.IsNullOrWhiteSpace(article.OriginalAuthor))
             {
-                sb.AppendLine($"作者：{article.CreateUser.UserName}");
+                _ = sb.AppendLine($"作者：{article.CreateUser.UserName}");
             }
             else
             {
-                sb.AppendLine($"作者：{article.OriginalAuthor}");
+                _ = sb.AppendLine($"作者：{article.OriginalAuthor}");
             }
 
             if (string.IsNullOrWhiteSpace(article.OriginalLink) == false)
             {
-                sb.AppendLine($"原文链接：{article.OriginalLink}");
+                _ = sb.AppendLine($"原文链接：{article.OriginalLink}");
             }
 
-            sb.AppendLine();
+            _ = sb.AppendLine();
 
             if (string.IsNullOrWhiteSpace(article.BriefIntroduction) == false)
             {
-                sb.Append($"{article.BriefIntroduction.Abbreviate(plainText ? 40 : 23)}");
+                _ = sb.Append($"{article.BriefIntroduction.Abbreviate(plainText ? 40 : 23)}");
             }
 
 
@@ -345,8 +360,8 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
             if (showLink)
             {
-                sb.AppendLine();
-                sb.Append($"https://www.cngal.org/articles/index/{article.Id}");
+                _ = sb.AppendLine();
+                _ = sb.Append($"https://www.cngal.org/articles/index/{article.Id}");
             }
 
             return sb.ToString();
@@ -373,21 +388,21 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
             foreach (var item in games)
             {
-                if(plainText)
+                if (plainText)
                 {
-                    sb.Append($"《{item.DisplayName}》 - {item.LastEditTime.ToTimeFromNowString()}\nhttps://www.cngal.org/entries/index/{item.Id}{(games.IndexOf(item) != games.Count - 1 ? "\n" : "")}");
+                    _ = sb.Append($"《{item.DisplayName}》 - {item.LastEditTime.ToTimeFromNowString()}\nhttps://www.cngal.org/entries/index/{item.Id}{(games.IndexOf(item) != games.Count - 1 ? "\n" : "")}");
                 }
                 else
                 {
-                    sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
+                    _ = sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
 
-                    sb.Append($" - {item.LastEditTime.ToTimeFromNowString()}");
+                    _ = sb.Append($" - {item.LastEditTime.ToTimeFromNowString()}");
 
                 }
 
                 if (games.IndexOf(item) != games.Count - 1)
                 {
-                    sb.AppendLine();
+                    _ = sb.AppendLine();
                 }
             }
 
@@ -406,22 +421,22 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             foreach (var item in news)
             {
                 var infor = await _articleService.GetNewsModelAsync(item);
-                sb.Append($"【{infor.GroupName}】");
+                _ = sb.Append($"【{infor.GroupName}】");
 
-                if(plainText)
+                if (plainText)
                 {
-                    sb.Append($"{item.DisplayName} - {infor.HappenedTime.ToTimeFromNowString()}\n{(string.IsNullOrWhiteSpace(infor.Link)||showOutlink==false ? ("https://www.cngal.org/articles/index/" + item.Id) : infor.Link)}{(news.IndexOf(item) != news.Count - 1 ? "\n" : "")}");
+                    _ = sb.Append($"{item.DisplayName} - {infor.HappenedTime.ToTimeFromNowString()}\n{(string.IsNullOrWhiteSpace(infor.Link) || showOutlink == false ? ("https://www.cngal.org/articles/index/" + item.Id) : infor.Link)}{(news.IndexOf(item) != news.Count - 1 ? "\n" : "")}");
                 }
                 else
                 {
-                    sb.Append($"<a href=\"{(string.IsNullOrWhiteSpace(infor.Link) ? ("https://www.cngal.org/articles/index/" + item.Id) : infor.Link)}\">《{item.DisplayName}》</a>");
+                    _ = sb.Append($"<a href=\"{(string.IsNullOrWhiteSpace(infor.Link) ? ("https://www.cngal.org/articles/index/" + item.Id) : infor.Link)}\">《{item.DisplayName}》</a>");
 
-                    sb.Append($" - {infor.HappenedTime.ToTimeFromNowString()}");
+                    _ = sb.Append($" - {infor.HappenedTime.ToTimeFromNowString()}");
 
                 }
                 if (news.IndexOf(item) != news.Count - 1)
                 {
-                    sb.AppendLine();
+                    _ = sb.AppendLine();
                 }
             }
 
@@ -442,19 +457,19 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 var sb = new StringBuilder();
                 foreach (var item in games)
                 {
-                    sb.Append($"【{item.PubulishTime?.ToString("M月d日")}】");
+                    _ = sb.Append($"【{item.PubulishTime?.ToString("M月d日")}】");
                     if (plainText)
                     {
-                        sb.Append($"《{item.DisplayName}》\nhttps://www.cngal.org/entries/index/{item.Id}{(games.IndexOf(item) != games.Count - 1 ? "\n" : "")}");
+                        _ = sb.Append($"《{item.DisplayName}》\nhttps://www.cngal.org/entries/index/{item.Id}{(games.IndexOf(item) != games.Count - 1 ? "\n" : "")}");
                     }
                     else
                     {
-                        sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
+                        _ = sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
                     }
 
                     if (games.IndexOf(item) != games.Count - 1)
                     {
-                        sb.AppendLine();
+                        _ = sb.AppendLine();
                     }
                 }
 
@@ -482,25 +497,25 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 foreach (var item in games)
                 {
                     var publishStr = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间备注" && string.IsNullOrWhiteSpace(s.DisplayValue) == false)?.DisplayValue;
-                    if(string.IsNullOrWhiteSpace(publishStr))
+                    if (string.IsNullOrWhiteSpace(publishStr))
                     {
                         publishStr = item.PubulishTime?.ToString("M月d日");
                     }
-                    sb.Append($"【{publishStr}】");
+                    _ = sb.Append($"【{publishStr}】");
 
-                    if(plainText)
+                    if (plainText)
                     {
-                        sb.Append($"《{item.DisplayName}》\nhttps://www.cngal.org/entries/index/{item.Id}{(games.IndexOf(item) != games.Count - 1 ? "\n" : "")}");
+                        _ = sb.Append($"《{item.DisplayName}》\nhttps://www.cngal.org/entries/index/{item.Id}{(games.IndexOf(item) != games.Count - 1 ? "\n" : "")}");
                     }
                     else
                     {
-                        sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
+                        _ = sb.Append($"<a href=\"https://www.cngal.org/entries/index/{item.Id}\">《{item.DisplayName}》</a>");
                     }
 
 
                     if (games.IndexOf(item) != games.Count - 1)
                     {
-                        sb.AppendLine();
+                        _ = sb.AppendLine();
                     }
                 }
 
