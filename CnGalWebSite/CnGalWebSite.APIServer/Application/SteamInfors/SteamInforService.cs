@@ -77,7 +77,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             var date = DateTime.Now.ToCstTime().Date;
 
             var steams = await _steamInforRepository.GetAll().AsNoTracking()
-                .Where(s => s.UpdateTime.Date < date)
+                .Where(s => s.UpdateTime.Date < date&&s.PriceNow != -3)
                 .OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.EntryId)
                 .Select(s => s.SteamId)
                 .Take(count)
@@ -186,13 +186,19 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 SteamId = steamId,
             };
 
+            //判断是否下架
+            if (steam.PriceNow != -3)
+            {
+                return steam;
+            }
+
             //更新数据 支持小数点 将真实价格*100储存 即1500表示15元
 
             //当前价格
             steam.PriceNow = steamNowJson.price;
             if (steam.PriceNow == -1)
             {
-                //判断是否为已下架
+                //判断是否 无法获取数据
                 if (steamLowestJson.price != -1)
                 {
                     steam.PriceNow = -2;

@@ -89,6 +89,10 @@ else
         }
         else if (res == "-0.02")
         {
+            res = "未更新";
+        }
+        else if (res == "-0.03")
+        {
             res = "已下架";
         }
         return res;
@@ -103,9 +107,12 @@ else
         }
         else if (res == "-0.02")
         {
+            res = "未更新";
+        }
+        else if (res == "-0.03")
+        {
             res = "已下架";
         }
-
         return res;
     }
 
@@ -118,9 +125,12 @@ else
         }
         else if (res == "-2")
         {
+            res = "未更新";
+        }
+        else if (res == "-3")
+        {
             res = "已下架";
         }
-
         return res;
     }
 
@@ -133,9 +143,12 @@ else
         }
         else if (res == "-2")
         {
+            res = "未更新";
+        }
+        else if (res == "-3")
+        {
             res = "已下架";
         }
-
         return res;
     }
     public async Task<string> RecommendationRateFormatter(object cut)

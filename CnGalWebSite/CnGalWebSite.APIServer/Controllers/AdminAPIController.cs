@@ -863,7 +863,12 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _steamInforService.UpdateSteamInfor(2001090, 3911);
+                var steamIds = new int[] { 924540, 1082870 , 820770, 962940, 1020060 , 1082880, 943100 , 895920 , 1036690 , 1117650 , 1058040, 1007450 };
+
+                _ = await _steamInforRepository.GetRangeUpdateTable().Where(s => steamIds.Contains(s.SteamId)).Set(s => s.PriceNow, b => -3).ExecuteAsync();
+                _ = await _steamInforRepository.GetRangeUpdateTable().Where(s => steamIds.Contains(s.SteamId)).Set(s => s.CutNow, b => -3).ExecuteAsync();
+
+
                 return new Result { Successful = true };
             }
             catch (Exception ex)
