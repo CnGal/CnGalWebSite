@@ -34,6 +34,25 @@
             }
             else if (SteamInfor.PriceNow == -2)
             {
+                @if (SteamInfor.OriginalPrice > 0)
+                {
+                    <span class="col-12">
+                        <i class="fa fa-fw font-color fa-money"></i>&nbsp; &nbsp;
+                        <span>价格：¥</span>
+
+                        <span>  @((SteamInfor.OriginalPrice / 100.0).ToString(" 0.00"))</span>
+
+                    </span>
+                }
+                else if (SteamInfor.OriginalPrice == 0)
+                {
+                    <BasicInforAloneTip Icon="fa-check-circle-o" Text="价格：¥ 0.00 - Free" Class="col-12" />
+                }
+                <BasicInforAloneTip Icon="fa-calendar-times-o" Text="数据未更新" Class="col-12" />
+                <meta itemprop="availability" content="SoldOut" />
+            }
+            else if (SteamInfor.PriceNow == -3)
+            {
                 <BasicInforAloneTip Icon="fa-calendar-times-o" Text="已下架" Class="col-12" />
                 <meta itemprop="availability" content="SoldOut" />
             }
