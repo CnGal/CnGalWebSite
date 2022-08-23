@@ -187,7 +187,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             };
 
             //判断是否下架
-            if (steam.PriceNow != -3)
+            if (steam.PriceNow == -3)
             {
                 return steam;
             }
