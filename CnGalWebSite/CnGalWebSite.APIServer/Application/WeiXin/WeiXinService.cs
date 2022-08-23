@@ -236,7 +236,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                     {
                         if (steam.OriginalPrice > 0)
                         {
-                            _ = sb.AppendLine($"价格：{(steam.OriginalPrice / 100.0).ToString("0.00")}（数据未更新）");
+                            _ = sb.AppendLine($"价格：¥ {(steam.OriginalPrice / 100.0).ToString("0.00")}（数据未更新）");
                         }
                         else if (steam.OriginalPrice == 0)
                         {
