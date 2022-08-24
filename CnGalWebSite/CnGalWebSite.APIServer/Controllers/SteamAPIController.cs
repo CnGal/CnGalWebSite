@@ -111,6 +111,21 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
+        [HttpGet("{Id}")]
+        public async Task<ActionResult<Result>> UpdateAllSteamInforAsync(int Id)
+        {
+            try
+            {
+                await _steamInforService.UpdateSteamInfor(Id,0);
+                return new Result { Successful = true };
+            }
+            catch (Exception exc)
+            {
+                return new Result { Successful = false, Error = exc.Message };
+            }
+
+        }
+
         [HttpGet]
         public async Task<ActionResult<Result>> GetAllSteamImageToGame()
         {

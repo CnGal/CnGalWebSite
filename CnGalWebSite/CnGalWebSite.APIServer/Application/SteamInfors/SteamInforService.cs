@@ -122,51 +122,61 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             {
                 steamLowestJson = thirdResult["data"]["app/" + steamId]["lowest"].ToObject<SteamLowestJson>();
             }
-
+            JObject officialResult = null;
             try
             {
                 //尝试使用官方api获取信息
                 jsonContent = await client.GetStringAsync("https://store.steampowered.com/api/appdetails/?appids=" + steamId + "&cc=cn&filters=price_overview");
-                var officialResult = JObject.Parse(jsonContent);
+                officialResult = JObject.Parse(jsonContent);
 
-                if (officialResult[steamId.ToString()]["success"].ToObject<string>() == "True")
+
+            }
+            catch (Exception ex)
+            {
+                try
                 {
-                    if (officialResult[steamId.ToString()]["data"].Count() != 0)
-                    {
-                        var discount_percent = officialResult[steamId.ToString()]["data"]["price_overview"]["discount_percent"].ToObject<string>();
-                        var final = officialResult[steamId.ToString()]["data"]["price_overview"]["final"].ToObject<string>();
-                        var final_formatted = officialResult[steamId.ToString()]["data"]["price_overview"]["final_formatted"].ToObject<string>();
+                    jsonContent = await client.GetStringAsync("https://store.steampowered.com/api/appdetails/?appids=" + steamId + "&cc=cn&filters=price_overview");
+                    officialResult = JObject.Parse(jsonContent);
 
-                        steamNowJson = new SteamNowJson
-                        {
-                            price = int.Parse(final),
-                            cut = int.Parse(discount_percent),
-                            price_formatted = final_formatted
-                        };
+                }
+                catch
+                {
 
-                    }
-                    else
+                }
+            }
+
+            if (officialResult != null && officialResult[steamId.ToString()]["success"].ToObject<bool>() == true)
+            {
+                if (officialResult[steamId.ToString()]["data"].Count() != 0)
+                {
+                    var discount_percent = officialResult[steamId.ToString()]["data"]["price_overview"]["discount_percent"].ToObject<string>();
+                    var final = officialResult[steamId.ToString()]["data"]["price_overview"]["final"].ToObject<string>();
+                    var final_formatted = officialResult[steamId.ToString()]["data"]["price_overview"]["final_formatted"].ToObject<string>();
+
+                    steamNowJson = new SteamNowJson
                     {
-                        steamNowJson = new SteamNowJson
-                        {
-                            price = 0,
-                            cut = 0
-                        };
-                    }
+                        price = int.Parse(final),
+                        cut = int.Parse(discount_percent),
+                        price_formatted = final_formatted
+                    };
+
                 }
                 else
                 {
-                    if (thirdResult["data"]["app/" + steamId]["price"].Count() != 0)
+                    steamNowJson = new SteamNowJson
                     {
-                        steamNowJson = thirdResult["data"]["app/" + steamId]["price"].ToObject<SteamNowJson>();
-                    }
+                        price = 0,
+                        cut = 0
+                    };
                 }
             }
-            catch
+            else
             {
-
+                if (thirdResult["data"]["app/" + steamId]["price"].Count() != 0)
+                {
+                    steamNowJson = thirdResult["data"]["app/" + steamId]["price"].ToObject<SteamNowJson>();
+                }
             }
-
 
             //修正无法获取价格的游戏状态
             if (steamNowJson.price == 0 && steamLowestJson.price == -1)
@@ -284,7 +294,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 steam.PriceNowString = "¥ 0.00";
             }
 
-            
+
             //获取评测
             if (steam.PriceNow >= 0)
             {
