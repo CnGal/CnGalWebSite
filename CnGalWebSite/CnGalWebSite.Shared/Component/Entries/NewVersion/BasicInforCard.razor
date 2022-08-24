@@ -177,27 +177,27 @@
                     {
                         @if (item.DisplayValue.Contains("bilibili.com"))
                         {
-                            <BasicInforAloneTip Icon="fa-external-link-square" Text="B站：" Url="@item.DisplayValue" Class="col-12  text-truncate-1" />
+                            <BasicInforAloneTip Icon="fa-external-link-square" Text="B站：" Url="@item.DisplayValue" Class="col-12  text-truncate-1" ItemProp="url"/>
                         }
                         else if (item.DisplayValue.Contains("weibo.com"))
                         {
-                            <BasicInforAloneTip Icon=" fa-weibo" Text="微博：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
+                            <BasicInforAloneTip Icon=" fa-weibo" Text="微博：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url"/>
                         }
                         else if (item.DisplayValue.Contains("youtube.com"))
                         {
-                            <BasicInforAloneTip Icon="fa-youtube" Text="YouTube：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
+                            <BasicInforAloneTip Icon="fa-youtube" Text="YouTube：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url"/>
                         }
                         else if (item.DisplayValue.Contains("twitter.com"))
                         {
-                            <BasicInforAloneTip Icon="fa-twitter" Text="Twitter：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
+                            <BasicInforAloneTip Icon="fa-twitter" Text="Twitter：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url"/>
                         }
                         else if (item.DisplayValue.Contains("facebook.com"))
                         {
-                            <BasicInforAloneTip Icon="fa-facebook" Text="Facebook：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
+                            <BasicInforAloneTip Icon="fa-facebook" Text="Facebook：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url"/>
                         }
                         else
                         {
-                            <BasicInforAloneTip Icon=" fa-external-link-square" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
+                            <BasicInforAloneTip Icon=" fa-external-link-square" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url"/>
                         }
                     }
                 }

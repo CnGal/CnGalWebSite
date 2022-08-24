@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /home/examined/
+Disallow: /home/editrecord/
+Disallow: /home/editrecord
+Disallow: /account/
