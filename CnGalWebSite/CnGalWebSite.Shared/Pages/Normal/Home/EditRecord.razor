@@ -17,7 +17,7 @@
 
 @if (isReady)
 {
-    <TitleTip Title="@("『"+ExaminesOverview.ObjectName+"』第" +(ExaminesOverview.Examines.FindIndex(s=>s.Id==ContrastId)+1)+"次编辑记录")" Description="@ExaminesOverview.ObjectBriefIntroduction" Image="@ExaminesOverview.Image"></TitleTip>
+    <TitleTip NoIndex Title="@("『"+ExaminesOverview.ObjectName+"』第" +(ExaminesOverview.Examines.FindIndex(s=>s.Id==ContrastId)+1)+"次编辑记录")" Description="@ExaminesOverview.ObjectBriefIntroduction" Image="@ExaminesOverview.Image"></TitleTip>
 }
 
 @if (isReady)
