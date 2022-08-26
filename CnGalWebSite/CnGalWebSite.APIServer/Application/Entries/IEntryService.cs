@@ -25,7 +25,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         void UpdateEntryDataMain(Entry entry, EntryMain_1_0 examine);
 
-        void UpdateEntryDataAddInfor(Entry entry, EntryAddInfor examine);
+        Task UpdateEntryDataAddInforAsync(Entry entry, EntryAddInfor examine);
 
         void UpdateEntryDataImages(Entry entry, EntryImages examine);
 
@@ -61,7 +61,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         void SetDataFromEditMainViewModel(Entry newEntry, EditMainViewModel model);
 
-        void SetDataFromEditAddInforViewModel(Entry newEntry, EditAddInforViewModel model);
+        Task SetDataFromEditAddInforViewModelAsync(Entry newEntry, EditAddInforViewModel model);
 
         void SetDataFromEditImagesViewModel(Entry newEntry, EditImagesViewModel model);
 

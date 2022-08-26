@@ -7,102 +7,120 @@
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditRelevances/" + Model.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke" />
     }
 
-    <div>
-        @if (RightDisplay == false)
+<div>
+    @if (RightDisplay == false)
+    {
+        @if (Model.Roles.Count > 0)
         {
-            @if (Model.Roles.Count > 0)
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-child" Title="登场角色" Outline Collapable>
-                    <div class="row">
-                        @foreach (var item in Model.Roles)
-                        {
-                            <div class="col-12 mb-3">
-                                <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" IsEdit="Model.IsEdit" />
-                                </div>
-                        }
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-child" Title="登场角色" Outline Collapable>
+                <div class="row">
+                    @foreach (var item in Model.Roles)
+                    {
+                        <div class="col-12 mb-3">
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" IsEdit="Model.IsEdit" />
+                        </div>
+                    }
 
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+        }
+    }
+    @if (LeftDisplay == false)
+    {
+        var participationWorks = Model.StaffGames.Where(s => s.AddInfors == null || s.AddInfors.Any(s => s.Contents.Any(s => s.DisplayName.Contains("感谢") == false && s.DisplayName.Contains("鸣谢") == false)));
+        @if (participationWorks.Any())
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-paper-plane-o" Title="参与作品" Outline Collapable>
+                <div class="row">
+                    @foreach (var item in participationWorks)
+                    {
+                        <div class="mb-3 col-12">
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" IsEdit="Model.IsEdit" />
+                        </div>
+                    }
+
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+        }
+        var appreciatedParticWorks = Model.StaffGames.Where(s => participationWorks.Select(s => s.Id).Contains(s.Id) == false);
+
+        @if (appreciatedParticWorks.Any())
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-star-o" Title="特别感谢" Outline Collapable>
+                <div class="row">
+                    @foreach (var item in appreciatedParticWorks)
+                    {
+                        <div class="mb-3 col-12">
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" IsEdit="Model.IsEdit" />
+                        </div>
+                    }
+
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+        }
+        @if (Model.EntryRelevances.Count > 0)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-codepen" Title="相关词条" Outline Collapable>
+                <div class="row">
+                    @foreach (var item in Model.EntryRelevances)
+                    {
+                        <div class="mb-3 col-12">
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" IsEdit="Model.IsEdit" />
+                        </div>
+                    }
+
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+
+        }
+        @if (Model.ArticleRelevances.Count > 0)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-newspaper-o" Title="相关文章" Outline Collapable>
+                <div class="row">
+                    @foreach (var item in Model.ArticleRelevances)
+                    {
+
+                        <div class="mb-3 col-12">
+
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item" />
+                        </div>
+                    }
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+        }
+    }
+    @if (RightDisplay == false)
+    {
+        @if (Model.OtherRelevances.Count > 0 && Model.IsHideOutlink == false)
+        {
+            <div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="外部链接" Outline Collapable>
+                    <div class="mb-3">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning">
+                            以下为外部链接，与本站没有任何从属关系，本站亦不对其安全性负责
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+                    </div>
+                    <div class="row">
+
+                        @foreach (var item in Model.OtherRelevances)
+                        {
+                            <div class="mb-3 col-12">
+                                <RelevanceOtherTip Model="item" />
+                            </div>
+                        }
                     </div>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            </div>
 
-            }
         }
-        @if (LeftDisplay == false)
-        {
-            @if (Model.StaffGames.Count > 0)
-            {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-paper-plane-o" Title="参与作品" Outline Collapable>
-                        <div class="row">
-                            @foreach (var item in Model.StaffGames)
-                            {
-                                <div class="mb-3 col-12">
-                                    <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" IsEdit="Model.IsEdit"  />
-                                </div>
-                            }
+    }
 
-                        </div>
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-        
-            }
-            @if (Model.EntryRelevances.Count > 0)
-            {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-codepen" Title="相关词条" Outline Collapable>
-                        <div class="row">
-                            @foreach (var item in Model.EntryRelevances)
-                            {
-                                <div class="mb-3 col-12">
-                                    <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ColorNum="main" IsEdit="Model.IsEdit" />
-                                </div>
-                            }
-
-                        </div>
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-       
-
-            }
-            @if (Model.ArticleRelevances.Count > 0)
-            {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-newspaper-o" Title="相关文章" Outline Collapable>
-                        <div class="row">
-                            @foreach (var item in Model.ArticleRelevances)
-                            {
-
-                                <div class="mb-3 col-12">
-
-                                    <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item" />
-                                </div>
-                            }
-                        </div>
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-           
-            }
-        }
-        @if (RightDisplay == false)
-        {
-            @if (Model.OtherRelevances.Count > 0 && Model.IsHideOutlink == false)
-            {
-                <div>
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="外部链接" Outline Collapable>
-                        <div class="mb-3">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning">
-                                以下为外部链接，与本站没有任何从属关系，本站亦不对其安全性负责
-                            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
-                        </div>
-                        <div class="row">
-
-                            @foreach (var item in Model.OtherRelevances)
-                            {
-                                <div class="mb-3 col-12">
-                                    <RelevanceOtherTip Model="item" />
-                                </div>
-                            }
-                        </div>
-                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-                </div>
-
-            }
-        }
-
-    </div>
+</div>
 
 </div>
 

@@ -100,7 +100,7 @@ namespace CnGalWebSite.DataModel.Model
 
 
         /// <summary>
-        /// 附加信息列表
+        /// 附加信息列表 Staff迁移到 EntryStaffFromEntryNavigation 中
         /// </summary>
         public ICollection<BasicEntryInformation> Information { get; set; } = new List<BasicEntryInformation>();
 
@@ -162,6 +162,16 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public virtual ICollection<EntryRelation> EntryRelationToEntryNavigation { get; set; } = new List<EntryRelation>();
 
+        /// <summary>
+        /// 关联Staff列表
+        /// </summary>
+        public virtual ICollection<EntryStaff> EntryStaffFromEntryNavigation { get; set; } = new List<EntryStaff>();
+
+        /// <summary>
+        /// To 指当前词条被关联的其他Staff关联 呈现编辑视图时不使用
+        /// </summary>
+        public virtual ICollection<EntryStaff> EntryStaffToEntryNavigation { get; set; } = new List<EntryStaff>();
+
     }
     public class Outlink
     {
@@ -184,6 +194,50 @@ namespace CnGalWebSite.DataModel.Model
         public virtual Entry FromEntryNavigation { get; set; } = new Entry();
         public virtual Entry ToEntryNavigation { get; set; } = new Entry();
     }
+
+    public partial class EntryStaff
+    {
+        public long EntryStaffId { get; set; }
+
+        public int? FromEntry { get; set; }
+        public int? ToEntry { get; set; }
+
+        /// <summary>
+        /// 仅当关联Staff为空时展示
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 优先展示显示名称 与其他地方不一致的行为
+        /// </summary>
+        public string CustomName { get; set; }
+        /// <summary>
+        /// 官方职位
+        /// </summary>
+        public string PositionOfficial { get; set; }
+        /// <summary>
+        /// 通用职位
+        /// </summary>
+        public PositionGeneralType PositionGeneral { get; set; }
+        /// <summary>
+        /// 隶属组织
+        /// </summary>
+        public string SubordinateOrganization { get; set; }
+        /// <summary>
+        /// 分组
+        /// </summary>
+        public string Modifier { get; set; }
+
+        /// <summary>
+        /// 游戏
+        /// </summary>
+        public virtual Entry FromEntryNavigation { get; set; } = new Entry();
+        /// <summary>
+        /// Staff
+        /// </summary>
+        public virtual Entry ToEntryNavigation { get; set; } = new Entry();
+    }
+
 
     public class EditionModel
     {
@@ -324,7 +378,13 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "策划")]
         Plan,
         [Display(Name = "作曲")]
-        ComposeMusic
+        ComposeMusic,
+        [Display(Name = "制作组")]
+        ProductionGroup,
+        [Display(Name = "发行商")]
+        Publisher,
+        [Display(Name = "特别感谢")]
+        SpecialThanks
     }
 
     public enum GenderType

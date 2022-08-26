@@ -82,6 +82,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<RobotFace> RobotFaces { get; set; }
         public DbSet<GameScoreTableModel> GameScores { get; set; }
         public DbSet<OperationRecord> OperationRecords { get; set; }
+        public DbSet<EntryStaff> EntryStaffs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -168,7 +169,22 @@ namespace CnGalWebSite.APIServer.Infrastructure
                 entity.HasOne(d => d.ToArticleNavigation)
                     .WithMany(p => p.ArticleRelationToArticleNavigation)
                     .HasForeignKey(d => d.ToArticle)
-                    .HasConstraintName("FK_ArticleRelation_Entry_To");
+                    .HasConstraintName("FK_ArticleRelation_Entry_To");//笔误 应为 FK_ArticleRelation_Article_To
+            });
+            //设置Staff与词条多对多关系
+            modelBuilder.Entity<EntryStaff>(entity =>
+            {
+                entity.Property(e => e.EntryStaffId).HasColumnName("EntryStaffId");
+
+                entity.HasOne(d => d.FromEntryNavigation)
+                    .WithMany(p => p.EntryStaffFromEntryNavigation)
+                    .HasForeignKey(d => d.FromEntry)
+                    .HasConstraintName("FK_EntryStaff_Entry_From");
+
+                entity.HasOne(d => d.ToEntryNavigation)
+                    .WithMany(p => p.EntryStaffToEntryNavigation)
+                    .HasForeignKey(d => d.ToEntry)
+                    .HasConstraintName("FK_EntryStaff_Entry_To");
             });
             //角色Id
             const string ADMIN_ID = "a18be9c0-aa65-4af8-bd17-00bd9344e575";
@@ -200,8 +216,6 @@ namespace CnGalWebSite.APIServer.Infrastructure
                 NormalizedEmail = "1278490989@qq.com",
                 EmailConfirmed = true,
                 PersonalSignature = "这个人太懒了，什么也没写额(～￣▽￣)～",
-                Integral = 0,
-                ContributionValue = 0,
                 MainPageContext = "### 这个人太懒了，什么也没写额(～￣▽￣)～",
                 Birthday = null,
                 RegistTime = DateTime.MinValue,

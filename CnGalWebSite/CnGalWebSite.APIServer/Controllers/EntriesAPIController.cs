@@ -143,12 +143,16 @@ namespace CnGalWebSite.APIServer.Controllers
             //通过Id获取词条 
             var entry = await _entryRepository.GetAll().Include(s => s.Disambig)
                     .Include(s => s.Outlinks)
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation)
+                    .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information)
+                    .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                    .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation)
                     .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
                     .Include(s => s.Articles).ThenInclude(s => s.Entries)
                     .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
-                    .AsSplitQuery().FirstOrDefaultAsync(x => x.Id == id);
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
 
             if (entry == null)
@@ -326,6 +330,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //增加词条阅读次数
+            
             await _appHelper.EntryReaderNumUpAsync(entry.Id);
 
             return model;
@@ -478,7 +483,10 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //获取词条
-            var entry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Information).ThenInclude(s => s.Additional).FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
+            var entry = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Information).ThenInclude(s => s.Additional)
+                .Include(s=>s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                .FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
             if (entry == null)
             {
                 return NotFound();
@@ -525,10 +533,12 @@ namespace CnGalWebSite.APIServer.Controllers
             var currentEntry = await _entryRepository.GetAll()
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .FirstOrDefaultAsync(x => x.Id == model.Id);
             var newEntry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .FirstOrDefaultAsync(x => x.Id == model.Id);
             if (currentEntry == null)
             {
@@ -536,7 +546,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //设置数据
-            _entryService.SetDataFromEditAddInforViewModel(newEntry, model);
+            await _entryService.SetDataFromEditAddInforViewModelAsync(newEntry, model);
 
             var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
 
@@ -985,7 +995,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
                 var newEntry = new Entry();
-                _entryService.SetDataFromEditAddInforViewModel(newEntry, model.AddInfor);
+                await _entryService.SetDataFromEditAddInforViewModelAsync(newEntry, model.AddInfor);
                 _entryService.SetDataFromEditImagesViewModel(newEntry, model.Images);
                 _entryService.SetDataFromEditMainPageViewModel(newEntry, model.MainPage);
                 _entryService.SetDataFromEditMainViewModel(newEntry, model.Main);

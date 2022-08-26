@@ -2491,7 +2491,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task ExamineEstablishAddInforAsync(Entry entry, EntryAddInfor examine)
         {
             //更新数据
-            _entryService.UpdateEntryDataAddInfor(entry, examine);
+            await _entryService.UpdateEntryDataAddInforAsync(entry, examine);
             //保存
             entry = await _entryRepository.UpdateAsync(entry);
 
@@ -2501,114 +2501,37 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
 
             //反向关联
-            foreach (var item in examine.Information)
+            foreach (var item in examine.Staffs)
             {
                 if (item.IsDelete == false)
                 {
-                    if (entry.Type == EntryType.Game)
+                    var temp = await _entryRepository.GetAll()
+                        .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                        .FirstOrDefaultAsync(s => s.Id == item.StaffId);
+
+                    if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
                     {
-                        if (item.Modifier == "STAFF")
+                        //补全审核记录
+                        //创建审核数据模型
+                        var examinedModel = new EntryRelevances();
+
+                        examinedModel.Relevances.Add(new EntryRelevancesAloneModel
                         {
-                            var temp = await _entryRepository.GetAll()
-                                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                                .FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
-
-                            if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
-                            {
-                                //补全审核记录
-                                //创建审核数据模型
-                                var examinedModel = new EntryRelevances();
-
-                                examinedModel.Relevances.Add(new EntryRelevancesAloneModel
-                                {
-                                    DisplayName = entry.Id.ToString(),
-                                    DisplayValue = entry.Name,
-                                    IsDelete = false,
-                                    Type = RelevancesType.Entry,
-                                });
-                                var resulte = "";
-                                using (TextWriter text = new StringWriter())
-                                {
-                                    var serializer = new JsonSerializer();
-                                    serializer.Serialize(text, examinedModel);
-                                    resulte = text.ToString();
-                                }
-
-                                await ExamineEstablishRelevancesAsync(temp, examinedModel);
-                                await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
-
-                            }
-                        }
-                        else if (item.Modifier == "基本信息" && (item.DisplayName == "制作组" || item.DisplayName == "发行商") && string.IsNullOrWhiteSpace(item.DisplayValue) == false)
+                            DisplayName = entry.Id.ToString(),
+                            DisplayValue = entry.Name,
+                            IsDelete = false,
+                            Type = RelevancesType.Entry,
+                        });
+                        var resulte = "";
+                        using (TextWriter text = new StringWriter())
                         {
-                            var values = item.DisplayValue.Replace("，", ",").Replace("、", ",").Split(',');
-                            foreach (var value in values)
-                            {
-                                var temp = await _entryRepository.GetAll()
-                                                               .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                                                               .FirstOrDefaultAsync(s => s.Name == value);
-
-                                if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
-                                {
-                                    //补全审核记录
-                                    //创建审核数据模型
-                                    var examinedModel = new EntryRelevances();
-
-                                    examinedModel.Relevances.Add(new EntryRelevancesAloneModel
-                                    {
-                                        DisplayName = entry.Id.ToString(),
-                                        DisplayValue = entry.Name,
-                                        IsDelete = false,
-                                        Type = RelevancesType.Entry,
-                                    });
-                                    var resulte = "";
-                                    using (TextWriter text = new StringWriter())
-                                    {
-                                        var serializer = new JsonSerializer();
-                                        serializer.Serialize(text, examinedModel);
-                                        resulte = text.ToString();
-                                    }
-
-                                    await ExamineEstablishRelevancesAsync(temp, examinedModel);
-                                    await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
-                                }
-                            }
-
+                            var serializer = new JsonSerializer();
+                            serializer.Serialize(text, examinedModel);
+                            resulte = text.ToString();
                         }
-                    }
-                    else if (entry.Type == EntryType.Role)
-                    {
-                        if (item.Modifier == "基本信息" && item.DisplayName == "声优" && string.IsNullOrWhiteSpace(item.DisplayValue) == false)
-                        {
-                            var temp = await _entryRepository.GetAll()
-                                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                                .FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
 
-                            if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
-                            {
-                                //补全审核记录
-                                //创建审核数据模型
-                                var examinedModel = new EntryRelevances();
-
-                                examinedModel.Relevances.Add(new EntryRelevancesAloneModel
-                                {
-                                    DisplayName = entry.Id.ToString(),
-                                    DisplayValue = entry.Name,
-                                    IsDelete = false,
-                                    Type = RelevancesType.Entry,
-                                });
-                                var resulte = "";
-                                using (TextWriter text = new StringWriter())
-                                {
-                                    var serializer = new JsonSerializer();
-                                    serializer.Serialize(text, examinedModel);
-                                    resulte = text.ToString();
-                                }
-
-                                await ExamineEstablishRelevancesAsync(temp, examinedModel);
-                                await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
-                            }
-                        }
+                        await ExamineEstablishRelevancesAsync(temp, examinedModel);
+                        await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动关联词条");
                     }
                 }
             }

@@ -434,10 +434,10 @@ namespace CnGalWebSite.DataModel.Helper
                     var type = GetGeneralType(PositionGeneral ?? Position);
                     result.Add(new StaffModel
                     {
-                        NicknameOfficial = infor.Replace($"({roleName})", ""),
+                        Name = infor.Replace($"({roleName})", ""),
+                        CustomName = infor.Replace($"({roleName})", ""),
                         PositionOfficial = Position,
-                        Subcategory = Subcategory,
-                        Role = type == PositionGeneralType.CV ? roleName : null,
+                        Modifier = Subcategory,
                         SubordinateOrganization = type == PositionGeneralType.CV ? null : roleName,
                         PositionGeneral = type
                     });
@@ -1016,6 +1016,28 @@ namespace CnGalWebSite.DataModel.Helper
                 if (informations.Count(s => item.DisplayName == s.DisplayName && item.DisplayValue == s.DisplayValue && item.Modifier == s.Modifier) > 1)
                 {
                     var temp = informations.FirstOrDefault(s => item.DisplayName == s.DisplayName && s.DisplayValue == s.DisplayValue && item.Modifier == s.Modifier);
+                    if (temp != null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
+        /// <summary>
+        /// 词条 Staff 列表 清理相同项目
+        /// </summary>
+        /// <param name="informations"></param>
+        /// <returns></returns>
+        public static List<EntryStaff> Purge(this List<EntryStaff> informations)
+        {
+            var list = informations.ToList();
+            foreach (var item in list)
+            {
+                if (informations.Count(s => item.Name == s.Name && item.ToEntry == s.ToEntry && s.PositionOfficial == item.PositionOfficial && s.Modifier == item.Modifier) > 1)
+                {
+                    var temp = informations.FirstOrDefault(s => item.Name == s.Name && s.ToEntry == item.ToEntry && s.PositionOfficial == item.PositionOfficial && s.Modifier == item.Modifier);
                     if (temp != null)
                     {
                         informations.Remove(temp);

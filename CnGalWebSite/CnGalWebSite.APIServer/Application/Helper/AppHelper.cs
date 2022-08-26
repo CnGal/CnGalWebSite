@@ -464,12 +464,14 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public async Task ArticleReaderNumUpAsync(long articleId)
         {
+            _entryRepository.Clear();
             _ = await _articleRepository.GetRangeUpdateTable().Where(s => s.Id == articleId).Set(s => s.ReaderCount, b => b.ReaderCount + 1).ExecuteAsync();
 
         }
 
         public async Task EntryReaderNumUpAsync(int entryId)
         {
+            _entryRepository.Clear();
             _ = await _entryRepository.GetRangeUpdateTable().Where(s => s.Id == entryId).Set(s => s.ReaderCount, b => b.ReaderCount + 1).ExecuteAsync();
         }
 
@@ -679,35 +681,21 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 if (entry.Type == EntryType.Role)
                 {
                     //查找配音
-                    foreach (var item in entry.Information)
+                    var cvs = entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral == PositionGeneralType.CV);
+                    if (cvs.Any())
                     {
-                        if (item.Modifier == "基本信息" && item.DisplayName == "声优" && string.IsNullOrWhiteSpace(item.DisplayValue) == false)
+                        model.AddInfors.Add(new EntryInforTipAddInforModel
                         {
-                            var cvs = item.DisplayValue.Replace(",", "、").Replace("，", "、").Split("、").ToList();
-                            var cvEntries = await _entryRepository.GetAll().Where(s => cvs.Contains(s.Name)).Select(s => new KeyValuePair<int, string>(s.Id, s.DisplayName)).ToListAsync();
+                            Modifier = "配音",
+                            Contents = cvs.Select(s => new StaffNameModel
+                            {
+                                DisplayName = string.IsNullOrWhiteSpace(s.CustomName) ? (s.ToEntryNavigation?.Name ?? s.Name) : s.CustomName,
+                                Id = s.ToEntryNavigation?.Id ?? -1
+                            }).ToList()
+                        });
 
-                            if (cvEntries.Count != cvs.Count)
-                            {
-                                foreach (var temp in cvs)
-                                {
-                                    if (cvEntries.Select(s => s.Value).Contains(temp) == false)
-                                    {
-                                        cvEntries.Add(new KeyValuePair<int, string>(-1, temp));
-                                    }
-                                }
-                            }
-                            model.AddInfors.Add(new EntryInforTipAddInforModel
-                            {
-                                Modifier = "配音",
-                                Contents = cvEntries.Select(s => new StaffNameModel
-                                {
-                                    DisplayName = s.Value,
-                                    Id = s.Key
-                                }).ToList()
-                            });
-                            break;
-                        }
                     }
+                    
                     //查找登场游戏
                     var gameNames = new List<StaffNameModel>();
                     foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
@@ -739,24 +727,16 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 else if (entry.Type == EntryType.Staff)
                 {
                     //查找参与作品
-                    var gameNames = new List<StaffNameModel>();
-                    foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
-                    {
-                        var item = nav.ToEntryNavigation;
-                        if (item.Type == EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)
+                    var gameNames = entry.EntryRelationFromEntryNavigation
+                        .Where(s => s.ToEntryNavigation.IsHidden == false&&s.ToEntryNavigation.Type== EntryType.Game&&string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name)==false)
+                        .Where(s=>s.ToEntryNavigation.EntryStaffFromEntryNavigation.Any(s=>s.PositionGeneral!= PositionGeneralType.SpecialThanks&&s.ToEntry==entry.Id))
+                        .Take(3)
+                        .Select(s=>new StaffNameModel
                         {
-                            gameNames.Add(new StaffNameModel
-                            {
-                                DisplayName = item.DisplayName,
-                                Id = item.Id
-                            });
-                            if (gameNames.Count >= 3)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    if (gameNames.Count > 0)
+                            DisplayName=s.ToEntryNavigation.DisplayName,
+                            Id=s.ToEntryNavigation.Id
+                        }).ToList();
+                    if (gameNames.Any())
                     {
                         model.AddInfors.Add(new EntryInforTipAddInforModel
                         {
@@ -768,24 +748,16 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 else if (entry.Type == EntryType.ProductionGroup)
                 {
                     //查找参与作品
-                    var gameNames = new List<StaffNameModel>();
-                    foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
-                    {
-                        var item = nav.ToEntryNavigation;
-                        if (item.Type == EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)
-                        {
-                            gameNames.Add(new StaffNameModel
-                            {
-                                DisplayName = item.DisplayName,
-                                Id = item.Id
-                            });
-                            if (gameNames.Count >= 3)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    if (gameNames.Count > 0)
+                    var gameNames = entry.EntryRelationFromEntryNavigation
+                          .Where(s => s.ToEntryNavigation.IsHidden == false && s.ToEntryNavigation.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name) == false)
+                          .Where(s => s.ToEntryNavigation.EntryStaffFromEntryNavigation.Any(s => s.PositionGeneral != PositionGeneralType.SpecialThanks && s.ToEntry == entry.Id))
+                          .Take(3)
+                          .Select(s => new StaffNameModel
+                          {
+                              DisplayName = s.ToEntryNavigation.DisplayName,
+                              Id = s.ToEntryNavigation.Id
+                          }).ToList();
+                    if (gameNames.Any())
                     {
                         model.AddInfors.Add(new EntryInforTipAddInforModel
                         {

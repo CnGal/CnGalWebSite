@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Tables
@@ -24,6 +25,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Tables
         [Display(Name = "通用职位")]
         public PositionGeneralType PositionGeneral { get; set; }
         [Display(Name = "角色")]
+        [Obsolete("角色已删除")]
         public string Role { get; set; }
         [Display(Name = "隶属组织")]
         public string SubordinateOrganization { get; set; }

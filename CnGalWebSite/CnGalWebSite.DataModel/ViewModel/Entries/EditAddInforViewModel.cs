@@ -121,9 +121,9 @@ namespace CnGalWebSite.DataModel.ViewModel
                     {
                         return new Result { Error = "Staff必须填写官方职位" };
                     }
-                    if (string.IsNullOrWhiteSpace(item.NicknameOfficial))
+                    if (string.IsNullOrWhiteSpace(item.Name))
                     {
-                        return new Result { Error = "Staff必须填写官方昵称" };
+                        return new Result { Error = "Staff必须填写唯一名称" };
                     }
                 }
             }
@@ -144,18 +144,23 @@ namespace CnGalWebSite.DataModel.ViewModel
     {
         public long Id { get; set; }
         [Display(Name = "分组")]
-        public string Subcategory { get; set; }
+        public string Modifier { get; set; }
+
         [Display(Name = "官方职位")]
         [Required(ErrorMessage = "请填写官方职位")]
         public string PositionOfficial { get; set; }
+
         [Display(Name = "唯一名称")]
         [Required(ErrorMessage = "请填写唯一名称")]
-        public string NicknameOfficial { get; set; }
+        public string Name { get; set; }
+
+        [Display(Name = "自定义名称")]
+        public string CustomName { get; set; }
+
         [Display(Name = "通用职位")]
         [Required(ErrorMessage = "请填写通用职位")]
         public PositionGeneralType PositionGeneral { get; set; }
-        [Display(Name = "角色")]
-        public string Role { get; set; }
+
         [Display(Name = "隶属组织")]
         public string SubordinateOrganization { get; set; }
     }

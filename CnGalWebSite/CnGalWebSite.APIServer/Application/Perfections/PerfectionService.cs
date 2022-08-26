@@ -978,7 +978,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
         {
             var results = new List<PerfectionCheck>();
             //获取所有staff
-            var staffs = entry.Information.ToList().Where(s => s.Modifier == "STAFF").Select(s => s.DisplayValue).ToList();
+            var staffs = entry.EntryStaffFromEntryNavigation;
 
 
             if (staffs.Count == 0)
@@ -993,35 +993,29 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 };
             }
 
-            ToolHelper.Purge(ref staffs);
-
-            //拿到存在和不存在的名单
-            var existentialStaffs = await _entryRepository.GetAll().Where(s => staffs.Contains(s.Name)).Select(s => new { s.Name, s.Type }).ToListAsync();
-
             var existentialCount = 0;
 
             var score = (double)20 / staffs.Count;
             foreach (var item in staffs)
             {
-                var temp = existentialStaffs.FirstOrDefault(s => s.Name.ToLower() == item.ToLower());
-                if (temp == null)
+                if (item.ToEntryNavigation == null)
                 {
                     results.Add(new PerfectionCheck
                     {
                         CheckType = PerfectionCheckType.Staff,
                         DefectType = PerfectionDefectType.NonExistent,
-                        Infor = item,
+                        Infor = item.Name,
                         Grade = score / 2,
                     });
 
                 }
-                else if (temp.Type != EntryType.Staff && temp.Type != EntryType.ProductionGroup)
+                else if (item.ToEntryNavigation.Type != EntryType.Staff && item.ToEntryNavigation.Type != EntryType.ProductionGroup)
                 {
                     results.Add(new PerfectionCheck
                     {
                         CheckType = PerfectionCheckType.Staff,
                         DefectType = PerfectionDefectType.TypeError,
-                        Infor = item,
+                        Infor = item.ToEntryNavigation.Name,
                         Grade = score / 2,
                     });
                 }
