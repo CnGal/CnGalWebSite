@@ -225,8 +225,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
             List<Entry> models = null;
             if (count != 0)
             {
-                models = await query.AsNoTracking().Include(s => s.Information)
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                models = await query.AsNoTracking()
+                    .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .ToListAsync();
             }
             else
@@ -237,7 +238,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             var dtos = new List<EntryInforTipViewModel>();
             foreach (var item in models)
             {
-                dtos.Add(await _appHelper.GetEntryInforTipViewModel(item));
+                dtos.Add( _appHelper.GetEntryInforTipViewModel(item));
             }
 
             var dtos_ = new PagedResultDto<EntryInforTipViewModel>
@@ -982,7 +983,38 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             var information = new List<InformationsModel>();
 
-            foreach (var item in entry.Information.Where(s=>s.DisplayName.Contains("发行时间")==false))
+            //添加角色CV
+            if (model.Type == EntryType.Role)
+            {
+                var cvs = new StringBuilder();
+                foreach (var item in entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral == PositionGeneralType.CV))
+                {
+                    if (cvs.Length > 0)
+                    {
+                        cvs.Append("、");
+                    }
+                    cvs.Append(String.IsNullOrWhiteSpace(item.CustomName) ? (item.ToEntryNavigation?.Name ?? item.Name) : item.CustomName);
+                }
+                if (cvs.Length > 0)
+                {
+                    information.Add(new InformationsModel
+                    {
+                        Modifier = "基本信息",
+                        Informations = new List<KeyValueModel>
+                        {
+                            new KeyValueModel()
+                            {
+                                DisplayName = "声优",
+                                DisplayValue = cvs.ToString()
+                            }
+
+                        }
+                    });
+                }
+
+            }
+
+            foreach (var item in entry.Information.Where(s => s.DisplayName.Contains("发行时间") == false))
             {
                 //判断
                 if (item.DisplayName == "性别")
@@ -1064,7 +1096,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             //序列化 STAFF
             //先读取词条信息
-            var staffInforModel = new List<StaffInforModel>
+            if (model.Type == EntryType.Game)
+            {
+                model.Staffs = new List<StaffInforModel>
             {
                 new StaffInforModel
                 {
@@ -1072,83 +1106,106 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     StaffList = new List<StaffValue>()
                 }
             };
-            foreach (var item in entry.EntryStaffFromEntryNavigation)
-            {
-
-                var isAdd = false;
-
-                //尝试获取staff的显示名称
-                var displayName = string.IsNullOrWhiteSpace(item.CustomName) ? (item.ToEntryNavigation?.DisplayName ?? item.Name) : item.CustomName;
-                var mainModifier = item.Modifier;
-                var secordModifier = item.PositionOfficial;
-                var staffId = item.ToEntry??0;
-
-                //遍历信息列表寻找 主关键词
-                foreach (var infor in staffInforModel)
+                foreach (var item in entry.EntryStaffFromEntryNavigation)
                 {
-                    if (infor.Modifier == mainModifier)
+
+                    var isAdd = false;
+
+                    //尝试获取staff的显示名称
+                    var displayName = string.IsNullOrWhiteSpace(item.CustomName) ? (item.ToEntryNavigation?.DisplayName ?? item.Name) : item.CustomName;
+                    var mainModifier = item.Modifier;
+                    var secordModifier = item.PositionOfficial;
+                    var staffId = item.ToEntry ?? 0;
+
+                    //检测是否为制作组发行商
+                    if (item.PositionGeneral == PositionGeneralType.ProductionGroup)
                     {
-                        //寻找次要关键词
-                        foreach (var temp in infor.StaffList)
+                        model.ProductionGroups.Add(new StaffNameModel
                         {
-                            if (temp.Modifier == secordModifier)
+                            DisplayName = displayName,
+                            Id = staffId
+                        });
+                        continue;
+                    }
+                    else if (item.PositionGeneral == PositionGeneralType.Publisher)
+                    {
+                        model.Publishers.Add(new StaffNameModel
+                        {
+                            DisplayName = displayName,
+                            Id = staffId
+                        });
+                        continue;
+                    }
+
+                    //遍历信息列表寻找 主关键词
+                    foreach (var infor in model.Staffs)
+                    {
+                        if (infor.Modifier == mainModifier)
+                        {
+                            //寻找次要关键词
+                            foreach (var temp in infor.StaffList)
                             {
-                                //关键词相同则添加
+                                if (temp.Modifier == secordModifier)
+                                {
+                                    //关键词相同则添加
+                                    temp.Names.Add(new StaffNameModel
+                                    {
+                                        DisplayName = displayName,
+                                        Id = staffId,
+                                    });
+                                    isAdd = true;
+                                    break;
+                                }
+                            }
+                            //没有找到次要关键词 则新建次要关键词
+                            if (isAdd == false)
+                            {
+                                //没有找到关键词 则新建关键词
+                                var temp = new StaffValue
+                                {
+                                    Modifier = secordModifier,
+                                    Names = new List<StaffNameModel>()
+                                };
                                 temp.Names.Add(new StaffNameModel
                                 {
                                     DisplayName = displayName,
-                                    Id= staffId,
+                                    Id = staffId,
                                 });
+                                infor.StaffList.Add(temp);
                                 isAdd = true;
-                                break;
                             }
+                            break;
                         }
-                        //没有找到次要关键词 则新建次要关键词
-                        if (isAdd == false)
+                    }
+                    if (isAdd == false)
+                    {
+                        //没有找到主关键词 则新建关键词
+                        var temp = new StaffInforModel
                         {
-                            //没有找到关键词 则新建关键词
-                            var temp = new StaffValue
-                            {
-                                Modifier = secordModifier,
-                                Names = new List<StaffNameModel>()
-                            };
-                            temp.Names.Add(new StaffNameModel
-                            {
-                                DisplayName = displayName,
-                                Id = staffId,
-                            });
-                            infor.StaffList.Add(temp);
-                            isAdd = true;
-                        }
-                        break;
+                            Modifier = mainModifier,
+                            StaffList = new List<StaffValue>()
+                        };
+                        temp.StaffList.Add(new StaffValue
+                        {
+                            Modifier = secordModifier,
+                            Names = new List<StaffNameModel>()
+                        });
+                        temp.StaffList[0].Names.Add(new StaffNameModel
+                        {
+                            DisplayName = displayName,
+                            Id = staffId,
+                        });
+                        model.Staffs.Add(temp);
                     }
                 }
-                if (isAdd == false)
-                {
-                    //没有找到主关键词 则新建关键词
-                    var temp = new StaffInforModel
-                    {
-                        Modifier = mainModifier,
-                        StaffList = new List<StaffValue>()
-                    };
-                    temp.StaffList.Add(new StaffValue
-                    {
-                        Modifier = secordModifier,
-                        Names = new List<StaffNameModel>()
-                    });
-                    temp.StaffList[0].Names.Add(new StaffNameModel
-                    {
-                        DisplayName = displayName,
-                        Id = staffId,
-                    });
-                    staffInforModel.Add(temp);
-                }
-            }
 
-            //如果所有staff都有分组 则删除默认空分组
-            if (staffInforModel[0].StaffList.Count == 0)
-            {
-                staffInforModel.RemoveAt(0);
+
+                //如果所有staff都有分组 则删除默认空分组
+                if (model.Staffs[0].StaffList.Count == 0)
+                {
+                    model.Staffs.RemoveAt(0);
+                }
+
             }
 
             //序列化图片列表
@@ -1234,7 +1291,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             var relevanceArticle = new List<ArticleInforTipViewModel>();
             var relevanceOther = new List<RelevancesKeyValueModel>();
 
-            foreach (var item in entry.Articles.Where(s=>s.IsHidden==false))
+            foreach (var item in entry.Articles.Where(s => s.IsHidden == false))
             {
                 if (item.Type == ArticleType.News)
                 {
@@ -1253,7 +1310,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     if (entry.Type != EntryType.Game)
                     {
-                        var role = await _appHelper.GetEntryInforTipViewModel(item);
+                        var role = _appHelper.GetEntryInforTipViewModel(item);
                         if (entry.Type == EntryType.Staff)
                         {
                             role.AddInfors.RemoveAll(s => s.Modifier == "配音");
@@ -1264,7 +1321,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     {
 
                         //获取角色词条
-                        var role = await _appHelper.GetEntryInforTipViewModel(item);
+                        var role = _appHelper.GetEntryInforTipViewModel(item);
                         role.AddInfors.RemoveAll(s => s.Modifier == "登场游戏");
 
                         roleInforModel.Add(role);
@@ -1277,24 +1334,19 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     {
 
                         //获取角色词条
-                        var staffGame = await _appHelper.GetEntryInforTipViewModel(item);
+                        var staffGame = _appHelper.GetEntryInforTipViewModel(item);
                         staffGame.AddInfors.Clear();
                         //查找担任过的职位
-                        var tempStaffs = item.EntryStaffFromEntryNavigation.Where(s =>  s.ToEntry == entry.Id);
+                        var tempStaffs = item.EntryStaffFromEntryNavigation.Where(s => s.ToEntry == entry.Id);
                         if (tempStaffs.Any())
                         {
-                            var inforPositions = new List<string>();
-                            foreach (var roleInfor in tempStaffs)
-                            {
-                                inforPositions.Add(roleInfor.CustomName);
-                            }
 
                             staffGame.AddInfors.Add(new EntryInforTipAddInforModel
                             {
                                 Modifier = "职位",
                                 Contents = tempStaffs.Select(s => new StaffNameModel
                                 {
-                                    DisplayName = s.PositionOfficial,
+                                    DisplayName = s.PositionOfficial ?? s.PositionGeneral.GetDisplayName(),
                                     Id = -1
                                 }).ToList()
                             });
@@ -1305,19 +1357,19 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     }
                     else
                     {
-                        relevancesEntry.Add(await _appHelper.GetEntryInforTipViewModel(item));
+                        relevancesEntry.Add(_appHelper.GetEntryInforTipViewModel(item));
                     }
                 }
                 else if (item.Type == EntryType.Staff)
                 {
                     if (entry.Type != EntryType.Game)
                     {
-                        relevancesEntry.Add(await _appHelper.GetEntryInforTipViewModel(item));
+                        relevancesEntry.Add(_appHelper.GetEntryInforTipViewModel(item));
                     }
                 }
                 else if (item.Type == EntryType.ProductionGroup)
                 {
-                    relevancesEntry.Add(await _appHelper.GetEntryInforTipViewModel(item));
+                    relevancesEntry.Add(_appHelper.GetEntryInforTipViewModel(item));
                 }
             }
 
@@ -1342,11 +1394,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
             model.StaffGames = staffGames;
             model.NewsOfEntry = newsModel;
 
-            model.Staffs = staffInforModel;
 
             //获取是否评分
-            if(model.Type== EntryType.Game)
-{
+            if (model.Type == EntryType.Game)
+            {
                 model.IsScored = await _playedGameRepository.GetAll().AnyAsync(s => s.EntryId == model.Id && s.ShowPublicly && s.MusicSocre != 0 && s.ShowSocre != 0 && s.TotalSocre != 0 && s.PaintSocre != 0 && s.ScriptSocre != 0);
             }
 
@@ -1457,11 +1508,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
             }
 
-            if (entryAddInfor.Information.Count != 0)
-            {
-                examines.Add(new KeyValuePair<object, Operation>(entryAddInfor, Operation.EstablishAddInfor));
 
-            }
 
             //Staff
             //遍历当前词条数据 打上删除标签
@@ -1480,6 +1527,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 });
             }
 
+            if (entryAddInfor.Information.Any()||entryAddInfor.Staffs.Any())
+            {
+                examines.Add(new KeyValuePair<object, Operation>(entryAddInfor, Operation.EstablishAddInfor));
+
+            }
             //再遍历视图 对应修改
 
             foreach (var infor in newEntry.EntryStaffFromEntryNavigation.ToList().Purge())
@@ -1897,7 +1949,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     }
 
                     //处理Staff信息
-                    foreach(var item in entry.EntryStaffFromEntryNavigation)
+                    foreach(var item in entry.EntryStaffFromEntryNavigation.Where(s=>s.PositionGeneral!= PositionGeneralType.Publisher&& s.PositionGeneral != PositionGeneralType.ProductionGroup))
                     {
                         model.Staffs.Add(new StaffModel
                         {
@@ -1907,6 +1959,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                             Name = item.ToEntryNavigation?.Name?? item.Name,
                             PositionGeneral = item.PositionGeneral,
                             PositionOfficial = item.PositionOfficial,
+                            Id=item.EntryStaffId
                         });
                     }
                     //处理制作组发行商信息
@@ -2167,7 +2220,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 if(cvs.IndexOf(item)!= cvs.Count-1)
                 {
-                    text.Append(',');
+                    text.Append("、");
                 }
             }
 
@@ -2374,6 +2427,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
         public async Task SetDataFromEditAddInforViewModelAsync(Entry newEntry, EditAddInforViewModel model)
         {
             newEntry.Information.Clear();
+            newEntry.EntryStaffFromEntryNavigation.Clear();
             //根据类别进行序列化操作
             switch (model.Type)
             {
@@ -2693,6 +2747,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 foreach (var publisher in publishers)
                 {
                     var publisherEntry = publisherEntries.FirstOrDefault(s => s.Name == publisher);
+
+                    if (newEntry.EntryStaffFromEntryNavigation.Any(s => s.ToEntry == publisherEntry?.Id && s.Name == (publisherEntry == null ? publisher : null)))
+                    {
+                        continue;
+                    }
                     newEntry.EntryStaffFromEntryNavigation.Add(new EntryStaff
                     {
                         Name = publisherEntry == null ? publisher : null,

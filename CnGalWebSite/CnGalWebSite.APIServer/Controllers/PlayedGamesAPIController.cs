@@ -364,7 +364,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var model = new PlayedGameOverviewModel
             {
-                Game = await _appHelper.GetEntryInforTipViewModel(entry),
+                Game = _appHelper.GetEntryInforTipViewModel(entry),
                 UserScores = entry.PlayedGames.Where(s => s.ShowPublicly).Select(s => new PlayedGameUserScoreModel
                 {
                     Socres = new PlayedGameScoreModel

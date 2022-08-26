@@ -838,7 +838,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return true;
         }
 
-        private async Task<ExaminePreDataModel> InitExamineViewEntryRelevances(Entry entry)
+        private ExaminePreDataModel InitExamineViewEntryRelevances(Entry entry)
         {
             var model = new ExaminePreDataModel();
 
@@ -855,7 +855,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    entry = await _appHelper.GetEntryInforTipViewModel(item.ToEntryNavigation)
+                    entry = _appHelper.GetEntryInforTipViewModel(item.ToEntryNavigation)
                 });
 
             }
@@ -904,12 +904,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             //序列化相关性列表
             //先读取词条信息
-            var relevances = await InitExamineViewEntryRelevances(entry);
+            var relevances =  InitExamineViewEntryRelevances(entry);
 
             //添加修改记录 
             await _entryService.UpdateEntryDataAsync(entry, examine);
 
-            var relevances_examine = await InitExamineViewEntryRelevances(entry);
+            var relevances_examine =  InitExamineViewEntryRelevances(entry);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -1201,7 +1201,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return true;
         }
 
-        private async Task<ExaminePreDataModel> InitExamineViewArticleRelevances(Article article)
+        private ExaminePreDataModel InitExamineViewArticleRelevances(Article article)
         {
             var model = new ExaminePreDataModel();
 
@@ -1209,7 +1209,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    entry = await _appHelper.GetEntryInforTipViewModel(item)
+                    entry = _appHelper.GetEntryInforTipViewModel(item)
                 });
 
             }
@@ -1260,12 +1260,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             //序列化相关性列表
             //先读取词条信息
-            var relevances = await InitExamineViewArticleRelevances(article);
+            var relevances =  InitExamineViewArticleRelevances(article);
 
             //添加修改记录 
             await _articleService.UpdateArticleData(article, examine);
 
-            var relevances_examine = await InitExamineViewArticleRelevances(article);
+            var relevances_examine =  InitExamineViewArticleRelevances(article);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -1519,7 +1519,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         }
 
 
-        private async Task<ExaminePreDataModel> InitExamineViewEditChildEntries(Tag tag)
+        private ExaminePreDataModel InitExamineViewEditChildEntries(Tag tag)
         {
             var model = new ExaminePreDataModel();
 
@@ -1527,7 +1527,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    entry = await _appHelper.GetEntryInforTipViewModel(item)
+                    entry =  _appHelper.GetEntryInforTipViewModel(item)
                 });
             }
             return model;
@@ -1548,12 +1548,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             //序列化相关性列表
             //先读取词条信息
-            var relevances = await InitExamineViewEditChildEntries(tag);
+            var relevances =  InitExamineViewEditChildEntries(tag);
 
             //添加修改记录 
             await _tagService.UpdateTagDataAsync(tag, examine);
 
-            var relevances_examine = await InitExamineViewEditChildEntries(tag);
+            var relevances_examine =  InitExamineViewEditChildEntries(tag);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -1662,7 +1662,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 {
                     model.AfterModel.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                     {
-                        entry = await _appHelper.GetEntryInforTipViewModel(item)
+                        entry =  _appHelper.GetEntryInforTipViewModel(item)
                     });
                     model.ObjectBriefIntroduction = item.BriefIntroduction;
                     if (item.Type is EntryType.Game or EntryType.ProductionGroup)
@@ -1777,7 +1777,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var disambigAloneModels = new List<DisambigAloneModel>();
             foreach (var item in disambig.Entries)
             {
-                disambigAloneModels.Add(new DisambigAloneModel { entry = await _appHelper.GetEntryInforTipViewModel(item) });
+                disambigAloneModels.Add(new DisambigAloneModel { entry =  _appHelper.GetEntryInforTipViewModel(item) });
             }
             foreach (var item in disambig.Articles)
             {
@@ -1848,7 +1848,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         var temp = await _entryRepository.GetAll().Where(s => s.Id == item.EntryId).FirstOrDefaultAsync();
                         if (temp != null)
                         {
-                            disambigAloneModels_examine.Add(new DisambigAloneModel { entry = await _appHelper.GetEntryInforTipViewModel(temp) });
+                            disambigAloneModels_examine.Add(new DisambigAloneModel { entry =  _appHelper.GetEntryInforTipViewModel(temp) });
                         }
                     }
                     else if (item.Type == DisambigRelevanceType.Article)
@@ -2287,7 +2287,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return true;
         }
 
-        private async Task<ExaminePreDataModel> InitExamineViewPeripheryRelatedEntries(Periphery periphery)
+        private ExaminePreDataModel InitExamineViewPeripheryRelatedEntries(Periphery periphery)
         {
             var model = new ExaminePreDataModel();
 
@@ -2295,7 +2295,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    entry = await _appHelper.GetEntryInforTipViewModel(item)
+                    entry =  _appHelper.GetEntryInforTipViewModel(item)
                 });
 
             }
@@ -2319,12 +2319,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             //序列化相关性列表
             //先读取词条信息
-            var relevances = await InitExamineViewPeripheryRelatedEntries(periphery);
+            var relevances =  InitExamineViewPeripheryRelatedEntries(periphery);
 
             //添加修改记录 
             await _peripheryService.UpdatePeripheryDataAsync(periphery, examine);
 
-            var relevances_examine = await InitExamineViewPeripheryRelatedEntries(periphery);
+            var relevances_examine =  InitExamineViewPeripheryRelatedEntries(periphery);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -2432,7 +2432,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 model.AfterModel.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    entry = await _appHelper.GetEntryInforTipViewModel(playedGame.Entry)
+                    entry =  _appHelper.GetEntryInforTipViewModel(playedGame.Entry)
                 });
                 model.ObjectBriefIntroduction = playedGame.Entry.BriefIntroduction;
 
@@ -4749,6 +4749,241 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
         }
 
+        /// <summary>
+        /// 迁移词条审核数据 附加信息 Staff部分
+        /// </summary>
+        /// <returns></returns>
+        public async Task ReplaceEditEntryStaffExamineContext()
+        {
+            EntryAddInfor oldExamineModel = null;
+            EntryAddInfor newExamineModel = null;
+            //获取要替换的所有审核记录ID
+            var ids = await _examineRepository.GetAll().AsNoTracking()
+                .Where(s => s.Operation == Operation.EstablishAddInfor && s.Version != ExamineVersion.V1_2).Select(s => s.Id).ToListAsync();
+
+            //遍历列表 依次替换
+            foreach (var id in ids)
+            {
+                var examine = await _examineRepository.GetAll().Include(s => s.Entry).FirstOrDefaultAsync(s => s.Id == id);
+                if (examine != null)
+                {
+                    //反序列化旧数据模型                   
+                    using (TextReader str = new StringReader(examine.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        oldExamineModel = (EntryAddInfor)serializer.Deserialize(str, typeof(EntryAddInfor));
+                    }
+
+                    newExamineModel = new EntryAddInfor();
+
+                    //遍历对应复制
+
+                    //处理Staff
+                    foreach (var item in oldExamineModel.Information.Where(s=>s.Modifier=="STAFF"))
+                    {
+
+                        var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
+
+                        var temp = new EntryStaffExamineModel();
+                        if(entry==null)
+                        {
+                            temp.Name = item.DisplayValue;
+                        }
+                        else
+                        {
+                            temp.StaffId = entry.Id;
+                        }
+
+                        foreach (var infor in item.Additional.Where(s=>s.IsDelete==false))
+                        {
+                            if(infor.DisplayName== "职位（官方称呼）")
+                            {
+                                temp.PositionOfficial = infor.DisplayValue;
+                            }
+                            else if (infor.DisplayName == "职位（通用）")
+                            {
+                                temp.PositionGeneral = (PositionGeneralType)Enum.Parse(typeof(PositionGeneralType), infor.DisplayValue);
+                            }
+                            else if (infor.DisplayName == "隶属组织")
+                            {
+                                temp.SubordinateOrganization = infor.DisplayValue;
+                            }
+                            else if (infor.DisplayName == "子项目")
+                            {
+                                temp.Modifier = infor.DisplayValue;
+                            }
+                        }
+
+                        if(string.IsNullOrWhiteSpace(temp.PositionOfficial))
+                        {
+                            temp.PositionOfficial = item.DisplayName;
+                        }
+
+                        newExamineModel.Staffs.Add(temp);
+                    }
+
+                    //处理发行商
+                    await SetStaffsFromString(newExamineModel, oldExamineModel.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "发行商")?.DisplayValue, PositionGeneralType.Publisher);
+                    await SetStaffsFromString(newExamineModel, oldExamineModel.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "制作组")?.DisplayValue, PositionGeneralType.ProductionGroup);
+                    await SetStaffsFromString(newExamineModel, oldExamineModel.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "声优")?.DisplayValue, PositionGeneralType.CV);
+
+                    //删除旧数据
+                    oldExamineModel.Information.RemoveAll(s => s.Modifier == "STAFF" || s.DisplayName == "发行商" || s.DisplayName == "制作组" || s.DisplayName == "声优");
+
+                    //序列化新数据模型
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, newExamineModel);
+                        resulte = text.ToString();
+                    }
+
+                    //保存
+                    if (newExamineModel.Staffs.Count != 0)
+                    {
+                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移词条附加信息Staff部分编辑记录";
+                    }
+
+                    _logger.LogInformation("迁移词条 - {Name}({Id}) 附加信息Staff部分编辑记录(Id:{Examine})", examine.Entry.Name, examine.Entry.Id,examine.Id);
+
+                    examine.Version = ExamineVersion.V1_2;
+                    examine.Context = resulte;
+                    _ = await _examineRepository.UpdateAsync(examine);
+                }
+            }
+        }
+        /// <summary>
+        /// 迁移词条附加信息 Staff部分
+        /// </summary>
+        /// <returns></returns>
+        public async Task ReplaceEntryStaff()
+        {
+            var entries = await _entryRepository.GetAll()
+                .Where(s => s.Type == EntryType.Game || s.Type == EntryType.Role)
+                .Where(s => s.Information.Any())
+                .Include(s => s.Information).ThenInclude(s => s.Additional)
+                .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .ToListAsync();
+
+            foreach (var entry in entries)
+            {
+                //处理Staff
+                foreach (var item in entry.Information.Where(s => s.Modifier == "STAFF"))
+                {
+
+                    var staff = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
+
+                    var temp = new EntryStaff
+                    {
+                        FromEntry = entry.Id,
+                        FromEntryNavigation = entry
+                    };
+                    if (staff == null)
+                    {
+                        temp.Name = item.DisplayValue;
+                    }
+                    else
+                    {
+                        temp.Name = staff.Name;
+                        temp.ToEntry = staff.Id;
+                        temp.ToEntryNavigation = staff;
+                    }
+
+                    foreach (var infor in item.Additional)
+                    {
+                        if (infor.DisplayName == "职位（官方称呼）")
+                        {
+                            temp.PositionOfficial = infor.DisplayValue;
+                        }
+                        else if (infor.DisplayName == "职位（通用）")
+                        {
+                            temp.PositionGeneral = (PositionGeneralType)Enum.Parse(typeof(PositionGeneralType), infor.DisplayValue);
+                        }
+                        else if (infor.DisplayName == "隶属组织")
+                        {
+                            temp.SubordinateOrganization = infor.DisplayValue;
+                        }
+                        else if (infor.DisplayName == "子项目")
+                        {
+                            temp.Modifier = infor.DisplayValue;
+                        }
+                    }
+
+                    if (string.IsNullOrWhiteSpace(temp.PositionOfficial))
+                    {
+                        temp.PositionOfficial = item.DisplayName;
+                    }
+
+                    entry.EntryStaffFromEntryNavigation.Add(temp);
+                }
+
+                //处理发行商
+                await SetStaffsFromString(entry, entry.Information.FirstOrDefault(s =>s.Modifier=="基本信息"&& s.DisplayName == "发行商")?.DisplayValue, PositionGeneralType.Publisher);
+                await SetStaffsFromString(entry, entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "制作组")?.DisplayValue, PositionGeneralType.ProductionGroup);
+                await SetStaffsFromString(entry, entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "声优")?.DisplayValue, PositionGeneralType.CV);
+
+                //删除旧数据
+                var list = entry.Information.ToList();
+                list.RemoveAll(s => s.Modifier == "STAFF" || s.DisplayName == "发行商" || s.DisplayName == "制作组" || s.DisplayName == "声优");
+                entry.Information = list;
+
+                _ = await _entryRepository.UpdateAsync(entry);
+
+                _logger.LogInformation("迁移词条 - {Name}({Id}) 附加信息Staff部分数据", entry.Name, entry.Id);
+            }
+        }
+        /// <summary>
+        /// 从字符串中设置Staff
+        /// </summary>
+        private async Task SetStaffsFromString(EntryAddInfor model, string text, PositionGeneralType type)
+        {
+            if (string.IsNullOrWhiteSpace(text) == false)
+            {
+                var publishers = text.Replace("，", ",").Replace("、", ",").Split(',');
+                var publisherEntries = await _entryRepository.GetAll().Where(s => publishers.Contains(s.Name)).ToListAsync();
+                foreach (var publisher in publishers)
+                {
+                    var publisherEntry = publisherEntries.FirstOrDefault(s => s.Name == publisher);
+                    model.Staffs.Add(new EntryStaffExamineModel
+                    {
+                        IsDelete=false,
+                        Name = publisherEntry == null ? publisher : null,
+                        StaffId= publisherEntry?.Id,
+                        PositionGeneral = type
+                    });
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// 从字符串中设置Staff
+        /// </summary>
+        /// <param name="newEntry"></param>
+        /// <param name="text"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private async Task SetStaffsFromString(Entry newEntry, string text, PositionGeneralType type)
+        {
+            if (string.IsNullOrWhiteSpace(text) == false)
+            {
+                var publishers = text.Replace("，", ",").Replace("、", ",").Split(',');
+                var publisherEntries = await _entryRepository.GetAll().Where(s => publishers.Contains(s.Name)).ToListAsync();
+                foreach (var publisher in publishers)
+                {
+                    var publisherEntry = publisherEntries.FirstOrDefault(s => s.Name == publisher);
+                    newEntry.EntryStaffFromEntryNavigation.Add(new EntryStaff
+                    {
+                        Name = publisherEntry == null ? publisher : null,
+                        ToEntry = publisherEntry?.Id,
+                        ToEntryNavigation = publisherEntry,
+                        PositionGeneral = type
+                    });
+                }
+
+            }
+        }
         #endregion
 
         #region 通过审核记录生成模型 用于对比编辑

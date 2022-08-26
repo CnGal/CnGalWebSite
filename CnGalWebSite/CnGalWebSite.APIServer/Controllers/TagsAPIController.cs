@@ -885,7 +885,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 };
                 foreach (var infor in item.Entries.ToList().Random().Take(12))
                 {
-                    temp.Entries.Add(await _appHelper.GetEntryInforTipViewModel(infor));
+                    temp.Entries.Add( _appHelper.GetEntryInforTipViewModel(infor));
                 }
                 model.Add(temp);
             }

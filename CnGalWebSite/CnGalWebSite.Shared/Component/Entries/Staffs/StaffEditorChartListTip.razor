@@ -17,7 +17,7 @@
            IsPagination="true" PageItemsSource="@PageItemsSource"
            IsStriped="true" IsBordered="true" IsMultipleSelect="true" ShowSearch="true"
            ShowToolbar="true" ShowExtendButtons="true" ShowSkeleton="true"
-           OnQueryAsync="@OnQueryAsync" EditMode="EditMode.InCell"
+           OnQueryAsync="@OnQueryAsync" EditMode="EditMode.InCell" ShowToastAfterSaveOrDeleteModel="false"
            OnAddAsync="@OnAddAsync" OnSaveAsync="@OnSaveAsync" OnDeleteAsync="@OnDeleteAsync">
         <TableToolbarTemplate>
             <TableToolbarButton TItem="StaffModel" Color="Color.Warning" Icon="fa fa-upload" Text="批量导入" OnClickCallback="OnImportClick" />

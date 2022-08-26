@@ -519,7 +519,7 @@ namespace CnGalWebSite.APIServer.Application.Tags
 
             foreach (var item in tag.Entries.Where(s => s.IsHidden == false))
             {
-                model.ChildrenEntries.Add(await _appHelper.GetEntryInforTipViewModel(item));
+                model.ChildrenEntries.Add( _appHelper.GetEntryInforTipViewModel(item));
             }
 
             return model;

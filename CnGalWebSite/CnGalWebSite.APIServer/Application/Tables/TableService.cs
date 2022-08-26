@@ -322,14 +322,13 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 var temp = currentItems.Find(s => s.RealId == item.RealId);
                 temp.Id = item.Id;
                 if (item.RealId != temp.RealId || item.GameName != temp.GameName || item.Subcategory != temp.Subcategory || item.PositionOfficial != temp.PositionOfficial
-                    || item.NicknameOfficial != temp.NicknameOfficial || item.PositionGeneral != temp.PositionGeneral || item.Role != temp.Role || item.SubordinateOrganization != temp.SubordinateOrganization)
+                    || item.NicknameOfficial != temp.NicknameOfficial || item.PositionGeneral != temp.PositionGeneral || item.SubordinateOrganization != temp.SubordinateOrganization)
                 {
                     item.GameName = temp.GameName;
                     item.Subcategory = temp.Subcategory;
                     item.PositionOfficial = temp.PositionOfficial;
                     item.NicknameOfficial = temp.NicknameOfficial;
                     item.PositionGeneral = temp.PositionGeneral;
-                    item.Role = temp.Role;
                     item.SubordinateOrganization = temp.SubordinateOrganization;
 
                     await _staffInforTableModelRepository.UpdateAsync(item);

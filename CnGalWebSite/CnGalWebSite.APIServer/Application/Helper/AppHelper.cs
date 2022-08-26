@@ -654,7 +654,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             };
         }
 
-        public async Task<EntryInforTipViewModel> GetEntryInforTipViewModel(Entry entry)
+        public EntryInforTipViewModel GetEntryInforTipViewModel(Entry entry)
         {
             //预处理图片
             entry.MainPicture = entry.Type is EntryType.Staff or EntryType.Role
@@ -676,7 +676,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             };
 
             //处理附加信息
-            if (entry.Information != null && entry.EntryRelationFromEntryNavigation != null)
+            if (entry.EntryRelationFromEntryNavigation != null&&entry.EntryStaffFromEntryNavigation!=null)
             {
                 if (entry.Type == EntryType.Role)
                 {
@@ -695,7 +695,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                         });
 
                     }
-                    
+
                     //查找登场游戏
                     var gameNames = new List<StaffNameModel>();
                     foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
@@ -728,13 +728,13 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 {
                     //查找参与作品
                     var gameNames = entry.EntryRelationFromEntryNavigation
-                        .Where(s => s.ToEntryNavigation.IsHidden == false&&s.ToEntryNavigation.Type== EntryType.Game&&string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name)==false)
-                        .Where(s=>s.ToEntryNavigation.EntryStaffFromEntryNavigation.Any(s=>s.PositionGeneral!= PositionGeneralType.SpecialThanks&&s.ToEntry==entry.Id))
+                        .Where(s => s.ToEntryNavigation.IsHidden == false && s.ToEntryNavigation.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name) == false)
+                        .Where(s => s.ToEntryNavigation.EntryStaffFromEntryNavigation.Any(s => s.PositionGeneral != PositionGeneralType.SpecialThanks && s.ToEntry == entry.Id))
                         .Take(3)
-                        .Select(s=>new StaffNameModel
+                        .Select(s => new StaffNameModel
                         {
-                            DisplayName=s.ToEntryNavigation.DisplayName,
-                            Id=s.ToEntryNavigation.Id
+                            DisplayName = s.ToEntryNavigation.DisplayName,
+                            Id = s.ToEntryNavigation.Id
                         }).ToList();
                     if (gameNames.Any())
                     {

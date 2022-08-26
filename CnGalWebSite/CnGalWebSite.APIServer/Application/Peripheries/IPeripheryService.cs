@@ -32,11 +32,11 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
 
         Task<List<long>> GetPeripheryIdsFromNames(List<string> names);
 
-        Task<PeripheryViewModel> GetPeripheryViewModel(Periphery periphery);
+       PeripheryViewModel GetPeripheryViewModel(Periphery periphery);
 
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Periphery currentPeriphery, Periphery newPeriphery);
 
-        Task<List<PeripheryViewModel>> ConcompareAndGenerateModel(Periphery currentPeriphery, Periphery newPeriphery);
+       List<PeripheryViewModel> ConcompareAndGenerateModel(Periphery currentPeriphery, Periphery newPeriphery);
 
         void SetDataFromEditPeripheryMainViewModel(Periphery newPeriphery, EditPeripheryMainViewModel model);
 

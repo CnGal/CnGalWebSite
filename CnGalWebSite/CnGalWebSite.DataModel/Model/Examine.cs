@@ -72,6 +72,7 @@ namespace CnGalWebSite.DataModel.Model
     {
         V1_0,
         V1_1,
+        V1_2,
     }
 
     public enum Operation

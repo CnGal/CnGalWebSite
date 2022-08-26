@@ -123,7 +123,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //建立视图模型
-            var model = await _peripheryService.GetPeripheryViewModel(periphery);
+            var model = _peripheryService.GetPeripheryViewModel(periphery);
 
             //判断该周边是否被收集
             if (user != null)
@@ -1125,7 +1125,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 await _peripheryService.UpdatePeripheryDataAsync(newPeriphery, item);
             }
 
-            var result = await _peripheryService.ConcompareAndGenerateModel(currentPeriphery, newPeriphery);
+            var result = _peripheryService.ConcompareAndGenerateModel(currentPeriphery, newPeriphery);
 
             var model = new PeripheryContrastEditRecordViewModel
             {

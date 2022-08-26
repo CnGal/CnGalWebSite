@@ -167,6 +167,8 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
         {
             var entry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.Information)
+                .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .FirstOrDefaultAsync(s => s.Id == id);
             if (entry == null)
@@ -194,7 +196,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
                 }
             }
 
-            var model = await _appHelper.GetEntryInforTipViewModel(entry);
+            var model = _appHelper.GetEntryInforTipViewModel(entry);
 
 
             _ = sb.AppendLine($"{model.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/entries/index/{model.Id}\">{model.DisplayName}</a>");

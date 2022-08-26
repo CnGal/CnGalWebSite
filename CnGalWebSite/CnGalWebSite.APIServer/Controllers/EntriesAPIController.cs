@@ -145,7 +145,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     .Include(s => s.Outlinks)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information)
                     .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation)
@@ -1341,7 +1341,8 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<GameRoleModel>>> GetGameRolesAsync()
         {
-            var entries = await _entryRepository.GetAll().Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).AsNoTracking()
+            var entries = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game
                         && s.EntryRelationFromEntryNavigation.Count(s => s.ToEntryNavigation.Type == EntryType.Role && string.IsNullOrWhiteSpace(s.ToEntryNavigation.MainPicture) == false) > 4)
                 .Select(s => new
@@ -1365,7 +1366,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 };
                 foreach (var infor in item.Roles)
                 {
-                    var infor1 = await _appHelper.GetEntryInforTipViewModel(infor);
+                    var infor1 = _appHelper.GetEntryInforTipViewModel(infor);
                     temp.Roles.Add(infor1);
                 }
 
@@ -1397,7 +1398,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var model = new List<EntryInforTipViewModel>();
             foreach(var item in games)
             {
-                model.Add(await _appHelper.GetEntryInforTipViewModel(item));
+                model.Add( _appHelper.GetEntryInforTipViewModel(item));
             }
 
             return model;

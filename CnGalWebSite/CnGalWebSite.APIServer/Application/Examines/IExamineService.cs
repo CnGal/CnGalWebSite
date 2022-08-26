@@ -427,5 +427,9 @@ namespace CnGalWebSite.APIServer.ExamineX
         Task ExaminesCompletionEntry(Entry newEntry, Entry currentEntry);
 
         Task ExaminesCompletionArticle(Article newArticle, Article currentArticle);
+
+        Task ReplaceEditEntryStaffExamineContext();
+
+        Task ReplaceEntryStaff();
     }
 }

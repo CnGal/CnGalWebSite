@@ -435,7 +435,6 @@ namespace CnGalWebSite.DataModel.Helper
                     result.Add(new StaffModel
                     {
                         Name = infor.Replace($"({roleName})", ""),
-                        CustomName = infor.Replace($"({roleName})", ""),
                         PositionOfficial = Position,
                         Modifier = Subcategory,
                         SubordinateOrganization = type == PositionGeneralType.CV ? null : roleName,
