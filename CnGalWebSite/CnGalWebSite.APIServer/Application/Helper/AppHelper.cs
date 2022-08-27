@@ -727,14 +727,15 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 else if (entry.Type == EntryType.Staff)
                 {
                     //查找参与作品
-                    var gameNames = entry.EntryRelationFromEntryNavigation
-                        .Where(s => s.ToEntryNavigation.IsHidden == false && s.ToEntryNavigation.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name) == false)
-                        .Where(s => s.ToEntryNavigation.EntryStaffFromEntryNavigation.Any(s => s.PositionGeneral != PositionGeneralType.SpecialThanks && s.ToEntry == entry.Id))
+                    var gameNames = entry.EntryStaffToEntryNavigation
+                        .Where(s => s.PositionGeneral != PositionGeneralType.SpecialThanks && s.ToEntry == entry.Id)
+                        .Where(s => s.FromEntryNavigation != null && s.FromEntryNavigation.IsHidden == false && s.FromEntryNavigation.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.FromEntryNavigation.Name) == false)
+                        .GroupBy(s => s.FromEntry)
                         .Take(3)
                         .Select(s => new StaffNameModel
                         {
-                            DisplayName = s.ToEntryNavigation.DisplayName,
-                            Id = s.ToEntryNavigation.Id
+                            DisplayName = (string.IsNullOrWhiteSpace(s.First().Modifier) ? "" :s.First().Modifier + " - " ) + s.First().FromEntryNavigation.DisplayName,
+                            Id = s.First().FromEntryNavigation.Id
                         }).ToList();
                     if (gameNames.Any())
                     {
@@ -748,15 +749,16 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 else if (entry.Type == EntryType.ProductionGroup)
                 {
                     //查找参与作品
-                    var gameNames = entry.EntryRelationFromEntryNavigation
-                          .Where(s => s.ToEntryNavigation.IsHidden == false && s.ToEntryNavigation.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name) == false)
-                          .Where(s => s.ToEntryNavigation.EntryStaffFromEntryNavigation.Any(s => s.PositionGeneral != PositionGeneralType.SpecialThanks && s.ToEntry == entry.Id))
-                          .Take(3)
-                          .Select(s => new StaffNameModel
-                          {
-                              DisplayName = s.ToEntryNavigation.DisplayName,
-                              Id = s.ToEntryNavigation.Id
-                          }).ToList();
+                    var gameNames = entry.EntryStaffToEntryNavigation
+                        .Where(s => s.PositionGeneral != PositionGeneralType.SpecialThanks && s.ToEntry == entry.Id)
+                        .Where(s => s.FromEntryNavigation != null && s.FromEntryNavigation.IsHidden == false && s.FromEntryNavigation.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.FromEntryNavigation.Name) == false)
+                        .GroupBy(s => s.FromEntry)
+                        .Take(3)
+                        .Select(s => new StaffNameModel
+                        {
+                            DisplayName = (string.IsNullOrWhiteSpace(s.First().Modifier) ? "" : s.First().Modifier + " - ") + s.First().FromEntryNavigation.DisplayName,
+                            Id = s.First().FromEntryNavigation.Id
+                        }).ToList();
                     if (gameNames.Any())
                     {
                         model.AddInfors.Add(new EntryInforTipAddInforModel

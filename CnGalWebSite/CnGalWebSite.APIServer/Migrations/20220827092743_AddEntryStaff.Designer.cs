@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CnGalWebSite.APIServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220826071635_AddEntryStaff")]
+    [Migration("20220827092743_AddEntryStaff")]
     partial class AddEntryStaff
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -242,7 +242,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "e7125092-7cf8-41d8-ae2c-a028cf1b59af",
+                            ConcurrencyStamp = "a7394c9b-b422-40cb-b28e-97d199b8fa7a",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
@@ -3069,28 +3069,28 @@ namespace CnGalWebSite.APIServer.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            ConcurrencyStamp = "952d9f3f-75e0-4e04-a9fc-c8572578cecb",
+                            ConcurrencyStamp = "9b517248-bfc4-40f9-b8fd-d2186fabb6ed",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e576",
-                            ConcurrencyStamp = "7320af78-4040-4c76-9315-8962082ee0c0",
+                            ConcurrencyStamp = "bbc2e294-79c6-4ab6-b66c-130b29f6c1b7",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e577",
-                            ConcurrencyStamp = "dba2b6f7-b8e9-4429-9314-d15ab4ae364d",
+                            ConcurrencyStamp = "2c7709d6-85a4-41e7-ada9-c2198a727c38",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e578",
-                            ConcurrencyStamp = "d110d972-1e13-4e28-8e4f-5479b805fd7d",
+                            ConcurrencyStamp = "71032ac8-3c2f-4b3b-9c9b-453be82afd6f",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         });

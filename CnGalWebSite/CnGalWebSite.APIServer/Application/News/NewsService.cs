@@ -603,18 +603,17 @@ namespace CnGalWebSite.APIServer.Application.News
 
 
             //添加主图
-            if (string.IsNullOrWhiteSpace(entry.MainPicture))
-            {
-                if (entry.Type == EntryType.Staff || entry.Type == EntryType.Role)
-                {
-                    entry.MainPicture = user.Image;
-                }
-                else
-                {
-                    entry.MainPicture = await _fileService.SaveImageAsync(user.Image, _configuration["NewsAdminId"], 460, 215);
-                }
-
-            }
+            //if (string.IsNullOrWhiteSpace(entry.MainPicture))
+            //{
+            //    if (entry.Type == EntryType.Staff || entry.Type == EntryType.Role)
+            //    {
+            //        entry.MainPicture = user.Image;
+            //    }
+            //    else
+            //    {
+            //        entry.MainPicture = await _fileService.SaveImageAsync(user.Image, _configuration["NewsAdminId"], 460, 215);
+            //    }
+            //}
             if (string.IsNullOrWhiteSpace(entry.Thumbnail))
             {
                 entry.Thumbnail = user.Image;

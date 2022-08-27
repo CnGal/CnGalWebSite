@@ -50,35 +50,35 @@ namespace CnGalWebSite.APIServer.Migrations
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                 column: "ConcurrencyStamp",
-                value: "952d9f3f-75e0-4e04-a9fc-c8572578cecb");
+                value: "9b517248-bfc4-40f9-b8fd-d2186fabb6ed");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e576",
                 column: "ConcurrencyStamp",
-                value: "7320af78-4040-4c76-9315-8962082ee0c0");
+                value: "bbc2e294-79c6-4ab6-b66c-130b29f6c1b7");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e577",
                 column: "ConcurrencyStamp",
-                value: "dba2b6f7-b8e9-4429-9314-d15ab4ae364d");
+                value: "2c7709d6-85a4-41e7-ada9-c2198a727c38");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e578",
                 column: "ConcurrencyStamp",
-                value: "d110d972-1e13-4e28-8e4f-5479b805fd7d");
+                value: "71032ac8-3c2f-4b3b-9c9b-453be82afd6f");
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                 column: "ConcurrencyStamp",
-                value: "e7125092-7cf8-41d8-ae2c-a028cf1b59af");
+                value: "a7394c9b-b422-40cb-b28e-97d199b8fa7a");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EntryStaffs_FromEntry",

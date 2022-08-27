@@ -93,6 +93,12 @@ namespace CnGalWebSite.DrawingBed.Services
             var response = await client.PostAsync(url, content);
 
             var newUploadResults = await response.Content.ReadAsStringAsync();
+
+            if(response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                _logger.LogError("上传文件到 {url} 失败：{filePath}", _configuration["SliotsImageUrl"], filePath);
+            }
+
             return response.StatusCode == System.Net.HttpStatusCode.OK && string.IsNullOrWhiteSpace(newUploadResults) == false && newUploadResults.Contains("http")
                 ? newUploadResults.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/")
                 : null;

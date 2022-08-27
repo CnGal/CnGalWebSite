@@ -518,9 +518,13 @@ namespace CnGalWebSite.DataModel.Helper
             {
                 return PositionGeneralType.FineArts;
             }
-            else if (text.Contains("配音") || text.ToUpper().Contains("CV"))
+            else if ((text.Contains("配音") || text.ToUpper().Contains("CV"))&&text.Contains("导演")==false&&text.Contains("监督")==false)
             {
                 return PositionGeneralType.CV;
+            }
+            else if (text.Contains("感谢") || text.ToUpper().Contains("鸣谢") || text.ToUpper().Contains("致谢"))
+            {
+                return PositionGeneralType.SpecialThanks;
             }
 
             return PositionGeneralType.Other;

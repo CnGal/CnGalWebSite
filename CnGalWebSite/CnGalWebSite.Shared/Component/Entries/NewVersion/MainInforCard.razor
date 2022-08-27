@@ -1,4 +1,7 @@
-﻿<div class="rounded shadow-sm bg-opacity rounded pb-4">
+﻿@inject IDataCacheService _dataCacheService
+
+
+<div class="rounded shadow-sm bg-opacity rounded pb-4">
     @if (Model.MainState == EditState.Preview)
     {
         <div class="pt-4">
@@ -12,11 +15,11 @@
             <div class="w-100 col-12 p-0" style="display: flex; justify-content: center;">
                 @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
                 {
-                    <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name"  itemprop="image">
+                    <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name" itemprop="image">
                 }
                 else
                 {
-                    <img style="height:200px;border-radius:50%;" src="@Model.Thumbnail" alt="@Model.Name"  itemprop="image">
+                    <img style="height:200px;border-radius:50%;" class="mt-4" src="@Model.Thumbnail" alt="@Model.Name" itemprop="image">
                 }
             </div>
         }
@@ -25,28 +28,21 @@
             <div class="d-md-flex d-none col-auto ps-4 pt-4">
                 @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
                 {
-
-
-
-                    <img style="height:200px;" src="@Model.MainPicture" alt="@Model.Name"  itemprop="image">
-
-
-
+                    <img style="height:200px;" src="@Model.MainPicture" alt="@Model.Name" itemprop="image">
                 }
                 else
                 {
                     <img style="height:200px;border-radius:50%;" src="@Model.Thumbnail" alt="@Model.Name">
-
                 }
             </div>
-            <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;" >
+            <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;">
                 @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
                 {
                     <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name">
                 }
                 else
                 {
-                    <img style="height:200px;border-radius:50%;" src="@Model.Thumbnail" alt="@Model.Name" >
+                    <img style="height:200px;border-radius:50%;" class="mt-4" src="@Model.Thumbnail" alt="@Model.Name">
                 }
             </div>
         }
@@ -80,7 +76,7 @@
                             @foreach (var temp in Model.ProductionGroups)
                             {
                                 <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
-                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" ItemProp="author" ItemType="http://schema.org/Organization"/>
+                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" ItemProp="author" ItemType="http://schema.org/Organization" />
                             }
                         }
                     </div>
@@ -94,7 +90,7 @@
                             @foreach (var temp in Model.Publishers)
                             {
                                 <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
-                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" ItemProp="publisher" ItemType="http://schema.org/Organization"/>
+                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" ItemProp="publisher" ItemType="http://schema.org/Organization" />
                             }
                         }
                     </div>
@@ -126,7 +122,7 @@
 
             @if (HiddenButton == false)
             {
-                <div class="mt-2" style="display: flex; justify-content: flex-end;">
+                <div class="mt-2" style="@("display: flex; "+(ForceSmall||_dataCacheService.IsApp?"justify-content: center;":"justify-content: flex-end;"))">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Entry" Class="me-4" />
 
                     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Entry" Id="Model.Id" ShowPerfection="Model.Type==EntryType.Game" @bind-IsHidden="@Model.IsHidden" IsEdit="Model.IsEdit" IsEditChanged="OnPreEdit" />
@@ -137,9 +133,9 @@
                 </div>
             }
 
-            @if(Model.Type== EntryType.ProductionGroup&&string.IsNullOrWhiteSpace(Model.Thumbnail)==false&&Model.Thumbnail.Contains("user.png")==false)
+            @if (Model.Type == EntryType.ProductionGroup && string.IsNullOrWhiteSpace(Model.Thumbnail) == false && Model.Thumbnail.Contains("user.png") == false)
             {
-                <meta itemprop="logo" content="@Model.Thumbnail"/>
+                <meta itemprop="logo" content="@Model.Thumbnail" />
             }
         </div>
 

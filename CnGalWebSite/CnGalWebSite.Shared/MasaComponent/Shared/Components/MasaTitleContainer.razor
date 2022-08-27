@@ -11,16 +11,8 @@
                 @ButtonContent
                 @if (Collapable)
                 {
-                    @if (IsCollapsed)
-                    {
-                        <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-right" Tooltip="展开" OnClick="@(() => OnCollapseChanged(false))" />
+                    <MasaButton Color="@ButtonColor" Fab XSmall Icon="@(IsCollapsed?"fa fa-chevron-right":"fa fa-chevron-down")" Tooltip="@(IsCollapsed?"展开":"折叠")" OnClick="@(() => OnCollapseChanged(!IsCollapsed))" />
 
-                    }
-                    else
-                    {
-                        <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-down" Tooltip="折叠" OnClick="@(() => OnCollapseChanged(true))" />
-
-                    }
                 }
             </div>
         </div>
@@ -50,16 +42,7 @@ else
                 @ButtonContent
                 @if (Collapable)
                 {
-                    @if (IsCollapsed)
-                    {
-                        <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-right" Tooltip="展开" OnClick="@(() => OnCollapseChanged(false))" />
-
-                    }
-                    else
-                    {
-                        <MasaButton Color="@ButtonColor" Fab XSmall Icon="fa fa-chevron-down" Tooltip="折叠" OnClick="@(() => OnCollapseChanged(true))" />
-
-                    }
+                     <MasaButton Color="@ButtonColor" Fab XSmall Icon="@(IsCollapsed?"fa fa-chevron-right":"fa fa-chevron-down")" Tooltip="@(IsCollapsed?"展开":"折叠")" OnClick="@(() => OnCollapseChanged(!IsCollapsed))" />
                 }
             </div>
         </div>

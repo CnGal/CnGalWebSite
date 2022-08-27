@@ -1527,11 +1527,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 });
             }
 
-            if (entryAddInfor.Information.Any()||entryAddInfor.Staffs.Any())
-            {
-                examines.Add(new KeyValuePair<object, Operation>(entryAddInfor, Operation.EstablishAddInfor));
 
-            }
             //再遍历视图 对应修改
 
             foreach (var infor in newEntry.EntryStaffFromEntryNavigation.ToList().Purge())
@@ -1572,7 +1568,12 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     });
                 }
             }
+            //检测是否有修改
+            if (entryAddInfor.Information.Any()||entryAddInfor.Staffs.Any())
+            {
+                examines.Add(new KeyValuePair<object, Operation>(entryAddInfor, Operation.EstablishAddInfor));
 
+            }
             //第三部分 图片
             var entryImages = new EntryImages();
             //先把 当前词条中的图片 都 打上删除标签
@@ -2220,7 +2221,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 if(cvs.IndexOf(item)!= cvs.Count-1)
                 {
-                    text.Append("、");
+                    text.Append('、');
                 }
             }
 
@@ -2757,11 +2758,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         Name = publisherEntry == null ? publisher : null,
                         ToEntry = publisherEntry?.Id,
                         ToEntryNavigation = publisherEntry,
-                        PositionGeneral = type
+                        PositionGeneral = type,
+                        PositionOfficial = type.GetDisplayName()
                     });
                 }
 
             }
         }
+
+
     }
 }

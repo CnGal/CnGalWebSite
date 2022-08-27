@@ -168,7 +168,7 @@ namespace CnGalWebSite.DataModel.Model
         public virtual ICollection<EntryStaff> EntryStaffFromEntryNavigation { get; set; } = new List<EntryStaff>();
 
         /// <summary>
-        /// To 指当前词条被关联的其他Staff关联 呈现编辑视图时不使用
+        /// To 指当前词条被关联的其他Staff关联 用于快速查找反向关联
         /// </summary>
         public virtual ICollection<EntryStaff> EntryStaffToEntryNavigation { get; set; } = new List<EntryStaff>();
 
@@ -231,11 +231,11 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 游戏
         /// </summary>
-        public virtual Entry FromEntryNavigation { get; set; } = new Entry();
+        public virtual Entry FromEntryNavigation { get; set; }
         /// <summary>
         /// Staff
         /// </summary>
-        public virtual Entry ToEntryNavigation { get; set; } = new Entry();
+        public virtual Entry ToEntryNavigation { get; set; }
     }
 
 

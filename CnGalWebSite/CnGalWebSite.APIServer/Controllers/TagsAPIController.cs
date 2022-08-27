@@ -55,32 +55,18 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
         [AllowAnonymous]
-        [HttpGet("{_id}")]
-        public async Task<ActionResult<TagIndexViewModel>> GetTagAsync(string _id)
+        [HttpGet("{Id}")]
+        public async Task<ActionResult<TagIndexViewModel>> GetTagAsync(int id)
         {
 
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //通过Id获取词条 
-            Tag tag = null;
-            try
-            {
-                var id = -1;
-                id = int.Parse(_id);
-                tag = await _tagRepository.GetAll().AsNoTracking()
+            Tag tag = await _tagRepository.GetAll().AsNoTracking()
                     .Include(s => s.InverseParentCodeNavigation)
                     .Include(s => s.ParentCodeNavigation)
                     .Include(s => s.Entries)
                     .FirstOrDefaultAsync(x => x.Id == id);
-            }
-            catch
-            {
-                tag = await _tagRepository.GetAll().AsNoTracking()
-                    .Include(s => s.InverseParentCodeNavigation)
-                    .Include(s => s.ParentCodeNavigation)
-                    .Include(s => s.Entries)
-                    .FirstOrDefaultAsync(x => x.Name == ToolHelper.Base64DecodeName(_id));
-            }
             if (tag == null)
             {
                 return NotFound();

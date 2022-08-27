@@ -431,5 +431,9 @@ namespace CnGalWebSite.APIServer.ExamineX
         Task ReplaceEditEntryStaffExamineContext();
 
         Task ReplaceEntryStaff();
+
+        Task RefreshAllEntryStaffRelevances(bool autoCreate, PositionGeneralType type);
+
+        Task RefreshEntryStaffRelevances(int id, bool autoCreate, PositionGeneralType type);
     }
 }

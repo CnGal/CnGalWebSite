@@ -4782,7 +4782,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     foreach (var item in oldExamineModel.Information.Where(s=>s.Modifier=="STAFF"))
                     {
 
-                        var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
+                        var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayValue&&(s.Type== EntryType.ProductionGroup||s.Type== EntryType.Staff));
 
                         var temp = new EntryStaffExamineModel();
                         if(entry==null)
@@ -4872,7 +4872,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 foreach (var item in entry.Information.Where(s => s.Modifier == "STAFF"))
                 {
 
-                    var staff = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
+                    var staff = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayValue&&(s.Type== EntryType.ProductionGroup||s.Type== EntryType.Staff));
 
                     var temp = new EntryStaff
                     {
@@ -4914,6 +4914,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     {
                         temp.PositionOfficial = item.DisplayName;
                     }
+                    if(temp.PositionGeneral== PositionGeneralType.Other)
+                    {
+                        temp.PositionGeneral = ToolHelper.GetGeneralType(temp.PositionOfficial);
+                    }
 
                     entry.EntryStaffFromEntryNavigation.Add(temp);
                 }
@@ -4926,6 +4930,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 //删除旧数据
                 var list = entry.Information.ToList();
                 list.RemoveAll(s => s.Modifier == "STAFF" || s.DisplayName == "发行商" || s.DisplayName == "制作组" || s.DisplayName == "声优");
+                list.RemoveAll(s => s.Modifier == "基本信息" && s.DisplayName == "昵称");
                 entry.Information = list;
 
                 _ = await _entryRepository.UpdateAsync(entry);
@@ -4950,7 +4955,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         IsDelete=false,
                         Name = publisherEntry == null ? publisher : null,
                         StaffId= publisherEntry?.Id,
-                        PositionGeneral = type
+                        PositionGeneral = type,
+                        PositionOfficial = type.GetDisplayName()
                     });
                 }
 
@@ -4978,7 +4984,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Name = publisherEntry == null ? publisher : null,
                         ToEntry = publisherEntry?.Id,
                         ToEntryNavigation = publisherEntry,
-                        PositionGeneral = type
+                        PositionGeneral = type,
+                        PositionOfficial=type.GetDisplayName()
                     });
                 }
 
@@ -5252,6 +5259,117 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 throw new Exception("不支持的类型");
             }
 
+        }
+
+        #endregion
+
+        #region 补全数据关联
+        /// <summary>
+        /// 刷新词条Staff关联
+        /// </summary>
+        /// <returns></returns>
+        public async Task RefreshAllEntryStaffRelevances(bool autoCreate, PositionGeneralType type)
+        {
+            var ids = await _entryRepository.GetAll().AsNoTracking()
+                .Where(s => s.Type == EntryType.Game || s.Type == EntryType.Role)
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name)==false)
+                .Select(s=>s.Id)
+                .ToListAsync();
+            foreach(var item in ids)
+            {
+                await RefreshEntryStaffRelevances(item, autoCreate, type);
+            }
+        }
+        /// <summary>
+        /// 刷新词条Staff关联
+        /// </summary>
+        /// <returns></returns>
+        public async Task RefreshEntryStaffRelevances(int id,bool autoCreate, PositionGeneralType type)
+        {
+            var currentEntry = await _entryRepository.GetAll()
+                .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .FirstOrDefaultAsync(s => s.Id == id);
+            var entry = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            var admin = await _userManager.FindByIdAsync(_configuration["ExamineAdminId"]);
+            if (entry == null)
+            {
+                return;
+            }
+
+            //遍历Staff
+
+            foreach (var item in entry.EntryStaffFromEntryNavigation.Where(s => s.ToEntryNavigation == null && string.IsNullOrWhiteSpace(s.Name) == false&&s.PositionGeneral == type))
+            {
+                var newEntry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.Name/*&&(s.Type== EntryType.ProductionGroup||s.Type== EntryType.Staff)*/);
+                if (newEntry == null)
+                {
+                    if (autoCreate)
+                    {
+                        newEntry = new Entry
+                        {
+                            Name = item.Name,
+                            DisplayName = item.Name,
+                            Type = EntryType.Staff,
+
+                        };
+                        try
+                        {
+                        newEntry = await AddNewEntryExaminesAsync(newEntry, admin, "自动创建Staff");
+                        _logger.LogInformation("自动创建词条 - {Name}({Id}) 的Staff - {Staff}", entry.Name, entry.Id, newEntry.Name);
+
+                        }
+                        catch(Exception ex)
+                        {
+                            _logger.LogError(ex,"自动创建词条失败 - {Name}({Id}) 的Staff - {Staff}", entry.Name, entry.Id, newEntry.Name);
+
+                        }
+
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+
+                item.Name = null;
+                item.ToEntry = newEntry.Id;
+                item.ToEntryNavigation = newEntry;
+            }
+
+            //保存更改
+            currentEntry.Information.Clear();
+            var examines = _entryService.ExaminesCompletion(currentEntry, entry);
+
+            if (examines.Any(s => s.Value == Operation.EstablishAddInfor) == false)
+            {
+                return;
+            }
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishAddInfor);
+            //序列化
+            var resulte = "";
+            using (TextWriter text = new StringWriter())
+            {
+                var serializer = new JsonSerializer();
+                serializer.Serialize(text, examine.Key);
+                resulte = text.ToString();
+            }
+            try
+            {
+            await ExamineEstablishAddInforAsync(currentEntry, examine.Key as EntryAddInfor);
+            await UniversalEditExaminedAsync(currentEntry, admin, true, resulte, Operation.EstablishAddInfor, "自动创建Staff");
+            await _appHelper.AddUserContributionValueAsync(admin.Id, currentEntry.Id, Operation.EstablishAddInfor);
+
+            _logger.LogInformation("成功刷新词条 - {Name}({Id}) 的Staff关联", entry.Name, entry.Id);
+
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex,"刷新词条 - {Name}({Id}) 的Staff关联失败", entry.Name, entry.Id);
+            }
         }
 
         #endregion

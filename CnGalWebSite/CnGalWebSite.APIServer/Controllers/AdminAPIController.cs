@@ -864,9 +864,11 @@ namespace CnGalWebSite.APIServer.Controllers
             try
             {
 
-                await _examineService.ReplaceEditEntryStaffExamineContext();
-                await _examineService.ReplaceEntryStaff();
+                //await _examineService.ReplaceEditEntryStaffExamineContext();
+                //await _examineService.ReplaceEntryStaff();
 
+                await _examineService.RefreshAllEntryStaffRelevances(true, PositionGeneralType.CV);
+                //await _examineService.RefreshEntryStaffRelevances(3002,true, PositionGeneralType.CV);
 
                 return new Result { Successful = true };
             }
