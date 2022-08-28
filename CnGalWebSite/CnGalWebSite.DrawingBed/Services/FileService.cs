@@ -8,6 +8,8 @@ using FFmpeg.NET;
 using OneOf.Types;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using System.Text;
+using Tweetinvi.Security;
 
 namespace CnGalWebSite.DrawingBed.Services
 {
@@ -55,12 +57,21 @@ namespace CnGalWebSite.DrawingBed.Services
                     pathCompressFile = result.FileURL;
                 }
 
+
+                var sha1 = GetSHA1(pathCompressFile);
+                var uploadedFile = await CheckSameFileFromServer(sha1);
+                if (string.IsNullOrWhiteSpace(uploadedFile))
+                {
+                    uploadedFile = await UploadLocalFileToServer(pathCompressFile, type);
+                }
+
                 return new UploadResult
                 {
                     Uploaded = true,
-                    FileURL = await UploadLocalFileToServer(pathCompressFile, type),
+                    Sha1 = sha1,
+                    FileURL = uploadedFile,
                     FileSize = result.FileSize,
-                    AudioLength = result.AudioLength
+                    Duration = result.Duration
                 };
             }
             catch (Exception ex)
@@ -99,15 +110,21 @@ namespace CnGalWebSite.DrawingBed.Services
                     pathCompressFile = result.FileURL;
                 }
 
+                var sha1 = GetSHA1(pathCompressFile);
+                var uploadedFile = await CheckSameFileFromServer(sha1);
+                if (string.IsNullOrWhiteSpace(uploadedFile))
+                {
+                    uploadedFile = await UploadLocalFileToServer(pathCompressFile, type);
+                }
 
                 return new UploadResult
                 {
                     Uploaded = true,
-
+                    Sha1 = sha1,
                     FileName = file.Name,
-                    FileURL = await UploadLocalFileToServer(pathCompressFile, type),
+                    FileURL = uploadedFile,
                     FileSize = (new FileInfo(pathCompressFile)).Length,
-                    AudioLength = result.AudioLength
+                    Duration = result.Duration
                 };
             }
             catch (Exception ex)
@@ -268,6 +285,47 @@ namespace CnGalWebSite.DrawingBed.Services
             return "";
         }
 
+        private string GetSHA1(string path)
+        {
+            try
+            {
+                FileStream file = new FileStream(path, FileMode.Open);
+                SHA1 sha1 = new SHA1CryptoServiceProvider();
+                byte[] retval = sha1.ComputeHash(file);
+                file.Close();
+
+                StringBuilder sc = new StringBuilder();
+                for (int i = 0; i < retval.Length; i++)
+                {
+                    sc.Append(retval[i].ToString("x2"));
+                }
+                return sc.ToString();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "计算文件Sha1失败");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 检测是否存在相同的文件 存在则返回
+        /// </summary>
+        /// <returns></returns>
+        private async Task<string> CheckSameFileFromServer(string sha1)
+        {
+            using var client = _clientFactory.CreateClient();
+            var result = await client.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/files/GetSameFile?sha1=" + sha1);
+            if(result.Successful&&string.IsNullOrWhiteSpace(result.Error)==false)
+            {
+                return result.Error;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         private static void SaveFile(IFormFile sourceFile, string destinationPath)
         {
             using var stmMemory = new MemoryStream();
@@ -311,7 +369,7 @@ namespace CnGalWebSite.DrawingBed.Services
             return new CutFileResult
             {
                 FileURL = output.FileInfo.FullName,
-                AudioLength = metadata.Duration
+                Duration = metadata.Duration
             };
         }
 

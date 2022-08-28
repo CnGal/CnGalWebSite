@@ -18,6 +18,9 @@
                 <th class="text-left">
                     预览
                 </th>
+                <th class="text-left">
+                    Sha1
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -38,19 +41,21 @@
                         }
                     </td>
                     <td style="min-width: 100px; ">
-                        @if (item.AudioLength == null || item.AudioLength.Value.TotalSeconds == 0)
+                        @if (item.Duration == null || item.Duration.Value.TotalSeconds == 0)
                         {
                             <span>无</span>
                         }
                         else
                         {
-                            <span>@(item.AudioLength.Value.TotalSeconds.ToString("0.0")+" s")</span>
+                            <span>@(item.Duration.Value.TotalSeconds.ToString("0.0")+" s")</span>
                         }
                     </td>
                     <td>
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@item.FileName" />
                     </td>
-
+                    <td style="min-width: 100px; ">
+                        @item.Sha1
+                    </td>
                 </tr>
             }
         </tbody>

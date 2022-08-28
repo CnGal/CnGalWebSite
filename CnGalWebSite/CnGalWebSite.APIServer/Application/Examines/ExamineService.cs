@@ -1072,10 +1072,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 model.Audio.Add(new AudioViewModel
                 {
                     Url = item.Url,
-                    BriefIntroduction=item.BriefIntroduction,
-                    Name=item.Name,
-                    Priority=item.Priority
-                });
+                    BriefIntroduction = item.BriefIntroduction,
+                    Name = item.Name,
+                    Priority = item.Priority,
+                    Duration = item.Duration,
+                    Thumbnail = item.Thumbnail
+                }) ;
             }
 
             return model;
@@ -4927,10 +4929,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     await SetStaffsFromString(newExamineModel, oldExamineModel.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "声优")?.DisplayValue, PositionGeneralType.CV);
 
                     //删除旧数据
-                    oldExamineModel.Information.RemoveAll(s => s.Modifier == "STAFF" || s.DisplayName == "发行商" || s.DisplayName == "制作组" || s.DisplayName == "声优");
-
-                    //序列化新数据模型
-                    var resulte = "";
+                   oldExamineModel.Information.RemoveAll(s => s.Modifier == "STAFF" || s.DisplayName == "发行商" || s.DisplayName == "制作组" || s.DisplayName == "声优");
+                    //复制其他信息
+                    newExamineModel.Information = oldExamineModel.Information;
+                   //序列化新数据模型
+                   var resulte = "";
                     using (TextWriter text = new StringWriter())
                     {
                         var serializer = new JsonSerializer();

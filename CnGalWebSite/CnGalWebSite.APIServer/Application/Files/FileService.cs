@@ -130,7 +130,8 @@ namespace CnGalWebSite.APIServer.Application.Files
                         UploadTime = s.UploadTime,
                         UserId = s.FileManager.ApplicationUserId,
                         UserName = s.FileManager.ApplicationUser.UserName,
-                        AudioLength=s.AudioLength,
+                        Duration=s.Duration,
+                        Sha1 = s.Sha1,
                         Type=s.Type
                     }).ToListAsync();
             }
@@ -202,8 +203,9 @@ namespace CnGalWebSite.APIServer.Application.Files
                     FileSize = item.FileSize,
                     UploadTime = item.UploadTime,
                     UserId = item.UserId,
-                    AudioLength= item.AudioLength,
+                    Duration= item.Duration,
                     Type= item.Type,
+                    Sha1= item.Sha1,
                 });
             }
 

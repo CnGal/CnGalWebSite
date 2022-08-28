@@ -70,13 +70,21 @@ namespace CnGalWebSite.APIServer.Controllers
                 };
                 fileManager = await _fileManagerRepository.InsertAsync(fileManager);
             }
+
+            //检测是否已添加相同文件
+            if(string.IsNullOrWhiteSpace(model.Sha1)==false&&await _userFileRepository.GetAll().AnyAsync(s=>s.Sha1==model.Sha1))
+            {
+                return new Result { Successful = true };
+            }
+
+
             fileManager.UserFiles.Add(new UserFile
             {
                 FileName = model.FileName,
                 UploadTime = DateTime.Now.ToCstTime(),
                 FileSize = model.FileSize,
                 Sha1 = model.Sha1,
-                AudioLength = model.AudioLength,
+                Duration = model.Duration,
                 Type = model.Type,
                 UserId = fileManager.ApplicationUserId
             });
@@ -86,6 +94,25 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
 
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<Result>> GetSameFileAsync([FromQuery]string sha1)
+        {
+            if(string.IsNullOrWhiteSpace(sha1))
+            {
+                return new Result { Successful = false };
+            }
+
+            var file = await _userFileRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Sha1 == sha1);
+            if(file==null)
+            {
+                return new Result { Successful = false };
+            }
+
+            return new Result { Successful = true,Error=file.FileName };
+           
         }
 
         [AllowAnonymous]

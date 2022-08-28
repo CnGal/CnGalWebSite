@@ -14,7 +14,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Files
         /// <summary>
         /// 音频长度
         /// </summary>
-        public TimeSpan? AudioLength { get; set; }
+        public TimeSpan? Duration { get; set; }
 
         public string Sha1 { get; set; }
 

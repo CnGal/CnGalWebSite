@@ -3,6 +3,7 @@ using System;
 using CnGalWebSite.APIServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CnGalWebSite.APIServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220828125402_AddUserFileType")]
+    partial class AddUserFileType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -240,7 +242,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "50df82c5-bde9-4c95-b1f3-39b5679cbea5",
+                            ConcurrencyStamp = "2a483b05-30f4-43af-82c7-9c757263e212",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
@@ -741,9 +743,6 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.Property<int>("Priority")
                         .HasColumnType("int");
-
-                    b.Property<string>("Thumbnail")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("Url")
                         .HasColumnType("longtext");
@@ -3107,28 +3106,28 @@ namespace CnGalWebSite.APIServer.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            ConcurrencyStamp = "7e2f2fea-fab1-4e73-84ec-7681940d629a",
+                            ConcurrencyStamp = "4720fd9b-90ee-485a-b17c-ffcf3c9f8b8e",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e576",
-                            ConcurrencyStamp = "e947b672-900e-489a-be9a-ba13b475003f",
+                            ConcurrencyStamp = "d2f4118c-4b5b-474f-b128-6b253c964b9f",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e577",
-                            ConcurrencyStamp = "6e1377a9-4a89-4353-b399-7e679a78a750",
+                            ConcurrencyStamp = "e72408d2-566f-4add-b2f2-b1af0868c538",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e578",
-                            ConcurrencyStamp = "cd394c7d-bb94-420a-be9b-841d9c8a34f9",
+                            ConcurrencyStamp = "cf94431d-f35f-42b5-9db2-44023ba4a2ff",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         });

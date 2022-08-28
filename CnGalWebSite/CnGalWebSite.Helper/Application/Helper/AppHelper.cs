@@ -124,7 +124,8 @@ namespace CnGalWebSite.DataModel.Application.Helper
                 {
                     FileName = infor.FileURL,
                     FileSize = infor.FileSize,
-                    AudioLength = infor.AudioLength,
+                    Duration = infor.Duration,
+                    Sha1 = infor.Sha1,
                     Type= type
                 };
 

@@ -26,7 +26,7 @@
 
 
     [Parameter]
-    public EventCallback<string> OnUploaded { get; set; }
+    public EventCallback<UploadResult> OnUploaded { get; set; }
     [Parameter]
     public string Class { get; set; }
     [Parameter]
@@ -62,7 +62,7 @@
                 var obj = await _appHelper.UploadAudioAsync(item);
                 if (obj.Uploaded == true)
                 {
-                    await OnUploaded.InvokeAsync(obj.FileURL);
+                    await OnUploaded.InvokeAsync(obj);
                 }
                 else
                 {

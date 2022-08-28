@@ -123,6 +123,12 @@ else
 
                                     </div>
                                 }
+                                @if (EntryView.Audio.Any())
+                                {
+                                    <div class="mb-4">
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
+                                    </div>
+                                }
 
                                 @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
                                 {
@@ -178,6 +184,12 @@ else
 
                             </div>
                         }
+                        @if (EntryView.Audio.Any())
+                        {
+                            <div class="mb-4">
+                                <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
+                            </div>
+                        }
                         @if (EntryView.Type == EntryType.Game && EntryView.IsScored)
                         {
                             <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" Large />
@@ -192,7 +204,7 @@ else
                         }
                         <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke" RightDisplay />
 
-                        <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" Class="mb-4" IsGameView="EntryView.Type == EntryType.Game"/>
+                        <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" Class="mb-4" IsGameView="EntryView.Type == EntryType.Game" />
                         <div>
                             @if (EntryView.CanComment)
                             {

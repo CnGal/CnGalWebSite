@@ -24,6 +24,9 @@ namespace CnGalWebSite.DataModel.Models
 
         public string Sha1 { get; set; }
 
+        /// <summary>
+        /// 文件链接
+        /// </summary>
         public string FileName { get; set; }
 
         public long? FileSize { get; set; }
@@ -33,7 +36,7 @@ namespace CnGalWebSite.DataModel.Models
         /// <summary>
         /// 音频长度
         /// </summary>
-        public TimeSpan? AudioLength { get; set; }
+        public TimeSpan? Duration { get; set; }
         /// <summary>
         /// 文件类型
         /// </summary>

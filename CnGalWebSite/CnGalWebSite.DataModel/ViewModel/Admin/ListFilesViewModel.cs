@@ -28,9 +28,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         public string UserId { get; set; }
         [Display(Name = "上传的用户")]
         public string UserName { get; set; }
+        [Display(Name = "Sha1")]
+        public string Sha1 { get; set; }
+
 
         [Display(Name = "音频长度")]
-        public TimeSpan? AudioLength { get; set; }
+        public TimeSpan? Duration { get; set; }
 
         [Display(Name = "文件类型")]
         public UploadFileType Type { get; set; }

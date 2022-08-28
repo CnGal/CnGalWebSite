@@ -349,6 +349,11 @@ namespace CnGalWebSite.DataModel.Model
         public string Url { get; set; }
         [Display(Name = "优先级")]
         public int Priority { get; set; }
+        [Display(Name = "时长")]
+        public TimeSpan Duration { get; set; }
+
+        [Display(Name = "缩略图")]
+        public string Thumbnail { get; set; }
     }
 
     public enum GamePlatformType

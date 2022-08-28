@@ -1,4 +1,5 @@
-﻿using BootstrapBlazor.Components;
+﻿using BlazorComponent;
+using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -449,15 +450,15 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     if (item.ToEntry == infor.StaffId && item.Name == infor.Name && item.PositionOfficial == infor.PositionOfficial && item.Modifier == infor.Modifier)
                     {
-                        if (item.SubordinateOrganization != infor.SubordinateOrganization || item.CustomName != infor.CustomName || item.PositionGeneral != infor.PositionGeneral)
+                        if (infor.IsDelete == true)
+                        {
+                            entry.EntryStaffFromEntryNavigation.Remove(item);
+                        }
+                        else
                         {
                             item.SubordinateOrganization = infor.SubordinateOrganization;
                             item.CustomName = infor.CustomName;
                             item.PositionGeneral = infor.PositionGeneral;
-                        }
-                        else
-                        {
-                            entry.EntryStaffFromEntryNavigation.Remove(item);
                         }
                         isSame = true;
                         break;
@@ -539,20 +540,22 @@ namespace CnGalWebSite.APIServer.Application.Entries
             foreach (var item in examine.Audio)
             {
                 var isAdd = false;
-                foreach (var pic in entry.Audio)
+                foreach (var infor in entry.Audio)
                 {
-                    if (pic.Url == item.Url)
+                    if (infor.Url == item.Url)
                     {
                         if (item.IsDelete == true)
                         {
-                            entry.Audio.Remove(pic);
+                            entry.Audio.Remove(infor);
 
                         }
                         else
                         {
-                            pic.BriefIntroduction = item.BriefIntroduction;
-                            pic.Name = item.Name;
-                            pic.Priority = item.Priority;
+                            infor.BriefIntroduction = item.BriefIntroduction;
+                            infor.Name = item.Name;
+                            infor.Priority = item.Priority;
+                            infor.Duration = item.Duration;
+                            infor.Thumbnail = item.Thumbnail;
                         }
                         isAdd = true;
                         break;
@@ -565,7 +568,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         Url = item.Url,
                         BriefIntroduction=item.BriefIntroduction,
                         Name=item.Name,
-                        Priority=item.Priority
+                        Priority=item.Priority,
+                        Duration=item.Duration,
+                        Thumbnail=item.Thumbnail
                     });
                 }
             }
@@ -1346,7 +1351,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 BriefIntroduction = s.BriefIntroduction,
                 Name = s.Name,
                 Priority = s.Priority,
-                Url = s.Url
+                Url = s.Url,
+                Duration=s.Duration,
+                Thumbnail=s.Thumbnail
             }).ToList());
 
 
@@ -1912,12 +1919,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     if (item.Url == infor.Url)
                     {
-                        if (item.BriefIntroduction != infor.BriefIntroduction || item.Name != infor.Name || item.Priority != infor.Priority )
+                        if (item.BriefIntroduction != infor.BriefIntroduction || item.Name != infor.Name || item.Duration != infor.Duration || item.Priority != infor.Priority || item.Thumbnail != infor.Thumbnail)
                         {
                             item.BriefIntroduction = infor.BriefIntroduction;
                             item.Name = infor.Name;
                             item.IsDelete = false;
                             item.Priority = infor.Priority;
+                            item.Duration = infor.Duration;
+                            item.Thumbnail = infor.Thumbnail;
                         }
                         else
                         {
@@ -1936,7 +1945,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         BriefIntroduction = infor.BriefIntroduction,
                         Name = infor.Name,
                         Priority = infor.Priority,
-                        IsDelete = false
+                        Duration=infor.Duration,
+                        IsDelete = false,
+                        Thumbnail=infor.Thumbnail
                     });
                 }
             }
@@ -2560,7 +2571,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     BriefIntroduction=item.BriefIntroduction,
                     Name=item.Name,
                     Priority=item.Priority,
-                    Url=item.Url
+                    Url=item.Url,
+                    Duration=item.Duration,
+                    Thumbnail=item.Thumbnail
                 });
             }
 
@@ -2887,7 +2900,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             newEntry.Tags = tags;
         }
 
-        public void SetDataFromEditAudiViewModel(Entry newEntry, EditAudioViewModel model)
+        public void SetDataFromEditAudioViewModel(Entry newEntry, EditAudioViewModel model)
         {
             //再遍历视图模型中的图片 对应修改
             newEntry.Audio.Clear();
@@ -2900,7 +2913,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     BriefIntroduction = item.BriefIntroduction,
                     Name = item.Name,
                     Priority = item.Priority,
-                    Url = item.Url
+                    Url = item.Url,
+                    Duration = item.Duration,
+                    Thumbnail=item.Thumbnail
                 });
 
             }

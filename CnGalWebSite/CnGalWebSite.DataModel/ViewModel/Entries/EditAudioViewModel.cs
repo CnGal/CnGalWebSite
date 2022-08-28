@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Base;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -39,6 +40,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Entries
         public string Url { get; set; }
         [Display(Name = "优先级")]
         public int Priority { get; set; }
+        [Display(Name = "时长")]
+        public TimeSpan Duration { get; set; }
+        [Display(Name = "缩略图")]
+        public string Thumbnail { get; set; }
     }
 
 }

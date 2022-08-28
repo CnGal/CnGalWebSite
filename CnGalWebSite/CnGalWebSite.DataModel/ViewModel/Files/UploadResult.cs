@@ -23,11 +23,15 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 音频长度
         /// </summary>
-        public TimeSpan? AudioLength { get; set; }
+        public TimeSpan? Duration { get; set; }
         /// <summary>
         /// 文件长度
         /// </summary>
         public long? FileSize { get; set; }
+        /// <summary>
+        /// 哈希值
+        /// </summary>
+        public string Sha1 { get; set; }
 
     }
 
@@ -36,7 +40,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 音频长度
         /// </summary>
-        public TimeSpan? AudioLength { get; set; }
+        public TimeSpan? Duration { get; set; }
         /// <summary>
         /// 文件长度
         /// </summary>

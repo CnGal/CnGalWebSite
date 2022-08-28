@@ -1086,7 +1086,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //设置数据
-            _entryService.SetDataFromEditAudiViewModel(newEntry, model);
+            _entryService.SetDataFromEditAudioViewModel(newEntry, model);
 
             var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
 
@@ -1232,7 +1232,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 _entryService.SetDataFromEditMainViewModel(newEntry, model.Main);
                 _entryService.SetDataFromEditRelevancesViewModel(newEntry, model.Relevances, entries, articles);
                 _entryService.SetDataFromEditTagsViewModel(newEntry, model.Tags, tags);
-                _entryService.SetDataFromEditAudiViewModel(newEntry, model.Audio);
+                _entryService.SetDataFromEditAudioViewModel(newEntry, model.Audio);
 
                 var entry = new Entry();
                 //获取审核记录

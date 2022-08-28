@@ -10,11 +10,12 @@
     <TableColumns>
         <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
         <TableColumn @bind-Field="@context.FileName" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.FileSize" Sortable="true" Width="100" TextWrap="true"  Formatter="FileSizeFormatter"/>
-        <TableColumn @bind-Field="@context.AudioLength" Sortable="true" Width="100" TextWrap="true" Formatter="AudioLengthFormatter"/>
+        <TableColumn @bind-Field="@context.FileSize" Sortable="true" Width="100" TextWrap="true" Formatter="FileSizeFormatter" />
+        <TableColumn @bind-Field="@context.Duration" Sortable="true" Width="100" TextWrap="true" Formatter="AudioLengthFormatter" />
         <TableColumn @bind-Field="@context.Type" Sortable="true" Width="100" TextWrap="true" />
         <TableColumn @bind-Field="@context.UploadTime" TextWrap="true" Width="170" />
         <TableColumn @bind-Field="@context.UserId" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
+        <TableColumn @bind-Field="@context.Sha1" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
     </TableColumns>
     <RowButtonTemplate>
         <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookFile( context.FileName))" />

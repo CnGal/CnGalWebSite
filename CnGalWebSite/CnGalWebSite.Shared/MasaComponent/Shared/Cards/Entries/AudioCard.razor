@@ -1,0 +1,53 @@
+﻿
+@if (currentAudio != null)
+{
+    <div>
+        <div class="h6 fw-bold">@currentAudio.Name</div>
+        <div style=" color: gray; ">@currentAudio.BriefIntroduction</div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@currentAudio.Url" AutoPlay="AutoPlay" Class="w-100 mb-2 mt-2" />
+    </div>
+    <MSimpleTable Class="mb-4">
+        <tbody>
+            @{ int index = 0; }
+            @foreach (var item in Model.OrderByDescending(s => s.Priority))
+            {
+                <tr @key="item.Url" @onclick="@(()=>OnClick(item))">
+                    <td style="min-width: 100px; ">@($"{++index}. {item.Name}" )</td>
+                    <td style="min-width: 100px; display: flex; justify-content: flex-end; align-items: center;">
+                        @(item.Duration.TotalMinutes.ToString("0") + ":"+(item.Duration.TotalSeconds%60).ToString("00"))
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </MSimpleTable>
+}
+@code {
+    [Parameter]
+    public List<AudioViewModel> Model { get; set; }
+    [Parameter]
+    public bool AutoPlay { get; set; } = true;
+
+    AudioViewModel currentAudio;
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (currentAudio == null)
+        {
+            currentAudio = Model.FirstOrDefault();
+        }
+    }
+
+    public Task OnClick(AudioViewModel model)
+    {
+        if (currentAudio == model)
+        {
+            return Task.CompletedTask;
+        }
+        currentAudio = model;
+        StateHasChanged();
+        return Task.CompletedTask;
+
+    }
+
+}

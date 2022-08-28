@@ -11,19 +11,30 @@
             音频的名称和简介会在词条页面展示，优先级会影响展示顺序
         </MCardText>
         <MCardText>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.AudioUploadButton Multiple="false" OnUploaded="OnUploaded" Class="mb-4" Text="重新上传音频" Icon="mdi-refresh"/>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@Model.Url" Class="mb-4 w-100"/>
-            <div class="row">
-                <div class="col-12  col-sm-6">
-                    <MTextField @bind-Value="Model.Name" Label="名称" Color="@_dataCacheService.ThemeSetting.Theme" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-image" Title="图片" Class="mb-4" Collapable Outline OutlineHead>
+                <div class="row">
+                    <div class="col-12 col-sm-6 mb-4">
+                        <ImageCropperButton @bind-ImagePath="@Model.Thumbnail" Type="ImageAspectType._1_1" Text="上传缩略图"></ImageCropperButton>
+                    </div>
                 </div>
-                <div class="col-12  col-sm-6">
-                    <MTextField @bind-Value="Model.Priority" Label="优先级" Color="@_dataCacheService.ThemeSetting.Theme" />
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="信息" Class="mb-4" Collapable Outline OutlineHead>
+
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@Model.Url" Class="mb-2 w-100" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.AudioUploadButton Multiple="false" OnUploaded="OnUploaded" Class="mb-4" Text="重新上传音频" Icon="mdi-refresh" />
+                <div class="row">
+                    <div class="col-12  col-sm-6">
+                        <MTextField @bind-Value="Model.Name" Label="名称" Color="@_dataCacheService.ThemeSetting.Theme" />
+                    </div>
+                    <div class="col-12  col-sm-6">
+                        <MTextField @bind-Value="Model.Priority" Label="优先级" Color="@_dataCacheService.ThemeSetting.Theme" />
+                    </div>
+                    <div class="col-12">
+                        <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介" Color="@_dataCacheService.ThemeSetting.Theme" />
+                    </div>
                 </div>
-                <div class="col-12">
-                    <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介" Color="@_dataCacheService.ThemeSetting.Theme" />
-                </div>
-            </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+           
 
         </MCardText>
     </MCard>
@@ -39,9 +50,10 @@
 
     bool Dialog { get; set; }
 
-    public Task OnUploaded(string url)
+    public Task OnUploaded(UploadResult result)
     {
-        Model.Url = url;
+        Model.Url = result.FileURL;
+        Model.Duration = result.Duration??new TimeSpan(0);
 
         StateHasChanged();
         return Task.CompletedTask;

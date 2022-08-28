@@ -75,6 +75,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         void SetDataFromEditTagsViewModel(Entry newEntry, EditEntryTagViewModel model, List<Tag> tags);
 
-        void SetDataFromEditAudiViewModel(Entry newEntry, EditAudioViewModel model);
+        void SetDataFromEditAudioViewModel(Entry newEntry, EditAudioViewModel model);
     }
 }
