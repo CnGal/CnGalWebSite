@@ -125,5 +125,7 @@ namespace CnGalWebSite.DataModel.Model
         EditPeripheryRelatedPeripheries,
         [Display(Name = "编辑游玩记录")]
         EditPlayedGameMain,
+        [Display(Name = "编辑词条音频")]
+        EstablishAudio,
     }
 }

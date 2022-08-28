@@ -151,7 +151,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditTagMain))
                     {
-                        model.MainState = EditState.locked;
+                        model.MainState = EditState.Locked;
                     }
                     else
                     {
@@ -162,7 +162,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditTagChildTags))
                     {
-                        model.ChildTagsState = EditState.locked;
+                        model.ChildTagsState = EditState.Locked;
                     }
                     else
                     {
@@ -173,7 +173,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditTagChildEntries))
                     {
-                        model.ChildEntriesState = EditState.locked;
+                        model.ChildEntriesState = EditState.Locked;
                     }
                     else
                     {

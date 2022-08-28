@@ -315,6 +315,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 Operation.EditTagChildTags => await GetEditTagChildTagsExamineView(model, examine),
                 Operation.EditTagChildEntries => await GetEditTagChildEntriesExamineView(model, examine),
                 Operation.EditPlayedGameMain => await GetEditPlayedGameMainExamineView(model, examine),
+                Operation.EstablishAudio => await GetEstablishAudioExamineView(model, examine),
                 _ => false,
             };
         }
@@ -719,7 +720,25 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     });
                     information.Add(temp);
                 }
+            }
 
+            if(entry.EntryStaffFromEntryNavigation.Any())
+            {
+                var temp = new List<KeyValueModel>();
+                foreach(var item in entry.EntryStaffFromEntryNavigation)
+                {
+                    temp.Add(new KeyValueModel
+                    {
+                        DisplayName = item.PositionOfficial,
+                        DisplayValue = string.IsNullOrWhiteSpace(item.CustomName) ? item.ToEntryNavigation?.Name ?? item.Name : item.CustomName
+                    });
+                }
+                information.Add(new InformationsModel
+                {
+                    Modifier = "STAFF",
+                    Informations = temp
+                });
+                
             }
 
             model.Texts = information;
@@ -1044,6 +1063,70 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
             return true;
         }
+
+        private static ExaminePreDataModel InitExamineViewEntryAudio(Entry entry)
+        {
+            var model = new ExaminePreDataModel();
+            foreach (var item in entry.Audio)
+            {
+                model.Audio.Add(new AudioViewModel
+                {
+                    Url = item.Url,
+                    BriefIntroduction=item.BriefIntroduction,
+                    Name=item.Name,
+                    Priority=item.Priority
+                });
+            }
+
+            return model;
+        }
+
+        public async Task<bool> GetEstablishAudioExamineView(ExamineViewModel model, Examine examine)
+        {
+            model.Type = ExaminedNormalListModelType.Entry;
+            var entry = await _entryRepository.GetAll()
+                  .Include(s => s.Audio)
+                  .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
+            if (entry == null)
+            {
+                return false;
+            }
+            model.ObjectId = entry.Id;
+            model.ObjectName = entry.Name;
+            model.ObjectBriefIntroduction = entry.BriefIntroduction;
+            if (entry.Type is EntryType.Game or EntryType.ProductionGroup)
+            {
+                model.Image = _appHelper.GetImagePath(entry.MainPicture, "app.png");
+            }
+            else
+            {
+                model.Image = _appHelper.GetImagePath(entry.Thumbnail, "user.png");
+                model.IsThumbnail = true;
+            }
+            var audio = InitExamineViewEntryAudio(entry);
+
+            //添加修改记录 
+            await _entryService.UpdateEntryDataAsync(entry, examine);
+
+            var audio_examine = InitExamineViewEntryAudio(entry);
+
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+
+            //判断是否是等待审核状态
+            if (examine.IsPassed != null)
+            {
+                model.BeforeModel = audio_examine;
+                model.AfterModel = audio;
+            }
+            else
+            {
+                model.BeforeModel = audio;
+                model.AfterModel = audio_examine;
+            }
+            return true;
+        }
+
 
         #endregion
 
@@ -2659,6 +2742,19 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
         }
+
+        public async Task ExamineEstablishAudioAsync(Entry entry, EntryAudioExamineModel examine)
+        {
+            //更新数据
+            _entryService.UpdateEntryDataAudio(entry, examine);
+            //保存
+            _ = await _entryRepository.UpdateAsync(entry);
+
+            //更新完善度
+            //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
+
+        }
+
         #endregion
 
         #region 文章
@@ -3710,6 +3806,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                             break;
                         case Operation.EstablishTags:
                             await ExamineEstablishTagsAsync(entry, item.Key as EntryTags);
+                            break;
+                        case Operation.EstablishAudio:
+                            await ExamineEstablishAudioAsync(entry, item.Key as EntryAudioExamineModel);
                             break;
                         default:
                             throw new Exception("不支持的类型");

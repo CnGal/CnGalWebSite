@@ -1,0 +1,84 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-volume-up" Title="音频试听" Class="@Class" Collapable>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.AudioUploadButton OnUploaded="OnUploaded" Class="mb-4" />
+    <MSimpleTable Class="mb-4">
+        <thead>
+            <tr>
+                <th class="text-left">
+                    名称
+                </th>
+                <th class="text-left">
+                    简介
+                </th>
+                <th class="text-left">
+                    预览
+                </th>
+                <th class="text-left">
+                    操作
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Audio.OrderByDescending(s=>s.Priority))
+            {
+                <tr @key="item.Url">
+                    <td style="min-width: 100px; ">@item.Name</td>
+                    <td style="overflow-wrap: anywhere; min-width: 200px; ">@item.BriefIntroduction</td>
+                    <td>
+                       <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@item.Url"/>
+                    </td>
+                    <td>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="编辑" OnClick="@(()=>OnEdit(item))" Icon="mdi-pencil" Color="success" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="删除" OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </MSimpleTable>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+<CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditAudioCard @ref="editAudioCard" OnChanged="OnChanged"/>
+@code {
+    [Parameter]
+    public EditAudioViewModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+    CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditAudioCard editAudioCard;
+
+    public Task OnUploaded(string url)
+    {
+        Model.Audio.Add(new EditAudioAloneModel
+        {
+            Name = "音频" + (Model.Audio.Count + 1).ToString(),
+            Url = url
+        });
+
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public Task OnDelete(EditAudioAloneModel model)
+    {
+        Model.Audio.Remove(model);
+        return Task.CompletedTask;
+    }
+
+    public Task OnEdit(EditAudioAloneModel model)
+    {
+        if(editAudioCard!=null)
+        {
+            editAudioCard.Refresh(model);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task OnChanged()
+    {
+        StateHasChanged();
+
+        return Task.CompletedTask;
+    }
+}

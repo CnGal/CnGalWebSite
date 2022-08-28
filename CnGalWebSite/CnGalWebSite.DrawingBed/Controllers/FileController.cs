@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Files;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DrawingBed.Services;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +34,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         /// <param name="y"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<List<UploadResult>>> UploadAsync([FromForm] List<IFormFile> files, [FromQuery] double x, [FromQuery] double y)
+        public async Task<ActionResult<List<UploadResult>>> UploadAsync([FromForm] List<IFormFile> files, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type)
         {
             if (files.Count == 0)
             {
@@ -42,23 +43,20 @@ namespace CnGalWebSite.DrawingBed.Controllers
             var model = new List<UploadResult>();
             foreach (var item in files)
             {
-                var url = await _fileService.UploadFormFile(item, x, y);
-                if (string.IsNullOrWhiteSpace(url))
+                try
+                {
+                    model.Add(await _fileService.UploadFormFile(item, x, y, type));
+                }
+                catch (Exception ex)
                 {
                     model.Add(new UploadResult
                     {
-                        Uploaded = false
+                        Uploaded = false,
+                        FileName=item.Name,
+                        Error = ex.Message
                     });
                 }
-                else
-                {
-                    model.Add(new UploadResult
-                    {
-                        Uploaded = true,
-                        FileName = item.FileName,
-                        FileURL = url
-                    });
-                }
+
             }
 
             return model;
@@ -70,7 +68,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         /// <param name="url"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<LinkToImgResult>> linkToImgUrlAsync([FromQuery] string url, [FromQuery] double x, [FromQuery] double y)
+        public async Task<ActionResult<LinkToImgResult>> linkToImgUrlAsync([FromQuery] string url, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type)
         {
             if (string.IsNullOrWhiteSpace(url))
             {
@@ -93,25 +91,36 @@ namespace CnGalWebSite.DrawingBed.Controllers
             }
 
 
+            try
+            {
+                var res = (url.Contains("image.cngal.org") || url.Contains("pic.cngal.top")) && x == 0 && y == 0
+                              ? url
+                              : (await _fileService.TransferDepositFile(url, x, y, type)).FileURL;
 
-            var res = (url.Contains("image.cngal.org") || url.Contains("pic.cngal.top")) && x == 0 && y == 0
-                ? url
-                : await _fileService.TransferDepositFile(url, x, y);
+                return string.IsNullOrWhiteSpace(res)
+                    ? (ActionResult<LinkToImgResult>)new LinkToImgResult
+                    {
+                        Successful = false,
+                        OriginalUrl = url,
+                    }
+                    : (ActionResult<LinkToImgResult>)new LinkToImgResult
+                    {
+                        OriginalUrl = url,
+                        Url = res,
+                        Successful = true,
 
-            return string.IsNullOrWhiteSpace(res)
-                ? (ActionResult<LinkToImgResult>)new LinkToImgResult
+                    };
+            }
+            catch (Exception ex)
+            {
+                return new LinkToImgResult
                 {
                     Successful = false,
                     OriginalUrl = url,
-
-                }
-                : (ActionResult<LinkToImgResult>)new LinkToImgResult
-                {
-                    OriginalUrl = url,
-                    Url = res,
-                    Successful = true,
-
+                    Error = ex.Message
                 };
+            }
+
         }
 
     }

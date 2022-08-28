@@ -5,6 +5,7 @@ using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Files;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -47,7 +48,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<Result>> AddUserLoadedFileInfor(ImageInforTipViewModel model)
+        public async Task<ActionResult<Result>> AddUserUploadFileInfor(AddUserUploadFileInforModel model)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -75,9 +76,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 UploadTime = DateTime.Now.ToCstTime(),
                 FileSize = model.FileSize,
                 Sha1 = model.Sha1,
+                AudioLength = model.AudioLength,
+                Type = model.Type,
                 UserId = fileManager.ApplicationUserId
             });
-            fileManager.UsedSize += (long)model.FileSize;
+            fileManager.UsedSize += (model.FileSize ?? 0);
             //更新用户文件列表
             await _fileManagerRepository.UpdateAsync(fileManager);
 
@@ -110,12 +113,28 @@ namespace CnGalWebSite.APIServer.Controllers
             }
         }
 
+        /// <summary>
+        /// 获取图片列表 用于预览
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost]
-        public async Task<PagedResultDto<ImageInforTipViewModel>> GetFileListAsync(PagedSortedAndFilterInput input)
+        public async Task<PagedResultDto<ImageInforTipViewModel>> GetImageListAsync(PagedSortedAndFilterInput input)
         {
-            return await _fileService.GetPaginatedResult(input);
+            return await _fileService.GetImagePaginatedResult(input);
         }
 
+        /// <summary>
+        /// 获取音频列表 用于预览
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [HttpPost]
+        public async Task<PagedResultDto<ListFileAloneModel>> GetAudioListAsync(PagedSortedAndFilterInput input)
+        {
+            return await _fileService.GetAudioPaginatedResult(input);
+        }
     }
 }

@@ -119,7 +119,7 @@
     {
         try
         {
-            var obj = await _appHelper.UploadFilesAsync(file.File, Type);
+            var obj = await _appHelper.UploadImagesAsync(file.File, Type);
             if (obj.Uploaded == true)
             {
                 ImagePath = obj.FileURL;

@@ -69,7 +69,10 @@
                 }
                 else
                 {
-                    <MProgressCircular Size="60" Width="6" Indeterminate Color="@_dataCacheService.ThemeSetting.Theme" Class="mt-4 mb-4"></MProgressCircular>
+                    <div class="w-100" style=" text-align: center;">
+                        <MProgressCircular Size="60" Width="6" Indeterminate Color="@_dataCacheService.ThemeSetting.Theme" Class="mt-4 mb-4"></MProgressCircular>
+
+                    </div>
                 }
 
 
@@ -144,7 +147,8 @@
                 EditCount = Examines.Count(s => s.Operation == item.Key),
                 Id = long.Parse(Examines.FirstOrDefault()?.RelatedId),
                 LastEditTime = Examines.Where(s => s.Operation == item.Key).OrderByDescending(s => s.ApplyTime).FirstOrDefault()?.ApplyTime,
-                Operation = item.Key
+                Operation = item.Key,
+                
             });
         }
 
@@ -173,6 +177,7 @@
                 editStates.Add(Operation.EstablishImages, model.State.ImagesState);
                 editStates.Add(Operation.EstablishRelevances, model.State.RelevancesState);
                 editStates.Add(Operation.EstablishTags, model.State.TagState);
+                editStates.Add(Operation.EstablishAudio, model.State.AudioState);
 
             }
             else if (Type == ExaminedNormalListModelType.Article)

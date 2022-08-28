@@ -204,7 +204,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditPeripheryMain))
                     {
-                        model.MainState = EditState.locked;
+                        model.MainState = EditState.Locked;
                     }
                     else
                     {
@@ -215,7 +215,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditPeripheryImages))
                     {
-                        model.ImagesState = EditState.locked;
+                        model.ImagesState = EditState.Locked;
                     }
                     else
                     {
@@ -227,7 +227,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditPeripheryRelatedEntries))
                     {
-                        model.RelatedEntriesState = EditState.locked;
+                        model.RelatedEntriesState = EditState.Locked;
                     }
                     else
                     {
@@ -238,7 +238,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditPeripheryRelatedPeripheries))
                     {
-                        model.RelatedPeripheriesState = EditState.locked;
+                        model.RelatedPeripheriesState = EditState.Locked;
                     }
                     else
                     {

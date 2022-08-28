@@ -82,6 +82,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         public EditState RelevancesState { get; set; }
         public EditState InforState { get; set; }
         public EditState TagState { get; set; }
+        public EditState AudioState { get; set; }
 
         public bool CanComment { get; set; }
 
@@ -140,6 +141,10 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// </summary>
         public List<PicturesViewModel> Pictures { get; set; } = new List<PicturesViewModel>();
         /// <summary>
+        /// 音频列表
+        /// </summary>
+        public List<AudioViewModel> Audio { get; set; } = new List<AudioViewModel>();
+        /// <summary>
         /// 审核记录 也是编辑记录
         /// </summary>
         public List<ExaminedNormalListModel> Examines { get; set; } = new List<ExaminedNormalListModel> { };
@@ -154,7 +159,17 @@ namespace CnGalWebSite.DataModel.ViewModel
         public int Id { get; set; }
         public string Name { get; set; }
     }
-
+    public class AudioViewModel
+    {
+        [Display(Name = "名称")]
+        public string Name { get; set; }
+        [Display(Name = "简介")]
+        public string BriefIntroduction { get; set; }
+        [Display(Name = "链接")]
+        public string Url { get; set; }
+        [Display(Name = "优先级")]
+        public int Priority { get; set; }
+    }
     public class PicturesViewModel
     {
         public string Modifier { get; set; }
@@ -179,7 +194,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         [Display(Name = "预览")]
         Preview,
         [Display(Name = "锁定")]
-        locked
+        Locked
 
     }
     public class NewsModel

@@ -66,6 +66,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
         public List<RelevancesKeyValueModel> Outlinks { get; set; } = new List<RelevancesKeyValueModel>();
 
+        public List<AudioViewModel> Audio { get; set; } = new List<AudioViewModel>();
+
         public string MainPage { get; set; }
     }
 }

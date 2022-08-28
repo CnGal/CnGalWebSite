@@ -267,6 +267,25 @@ namespace CnGalWebSite.APIServer.Controllers
 
                         await _examineService.ExamineEstablishImagesAsync(entry, entryImages);
                         break;
+                    case Operation.EstablishAudio:
+                        entry = await _entryRepository.GetAll()
+                           .Include(s => s.Audio)
+                           .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
+                        if (entry == null)
+                        {
+                            return NotFound();
+                        }
+
+                        //序列化数据
+                        EntryAudioExamineModel entryAudioExamineModel = null;
+                        using (TextReader str = new StringReader(examine.Context))
+                        {
+                            var serializer = new JsonSerializer();
+                            entryAudioExamineModel = (EntryAudioExamineModel)serializer.Deserialize(str, typeof(EntryAudioExamineModel));
+                        }
+
+                        await _examineService.ExamineEstablishAudioAsync(entry, entryAudioExamineModel);
+                        break;
                     case Operation.EstablishRelevances:
                         entry = await _entryRepository.GetAll()
                             .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)

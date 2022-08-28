@@ -26,5 +26,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Entries
         public EditState RelevancesState { get; set; }
         public EditState InforState { get; set; }
         public EditState TagState { get; set; }
+        public EditState AudioState { get; set; }
     }
 }

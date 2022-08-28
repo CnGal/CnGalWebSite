@@ -1,0 +1,110 @@
+﻿@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+@if (isReady)
+{
+    <MSimpleTable Class="mb-4">
+        <thead>
+            <tr>
+                <th class="text-left">
+                    上传用户
+                </th>
+                <th class="text-left">
+                    文件大小
+                </th>
+                <th class="text-left">
+                    时长
+                </th>
+                <th class="text-left">
+                    预览
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr @key="item.Id">
+                    <td style="min-width: 100px; ">
+                        <a href="@("/space/index/"+item.UserId)">@item.UserName</a>
+                    </td>
+                    <td style="min-width: 100px; ">
+                        @if (item.FileSize == null || item.FileSize == 0)
+                        {
+                            <span>无</span>
+                        }
+                        else
+                        {
+                            <span>@(((double)item.FileSize.Value/1024/1024).ToString("0.00")+" MB")</span>
+                        }
+                    </td>
+                    <td style="min-width: 100px; ">
+                        @if (item.AudioLength == null || item.AudioLength.Value.TotalSeconds == 0)
+                        {
+                            <span>无</span>
+                        }
+                        else
+                        {
+                            <span>@(item.AudioLength.Value.TotalSeconds.ToString("0.0")+" s")</span>
+                        }
+                    </td>
+                    <td>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@item.FileName" />
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+
+
+    </MSimpleTable>
+    @if (Model.TotalPages > 1)
+    {
+        <MPagination Value="@Model.CurrentPage" Class="my-4" Length="@Model.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+    }
+}
+else
+{
+    <div style="height:300px">
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
+    </div>
+}
+
+
+
+@code {
+    [NotNull]
+    public PagedResultDto<ListFileAloneModel> Model { get; set; } = new PagedResultDto<ListFileAloneModel> { MaxResultCount = 12, Sorting = "id desc" };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool isReady;
+
+    private async Task OnPageClick(int pageIndex)
+    {
+        Model.CurrentPage = pageIndex;
+        StateHasChanged();
+        await OnGetNewItems();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OnGetNewItems();
+        isReady = true;
+    }
+
+    private async Task OnGetNewItems()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<PagedSortedAndFilterInput>(ToolHelper.WebApiPath + "api/files/GetAudioList", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Model = JsonSerializer.Deserialize<PagedResultDto<ListFileAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取音频列表");
+
+            Model = new PagedResultDto<ListFileAloneModel> { Data = new List<ListFileAloneModel>() };
+        }
+    }
+}

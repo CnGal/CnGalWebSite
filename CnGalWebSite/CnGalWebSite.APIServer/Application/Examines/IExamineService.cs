@@ -435,5 +435,21 @@ namespace CnGalWebSite.APIServer.ExamineX
         Task RefreshAllEntryStaffRelevances(bool autoCreate, PositionGeneralType type);
 
         Task RefreshEntryStaffRelevances(int id, bool autoCreate, PositionGeneralType type);
+
+        /// <summary>
+        /// 获取词条音频审核视图
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="examine"></param>
+        /// <returns></returns>
+        Task<bool> GetEstablishAudioExamineView(ExamineViewModel model, Examine examine);
+
+        /// <summary>
+        /// 使 词条 音频 审核记录作用
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="examine"></param>
+        /// <returns></returns>
+        Task ExamineEstablishAudioAsync(Entry entry, EntryAudioExamineModel examine);
     }
 }

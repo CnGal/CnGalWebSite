@@ -69,7 +69,7 @@ else
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<PagedSortedAndFilterInput>(ToolHelper.WebApiPath + "api/files/GetFileList", Model);
+            var result = await Http.PostAsJsonAsync<PagedSortedAndFilterInput>(ToolHelper.WebApiPath + "api/files/GetImageList", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Model = JsonSerializer.Deserialize<PagedResultDto<ImageInforTipViewModel>>(jsonContent, ToolHelper.options);
         }

@@ -29,8 +29,8 @@ namespace CnGalWebSite.DataModel.Helper
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";
         public static bool IsWASM => WebApiPath == "https://www.cngal.org/";
 
-        public const string ImageApiPath = "https://api.cngal.top/";
-        //public const string ImageApiPath = "http://localhost:5098/";
+        //public const string ImageApiPath = "https://api.cngal.top/";
+        public const string ImageApiPath = "http://localhost:5098/";
 
 
         public const bool IsMaui = false;
@@ -1125,6 +1125,29 @@ namespace CnGalWebSite.DataModel.Helper
         /// <param name="informations"></param>
         /// <returns></returns>
         public static List<EntryPicture> Purge(this List<EntryPicture> informations)
+        {
+            var list = informations.ToList();
+            foreach (var item in list)
+            {
+                if (informations.Count(s => item.Url == s.Url) > 1)
+                {
+                    var temp = informations.FirstOrDefault(s => item.Url == s.Url);
+                    if (temp != null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
+
+        /// <summary>
+        /// 词条 音频 的 列表 清理相同项目
+        /// </summary>
+        /// <param name="informations"></param>
+        /// <returns></returns>
+        public static List<EntryAudio> Purge(this List<EntryAudio> informations)
         {
             var list = informations.ToList();
             foreach (var item in list)

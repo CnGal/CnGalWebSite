@@ -4,7 +4,7 @@
         {
             @switch (EntryView.InforState)
             {
-                case EditState.locked:
+                case EditState.Locked:
                     <AlertTip Type="AlertTip.AlertTipType.Blocked"></AlertTip>
                     break;
                 case EditState.Normal:
@@ -85,7 +85,7 @@
             {
                 @switch (EntryView.TagState)
                 {
-                    case EditState.locked:
+                    case EditState.Locked:
                         <button type="button" class="@("badge-btn btn btn-secondary m-1 "+(isFirstBadge ? "ms-0" : ""))" >
                             锁定
                         </button>

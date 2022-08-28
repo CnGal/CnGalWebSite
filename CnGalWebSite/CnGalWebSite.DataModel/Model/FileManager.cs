@@ -1,5 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Model;
-
+using CnGalWebSite.DataModel.ViewModel.Files;
 using System;
 using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.Models
@@ -30,7 +30,19 @@ namespace CnGalWebSite.DataModel.Models
 
         public DateTime UploadTime { get; set; }
 
+        /// <summary>
+        /// 音频长度
+        /// </summary>
+        public TimeSpan? AudioLength { get; set; }
+        /// <summary>
+        /// 文件类型
+        /// </summary>
+        public UploadFileType Type { get; set; }
+
         public FileManager FileManager { get; set; }
+
+
+
 
         public string UserId { get; set; }
     }

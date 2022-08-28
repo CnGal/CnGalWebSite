@@ -280,7 +280,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditArticleMain))
                     {
-                        model.MainState = EditState.locked;
+                        model.MainState = EditState.Locked;
                     }
                     else
                     {
@@ -291,7 +291,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditArticleMainPage))
                     {
-                        model.MainPageState = EditState.locked;
+                        model.MainPageState = EditState.Locked;
                     }
                     else
                     {
@@ -302,7 +302,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditArticleRelevanes))
                     {
-                        model.RelevancesState = EditState.locked;
+                        model.RelevancesState = EditState.Locked;
                     }
                     else
                     {

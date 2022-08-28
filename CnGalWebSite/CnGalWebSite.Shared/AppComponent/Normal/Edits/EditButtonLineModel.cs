@@ -25,6 +25,7 @@ namespace CnGalWebSite.Shared.AppComponent.Normal.Edits
             Operation.EstablishTags => "标签",
             Operation.EstablishAddInfor => "附加信息",
             Operation.EstablishImages => "相册",
+            Operation.EstablishAudio => "音频",
             Operation.EditPeripheryMain => "主要信息",
             Operation.EditPeripheryImages => "相册",
             Operation.EditPeripheryRelatedEntries => "关联词条",
@@ -45,6 +46,7 @@ namespace CnGalWebSite.Shared.AppComponent.Normal.Edits
             Operation.EstablishTags => "entries/edittags/" + Id,
             Operation.EstablishAddInfor => "entries/editaddinfor/" + Id,
             Operation.EstablishImages => "entries/editimages/" + Id,
+            Operation.EstablishAudio => "entries/editaudio/" + Id,
             Operation.EditPeripheryMain => "peripheries/editmain/" + Id,
             Operation.EditPeripheryImages => "peripheries/editimages/" + Id,
             Operation.EditPeripheryRelatedEntries => "peripheries/EditRelatedEntries/" + Id,
@@ -62,7 +64,7 @@ namespace CnGalWebSite.Shared.AppComponent.Normal.Edits
             EditState.None => "bg-success",
             EditState.Preview => "bg-warning",
             EditState.Normal => "bg-primary",
-            EditState.locked => "bg-dark",
+            EditState.Locked => "bg-dark",
             _ => "",
         };
         public string Describe => Operation switch

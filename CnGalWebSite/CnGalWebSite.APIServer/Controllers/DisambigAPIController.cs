@@ -165,7 +165,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.DisambigMain))
                     {
-                        model.MainState = EditState.locked;
+                        model.MainState = EditState.Locked;
                     }
                     else
                     {
@@ -176,7 +176,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.DisambigRelevances))
                     {
-                        model.RelevancesState = EditState.locked;
+                        model.RelevancesState = EditState.Locked;
                     }
                     else
                     {

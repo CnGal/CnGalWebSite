@@ -143,6 +143,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //通过Id获取词条 
             var entry = await _entryRepository.GetAll().Include(s => s.Disambig)
                     .Include(s => s.Outlinks)
+                    .Include(s=>s.Audio)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffToEntryNavigation).ThenInclude(s => s.FromEntryNavigation)                  
@@ -172,7 +173,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 examineQuery = await _examineRepository.GetAll().AsNoTracking()
                                .Where(s => s.EntryId == entry.Id && s.ApplicationUserId == user.Id && s.IsPassed == null
                                && (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishMainPage || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages
-                               || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags))
+                               || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishAudio))
                                .Select(s => new Examine
                                {
                                    Operation = s.Operation,
@@ -213,6 +214,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     await _entryService.UpdateEntryDataAsync(entry, examine);
                 }
+                examine = examineQuery.FirstOrDefault(s => s.Operation == Operation.EstablishAudio);
+                if (examine != null)
+                {
+                    await _entryService.UpdateEntryDataAsync(entry, examine);
+                }
             }
 
             //建立视图模型
@@ -245,6 +251,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     model.TagState = EditState.Preview;
                 }
+                if (examineQuery.Any(s => s.Operation == Operation.EstablishAudio))
+                {
+                    model.AudioState = EditState.Preview;
+                }
             }
 
             //获取各部分状态
@@ -260,7 +270,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EstablishMain))
                     {
-                        model.MainState = EditState.locked;
+                        model.MainState = EditState.Locked;
                     }
                     else
                     {
@@ -272,7 +282,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                     if (examiningList.Any(s => s == Operation.EstablishAddInfor))
                     {
-                        model.InforState = EditState.locked;
+                        model.InforState = EditState.Locked;
                     }
                     else
                     {
@@ -283,7 +293,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EstablishMainPage))
                     {
-                        model.MainPageState = EditState.locked;
+                        model.MainPageState = EditState.Locked;
                     }
                     else
                     {
@@ -294,7 +304,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EstablishImages))
                     {
-                        model.ImagesState = EditState.locked;
+                        model.ImagesState = EditState.Locked;
                     }
                     else
                     {
@@ -305,7 +315,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EstablishRelevances))
                     {
-                        model.RelevancesState = EditState.locked;
+                        model.RelevancesState = EditState.Locked;
                     }
                     else
                     {
@@ -317,11 +327,23 @@ namespace CnGalWebSite.APIServer.Controllers
 
                     if (examiningList.Any(s => s == Operation.EstablishTags))
                     {
-                        model.TagState = EditState.locked;
+                        model.TagState = EditState.Locked;
                     }
                     else
                     {
                         model.TagState = EditState.Normal;
+                    }
+                }
+                if (model.AudioState != EditState.Preview)
+                {
+
+                    if (examiningList.Any(s => s == Operation.EstablishAudio))
+                    {
+                        model.AudioState = EditState.Locked;
+                    }
+                    else
+                    {
+                        model.AudioState = EditState.Normal;
                     }
                 }
             }
@@ -893,148 +915,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [HttpPost]
-        public async Task<ActionResult<Result>> EstablishEntryAsync(EstablishEntryViewModel model)
-        {
-            try
-            {
-                //获取当前用户ID
-                var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-                //检查是否超过编辑上限
-                if (await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == null) > ToolHelper.MaxEditorCount)
-                {
-                    return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
-                }
-                //判断名称是否重复
-                if (await _entryRepository.FirstOrDefaultAsync(s => s.Name == model.Main.Name) != null)
-                {
-                    return new Result { Error = "该词条的名称与其他词条重复", Successful = false };
-                }
-
-                //预处理
-                //检查图片链接 是否包含外链
-                foreach (var item in model.Images.Images)
-                {
-                    if (item.Image.Contains("image.cngal.org") == false && item.Image.Contains("pic.cngal.top") == false)
-                    {
-                        return new Result { Successful = false, Error = "相册中不能添加外部图片：" + item.Image };
-                    }
-                }
-                //检查是否重复
-                foreach (var item in model.Images.Images)
-                {
-                    if (model.Images.Images.Count(s => s.Image == item.Image) > 1)
-                    {
-                        return new Result { Error = "图片链接不能重复，重复的链接：" + item.Image, Successful = false };
-
-                    }
-                }
-
-                //判断关联是否存在
-                var tags = new List<Tag>();
-
-                var tagNames = new List<string>();
-                tagNames.AddRange(model.Tags.Tags.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-                tagNames = tagNames.Distinct().ToList();
-
-                foreach (var item in tagNames)
-                {
-                    var infor = await _tagRepository.GetAll().Where(s => s.Name == item).FirstOrDefaultAsync();
-                    if (infor == null)
-                    {
-                        return new Result { Successful = false, Error = "标签 " + item + " 不存在" };
-                    }
-                    else
-                    {
-                        tags.Add(infor);
-                    }
-                }
-
-                //处理原始数据 删除空项目
-                model.Relevances.Roles.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
-                model.Relevances.staffs.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
-                model.Relevances.Groups.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
-                model.Relevances.Games.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
-                model.Relevances.articles.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
-                model.Relevances.news.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
-                model.Relevances.others.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
-
-
-                //预处理 建立词条关联信息
-                //判断关联是否存在
-                var entryIds = new List<int>();
-                var entryNames = new List<string>();
-
-                var articleIds = new List<long>();
-                var articleNames = new List<string>();
-
-                entryNames.AddRange(model.Relevances.Games.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-                entryNames.AddRange(model.Relevances.Groups.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-                entryNames.AddRange(model.Relevances.staffs.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-                entryNames.AddRange(model.Relevances.Roles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-
-                //建立文章关联信息
-                articleNames.AddRange(model.Relevances.articles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-                articleNames.AddRange(model.Relevances.news.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
-                try
-                {
-                    entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
-                    articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
-                }
-                catch (Exception ex)
-                {
-                    return new Result { Successful = false, Error = ex.Message };
-                }
-                //获取词条文章
-                var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
-                var articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
-
-
-
-                var newEntry = new Entry();
-                await _entryService.SetDataFromEditAddInforViewModelAsync(newEntry, model.AddInfor);
-                _entryService.SetDataFromEditImagesViewModel(newEntry, model.Images);
-                _entryService.SetDataFromEditMainPageViewModel(newEntry, model.MainPage);
-                _entryService.SetDataFromEditMainViewModel(newEntry, model.Main);
-                _entryService.SetDataFromEditRelevancesViewModel(newEntry, model.Relevances, entries, articles);
-                _entryService.SetDataFromEditTagsViewModel(newEntry, model.Tags, tags);
-
-                var entry = new Entry();
-                //获取审核记录
-                try
-                {
-                    entry = await _examineService.AddNewEntryExaminesAsync(newEntry, user, model.Note);
-                }
-                catch (Exception ex)
-                {
-                    return new Result { Successful = false, Error = ex.Message };
-
-                }
-
-                //创建词条成功
-                return new Result { Successful = true, Error = entry.Id.ToString() };
-            }
-            catch (Exception)
-            {
-                return new Result { Error = "创建词条的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
-            }
-        }
-
-        [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        public async Task<ActionResult<Result>> HiddenEntryAsync(HiddenEntryModel model)
-        {
-            await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
-            return new Result { Successful = true };
-        }
-        [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        public async Task<ActionResult<Result>> HideEntryOutlinkAsync(HiddenEntryModel model)
-        {
-            await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHideOutlink, b => model.IsHidden).ExecuteAsync();
-            return new Result { Successful = true };
-        }
-
         [HttpGet("{id}")]
         public async Task<ActionResult<EditEntryTagViewModel>> EditTags(int Id)
         {
@@ -1145,6 +1025,252 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
 
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EditAudioViewModel>> EditAudioAsync(int Id)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            //获取词条
+            var entry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Audio).FirstOrDefaultAsync(s => s.Id == Id && s.IsHidden != true);
+            if (entry == null)
+            {
+                return NotFound();
+            }
+            //判断是否为锁定状态
+            if (await _appHelper.IsEntryLockedAsync(Id, user.Id, Operation.EstablishAudio))
+            {
+                return NotFound();
+            }
+
+            //获取用户的审核信息
+            var examine = await _examineService.GetUserEntryActiveExamineAsync(entry.Id, user.Id, Operation.EstablishAudio);
+            if (examine != null)
+            {
+                await _entryService.UpdateEntryDataAsync(entry, examine);
+            }
+
+            return _entryService.GetEditAuioViewModel(entry);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Result>> EditAudioAsync(EditAudioViewModel model)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            //检查是否超过编辑上限
+            if (await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == null) > ToolHelper.MaxEditorCount)
+            {
+                return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
+            }
+            //判断是否为锁定状态
+            if (await _appHelper.IsEntryLockedAsync(model.Id, user.Id, Operation.EstablishAudio))
+            {
+                return new Result { Error = "当前词条该部分已经被另一名用户编辑，正在等待审核,请等待审核结束后再进行编辑", Successful = false };
+            }
+            //检查是否重复
+            foreach (var item in model.Audio)
+            {
+                if (model.Audio.Count(s => s.Url == item.Url) > 1)
+                {
+                    return new Result { Error = $"{item.Name} 与其他音频重复了，链接：{item.Url}", Successful = false };
+
+                }
+            }
+            //查找词条
+            var currentEntry = await _entryRepository.GetAll().Include(s => s.Audio).FirstOrDefaultAsync(x => x.Id == model.Id);
+            var newEntry = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Audio).FirstOrDefaultAsync(x => x.Id == model.Id);
+            if (currentEntry == null)
+            {
+                return new Result { Error = $"无法找到ID为{model.Id}的词条", Successful = false };
+            }
+
+            //设置数据
+            _entryService.SetDataFromEditAudiViewModel(newEntry, model);
+
+            var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
+
+            if (examines.Any(s => s.Value == Operation.EstablishAudio) == false)
+            {
+                return new Result { Successful = true };
+            }
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishAudio);
+            //序列化
+            var resulte = "";
+            using (TextWriter text = new StringWriter())
+            {
+                var serializer = new JsonSerializer();
+                serializer.Serialize(text, examine.Key);
+                resulte = text.ToString();
+            }
+            //判断是否是管理员
+            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
+            {
+                await _examineService.ExamineEstablishAudioAsync(currentEntry, examine.Key as EntryAudioExamineModel);
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishAudio, model.Note);
+                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishAudio);
+            }
+            else
+            {
+                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishAudio, model.Note);
+            }
+            return new Result { Successful = true };
+
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Result>> EstablishEntryAsync(EstablishEntryViewModel model)
+        {
+            try
+            {
+                //获取当前用户ID
+                var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+                //检查是否超过编辑上限
+                if (await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == null) > ToolHelper.MaxEditorCount)
+                {
+                    return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
+                }
+                //判断名称是否重复
+                if (await _entryRepository.FirstOrDefaultAsync(s => s.Name == model.Main.Name) != null)
+                {
+                    return new Result { Error = "该词条的名称与其他词条重复", Successful = false };
+                }
+
+                //预处理
+                //检查图片链接 是否包含外链
+                foreach (var item in model.Images.Images)
+                {
+                    if (item.Image.Contains("image.cngal.org") == false && item.Image.Contains("pic.cngal.top") == false)
+                    {
+                        return new Result { Successful = false, Error = "相册中不能添加外部图片：" + item.Image };
+                    }
+                }
+                //检查是否重复
+                foreach (var item in model.Images.Images)
+                {
+                    if (model.Images.Images.Count(s => s.Image == item.Image) > 1)
+                    {
+                        return new Result { Error = "图片链接不能重复，重复的链接：" + item.Image, Successful = false };
+
+                    }
+                }
+                //检查是否重复
+                foreach (var item in model.Audio.Audio)
+                {
+                    if (model.Audio.Audio.Count(s => s.Url == item.Url) > 1)
+                    {
+                        return new Result { Error = $"{item.Name} 与其他音频重复了，链接：{item.Url}", Successful = false };
+
+                    }
+                }
+
+                //判断关联是否存在
+                var tags = new List<Tag>();
+
+                var tagNames = new List<string>();
+                tagNames.AddRange(model.Tags.Tags.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                tagNames = tagNames.Distinct().ToList();
+
+                foreach (var item in tagNames)
+                {
+                    var infor = await _tagRepository.GetAll().Where(s => s.Name == item).FirstOrDefaultAsync();
+                    if (infor == null)
+                    {
+                        return new Result { Successful = false, Error = "标签 " + item + " 不存在" };
+                    }
+                    else
+                    {
+                        tags.Add(infor);
+                    }
+                }
+
+                //处理原始数据 删除空项目
+                model.Relevances.Roles.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.Relevances.staffs.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.Relevances.Groups.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.Relevances.Games.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.Relevances.articles.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.Relevances.news.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.Relevances.others.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+
+
+                //预处理 建立词条关联信息
+                //判断关联是否存在
+                var entryIds = new List<int>();
+                var entryNames = new List<string>();
+
+                var articleIds = new List<long>();
+                var articleNames = new List<string>();
+
+                entryNames.AddRange(model.Relevances.Games.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.Relevances.Groups.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.Relevances.staffs.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                entryNames.AddRange(model.Relevances.Roles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+
+                //建立文章关联信息
+                articleNames.AddRange(model.Relevances.articles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                articleNames.AddRange(model.Relevances.news.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                try
+                {
+                    entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
+                    articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
+                }
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
+                }
+                //获取词条文章
+                var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
+                var articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
+
+
+
+                var newEntry = new Entry();
+                await _entryService.SetDataFromEditAddInforViewModelAsync(newEntry, model.AddInfor);
+                _entryService.SetDataFromEditImagesViewModel(newEntry, model.Images);
+                _entryService.SetDataFromEditMainPageViewModel(newEntry, model.MainPage);
+                _entryService.SetDataFromEditMainViewModel(newEntry, model.Main);
+                _entryService.SetDataFromEditRelevancesViewModel(newEntry, model.Relevances, entries, articles);
+                _entryService.SetDataFromEditTagsViewModel(newEntry, model.Tags, tags);
+                _entryService.SetDataFromEditAudiViewModel(newEntry, model.Audio);
+
+                var entry = new Entry();
+                //获取审核记录
+                try
+                {
+                    entry = await _examineService.AddNewEntryExaminesAsync(newEntry, user, model.Note);
+                }
+                catch (Exception ex)
+                {
+                    return new Result { Successful = false, Error = ex.Message };
+
+                }
+
+                //创建词条成功
+                return new Result { Successful = true, Error = entry.Id.ToString() };
+            }
+            catch (Exception)
+            {
+                return new Result { Error = "创建词条的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
+            }
+        }
+
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        public async Task<ActionResult<Result>> HiddenEntryAsync(HiddenEntryModel model)
+        {
+            await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            return new Result { Successful = true };
+        }
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        public async Task<ActionResult<Result>> HideEntryOutlinkAsync(HiddenEntryModel model)
+        {
+            await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHideOutlink, b => model.IsHidden).ExecuteAsync();
+            return new Result { Successful = true };
+        }
+
+
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]

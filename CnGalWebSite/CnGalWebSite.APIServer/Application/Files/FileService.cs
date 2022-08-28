@@ -52,9 +52,9 @@ namespace CnGalWebSite.APIServer.Application.Files
             _logger = logger;
         }
 
-        public async Task<PagedResultDto<ImageInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input)
+        public async Task<PagedResultDto<ImageInforTipViewModel>> GetImagePaginatedResult(PagedSortedAndFilterInput input)
         {
-            var query = _userFileRepository.GetAll().AsNoTracking();
+            var query = _userFileRepository.GetAll().Where(s=>s.Type== UploadFileType.Image).AsNoTracking();
 
             //判断输入的查询名称是否为空
             if (!string.IsNullOrWhiteSpace(input.FilterText))
@@ -90,6 +90,58 @@ namespace CnGalWebSite.APIServer.Application.Files
             var dtos = models;
 
             var dtos_ = new PagedResultDto<ImageInforTipViewModel>
+            {
+                TotalCount = count,
+                CurrentPage = input.CurrentPage,
+                MaxResultCount = input.MaxResultCount,
+                Data = dtos,
+                FilterText = input.FilterText,
+                Sorting = input.Sorting,
+                ScreeningConditions = input.ScreeningConditions
+            };
+            return dtos_;
+        }
+
+        public async Task<PagedResultDto<ListFileAloneModel>> GetAudioPaginatedResult(PagedSortedAndFilterInput input)
+        {
+            var query = _userFileRepository.GetAll().Where(s => s.Type == UploadFileType.Audio).AsNoTracking();
+
+            //判断输入的查询名称是否为空
+            if (!string.IsNullOrWhiteSpace(input.FilterText))
+            {
+                query = query.Where(s => s.FileName == input.FilterText);
+            }
+            //统计查询数据的总条数
+            var count = query.Count();
+            //根据需求进行排序，然后进行分页逻辑的计算
+            //这个特殊方法中当前页数解释为起始位
+            query = query.OrderBy(input.Sorting).Skip((input.CurrentPage - 1) * input.MaxResultCount).Take(input.MaxResultCount);
+
+            //将结果转换为List集合 加载到内存中
+            List<ListFileAloneModel> models = null;
+            if (count != 0)
+            {
+                models = await query.AsNoTracking().Include(s => s.FileManager).ThenInclude(s => s.ApplicationUser)
+                    .Select(s => new ListFileAloneModel
+                    {
+                        FileName = s.FileName,
+                        Id = s.Id,
+                        FileSize = s.FileSize,
+                        UploadTime = s.UploadTime,
+                        UserId = s.FileManager.ApplicationUserId,
+                        UserName = s.FileManager.ApplicationUser.UserName,
+                        AudioLength=s.AudioLength,
+                        Type=s.Type
+                    }).ToListAsync();
+            }
+            else
+            {
+                models = new List<ListFileAloneModel>();
+            }
+
+            var dtos = models;
+
+            var dtos_ = new PagedResultDto<ListFileAloneModel>
             {
                 TotalCount = count,
                 CurrentPage = input.CurrentPage,
@@ -149,7 +201,9 @@ namespace CnGalWebSite.APIServer.Application.Files
                     FileName = item.FileName,
                     FileSize = item.FileSize,
                     UploadTime = item.UploadTime,
-                    UserId = item.UserId
+                    UserId = item.UserId,
+                    AudioLength= item.AudioLength,
+                    Type= item.Type,
                 });
             }
 

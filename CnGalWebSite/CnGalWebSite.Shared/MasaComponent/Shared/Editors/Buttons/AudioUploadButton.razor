@@ -1,0 +1,82 @@
+﻿@inject IAppHelper _appHelper
+@inject IPopupService PopupService
+
+<div class="@Class">
+    <InputFile class="form-control form-control-lg d-none" id="@Id" OnChange="OnInputFileChange" multiple="@Multiple"></InputFile>
+    <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark green pointer">
+        <span class="m-btn__content">
+
+            @if (IsInProc)
+            {
+                <MProgressCircular Size="@("20px")" Width="2" Class="me-2" Indeterminate Color="white">
+                </MProgressCircular>
+            }
+            else
+            {
+                <i class="@("m-icon m-icon--left theme--dark mdi  "+Icon)">
+                </i>
+            }
+            @Text
+        </span>
+    </label>
+</div>
+@code {
+    private int maxAllowedFiles = 10;
+    bool IsInProc;
+
+
+    [Parameter]
+    public EventCallback<string> OnUploaded { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public string Text { get; set; } = "上传音频";
+    [Parameter]
+    public bool Multiple { get; set; } = true;
+
+    public string Id = "input" + new Random().Next();
+
+    [Parameter]
+    public string Icon { get; set; } = "mdi-progress-upload ";
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs args)
+    {
+        var text = Text;
+        Text = "正在上传音频";
+        IsInProc = true;
+        StateHasChanged();
+
+        var files = args.GetMultipleFiles(maxAllowedFiles);
+        if(files.Count>maxAllowedFiles)
+        {
+            await PopupService.ToastAsync($"单次最多上传{maxAllowedFiles}个文件哦~", AlertTypes.Info);
+        }
+
+        foreach (var item in files)
+        {
+            try
+            {
+                var obj = await _appHelper.UploadAudioAsync(item);
+                if (obj.Uploaded == true)
+                {
+                    await OnUploaded.InvokeAsync(obj.FileURL);
+                }
+                else
+                {
+                    await PopupService.ToastAsync($"音频上传失败", AlertTypes.Error);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "音频上传失败");
+            }
+        }
+        Text = text;
+        IsInProc = false;
+        StateHasChanged();
+    }
+}

@@ -28,6 +28,10 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// 标签
         /// </summary>
         public EditEntryTagViewModel Tags { get; set; } = new EditEntryTagViewModel();
+        /// <summary>
+        /// 音频
+        /// </summary>
+        public EditAudioViewModel Audio { get; set; } = new EditAudioViewModel();
 
         public override Result Validate()
         {
@@ -57,6 +61,11 @@ namespace CnGalWebSite.DataModel.ViewModel
                 return result;
             }
             result = Tags.Validate();
+            if (!result.Successful)
+            {
+                return result;
+            }
+            result = Audio.Validate();
             if (!result.Successful)
             {
                 return result;

@@ -1,4 +1,4 @@
-﻿@page "/admin/listImages"
+﻿@page "/admin/listfiles"
 @attribute [Authorize(Roles = "Admin")]
 
 @inject HttpClient Http
@@ -6,7 +6,7 @@
 @inject IDataCacheService _dataCacheService
 
 
-<TitleTip Title="图片板块"></TitleTip>
+<TitleTip Title="文件板块"></TitleTip>
 
 <div>
     <div class="rounded  shadow-sm bg-opacity mb-4">
@@ -16,21 +16,32 @@
             <MTab Value="1">
                 信息列表<MIcon>mdi-format-list-bulleted-square </MIcon>
             </MTab>
+
             <MTab Value="2">
                 图库预览<MIcon>mdi-image-multiple </MIcon>
+            </MTab>
+
+            <MTab Value="3">
+                音频列表<MIcon>mdi-volume-high</MIcon>
             </MTab>
         </MTabs>
     </div>
     <MTabsItems @bind-Value="TabIndex">
         <MTabItem Value="1">
             <div class="  rounded shadow-sm p-3 bg-opacity">
-                <ImageChartListView></ImageChartListView>
+                <CnGalWebSite.Shared.Component.Admin.Files.ImageChartListView />
             </div>
 
         </MTabItem>
         <MTabItem Value="2">
             <div class="">
-                <ImageOutlineListView></ImageOutlineListView>
+                <CnGalWebSite.Shared.Component.Admin.Files.ImageOutlineListView />
+            </div>
+
+        </MTabItem>
+        <MTabItem Value="3">
+            <div class=" rounded shadow-sm p-3 bg-opacity">
+                <CnGalWebSite.Shared.Component.Admin.Files.AudioListCard />
             </div>
 
         </MTabItem>

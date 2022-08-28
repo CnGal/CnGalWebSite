@@ -532,6 +532,49 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         }
 
+        public void UpdateEntryDataAudio(Entry entry, EntryAudioExamineModel examine)
+        {
+            //先读取词条信息
+
+            foreach (var item in examine.Audio)
+            {
+                var isAdd = false;
+                foreach (var pic in entry.Audio)
+                {
+                    if (pic.Url == item.Url)
+                    {
+                        if (item.IsDelete == true)
+                        {
+                            entry.Audio.Remove(pic);
+
+                        }
+                        else
+                        {
+                            pic.BriefIntroduction = item.BriefIntroduction;
+                            pic.Name = item.Name;
+                            pic.Priority = item.Priority;
+                        }
+                        isAdd = true;
+                        break;
+                    }
+                }
+                if (isAdd == false && item.IsDelete == false)
+                {
+                    entry.Audio.Add(new EntryAudio
+                    {
+                        Url = item.Url,
+                        BriefIntroduction=item.BriefIntroduction,
+                        Name=item.Name,
+                        Priority=item.Priority
+                    });
+                }
+            }
+
+            //更新最后编辑时间
+            entry.LastEditTime = DateTime.Now.ToCstTime();
+
+        }
+
         public async Task UpdateEntryDataRelevances(Entry entry, EntryRelevances examine)
         {
             UpdateEntryDataOutlinks(entry, examine);
@@ -796,6 +839,16 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     var mainPage = examine.Context;
                     UpdateEntryDataMainPage(entry, mainPage);
                     break;
+                case Operation.EstablishAudio:
+                    EntryAudioExamineModel entryAudioExamineModel = null;
+                    using (TextReader str = new StringReader(examine.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        entryAudioExamineModel = (EntryAudioExamineModel)serializer.Deserialize(str, typeof(EntryAudioExamineModel));
+                    }
+
+                    UpdateEntryDataAudio(entry, entryAudioExamineModel);
+                    break;
                 default:
                     throw new InvalidOperationException("不支持的操作");
             }
@@ -812,7 +865,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 examineQuery = await _examineRepository.GetAll().AsNoTracking()
                                .Where(s => s.EntryId == entryId && s.ApplicationUserId == user.Id && s.IsPassed == null
                                && (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishMainPage || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages
-                               || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags))
+                               || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishAudio))
                                .Select(s => new Examine
                                {
                                    Operation = s.Operation,
@@ -849,6 +902,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     model.TagState = EditState.Preview;
                 }
+                if (examineQuery.Any(s => s.Operation == Operation.EstablishAudio))
+                {
+                    model.AudioState = EditState.Preview;
+                }
             }
             //获取各部分状态
             var examiningList = new List<Operation>();
@@ -863,7 +920,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     if (examiningList.Any(s => s == Operation.EstablishMain))
                     {
-                        model.MainState = EditState.locked;
+                        model.MainState = EditState.Locked;
                     }
                     else
                     {
@@ -875,7 +932,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                     if (examiningList.Any(s => s == Operation.EstablishAddInfor))
                     {
-                        model.InforState = EditState.locked;
+                        model.InforState = EditState.Locked;
                     }
                     else
                     {
@@ -886,7 +943,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     if (examiningList.Any(s => s == Operation.EstablishMainPage))
                     {
-                        model.MainPageState = EditState.locked;
+                        model.MainPageState = EditState.Locked;
                     }
                     else
                     {
@@ -897,7 +954,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     if (examiningList.Any(s => s == Operation.EstablishImages))
                     {
-                        model.ImagesState = EditState.locked;
+                        model.ImagesState = EditState.Locked;
                     }
                     else
                     {
@@ -908,7 +965,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     if (examiningList.Any(s => s == Operation.EstablishRelevances))
                     {
-                        model.RelevancesState = EditState.locked;
+                        model.RelevancesState = EditState.Locked;
                     }
                     else
                     {
@@ -920,11 +977,23 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                     if (examiningList.Any(s => s == Operation.EstablishTags))
                     {
-                        model.TagState = EditState.locked;
+                        model.TagState = EditState.Locked;
                     }
                     else
                     {
                         model.TagState = EditState.Normal;
+                    }
+                }
+                if (model.AudioState != EditState.Preview)
+                {
+
+                    if (examiningList.Any(s => s == Operation.EstablishAudio))
+                    {
+                        model.AudioState = EditState.Locked;
+                    }
+                    else
+                    {
+                        model.AudioState = EditState.Normal;
                     }
                 }
             }
@@ -1271,6 +1340,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 picturesViewModels.RemoveAt(0);
             }
 
+            //读取音频信息
+            model.Audio.AddRange(entry.Audio.Select(s => new AudioViewModel
+            {
+                BriefIntroduction = s.BriefIntroduction,
+                Name = s.Name,
+                Priority = s.Priority,
+                Url = s.Url
+            }).ToList());
 
 
             //序列化标签列表
@@ -1813,6 +1890,62 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 examines.Add(new KeyValuePair<object, Operation>(entryTags, Operation.EstablishTags));
             }
 
+            //第七部分 音频
+            var entryAudio = new EntryAudioExamineModel();
+            //先把 当前词条中的图片 都 打上删除标签
+            foreach (var item in currentEntry.Audio)
+            {
+                entryAudio.Audio.Add(new EntryAudioExamineAloneModel
+                {
+                    Url = item.Url,
+                    BriefIntroduction = item.BriefIntroduction,
+                    Name = item.Name,
+                    Priority = item.Priority,
+                    IsDelete = true
+                });
+            }
+            //再对比当前
+            foreach (var infor in newEntry.Audio.ToList().Purge())
+            {
+                var isSame = false;
+                foreach (var item in entryAudio.Audio)
+                {
+                    if (item.Url == infor.Url)
+                    {
+                        if (item.BriefIntroduction != infor.BriefIntroduction || item.Name != infor.Name || item.Priority != infor.Priority )
+                        {
+                            item.BriefIntroduction = infor.BriefIntroduction;
+                            item.Name = infor.Name;
+                            item.IsDelete = false;
+                            item.Priority = infor.Priority;
+                        }
+                        else
+                        {
+                            entryAudio.Audio.Remove(item);
+                        }
+                        isSame = true;
+                        break;
+
+                    }
+                }
+                if (isSame == false)
+                {
+                    entryAudio.Audio.Add(new EntryAudioExamineAloneModel
+                    {
+                        Url = infor.Url,
+                        BriefIntroduction = infor.BriefIntroduction,
+                        Name = infor.Name,
+                        Priority = infor.Priority,
+                        IsDelete = false
+                    });
+                }
+            }
+
+            if (entryAudio.Audio.Any())
+            {
+                examines.Add(new KeyValuePair<object, Operation>(entryAudio, Operation.EstablishAudio));
+
+            }
             return examines;
         }
 
@@ -2412,6 +2545,29 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         }
 
+        public EditAudioViewModel GetEditAuioViewModel(Entry entry)
+        {
+            var model = new EditAudioViewModel
+            {
+                Name = entry.Name,
+                Id = entry.Id,
+            };
+            //处理音频
+            foreach (var item in entry.Audio)
+            {
+                model.Audio.Add(new EditAudioAloneModel
+                {
+                    BriefIntroduction=item.BriefIntroduction,
+                    Name=item.Name,
+                    Priority=item.Priority,
+                    Url=item.Url
+                });
+            }
+
+            return model;
+        }
+
+
         public void SetDataFromEditMainViewModel(Entry newEntry, EditMainViewModel model)
         {
             newEntry.Name = model.Name;
@@ -2731,6 +2887,24 @@ namespace CnGalWebSite.APIServer.Application.Entries
             newEntry.Tags = tags;
         }
 
+        public void SetDataFromEditAudiViewModel(Entry newEntry, EditAudioViewModel model)
+        {
+            //再遍历视图模型中的图片 对应修改
+            newEntry.Audio.Clear();
+
+            foreach (var item in model.Audio)
+            {
+
+                newEntry.Audio.Add(new EntryAudio
+                {
+                    BriefIntroduction = item.BriefIntroduction,
+                    Name = item.Name,
+                    Priority = item.Priority,
+                    Url = item.Url
+                });
+
+            }
+        }
 
         /// <summary>
         /// 从字符串中设置Staff

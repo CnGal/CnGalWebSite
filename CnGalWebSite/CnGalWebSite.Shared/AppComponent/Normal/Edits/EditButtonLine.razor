@@ -4,7 +4,7 @@
 @inject NavigationManager NavigationManager
 
 <div>
-    <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="@Model.Title" UrlName="编辑" Url="@(Model.State==EditState.locked? "":Model.Link)" />
+    <CnGalWebSite.Shared.AppComponent.Normal.Titles.TitleLine Title="@Model.Title" UrlName="编辑" Url="@(Model.State==EditState.Locked? "":Model.Link)" />
     <div style="font-size: xx-small;">
         <div >@Model.Describe</div>
         <div class="mt-2" style="display:flex;">
@@ -26,7 +26,7 @@
                         <a class="fw-bold" @onclick="OnRevoke">撤销编辑</a>
                     </div>
                 }
-                else if (Model.State == EditState.locked)
+                else if (Model.State == EditState.Locked)
                 {
                     <div>该部分已经被另一名用户编辑</div>
                 }

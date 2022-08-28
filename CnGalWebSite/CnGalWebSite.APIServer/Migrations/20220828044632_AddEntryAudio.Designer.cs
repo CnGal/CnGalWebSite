@@ -3,6 +3,7 @@ using System;
 using CnGalWebSite.APIServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CnGalWebSite.APIServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220828044632_AddEntryAudio")]
+    partial class AddEntryAudio
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -240,7 +242,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "d8634835-e3dc-4ef5-bfa4-0a333ac768fb",
+                            ConcurrencyStamp = "5b322451-f920-455f-9bf8-d73eff42c92b",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
@@ -2673,9 +2675,6 @@ namespace CnGalWebSite.APIServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan?>("AudioLength")
-                        .HasColumnType("time(6)");
-
                     b.Property<int?>("FileManagerId")
                         .HasColumnType("int");
 
@@ -2687,9 +2686,6 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.Property<string>("Sha1")
                         .HasColumnType("longtext");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("UploadTime")
                         .HasColumnType("datetime(6)");
@@ -3101,28 +3097,28 @@ namespace CnGalWebSite.APIServer.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            ConcurrencyStamp = "6ddbfdd4-0826-472a-bef3-374d988044d2",
+                            ConcurrencyStamp = "5b59e358-a049-4eff-8687-13a027cb3dc5",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e576",
-                            ConcurrencyStamp = "8d90a933-61e9-4e06-bdbc-a19211e85a4a",
+                            ConcurrencyStamp = "3826db67-6e2f-4ab6-98c4-f2c16ec8b2a0",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e577",
-                            ConcurrencyStamp = "3d256f97-62f6-4722-8585-2c819859bd44",
+                            ConcurrencyStamp = "9d39fd23-f65a-40bc-926e-72ff9014110b",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e578",
-                            ConcurrencyStamp = "4d81cd5a-55a0-4c95-b80b-df056dfccdd4",
+                            ConcurrencyStamp = "4e7a617f-be5f-43d8-a2b8-5ae3b1d10627",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         });

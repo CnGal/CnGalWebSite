@@ -1,5 +1,5 @@
-﻿@inject IJSRuntime JSRuntime;
-@inject IAppHelper _appHelper;
+﻿@inject IJSRuntime JSRuntime
+@inject IAppHelper _appHelper
 @inject ToastService ToastService
 @using Microsoft.AspNetCore.Http
 
@@ -179,7 +179,7 @@
         try
         {
             //上传
-            var obj = await _appHelper.UploadFilesAsync(await args.GetDataAsync(),file.Name, Type);
+            var obj = await _appHelper.UploadImagesAsync(await args.GetDataAsync(),file.Name, Type);
             if (obj.Uploaded == true)
             {
 
@@ -208,7 +208,7 @@
     {
         try
         {
-            var obj = await _appHelper.UploadFilesAsync(file,Type);
+            var obj = await _appHelper.UploadImagesAsync(file,Type);
             if (obj.Uploaded == true)
             {
 
