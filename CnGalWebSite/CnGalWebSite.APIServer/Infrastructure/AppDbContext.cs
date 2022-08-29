@@ -83,6 +83,9 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<GameScoreTableModel> GameScores { get; set; }
         public DbSet<OperationRecord> OperationRecords { get; set; }
         public DbSet<EntryStaff> EntryStaffs { get; set; }
+        public DbSet<UserCertification> UserCertifications { get; set; }
+        public DbSet<UserMonitorEntry> UserMonitorEntries { get; set; }
+        public DbSet<UserReviewEditRecord> UserReviewEditRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

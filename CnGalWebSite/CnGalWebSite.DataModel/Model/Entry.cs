@@ -157,6 +157,17 @@ namespace CnGalWebSite.DataModel.Model
         public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
 
         /// <summary>
+        /// 用户认证
+        /// </summary>
+        public UserCertification Certification { get; set; }
+
+        /// <summary>
+        /// 请求监视的用户
+        /// </summary>
+        public virtual ICollection<UserMonitorEntry> MonitorByUsers { get; set; }
+
+
+        /// <summary>
         /// 关联词条列表
         /// </summary>
         public virtual ICollection<EntryRelation> EntryRelationFromEntryNavigation { get; set; } = new List<EntryRelation>();

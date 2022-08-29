@@ -108,6 +108,10 @@ namespace CnGalWebSite.DataModel.Model
         /// 用户地址 用于接收奖品
         /// </summary>
         public UserAddress UserAddress { get; set; }
+        /// <summary>
+        /// 用户认证
+        /// </summary>
+        public UserCertification Certification { get; set; }
 
         public virtual ICollection<LotteryUser> Lotteries { get; set; }
 
@@ -135,7 +139,40 @@ namespace CnGalWebSite.DataModel.Model
         public ICollection<PeripheryRelevanceUser> UserOwnedPeripheries { get; set; }
 
         public ICollection<OperationRecord> OperationRecords { get; set; }
+
+        public virtual ICollection<UserMonitorEntry> MonitorEntries { get; set; }
+
+        public virtual ICollection<UserReviewEditRecord> ReviewEntries { get; set; }
     }
+
+    public class UserCertification
+    {
+        public long Id { get; set; }
+
+        public DateTime CertificationTime { get; set; }
+
+        public ApplicationUser ApplicationUser { get; set; }
+        public string ApplicationUserId { get; set; }
+
+        public int? EntryId { get; set; }
+        public Entry Entry { get; set; }
+    }
+
+    public class UserMonitorEntry
+    {
+        public long Id { get; set; }
+
+        public DateTime CreateTime { get; set; }
+
+        public ApplicationUser ApplicationUser { get; set; }
+        public string ApplicationUserId { get; set; }
+
+        public int? EntryId { get; set; }
+        public Entry Entry { get; set; }
+    }
+
+
+
 
     public class UserIntegral
     {
