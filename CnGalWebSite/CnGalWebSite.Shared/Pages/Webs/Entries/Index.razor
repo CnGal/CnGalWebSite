@@ -116,6 +116,12 @@ else
                     <div>
                         <MTabsItems @bind-Value="TabIndex">
                             <MTabItem Value="1">
+                                @if (EntryView.Audio.Any())
+                                {
+                                    <div class="mb-4">
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
+                                    </div>
+                                }
                                 @if (EntryView.Pictures.Count != 0)
                                 {
                                     <div class="mb-4">
@@ -123,12 +129,7 @@ else
 
                                     </div>
                                 }
-                                @if (EntryView.Audio.Any())
-                                {
-                                    <div class="mb-4">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
-                                    </div>
-                                }
+
 
                                 @if ((EntryView.Type == EntryType.Role || EntryView.Type == EntryType.Staff) && string.IsNullOrWhiteSpace(EntryView.MainPicture) == false)
                                 {
@@ -177,6 +178,12 @@ else
                 <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8  order-2 order-lg-1") ">
 
                     <div>
+                        @if (EntryView.Audio.Any())
+                        {
+                            <div class="mb-4">
+                                <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
+                            </div>
+                        }
                         @if (EntryView.Pictures.Count != 0)
                         {
                             <div class="mb-4">
@@ -184,12 +191,7 @@ else
 
                             </div>
                         }
-                        @if (EntryView.Audio.Any())
-                        {
-                            <div class="mb-4">
-                                <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
-                            </div>
-                        }
+
                         @if (EntryView.Type == EntryType.Game && EntryView.IsScored)
                         {
                             <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" Large />

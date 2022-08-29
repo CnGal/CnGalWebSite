@@ -1353,7 +1353,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 Priority = s.Priority,
                 Url = s.Url,
                 Duration=s.Duration,
-                Thumbnail=s.Thumbnail
+                Thumbnail=_appHelper.GetImagePath( s.Thumbnail, "AudioThumbnail.png")
             }).ToList());
 
 

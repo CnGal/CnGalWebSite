@@ -511,13 +511,13 @@ namespace CnGalWebSite.APIServer.Application.Tags
 
 
 
-            foreach (var item in tag.InverseParentCodeNavigation)
+            foreach (var item in tag.InverseParentCodeNavigation.Where(s=>s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false))
             {
                 model.ChildrenTags.Add(_appHelper.GetTagInforTipViewModel(item));
             }
 
 
-            foreach (var item in tag.Entries.Where(s => s.IsHidden == false))
+            foreach (var item in tag.Entries.Where(s => s.IsHidden == false&&string.IsNullOrWhiteSpace(s.Name)==false))
             {
                 model.ChildrenEntries.Add( _appHelper.GetEntryInforTipViewModel(item));
             }
