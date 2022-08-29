@@ -7,16 +7,16 @@ using System.Xml.Linq;
 
 namespace CnGalWebSite.DataModel.ViewModel.EditRecords
 {
-    public class ListUserMonitorEntriesViewModel
+    public class ListUserMonitorsViewModel
     {
-        public List<ListUserMonitorEntryAloneModel> UserMonitorEntries { get; set; } = new List<ListUserMonitorEntryAloneModel> { };
+        public List<ListUserMonitorAloneModel> UserMonitorEntries { get; set; } = new List<ListUserMonitorAloneModel> { };
     }
-    public class ListUserMonitorEntryAloneModel
+    public class ListUserMonitorAloneModel
     {
         [Display(Name = "Id")]
         public long Id { get; set; }
         [Display(Name = "词条Id")]
-        public long EntryId { get; set; }
+        public int EntryId { get; set; }
         [Display(Name = "类型")]
         public EntryType Type { get; set; }
         [Display(Name = "名称")]
@@ -25,9 +25,9 @@ namespace CnGalWebSite.DataModel.ViewModel.EditRecords
         public DateTime CreateTime { get; set; }
     }
 
-    public class UserMonitorEntriesPagesInfor
+    public class UserMonitorsPagesInfor
     {
         public CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions Options { get; set; }
-        public ListUserMonitorEntryAloneModel SearchModel { get; set; }
+        public ListUserMonitorAloneModel SearchModel { get; set; }
     }
 }

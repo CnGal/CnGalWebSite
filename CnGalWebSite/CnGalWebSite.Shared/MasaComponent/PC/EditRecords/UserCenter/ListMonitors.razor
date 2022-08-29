@@ -1,0 +1,70 @@
+﻿@inject IAuthService AuthService
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject DialogService DialogService
+
+<div>
+    <Table TItem="ListUserMonitorAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="80" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable DefaultSort DefaultSortOrder="@SortOrder.Desc" Fixed Width="80" />
+            <TableColumn @bind-Field="@context.EntryName" TextWrap Width="200" />
+            <TableColumn @bind-Field="@context.Type" TextWrap Width="150" />
+            <TableColumn @bind-Field="@context.CreateTime" Sortable="true" TextWrap="true" Width="180" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.EntryId ))" />
+        </RowButtonTemplate>
+    </Table>
+</div>
+
+@code {
+    [NotNull]
+    private Table<ListUserMonitorAloneModel> TableRows { get; set; }
+    private List<ListUserMonitorAloneModel> SelectedRows { get; set; } = new();
+
+    public ListUserMonitorsViewModel ListModel { get; set; } = new ListUserMonitorsViewModel { UserMonitorEntries = new List<ListUserMonitorAloneModel>() };
+
+    private ListUserMonitorAloneModel SearchModelUser { get; set; } = new ListUserMonitorAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private async Task<QueryData<ListUserMonitorAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<UserMonitorsPagesInfor>(ToolHelper.WebApiPath + "api/examines/GetUserReviewEditRecordList", new UserMonitorsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListUserMonitorAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取用户监视列表");
+            return new QueryData<ListUserMonitorAloneModel>();
+        }
+    }
+    private async Task RefreshTable()
+    {
+        await TableRows.QueryAsync();
+    }
+    private Task OnLook(int id)
+    {
+        NavigationManager.NavigateTo("/entries/index/" + id);
+        return Task.CompletedTask;
+    }
+}

@@ -10,6 +10,7 @@ using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
+using CnGalWebSite.DataModel.ViewModel.EditRecords;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.DataModel.ViewModel.Home;
@@ -266,6 +267,10 @@ namespace CnGalWebSite.Shared.Service
         /// 随机用户评分
         /// </summary>
         public List<PlayedGameUserScoreRandomModel> RandomUserScoresCatche { get; set; } = new List<PlayedGameUserScoreRandomModel>();
+        /// <summary>
+        /// 内容中心缓存
+        /// </summary>
+        public UserContentCenterViewModel UserContentCenterCatche { get; set; }
 
         /// <summary>
         /// 评论详情

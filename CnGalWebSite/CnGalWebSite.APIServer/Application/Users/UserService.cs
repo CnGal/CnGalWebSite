@@ -629,6 +629,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             user.MBgImage = examine.MBgImage;
             return Task.CompletedTask;
         }
+       
 
         public Task UpdateUserDataMainPage(ApplicationUser user, string examine)
         {
@@ -668,7 +669,8 @@ namespace CnGalWebSite.APIServer.Application.Users
 
 
             //拉取审核数据
-            var examines = await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id)
+            var examines = await _examineRepository.GetAll().AsNoTracking()
+                .Where(s => s.ApplicationUserId == user.Id)
                 .Select(n => new { n.IsPassed, n.Operation, n.Context, n.EntryId, n.ArticleId, n.TagId, n.ApplyTime, n.Id })
                 .ToListAsync();
 
@@ -697,7 +699,8 @@ namespace CnGalWebSite.APIServer.Application.Users
             //从30天前开始倒数 遇到第一个开始添加
             var MaxCountLineDay = DateTime.Now.DayOfYear;
             var tempDateTimeNow = DateTime.Now.ToCstTime();
-            var editCounts = await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
+            var editCounts = await _examineRepository.GetAll().AsNoTracking()
+                .Where(s => s.ApplicationUserId == user.Id && s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
                    // 先进行了时间字段变更为String字段，切只保留到天
                    // 采用拼接的方式
                    .Select(n => new { Time = n.ApplyTime.Date })
@@ -798,5 +801,44 @@ namespace CnGalWebSite.APIServer.Application.Users
 
             return new Result { Successful = true };
         }
+
+        #region 用户认证
+        public void UpdateUserCertificationDataMain(UserCertification userCertification, UserCertificationMain examine)
+        {
+            if(examine.EntryId==0)
+            {
+                userCertification.EntryId = null;
+                userCertification.Entry = null;
+                userCertification.ApplicationUserId = null;
+                userCertification.ApplicationUser = null;
+            }
+            else
+            {
+                userCertification.EntryId=examine.EntryId;
+            }
+
+            userCertification.CertificationTime = DateTime.Now.ToCstTime();
+        }
+
+        public void UpdateUserCertificationData(UserCertification userCertification, Examine examine)
+        {
+            switch (examine.Operation)
+            {
+                case Operation.RequestUserCertification:
+                    UserCertificationMain userCertificationMain = null;
+                    using (TextReader str = new StringReader(examine.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        userCertificationMain = (UserCertificationMain)serializer.Deserialize(str, typeof(UserCertificationMain));
+                    }
+
+                    UpdateUserCertificationDataMain(userCertification, userCertificationMain);
+                    break;
+            }
+
+            return;
+
+        }
+        #endregion
     }
 }

@@ -240,6 +240,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+
         /// <summary>
         /// 折叠游戏记录
         /// </summary>

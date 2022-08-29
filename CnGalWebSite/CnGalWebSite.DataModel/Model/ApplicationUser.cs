@@ -140,7 +140,7 @@ namespace CnGalWebSite.DataModel.Model
 
         public ICollection<OperationRecord> OperationRecords { get; set; }
 
-        public virtual ICollection<UserMonitorEntry> MonitorEntries { get; set; }
+        public virtual ICollection<UserMonitor> Monitors { get; set; }
 
         public virtual ICollection<UserReviewEditRecord> ReviewEntries { get; set; }
     }
@@ -158,7 +158,7 @@ namespace CnGalWebSite.DataModel.Model
         public Entry Entry { get; set; }
     }
 
-    public class UserMonitorEntry
+    public class UserMonitor
     {
         public long Id { get; set; }
 

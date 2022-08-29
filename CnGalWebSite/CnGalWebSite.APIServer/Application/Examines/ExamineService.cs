@@ -67,13 +67,14 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IRepository<Message, long> _messageRepository;
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
+        private readonly IRepository<UserCertification, long> _userCertificationRepository;
 
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Examine>, string, SortOrder, IEnumerable<Examine>>> SortLambdaCacheEntry = new();
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService,
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository, IRepository<Message, long> messageRepository,
-        IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService,
+        IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger, IRepository<Lottery, long> lotteryRepository,
         IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<PlayedGame, string> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository)
         {
@@ -103,6 +104,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _commentService = commentService;
             _lotteryRepository = lotteryRepository;
             _voteRepository = voteRepository;
+            _userCertificationRepository = userCertificationRepository;
         }
 
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "")
@@ -316,6 +318,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 Operation.EditTagChildEntries => await GetEditTagChildEntriesExamineView(model, examine),
                 Operation.EditPlayedGameMain => await GetEditPlayedGameMainExamineView(model, examine),
                 Operation.EstablishAudio => await GetEstablishAudioExamineView(model, examine),
+                Operation.RequestUserCertification => await GetEditUserCertificationMainExamineView(model, examine),
                 _ => false,
             };
         }
@@ -2556,6 +2559,69 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         #endregion
 
+        #region 申请认证
+
+        public async Task<bool> GetEditUserCertificationMainExamineView(ExamineViewModel model, Examine examine)
+        {
+            model.Type = ExaminedNormalListModelType.UserCertification;
+
+            var userCertification = await _userCertificationRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entry)
+                .Include(s => s.ApplicationUser)
+                .FirstOrDefaultAsync(s => s.ApplicationUserId == examine.ApplicationUserId);
+
+            if (userCertification == null)
+            {
+                return false;
+            }
+
+            model.ObjectBriefIntroduction = userCertification.ApplicationUser.PersonalSignature;
+            model.Image = _appHelper.GetImagePath(userCertification.ApplicationUser?.PhotoPath, "app.png");
+
+            //序列化数据
+            UserCertificationMain userCertificationMain = null;
+            using (TextReader str = new StringReader(examine.Context))
+            {
+                var serializer = new JsonSerializer();
+                userCertificationMain = (UserCertificationMain)serializer.Deserialize(str, typeof(UserCertificationMain));
+            }
+
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+
+            if (userCertification.Entry != null)
+            {
+                model.AfterModel.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
+                {
+                    entry = _appHelper.GetEntryInforTipViewModel(userCertification.Entry)
+                });
+            }
+
+            model.AfterModel.Texts.Add(new InformationsModel
+            {
+                Modifier = "申请认证",
+                Informations = new List<KeyValueModel>
+                {
+                    new KeyValueModel
+                    {
+                        DisplayName="认证",
+                        DisplayValue=userCertification.Entry.DisplayName
+                    }
+                }
+            });
+
+            model.AfterModel.MainPage = examine.Note;
+
+            if (examine.IsPassed == true)
+            {
+                model.BeforeModel = model.AfterModel;
+            }
+            return true;
+        }
+
+        #endregion
+
+
 
         #endregion
 
@@ -3069,6 +3135,19 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _playedGameService.UpdatePlayedGameDataMain(playedGame, examine);
             //保存
             _ = await _playedGameRepository.UpdateAsync(playedGame);
+        }
+
+
+        #endregion
+
+        #region 申请认证
+
+        public async Task ExamineEditUserCertificationMainAsync(UserCertification userCertification, UserCertificationMain examine)
+        {
+            //更新数据
+            _userService.UpdateUserCertificationDataMain(userCertification, examine);
+            //保存
+            _ = await _userCertificationRepository.UpdateAsync(userCertification);
         }
 
 
@@ -3754,6 +3833,54 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
         }
 
+        public async Task UniversalEditUserCertificationExaminedAsync(UserCertification userCertification, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        {
+            if (isAdmin)
+            {
+                //添加到审核列表
+                var examine = new Examine
+                {
+                    Operation = operation,
+                    Context = examineStr,
+                    IsPassed = true,
+                    PassedAdminName = user.UserName,
+                    PassedTime = DateTime.Now.ToCstTime(),
+                    ApplyTime = DateTime.Now.ToCstTime(),
+                    ApplicationUserId = user.Id,
+                    Note = note
+                };
+                _ = await _examineRepository.InsertAsync(examine);
+            }
+            else
+            {
+                //查找是否在之前有审核
+                //获取审核记录
+                var examine = await GetUserUserCertificationActiveExamineAsync(user.Id, operation);
+                if (examine != null)
+                {
+                    examine.Context = examineStr;
+                    examine.ApplyTime = DateTime.Now.ToCstTime();
+                    _ = await _examineRepository.UpdateAsync(examine);
+                }
+                else
+                {
+                    examine = new Examine
+                    {
+                        Operation = operation,
+                        Context = examineStr,
+                        IsPassed = null,
+                        PassedTime = null,
+                        ApplyTime = DateTime.Now.ToCstTime(),
+                        ApplicationUserId = user.Id,
+                        Note = note
+                    };
+                    //添加到审核列表
+                    _ = await _examineRepository.InsertAsync(examine);
+                }
+            }
+        }
+
+
         #endregion
 
         #region 创建新模型数据
@@ -4035,9 +4162,15 @@ namespace CnGalWebSite.APIServer.Application.Examines
         {
             return await _examineRepository.FirstOrDefaultAsync(s => s.PeripheryId == peripheryId && s.ApplicationUserId == userId && s.Operation == operation && s.IsPassed == null);
         }
+
         public async Task<Examine> GetUserPlayedGameActiveExamineAsync(long peripheryId, string userId, Operation operation)
         {
             return await _examineRepository.FirstOrDefaultAsync(s => s.PlayedGameId == peripheryId && s.ApplicationUserId == userId && s.Operation == operation && s.IsPassed == null);
+        }
+
+        public async Task<Examine> GetUserUserCertificationActiveExamineAsync( string userId, Operation operation)
+        {
+            return await _examineRepository.FirstOrDefaultAsync(s =>s.ApplicationUserId == userId && s.Operation == operation && s.IsPassed == null);
         }
 
         #endregion

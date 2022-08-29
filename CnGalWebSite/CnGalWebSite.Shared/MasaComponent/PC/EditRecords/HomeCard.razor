@@ -1,0 +1,53 @@
+﻿@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+@if (isReady)
+{
+    <div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="fa fa-fw  fa-pencil" Class="mb-4">
+            <CalendarHeatmapTip BeforeTreatmentDate="_dataCacheService.UserContentCenterCatche.UserEditInfor.EditCountList"></CalendarHeatmapTip>
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+        <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListUnReviewEntriesCard Model="_dataCacheService.UserContentCenterCatche.UnReviewEntries" />
+        <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListUnReviewEditRecordsCard Model="_dataCacheService.UserContentCenterCatche.UnReviewExamines" />
+        <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListPendingExaminesCard Model="_dataCacheService.UserContentCenterCatche.PendingExamines" />
+    </div>
+}
+else
+{
+    <div style="height:300px">
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
+    </div>
+
+}
+
+
+
+@code {
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    bool isReady;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if(_dataCacheService.UserContentCenterCatche==null)
+            {
+                _dataCacheService.UserContentCenterCatche = await Http.GetFromJsonAsync<UserContentCenterViewModel>(ToolHelper.WebApiPath + "api/examines/GetUserContentCenterView");
+            }
+
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取内容中心视图数据");
+        }
+
+    }
+
+}
+

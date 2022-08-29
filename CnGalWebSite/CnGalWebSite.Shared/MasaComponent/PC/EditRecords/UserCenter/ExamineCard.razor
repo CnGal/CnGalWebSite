@@ -1,0 +1,68 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IPopupService PopupService
+
+<div>
+    <a href="@("/examine?id="+Model.Id)" class="a-font-color">
+        <div class=" rounded shadow-sm p-2 bg-opacity">
+
+            <UserRankTextViewTip UserId="@Model.UserId" UserName="@Model.UserName" Image="@Model.UserImage" Ranks="@Model.Ranks" Time="@Model.ApplyTime"
+                                 Text="@("对『"+ (string.IsNullOrWhiteSpace(Model.RelatedName) ?("Id："+ Model.RelatedId) : Model.RelatedName )+"』 "+Model.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
+        </div>
+    </a>
+
+
+    <div>
+        @if (IsReview)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="已审阅" Icon="mdi-read" Color="success" TextStyle OnClick="@(()=>OnReview( EditRecordReviewState.Reviewed))" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="忽略" Icon="mdi-bell-off" Color="warning" TextStyle OnClick="@(()=>OnReview( EditRecordReviewState.Reviewed))" />
+
+        }
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public ExaminedNormalListModel Model { get; set; } = new ExaminedNormalListModel();
+    [Parameter]
+    public EventCallback<ExaminedNormalListModel> OnReviewed { get; set; }
+    [Parameter]
+    public bool IsReview { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async Task OnReview(EditRecordReviewState state)
+    {
+        //上传
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditUserReviewEditRecordStateModel>(ToolHelper.WebApiPath + "api/exaines/EditUserReviewEditRecordState", new EditUserReviewEditRecordStateModel
+            {
+                State = state,
+                ExamineIds = new long[] { Model.Id }
+            });
+
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await PopupService.ToastAsync("审阅失败，" + obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+                await OnReviewed.InvokeAsync(Model);
+            }
+        }
+        catch (Exception ex)
+        {
+
+            ErrorHandler.ProcessError(ex, "审阅失败");
+        }
+    }
+
+}

@@ -41,5 +41,9 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         Task<Result> BindGroupQQ(string code, long groupQQ);
 
+        void UpdateUserCertificationDataMain(UserCertification userCertification, UserCertificationMain examine);
+
+        void UpdateUserCertificationData(UserCertification userCertification, Examine examine);
+
     }
 }

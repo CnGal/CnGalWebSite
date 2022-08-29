@@ -1,0 +1,93 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject HttpClient Http
+@inject IPopupService PopupService
+
+@if(Model.Any())
+            {
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-history" Title="近期修改" Class="mb-4" Collapable Outline>
+    <ButtonContent>
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="ReviewAll">
+            <MIcon Left>mdi-share-all-outline  </MIcon>
+            全部已审阅
+        </MButton>
+    </ButtonContent>
+    <ChildContent>
+        @foreach (var item in Model.Skip((CurrentPage - 1) * MaxCount).Take(MaxCount))
+        {
+
+            <div class="mb-4">
+                <ExamineCard Model="item" OnReviewed="OnReviewed" />
+            </div>
+        }
+
+        @if (TotalPages > 1)
+        {
+            <MPagination Value="@CurrentPage" Class="my-4" Length="@TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+        }
+    </ChildContent>
+
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+            }
+
+
+@code {
+    [Parameter]
+    public List<ExaminedNormalListModel> Model { get; set; } = new List<ExaminedNormalListModel>();
+
+    public StringNumber TabIndex { get; set; } = 1;
+
+    public int MaxCount { get; set; } = 10;
+
+    public int TotalPages => ((Model.Count - 1) / MaxCount) + 1;
+
+    public int CurrentPage { get; set; } = 1;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    private Task OnPageClick(int pageIndex)
+    {
+        CurrentPage = pageIndex;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public async Task ReviewAll()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditUserReviewEditRecordStateModel>(ToolHelper.WebApiPath + "api/exaines/EditUserReviewEditRecordState", new EditUserReviewEditRecordStateModel
+            {
+                State = EditRecordReviewState.Reviewed,
+                ExamineIds = Model.Select(s => s.Id).ToArray()
+            });
+
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await PopupService.ToastAsync("审阅失败，" + obj.Error, AlertTypes.Error);
+            }
+            else
+            {
+                Model.Clear();
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+
+            ErrorHandler.ProcessError(ex, "审阅失败");
+        }
+    }
+
+    public Task OnReviewed(ExaminedNormalListModel model)
+    {
+        Model.Remove(model);
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

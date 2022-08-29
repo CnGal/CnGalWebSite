@@ -89,7 +89,7 @@
                                     @(string.IsNullOrWhiteSpace(examine.RelatedName) ?("Id："+ examine.RelatedId) : examine.RelatedName )
                                 </TabLink>
                                 进行
-                                <TabLink Text="@name" Url="@((examine.IsPassed==true&&examine.Type!= ExaminedNormalListModelType.User&&examine.Type!= ExaminedNormalListModelType.Comment)?("/home/editrecord?ContrastId=" +examine.Id):("/home/examines?Id="+examine.Id))" Icon="fa fa-pencil">
+                                <TabLink Text="@name" Url="@((examine.IsPassed==true&&examine.Type!= ExaminedNormalListModelType.User&&examine.Type!= ExaminedNormalListModelType.Comment)?("/home/editrecord?ContrastId=" +examine.Id):("/examine?Id="+examine.Id))" Icon="fa fa-pencil">
                                     @examine.Operation.GetDisplayName()
                                 </TabLink>
                                 操作

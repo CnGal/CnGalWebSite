@@ -69,7 +69,7 @@
             else
             {
                 await ToastService.Success("审核成功", "对『" + (string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName) + "』的审核已完成");
-                NavigationManager.NavigateTo( "/admin/listexamines");
+                NavigationManager.NavigateTo( "/contentcenter");
             }
         }
         catch (Exception ex)

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.EditRecords
 {
-    public class EditUserMonitorEntryModel
+    public class EditUserMonitorModel
     {
         public int[] Ids { get; set; }
 

@@ -21,17 +21,17 @@ namespace CnGalWebSite.APIServer.Application.Examines
     public class EditRecordService:IEditRecordService
     {
         private readonly IRepository<UserReviewEditRecord, long> _UserReviewEditRecordRepository;
-        private readonly IRepository<UserMonitorEntry, long> _UserMonitorEntryRepository;
+        private readonly IRepository<UserMonitor, long> _UserMonitorEntryRepository;
         private readonly IAppHelper _appHelper;
 
-        public EditRecordService(IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IRepository<UserMonitorEntry, long> userMonitorEntryRepository, IAppHelper appHelper)
+        public EditRecordService(IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IRepository<UserMonitor, long> userMonitorEntryRepository, IAppHelper appHelper)
         {
             _UserMonitorEntryRepository= userMonitorEntryRepository;
             _UserReviewEditRecordRepository= userReviewEditRecordRepository;
             _appHelper = appHelper;
         }
 
-        public Task<QueryData<ListUserMonitorEntryAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserMonitorEntryAloneModel searchModel, string userId)
+        public Task<QueryData<ListUserMonitorAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListUserMonitorAloneModel searchModel, string userId)
         {
             var items = _UserMonitorEntryRepository.GetAll().Include(s=>s.Entry).Where(s => s.EntryId!=null&&s.ApplicationUserId==userId).AsNoTracking();
 
@@ -58,10 +58,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var list = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
 
             //复制数据
-            var resultItems = new List<ListUserMonitorEntryAloneModel>();
+            var resultItems = new List<ListUserMonitorAloneModel>();
             foreach (var item in list)
             {
-                resultItems.Add(new ListUserMonitorEntryAloneModel
+                resultItems.Add(new ListUserMonitorAloneModel
                 {
                     Id = item.Id,
                     CreateTime = item.CreateTime,
@@ -71,7 +71,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 });
             }
 
-            return Task.FromResult(new QueryData<ListUserMonitorEntryAloneModel>()
+            return Task.FromResult(new QueryData<ListUserMonitorAloneModel>()
             {
                 Items = resultItems,
                 TotalCount = total,

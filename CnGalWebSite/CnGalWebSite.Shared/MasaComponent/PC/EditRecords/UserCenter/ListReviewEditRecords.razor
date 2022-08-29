@@ -1,0 +1,73 @@
+﻿@inject IAuthService AuthService
+@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject DialogService DialogService
+
+<div class="">
+    <Table TItem="ListUserReviewEditRecordAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="80" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable DefaultSort DefaultSortOrder="@SortOrder.Desc" Fixed Width="80" />
+            <TableColumn @bind-Field="@context.EntryName" TextWrap Width="200" />
+            <TableColumn @bind-Field="@context.Operation" TextWrap Width="150" />
+            <TableColumn @bind-Field="@context.State" TextWrap Sortable Width="120" />
+            <TableColumn @bind-Field="@context.ReviewedTime" Sortable="true" TextWrap="true" Width="180" />
+
+            <TableColumn @bind-Field="@context.UserName" TextWrap Width="200" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.Id ))" />
+        </RowButtonTemplate>
+    </Table>
+</div>
+
+@code {
+    [NotNull]
+    private Table<ListUserReviewEditRecordAloneModel> TableRows { get; set; }
+    private List<ListUserReviewEditRecordAloneModel> SelectedRows { get; set; } = new();
+
+    public ListUserReviewEditRecordsViewModel ListModel { get; set; } = new ListUserReviewEditRecordsViewModel { UserReviewEditRecords = new List<ListUserReviewEditRecordAloneModel>() };
+
+    private ListUserReviewEditRecordAloneModel SearchModelUser { get; set; } = new ListUserReviewEditRecordAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private async Task<QueryData<ListUserReviewEditRecordAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<UserReviewEditRecordsPagesInfor>(ToolHelper.WebApiPath + "api/examines/GetUserReviewEditRecordList", new UserReviewEditRecordsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            return JsonSerializer.Deserialize<QueryData<ListUserReviewEditRecordAloneModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取用户审阅编辑记录列表");
+            return new QueryData<ListUserReviewEditRecordAloneModel>();
+        }
+    }
+    private async Task RefreshTable()
+    {
+        await TableRows.QueryAsync();
+    }
+    private Task OnLook(long id)
+    {
+        NavigationManager.NavigateTo("/examines/index/" + id);
+        return Task.CompletedTask;
+    }
+}

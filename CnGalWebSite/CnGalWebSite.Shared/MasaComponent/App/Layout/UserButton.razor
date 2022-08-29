@@ -23,50 +23,51 @@
         主页
     </MButton>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-    @if (Admin == false)
-    {
-        <CnGalWebSite.Shared.MasaComponent.PC.Layout.SignInButton Model="_dataCacheService.UserInfor" Left />
 
-            <AuthorizeView Roles="Admin">
-                <Authorized>
-                    <MButton Text Block Color="success" OnClick="@(()=>OnClickUrl("/admin/index"))">
-                        <MIcon Left>mdi-shield-crown </MIcon>
-                        管理员后台
-                    </MButton>
-                </Authorized>
-            </AuthorizeView>
-   
+    <CnGalWebSite.Shared.MasaComponent.PC.Layout.SignInButton Model="_dataCacheService.UserInfor" Left />
 
-        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSpace">
-            <MIcon Left>mdi-star</MIcon>
-            个人空间
-        </MButton>
-        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/space/messages"))">
-            <MIcon Left>mdi-comment-text-multiple  </MIcon>
-            消息通知
-        </MButton>
-        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/home/editlist"))">
-            <MIcon Left>mdi-plus  </MIcon>
-            创建投稿
-        </MButton>
-        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnClickUrl("/account/logout"))">
-            <MIcon Left>mdi-logout</MIcon>
-            退出登入
-        </MButton>
-
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
-
-            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSetting">
-                <MIcon Left>mdi-cog</MIcon>
-                主题设置
+    <AuthorizeView Roles="Admin">
+        <Authorized>
+            <MButton Text Block Color="success" OnClick="@(()=>OnClickUrl("/admin/index"))">
+                <MIcon Left>mdi-car-traction-control</MIcon>
+                管理员后台
             </MButton>
+        </Authorized>
+    </AuthorizeView>
+    <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnClickUrl("/contentcenter"))">
+        <MIcon Left>mdi-database-edit </MIcon>
+        内容中心
+    </MButton>
+
+    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSpace">
+        <MIcon Left>mdi-star</MIcon>
+        个人空间
+    </MButton>
+    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/space/messages"))">
+        <MIcon Left>mdi-comment-text-multiple  </MIcon>
+        消息通知
+    </MButton>
+    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/home/editlist"))">
+        <MIcon Left>mdi-plus  </MIcon>
+        创建投稿
+    </MButton>
+    <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnClickUrl("/account/logout"))">
+        <MIcon Left>mdi-logout</MIcon>
+        退出登入
+    </MButton>
+
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+
+    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSetting">
+        <MIcon Left>mdi-cog</MIcon>
+        主题设置
+    </MButton>
 
 
-        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/about"))">
-            <MIcon Left>mdi-information-outline</MIcon>
-            关于我们
-        </MButton>
-    }
+    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/about"))">
+        <MIcon Left>mdi-information-outline</MIcon>
+        关于我们
+    </MButton>
 
 
 }
@@ -74,8 +75,6 @@
 
     [Parameter]
     public string Class { get; set; }
-    [Parameter]
-    public bool Admin { get; set; }
     [Parameter]
     public EventCallback OnClickSetting { get; set; }
     [Parameter]
@@ -138,16 +137,9 @@
 
     private async Task OnClickUrl(string url)
     {
-        if(url=="/" && Admin)
-        {
-            await OnRefresh.InvokeAsync();
+        NavigationManager.NavigateTo(url);
 
-        }
-        else
-        {
-            NavigationManager.NavigateTo(url);
 
-        }
 
         await OnClosed.InvokeAsync();
     }

@@ -164,7 +164,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 请求监视的用户
         /// </summary>
-        public virtual ICollection<UserMonitorEntry> MonitorByUsers { get; set; }
+        public virtual ICollection<UserMonitor> Monitors { get; set; }
 
 
         /// <summary>

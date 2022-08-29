@@ -21,6 +21,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
 using CnGalWebSite.DataModel.ViewModel.EditRecords;
+using CnGalWebSite.APIServer.Application.Examines;
+using CnGalWebSite.APIServer.Application.Users;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -40,16 +42,18 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
-        private readonly IRepository<UserMonitorEntry, long> _userMonitorEntriesRepository;
+        private readonly IRepository<UserMonitor, long> _userMonitorEntriesRepository;
         private readonly IRepository<UserReviewEditRecord, long> _userReviewEditRecordRepository;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
         private readonly IRankService _rankService;
+        private readonly IEditRecordService _editRecordService;
+        private readonly IUserService _userService;
 
 
-        public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository,
+        public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository, IUserService userService,
         IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository,
-        UserManager<ApplicationUser> userManager, IExamineService examineService, IRepository<UserMonitorEntry, long> userMonitorEntriesRepository,
+        UserManager<ApplicationUser> userManager, IExamineService examineService, IRepository<UserMonitor, long> userMonitorEntriesRepository, IEditRecordService editRecordService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository)
         {
             _userManager = userManager;
@@ -68,6 +72,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _userRepository = userRepository;
             _userMonitorEntriesRepository = userMonitorEntriesRepository;
             _userReviewEditRecordRepository = userReviewEditRecordRepository;
+            _editRecordService = editRecordService;
+            _userService = userService;
         }
 
 
@@ -985,7 +991,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
-        public async Task<ActionResult<Result>> EditUserMonitorEntry(EditUserMonitorEntryModel model)
+        public async Task<ActionResult<Result>> EditUserMonitorEntry(EditUserMonitorModel model)
         {
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
@@ -1001,7 +1007,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 foreach (var item in model.Ids.Where(s => existIds.Contains(s) == false))
                 {
-                    await _userMonitorEntriesRepository.InsertAsync(new UserMonitorEntry
+                    await _userMonitorEntriesRepository.InsertAsync(new UserMonitor
                     {
                         ApplicationUserId = user.Id,
                         CreateTime = DateTime.Now.ToCstTime(),
@@ -1041,17 +1047,17 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Select(s => s.ExamineId)
                 .ToListAsync();
 
-            //添加新项目
-            foreach (var item in model.ExamineIds.Where(s => existIds.Contains(s) == false))
-            {
-                await _userReviewEditRecordRepository.InsertAsync(new UserReviewEditRecord
-                {
-                    ApplicationUserId = user.Id,
-                    ChangedTime = DateTime.Now.ToCstTime(),
-                    ExamineId = item,
-                    State = model.State,
-                });
-            }
+            //添加新项目 试着用全部添加的方式
+            //foreach (var item in model.ExamineIds.Where(s => existIds.Contains(s) == false))
+            //{
+            //    await _userReviewEditRecordRepository.InsertAsync(new UserReviewEditRecord
+            //    {
+            //        ApplicationUserId = user.Id,
+            //        ReviewedTime = DateTime.Now.ToCstTime(),
+            //        ExamineId = item,
+            //        State = model.State,
+            //    });
+            //}
 
             //修改旧项目
             _ = await _userReviewEditRecordRepository.GetRangeUpdateTable()
@@ -1070,7 +1076,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
-        public async Task<ActionResult<UserEditRecordCenterViewModel>> GetUserEditRecordCenterView()
+        public async Task<ActionResult<UserContentCenterViewModel>> GetUserContentCenterView()
         {
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
@@ -1079,12 +1085,17 @@ namespace CnGalWebSite.APIServer.Controllers
                 return NotFound();
             }
 
-            var model = new UserEditRecordCenterViewModel();
+            var model = new UserContentCenterViewModel();
+
+            //获取用户编辑信息
+            model.UserEditInfor = await _userService.GetUserEditInforBindModel(user);
 
             //获取未读的审核记录
-            var unreadExamines = _userReviewEditRecordRepository.GetAll().Include(s=>s.Examine).Where(s => s.ApplicationUserId == user.Id && s.State == EditRecordReviewState.Unread && s.ExamineId != null).Select(s=>s.Examine);
+            var unreadExamineIds =await _userReviewEditRecordRepository.GetAll().AsNoTracking().Include(s=>s.Examine).Where(s => s.ApplicationUserId == user.Id && s.State == EditRecordReviewState.Unread && s.ExamineId != null).Select(s=>s.ExamineId).ToListAsync();
 
-            model.UnreadExamines = await _examineService.GetExaminesToNormalListAsync(unreadExamines, true);
+            var unreadExamines = _examineRepository.GetAll().AsNoTracking().Where(s => unreadExamineIds.Contains(s.Id));
+
+            model.UnReviewExamines = await _examineService.GetExaminesToNormalListAsync(unreadExamines, true);
 
             //获取未读词条
             var entries = await _entryRepository.GetAll().AsNoTracking()
@@ -1093,7 +1104,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             foreach(var item in entries)
             {
-                model.UnreadEntries.Add(_appHelper.GetEntryInforTipViewModel(item));
+                model.UnReviewEntries.Add(_appHelper.GetEntryInforTipViewModel(item));
             }
 
             //获取待审核记录
@@ -1105,5 +1116,62 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
         }
+
+        /// <summary>
+        /// 获取用户所有监视列表
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListUserMonitorAloneModel>>> GetUserMonitorListAsync(UserMonitorsPagesInfor input)
+        {
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var dtos = await _editRecordService.GetPaginatedResult(input.Options, input.SearchModel, user.Id);
+
+            return dtos;
+        }
+
+        /// <summary>
+        /// 获取所有审阅列表
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListUserReviewEditRecordAloneModel>>> GetUserReviewEditRecordListAsync(UserReviewEditRecordsPagesInfor input)
+        {
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var dtos = await _editRecordService.GetPaginatedResult(input.Options, input.SearchModel, user.Id);
+
+            return dtos;
+        }
+
+        /// <summary>
+        /// 获取用户有权限查看的所有审核记录
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListExamineAloneModel>>> GetExamineListAsync(ExaminesPagesInfor input)
+        {
+            var dtos = await _examineService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
+        }
+
+
     }
 }

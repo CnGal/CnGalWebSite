@@ -8,6 +8,7 @@ using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
+using CnGalWebSite.DataModel.ViewModel.EditRecords;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.DataModel.ViewModel.Home;
@@ -116,6 +117,9 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<List<EntryInforTipViewModel>> PublishGameTimesDataCatche { get; set; }
 
+        IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
+
+
         UserPendingDataCacheModel UserPendingDataCatche { get; set; }
 
         List<DocumentViewModel> DocumentsCatche { get; set; }
@@ -144,7 +148,8 @@ namespace CnGalWebSite.Shared.Service
 
         List<PlayedGameUserScoreRandomModel> RandomUserScoresCatche { get; set; }
 
-        IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
+        public UserContentCenterViewModel UserContentCenterCatche { get; set; }
+
 
         DiscountPageHelper DiscountPageCatcheHelper { get; set; }
 

@@ -27,6 +27,8 @@ namespace CnGalWebSite.DataModel.ViewModel.EditRecords
         public string UserId { get; set; }
         [Display(Name = "编辑者")]
         public string UserName { get; set; }
+        [Display(Name = "审阅时间")]
+        public DateTime? ReviewedTime { get; set; }
     }
 
     public class UserReviewEditRecordsPagesInfor

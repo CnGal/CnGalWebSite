@@ -19,18 +19,21 @@
     <div class="w-100">
         <SignInButton Model="Model" />
 
-            <AuthorizeView Roles="Admin">
-                <Authorized>
-                    <MButton Text Block Color="success" OnClick="OnClickAdmin">
-                        <MIcon Left>mdi-shield-crown </MIcon>
-                        管理员后台
-                    </MButton>
-                </Authorized>
-            </AuthorizeView>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <MButton Text Block Color="success" OnClick="@(()=>OnNav("/admin/index"))">
+                    <MIcon Left>mdi-car-traction-control</MIcon>
+                    管理员后台
+                </MButton>
+            </Authorized>
+        </AuthorizeView>
 
+        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnNav("/contentcenter"))">
+            <MIcon Left>mdi-database-edit</MIcon>
+            内容中心
+        </MButton>
 
-
-        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickUserSpace">
+        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnNav("/space/index/" + Model.Id))">
             <MIcon Left>mdi-star</MIcon>
             个人空间
         </MButton>
@@ -51,13 +54,13 @@
 
         }
 
-            <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" StopPropagation OnClick="OnClickSetting">
-                <MIcon Left>mdi-cog</MIcon>
-                主题设置
-            </MButton>
+        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" StopPropagation OnClick="OnClickSetting">
+            <MIcon Left>mdi-cog</MIcon>
+            主题设置
+        </MButton>
 
 
-        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickLogout">
+        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnNav("/account/logout"))">
             <MIcon Left>mdi-logout</MIcon>
             退出登入
         </MButton>
@@ -78,16 +81,12 @@
     [Parameter]
     public EventCallback< long> MessageCountChanged { get; set; }
 
-    private async Task OnClickUserSpace()
+    private async Task OnNav(string url)
     {
-        NavigationManager.NavigateTo("/space/index/" + Model.Id);
+        NavigationManager.NavigateTo(url);
         await OnClosed.InvokeAsync();
     }
-    private async Task OnClickLogout()
-    {
-        NavigationManager.NavigateTo("/account/logout");
-        await OnClosed.InvokeAsync();
-    }
+
     private async Task OnClickMessage()
     {
         MessageCount = 0;
@@ -96,9 +95,6 @@
         NavigationManager.NavigateTo("/space/messages");
         await OnClosed.InvokeAsync();
     }
-    private async Task OnClickAdmin()
-    {
-        NavigationManager.NavigateTo("/admin/index");
-        await OnClosed.InvokeAsync();
-    }
+
+
 }

@@ -1,0 +1,52 @@
+﻿@page "/contentcenter"
+@attribute [Authorize]
+@inject IDataCacheService _dataCacheService
+
+
+<div class="rounded  shadow-sm bg-opacity mb-4">
+    <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded" CenterActive
+           Color="@_dataCacheService.ThemeSetting.Theme">
+
+        <MTab Value="1">
+            概览<MIcon>mdi-home</MIcon>
+        </MTab>
+        <MTab Value="2">
+            监视列表<MIcon>mdi-monitor</MIcon>
+        </MTab>
+        <MTab Value="3">
+            审阅记录列表<MIcon>mdi-read</MIcon>
+        </MTab>
+        <MTab Value="4">
+            编辑记录<MIcon>mdi-pencil</MIcon>
+        </MTab>
+    </MTabs>
+</div>
+<MTabsItems @bind-Value="TabIndex">
+    <MTabItem Value="1">
+
+        <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.HomeCard />
+    </MTabItem>
+    <MTabItem Value="2">
+        <div class="  rounded shadow-sm p-3 bg-opacity">
+            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListMonitors />
+        </div>
+    </MTabItem>
+    <MTabItem Value="3">
+        <div class="  rounded shadow-sm p-3 bg-opacity">
+            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListReviewEditRecords />
+        </div>
+    </MTabItem>
+    <MTabItem Value="4">
+        <div class="  rounded shadow-sm p-3 bg-opacity">
+            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListExamines />
+        </div>
+    </MTabItem>
+</MTabsItems>
+
+
+
+@code {
+    public StringNumber TabIndex { get; set; } = 1;
+
+}
+

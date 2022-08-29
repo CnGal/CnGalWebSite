@@ -5,7 +5,7 @@
 
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-file-text-o" Title="概览" Class="mb-4" Outline OutlineHead>
         <ButtonContent>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab XSmall Icon="mdi-share" Tooltip="查看详细信息" OnClick="@(()=>NavigationManager.NavigateTo("/home/examines?Id="+Model.Id))" StopPropagation/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab XSmall Icon="mdi-share" Tooltip="查看详细信息" OnClick="@(()=>NavigationManager.NavigateTo("/examine?Id="+Model.Id))" StopPropagation/>
         </ButtonContent>
         <ChildContent>
             <style>

@@ -12,6 +12,7 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -47,9 +48,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRankService _rankService;
         private readonly ISteamInforService _steamInforService;
         private readonly IAppHelper _appHelper;
+        private readonly IRepository<UserCertification, long> _userCertificationRepository;
 
         public SpaceAPIController(IRepository<Message, int> messageRepository, IMessageService messageService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository,
-        UserManager<ApplicationUser> userManager, IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService,
+        UserManager<ApplicationUser> userManager, IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Examine, long> examineRepository, IExamineService examineService, IRankService rankService, IRepository<FavoriteObject, long> favoriteObjectRepository,
         ISteamInforService steamInforService)
         {
@@ -66,6 +68,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _rankService = rankService;
             _favoriteObjectRepository = favoriteObjectRepository;
             _steamInforService = steamInforService;
+            _userCertificationRepository = userCertificationRepository;
         }
 
         /// <summary>
@@ -761,7 +764,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
-
         /// <summary>
         /// 获取用户待审核的编辑对象列表
         /// </summary>
@@ -774,6 +776,85 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
             return await _examineService.GetUserPendingData(user.Id);
+        }
+
+        /// <summary>
+        /// 编辑用户认证
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<Result>> EditUserCertificationAsync(EditUserCertificationModel model)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            var userCertification = await _userCertificationRepository.FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id);
+
+            var userCertificationMain = new UserCertificationMain();
+
+            if (userCertification == null)
+            {
+                if (model.EntryId <= 0)
+                {
+                    return new Result { Successful = true };
+                }
+                else
+                {
+                    userCertification = await _userCertificationRepository.InsertAsync(new UserCertification
+                    {
+                        ApplicationUserId = user.Id
+                    });
+
+                    userCertificationMain.EntryId = model.EntryId;
+
+
+                }
+
+            }
+            else
+            {
+                if (model.EntryId > 0)
+                {
+                    userCertificationMain.EntryId = model.EntryId;
+                }
+                else
+                {
+                    userCertification.EntryId = null;
+                    userCertification.Entry = null;
+                    userCertification.ApplicationUser = null;
+                    userCertification.ApplicationUserId = null;
+
+                    await _userCertificationRepository.UpdateAsync(userCertification);
+                    await _userCertificationRepository.DeleteAsync(userCertification);
+
+                    return new Result { Successful = true };
+                }
+            }
+
+            //序列化JSON
+            var resulte = "";
+            using (TextWriter text = new StringWriter())
+            {
+                var serializer = new JsonSerializer();
+                serializer.Serialize(text, userCertificationMain);
+                resulte = text.ToString();
+            }
+
+            //判断是否是管理员
+            if (await _userManager.IsInRoleAsync(user, "Admin") == true)
+            {
+                await _examineService.ExamineEditUserCertificationMainAsync(userCertification, userCertificationMain);
+                await _examineService.UniversalEditUserCertificationExaminedAsync(userCertification, user, true, resulte, Operation.RequestUserCertification, model.Note);
+                await _appHelper.AddUserContributionValueAsync(user.Id, userCertification.Id, Operation.EditPlayedGameMain);
+
+            }
+            else
+            {
+                await _examineService.UniversalEditUserCertificationExaminedAsync(userCertification, user, false, resulte, Operation.RequestUserCertification, model.Note);
+            }
+
+            return new Result { Successful = true };
         }
 
     }

@@ -406,26 +406,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<ListExaminesInforViewModel>> ListExaminesAsync()
-        {
-            ListExaminesInforViewModel model = new();
-            var tempDateTimeNow = DateTime.Now.ToCstTime();
-            model.All = await _examineRepository.CountAsync();
-            model.Passed = await _examineRepository.CountAsync(x => x.IsPassed == true && x.PassedTime != null && x.PassedTime.Value.Date == tempDateTimeNow.Date);
-            model.Unpassed = await _examineRepository.CountAsync(x => x.IsPassed == false && x.PassedTime != null && x.PassedTime.Value.Date == tempDateTimeNow.Date);
-            model.Examining = await _examineRepository.CountAsync(x => x.IsPassed == null);
-
-
-            return model;
-        }
-        [HttpPost]
-        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListExamineAloneModel>>> GetExamineListAsync(ExaminesPagesInfor input)
-        {
-            var dtos = await _examineService.GetPaginatedResult(input.Options, input.SearchModel);
-
-            return dtos;
-        }
 
         [HttpGet]
         public async Task<ActionResult<ListCommentsInforViewModel>> ListCommentsAsync()

@@ -1,0 +1,50 @@
+﻿<a  src="@("/entries/index/" + Model.Id)" class="a-font-color h-100">
+
+    <div class="div-shadow rounded  bg-opacity aticle-home-layout h-100" style="display: flex; flex-direction: column; justify-content: space-between;">
+        @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
+        {
+            <div class="">
+                <div class="">
+                    <img class="img-fluid" src="@Model.MainImage" alt="@Model.Name">
+                </div>
+                <div class="p-3">
+                    <header class="text-truncate-2">
+                        <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
+                        <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                    </header>
+                    <div class="text-truncate-4">
+                        @Model.BriefIntroduction
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="h-100" style=" display: flex; flex-direction: column; justify-content: center; ">
+                <div class="p-3">
+                    <div class="" style="width: 50%; margin-right: auto; margin-left: auto;">
+                        <img class="img-fluid" src="@Model.MainImage" style=" border-radius: 50%;">
+                    </div>
+                    <div class="pt-3">
+                        <header style=" display: flex; justify-content: center;">
+                            <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
+                            <h5 class="fw-bold" style=" margin-bottom: 0px; margin-left: 5px; margin-top: 1px;">@Model.DisplayName</h5>
+                        </header>
+                        <div class="text-truncate-3">
+                            @Model.BriefIntroduction
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+
+    </div>
+</a>
+
+
+
+@code {
+    [Parameter]
+    public EntryInforTipViewModel Model { get; set; }
+}

@@ -451,5 +451,33 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="examine"></param>
         /// <returns></returns>
         Task ExamineEstablishAudioAsync(Entry entry, EntryAudioExamineModel examine);
+
+        /// <summary>
+        /// 添加 申请用户认证 到数据库
+        /// </summary>
+        /// <param name="userCertification"></param>
+        /// <param name="user"></param>
+        /// <param name="isAdmin"></param>
+        /// <param name="examineStr"></param>
+        /// <param name="operation"></param>
+        /// <param name="note"></param>
+        /// <returns></returns>
+        Task UniversalEditUserCertificationExaminedAsync(UserCertification userCertification, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
+
+        /// <summary>
+        /// 用户认证 真实作用
+        /// </summary>
+        /// <param name="userCertification"></param>
+        /// <param name="examine"></param>
+        /// <returns></returns>
+        Task ExamineEditUserCertificationMainAsync(UserCertification userCertification, UserCertificationMain examine);
+
+        /// <summary>
+        /// 获取 申请用户认证 审核视图
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="examine"></param>
+        /// <returns></returns>
+        Task<bool> GetEditUserCertificationMainExamineView(ExamineViewModel model, Examine examine);
     }
 }
