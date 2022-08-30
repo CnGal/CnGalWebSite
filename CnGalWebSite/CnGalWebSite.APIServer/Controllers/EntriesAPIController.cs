@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
+using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.DataReositories;
@@ -44,9 +45,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IArticleService _articleService;
         private readonly IExamineService _examineService;
         private readonly IPerfectionService _perfectionService;
+        private readonly IEditRecordService _editRecordService;
 
         public EntriesAPIController(UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository,
-        IPerfectionService perfectionService, IRepository<Examine, long> examineRepository, IArticleService articleService,
+        IPerfectionService perfectionService, IRepository<Examine, long> examineRepository, IArticleService articleService, IEditRecordService editRecordService,
         IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IExamineService examineService)
         {
             _userManager = userManager;
@@ -60,6 +62,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _perfectionService = perfectionService;
             _articleService = articleService;
             _peripheryRepository = peripheryRepository;
+            _editRecordService = editRecordService;
         }
 
         /// <summary>
@@ -472,25 +475,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishMain);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEstablishMainAsync(currentEntry, examine.Key as ExamineMain);
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishMain, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishMain);
-            }
-            else
-            {
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishMain, model.Note);
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentEntry, user, examine.Key, Operation.EstablishMain, model.Note);
+
 
             return new Result { Successful = true };
 
@@ -574,25 +562,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishAddInfor);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEstablishAddInforAsync(currentEntry, examine.Key as EntryAddInfor);
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishAddInfor, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishAddInfor);
-            }
-            else
-            {
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishAddInfor, model.Note);
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentEntry, user, examine.Key, Operation.EstablishAddInfor, model.Note);
 
             return new Result { Successful = true };
         }
@@ -674,25 +646,12 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishImages);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEstablishImagesAsync(currentEntry, examine.Key as EntryImages);
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishImages, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishImages);
-            }
-            else
-            {
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishImages, model.Note);
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentEntry, user, examine.Key, Operation.EstablishImages, model.Note);
+
+
+
             return new Result { Successful = true };
 
         }
@@ -813,25 +772,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishRelevances);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEstablishRelevancesAsync(currentEntry, examine.Key as EntryRelevances);
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishRelevances, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishRelevances);
-            }
-            else
-            {
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishRelevances, model.Note);
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentEntry, user, examine.Key, Operation.EstablishRelevances, model.Note);
+
 
             return new Result { Successful = true };
 
@@ -897,20 +841,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishMainPage);
-            //序列化
-            var resulte = examine.Key as string;
 
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEstablishMainPageAsync(currentEntry, examine.Key as string);
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishMainPage, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishMainPage);
-            }
-            else
-            {
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishMainPage, model.Note);
-            }
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentEntry, user, examine.Key, Operation.EstablishMainPage, model.Note);
 
             return new Result { Successful = true };
         }
@@ -1002,25 +935,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishTags);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEstablishTagsAsync(currentEntry, examine.Key as EntryTags);
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishTags, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishTags);
-            }
-            else
-            {
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishTags, model.Note);
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentEntry, user, examine.Key, Operation.EstablishTags, model.Note);
+
 
             return new Result { Successful = true };
 
@@ -1095,25 +1013,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishAudio);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEstablishAudioAsync(currentEntry, examine.Key as EntryAudioExamineModel);
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, true, resulte, Operation.EstablishAudio, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentEntry.Id, Operation.EstablishAudio);
-            }
-            else
-            {
-                await _examineService.UniversalEditExaminedAsync(currentEntry, user, false, resulte, Operation.EstablishAudio, model.Note);
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentEntry, user, examine.Key, Operation.EstablishAudio, model.Note);
+
+
             return new Result { Successful = true };
 
         }
@@ -1383,6 +1287,12 @@ namespace CnGalWebSite.APIServer.Controllers
             model.Examines = model.Examines.OrderByDescending(s => s.ApplyTime).ToList();
             //获取编辑状态
             model.State = await _entryService.GetEntryEditState(user, id);
+            //是否监视
+            if(user!=null)
+            {
+           model.IsInMonitor=  await _editRecordService.CheckObjectIsInUserMonitor(user, id);
+
+            }
 
             return model;
         }

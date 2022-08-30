@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
+
 namespace CnGalWebSite.DataModel.Model
 {
     public class Examine
@@ -93,8 +95,11 @@ namespace CnGalWebSite.DataModel.Model
 
     public enum EditRecordReviewState
     {
-        Unread,
+        [Display(Name ="未读")]
+        UnRead,
+        [Display(Name = "已读")]
         Reviewed,
+        [Display(Name = "忽略")]
         Ignored
     }
 

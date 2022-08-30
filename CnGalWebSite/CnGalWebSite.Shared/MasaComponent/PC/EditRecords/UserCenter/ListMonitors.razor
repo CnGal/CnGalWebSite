@@ -6,21 +6,45 @@
 @inject IJSRuntime JS
 @inject DialogService DialogService
 
-<div>
-    <Table TItem="ListUserMonitorAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="80" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-        <TableColumns>
-            <TableColumn @bind-Field="@context.Id" Sortable DefaultSort DefaultSortOrder="@SortOrder.Desc" Fixed Width="80" />
-            <TableColumn @bind-Field="@context.EntryName" TextWrap Width="200" />
-            <TableColumn @bind-Field="@context.Type" TextWrap Width="150" />
-            <TableColumn @bind-Field="@context.CreateTime" Sortable="true" TextWrap="true" Width="180" />
-        </TableColumns>
-        <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.EntryId ))" />
-        </RowButtonTemplate>
-    </Table>
-</div>
+
+@if (noData)
+{
+    <div class="p-4" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+        <div style="width: 100%;">
+            <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;margin-left: 15%;margin-right: 15%;">
+            <div class="h5 text-center mt-4" style=" font-weight: 600;">
+                找不到数据欸......
+                不过你可以到词条页面添加监视，点击编辑按钮就能看到入口哦~
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div style="@(isFirst?"display:none":"")">
+        <Table TItem="ListUserMonitorAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
+               ShowExtendButtons="true" ExtendButtonColumnWidth="120" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true EmptyText="可以前往词条页面添加监视哦~"
+               ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+            <TableToolbarTemplate>
+                <TableToolbarButton TItem="ListUserMonitorAloneModel" Color="Color.Danger" Icon="fa fa-trash" Text="移除" OnClickCallback="OnRemoveClick" IsAsync="true" />
+            </TableToolbarTemplate>
+            <TableColumns>
+                <TableColumn @bind-Field="@context.Id" Sortable DefaultSort DefaultSortOrder="@SortOrder.Desc" Fixed Width="80" />
+                <TableColumn @bind-Field="@context.EntryName" TextWrap Width="200" />
+                <TableColumn @bind-Field="@context.Type" TextWrap Width="150" />
+                <TableColumn @bind-Field="@context.CreateTime" Sortable="true" TextWrap="true" Width="180" />
+            </TableColumns>
+            <RowButtonTemplate>
+                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-paper-plane" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.EntryId ))" />
+                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-trash" Text="移除" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditMonitorClick(new int[] { context.EntryId }, false, true))" />
+
+            </RowButtonTemplate>
+        </Table>
+    </div>
+}
+
+
+
 
 @code {
     [NotNull]
@@ -35,6 +59,9 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    bool isFirst=true;
+    bool noData;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,13 +75,28 @@
             options.Filters = new List<IFilterAction>();
             options.Searchs = new List<IFilterAction>();
 
-            var result = await Http.PostAsJsonAsync<UserMonitorsPagesInfor>(ToolHelper.WebApiPath + "api/examines/GetUserReviewEditRecordList", new UserMonitorsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
+            var result = await Http.PostAsJsonAsync<UserMonitorsPagesInfor>(ToolHelper.WebApiPath + "api/examines/GetUserMonitorList", new UserMonitorsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListUserMonitorAloneModel>>(jsonContent, ToolHelper.options);
+            var data = JsonSerializer.Deserialize<QueryData<ListUserMonitorAloneModel>>(jsonContent, ToolHelper.options);
+
+            if (isFirst)
+            {
+                if (data.TotalCount == 0)
+                {
+                    noData = true;
+                }
+            }
+
+            isFirst = false;
+
+            StateHasChanged();
+
+            return data;
         }
         catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "无法获取用户监视列表");
+            noData = true;
             return new QueryData<ListUserMonitorAloneModel>();
         }
     }
@@ -66,5 +108,63 @@
     {
         NavigationManager.NavigateTo("/entries/index/" + id);
         return Task.CompletedTask;
+    }
+
+    private async Task OnRowEditMonitorClick(int[] ids, bool inMonitor, bool showMessage)
+    {
+        string tempString = inMonitor ? "添加监视" : "移除监视";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditUserMonitorsModel>(ToolHelper.WebApiPath + "api/examines/EditUserMonitors", new EditUserMonitorsModel { Ids = ids, InMonitor = inMonitor });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "成功", tempString + "成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "失败");
+        }
+    }
+
+    private async Task OnAddClick(IEnumerable<ListUserMonitorAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有添加监视", "请选中监视");
+            return;
+        }
+
+        await OnRowEditMonitorClick(items.Select(s => s.EntryId).ToArray(), true, false);
+
+        await ToastService.Success("添加监视成功", "添加监视成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnRemoveClick(IEnumerable<ListUserMonitorAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有移除监视", "请选中监视");
+            return;
+        }
+
+        await OnRowEditMonitorClick(items.Select(s => s.EntryId).ToArray(), false, false);
+
+        await ToastService.Success("移除监视成功", "移除监视成功");
+        await TableRows.QueryAsync();
     }
 }

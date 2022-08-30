@@ -1,6 +1,7 @@
 ﻿@inject ToastService ToastService
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 <div class="@Class">
     <div class="rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-4">
@@ -69,7 +70,12 @@
             else
             {
                 await ToastService.Success("审核成功", "对『" + (string.IsNullOrWhiteSpace(Model.ObjectName) ? ("Id：" + Model.ObjectId) : Model.ObjectName) + "』的审核已完成");
-                NavigationManager.NavigateTo( "/contentcenter");
+                //清除缓存
+                if (_dataCacheService.UserContentCenterCatche?.PendingExamines != null)
+                {
+                    _dataCacheService.UserContentCenterCatche.PendingExamines.RemoveAll(s => s.Id == Model.Id);
+                }
+                NavigationManager.NavigateTo("/contentcenter");
             }
         }
         catch (Exception ex)

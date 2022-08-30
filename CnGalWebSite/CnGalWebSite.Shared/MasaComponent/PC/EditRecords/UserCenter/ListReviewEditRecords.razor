@@ -6,12 +6,29 @@
 @inject IJSRuntime JS
 @inject DialogService DialogService
 
-<div class="">
+@if (noData)
+{
+    <div class="p-4" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+        <div style="width: 100%;">
+            <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;margin-left: 15%;margin-right: 15%;">
+            <div class="h5 text-center mt-4" style=" font-weight: 600;">
+                找不到数据欸......
+                不过你可以到词条页面添加监视，点击编辑按钮就能看到入口哦~
+            </div>
+        </div>
+    </div>
+}
+else
+{
     <Table TItem="ListUserReviewEditRecordAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="80" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowExtendButtons="true" ExtendButtonColumnWidth="160" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true EmptyText="可以前往词条页面添加监视哦~"
            ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableToolbarTemplate>
+            <TableToolbarButton TItem="ListUserReviewEditRecordAloneModel" Color="Color.Success" Icon="fa fa-check" Text="已读" OnClickCallback="OnReviewedClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListUserReviewEditRecordAloneModel" Color="Color.Danger" Icon="fa fa-trash-o" Text="忽略" OnClickCallback="OnIgnoreClick" IsAsync="true" />
+        </TableToolbarTemplate>
         <TableColumns>
-            <TableColumn @bind-Field="@context.Id" Sortable DefaultSort DefaultSortOrder="@SortOrder.Desc" Fixed Width="80" />
+            <TableColumn @bind-Field="@context.ExamineId" Sortable DefaultSort DefaultSortOrder="@SortOrder.Desc" Fixed Width="80" />
             <TableColumn @bind-Field="@context.EntryName" TextWrap Width="200" />
             <TableColumn @bind-Field="@context.Operation" TextWrap Width="150" />
             <TableColumn @bind-Field="@context.State" TextWrap Sortable Width="120" />
@@ -20,10 +37,14 @@
             <TableColumn @bind-Field="@context.UserName" TextWrap Width="200" />
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.Id ))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-paper-plane" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.ExamineId ))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-check" Text="已读" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditStateClick(new long[] { context.ExamineId },  EditRecordReviewState.Reviewed, true))" IsShow="context.State == EditRecordReviewState.UnRead" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-trash-o" Text="忽略" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditStateClick(new long[] { context.ExamineId },  EditRecordReviewState.Ignored, true))" IsShow="context.State == EditRecordReviewState.UnRead" />
+
         </RowButtonTemplate>
     </Table>
-</div>
+}
+
 
 @code {
     [NotNull]
@@ -38,6 +59,8 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    bool isFirst = true;
+    bool noData;
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,11 +76,27 @@
 
             var result = await Http.PostAsJsonAsync<UserReviewEditRecordsPagesInfor>(ToolHelper.WebApiPath + "api/examines/GetUserReviewEditRecordList", new UserReviewEditRecordsPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListUserReviewEditRecordAloneModel>>(jsonContent, ToolHelper.options);
+
+            var data= JsonSerializer.Deserialize<QueryData<ListUserReviewEditRecordAloneModel>>(jsonContent, ToolHelper.options);
+
+            if (isFirst)
+            {
+                if (data.TotalCount == 0)
+                {
+                    noData = true;
+                }
+            }
+
+            isFirst = false;
+
+            StateHasChanged();
+
+            return data;
         }
         catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "无法获取用户审阅编辑记录列表");
+            noData = true;
             return new QueryData<ListUserReviewEditRecordAloneModel>();
         }
     }
@@ -67,7 +106,65 @@
     }
     private Task OnLook(long id)
     {
-        NavigationManager.NavigateTo("/examines/index/" + id);
+        NavigationManager.NavigateTo("/examine?Id=" + id);
         return Task.CompletedTask;
+    }
+
+    private async Task OnRowEditStateClick(long[] ids, EditRecordReviewState state, bool showMessage)
+    {
+        string tempString = state == EditRecordReviewState.Reviewed ? "审阅编辑记录" : "忽略编辑记录";
+        //调用API
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditUserReviewEditRecordStateModel>(ToolHelper.WebApiPath + "api/examines/EditUserReviewEditRecordState", new EditUserReviewEditRecordStateModel { ExamineIds = ids, State = state });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+
+
+
+            if (obj.Successful == false)
+            {
+                await ToastService.Error(tempString + "失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success(tempString + "成功", tempString + "成功");
+                    await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, tempString + "失败");
+        }
+    }
+
+    private async Task OnReviewedClick(IEnumerable<ListUserReviewEditRecordAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有审阅编辑记录", "请选中编辑记录");
+            return;
+        }
+
+        await OnRowEditStateClick(items.Select(s => s.ExamineId).ToArray(), EditRecordReviewState.Reviewed, false);
+
+        await ToastService.Success("审阅编辑记录成功", "审阅编辑记录成功");
+        await TableRows.QueryAsync();
+    }
+    private async Task OnIgnoreClick(IEnumerable<ListUserReviewEditRecordAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有忽略编辑记录", "请选中编辑记录");
+            return;
+        }
+
+        await OnRowEditStateClick(items.Select(s => s.ExamineId).ToArray(), EditRecordReviewState.Ignored, false);
+
+        await ToastService.Success("忽略编辑记录成功", "忽略编辑记录成功");
+        await TableRows.QueryAsync();
     }
 }

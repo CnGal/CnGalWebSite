@@ -108,7 +108,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<List<ExaminedNormalListModel>>> GetRecentlyEditListAsync()
         {
             return await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => (s.PrepositionExamineId == null || s.PrepositionExamineId == -1) && s.IsPassed == true
-            && s.Operation != Operation.UserMainPage && s.Operation != Operation.EditUserMain && s.Operation != Operation.PubulishComment).OrderByDescending(s => s.Id).Take(12), true);
+            && s.Operation != Operation.UserMainPage && s.Operation != Operation.EditUserMain && s.Operation != Operation.PubulishComment && s.Operation != Operation.RequestUserCertification).OrderByDescending(s => s.Id).Take(12), true);
         }
 
         [AllowAnonymous]

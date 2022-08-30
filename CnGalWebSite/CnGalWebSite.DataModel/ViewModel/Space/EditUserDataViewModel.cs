@@ -59,6 +59,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         /// 登入QQ昵称
         /// </summary>
         public string QQAccountName { get; set; }
+        /// <summary>
+        /// 认证的词条
+        /// </summary>
+        public EditUserCertificationModel UserCertificationModel { get; set; }
 
         public List<UserEditRankIsShow> Ranks { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.APIServer.Application.Entries;
+using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.DataReositories;
@@ -37,8 +38,9 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IExamineService _examineService;
         private readonly IPeripheryService _peripheryService;
         private readonly IEntryService _entryService;
+        private readonly IEditRecordService _editRecordService;
 
-        public PeripheriesAPIController(IPeripheryService peripheryService, IEntryService entryService,
+        public PeripheriesAPIController(IPeripheryService peripheryService, IEntryService entryService, IEditRecordService editRecordService,
         UserManager<ApplicationUser> userManager, IRepository<PeripheryRelevanceUser, long> userOwnedPeripheryRepository,
          IExamineService examineService, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository)
         {
@@ -51,6 +53,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _peripheryService = peripheryService;
             _userOwnedPeripheryRepository = userOwnedPeripheryRepository;
             _entryService = entryService;
+            _editRecordService = editRecordService;
         }
 
 
@@ -446,26 +449,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EditPeripheryMain);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEditPeripheryMainAsync(currentPeriphery, examine.Key as ExamineMain);
-                await _examineService.UniversalEditPeripheryExaminedAsync(currentPeriphery, user, true, resulte, Operation.EditPeripheryMain, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentPeriphery.Id, Operation.EditPeripheryMain);
-            }
-            else
-            {
-                await _examineService.UniversalEditPeripheryExaminedAsync(currentPeriphery, user, false, resulte, Operation.EditPeripheryMain, model.Note);
-            }
 
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentPeriphery, user, examine.Key, Operation.EditPeripheryMain, model.Note);
 
 
             return new Result { Successful = true };
@@ -573,25 +559,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EditPeripheryImages);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEditPeripheryImagesAsync(currentPeriphery, examine.Key as PeripheryImages);
-                await _examineService.UniversalEditPeripheryExaminedAsync(currentPeriphery, user, true, resulte, Operation.EditPeripheryImages, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentPeriphery.Id, Operation.EditPeripheryImages);
-            }
-            else
-            {
-                await _examineService.UniversalEditPeripheryExaminedAsync(currentPeriphery, user, false, resulte, Operation.EditPeripheryImages, model.Note);
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentPeriphery, user, examine.Key, Operation.EditPeripheryImages, model.Note);
 
 
             return new Result { Successful = true };
@@ -736,25 +706,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EditPeripheryRelatedEntries);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEditPeripheryRelatedEntriesAsync(currentPeriphery, examine.Key as PeripheryRelatedEntries);
-                await _examineService.UniversalEditPeripheryExaminedAsync(currentPeriphery, user, true, resulte, Operation.EditPeripheryRelatedEntries, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentPeriphery.Id, Operation.EditPeripheryRelatedEntries);
-            }
-            else
-            {
-                await _examineService.UniversalEditPeripheryExaminedAsync(currentPeriphery, user, false, resulte, Operation.EditPeripheryRelatedEntries, model.Note);
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentPeriphery, user, examine.Key, Operation.EditPeripheryRelatedEntries, model.Note);
 
 
             return new Result { Successful = true };
@@ -862,25 +816,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EditPeripheryRelatedPeripheries);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEditPeripheryRelatedPeripheriesAsync(currentPeriphery, examine.Key as PeripheryRelatedPeripheries);
-                await _examineService.UniversalEditPeripheryExaminedAsync(currentPeriphery, user, true, resulte, Operation.EditPeripheryRelatedPeripheries, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentPeriphery.Id, Operation.EditPeripheryRelatedPeripheries);
-            }
-            else
-            {
-                await _examineService.UniversalEditPeripheryExaminedAsync(currentPeriphery, user, false, resulte, Operation.EditPeripheryRelatedPeripheries, model.Note);
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentPeriphery, user, examine.Key, Operation.EditPeripheryRelatedPeripheries, model.Note);
+
 
             return new Result { Successful = true };
 

@@ -4,9 +4,13 @@
 @if (isReady)
 {
     <div>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="fa fa-fw  fa-pencil" Class="mb-4">
-            <CalendarHeatmapTip BeforeTreatmentDate="_dataCacheService.UserContentCenterCatche.UserEditInfor.EditCountList"></CalendarHeatmapTip>
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        @if (showChart)
+        {
+            <div class="mb-4">
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Square.EditOverviewCard />
+            </div>
+
+        }
 
         <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListUnReviewEntriesCard Model="_dataCacheService.UserContentCenterCatche.UnReviewEntries" />
         <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListUnReviewEditRecordsCard Model="_dataCacheService.UserContentCenterCatche.UnReviewExamines" />
@@ -30,6 +34,7 @@ else
 
 
     bool isReady;
+    bool showChart;
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,5 +54,13 @@ else
 
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            showChart = true;
+            StateHasChanged();
+        }
+    }
 }
 

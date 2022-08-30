@@ -16,9 +16,8 @@
     </ButtonContent>
     <ChildContent>
         <div class="row h-100 ps-2 pe-2">
-            @for (int i = 0; i < Model.Count; i++)
+            @foreach (var item in Model)
             {
-                var item = Model[i];
                 <div class="col-12 col-md-6 col-xxl-4">
                     @{
                         string name = item.RelatedName + " 编辑记录";

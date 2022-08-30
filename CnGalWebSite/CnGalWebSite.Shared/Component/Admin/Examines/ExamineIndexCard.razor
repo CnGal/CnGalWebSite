@@ -79,12 +79,11 @@
 
                 </div>
             </div>
-            <AuthorizeView Roles="Admin">
-                @if (Model.IsPassed == null && Model.PrepositionExamineId <= 0)
+          
+                @if (Model.IsPassed == null && Model.PrepositionExamineId <= 0&&Model.IsAdmin)
                 {
                     <CnGalWebSite.Shared.Component.Admin.Examines.Cards.SubmitCard Model="Model"  Class="mb-4"/>
                 }
-            </AuthorizeView>
         </div>
     }
 </div>

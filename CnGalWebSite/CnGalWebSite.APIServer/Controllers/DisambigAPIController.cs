@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.APIServer.Application.Disambigs;
+using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
@@ -36,9 +37,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IAppHelper _appHelper;
         private readonly IDisambigService _disambigService;
         private readonly IExamineService _examineService;
+        private readonly IEditRecordService _editRecordService;
 
-        public DisambigAPIController(IRepository<Disambig, int> disambigRepository, IDisambigService disambigService,
-            UserManager<ApplicationUser> userManager, IExamineService examineService, IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository,
+        public DisambigAPIController(IRepository<Disambig, int> disambigRepository, IDisambigService disambigService, IEditRecordService editRecordService,
+        UserManager<ApplicationUser> userManager, IExamineService examineService, IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository,
        IRepository<Examine, long> examineRepository)
         {
             _userManager = userManager;
@@ -49,6 +51,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _disambigRepository = disambigRepository;
             _disambigService = disambigService;
             _examineService = examineService;
+            _editRecordService = editRecordService;
         }
 
         [AllowAnonymous]
@@ -234,17 +237,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 var disambig = new Disambig();
 
                 disambig = await _disambigRepository.InsertAsync(disambig);
-                //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                {
-                    await _examineService.ExamineEditDisambigMainAsync(disambig, disambigMain);
-                    await _examineService.UniversalCreateDisambigExaminedAsync(disambig, user, true, resulte, Operation.DisambigMain, model.Note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, disambig.Id, Operation.DisambigMain);
-                }
-                else
-                {
-                    await _examineService.UniversalCreateDisambigExaminedAsync(disambig, user, false, resulte, Operation.DisambigMain, model.Note);
-                }
+
+                //保存并尝试应用审核记录
+                await _editRecordService.SaveAndApplyEditRecord(disambig, user, disambigMain, Operation.DisambigMain, model.Note, true);
+
 
                 //第二步 处理关联词条
 
@@ -277,27 +273,9 @@ namespace CnGalWebSite.APIServer.Controllers
                         Relevances = relevances
                     };
 
-                    //序列化JSON
-                    resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, disambigRelevances);
-                        resulte = text.ToString();
-                    }
-                    disambig = await _disambigRepository.GetAll().Include(s => s.Entries).Include(s => s.Articles).FirstOrDefaultAsync(s => s.Id == disambig.Id);
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEditDisambigRelevancesAsync(disambig, disambigRelevances);
-                        await _examineService.UniversalCreateDisambigExaminedAsync(disambig, user, true, resulte, Operation.DisambigRelevances, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, disambig.Id, Operation.DisambigRelevances);
+                    //保存并尝试应用审核记录
+                    await _editRecordService.SaveAndApplyEditRecord(disambig, user, disambigRelevances, Operation.DisambigRelevances, model.Note,true);
 
-                    }
-                    else
-                    {
-                        await _examineService.UniversalCreateDisambigExaminedAsync(disambig, user, false, resulte, Operation.DisambigRelevances, model.Note);
-                    }
                 }
                 return new Result { Successful = true, Error = disambig.Id.ToString() };
             }
@@ -420,25 +398,10 @@ namespace CnGalWebSite.APIServer.Controllers
                         BackgroundPicture = model.BackgroundPicture,
                         SmallBackgroundPicture = model.SmallBackgroundPicture
                     };
-                    //序列化
-                    var resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, disambigMain);
-                        resulte = text.ToString();
-                    }
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEditDisambigMainAsync(disambig, disambigMain);
-                        await _examineService.UniversalEditDisambigExaminedAsync(disambig, user, true, resulte, Operation.DisambigMain, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, disambig.Id, Operation.DisambigMain);
-                    }
-                    else
-                    {
-                        await _examineService.UniversalEditDisambigExaminedAsync(disambig, user, false, resulte, Operation.DisambigMain, model.Note);
-                    }
+
+                    //保存并尝试应用审核记录
+                    await _editRecordService.SaveAndApplyEditRecord(disambig, user, disambigMain, Operation.DisambigMain, model.Note);
+
                 }
 
 
@@ -571,26 +534,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 //判断审核是否为空
                 if (disambigRelevances.Relevances.Count != 0)
                 {
-                    //序列化JSON
-                    var resulte = "";
-                    using (TextWriter text = new StringWriter())
-                    {
-                        var serializer = new JsonSerializer();
-                        serializer.Serialize(text, disambigRelevances);
-                        resulte = text.ToString();
-                    }
-                    //判断是否是管理员
-                    if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                    {
-                        await _examineService.ExamineEditDisambigRelevancesAsync(disambig, disambigRelevances);
-                        await _examineService.UniversalEditDisambigExaminedAsync(disambig, user, true, resulte, Operation.DisambigRelevances, model.Note);
-                        await _appHelper.AddUserContributionValueAsync(user.Id, disambig.Id, Operation.DisambigRelevances);
+                    //保存并尝试应用审核记录
+                    await _editRecordService.SaveAndApplyEditRecord(disambig, user, disambigRelevances, Operation.DisambigRelevances, model.Note);
 
-                    }
-                    else
-                    {
-                        await _examineService.UniversalEditDisambigExaminedAsync(disambig, user, false, resulte, Operation.DisambigRelevances, model.Note);
-                    }
                 }
                 return new Result { Successful = true, Error = disambig.Id.ToString() };
             }

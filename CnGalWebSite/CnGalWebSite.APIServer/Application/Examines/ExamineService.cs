@@ -68,11 +68,14 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly IRepository<UserCertification, long> _userCertificationRepository;
+        private readonly IRepository<UserMonitor, long> _userMonitorRepository;
+        private readonly IRepository<UserReviewEditRecord, long> _userReviewEditRecordRepository;
 
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Examine>, string, SortOrder, IEnumerable<Examine>>> SortLambdaCacheEntry = new();
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService,
+           IRepository<UserMonitor, long> userMonitorRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository,
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository, IRepository<Message, long> messageRepository,
         IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger, IRepository<Lottery, long> lotteryRepository,
@@ -105,6 +108,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _lotteryRepository = lotteryRepository;
             _voteRepository = voteRepository;
             _userCertificationRepository = userCertificationRepository;
+            _userMonitorRepository = userMonitorRepository;
+            _userReviewEditRecordRepository = userReviewEditRecordRepository;
         }
 
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "")
@@ -198,9 +203,25 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return dtos;
         }
 
-        public async Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListExamineAloneModel searchModel)
+        public async Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListExamineAloneModel searchModel,ApplicationUser user)
         {
-            var items = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
+             var items = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
+
+            //若不是管理员 则检查认证词条
+            if(await _userManager.IsInRoleAsync(user,"Admin")==false)
+            {
+                var userCertification = await _userCertificationRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.EntryId != null);
+                if(userCertification==null)
+                {
+                    items = items.Where(s => false);
+                }
+                else
+                {
+                    items = items.Where(s => s.EntryId == userCertification.EntryId);
+                }
+            }
+
+           
             // 处理高级搜索
             if (!string.IsNullOrWhiteSpace(searchModel.EntryId?.ToString()))
             {
@@ -2566,7 +2587,6 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.Type = ExaminedNormalListModelType.UserCertification;
 
             var userCertification = await _userCertificationRepository.GetAll().AsNoTracking()
-                .Include(s => s.Entry)
                 .Include(s => s.ApplicationUser)
                 .FirstOrDefaultAsync(s => s.ApplicationUserId == examine.ApplicationUserId);
 
@@ -2575,8 +2595,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 return false;
             }
 
+            model.ObjectName = userCertification.ApplicationUser.UserName;
             model.ObjectBriefIntroduction = userCertification.ApplicationUser.PersonalSignature;
             model.Image = _appHelper.GetImagePath(userCertification.ApplicationUser?.PhotoPath, "app.png");
+            model.IsThumbnail = true;
 
             //序列化数据
             UserCertificationMain userCertificationMain = null;
@@ -2589,11 +2611,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
-            if (userCertification.Entry != null)
+            var entry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == userCertificationMain.EntryId);
+
+            if (entry != null)
             {
                 model.AfterModel.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    entry = _appHelper.GetEntryInforTipViewModel(userCertification.Entry)
+                    entry = _appHelper.GetEntryInforTipViewModel(entry)
                 });
             }
 
@@ -2604,8 +2628,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 {
                     new KeyValueModel
                     {
-                        DisplayName="认证",
-                        DisplayValue=userCertification.Entry.DisplayName
+                        DisplayName="认证词条",
+                        DisplayValue=entry.DisplayName
+                    },
+                    new KeyValueModel
+                    {
+                        DisplayName="用户名",
+                        DisplayValue=userCertification.ApplicationUser.UserName
+                    },
+                    new KeyValueModel
+                    {
+                        DisplayName="用户Id",
+                        DisplayValue=userCertification.ApplicationUserId
                     }
                 }
             });
@@ -2626,6 +2660,85 @@ namespace CnGalWebSite.APIServer.Application.Examines
         #endregion
 
         #region 使审核记录真实作用在目标上
+
+        public async Task ApplyEditRecordToObject(object entry,object examine, Operation operation)
+        {
+            switch (operation)
+            {
+                case Operation.EstablishMain:
+                    await ExamineEstablishMainAsync(entry as Entry, examine as ExamineMain);
+                    break;
+                case Operation.EstablishAddInfor:
+                    await ExamineEstablishAddInforAsync(entry as Entry, examine as EntryAddInfor);
+                    break;
+                case Operation.EstablishImages:
+                    await ExamineEstablishImagesAsync(entry as Entry, examine as EntryImages);
+                    break;
+                case Operation.EstablishRelevances:
+                    await ExamineEstablishRelevancesAsync(entry as Entry, examine as EntryRelevances);
+                    break;
+                case Operation.EstablishTags:
+                    await ExamineEstablishTagsAsync(entry as Entry, examine as EntryTags);
+                    break;
+                case Operation.EstablishMainPage:
+                    await ExamineEstablishMainPageAsync(entry as Entry, examine as string);
+                    break;
+                case Operation.EstablishAudio:
+                    await ExamineEstablishAudioAsync(entry as Entry, examine as EntryAudioExamineModel);
+                    break;
+                case Operation.EditArticleMain:
+                    await ExamineEditArticleMainAsync(entry as Article, examine as ExamineMain);
+                    break;
+                case Operation.EditArticleRelevanes:
+                    await ExamineEditArticleRelevancesAsync(entry as Article, examine as ArticleRelevances);
+                    break;
+                case Operation.EditArticleMainPage:
+                    await ExamineEditArticleMainPageAsync(entry as Article, examine as string);
+                    break;
+                case Operation.EditTagMain:
+                    await ExamineEditTagMainAsync(entry as Tag, examine as ExamineMain);
+                    break;
+                case Operation.EditTagChildTags:
+                    await ExamineEditTagChildTagsAsync(entry as Tag, examine as TagChildTags);
+                    break;
+                case Operation.EditTagChildEntries:
+                    await ExamineEditTagChildEntriesAsync(entry as Tag, examine as TagChildEntries);
+                    break;
+                case Operation.DisambigMain:
+                    await ExamineEditDisambigMainAsync(entry as Disambig, examine as DisambigMain);
+                    break;
+                case Operation.DisambigRelevances:
+                    await ExamineEditDisambigRelevancesAsync(entry as Disambig, examine as DisambigRelevances);
+                    break;
+                case Operation.EditUserMain:
+                    await ExamineEditUserMainAsync(entry as ApplicationUser, examine as UserMain);
+                    break;
+                case Operation.UserMainPage:
+                    await ExamineEditUserMainPageAsync(entry as ApplicationUser, examine as string);
+                    break;
+                case Operation.EditPeripheryMain:
+                    await ExamineEditPeripheryMainAsync(entry as Periphery, examine as ExamineMain);
+                    break;
+                case Operation.EditPeripheryImages:
+                    await ExamineEditPeripheryImagesAsync(entry as Periphery, examine as PeripheryImages);
+                    break;
+                case Operation.EditPeripheryRelatedEntries:
+                    await ExamineEditPeripheryRelatedEntriesAsync(entry as Periphery, examine as PeripheryRelatedEntries);
+                    break;
+                case Operation.EditPeripheryRelatedPeripheries:
+                    await ExamineEditPeripheryRelatedPeripheriesAsync(entry as Periphery, examine as PeripheryRelatedPeripheries);
+                    break;
+                case Operation.PubulishComment:
+                    await ExaminePublishCommentTextAsync(entry as Comment, examine as CommentText);
+                    break;
+                case Operation.EditPlayedGameMain:
+                    await ExamineEditPlayedGameMainAsync(entry as PlayedGame, examine as PlayedGameMain);
+                    break;
+                case Operation.RequestUserCertification:
+                    await ExamineEditUserCertificationMainAsync(entry as UserCertification, examine as UserCertificationMain);
+                    break;
+            }
+        }
 
         #region 词条
         public async Task ExamineEstablishMainAsync(Entry entry, ExamineMain examine)
@@ -2710,11 +2823,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //更新完善度
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
-            var admin = new ApplicationUser
-            {
-                Id = _configuration["ExamineAdminId"],
-                UserName = "看板娘"
-            };
+            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
 
             //反向关联 词条
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Entry))
@@ -2838,11 +2947,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             await _articleService.UpdateArticleDataRelevances(article, examine);
             _ = await _articleRepository.UpdateAsync(article);
 
-            var admin = new ApplicationUser
-            {
-                Id = _configuration["ExamineAdminId"],
-                UserName = "看板娘"
-            };
+            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
             //反向关联 文章
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Article))
             {
@@ -2922,13 +3027,6 @@ namespace CnGalWebSite.APIServer.Application.Examines
         #endregion
 
         #region 标签
-        public async Task ExamineTagAsync(Tag tag, TagEdit examine)
-        {
-            await _tagService.UpdateTagDataOldAsync(tag, examine);
-
-            _ = await _tagRepository.UpdateAsync(tag);
-        }
-
         public async Task ExamineEditTagMainAsync(Tag tag, ExamineMain examine)
         {
             await _tagService.UpdateTagDataMainAsync(tag, examine);
@@ -2976,6 +3074,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             _ = await _userRepository.UpdateAsync(user);
         }
+
         public async Task ExamineEditUserMainPageAsync(ApplicationUser user, string examine)
         {
             await _userService.UpdateUserDataMainPage(user, examine);
@@ -3157,12 +3256,118 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         #region 将审核记录添加到数据库
 
-        public async Task UniversalEditExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> AddEditRecordAsync(object entry, ApplicationUser user, object examineData, Operation operation, string note, bool isAdmin, bool isCreating = false)
         {
+            //序列化审核数据
+            var resulte = "";
+            if (operation == Operation.EstablishMainPage)
+            {
+                resulte = examineData as string;
+            }
+            else
+            {
+                using TextWriter text = new StringWriter();
+                var serializer = new JsonSerializer();
+                serializer.Serialize(text, examineData);
+                resulte = text.ToString();
+            }
+
+            //添加到数据库
+            if (entry is Entry)
+            {
+                if (isCreating)
+                {
+                    return await UniversalEstablishExaminedAsync(entry as Entry, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditExaminedAsync(entry as Entry, user, isAdmin, resulte, operation, note);
+                }
+            }
+            else if (entry is Article)
+            {
+                if (isCreating)
+                {
+                    return await UniversalCreateArticleExaminedAsync(entry as Article, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditArticleExaminedAsync(entry as Article, user, isAdmin, resulte, operation, note);
+                }
+            }
+            else if (entry is Article)
+            {
+                if (isCreating)
+                {
+                    return await UniversalCreateArticleExaminedAsync(entry as Article, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditArticleExaminedAsync(entry as Article, user, isAdmin, resulte, operation, note);
+                }
+            }
+            else if (entry is Tag)
+            {
+                if (isCreating)
+                {
+                    return await UniversalCreateTagExaminedAsync(entry as Tag, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditTagExaminedAsync(entry as Tag, user, isAdmin, resulte, operation, note);
+                }
+            }
+            else if (entry is Disambig)
+            {
+                if (isCreating)
+                {
+                    return await UniversalCreateDisambigExaminedAsync(entry as Disambig, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditDisambigExaminedAsync(entry as Disambig, user, isAdmin, resulte, operation, note);
+                }
+            }
+            else if (entry is ApplicationUser)
+            {
+                return await UniversalEditUserExaminedAsync(entry as ApplicationUser, isAdmin, resulte, operation, note);
+            }
+            else if (entry is Periphery)
+            {
+                if (isCreating)
+                {
+                    return await UniversalCreatePeripheryExaminedAsync(entry as Periphery, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditPeripheryExaminedAsync(entry as Periphery, user, isAdmin, resulte, operation, note);
+                }
+            }
+            else if (entry is Comment)
+            {
+                return await UniversalCommentExaminedAsync(entry as Comment, user, isAdmin, resulte, operation, note);
+            }
+            else if (entry is PlayedGame)
+            {
+                return await UniversalEditPlayedGameExaminedAsync(entry as PlayedGame, user, isAdmin, resulte, operation, note);
+            }
+            else if (entry is UserCertification)
+            {
+                return await UniversalEditUserCertificationExaminedAsync(entry as UserCertification, user, isAdmin, resulte, operation, note);
+            }
+            else
+            {
+                throw new Exception("不支持的类型");
+            }
+        }
+
+        public async Task<Examine> UniversalEditExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                 examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3174,18 +3379,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PassedAdminName = user.UserName,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserEntryActiveExamineAsync(entry.Id, user.Id, operation);
+                examine = await GetUserEntryActiveExamineAsync(entry.Id, user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3201,20 +3406,24 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Note = note
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
 
+
             //log
             _logger.LogInformation("{User}({Id})对 词条 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, entry.Name, entry.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
+            return examine;
         }
 
-        public async Task<bool> UniversalEstablishExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEstablishExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3226,7 +3435,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -3238,13 +3447,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     var examine_1 = await GetUserEntryActiveExamineAsync(entry.Id, user.Id, Operation.EstablishMain);
                     if (examine_1 == null)
                     {
-                        return false;
+                        throw new Exception("前置审核不存在");
                     }
                     examineId = examine_1.Id;
                 }
 
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3256,21 +3465,22 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             //log
             _logger.LogInformation("{User}({Id})创建词条({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, entry.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
-            return true;
+            return examine;
         }
 
-        public async Task UniversalEditArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3281,18 +3491,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserArticleActiveExamineAsync(article.Id, user.Id, operation);
+                examine = await GetUserArticleActiveExamineAsync(article.Id, user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3307,20 +3517,22 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         ApplicationUserId = user.Id,
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
             //log
             _logger.LogInformation("{User}({Id})对 文章 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, article.Name, article.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
+            return examine;
         }
 
-        public async Task<bool> UniversalCreateArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalCreateArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3332,7 +3544,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -3344,13 +3556,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     var examine_1 = await GetUserArticleActiveExamineAsync(article.Id, user.Id, Operation.EditArticleMain);
                     if (examine_1 == null)
                     {
-                        return false;
+                        throw new Exception("前置审核不存在");
                     }
                     examineId = examine_1.Id;
                 }
 
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3362,22 +3574,23 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
 
             //log
             _logger.LogInformation("{User}({Id})创建文章({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, article.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
-            return true;
+            return examine;
         }
 
-        public async Task<bool> UniversalCreateTagExaminedAsync(Tag tag, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalCreateTagExaminedAsync(Tag tag, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                 examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3389,7 +3602,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -3401,13 +3614,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     var examine_1 = await GetUserTagActiveExamineAsync(tag.Id, user.Id, Operation.EditTagMain);
                     if (examine_1 == null)
                     {
-                        return false;
+                        throw new Exception("前置审核不存在");
                     }
                     examineId = examine_1.Id;
                 }
 
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3419,21 +3632,22 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             //log
             _logger.LogInformation("{User}({Id})创建标签({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, tag.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
-            return true;
+            return examine;
         }
 
-        public async Task UniversalEditTagExaminedAsync(Tag tag, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditTagExaminedAsync(Tag tag, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                 examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3444,18 +3658,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserTagActiveExamineAsync(tag.Id, user.Id, operation);
+                examine = await GetUserTagActiveExamineAsync(tag.Id, user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3470,22 +3684,24 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         ApplicationUserId = user.Id,
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
 
             //log
             _logger.LogInformation("{User}({Id})对 标签 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, tag.Name, tag.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
+            return examine;
         }
 
 
-        public async Task<bool> UniversalCreateDisambigExaminedAsync(Disambig disambig, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalCreateDisambigExaminedAsync(Disambig disambig, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3497,7 +3713,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -3509,13 +3725,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     var examine_1 = await GetUserDisambigActiveExamineAsync(disambig.Id, user.Id, Operation.DisambigMain);
                     if (examine_1 == null)
                     {
-                        return false;
+                        throw new Exception("前置审核不存在");
                     }
                     examineId = examine_1.Id;
                 }
 
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3527,22 +3743,23 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             //log
             _logger.LogInformation("{User}({Id})创建消歧义页({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, disambig.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
 
-            return true;
+            return examine;
         }
 
-        public async Task UniversalEditDisambigExaminedAsync(Disambig disambig, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditDisambigExaminedAsync(Disambig disambig, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3553,18 +3770,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserDisambigActiveExamineAsync(disambig.Id, user.Id, operation);
+                examine = await GetUserDisambigActiveExamineAsync(disambig.Id, user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3579,21 +3796,23 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         ApplicationUserId = user.Id,
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
 
             //log
             _logger.LogInformation("{User}({Id})对 消歧义页 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, disambig.Name, disambig.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
+            return examine;
         }
 
-        public async Task UniversalEditUserExaminedAsync(ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditUserExaminedAsync(ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3604,18 +3823,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserInforActiveExamineAsync(user.Id, operation);
+                examine = await GetUserInforActiveExamineAsync(user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3630,21 +3849,23 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Note = note
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
 
             //log
             _logger.LogInformation("{User}({Id})对个人资料进行{Operation}操作{Admin}", user.UserName, user.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
+            return examine;
         }
 
-        public async Task<bool> UniversalCreatePeripheryExaminedAsync(Periphery periphery, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalCreatePeripheryExaminedAsync(Periphery periphery, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3656,7 +3877,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -3668,13 +3889,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     var examine_1 = await GetUserPeripheryActiveExamineAsync(periphery.Id, user.Id, Operation.EditPeripheryMain);
                     if (examine_1 == null)
                     {
-                        return false;
+                        throw new Exception("前置审核不存在");
                     }
                     examineId = examine_1.Id;
                 }
 
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3686,21 +3907,22 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             //log
             _logger.LogInformation("{User}({Id})创建周边({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, periphery.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
-            return true;
+            return examine;
         }
 
-        public async Task UniversalEditPeripheryExaminedAsync(Periphery periphery, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditPeripheryExaminedAsync(Periphery periphery, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3711,18 +3933,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserPeripheryActiveExamineAsync(periphery.Id, user.Id, operation);
+                examine = await GetUserPeripheryActiveExamineAsync(periphery.Id, user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3737,7 +3959,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         ApplicationUserId = user.Id,
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
 
@@ -3745,14 +3967,16 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //log
             _logger.LogInformation("{User}({Id})对 周边 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, periphery.Name, periphery.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
+            return examine;
         }
 
-        public async Task UniversalCommentExaminedAsync(Comment comment, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalCommentExaminedAsync(Comment comment, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3764,11 +3988,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
-                var examine = new Examine
+                 examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3780,16 +4004,21 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     Note = note
                 };
                 //添加到审核列表
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
+            //log
+            _logger.LogInformation("{User}({Id})发表评论({EntryId}) {Admin}", user.UserName, user.Id, comment.Id, isAdmin ? "(管理员身份忽略审核)" : "");
+
+            return examine;
         }
 
-        public async Task UniversalEditPlayedGameExaminedAsync(PlayedGame playedGame, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditPlayedGameExaminedAsync(PlayedGame playedGame, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3801,18 +4030,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserPlayedGameActiveExamineAsync(playedGame.Id, user.Id, operation);
+                examine = await GetUserPlayedGameActiveExamineAsync(playedGame.Id, user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3828,17 +4057,22 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Note = note
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
+            //log
+            _logger.LogInformation("{User}({Id})编辑游玩记录({EntryId}) {Admin}", user.UserName, user.Id, playedGame.Id,isAdmin ? "(管理员身份忽略审核)" : "");
+
+            return examine;
         }
 
-        public async Task UniversalEditUserCertificationExaminedAsync(UserCertification userCertification, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditUserCertificationExaminedAsync(UserCertification userCertification, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3849,18 +4083,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserUserCertificationActiveExamineAsync(user.Id, operation);
+                examine = await GetUserUserCertificationActiveExamineAsync(user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3875,9 +4109,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Note = note
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
+            //log
+            _logger.LogInformation("{User}({Id})申请用户认证 {Admin}", user.UserName, user.Id, isAdmin ? "(管理员身份忽略审核)" : "");
+
+            return examine;
         }
 
 
@@ -3944,13 +4182,15 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     }
 
                     _ = await UniversalEstablishExaminedAsync(entry, user, true, resulte, item.Value, note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, item.Value);
                 }
                 else
                 {
                     _ = await UniversalEstablishExaminedAsync(entry, user, false, resulte, item.Value, note);
                 }
             }
+
+            //更新用户积分
+            await _userService.UpdateUserIntegral(user);
 
             return entry;
         }
@@ -4005,13 +4245,14 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     }
 
                     _ = await UniversalCreateArticleExaminedAsync(article, user, true, resulte, item.Value, note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, article.Id, item.Value);
                 }
                 else
                 {
                     _ = await UniversalCreateArticleExaminedAsync(article, user, false, resulte, item.Value, note);
                 }
             }
+            //更新用户积分
+            await _userService.UpdateUserIntegral(user);
 
             return article;
         }
@@ -4063,13 +4304,14 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     }
 
                     _ = await UniversalCreatePeripheryExaminedAsync(periphery, user, true, resulte, item.Value, note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, periphery.Id, item.Value);
                 }
                 else
                 {
                     _ = await UniversalCreatePeripheryExaminedAsync(periphery, user, false, resulte, item.Value, note);
                 }
             }
+            //更新用户积分
+            await _userService.UpdateUserIntegral(user);
 
             return periphery;
         }
@@ -4118,13 +4360,14 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     }
 
                     _ = await UniversalCreateTagExaminedAsync(tag, user, true, resulte, item.Value, note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, tag.Id, item.Value);
                 }
                 else
                 {
                     _ = await UniversalCreateTagExaminedAsync(tag, user, false, resulte, item.Value, note);
                 }
             }
+            //更新用户积分
+            await _userService.UpdateUserIntegral(user);
 
             return tag;
         }
@@ -5519,7 +5762,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         /// 刷新词条Staff关联
         /// </summary>
         /// <returns></returns>
-        public async Task RefreshEntryStaffRelevances(int id,bool autoCreate, PositionGeneralType type)
+        public async Task RefreshEntryStaffRelevances(int id, bool autoCreate, PositionGeneralType type)
         {
             var currentEntry = await _entryRepository.GetAll()
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
@@ -5536,7 +5779,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             //遍历Staff
 
-            foreach (var item in entry.EntryStaffFromEntryNavigation.Where(s => s.ToEntryNavigation == null && string.IsNullOrWhiteSpace(s.Name) == false&&s.PositionGeneral == type))
+            foreach (var item in entry.EntryStaffFromEntryNavigation.Where(s => s.ToEntryNavigation == null && string.IsNullOrWhiteSpace(s.Name) == false && s.PositionGeneral == type))
             {
                 var newEntry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.Name/*&&(s.Type== EntryType.ProductionGroup||s.Type== EntryType.Staff)*/);
                 if (newEntry == null)
@@ -5552,13 +5795,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         };
                         try
                         {
-                        newEntry = await AddNewEntryExaminesAsync(newEntry, admin, "自动创建Staff");
-                        _logger.LogInformation("自动创建词条 - {Name}({Id}) 的Staff - {Staff}", entry.Name, entry.Id, newEntry.Name);
+                            newEntry = await AddNewEntryExaminesAsync(newEntry, admin, "自动创建Staff");
+                            _logger.LogInformation("自动创建词条 - {Name}({Id}) 的Staff - {Staff}", entry.Name, entry.Id, newEntry.Name);
 
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
-                            _logger.LogError(ex,"自动创建词条失败 - {Name}({Id}) 的Staff - {Staff}", entry.Name, entry.Id, newEntry.Name);
+                            _logger.LogError(ex, "自动创建词条失败 - {Name}({Id}) 的Staff - {Staff}", entry.Name, entry.Id, newEntry.Name);
 
                         }
 
@@ -5593,18 +5836,29 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
             try
             {
-            await ExamineEstablishAddInforAsync(currentEntry, examine.Key as EntryAddInfor);
-            await UniversalEditExaminedAsync(currentEntry, admin, true, resulte, Operation.EstablishAddInfor, "自动创建Staff");
-            await _appHelper.AddUserContributionValueAsync(admin.Id, currentEntry.Id, Operation.EstablishAddInfor);
+                await ExamineEstablishAddInforAsync(currentEntry, examine.Key as EntryAddInfor);
+                await UniversalEditExaminedAsync(currentEntry, admin, true, resulte, Operation.EstablishAddInfor, "自动创建Staff");
+                await _userService.UpdateUserIntegral(admin);
 
-            _logger.LogInformation("成功刷新词条 - {Name}({Id}) 的Staff关联", entry.Name, entry.Id);
-
-
+                _logger.LogInformation("成功刷新词条 - {Name}({Id}) 的Staff关联", entry.Name, entry.Id);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogError(ex,"刷新词条 - {Name}({Id}) 的Staff关联失败", entry.Name, entry.Id);
+                _logger.LogError(ex, "刷新词条 - {Name}({Id}) 的Staff关联失败", entry.Name, entry.Id);
             }
+        }
+
+        #endregion
+
+        #region 监视
+
+        /// <summary>
+        /// 将用户监视的添加到其审阅列表中
+        /// </summary>
+        /// <returns></returns>
+        public async Task AddExamineToUserReviewList(Examine examine)
+        {
+
         }
 
         #endregion

@@ -29,6 +29,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
         public string PassedAdminName { get; set; }
 
+        public bool IsAdmin { get; set; }
+
         [Display(Name = "批注")]
         public string Comments { get; set; }
 
@@ -37,8 +39,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         public string UserId { get; set; }
 
         public string UserName { get; set; }
-
-        public ExaminedNormalListModelType ObjectType { get; set; }
 
         public ExaminePreDataModel BeforeModel { get; set; } = new ExaminePreDataModel();
 

@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.APIServer.Application.Entries;
+using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Tags;
 using CnGalWebSite.APIServer.DataReositories;
@@ -37,9 +38,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ITagService _tagService;
         private readonly IEntryService _entryService;
         private readonly IExamineService _examineService;
+        private readonly IEditRecordService _editRecordService;
 
-        public TagsAPIController(UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<Tag, int> tagRepository, ITagService tagService,
-            IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<Examine, long> examineRepository, IEntryService entryService)
+        public TagsAPIController(UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<Tag, int> tagRepository, ITagService tagService, IEditRecordService editRecordService,
+        IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<Examine, long> examineRepository, IEntryService entryService)
         {
             _userManager = userManager;
             _tagRepository = tagRepository;
@@ -49,6 +51,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _examineService = examineService;
             _examineRepository = examineRepository;
             _entryService = entryService;
+            _editRecordService = editRecordService;
         }
 
 
@@ -450,25 +453,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EditTagMain);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEditTagMainAsync(currentTag, examine.Key as ExamineMain);
-                await _examineService.UniversalEditTagExaminedAsync(currentTag, user, true, resulte, Operation.EditTagMain, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentTag.Id, Operation.EditTagMain);
-            }
-            else
-            {
-                await _examineService.UniversalEditTagExaminedAsync(currentTag, user, false, resulte, Operation.EditTagMain, model.Note);
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentTag, user, examine.Key, Operation.EditTagMain, model.Note);
 
 
             return new Result { Successful = true };
@@ -570,25 +557,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EditTagChildTags);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEditTagChildTagsAsync(currentTag, examine.Key as TagChildTags);
-                await _examineService.UniversalEditTagExaminedAsync(currentTag, user, true, resulte, Operation.EditTagChildTags, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentTag.Id, Operation.EditTagChildTags);
-            }
-            else
-            {
-                await _examineService.UniversalEditTagExaminedAsync(currentTag, user, false, resulte, Operation.EditTagChildTags, model.Note);
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentTag, user, examine.Key, Operation.EditTagChildTags, model.Note);
 
 
             return new Result { Successful = true };
@@ -690,25 +661,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = true };
             }
             var examine = examines.FirstOrDefault(s => s.Value == Operation.EditTagChildEntries);
-            //序列化
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, examine.Key);
-                resulte = text.ToString();
-            }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEditTagChildEntriesAsync(currentTag, examine.Key as TagChildEntries);
-                await _examineService.UniversalEditTagExaminedAsync(currentTag, user, true, resulte, Operation.EditTagChildEntries, model.Note);
-                await _appHelper.AddUserContributionValueAsync(user.Id, currentTag.Id, Operation.EditTagChildEntries);
-            }
-            else
-            {
-                await _examineService.UniversalEditTagExaminedAsync(currentTag, user, false, resulte, Operation.EditTagChildEntries, model.Note);
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(currentTag, user, examine.Key, Operation.EditTagChildEntries, model.Note);
 
             return new Result { Successful = true };
 

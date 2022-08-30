@@ -114,16 +114,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
             return str.Length < length * 2.5 ? str : string.Concat(str.AsSpan(0, (int)(length * 2.5)), "......");
         }
 
-        public async Task AddUserContributionValueAsync(string userId, long otherId, Operation operation)
-        {
-            //更新用户积分
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
-            {
-                await UpdateUserIntegral(user);
-            }
-        }
-
         public async Task<bool> IsArticleLockedAsync(long articleId, string userId, Operation operation)
         {
             return await _examineRepository.FirstOrDefaultAsync(s => s.ArticleId == articleId && s.ApplicationUserId != userId && s.IsPassed == null && s.Operation == operation) != null;
@@ -878,65 +868,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             return Markdown.ToHtml(str, pipeline);
         }
 
-        public async Task UpdateUserIntegral(ApplicationUser user)
-        {
-            //计算积分
-            //编辑 词条  标签  消歧义页  评论  发表文章 游玩记录
-            //积分  10    8      2         5     50       50
-            //
-            var signInDaysIntegral = 5;
-            var entryIntegral = 50;
-
-            var tagIntegral = signInDaysIntegral * 6;
-            var disambigIntegral = signInDaysIntegral * 6;
-            var peripheryIntegral = entryIntegral;
-            var commentIntegral = signInDaysIntegral;
-            var commentLimited = 5;
-            var articleIntegral = entryIntegral;
-            var playedGameIntegral = entryIntegral;
-
-            try
-            {
-                //编辑
-                var temp_1 = await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.IsPassed == true)
-                 .Select(n => new { Time = n.ApplyTime.Date, n.EntryId, n.TagId, n.ArticleId, n.CommentId, n.DisambigId, n.PeripheryId })
-                 // 分类
-                 .ToListAsync();
-                // 返回汇总样式
-                var temp_2 = temp_1.GroupBy(s => s.Time);
-                var integral_1 = (temp_2.Select(s => s.Where(s => s.EntryId != null).GroupBy(s => s.EntryId).Count()).Sum() * entryIntegral)
-                                  + (temp_2.Select(s => s.Where(s => s.TagId != null).GroupBy(s => s.TagId).Count()).Sum() * tagIntegral)
-                                  + (temp_2.Select(s => s.Where(s => s.DisambigId != null).GroupBy(s => s.DisambigId).Count()).Sum() * disambigIntegral)
-                                  + (temp_2.Select(s => s.Where(s => s.PeripheryId != null).GroupBy(s => s.PeripheryId).Count()).Sum() * peripheryIntegral)
-                                  + (temp_2.Select(s => s.Where(s => s.CommentId != null).GroupBy(s => s.DisambigId)
-                                            .Select(s => s.Count() > commentLimited ? commentLimited : s.Count()).Sum()).Sum() * commentLimited);
-
-
-                //发表文章
-                var integral_2 = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id) * articleIntegral;
-                //签到
-                var integral_3 = await _signInDayRepository.CountAsync(s => s.ApplicationUserId == user.Id) * signInDaysIntegral;
-
-                var integral_4 = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.Integral).Select(s => s.Count).SumAsync();
-                //发表文章
-                var integral_5 = await _playedGameRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.ShowPublicly && string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength) * playedGameIntegral;
-
-                user.DisplayIntegral = integral_1 + integral_2 + integral_3 + integral_4 + integral_5;
-
-
-                //计算贡献值
-
-                var contributionValue_1 = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.ContributionValue).Select(s => s.Count).SumAsync();
-
-                user.DisplayContributionValue = contributionValue_1 + await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).SumAsync(s => s.ContributionValue);
-
-                _ = await _userManager.UpdateAsync(user);
-            }
-            catch (Exception)
-            {
-
-            }
-        }
+       
 
         public async Task<long> GetUserIntegral(string userId, DateTime time)
         {

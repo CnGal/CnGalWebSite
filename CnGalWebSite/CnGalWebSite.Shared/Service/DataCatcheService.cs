@@ -407,6 +407,7 @@ namespace CnGalWebSite.Shared.Service
             TagIndexPageCatche.Clean();
             PlayedGameOverviewDataCatche.Clean();
 
+            UserContentCenterCatche = null;
             LoginKey = null;
             ThirdPartyLoginTempModel = null;
             UserInfor = new UserInforViewModel { Ranks = new List<RankViewModel>() };

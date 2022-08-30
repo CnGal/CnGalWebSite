@@ -4,37 +4,47 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
+@if (noData)
+{
+    <div class="p-4" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+        <div style="width: 100%;">
+            <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;margin-left: 15%;margin-right: 15%;">
+            <div class="h5 text-center mt-4" style=" font-weight: 600;">
+                找不到数据欸......
+                可以尝试申请 <a href="/space/editdata" class="alert-link">用户认证</a> 哦~
+            </div>
+        </div>
+    </div>
+}
+else
+{
 
-<Table TItem="ListExamineAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelExamine" ShowSearch="true" @ref="TableRows"
-       ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true" IsAutoRefresh="@IsAutoRefresh">
-    <TableToolbarTemplate>
-        <TableToolbarButton TItem="ListExamineAloneModel" Color="Color.Success" Icon="fa fa-paper-plane-o" Text="通过审核" OnClickCallback="OnPassedExamineClick" IsAsync="true" />
-        <TableToolbarButton TItem="ListExamineAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="驳回审核" OnClickCallback="OnUnPassedExamineClick" IsAsync="true" />
-    </TableToolbarTemplate>
-    <TableColumns>
-        <TableColumn @bind-Field="@context.Id" Sortable="true" Fixed="true" Width="60" DefaultSortOrder="@SortOrder.Desc" />
-        <TableColumn @bind-Field="@context.Operation" Sortable="true" Searchable="true" Width="200" />
-        <TableColumn @bind-Field="@context.IsPassed" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="120" Lookup="DataSource" />
-        <TableColumn @bind-Field="@context.PassedTime" Sortable="true" TextWrap="true" Width="180" />
+    <Table TItem="ListExamineAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelExamine" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true" IsAutoRefresh="@IsAutoRefresh">
+        <TableToolbarTemplate>
+            <TableToolbarButton TItem="ListExamineAloneModel" Color="Color.Success" Icon="fa fa-paper-plane-o" Text="通过审核" OnClickCallback="OnPassedExamineClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListExamineAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="驳回审核" OnClickCallback="OnUnPassedExamineClick" IsAsync="true" />
+        </TableToolbarTemplate>
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable="true" Fixed="true" Width="60" DefaultSortOrder="@SortOrder.Desc" />
+            <TableColumn @bind-Field="@context.Operation" Sortable="true" Searchable="true" Width="200" />
+            <TableColumn @bind-Field="@context.IsPassed" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="120" Lookup="DataSource" />
+            <TableColumn @bind-Field="@context.PassedTime" Sortable="true" TextWrap="true" Width="180" />
 
-        <TableColumn @bind-Field="@context.ApplyTime" Sortable="true" TextWrap="true" Width="180" />
+            <TableColumn @bind-Field="@context.ApplyTime" Sortable="true" TextWrap="true" Width="180" />
 
 
-        <TableColumn @bind-Field="@context.UserName" Searchable="true" Sortable="true" Width="300" />
-        <TableColumn @bind-Field="@context.PassedAdminName" Searchable="true" TextWrap="true" Sortable="true" Width="200" />
+            <TableColumn @bind-Field="@context.UserName" Searchable="true" Sortable="true" Width="300" />
+            <TableColumn @bind-Field="@context.PassedAdminName" Searchable="true" TextWrap="true" Sortable="true" Width="200" />
+            <TableColumn @bind-Field="@context.Comments" Sortable="true" TextWrap="true" Searchable="true" Width="350" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.Id))" />
+        </RowButtonTemplate>
+    </Table>
+}
 
-        <TableColumn @bind-Field="@context.ContributionValue" Sortable="true" Width="110" />
-        <TableColumn @bind-Field="@context.EntryId" Searchable="true" Sortable="true" Width="110" />
-
-        <TableColumn @bind-Field="@context.TagId" Searchable="true" Sortable="true" Width="110" />
-        <TableColumn @bind-Field="@context.ArticleId" Searchable="true" Sortable="true" Width="110" />
-        <TableColumn @bind-Field="@context.Comments" Sortable="true" TextWrap="true" Searchable="true" Width="350" />
-    </TableColumns>
-    <RowButtonTemplate>
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.Id))" />
-    </RowButtonTemplate>
-</Table>
 
 @code {
     [NotNull]
@@ -59,6 +69,9 @@
     public ErrorHandler ErrorHandler { get; set; }
 
 
+    bool isFirst = true;
+    bool noData;
+
     protected override async Task OnInitializedAsync()
     {
 
@@ -73,11 +86,28 @@
 
             var result = await Http.PostAsJsonAsync<ExaminesPagesInfor>(ToolHelper.WebApiPath + "api/examines/GetExamineList", new ExaminesPagesInfor { SearchModel = SearchModelExamine, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
-            return JsonSerializer.Deserialize<QueryData<ListExamineAloneModel>>(jsonContent, ToolHelper.options);
+
+
+            var data = JsonSerializer.Deserialize<QueryData<ListExamineAloneModel>>(jsonContent, ToolHelper.options);
+
+            if (isFirst)
+            {
+                if (data.TotalCount == 0)
+                {
+                    noData = true;
+                }
+            }
+
+            isFirst = false;
+
+            StateHasChanged();
+
+            return data;
         }
         catch (Exception exc)
         {
             await ToastService.Error("无法获取审核列表", "未知异常，请在确保网络正常后联系开发人员");
+            noData = true;
             return new QueryData<ListExamineAloneModel>();
         }
     }

@@ -1,0 +1,220 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@inject ToastService ToastService
+@inject HttpClient Http
+@inject IPopupService PopupService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="用户认证" Icon="fa fa-fw fa-university" Class="h-100">
+    <div style="display: flex; flex-direction: column; justify-content: space-between;">
+        @if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName))
+        {
+            <span>认证后可以审核对应词条的编辑</span>
+        }
+        else
+        {
+            <span>认证：@Model.UserCertificationModel.EntryName</span>
+            @if (Model.UserCertificationModel.IsPending)
+            {
+                <span>审核中</span>
+            }
+
+        }
+
+
+        <div style="display: flex; justify-content: flex-end;">
+            <div>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnOpenDialog">
+                    <MIcon Left>@(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "mdi-link-variant" : "mdi-link-variant-plus ")</MIcon>
+                    @(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "认证" : "更换认证")
+                </MButton>
+            </div>
+            @if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) == false)
+            {
+                <div>
+                    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickUnBind">
+                        <MIcon Left>mdi-link-variant-off</MIcon>
+                        取消认证
+                    </MButton>
+                </div>
+            }
+
+
+        </div>
+    </div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification @ref="humanMachineVerification" OnVerficated="OnVerficated" />
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            用户认证
+        </MCardTitle>
+        <MCardText>
+            选择认证的词条，认证为一对一关系，可以在下方上传并填写身份证明
+        </MCardText>
+        <MCardText Style="color:black;">
+            <div class="row">
+                <div class="col-12  col-sm-6">
+                    <Select TValue="EntryType" Value="Model.UserCertificationModel.Type" ValueChanged="OnTypeChanged" ShowLabel="true" DisplayText="类型"></Select>
+                </div>
+                @if (Model.UserCertificationModel.Type == EntryType.Game)
+                {
+                    <div class="col-12  col-sm-6">
+                        <AutoComplete Items="@GameItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.UserCertificationModel.EntryName" DisplayText="认证的词条" ShowLabel="true" />
+                    </div>
+                }
+                else if (Model.UserCertificationModel.Type == EntryType.Staff)
+                {
+                    <div class="col-12  col-sm-6">
+                        <AutoComplete Items="@StaffItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.UserCertificationModel.EntryName" DisplayText="认证的词条" ShowLabel="true" />
+                    </div>
+                }
+                else if (Model.UserCertificationModel.Type == EntryType.Role)
+                {
+                    <div class="col-12  col-sm-6">
+                        <AutoComplete Items="@RoleItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.UserCertificationModel.EntryName" DisplayText="认证的词条" ShowLabel="true" />
+                    </div>
+                }
+                else if (Model.UserCertificationModel.Type == EntryType.ProductionGroup)
+                {
+                    <div class="col-12  col-sm-6">
+                        <AutoComplete Items="@GroupItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.UserCertificationModel.EntryName" DisplayText="认证的词条" ShowLabel="true" />
+                    </div>
+                }
+
+                <div class="mt-4" style=" margin-bottom: -10px;">
+                    备注
+                </div>
+                <div class="col-12">
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMarkdown @bind-Context="@Model.UserCertificationModel.Note" Mode="MarkdownEditorMode.wysiwyg" Class="mb-4 mt-4" />
+                </div>
+            </div>
+        </MCardText>
+
+        <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
+            <MSpacer></MSpacer>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="提交" IsAsync="true" OnClick="OnClickBind" Icon="mdi-check" Color="green" TextStyle />
+        </MCardActions>
+    </MCard>
+</MDialog>
+@code {
+    [Parameter]
+    public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    public IEnumerable<string> GameItems { get; set; }
+    public IEnumerable<string> StaffItems { get; set; }
+    public IEnumerable<string> GroupItems { get; set; }
+    public IEnumerable<string> RoleItems { get; set; }
+
+    bool Dialog { get; set; }
+
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification humanMachineVerification;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool isReady;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取所有词条
+            GameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Game);
+            StaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Staff);
+            GroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.ProductionGroup);
+            RoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Role);
+
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
+        }
+    }
+
+    public async Task OnClickUnBind()
+    {
+
+        Model.UserCertificationModel.Note = null;
+        Model.UserCertificationModel.EntryName = null;
+
+        await humanMachineVerification.StartVerification();
+    }
+    public async Task OnClickBind()
+    {
+        if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName))
+        {
+            await PopupService.ToastAsync("请填写需要认证的词条", AlertTypes.Error);
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.Note))
+        {
+            await PopupService.ToastAsync("请填写一些有助于身份认证的信息", AlertTypes.Error);
+            return;
+        }
+
+        await humanMachineVerification.StartVerification();
+    }
+
+    public Task OnOpenDialog()
+    {
+        Dialog = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public async Task OnVerficated(HumanMachineVerificationResult model)
+    {
+        if (model.Success == false)
+        {
+            return;
+        }
+
+        await ProcUserCertification(model);
+
+
+    }
+
+    public async Task ProcUserCertification(HumanMachineVerificationResult model)
+    {
+        try
+        {
+            Model.UserCertificationModel.Verification = model;
+
+            var result = await Http.PostAsJsonAsync<EditUserCertificationModel>(ToolHelper.WebApiPath + "api/space/EditUserCertification", Model.UserCertificationModel);
+
+
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await PopupService.ToastAsync(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "取消认证失败" : "已提交用户认证申请失败", AlertTypes.Error);
+            }
+            else
+            {
+                await PopupService.ToastAsync(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "已取消认证" : "已提交用户认证申请，等待审核通过", AlertTypes.Success);
+                Model.UserCertificationModel.IsPending = true;
+                Dialog = false;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取身份识别码失败");
+        }
+    }
+
+    public Task OnTypeChanged(EntryType type)
+    {
+        Model.UserCertificationModel.Type = type;
+
+        StateHasChanged();
+
+        return Task.CompletedTask;
+    }
+}

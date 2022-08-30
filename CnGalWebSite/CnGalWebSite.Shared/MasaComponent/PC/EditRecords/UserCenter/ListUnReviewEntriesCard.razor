@@ -6,7 +6,7 @@
     <div class="row">
         @foreach (var item in Model.Skip((CurrentPage - 1) * MaxCount).Take(MaxCount))
         {
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2 mb-4">
                 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.InforCard Model="item" />
             </div>
         }

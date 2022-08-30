@@ -2,6 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
 @inject IDataCacheService _dataCacheService
+@inject ToastService ToastService
 
 <MMenu OffsetY CloseOnContentClick="false" Value="Menu" ValueChanged="ValueChanged">
     <ActivatorContent Context="m">
@@ -51,6 +52,29 @@
                             <EditHiddenButton IsHidden="IsHidden" IsHiddenChanged="IsHiddenChanged" Id="Id" Type="Type" />
                         </Authorized>
                     </AuthorizeView>
+                    @if (Type == ExaminedNormalListModelType.Entry)
+                    {
+                        <AuthorizeView>
+                            <Authorized>
+                                @if (isInMonitor)
+                                {
+                                    <MButton Text Block Color="success" OnClick="@(()=>SetMonitor(false))">
+                                        <MIcon Left>mdi-monitor</MIcon>
+                                        已关注
+                                    </MButton>
+                                }
+                                else
+                                {
+                            <MButton Text Block Color="warning" OnClick="@(()=>SetMonitor(true))">
+                                <MIcon Left>mdi-monitor</MIcon>
+                                关注词条
+                            </MButton>
+                                }
+                            </Authorized>
+                        </AuthorizeView>
+                    }
+
+
                     <AuthorizeView>
                         <Authorized>
                             @foreach (var item in Items)
@@ -107,6 +131,7 @@
 
     bool isReady { get; set; }
     bool ShowExamines { get; set; }
+    bool isInMonitor { get; set; }
 
     public List<EditButtonLineModel> Items { get; set; } = new List<EditButtonLineModel>();
 
@@ -148,7 +173,7 @@
                 Id = long.Parse(Examines.FirstOrDefault()?.RelatedId),
                 LastEditTime = Examines.Where(s => s.Operation == item.Key).OrderByDescending(s => s.ApplyTime).FirstOrDefault()?.ApplyTime,
                 Operation = item.Key,
-                
+
             });
         }
 
@@ -170,6 +195,8 @@
                 {
                     PerfectionInfor = model.PerfectionInfor;
                 }
+
+                isInMonitor = model.IsInMonitor;
 
                 editStates.Add(Operation.EstablishMain, model.State.MainState);
                 editStates.Add(Operation.EstablishAddInfor, model.State.InforState);
@@ -225,12 +252,10 @@
 
     }
 
-    private async Task OnClickLogin()
+    private Task OnClickLogin()
     {
-
         NavigationManager.NavigateTo("account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-
-
+        return Task.CompletedTask;
     }
 
     int count = 0;
@@ -245,6 +270,35 @@
         StateHasChanged();
     }
 
+    public async Task SetMonitor(bool open)
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditUserMonitorsModel>(ToolHelper.WebApiPath + "api/examines/EditUserMonitors", new EditUserMonitorsModel
+            {
+                InMonitor = open,
+                Ids = new int[] { (int)Id }
+            });
+
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+
+                await ToastService.Error("修改监视状态失败", obj.Error);
+            }
+            else
+            {
+                isInMonitor = open;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "修改监视状态失败");
+        }
+    }
 
     public Task OnClosed()
     {

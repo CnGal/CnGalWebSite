@@ -2,33 +2,33 @@
 @inject HttpClient Http
 @inject IPopupService PopupService
 
-@if(Model.Any())
+@if (Model.Any())
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-history" Title="近期修改" Class="mb-4" Outline>
+        <ButtonContent>
+            <MButton Text Block Color="success" OnClick="ReviewAll">
+                <MIcon Left>mdi-read </MIcon>
+                全部已读
+            </MButton>
+        </ButtonContent>
+        <ChildContent>
+            @foreach (var item in Model.Skip((CurrentPage - 1) * MaxCount).Take(MaxCount))
             {
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-history" Title="近期修改" Class="mb-4" Collapable Outline>
-    <ButtonContent>
-        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="ReviewAll">
-            <MIcon Left>mdi-share-all-outline  </MIcon>
-            全部已审阅
-        </MButton>
-    </ButtonContent>
-    <ChildContent>
-        @foreach (var item in Model.Skip((CurrentPage - 1) * MaxCount).Take(MaxCount))
-        {
 
-            <div class="mb-4">
-                <ExamineCard Model="item" OnReviewed="OnReviewed" />
-            </div>
-        }
-
-        @if (TotalPages > 1)
-        {
-            <MPagination Value="@CurrentPage" Class="my-4" Length="@TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
-        }
-    </ChildContent>
-
-
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+                <div class="mb-4">
+                    <ExamineCard Model="item" OnReviewed="OnReviewed" InReview />
+                </div>
             }
+
+            @if (TotalPages > 1)
+            {
+                <MPagination Value="@CurrentPage" Class="my-4" Length="@TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+            }
+        </ChildContent>
+
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
 
 
 @code {

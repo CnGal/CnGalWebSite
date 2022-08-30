@@ -14,7 +14,7 @@ namespace CnGalWebSite.DataModel.ViewModel.EditRecords
     public class ListUserReviewEditRecordAloneModel
     {
         [Display(Name = "Id")]
-        public long Id { get; set; }
+        public long ExamineId { get; set; }
         [Display(Name = "操作")]
         public Operation Operation { get; set; }
         [Display(Name = "名称")]

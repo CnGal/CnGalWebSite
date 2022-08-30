@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CnGalWebSite.DataModel.ViewModel.Search;
+using System;
 using System.Collections.Generic;
 namespace CnGalWebSite.DataModel.ViewModel.Space
 {
@@ -65,6 +66,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         /// 用户基础信息
         /// </summary>
         public UserInforViewModel BasicInfor { get; set; } = new UserInforViewModel();
+        /// <summary>
+        /// 用户认证词条
+        /// </summary>
+        public EntryInforTipViewModel UserCertification { get; set; } = new EntryInforTipViewModel();
 
     }
 }
