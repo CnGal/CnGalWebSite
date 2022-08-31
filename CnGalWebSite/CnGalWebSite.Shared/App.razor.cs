@@ -28,6 +28,7 @@ namespace CnGalWebSite.Shared
 
             I18n.SetCulture(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"));//将语言切换成zh-CN
 
+            //判断移动端
             if (NavigationManager.Uri.Contains("m.cngal.org"))
             {
                 _dataCacheService.IsApp = true;
@@ -37,6 +38,13 @@ namespace CnGalWebSite.Shared
             {
                 _dataCacheService.IsApp = ToolHelper.IsApp;
             }
+
+            //判断来源
+            if (NavigationManager.Uri.Contains("ref=gov"))
+            {
+                _dataCacheService.IsMiniMode = true;
+            }
+
 
             _dataCacheService.RefreshApp = EventCallback.Factory.Create(this, async () => await OnRefresh());
             _dataCacheService.OpenNewPage = EventCallback.Factory.Create(this, (string s) => OpenNewPage(s));
@@ -50,6 +58,7 @@ namespace CnGalWebSite.Shared
 
         public async Task OnRefresh()
         {
+            _dataCacheService.OnRefreshRequsted(null);
             StateHasChanged();
             if(cngalRootTip!=null)
             {
@@ -76,16 +85,46 @@ namespace CnGalWebSite.Shared
 
             if (firstRender)
             {
+                var needRefresh = false;
                 //检查是否为移动设备
-                if (NavigationManager.Uri.Contains("app.cngal.org") || NavigationManager.Uri.Contains("localhost")&&ToolHelper.IsMaui==false)
+                if (NavigationManager.Uri.Contains("app.cngal.org") || NavigationManager.Uri.Contains("localhost") && ToolHelper.IsMaui == false)
                 {
                     var isApp = await IsMobile();
                     if (isApp != _dataCacheService.IsApp)
                     {
                         _dataCacheService.IsApp = isApp;
-                       await OnRefresh();
+                        needRefresh = true;
+
+                    }
+                }
+                //检查迷你模式
+                try
+                {
+                    if (await _localStorage.GetItemAsync<bool>("IsMiniMode"))
+                    {
+                        if (_dataCacheService.IsMiniMode == false)
+                        {
+                            _dataCacheService.IsMiniMode = true;
+                            needRefresh = true;
+                        }
+                    }
+                    else
+                    {
+                        if (_dataCacheService.IsMiniMode)
+                        {
+                            await _localStorage.SetItemAsync<bool>("IsMiniMode", true);
+                        }
                     }
 
+                }
+                catch
+                {
+
+                }
+
+                if (needRefresh)
+                {
+                    await OnRefresh();
                 }
 
                 //需要调用一次令牌刷新接口 确保登入没有过期

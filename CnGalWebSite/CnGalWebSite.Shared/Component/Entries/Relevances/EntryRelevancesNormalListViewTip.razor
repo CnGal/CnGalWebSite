@@ -154,7 +154,7 @@
     {
         @if (Model.OtherRelevances.Count > 0 && Model.IsHideOutlink == false)
         {
-            <div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="外部链接" Outline Collapable>
                     <div class="mb-3">
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning">
@@ -171,7 +171,8 @@
                         }
                     </div>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-            </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
 
         }
     }

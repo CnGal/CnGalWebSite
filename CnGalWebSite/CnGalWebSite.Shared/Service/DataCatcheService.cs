@@ -31,6 +31,7 @@ using CnGalWebSite.Helper.ViewModel.Articles;
 using CnGalWebSite.Helper.ViewModel.Comments;
 using CnGalWebSite.Helper.ViewModel.Users;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,12 @@ namespace CnGalWebSite.Shared.Service
         /// 是否为APP模式
         /// </summary>
         public bool IsApp { get; set; }
+        /// <summary>
+        /// 是否为精简模式
+        /// </summary>
+        public bool IsMiniMode { get; set; }
+
+        public event EventHandler<EventArgs> RefreshRequsted;
 
         /// <summary>
         /// 刷新渲染框架方法
@@ -399,8 +406,12 @@ namespace CnGalWebSite.Shared.Service
             }
         }
 
-  
 
+        public void OnRefreshRequsted(EventArgs e)
+        {
+            EventHandler<EventArgs> handler = RefreshRequsted;
+            handler?.Invoke(this, e);
+        }
 
 
         public void RefreshAllCatche()

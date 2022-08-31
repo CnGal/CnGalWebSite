@@ -2,27 +2,29 @@
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
 
-<div>
-    @if (CanComment)
-    {
-        <CommentListView Model="Model" CanDeleted="CanDeleted" OnRefrsh="Refresh" @ref="commentListView"></CommentListView>
-        <AuthorizeView>
-            <Authorized>
-                <ReplyCommentTip IsChild="false" ObjectId="@ObjectId" Type="Type" OnRefresh="OnOutComment"></ReplyCommentTip>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+        @if (CanComment)
+        {
+            <CommentListView Model="Model" CanDeleted="CanDeleted" OnRefrsh="Refresh" @ref="commentListView"></CommentListView>
+            <AuthorizeView>
+                <Authorized>
+                    <ReplyCommentTip IsChild="false" ObjectId="@ObjectId" Type="Type" OnRefresh="OnOutComment"></ReplyCommentTip>
 
-            </Authorized>
-            <NotAuthorized>
-                <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 ">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后发表评论" OnClick="OnLoginClick" Icon="mdi-login" />
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
-    }
-    else
-    {
-        <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
-    }
-</div>
+                </Authorized>
+                <NotAuthorized>
+                    <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 ">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后发表评论" OnClick="OnLoginClick" Icon="mdi-login" />
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+        }
+        else
+        {
+            <CloseCommentTip IsNeedLayput="true"></CloseCommentTip>
+        }
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
 @code {
     [Parameter]
