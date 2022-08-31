@@ -25,7 +25,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         void UpdateEntryDataMain(Entry entry, EntryMain_1_0 examine);
 
-        void UpdateEntryDataAddInfor(Entry entry, EntryAddInfor examine);
+        Task UpdateEntryDataAddInforAsync(Entry entry, EntryAddInfor examine);
 
         void UpdateEntryDataImages(Entry entry, EntryImages examine);
 
@@ -36,6 +36,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
         void UpdateEntryDataMainPage(Entry entry, string examine);
 
         Task UpdateEntryDataAsync(Entry entry, Examine examine);
+
+        void UpdateEntryDataAudio(Entry entry, EntryAudioExamineModel examine);
 
         Task<List<int>> GetEntryIdsFromNames(List<string> names);
 
@@ -59,9 +61,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         EditEntryTagViewModel GetEditTagsViewModel(Entry entry);
 
+        EditAudioViewModel GetEditAuioViewModel(Entry entry);
+
         void SetDataFromEditMainViewModel(Entry newEntry, EditMainViewModel model);
 
-        void SetDataFromEditAddInforViewModel(Entry newEntry, EditAddInforViewModel model);
+        Task SetDataFromEditAddInforViewModelAsync(Entry newEntry, EditAddInforViewModel model);
 
         void SetDataFromEditImagesViewModel(Entry newEntry, EditImagesViewModel model);
 
@@ -70,5 +74,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
         void SetDataFromEditMainPageViewModel(Entry newEntry, EditMainPageViewModel model);
 
         void SetDataFromEditTagsViewModel(Entry newEntry, EditEntryTagViewModel model, List<Tag> tags);
+
+        void SetDataFromEditAudioViewModel(Entry newEntry, EditAudioViewModel model);
     }
 }

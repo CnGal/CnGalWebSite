@@ -100,7 +100,7 @@
         items.RemoveAll(s => lastTags.Contains(s) == false);
         selectedItems = items;
 
-        Model.RemoveAll(s => items.Contains(s.DisplayName) == false);
+        Model.RemoveAll(s => items.Contains(s.DisplayName) == false&& lastTags.Contains(s.DisplayName));
         Model.AddRange(items.Where(s => Model.Select(s => s.DisplayName).Contains(s) == false).Select(s => new RelevancesModel { DisplayName = s }));
         await OnInput.InvokeAsync();
     }

@@ -1,6 +1,6 @@
 ﻿<div>
     <div class=" mb-3 ">
-        <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="Model" HiddenButton ForceSmall/>
+        <CnGalWebSite.Shared.Component.Entries.NewVersion.MainInforCard Model="Model" HiddenButton ForceSmall />
     </div>
     @if (Model.SteamId > 0)
     {
@@ -37,6 +37,7 @@
         </div>
 
     }
+
     @if (Model.Pictures.Count > 0)
     {
         <div class="mb-3">
@@ -45,7 +46,12 @@
 
 
     }
-
+    @if (Model.Audio.Any())
+    {
+        <div class="mb-3">
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="Model"  AutoPlay="false"/>
+        </div>
+    }
     @if (Model.NewsOfEntry.Count > 0)
     {
         <div class="mb-3">

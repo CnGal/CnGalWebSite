@@ -67,13 +67,17 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IRepository<Message, long> _messageRepository;
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
+        private readonly IRepository<UserCertification, long> _userCertificationRepository;
+        private readonly IRepository<UserMonitor, long> _userMonitorRepository;
+        private readonly IRepository<UserReviewEditRecord, long> _userReviewEditRecordRepository;
 
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Examine>, string, SortOrder, IEnumerable<Examine>>> SortLambdaCacheEntry = new();
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService,
+           IRepository<UserMonitor, long> userMonitorRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository,
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository, IRepository<Message, long> messageRepository,
-        IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService,
+        IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger, IRepository<Lottery, long> lotteryRepository,
         IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<PlayedGame, string> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository)
         {
@@ -103,6 +107,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _commentService = commentService;
             _lotteryRepository = lotteryRepository;
             _voteRepository = voteRepository;
+            _userCertificationRepository = userCertificationRepository;
+            _userMonitorRepository = userMonitorRepository;
+            _userReviewEditRecordRepository = userReviewEditRecordRepository;
         }
 
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "")
@@ -196,9 +203,25 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return dtos;
         }
 
-        public async Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListExamineAloneModel searchModel)
+        public async Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListExamineAloneModel searchModel,ApplicationUser user)
         {
-            var items = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
+             var items = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
+
+            //若不是管理员 则检查认证词条
+            if(await _userManager.IsInRoleAsync(user,"Admin")==false)
+            {
+                var userCertification = await _userCertificationRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.EntryId != null);
+                if(userCertification==null)
+                {
+                    items = items.Where(s => false);
+                }
+                else
+                {
+                    items = items.Where(s => s.EntryId == userCertification.EntryId);
+                }
+            }
+
+           
             // 处理高级搜索
             if (!string.IsNullOrWhiteSpace(searchModel.EntryId?.ToString()))
             {
@@ -315,6 +338,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 Operation.EditTagChildTags => await GetEditTagChildTagsExamineView(model, examine),
                 Operation.EditTagChildEntries => await GetEditTagChildEntriesExamineView(model, examine),
                 Operation.EditPlayedGameMain => await GetEditPlayedGameMainExamineView(model, examine),
+                Operation.EstablishAudio => await GetEstablishAudioExamineView(model, examine),
+                Operation.RequestUserCertification => await GetEditUserCertificationMainExamineView(model, examine),
                 _ => false,
             };
         }
@@ -719,7 +744,25 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     });
                     information.Add(temp);
                 }
+            }
 
+            if(entry.EntryStaffFromEntryNavigation.Any())
+            {
+                var temp = new List<KeyValueModel>();
+                foreach(var item in entry.EntryStaffFromEntryNavigation)
+                {
+                    temp.Add(new KeyValueModel
+                    {
+                        DisplayName = item.PositionOfficial,
+                        DisplayValue = string.IsNullOrWhiteSpace(item.CustomName) ? item.ToEntryNavigation?.Name ?? item.Name : item.CustomName
+                    });
+                }
+                information.Add(new InformationsModel
+                {
+                    Modifier = "STAFF",
+                    Informations = temp
+                });
+                
             }
 
             model.Texts = information;
@@ -838,7 +881,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return true;
         }
 
-        private async Task<ExaminePreDataModel> InitExamineViewEntryRelevances(Entry entry)
+        private ExaminePreDataModel InitExamineViewEntryRelevances(Entry entry)
         {
             var model = new ExaminePreDataModel();
 
@@ -855,7 +898,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    entry = await _appHelper.GetEntryInforTipViewModel(item.ToEntryNavigation)
+                    entry = _appHelper.GetEntryInforTipViewModel(item.ToEntryNavigation)
                 });
 
             }
@@ -904,12 +947,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             //序列化相关性列表
             //先读取词条信息
-            var relevances = await InitExamineViewEntryRelevances(entry);
+            var relevances =  InitExamineViewEntryRelevances(entry);
 
             //添加修改记录 
             await _entryService.UpdateEntryDataAsync(entry, examine);
 
-            var relevances_examine = await InitExamineViewEntryRelevances(entry);
+            var relevances_examine =  InitExamineViewEntryRelevances(entry);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -1044,6 +1087,72 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
             return true;
         }
+
+        private static ExaminePreDataModel InitExamineViewEntryAudio(Entry entry)
+        {
+            var model = new ExaminePreDataModel();
+            foreach (var item in entry.Audio)
+            {
+                model.Audio.Add(new AudioViewModel
+                {
+                    Url = item.Url,
+                    BriefIntroduction = item.BriefIntroduction,
+                    Name = item.Name,
+                    Priority = item.Priority,
+                    Duration = item.Duration,
+                    Thumbnail = item.Thumbnail
+                }) ;
+            }
+
+            return model;
+        }
+
+        public async Task<bool> GetEstablishAudioExamineView(ExamineViewModel model, Examine examine)
+        {
+            model.Type = ExaminedNormalListModelType.Entry;
+            var entry = await _entryRepository.GetAll()
+                  .Include(s => s.Audio)
+                  .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
+            if (entry == null)
+            {
+                return false;
+            }
+            model.ObjectId = entry.Id;
+            model.ObjectName = entry.Name;
+            model.ObjectBriefIntroduction = entry.BriefIntroduction;
+            if (entry.Type is EntryType.Game or EntryType.ProductionGroup)
+            {
+                model.Image = _appHelper.GetImagePath(entry.MainPicture, "app.png");
+            }
+            else
+            {
+                model.Image = _appHelper.GetImagePath(entry.Thumbnail, "user.png");
+                model.IsThumbnail = true;
+            }
+            var audio = InitExamineViewEntryAudio(entry);
+
+            //添加修改记录 
+            await _entryService.UpdateEntryDataAsync(entry, examine);
+
+            var audio_examine = InitExamineViewEntryAudio(entry);
+
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+
+            //判断是否是等待审核状态
+            if (examine.IsPassed != null)
+            {
+                model.BeforeModel = audio_examine;
+                model.AfterModel = audio;
+            }
+            else
+            {
+                model.BeforeModel = audio;
+                model.AfterModel = audio_examine;
+            }
+            return true;
+        }
+
 
         #endregion
 
@@ -1201,7 +1310,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return true;
         }
 
-        private async Task<ExaminePreDataModel> InitExamineViewArticleRelevances(Article article)
+        private ExaminePreDataModel InitExamineViewArticleRelevances(Article article)
         {
             var model = new ExaminePreDataModel();
 
@@ -1209,7 +1318,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    entry = await _appHelper.GetEntryInforTipViewModel(item)
+                    entry = _appHelper.GetEntryInforTipViewModel(item)
                 });
 
             }
@@ -1260,12 +1369,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             //序列化相关性列表
             //先读取词条信息
-            var relevances = await InitExamineViewArticleRelevances(article);
+            var relevances =  InitExamineViewArticleRelevances(article);
 
             //添加修改记录 
             await _articleService.UpdateArticleData(article, examine);
 
-            var relevances_examine = await InitExamineViewArticleRelevances(article);
+            var relevances_examine =  InitExamineViewArticleRelevances(article);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -1519,7 +1628,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         }
 
 
-        private async Task<ExaminePreDataModel> InitExamineViewEditChildEntries(Tag tag)
+        private ExaminePreDataModel InitExamineViewEditChildEntries(Tag tag)
         {
             var model = new ExaminePreDataModel();
 
@@ -1527,7 +1636,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    entry = await _appHelper.GetEntryInforTipViewModel(item)
+                    entry =  _appHelper.GetEntryInforTipViewModel(item)
                 });
             }
             return model;
@@ -1548,12 +1657,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             //序列化相关性列表
             //先读取词条信息
-            var relevances = await InitExamineViewEditChildEntries(tag);
+            var relevances =  InitExamineViewEditChildEntries(tag);
 
             //添加修改记录 
             await _tagService.UpdateTagDataAsync(tag, examine);
 
-            var relevances_examine = await InitExamineViewEditChildEntries(tag);
+            var relevances_examine =  InitExamineViewEditChildEntries(tag);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -1662,7 +1771,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 {
                     model.AfterModel.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                     {
-                        entry = await _appHelper.GetEntryInforTipViewModel(item)
+                        entry =  _appHelper.GetEntryInforTipViewModel(item)
                     });
                     model.ObjectBriefIntroduction = item.BriefIntroduction;
                     if (item.Type is EntryType.Game or EntryType.ProductionGroup)
@@ -1777,7 +1886,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var disambigAloneModels = new List<DisambigAloneModel>();
             foreach (var item in disambig.Entries)
             {
-                disambigAloneModels.Add(new DisambigAloneModel { entry = await _appHelper.GetEntryInforTipViewModel(item) });
+                disambigAloneModels.Add(new DisambigAloneModel { entry =  _appHelper.GetEntryInforTipViewModel(item) });
             }
             foreach (var item in disambig.Articles)
             {
@@ -1848,7 +1957,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         var temp = await _entryRepository.GetAll().Where(s => s.Id == item.EntryId).FirstOrDefaultAsync();
                         if (temp != null)
                         {
-                            disambigAloneModels_examine.Add(new DisambigAloneModel { entry = await _appHelper.GetEntryInforTipViewModel(temp) });
+                            disambigAloneModels_examine.Add(new DisambigAloneModel { entry =  _appHelper.GetEntryInforTipViewModel(temp) });
                         }
                     }
                     else if (item.Type == DisambigRelevanceType.Article)
@@ -2287,7 +2396,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return true;
         }
 
-        private async Task<ExaminePreDataModel> InitExamineViewPeripheryRelatedEntries(Periphery periphery)
+        private ExaminePreDataModel InitExamineViewPeripheryRelatedEntries(Periphery periphery)
         {
             var model = new ExaminePreDataModel();
 
@@ -2295,7 +2404,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    entry = await _appHelper.GetEntryInforTipViewModel(item)
+                    entry =  _appHelper.GetEntryInforTipViewModel(item)
                 });
 
             }
@@ -2319,12 +2428,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             //序列化相关性列表
             //先读取词条信息
-            var relevances = await InitExamineViewPeripheryRelatedEntries(periphery);
+            var relevances =  InitExamineViewPeripheryRelatedEntries(periphery);
 
             //添加修改记录 
             await _peripheryService.UpdatePeripheryDataAsync(periphery, examine);
 
-            var relevances_examine = await InitExamineViewPeripheryRelatedEntries(periphery);
+            var relevances_examine =  InitExamineViewPeripheryRelatedEntries(periphery);
 
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
@@ -2432,7 +2541,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 model.AfterModel.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
-                    entry = await _appHelper.GetEntryInforTipViewModel(playedGame.Entry)
+                    entry =  _appHelper.GetEntryInforTipViewModel(playedGame.Entry)
                 });
                 model.ObjectBriefIntroduction = playedGame.Entry.BriefIntroduction;
 
@@ -2471,10 +2580,165 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         #endregion
 
+        #region 申请认证
+
+        public async Task<bool> GetEditUserCertificationMainExamineView(ExamineViewModel model, Examine examine)
+        {
+            model.Type = ExaminedNormalListModelType.UserCertification;
+
+            var userCertification = await _userCertificationRepository.GetAll().AsNoTracking()
+                .Include(s => s.ApplicationUser)
+                .FirstOrDefaultAsync(s => s.ApplicationUserId == examine.ApplicationUserId);
+
+            if (userCertification == null)
+            {
+                return false;
+            }
+
+            model.ObjectName = userCertification.ApplicationUser.UserName;
+            model.ObjectBriefIntroduction = userCertification.ApplicationUser.PersonalSignature;
+            model.Image = _appHelper.GetImagePath(userCertification.ApplicationUser?.PhotoPath, "app.png");
+            model.IsThumbnail = true;
+
+            //序列化数据
+            UserCertificationMain userCertificationMain = null;
+            using (TextReader str = new StringReader(examine.Context))
+            {
+                var serializer = new JsonSerializer();
+                userCertificationMain = (UserCertificationMain)serializer.Deserialize(str, typeof(UserCertificationMain));
+            }
+
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+
+            var entry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == userCertificationMain.EntryId);
+
+            if (entry != null)
+            {
+                model.AfterModel.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
+                {
+                    entry = _appHelper.GetEntryInforTipViewModel(entry)
+                });
+            }
+
+            model.AfterModel.Texts.Add(new InformationsModel
+            {
+                Modifier = "申请认证",
+                Informations = new List<KeyValueModel>
+                {
+                    new KeyValueModel
+                    {
+                        DisplayName="认证词条",
+                        DisplayValue=entry.DisplayName
+                    },
+                    new KeyValueModel
+                    {
+                        DisplayName="用户名",
+                        DisplayValue=userCertification.ApplicationUser.UserName
+                    },
+                    new KeyValueModel
+                    {
+                        DisplayName="用户Id",
+                        DisplayValue=userCertification.ApplicationUserId
+                    }
+                }
+            });
+
+            model.AfterModel.MainPage = examine.Note;
+
+            if (examine.IsPassed == true)
+            {
+                model.BeforeModel = model.AfterModel;
+            }
+            return true;
+        }
+
+        #endregion
+
+
 
         #endregion
 
         #region 使审核记录真实作用在目标上
+
+        public async Task ApplyEditRecordToObject(object entry,object examine, Operation operation)
+        {
+            switch (operation)
+            {
+                case Operation.EstablishMain:
+                    await ExamineEstablishMainAsync(entry as Entry, examine as ExamineMain);
+                    break;
+                case Operation.EstablishAddInfor:
+                    await ExamineEstablishAddInforAsync(entry as Entry, examine as EntryAddInfor);
+                    break;
+                case Operation.EstablishImages:
+                    await ExamineEstablishImagesAsync(entry as Entry, examine as EntryImages);
+                    break;
+                case Operation.EstablishRelevances:
+                    await ExamineEstablishRelevancesAsync(entry as Entry, examine as EntryRelevances);
+                    break;
+                case Operation.EstablishTags:
+                    await ExamineEstablishTagsAsync(entry as Entry, examine as EntryTags);
+                    break;
+                case Operation.EstablishMainPage:
+                    await ExamineEstablishMainPageAsync(entry as Entry, examine as string);
+                    break;
+                case Operation.EstablishAudio:
+                    await ExamineEstablishAudioAsync(entry as Entry, examine as EntryAudioExamineModel);
+                    break;
+                case Operation.EditArticleMain:
+                    await ExamineEditArticleMainAsync(entry as Article, examine as ExamineMain);
+                    break;
+                case Operation.EditArticleRelevanes:
+                    await ExamineEditArticleRelevancesAsync(entry as Article, examine as ArticleRelevances);
+                    break;
+                case Operation.EditArticleMainPage:
+                    await ExamineEditArticleMainPageAsync(entry as Article, examine as string);
+                    break;
+                case Operation.EditTagMain:
+                    await ExamineEditTagMainAsync(entry as Tag, examine as ExamineMain);
+                    break;
+                case Operation.EditTagChildTags:
+                    await ExamineEditTagChildTagsAsync(entry as Tag, examine as TagChildTags);
+                    break;
+                case Operation.EditTagChildEntries:
+                    await ExamineEditTagChildEntriesAsync(entry as Tag, examine as TagChildEntries);
+                    break;
+                case Operation.DisambigMain:
+                    await ExamineEditDisambigMainAsync(entry as Disambig, examine as DisambigMain);
+                    break;
+                case Operation.DisambigRelevances:
+                    await ExamineEditDisambigRelevancesAsync(entry as Disambig, examine as DisambigRelevances);
+                    break;
+                case Operation.EditUserMain:
+                    await ExamineEditUserMainAsync(entry as ApplicationUser, examine as UserMain);
+                    break;
+                case Operation.UserMainPage:
+                    await ExamineEditUserMainPageAsync(entry as ApplicationUser, examine as string);
+                    break;
+                case Operation.EditPeripheryMain:
+                    await ExamineEditPeripheryMainAsync(entry as Periphery, examine as ExamineMain);
+                    break;
+                case Operation.EditPeripheryImages:
+                    await ExamineEditPeripheryImagesAsync(entry as Periphery, examine as PeripheryImages);
+                    break;
+                case Operation.EditPeripheryRelatedEntries:
+                    await ExamineEditPeripheryRelatedEntriesAsync(entry as Periphery, examine as PeripheryRelatedEntries);
+                    break;
+                case Operation.EditPeripheryRelatedPeripheries:
+                    await ExamineEditPeripheryRelatedPeripheriesAsync(entry as Periphery, examine as PeripheryRelatedPeripheries);
+                    break;
+                case Operation.PubulishComment:
+                    await ExaminePublishCommentTextAsync(entry as Comment, examine as CommentText);
+                    break;
+                case Operation.EditPlayedGameMain:
+                    await ExamineEditPlayedGameMainAsync(entry as PlayedGame, examine as PlayedGameMain);
+                    break;
+                case Operation.RequestUserCertification:
+                    await ExamineEditUserCertificationMainAsync(entry as UserCertification, examine as UserCertificationMain);
+                    break;
+            }
+        }
 
         #region 词条
         public async Task ExamineEstablishMainAsync(Entry entry, ExamineMain examine)
@@ -2491,7 +2755,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task ExamineEstablishAddInforAsync(Entry entry, EntryAddInfor examine)
         {
             //更新数据
-            _entryService.UpdateEntryDataAddInfor(entry, examine);
+            await _entryService.UpdateEntryDataAddInforAsync(entry, examine);
             //保存
             entry = await _entryRepository.UpdateAsync(entry);
 
@@ -2501,114 +2765,37 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
 
             //反向关联
-            foreach (var item in examine.Information)
+            foreach (var item in examine.Staffs)
             {
                 if (item.IsDelete == false)
                 {
-                    if (entry.Type == EntryType.Game)
+                    var temp = await _entryRepository.GetAll()
+                        .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                        .FirstOrDefaultAsync(s => s.Id == item.StaffId);
+
+                    if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
                     {
-                        if (item.Modifier == "STAFF")
+                        //补全审核记录
+                        //创建审核数据模型
+                        var examinedModel = new EntryRelevances();
+
+                        examinedModel.Relevances.Add(new EntryRelevancesAloneModel
                         {
-                            var temp = await _entryRepository.GetAll()
-                                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                                .FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
-
-                            if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
-                            {
-                                //补全审核记录
-                                //创建审核数据模型
-                                var examinedModel = new EntryRelevances();
-
-                                examinedModel.Relevances.Add(new EntryRelevancesAloneModel
-                                {
-                                    DisplayName = entry.Id.ToString(),
-                                    DisplayValue = entry.Name,
-                                    IsDelete = false,
-                                    Type = RelevancesType.Entry,
-                                });
-                                var resulte = "";
-                                using (TextWriter text = new StringWriter())
-                                {
-                                    var serializer = new JsonSerializer();
-                                    serializer.Serialize(text, examinedModel);
-                                    resulte = text.ToString();
-                                }
-
-                                await ExamineEstablishRelevancesAsync(temp, examinedModel);
-                                await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
-
-                            }
-                        }
-                        else if (item.Modifier == "基本信息" && (item.DisplayName == "制作组" || item.DisplayName == "发行商") && string.IsNullOrWhiteSpace(item.DisplayValue) == false)
+                            DisplayName = entry.Id.ToString(),
+                            DisplayValue = entry.Name,
+                            IsDelete = false,
+                            Type = RelevancesType.Entry,
+                        });
+                        var resulte = "";
+                        using (TextWriter text = new StringWriter())
                         {
-                            var values = item.DisplayValue.Replace("，", ",").Replace("、", ",").Split(',');
-                            foreach (var value in values)
-                            {
-                                var temp = await _entryRepository.GetAll()
-                                                               .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                                                               .FirstOrDefaultAsync(s => s.Name == value);
-
-                                if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
-                                {
-                                    //补全审核记录
-                                    //创建审核数据模型
-                                    var examinedModel = new EntryRelevances();
-
-                                    examinedModel.Relevances.Add(new EntryRelevancesAloneModel
-                                    {
-                                        DisplayName = entry.Id.ToString(),
-                                        DisplayValue = entry.Name,
-                                        IsDelete = false,
-                                        Type = RelevancesType.Entry,
-                                    });
-                                    var resulte = "";
-                                    using (TextWriter text = new StringWriter())
-                                    {
-                                        var serializer = new JsonSerializer();
-                                        serializer.Serialize(text, examinedModel);
-                                        resulte = text.ToString();
-                                    }
-
-                                    await ExamineEstablishRelevancesAsync(temp, examinedModel);
-                                    await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
-                                }
-                            }
-
+                            var serializer = new JsonSerializer();
+                            serializer.Serialize(text, examinedModel);
+                            resulte = text.ToString();
                         }
-                    }
-                    else if (entry.Type == EntryType.Role)
-                    {
-                        if (item.Modifier == "基本信息" && item.DisplayName == "声优" && string.IsNullOrWhiteSpace(item.DisplayValue) == false)
-                        {
-                            var temp = await _entryRepository.GetAll()
-                                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                                .FirstOrDefaultAsync(s => s.Name == item.DisplayValue);
 
-                            if (temp != null && temp.EntryRelationFromEntryNavigation.Any(s => s.ToEntry == entry.Id) == false)
-                            {
-                                //补全审核记录
-                                //创建审核数据模型
-                                var examinedModel = new EntryRelevances();
-
-                                examinedModel.Relevances.Add(new EntryRelevancesAloneModel
-                                {
-                                    DisplayName = entry.Id.ToString(),
-                                    DisplayValue = entry.Name,
-                                    IsDelete = false,
-                                    Type = RelevancesType.Entry,
-                                });
-                                var resulte = "";
-                                using (TextWriter text = new StringWriter())
-                                {
-                                    var serializer = new JsonSerializer();
-                                    serializer.Serialize(text, examinedModel);
-                                    resulte = text.ToString();
-                                }
-
-                                await ExamineEstablishRelevancesAsync(temp, examinedModel);
-                                await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
-                            }
-                        }
+                        await ExamineEstablishRelevancesAsync(temp, examinedModel);
+                        await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动关联词条");
                     }
                 }
             }
@@ -2636,11 +2823,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //更新完善度
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
-            var admin = new ApplicationUser
-            {
-                Id = _configuration["ExamineAdminId"],
-                UserName = "看板娘"
-            };
+            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
 
             //反向关联 词条
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Entry))
@@ -2736,6 +2919,19 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
         }
+
+        public async Task ExamineEstablishAudioAsync(Entry entry, EntryAudioExamineModel examine)
+        {
+            //更新数据
+            _entryService.UpdateEntryDataAudio(entry, examine);
+            //保存
+            _ = await _entryRepository.UpdateAsync(entry);
+
+            //更新完善度
+            //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
+
+        }
+
         #endregion
 
         #region 文章
@@ -2751,11 +2947,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             await _articleService.UpdateArticleDataRelevances(article, examine);
             _ = await _articleRepository.UpdateAsync(article);
 
-            var admin = new ApplicationUser
-            {
-                Id = _configuration["ExamineAdminId"],
-                UserName = "看板娘"
-            };
+            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
             //反向关联 文章
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Article))
             {
@@ -2835,13 +3027,6 @@ namespace CnGalWebSite.APIServer.Application.Examines
         #endregion
 
         #region 标签
-        public async Task ExamineTagAsync(Tag tag, TagEdit examine)
-        {
-            await _tagService.UpdateTagDataOldAsync(tag, examine);
-
-            _ = await _tagRepository.UpdateAsync(tag);
-        }
-
         public async Task ExamineEditTagMainAsync(Tag tag, ExamineMain examine)
         {
             await _tagService.UpdateTagDataMainAsync(tag, examine);
@@ -2889,6 +3074,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             _ = await _userRepository.UpdateAsync(user);
         }
+
         public async Task ExamineEditUserMainPageAsync(ApplicationUser user, string examine)
         {
             await _userService.UpdateUserDataMainPage(user, examine);
@@ -3053,16 +3239,135 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         #endregion
 
+        #region 申请认证
+
+        public async Task ExamineEditUserCertificationMainAsync(UserCertification userCertification, UserCertificationMain examine)
+        {
+            //更新数据
+            _userService.UpdateUserCertificationDataMain(userCertification, examine);
+            //保存
+            _ = await _userCertificationRepository.UpdateAsync(userCertification);
+        }
+
+
+        #endregion
+
         #endregion
 
         #region 将审核记录添加到数据库
 
-        public async Task UniversalEditExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> AddEditRecordAsync(object entry, ApplicationUser user, object examineData, Operation operation, string note, bool isAdmin, bool isCreating = false)
         {
+            //序列化审核数据
+            var resulte = "";
+            if (operation == Operation.EstablishMainPage)
+            {
+                resulte = examineData as string;
+            }
+            else
+            {
+                using TextWriter text = new StringWriter();
+                var serializer = new JsonSerializer();
+                serializer.Serialize(text, examineData);
+                resulte = text.ToString();
+            }
+
+            //添加到数据库
+            if (entry is Entry)
+            {
+                if (isCreating)
+                {
+                    return await UniversalEstablishExaminedAsync(entry as Entry, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditExaminedAsync(entry as Entry, user, isAdmin, resulte, operation, note);
+                }
+            }
+            else if (entry is Article)
+            {
+                if (isCreating)
+                {
+                    return await UniversalCreateArticleExaminedAsync(entry as Article, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditArticleExaminedAsync(entry as Article, user, isAdmin, resulte, operation, note);
+                }
+            }
+            else if (entry is Article)
+            {
+                if (isCreating)
+                {
+                    return await UniversalCreateArticleExaminedAsync(entry as Article, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditArticleExaminedAsync(entry as Article, user, isAdmin, resulte, operation, note);
+                }
+            }
+            else if (entry is Tag)
+            {
+                if (isCreating)
+                {
+                    return await UniversalCreateTagExaminedAsync(entry as Tag, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditTagExaminedAsync(entry as Tag, user, isAdmin, resulte, operation, note);
+                }
+            }
+            else if (entry is Disambig)
+            {
+                if (isCreating)
+                {
+                    return await UniversalCreateDisambigExaminedAsync(entry as Disambig, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditDisambigExaminedAsync(entry as Disambig, user, isAdmin, resulte, operation, note);
+                }
+            }
+            else if (entry is ApplicationUser)
+            {
+                return await UniversalEditUserExaminedAsync(entry as ApplicationUser, isAdmin, resulte, operation, note);
+            }
+            else if (entry is Periphery)
+            {
+                if (isCreating)
+                {
+                    return await UniversalCreatePeripheryExaminedAsync(entry as Periphery, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditPeripheryExaminedAsync(entry as Periphery, user, isAdmin, resulte, operation, note);
+                }
+            }
+            else if (entry is Comment)
+            {
+                return await UniversalCommentExaminedAsync(entry as Comment, user, isAdmin, resulte, operation, note);
+            }
+            else if (entry is PlayedGame)
+            {
+                return await UniversalEditPlayedGameExaminedAsync(entry as PlayedGame, user, isAdmin, resulte, operation, note);
+            }
+            else if (entry is UserCertification)
+            {
+                return await UniversalEditUserCertificationExaminedAsync(entry as UserCertification, user, isAdmin, resulte, operation, note);
+            }
+            else
+            {
+                throw new Exception("不支持的类型");
+            }
+        }
+
+        public async Task<Examine> UniversalEditExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                 examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3074,18 +3379,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PassedAdminName = user.UserName,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserEntryActiveExamineAsync(entry.Id, user.Id, operation);
+                examine = await GetUserEntryActiveExamineAsync(entry.Id, user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3101,20 +3406,24 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Note = note
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
 
+
             //log
             _logger.LogInformation("{User}({Id})对 词条 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, entry.Name, entry.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
+            return examine;
         }
 
-        public async Task<bool> UniversalEstablishExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEstablishExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3126,7 +3435,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -3138,13 +3447,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     var examine_1 = await GetUserEntryActiveExamineAsync(entry.Id, user.Id, Operation.EstablishMain);
                     if (examine_1 == null)
                     {
-                        return false;
+                        throw new Exception("前置审核不存在");
                     }
                     examineId = examine_1.Id;
                 }
 
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3156,21 +3465,22 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             //log
             _logger.LogInformation("{User}({Id})创建词条({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, entry.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
-            return true;
+            return examine;
         }
 
-        public async Task UniversalEditArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3181,18 +3491,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserArticleActiveExamineAsync(article.Id, user.Id, operation);
+                examine = await GetUserArticleActiveExamineAsync(article.Id, user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3207,20 +3517,22 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         ApplicationUserId = user.Id,
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
             //log
             _logger.LogInformation("{User}({Id})对 文章 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, article.Name, article.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
+            return examine;
         }
 
-        public async Task<bool> UniversalCreateArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalCreateArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3232,7 +3544,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -3244,13 +3556,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     var examine_1 = await GetUserArticleActiveExamineAsync(article.Id, user.Id, Operation.EditArticleMain);
                     if (examine_1 == null)
                     {
-                        return false;
+                        throw new Exception("前置审核不存在");
                     }
                     examineId = examine_1.Id;
                 }
 
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3262,22 +3574,23 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
 
             //log
             _logger.LogInformation("{User}({Id})创建文章({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, article.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
-            return true;
+            return examine;
         }
 
-        public async Task<bool> UniversalCreateTagExaminedAsync(Tag tag, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalCreateTagExaminedAsync(Tag tag, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                 examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3289,7 +3602,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -3301,13 +3614,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     var examine_1 = await GetUserTagActiveExamineAsync(tag.Id, user.Id, Operation.EditTagMain);
                     if (examine_1 == null)
                     {
-                        return false;
+                        throw new Exception("前置审核不存在");
                     }
                     examineId = examine_1.Id;
                 }
 
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3319,21 +3632,22 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             //log
             _logger.LogInformation("{User}({Id})创建标签({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, tag.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
-            return true;
+            return examine;
         }
 
-        public async Task UniversalEditTagExaminedAsync(Tag tag, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditTagExaminedAsync(Tag tag, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                 examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3344,18 +3658,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserTagActiveExamineAsync(tag.Id, user.Id, operation);
+                examine = await GetUserTagActiveExamineAsync(tag.Id, user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3370,22 +3684,24 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         ApplicationUserId = user.Id,
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
 
             //log
             _logger.LogInformation("{User}({Id})对 标签 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, tag.Name, tag.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
+            return examine;
         }
 
 
-        public async Task<bool> UniversalCreateDisambigExaminedAsync(Disambig disambig, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalCreateDisambigExaminedAsync(Disambig disambig, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3397,7 +3713,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -3409,13 +3725,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     var examine_1 = await GetUserDisambigActiveExamineAsync(disambig.Id, user.Id, Operation.DisambigMain);
                     if (examine_1 == null)
                     {
-                        return false;
+                        throw new Exception("前置审核不存在");
                     }
                     examineId = examine_1.Id;
                 }
 
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3427,22 +3743,23 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             //log
             _logger.LogInformation("{User}({Id})创建消歧义页({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, disambig.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
 
-            return true;
+            return examine;
         }
 
-        public async Task UniversalEditDisambigExaminedAsync(Disambig disambig, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditDisambigExaminedAsync(Disambig disambig, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3453,18 +3770,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserDisambigActiveExamineAsync(disambig.Id, user.Id, operation);
+                examine = await GetUserDisambigActiveExamineAsync(disambig.Id, user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3479,21 +3796,23 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         ApplicationUserId = user.Id,
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
 
             //log
             _logger.LogInformation("{User}({Id})对 消歧义页 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, disambig.Name, disambig.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
+            return examine;
         }
 
-        public async Task UniversalEditUserExaminedAsync(ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditUserExaminedAsync(ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3504,18 +3823,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserInforActiveExamineAsync(user.Id, operation);
+                examine = await GetUserInforActiveExamineAsync(user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3530,21 +3849,23 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Note = note
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
 
             //log
             _logger.LogInformation("{User}({Id})对个人资料进行{Operation}操作{Admin}", user.UserName, user.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
+            return examine;
         }
 
-        public async Task<bool> UniversalCreatePeripheryExaminedAsync(Periphery periphery, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalCreatePeripheryExaminedAsync(Periphery periphery, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3556,7 +3877,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             else
@@ -3568,13 +3889,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     var examine_1 = await GetUserPeripheryActiveExamineAsync(periphery.Id, user.Id, Operation.EditPeripheryMain);
                     if (examine_1 == null)
                     {
-                        return false;
+                        throw new Exception("前置审核不存在");
                     }
                     examineId = examine_1.Id;
                 }
 
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3586,21 +3907,22 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     PrepositionExamineId = examineId,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
 
             }
             //log
             _logger.LogInformation("{User}({Id})创建周边({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, periphery.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
-            return true;
+            return examine;
         }
 
-        public async Task UniversalEditPeripheryExaminedAsync(Periphery periphery, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditPeripheryExaminedAsync(Periphery periphery, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3611,18 +3933,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplyTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserPeripheryActiveExamineAsync(periphery.Id, user.Id, operation);
+                examine = await GetUserPeripheryActiveExamineAsync(periphery.Id, user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3637,7 +3959,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         ApplicationUserId = user.Id,
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
 
@@ -3645,14 +3967,16 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //log
             _logger.LogInformation("{User}({Id})对 周边 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, periphery.Name, periphery.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
 
+            return examine;
         }
 
-        public async Task UniversalCommentExaminedAsync(Comment comment, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalCommentExaminedAsync(Comment comment, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3664,11 +3988,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
-                var examine = new Examine
+                 examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3680,16 +4004,21 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     Note = note
                 };
                 //添加到审核列表
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
+            //log
+            _logger.LogInformation("{User}({Id})发表评论({EntryId}) {Admin}", user.UserName, user.Id, comment.Id, isAdmin ? "(管理员身份忽略审核)" : "");
+
+            return examine;
         }
 
-        public async Task UniversalEditPlayedGameExaminedAsync(PlayedGame playedGame, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        public async Task<Examine> UniversalEditPlayedGameExaminedAsync(PlayedGame playedGame, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
         {
+            Examine examine = null;
             if (isAdmin)
             {
                 //添加到审核列表
-                var examine = new Examine
+                examine = new Examine
                 {
                     Operation = operation,
                     Context = examineStr,
@@ -3701,18 +4030,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     ApplicationUserId = user.Id,
                     Note = note
                 };
-                _ = await _examineRepository.InsertAsync(examine);
+                examine = await _examineRepository.InsertAsync(examine);
             }
             else
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                var examine = await GetUserPlayedGameActiveExamineAsync(playedGame.Id, user.Id, operation);
+                examine = await GetUserPlayedGameActiveExamineAsync(playedGame.Id, user.Id, operation);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    _ = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateAsync(examine);
                 }
                 else
                 {
@@ -3728,10 +4057,67 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Note = note
                     };
                     //添加到审核列表
-                    _ = await _examineRepository.InsertAsync(examine);
+                    examine = await _examineRepository.InsertAsync(examine);
                 }
             }
+            //log
+            _logger.LogInformation("{User}({Id})编辑游玩记录({EntryId}) {Admin}", user.UserName, user.Id, playedGame.Id,isAdmin ? "(管理员身份忽略审核)" : "");
+
+            return examine;
         }
+
+        public async Task<Examine> UniversalEditUserCertificationExaminedAsync(UserCertification userCertification, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        {
+            Examine examine = null;
+            if (isAdmin)
+            {
+                //添加到审核列表
+                examine = new Examine
+                {
+                    Operation = operation,
+                    Context = examineStr,
+                    IsPassed = true,
+                    PassedAdminName = user.UserName,
+                    PassedTime = DateTime.Now.ToCstTime(),
+                    ApplyTime = DateTime.Now.ToCstTime(),
+                    ApplicationUserId = user.Id,
+                    Note = note
+                };
+                examine = await _examineRepository.InsertAsync(examine);
+            }
+            else
+            {
+                //查找是否在之前有审核
+                //获取审核记录
+                examine = await GetUserUserCertificationActiveExamineAsync(user.Id, operation);
+                if (examine != null)
+                {
+                    examine.Context = examineStr;
+                    examine.ApplyTime = DateTime.Now.ToCstTime();
+                    examine = await _examineRepository.UpdateAsync(examine);
+                }
+                else
+                {
+                    examine = new Examine
+                    {
+                        Operation = operation,
+                        Context = examineStr,
+                        IsPassed = null,
+                        PassedTime = null,
+                        ApplyTime = DateTime.Now.ToCstTime(),
+                        ApplicationUserId = user.Id,
+                        Note = note
+                    };
+                    //添加到审核列表
+                    examine = await _examineRepository.InsertAsync(examine);
+                }
+            }
+            //log
+            _logger.LogInformation("{User}({Id})申请用户认证 {Admin}", user.UserName, user.Id, isAdmin ? "(管理员身份忽略审核)" : "");
+
+            return examine;
+        }
+
 
         #endregion
 
@@ -3788,18 +4174,23 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         case Operation.EstablishTags:
                             await ExamineEstablishTagsAsync(entry, item.Key as EntryTags);
                             break;
+                        case Operation.EstablishAudio:
+                            await ExamineEstablishAudioAsync(entry, item.Key as EntryAudioExamineModel);
+                            break;
                         default:
                             throw new Exception("不支持的类型");
                     }
 
                     _ = await UniversalEstablishExaminedAsync(entry, user, true, resulte, item.Value, note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, entry.Id, item.Value);
                 }
                 else
                 {
                     _ = await UniversalEstablishExaminedAsync(entry, user, false, resulte, item.Value, note);
                 }
             }
+
+            //更新用户积分
+            await _userService.UpdateUserIntegral(user);
 
             return entry;
         }
@@ -3854,13 +4245,14 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     }
 
                     _ = await UniversalCreateArticleExaminedAsync(article, user, true, resulte, item.Value, note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, article.Id, item.Value);
                 }
                 else
                 {
                     _ = await UniversalCreateArticleExaminedAsync(article, user, false, resulte, item.Value, note);
                 }
             }
+            //更新用户积分
+            await _userService.UpdateUserIntegral(user);
 
             return article;
         }
@@ -3912,13 +4304,14 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     }
 
                     _ = await UniversalCreatePeripheryExaminedAsync(periphery, user, true, resulte, item.Value, note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, periphery.Id, item.Value);
                 }
                 else
                 {
                     _ = await UniversalCreatePeripheryExaminedAsync(periphery, user, false, resulte, item.Value, note);
                 }
             }
+            //更新用户积分
+            await _userService.UpdateUserIntegral(user);
 
             return periphery;
         }
@@ -3967,13 +4360,14 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     }
 
                     _ = await UniversalCreateTagExaminedAsync(tag, user, true, resulte, item.Value, note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, tag.Id, item.Value);
                 }
                 else
                 {
                     _ = await UniversalCreateTagExaminedAsync(tag, user, false, resulte, item.Value, note);
                 }
             }
+            //更新用户积分
+            await _userService.UpdateUserIntegral(user);
 
             return tag;
         }
@@ -4011,9 +4405,15 @@ namespace CnGalWebSite.APIServer.Application.Examines
         {
             return await _examineRepository.FirstOrDefaultAsync(s => s.PeripheryId == peripheryId && s.ApplicationUserId == userId && s.Operation == operation && s.IsPassed == null);
         }
+
         public async Task<Examine> GetUserPlayedGameActiveExamineAsync(long peripheryId, string userId, Operation operation)
         {
             return await _examineRepository.FirstOrDefaultAsync(s => s.PlayedGameId == peripheryId && s.ApplicationUserId == userId && s.Operation == operation && s.IsPassed == null);
+        }
+
+        public async Task<Examine> GetUserUserCertificationActiveExamineAsync( string userId, Operation operation)
+        {
+            return await _examineRepository.FirstOrDefaultAsync(s =>s.ApplicationUserId == userId && s.Operation == operation && s.IsPassed == null);
         }
 
         #endregion
@@ -4826,6 +5226,248 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
         }
 
+        /// <summary>
+        /// 迁移词条审核数据 附加信息 Staff部分
+        /// </summary>
+        /// <returns></returns>
+        public async Task ReplaceEditEntryStaffExamineContext()
+        {
+            EntryAddInfor oldExamineModel = null;
+            EntryAddInfor newExamineModel = null;
+            //获取要替换的所有审核记录ID
+            var ids = await _examineRepository.GetAll().AsNoTracking()
+                .Where(s => s.Operation == Operation.EstablishAddInfor && s.Version != ExamineVersion.V1_2).Select(s => s.Id).ToListAsync();
+
+            //遍历列表 依次替换
+            foreach (var id in ids)
+            {
+                var examine = await _examineRepository.GetAll().Include(s => s.Entry).FirstOrDefaultAsync(s => s.Id == id);
+                if (examine != null)
+                {
+                    //反序列化旧数据模型                   
+                    using (TextReader str = new StringReader(examine.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        oldExamineModel = (EntryAddInfor)serializer.Deserialize(str, typeof(EntryAddInfor));
+                    }
+
+                    newExamineModel = new EntryAddInfor();
+
+                    //遍历对应复制
+
+                    //处理Staff
+                    foreach (var item in oldExamineModel.Information.Where(s=>s.Modifier=="STAFF"))
+                    {
+
+                        var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayValue&&(s.Type== EntryType.ProductionGroup||s.Type== EntryType.Staff));
+
+                        var temp = new EntryStaffExamineModel();
+                        if(entry==null)
+                        {
+                            temp.Name = item.DisplayValue;
+                        }
+                        else
+                        {
+                            temp.StaffId = entry.Id;
+                        }
+
+                        foreach (var infor in item.Additional.Where(s=>s.IsDelete==false))
+                        {
+                            if(infor.DisplayName== "职位（官方称呼）")
+                            {
+                                temp.PositionOfficial = infor.DisplayValue;
+                            }
+                            else if (infor.DisplayName == "职位（通用）")
+                            {
+                                temp.PositionGeneral = (PositionGeneralType)Enum.Parse(typeof(PositionGeneralType), infor.DisplayValue);
+                            }
+                            else if (infor.DisplayName == "隶属组织")
+                            {
+                                temp.SubordinateOrganization = infor.DisplayValue;
+                            }
+                            else if (infor.DisplayName == "子项目")
+                            {
+                                temp.Modifier = infor.DisplayValue;
+                            }
+                        }
+
+                        if(string.IsNullOrWhiteSpace(temp.PositionOfficial))
+                        {
+                            temp.PositionOfficial = item.DisplayName;
+                        }
+
+                        newExamineModel.Staffs.Add(temp);
+                    }
+
+                    //处理发行商
+                    await SetStaffsFromString(newExamineModel, oldExamineModel.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "发行商")?.DisplayValue, PositionGeneralType.Publisher);
+                    await SetStaffsFromString(newExamineModel, oldExamineModel.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "制作组")?.DisplayValue, PositionGeneralType.ProductionGroup);
+                    await SetStaffsFromString(newExamineModel, oldExamineModel.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "声优")?.DisplayValue, PositionGeneralType.CV);
+
+                    //删除旧数据
+                   oldExamineModel.Information.RemoveAll(s => s.Modifier == "STAFF" || s.DisplayName == "发行商" || s.DisplayName == "制作组" || s.DisplayName == "声优");
+                    //复制其他信息
+                    newExamineModel.Information = oldExamineModel.Information;
+                   //序列化新数据模型
+                   var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, newExamineModel);
+                        resulte = text.ToString();
+                    }
+
+                    //保存
+                    if (newExamineModel.Staffs.Count != 0)
+                    {
+                        examine.Note += "\n" + DateTime.Now.ToCstTime().ToString("yyyy年MM月dd日 HH:mm") + " 迁移词条附加信息Staff部分编辑记录";
+                    }
+
+                    _logger.LogInformation("迁移词条 - {Name}({Id}) 附加信息Staff部分编辑记录(Id:{Examine})", examine.Entry.Name, examine.Entry.Id,examine.Id);
+
+                    examine.Version = ExamineVersion.V1_2;
+                    examine.Context = resulte;
+                    _ = await _examineRepository.UpdateAsync(examine);
+                }
+            }
+        }
+        /// <summary>
+        /// 迁移词条附加信息 Staff部分
+        /// </summary>
+        /// <returns></returns>
+        public async Task ReplaceEntryStaff()
+        {
+            var entries = await _entryRepository.GetAll()
+                .Where(s => s.Type == EntryType.Game || s.Type == EntryType.Role)
+                .Where(s => s.Information.Any())
+                .Include(s => s.Information).ThenInclude(s => s.Additional)
+                .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .ToListAsync();
+
+            foreach (var entry in entries)
+            {
+                //处理Staff
+                foreach (var item in entry.Information.Where(s => s.Modifier == "STAFF"))
+                {
+
+                    var staff = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.DisplayValue&&(s.Type== EntryType.ProductionGroup||s.Type== EntryType.Staff));
+
+                    var temp = new EntryStaff
+                    {
+                        FromEntry = entry.Id,
+                        FromEntryNavigation = entry
+                    };
+                    if (staff == null)
+                    {
+                        temp.Name = item.DisplayValue;
+                    }
+                    else
+                    {
+                        temp.ToEntry = staff.Id;
+                        temp.ToEntryNavigation = staff;
+                    }
+
+                    foreach (var infor in item.Additional)
+                    {
+                        if (infor.DisplayName == "职位（官方称呼）")
+                        {
+                            temp.PositionOfficial = infor.DisplayValue;
+                        }
+                        else if (infor.DisplayName == "职位（通用）")
+                        {
+                            temp.PositionGeneral = (PositionGeneralType)Enum.Parse(typeof(PositionGeneralType), infor.DisplayValue);
+                        }
+                        else if (infor.DisplayName == "隶属组织")
+                        {
+                            temp.SubordinateOrganization = infor.DisplayValue;
+                        }
+                        else if (infor.DisplayName == "子项目")
+                        {
+                            temp.Modifier = infor.DisplayValue;
+                        }
+                    }
+
+                    if (string.IsNullOrWhiteSpace(temp.PositionOfficial))
+                    {
+                        temp.PositionOfficial = item.DisplayName;
+                    }
+                    if(temp.PositionGeneral== PositionGeneralType.Other)
+                    {
+                        temp.PositionGeneral = ToolHelper.GetGeneralType(temp.PositionOfficial);
+                    }
+
+                    entry.EntryStaffFromEntryNavigation.Add(temp);
+                }
+
+                //处理发行商
+                await SetStaffsFromString(entry, entry.Information.FirstOrDefault(s =>s.Modifier=="基本信息"&& s.DisplayName == "发行商")?.DisplayValue, PositionGeneralType.Publisher);
+                await SetStaffsFromString(entry, entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "制作组")?.DisplayValue, PositionGeneralType.ProductionGroup);
+                await SetStaffsFromString(entry, entry.Information.FirstOrDefault(s => s.Modifier == "基本信息" && s.DisplayName == "声优")?.DisplayValue, PositionGeneralType.CV);
+
+                //删除旧数据
+                var list = entry.Information.ToList();
+                list.RemoveAll(s => s.Modifier == "STAFF" || s.DisplayName == "发行商" || s.DisplayName == "制作组" || s.DisplayName == "声优" || s.DisplayName == "昵称"||s.DisplayName== "昵称（官方称呼）");
+                list.RemoveAll(s => s.Modifier == "基本信息" && s.DisplayName == "昵称");
+                entry.Information = list;
+
+                _ = await _entryRepository.UpdateAsync(entry);
+
+                _logger.LogInformation("迁移词条 - {Name}({Id}) 附加信息Staff部分数据", entry.Name, entry.Id);
+            }
+        }
+        /// <summary>
+        /// 从字符串中设置Staff
+        /// </summary>
+        private async Task SetStaffsFromString(EntryAddInfor model, string text, PositionGeneralType type)
+        {
+            if (string.IsNullOrWhiteSpace(text) == false)
+            {
+                var publishers = text.Replace("，", ",").Replace("、", ",").Split(',');
+                var publisherEntries = await _entryRepository.GetAll().Where(s => publishers.Contains(s.Name)).ToListAsync();
+                foreach (var publisher in publishers)
+                {
+                    var publisherEntry = publisherEntries.FirstOrDefault(s => s.Name == publisher);
+                    model.Staffs.Add(new EntryStaffExamineModel
+                    {
+                        IsDelete=false,
+                        Name = publisherEntry == null ? publisher : null,
+                        StaffId= publisherEntry?.Id,
+                        PositionGeneral = type,
+                        PositionOfficial = type.GetDisplayName()
+                    });
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// 从字符串中设置Staff
+        /// </summary>
+        /// <param name="newEntry"></param>
+        /// <param name="text"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private async Task SetStaffsFromString(Entry newEntry, string text, PositionGeneralType type)
+        {
+            if (string.IsNullOrWhiteSpace(text) == false)
+            {
+                var publishers = text.Replace("，", ",").Replace("、", ",").Split(',');
+                var publisherEntries = await _entryRepository.GetAll().Where(s => publishers.Contains(s.Name)).ToListAsync();
+                foreach (var publisher in publishers)
+                {
+                    var publisherEntry = publisherEntries.FirstOrDefault(s => s.Name == publisher);
+                    newEntry.EntryStaffFromEntryNavigation.Add(new EntryStaff
+                    {
+                        Name = publisherEntry == null ? publisher : null,
+                        ToEntry = publisherEntry?.Id,
+                        ToEntryNavigation = publisherEntry,
+                        PositionGeneral = type,
+                        PositionOfficial=type.GetDisplayName()
+                    });
+                }
+
+            }
+        }
         #endregion
 
         #region 通过审核记录生成模型 用于对比编辑
@@ -4840,6 +5482,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                  .Include(s => s.Outlinks)
                  .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
                  .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                  .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
                  .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
                  .FirstOrDefaultAsync(s => s.Id == entryId);
@@ -5093,6 +5736,130 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 throw new Exception("不支持的类型");
             }
+
+        }
+
+        #endregion
+
+        #region 补全数据关联
+        /// <summary>
+        /// 刷新词条Staff关联
+        /// </summary>
+        /// <returns></returns>
+        public async Task RefreshAllEntryStaffRelevances(bool autoCreate, PositionGeneralType type)
+        {
+            var ids = await _entryRepository.GetAll().AsNoTracking()
+                .Where(s => s.Type == EntryType.Game || s.Type == EntryType.Role)
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name)==false)
+                .Select(s=>s.Id)
+                .ToListAsync();
+            foreach(var item in ids)
+            {
+                await RefreshEntryStaffRelevances(item, autoCreate, type);
+            }
+        }
+        /// <summary>
+        /// 刷新词条Staff关联
+        /// </summary>
+        /// <returns></returns>
+        public async Task RefreshEntryStaffRelevances(int id, bool autoCreate, PositionGeneralType type)
+        {
+            var currentEntry = await _entryRepository.GetAll()
+                .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s => s.Information).ThenInclude(s => s.Additional)
+                .FirstOrDefaultAsync(s => s.Id == id);
+            var entry = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s=>s.Information).ThenInclude(s=>s.Additional)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            var admin = await _userManager.FindByIdAsync(_configuration["ExamineAdminId"]);
+            if (entry == null)
+            {
+                return;
+            }
+
+            //遍历Staff
+
+            foreach (var item in entry.EntryStaffFromEntryNavigation.Where(s => s.ToEntryNavigation == null && string.IsNullOrWhiteSpace(s.Name) == false && s.PositionGeneral == type))
+            {
+                var newEntry = await _entryRepository.FirstOrDefaultAsync(s => s.Name == item.Name/*&&(s.Type== EntryType.ProductionGroup||s.Type== EntryType.Staff)*/);
+                if (newEntry == null)
+                {
+                    if (autoCreate)
+                    {
+                        newEntry = new Entry
+                        {
+                            Name = item.Name,
+                            DisplayName = item.Name,
+                            Type = EntryType.Staff,
+
+                        };
+                        try
+                        {
+                            newEntry = await AddNewEntryExaminesAsync(newEntry, admin, "自动创建Staff");
+                            _logger.LogInformation("自动创建词条 - {Name}({Id}) 的Staff - {Staff}", entry.Name, entry.Id, newEntry.Name);
+
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "自动创建词条失败 - {Name}({Id}) 的Staff - {Staff}", entry.Name, entry.Id, newEntry.Name);
+
+                        }
+
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+
+                item.Name = null;
+                item.ToEntry = newEntry.Id;
+                item.ToEntryNavigation = newEntry;
+            }
+
+            //保存更改
+
+            var examines = _entryService.ExaminesCompletion(currentEntry, entry);
+
+            if (examines.Any(s => s.Value == Operation.EstablishAddInfor) == false)
+            {
+                return;
+            }
+            var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishAddInfor);
+            //序列化
+            var resulte = "";
+            using (TextWriter text = new StringWriter())
+            {
+                var serializer = new JsonSerializer();
+                serializer.Serialize(text, examine.Key);
+                resulte = text.ToString();
+            }
+            try
+            {
+                await ExamineEstablishAddInforAsync(currentEntry, examine.Key as EntryAddInfor);
+                await UniversalEditExaminedAsync(currentEntry, admin, true, resulte, Operation.EstablishAddInfor, "自动创建Staff");
+                await _userService.UpdateUserIntegral(admin);
+
+                _logger.LogInformation("成功刷新词条 - {Name}({Id}) 的Staff关联", entry.Name, entry.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "刷新词条 - {Name}({Id}) 的Staff关联失败", entry.Name, entry.Id);
+            }
+        }
+
+        #endregion
+
+        #region 监视
+
+        /// <summary>
+        /// 将用户监视的添加到其审阅列表中
+        /// </summary>
+        /// <returns></returns>
+        public async Task AddExamineToUserReviewList(Examine examine)
+        {
 
         }
 

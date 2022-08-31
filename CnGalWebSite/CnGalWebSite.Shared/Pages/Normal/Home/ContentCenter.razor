@@ -1,0 +1,115 @@
+﻿@page "/contentcenter"
+
+@attribute [Authorize]
+
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<TitleTip Title="@("内容中心"+Tab switch {"monitor"=>" - 监视列表","review"=> " - 审阅记录列表","editrecord" =>" - 审核",_=>""})" />
+
+<div class="rounded  shadow-sm bg-opacity mb-4">
+    <MTabs Value="TabIndex" ValueChanged="IndexChanged" IconsAndText Grow Class="rounded" CenterActive
+           Color="@_dataCacheService.ThemeSetting.Theme">
+
+        <MTab Value="1">
+            概览<MIcon>mdi-home</MIcon>
+        </MTab>
+        <MTab Value="2">
+            关注<MIcon>mdi-monitor</MIcon>
+        </MTab>
+        <MTab Value="3">
+            审阅记录<MIcon>mdi-read</MIcon>
+        </MTab>
+        <MTab Value="4">
+            审核<MIcon>mdi-pencil</MIcon>
+        </MTab>
+    </MTabs>
+</div>
+<MTabsItems @bind-Value="TabIndex">
+    <MTabItem Value="1">
+
+        <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.HomeCard />
+    </MTabItem>
+    <MTabItem Value="2">
+        <div class="  rounded shadow-sm p-3 bg-opacity">
+            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListMonitors />
+        </div>
+    </MTabItem>
+    <MTabItem Value="3">
+        <div class="  rounded shadow-sm p-3 bg-opacity">
+            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListReviewEditRecords />
+        </div>
+    </MTabItem>
+    <MTabItem Value="4">
+        <div class="  rounded shadow-sm p-3 bg-opacity">
+            <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListExamines />
+        </div>
+    </MTabItem>
+</MTabsItems>
+
+
+
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string Tab { get; set; }
+
+    public StringNumber TabIndex { get; set; } = 1;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            NavigationManager.LocationChanged += LocationChanged;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        LocationChanged(null, null);
+
+    }
+
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        TabIndex = Tab switch
+        {
+            "monitor" => 2,
+            "review" => 3,
+            "editrecord" => 4,
+            _ => 1
+        };
+        StateHasChanged();
+    }
+
+    public Task IndexChanged(StringNumber value)
+    {
+        TabIndex = value;
+
+        NavigationManager.NavigateTo(TabIndex.ToInt32() switch
+        {
+            2 => "/contentcenter?Tab=monitor",
+            3 => "/contentcenter?Tab=review",
+            4 => "/contentcenter?Tab=editrecord",
+            _ => "/contentcenter"
+        });
+
+        return Task.CompletedTask;
+
+    }
+
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        NavigationManager.LocationChanged -= LocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}
+

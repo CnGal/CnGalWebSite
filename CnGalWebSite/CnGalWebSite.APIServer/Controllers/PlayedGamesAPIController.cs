@@ -1,4 +1,5 @@
 ﻿using BlazorComponent;
+using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.PlayedGames;
@@ -44,9 +45,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IUserService _userService;
         private readonly ILogger<PlayedGamesAPIController> _logger;
         private readonly IOperationRecordService _operationRecordService;
+        private readonly IEditRecordService _editRecordService;
 
         public PlayedGamesAPIController(IPlayedGameService playedGameService, ISteamInforService steamInforService, IRepository<ApplicationUser, string> userRepository, UserManager<ApplicationUser> userManager,
-            ILogger<PlayedGamesAPIController> logger, IOperationRecordService operationRecordService,
+            ILogger<PlayedGamesAPIController> logger, IOperationRecordService operationRecordService, IEditRecordService editRecordService,
         IRepository<PlayedGame, long> playedGameRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IExamineService examineService, IUserService userService, IRepository<Examine, string> examineRepository)
         {
             _entryRepository = entryRepository;
@@ -61,6 +63,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _examineRepository=examineRepository;
             _logger = logger;
             _operationRecordService = operationRecordService;
+            _editRecordService = editRecordService;
         }
 
         /// <summary>
@@ -216,30 +219,13 @@ namespace CnGalWebSite.APIServer.Controllers
                 PlayImpressions=model.PlayImpressions,
                 ShowPublicly=model.ShowPublicly
             };
-            //序列化JSON
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, playedGameMain);
-                resulte = text.ToString();
-            }
 
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEditPlayedGameMainAsync(game, playedGameMain);
-                await _examineService.UniversalEditPlayedGameExaminedAsync(game, user, true, resulte, Operation.EditPlayedGameMain, "");
-                await _appHelper.AddUserContributionValueAsync(user.Id, game.Id, Operation.EditPlayedGameMain);
-
-            }
-            else
-            {
-                await _examineService.UniversalEditPlayedGameExaminedAsync(game, user, false, resulte, Operation.EditPlayedGameMain, "");
-            }
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(game, user, playedGameMain, Operation.EditPlayedGameMain, "");
 
             return new Result { Successful = true };
         }
+
         /// <summary>
         /// 折叠游戏记录
         /// </summary>
@@ -364,7 +350,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var model = new PlayedGameOverviewModel
             {
-                Game = await _appHelper.GetEntryInforTipViewModel(entry),
+                Game = _appHelper.GetEntryInforTipViewModel(entry),
                 UserScores = entry.PlayedGames.Where(s => s.ShowPublicly).Select(s => new PlayedGameUserScoreModel
                 {
                     Socres = new PlayedGameScoreModel

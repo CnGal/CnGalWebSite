@@ -9,7 +9,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
 
         public string BriefIntroduction { get; set; }
 
-        public string Image { get; set; }
+        public string MainImage { get; set; }
 
         public DateTime? PublishTime { get; set; }
 
@@ -34,7 +34,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
         /// </summary>
         public int RecommendationRate { get; set; }
 
-        public int EntryId { get; set; }
+        /// <summary>
+        /// 词条Id
+        /// </summary>
+        public int Id { get; set; }
 
         public DateTime LowestTime { get; set; }
     }

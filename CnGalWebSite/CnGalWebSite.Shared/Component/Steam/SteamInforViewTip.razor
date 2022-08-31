@@ -2,12 +2,12 @@
 
 
 
-<a href="@("/entries/index/" + Model.EntryId)" class="a-font-color">
+<a href="@("/entries/index/" + Model.Id)" class="a-font-color">
     @if (Type == SteamDisplayType.LargeCard)
     {
         <div class="div-shadow rounded  bg-opacity h-100">
             <div class="h-100" style="display: flex; flex-direction: column;">
-                <img class="w-100" src="@Model.Image" alt="@Model.Name">
+                <img class="w-100" src="@Model.MainImage" alt="@Model.Name">
                 <div class="p-3 pb-2 h-100" style=" display: flex; flex-direction: column; justify-content: space-between;">
                     <div style="display: flex; width: 100%;">
                         <div style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
@@ -78,7 +78,7 @@
         {
             <div style="display:flex;" class="shadow-sm bg-opacity rounded">
                 <div style="display: flex; width: 100%;">
-                    <img style=" height: 67px; " src="@Model.Image">
+                    <img style=" height: 67px; " src="@Model.MainImage">
                     <div class="ps-2" style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
                         <span class="text-truncate-1" style="font-size: larger;">@Model.Name</span>
                         <div style="display: flex; flex-direction: column;">
@@ -119,7 +119,7 @@
             <div class="div-shadow rounded  bg-opacity p-3 h-100">
                 <div style="display:flex;">
                     <div style="display: flex; width: 100%;">
-                        <img style="height: 115px;" src="@Model.Image">
+                        <img style="height: 115px;" src="@Model.MainImage">
                         <div class="ps-3" style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
                             <header class="text-truncate-2">
                                 <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>

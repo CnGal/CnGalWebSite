@@ -1,0 +1,183 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@if (noData)
+{
+    <div class="p-4" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+        <div style="width: 100%;">
+            <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;margin-left: 15%;margin-right: 15%;">
+            <div class="h5 text-center mt-4" style=" font-weight: 600;">
+                找不到数据欸......
+                可以尝试申请 <a href="/space/editdata" class="alert-link">用户认证</a> 哦~
+            </div>
+        </div>
+    </div>
+}
+else
+{
+
+    <Table TItem="ListExamineAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelExamine" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true" IsAutoRefresh="@IsAutoRefresh">
+        <TableToolbarTemplate>
+            <TableToolbarButton TItem="ListExamineAloneModel" Color="Color.Success" Icon="fa fa-paper-plane-o" Text="通过审核" OnClickCallback="OnPassedExamineClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListExamineAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="驳回审核" OnClickCallback="OnUnPassedExamineClick" IsAsync="true" />
+        </TableToolbarTemplate>
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable="true" Fixed="true" Width="60" DefaultSortOrder="@SortOrder.Desc" />
+            <TableColumn @bind-Field="@context.Operation" Sortable="true" Searchable="true" Width="200" />
+            <TableColumn @bind-Field="@context.IsPassed" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="120" Lookup="DataSource" />
+            <TableColumn @bind-Field="@context.PassedTime" Sortable="true" TextWrap="true" Width="180" />
+
+            <TableColumn @bind-Field="@context.ApplyTime" Sortable="true" TextWrap="true" Width="180" />
+
+
+            <TableColumn @bind-Field="@context.UserName" Searchable="true" Sortable="true" Width="300" />
+            <TableColumn @bind-Field="@context.PassedAdminName" Searchable="true" TextWrap="true" Sortable="true" Width="200" />
+            <TableColumn @bind-Field="@context.Comments" Sortable="true" TextWrap="true" Searchable="true" Width="350" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.Id))" />
+        </RowButtonTemplate>
+    </Table>
+}
+
+
+@code {
+    [NotNull]
+
+    private Table<ListExamineAloneModel>? TableRows { get; set; }
+    private List<ListExamineAloneModel> SelectedRows { get; set; } = new();
+
+    public ListExaminesInforViewModel InforModel { get; set; } = new ListExaminesInforViewModel();
+    public ListExaminesViewModel ListModel { get; set; } = new ListExaminesViewModel { Examines = new List<ListExamineAloneModel>() };
+
+    private ListExamineAloneModel SearchModelExamine { get; set; } = new ListExamineAloneModel();
+
+    private IEnumerable<int> PageItems => new int[] { 10, 20, 40, 80, 200, 5000 };
+
+    List<SelectedItem> DataSource = new List<SelectedItem>
+{
+           new SelectedItem{ Value = "true", Text ="已通过" },
+          new SelectedItem{ Value = "false", Text ="未通过"}
+    };
+    private bool IsAutoRefresh { get; set; } = false;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    bool isFirst = true;
+    bool noData;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private async Task<QueryData<ListExamineAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
+    {
+        try
+        {
+            options.Filters = new List<IFilterAction>();
+            options.Searchs = new List<IFilterAction>();
+
+            var result = await Http.PostAsJsonAsync<ExaminesPagesInfor>(ToolHelper.WebApiPath + "api/examines/GetExamineList", new ExaminesPagesInfor { SearchModel = SearchModelExamine, Options = (QueryPageOptionsHelper)options });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+
+
+            var data = JsonSerializer.Deserialize<QueryData<ListExamineAloneModel>>(jsonContent, ToolHelper.options);
+
+            if (isFirst)
+            {
+                if (data.TotalCount == 0)
+                {
+                    noData = true;
+                }
+            }
+
+            isFirst = false;
+
+            StateHasChanged();
+
+            return data;
+        }
+        catch (Exception exc)
+        {
+            await ToastService.Error("无法获取审核列表", "未知异常，请在确保网络正常后联系开发人员");
+            noData = true;
+            return new QueryData<ListExamineAloneModel>();
+        }
+    }
+    public Task OnRowLookClick(long id)
+    {
+        NavigationManager.NavigateTo("/examine?Id=" + id);
+        return Task.CompletedTask;
+    }
+    private async Task OnExamine(long examineId, bool isPassed, bool showMessage)
+    {
+        //上传
+        try
+        {
+
+            var result = await Http.PostAsJsonAsync<ExamineProcModel>(ToolHelper.WebApiPath + "api/examines/proc", new ExamineProcModel { Id = examineId, IsPassed = isPassed, Comments = "" });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("审核失败", obj.Error);
+            }
+            else
+            {
+                if (showMessage)
+                {
+                    await ToastService.Success("审核成功", "对第" + examineId + "条记录的审核已完成");
+                    //   await TableRows.QueryAsync();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "审核失败");
+        }
+    }
+    private async Task OnPassedExamineClick(IEnumerable<ListExamineAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有进行审核", "请选中词条");
+            return;
+        }
+        foreach (var item in items)
+        {
+            await OnExamine(item.Id, true, false);
+        }
+
+        await ToastService.Information("发送批量审核请求成功", "不代表操作会真实生效，可能产生错误");
+        // await TableRows.QueryAsync();
+    }
+    private async Task OnUnPassedExamineClick(IEnumerable<ListExamineAloneModel> items)
+    {
+        if (items.Count() == 0)
+        {
+            await ToastService.Information("没有进行审核", "请选中词条");
+            return;
+        }
+        foreach (var item in items)
+        {
+            await OnExamine(item.Id, false, false);
+        }
+
+        await ToastService.Information("发送批量审核请求成功", "不代表操作会真实生效，可能产生错误");
+        // await TableRows.QueryAsync();
+    }
+    private Task ClickIsAutoRefresh(IEnumerable<ListExamineAloneModel> items)
+    {
+        IsAutoRefresh = !IsAutoRefresh;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

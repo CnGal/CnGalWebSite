@@ -43,7 +43,10 @@
                 if (obj.Successful)
                 {
                     //向用户文件管理添加信息
-                    await _appHelper.AddUserLoadedFileInfor(obj.Url, 0);
+                    await _appHelper.AddUserLoadedFileInfor(new UploadResult
+                    {
+                        FileURL = obj.Url,
+                    }, UploadFileType.Image);
 
                     sb.Replace(item, obj.Url);
                 }

@@ -207,3 +207,14 @@ function setStructuredData(data) {
     structuredData.innerText = data;
 }
 
+var audio = new Audio();
+function playAudio(url) {
+    if (audio.currentTime == 0) {
+        audio.src = url;
+        audio.play();
+    }
+    else {
+        audio.pause();
+        audio.currentTime = 0;
+    }
+}

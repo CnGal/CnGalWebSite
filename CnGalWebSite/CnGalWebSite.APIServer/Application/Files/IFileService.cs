@@ -8,7 +8,9 @@ namespace CnGalWebSite.APIServer.Application.Files
 {
     public interface IFileService
     {
-        Task<PagedResultDto<ImageInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input);
+        Task<PagedResultDto<ListFileAloneModel>> GetAudioPaginatedResult(PagedSortedAndFilterInput input);
+
+        Task<PagedResultDto<ImageInforTipViewModel>> GetImagePaginatedResult(PagedSortedAndFilterInput input);
 
         Task<QueryData<ListFileAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListFileAloneModel searchModel);
 

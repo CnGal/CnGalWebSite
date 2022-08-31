@@ -1,4 +1,5 @@
 ﻿
+using CnGalWebSite.DataModel.ViewModel.Files;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,15 +17,26 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
     {
         [Display(Name = "Id")]
         public int Id { get; set; }
-        [Display(Name = "文件名")]
+        [Display(Name = "链接")]
         public string FileName { get; set; }
-        [Display(Name = "大小")]
+        [Display(Name = "文件大小")]
         public long? FileSize { get; set; }
         [Display(Name = "上传时间")]
         public DateTime UploadTime { get; set; }
 
         [Display(Name = "上传的用户Id")]
         public string UserId { get; set; }
+        [Display(Name = "上传的用户")]
+        public string UserName { get; set; }
+        [Display(Name = "Sha1")]
+        public string Sha1 { get; set; }
+
+
+        [Display(Name = "音频长度")]
+        public TimeSpan? Duration { get; set; }
+
+        [Display(Name = "文件类型")]
+        public UploadFileType Type { get; set; }
 
     }
 

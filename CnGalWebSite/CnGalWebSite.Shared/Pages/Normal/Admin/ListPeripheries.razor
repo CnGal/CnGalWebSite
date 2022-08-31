@@ -88,9 +88,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-#if DEBUG
-        //Thread.Sleep(10000);
-#endif
         try
         {
             InforModel = await Http.GetFromJsonAsync<ListPeripheriesInforViewModel>(ToolHelper.WebApiPath + "api/admin/listperipheries");

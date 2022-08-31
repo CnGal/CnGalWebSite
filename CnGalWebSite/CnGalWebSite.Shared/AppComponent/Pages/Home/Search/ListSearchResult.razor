@@ -21,7 +21,7 @@
                     @if (context.entry.Type == EntryType.Game || context.entry.Type == EntryType.ProductionGroup)
                     {
                         <div class="col-6 mb-3">
-                            <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new AppComponent.Normal.Cards.MainImageCardModel { CommentCount = context.entry.CommentCount, Image = context.entry.MainImage, Name = context.entry.DisplayName, ReadCount = context.entry.ReaderCount, Url = "/entries/index/" + context.entry.Id })" />
+                            <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new AppComponent.Normal.Cards.MainImageCardModel { CommentCount = context.entry.CommentCount, Image = context.entry.MainImage, Name = context.entry.Name, ReadCount = context.entry.ReaderCount, Url = "/entries/index/" + context.entry.Id })" />
 
                         </div>
 
@@ -29,7 +29,7 @@
                     else if (context.entry.Type == EntryType.Staff || context.entry.Type == EntryType.Role)
                     {
                         <div class="col-6 mb-3">
-                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.StaffOrRoleCard Model="@(new Entries.Normal.Relevances.StaffOrRoleCardModel { Image = context.entry.MainImage, Name = context.entry.DisplayName, InforModel = context.entry.AddInfors.FirstOrDefault(), Description = context.entry.Name, EntryId = context.entry.Id })" />
+                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.StaffOrRoleCard Model="@(new Entries.Normal.Relevances.StaffOrRoleCardModel { Image = context.entry.MainImage, Name = context.entry.Name, InforModel = context.entry.AddInfors.FirstOrDefault(), Description = context.entry.Name, EntryId = context.entry.Id })" />
                         </div>
 
                     }
@@ -67,13 +67,13 @@
                     @if (context.entry.Type == EntryType.Game || context.entry.Type == EntryType.ProductionGroup)
                     {
                         <div class="col-12 mb-3">
-                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.GameCard Model="@(new Entries.Normal.Relevances.GameCardModel { Description = context.entry.BriefIntroduction, Image = context.entry.MainImage, EntryId = context.entry.Id, Title = context.entry.DisplayName })" />
+                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.GameCard Model="@(new Entries.Normal.Relevances.GameCardModel { Description = context.entry.BriefIntroduction, Image = context.entry.MainImage, EntryId = context.entry.Id, Title = context.entry.Name })" />
                         </div>
                     }
                     else
                     {
                         <div class="col-12 mb-3">
-                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.StaffCard Model="@(new Entries.Normal.Relevances.StaffCardModel { Description = context.entry.BriefIntroduction, Image = context.entry.MainImage, EntryId = context.entry.Id, Title = context.entry.DisplayName })" />
+                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.StaffCard Model="@(new Entries.Normal.Relevances.StaffCardModel { Description = context.entry.BriefIntroduction, Image = context.entry.MainImage, EntryId = context.entry.Id, Title = context.entry.Name })" />
                         </div>
 
                     }

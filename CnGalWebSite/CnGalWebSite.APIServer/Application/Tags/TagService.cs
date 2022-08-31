@@ -455,7 +455,7 @@ namespace CnGalWebSite.APIServer.Application.Tags
                 {
                     if (examiningList.Any(s => s == Operation.EditPeripheryMain))
                     {
-                        model.MainState = EditState.locked;
+                        model.MainState = EditState.Locked;
                     }
                     else
                     {
@@ -467,7 +467,7 @@ namespace CnGalWebSite.APIServer.Application.Tags
 
                     if (examiningList.Any(s => s == Operation.EditTagChildTags))
                     {
-                        model.ChildTagsState = EditState.locked;
+                        model.ChildTagsState = EditState.Locked;
                     }
                     else
                     {
@@ -478,7 +478,7 @@ namespace CnGalWebSite.APIServer.Application.Tags
                 {
                     if (examiningList.Any(s => s == Operation.EditTagChildEntries))
                     {
-                        model.ChildEntriesState = EditState.locked;
+                        model.ChildEntriesState = EditState.Locked;
                     }
                     else
                     {
@@ -511,15 +511,15 @@ namespace CnGalWebSite.APIServer.Application.Tags
 
 
 
-            foreach (var item in tag.InverseParentCodeNavigation)
+            foreach (var item in tag.InverseParentCodeNavigation.Where(s=>s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false))
             {
                 model.ChildrenTags.Add(_appHelper.GetTagInforTipViewModel(item));
             }
 
 
-            foreach (var item in tag.Entries.Where(s => s.IsHidden == false))
+            foreach (var item in tag.Entries.Where(s => s.IsHidden == false&&string.IsNullOrWhiteSpace(s.Name)==false))
             {
-                model.ChildrenEntries.Add(await _appHelper.GetEntryInforTipViewModel(item));
+                model.ChildrenEntries.Add( _appHelper.GetEntryInforTipViewModel(item));
             }
 
             return model;

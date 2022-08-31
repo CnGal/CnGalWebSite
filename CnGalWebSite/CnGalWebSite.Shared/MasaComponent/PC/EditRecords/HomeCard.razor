@@ -1,0 +1,66 @@
+﻿@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+
+@if (isReady)
+{
+    <div>
+        @if (showChart)
+        {
+            <div class="mb-4">
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.Square.EditOverviewCard />
+            </div>
+
+        }
+
+        <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListUnReviewEntriesCard Model="_dataCacheService.UserContentCenterCatche.UnReviewEntries" />
+        <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListUnReviewEditRecordsCard Model="_dataCacheService.UserContentCenterCatche.UnReviewExamines" />
+        <CnGalWebSite.Shared.MasaComponent.PC.EditRecords.UserCenter.ListPendingExaminesCard Model="_dataCacheService.UserContentCenterCatche.PendingExamines" />
+    </div>
+}
+else
+{
+    <div style="height:300px">
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
+    </div>
+
+}
+
+
+
+@code {
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    bool isReady;
+    bool showChart;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if(_dataCacheService.UserContentCenterCatche==null)
+            {
+                _dataCacheService.UserContentCenterCatche = await Http.GetFromJsonAsync<UserContentCenterViewModel>(ToolHelper.WebApiPath + "api/examines/GetUserContentCenterView");
+            }
+
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取内容中心视图数据");
+        }
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            showChart = true;
+            StateHasChanged();
+        }
+    }
+}
+

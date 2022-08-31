@@ -142,7 +142,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
                 {
                     dtos.Add(new FavoriteObjectAloneViewModel
                     {
-                        entry = await _appHelper.GetEntryInforTipViewModel(item.Entry)
+                        entry =  _appHelper.GetEntryInforTipViewModel(item.Entry)
                     });
                 }
                 else if (item.Type == FavoriteObjectType.Periphery)

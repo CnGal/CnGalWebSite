@@ -41,14 +41,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <param name="length">缩略长度</param>
         /// <returns>缩略后的字符串 末尾...</returns>
         string GetStringAbbreviation(string str, int length);
-        /// <summary>
-        /// 为用户添加贡献值或积分
-        /// </summary>
-        /// <param name="userId">用户Id</param>
-        /// <param name="otherId">词条或文章Id</param>
-        /// <param name="operation">操作</param>
-        /// <returns></returns>
-        Task AddUserContributionValueAsync(string userId, long otherId, Operation operation);
 
         /// <summary>
         /// 判断该 文章 部分是否被锁定
@@ -199,7 +191,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// </summary>
         /// <param name="entry">词条</param>
         /// <returns></returns>
-        Task<EntryInforTipViewModel> GetEntryInforTipViewModel(Entry entry);
+        EntryInforTipViewModel GetEntryInforTipViewModel(Entry entry);
         /// <summary>
         /// 获取为卡片展示优化的标签数据模型
         /// </summary>
@@ -218,12 +210,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <param name="jsonStr"></param>
         /// <returns></returns>
         string GetJsonStringView(string jsonStr);
-        /// <summary>
-        /// 更新用户积分
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        Task UpdateUserIntegral(ApplicationUser user);
+
         /// <summary>
         /// 将所有没有主图的游戏 设置为steam主图
         /// </summary>

@@ -1,0 +1,14 @@
+﻿<audio controls src="@Src" style="@($"height:{Height};min-width: 300px;")" class="@Class" autoplay="@AutoPlay">
+    您的浏览器不支持 audio 标签。
+</audio>
+
+@code {
+    [Parameter]
+    public string Src { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public bool AutoPlay { get; set; }
+    [Parameter]
+    public string Height { get; set; } = "30px";
+}

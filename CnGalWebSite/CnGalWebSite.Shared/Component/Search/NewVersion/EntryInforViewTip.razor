@@ -13,7 +13,7 @@
                     <div class="ms-2 me-2 w-100">
                         <span class="text-truncate-1">
                             <span class="app-card-tag">@Model.Type.GetDisplayName()</span>
-                            <span class="fw-bold" style=" display: inline;">@Model.DisplayName</span>
+                            <span class="fw-bold" style=" display: inline;">@Model.Name</span>
                         </span>
                         <span class="text-truncate-2">
                             @Model.BriefIntroduction
@@ -33,7 +33,7 @@
                         <span class="text-truncate-2">
 
                             <span class="app-card-tag">@Model.Type.GetDisplayName()</span>
-                            <span class="fw-bold" style=" display: inline;">@Model.DisplayName</span>
+                            <span class="fw-bold" style=" display: inline;">@Model.Name</span>
                         </span>
                         <span class="@((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)?"text-truncate-1":"text-truncate-2")">
                             @Model.BriefIntroduction
@@ -83,7 +83,7 @@ else
                     <div class="pt-3 ps-3" style=" width: 100%;">
                         <header class="text-truncate-1">
                             <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
-                            <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                            <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
                         </header>
                         <span class="@((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false) ? "text-truncate-2" : "text-truncate-4")">
                             @Model.BriefIntroduction
@@ -124,7 +124,7 @@ else
                         <header class="text-truncate-2">
 
                             <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
-                            <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
+                            <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
                         </header>
                         <span class="@((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false) ? "text-truncate-2" : "text-truncate-4")">
                             @Model.BriefIntroduction

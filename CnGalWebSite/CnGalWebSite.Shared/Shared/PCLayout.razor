@@ -4,83 +4,56 @@
 
 <style>
     .m-main {
-        padding-bottom: 186px!important;
+        padding-bottom: 186px !important;
     }
 </style>
 
-    <MAppBar App Class="shadow-sm  bg-opacity">
-        <div style=" word-break: keep-all;" class="ms-4 me-8">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip />
-        </div>
-        <MTabs Color="@_dataCacheService.ThemeSetting.Theme">
-            <MTab OnClick="OnNavHomeClick">首页</MTab>
-            <MTab OnClick="OnNavEntryClick">词条</MTab>
-            <MTab OnClick="OnNavArticleClick">文章</MTab>
-            <MTab OnClick="OnNavSquareClick">广场</MTab>
-                    <MTab OnClick="On7thClick">周年庆</MTab>
-        </MTabs>
-        <MSpacer></MSpacer>
+<MAppBar App Class="shadow-sm  bg-opacity">
+    <div style=" word-break: keep-all;" class="ms-4 me-8">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip />
+    </div>
+    <MTabs Color="@_dataCacheService.ThemeSetting.Theme">
+        <MTab OnClick="@(()=>OnNavClick("/"))">首页</MTab>
+        <MTab OnClick="@(()=>OnNavClick("/entries/home"))">词条</MTab>
+        <MTab OnClick="@(()=>OnNavClick("/cv"))">CV</MTab>
+        <MTab OnClick="@(()=>OnNavClick("/articles/home"))">文章</MTab>
+        <MTab OnClick="@(()=>OnNavClick("/square"))">广场</MTab>
+    </MTabs>
+    <MSpacer></MSpacer>
 
-        <MTooltip Bottom>
-            <ActivatorContent>
-                <MButton Icon Dark Color="@_dataCacheService.ThemeSetting.Theme" Class="mr-6" OnClick="OnNavSearchClick">
-                    <MIcon>mdi-magnify</MIcon>
-                </MButton>
-            </ActivatorContent>
-            <ChildContent>
-                <span>搜索</span>
-            </ChildContent>
-        </MTooltip>
+    <MTooltip Bottom>
+        <ActivatorContent>
+            <MButton Icon Dark Color="@_dataCacheService.ThemeSetting.Theme" Class="mr-6" OnClick="@(()=>OnNavClick("/search"))">
+                <MIcon>mdi-magnify</MIcon>
+            </MButton>
+        </ActivatorContent>
+        <ChildContent>
+            <span>搜索</span>
+        </ChildContent>
+    </MTooltip>
 
-        <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
-    </MAppBar>
+    <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
+</MAppBar>
 
-    <MMain>
-        <MContainer>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
-                <div class="mt-3 mb-3">
-                    @Body
-                </div>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
+<MMain>
+    <MContainer>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
+            <div class="mt-3 mb-3">
+                @Body
+            </div>
+        </CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
 
-        </MContainer>
-    </MMain>
+    </MContainer>
+</MMain>
 
-    <MFooter App Padless Absolute Class="shadow-sm  bg-opacity">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.MainFooterTip/>
-    </MFooter>
+<MFooter App Padless Absolute Class="shadow-sm  bg-opacity">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.MainFooterTip />
+</MFooter>
 
 @code {
-    public Task OnNavHomeClick()
+    public Task OnNavClick(string url)
     {
-        NavigationManager.NavigateTo("/");
-        return Task.CompletedTask;
-    }
-
-    public Task OnNavEntryClick()
-    {
-        NavigationManager.NavigateTo("/entries/home");
-        return Task.CompletedTask;
-    }
-
-    public Task OnNavArticleClick()
-    {
-        NavigationManager.NavigateTo("/articles/home");
-        return Task.CompletedTask;
-    }
-    public Task OnNavSquareClick()
-    {
-        NavigationManager.NavigateTo("/square");
-        return Task.CompletedTask;
-    }
-    public Task OnNavSearchClick()
-    {
-        NavigationManager.NavigateTo("/search");
-        return Task.CompletedTask;
-    }
-    public Task On7thClick()
-    {
-        NavigationManager.NavigateTo("/7th");
+        NavigationManager.NavigateTo(url);
         return Task.CompletedTask;
     }
 }

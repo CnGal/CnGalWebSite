@@ -33,7 +33,11 @@ namespace CnGalWebSite.APIServer.Application.Users
         private readonly IRepository<ThirdPartyLoginInfor, long> _thirdPartyLoginInforRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Article, long> _articleRepository;
+        private readonly IRepository<Entry, long> _entryRepository;
+        private readonly IRepository<UserCertification, long> _userCertificationRepository;
         private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
+        private readonly IRepository<SignInDay, long> _signInDayRepository;
+        private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IAppHelper _appHelper;
@@ -43,7 +47,8 @@ namespace CnGalWebSite.APIServer.Application.Users
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<ApplicationUser>, string, SortOrder, IEnumerable<ApplicationUser>>> SortLambdaCacheApplicationUser = new();
 
         public UserService(IRepository<ApplicationUser, string> userRepository, IConfiguration configuration, IHttpClientFactory clientFactory, IRepository<ThirdPartyLoginInfor, long> thirdPartyLoginInforRepository, UserManager<ApplicationUser> userManager,
-        IRepository<Examine, long> examineRepository, IRepository<UserIntegral, string> userIntegralRepository, IAppHelper appHelper, IRankService rankService, IRepository<Article, long> articleRepository, IRepository<FavoriteObject, long> favoriteObjectRepository)
+        IRepository<Examine, long> examineRepository, IRepository<UserIntegral, string> userIntegralRepository, IAppHelper appHelper, IRankService rankService, IRepository<Article, long> articleRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
+        IRepository<SignInDay, long> signInDayRepository, IRepository<PlayedGame, long> playedGameRepository, IRepository<Entry, long> entryRepository, IRepository<UserCertification, long> userCertificationRepository)
         {
             _userRepository = userRepository;
             _configuration = configuration;
@@ -56,6 +61,10 @@ namespace CnGalWebSite.APIServer.Application.Users
             _articleRepository = articleRepository;
             _favoriteObjectRepository = favoriteObjectRepository;
             _userManager = userManager;
+            _signInDayRepository = signInDayRepository;
+            _playedGameRepository = playedGameRepository;
+            _entryRepository = entryRepository;
+            _userCertificationRepository = userCertificationRepository;
         }
 
         public async Task<PagedResultDto<ApplicationUser>> GetPaginatedResult(GetUserInput input)
@@ -629,6 +638,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             user.MBgImage = examine.MBgImage;
             return Task.CompletedTask;
         }
+       
 
         public Task UpdateUserDataMainPage(ApplicationUser user, string examine)
         {
@@ -668,7 +678,8 @@ namespace CnGalWebSite.APIServer.Application.Users
 
 
             //拉取审核数据
-            var examines = await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id)
+            var examines = await _examineRepository.GetAll().AsNoTracking()
+                .Where(s => s.ApplicationUserId == user.Id)
                 .Select(n => new { n.IsPassed, n.Operation, n.Context, n.EntryId, n.ArticleId, n.TagId, n.ApplyTime, n.Id })
                 .ToListAsync();
 
@@ -697,7 +708,8 @@ namespace CnGalWebSite.APIServer.Application.Users
             //从30天前开始倒数 遇到第一个开始添加
             var MaxCountLineDay = DateTime.Now.DayOfYear;
             var tempDateTimeNow = DateTime.Now.ToCstTime();
-            var editCounts = await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
+            var editCounts = await _examineRepository.GetAll().AsNoTracking()
+                .Where(s => s.ApplicationUserId == user.Id && s.ApplyTime.Date > tempDateTimeNow.Date.AddDays(-MaxCountLineDay))
                    // 先进行了时间字段变更为String字段，切只保留到天
                    // 采用拼接的方式
                    .Select(n => new { Time = n.ApplyTime.Date })
@@ -798,5 +810,117 @@ namespace CnGalWebSite.APIServer.Application.Users
 
             return new Result { Successful = true };
         }
+
+        public async Task UpdateUserIntegral(ApplicationUser user)
+        {
+            //计算积分
+            //编辑 词条  标签  消歧义页  评论  发表文章 游玩记录
+            //积分  10    8      2         5     50       50
+            //
+            var signInDaysIntegral = 5;
+            var entryIntegral = 50;
+
+            var tagIntegral = signInDaysIntegral * 6;
+            var disambigIntegral = signInDaysIntegral * 6;
+            var peripheryIntegral = entryIntegral;
+            var commentIntegral = signInDaysIntegral;
+            var commentLimited = 5;
+            var articleIntegral = entryIntegral;
+            var playedGameIntegral = entryIntegral;
+
+            try
+            {
+                //编辑
+                var temp_1 = await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.IsPassed == true)
+                 .Select(n => new { Time = n.ApplyTime.Date, n.EntryId, n.TagId, n.ArticleId, n.CommentId, n.DisambigId, n.PeripheryId })
+                 // 分类
+                 .ToListAsync();
+                // 返回汇总样式
+                var temp_2 = temp_1.GroupBy(s => s.Time);
+                var integral_1 = (temp_2.Select(s => s.Where(s => s.EntryId != null).GroupBy(s => s.EntryId).Count()).Sum() * entryIntegral)
+                                  + (temp_2.Select(s => s.Where(s => s.TagId != null).GroupBy(s => s.TagId).Count()).Sum() * tagIntegral)
+                                  + (temp_2.Select(s => s.Where(s => s.DisambigId != null).GroupBy(s => s.DisambigId).Count()).Sum() * disambigIntegral)
+                                  + (temp_2.Select(s => s.Where(s => s.PeripheryId != null).GroupBy(s => s.PeripheryId).Count()).Sum() * peripheryIntegral)
+                                  + (temp_2.Select(s => s.Where(s => s.CommentId != null).GroupBy(s => s.DisambigId)
+                                            .Select(s => s.Count() > commentLimited ? commentLimited : s.Count()).Sum()).Sum() * commentLimited);
+
+
+                //发表文章
+                var integral_2 = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id) * articleIntegral;
+                //签到
+                var integral_3 = await _signInDayRepository.CountAsync(s => s.ApplicationUserId == user.Id) * signInDaysIntegral;
+
+                var integral_4 = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.Integral).Select(s => s.Count).SumAsync();
+                //发表文章
+                var integral_5 = await _playedGameRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.ShowPublicly && string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength) * playedGameIntegral;
+
+                user.DisplayIntegral = integral_1 + integral_2 + integral_3 + integral_4 + integral_5;
+
+
+                //计算贡献值
+
+                var contributionValue_1 = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.ContributionValue).Select(s => s.Count).SumAsync();
+
+                user.DisplayContributionValue = contributionValue_1 + await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).SumAsync(s => s.ContributionValue);
+
+                _ = await _userManager.UpdateAsync(user);
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
+        #region 用户认证
+        public async void UpdateUserCertificationDataMain(UserCertification userCertification, UserCertificationMain examine)
+        {
+            if(examine.EntryId==0)
+            {
+                userCertification.EntryId = null;
+                userCertification.Entry = null;
+                userCertification.ApplicationUserId = null;
+                userCertification.ApplicationUser = null;
+            }
+            else
+            {
+                userCertification.EntryId = examine.EntryId;
+                userCertification.Entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == userCertification.EntryId);
+            }
+
+            userCertification.CertificationTime = DateTime.Now.ToCstTime();
+        }
+
+        public void UpdateUserCertificationData(UserCertification userCertification, Examine examine)
+        {
+            switch (examine.Operation)
+            {
+                case Operation.RequestUserCertification:
+                    UserCertificationMain userCertificationMain = null;
+                    using (TextReader str = new StringReader(examine.Context))
+                    {
+                        var serializer = new JsonSerializer();
+                        userCertificationMain = (UserCertificationMain)serializer.Deserialize(str, typeof(UserCertificationMain));
+                    }
+
+                    UpdateUserCertificationDataMain(userCertification, userCertificationMain);
+                    break;
+            }
+
+            return;
+
+        }
+
+        public async Task<List<string>> GetAllNotCertificatedEntriesAsync(EntryType? type = null)
+        {
+            var entryIds =await _userCertificationRepository.GetAll().Include(s => s.Entry).Where(s => string.IsNullOrWhiteSpace(s.ApplicationUserId) && s.EntryId != null).Select(s => s.EntryId.Value).ToListAsync();
+
+            var temp = _entryRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false && entryIds.Contains(s.Id) == false);
+            if (type != null)
+            {
+                temp = temp.Where(s => s.Type == type);
+            }
+            return await temp.Select(s => s.Name).ToListAsync();
+        }
+        #endregion
     }
 }

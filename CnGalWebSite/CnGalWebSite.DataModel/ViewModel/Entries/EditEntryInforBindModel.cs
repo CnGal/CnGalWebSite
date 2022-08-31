@@ -16,6 +16,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Entries
         public EntryEditState State { get; set; } = new EntryEditState();
 
         public int Id { get; set; }
+
+        /// <summary>
+        /// 是否已监视
+        /// </summary>
+        public bool IsInMonitor { get; set; }
     }
 
     public class EntryEditState
@@ -26,5 +31,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Entries
         public EditState RelevancesState { get; set; }
         public EditState InforState { get; set; }
         public EditState TagState { get; set; }
+        public EditState AudioState { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Comments.Dtos;
+using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
@@ -43,9 +44,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ICommentService _commentService;
         private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
+        private readonly IEditRecordService _editRecordService;
 
         public CommentsAPIController(UserManager<ApplicationUser> userManager, IRepository<ApplicationUser, string> userRepository, ICommentService commentService,
-            IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository,
+            IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository, IEditRecordService editRecordService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository, IExamineService examineService, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
         {
@@ -61,6 +63,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _lotteryRepository = lotteryRepository;
             _examineService = examineService;
             _examineRepository = examineRepository;
+            _editRecordService = editRecordService;
         }
 
         [AllowAnonymous]
@@ -298,27 +301,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 PubulicUserId = user.Id,
                 ObjectId = model.ObjectId
             };
-            //序列化JSON
-            var resulte = "";
-            using (TextWriter text = new StringWriter())
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(text, commentText);
-                resulte = text.ToString();
-            }
 
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExaminePublishCommentTextAsync(comment, commentText);
-                await _examineService.UniversalCommentExaminedAsync(comment, user, true, resulte, Operation.PubulishComment, "");
-                await _appHelper.AddUserContributionValueAsync(user.Id, comment.Id, Operation.PubulishComment);
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(comment, user, commentText, Operation.PubulishComment, "");
 
-            }
-            else
-            {
-                await _examineService.UniversalCommentExaminedAsync(comment, user, false, resulte, Operation.PubulishComment, "");
-            }
 
             return new Result { Successful = true };
         }

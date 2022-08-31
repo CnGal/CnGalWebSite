@@ -145,14 +145,14 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.Add(new SteamInforTipViewModel
                 {
                     SteamId = item.SteamId,
-                    EntryId = item.EntryId ?? 0,
+                    Id = item.EntryId ?? 0,
                     EvaluationCount = item.EvaluationCount,
                     BriefIntroduction = item.Entry.BriefIntroduction,
                     PriceLowestString = item.PriceLowestString,
                     PriceNowString = item.PriceNowString,
                     CutLowest = item.CutLowest,
                     CutNow = item.CutNow,
-                    Image = _appHelper.GetImagePath(item.Entry.MainPicture, "app.png"),
+                    MainImage = _appHelper.GetImagePath(item.Entry.MainPicture, "app.png"),
                     LowestTime = item.LowestTime,
                     Name = item.Entry.DisplayName,
                     OriginalPrice = item.OriginalPrice,
@@ -206,7 +206,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var model = new List<EntryInforTipViewModel>();
             foreach (var entry in tag.Entries.Where(s=>s.IsHidden==false))
             {
-                model.Add(await _appHelper.GetEntryInforTipViewModel(entry));
+                model.Add( _appHelper.GetEntryInforTipViewModel(entry));
             }
 
             return model;

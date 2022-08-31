@@ -16,9 +16,8 @@
     </ButtonContent>
     <ChildContent>
         <div class="row h-100 ps-2 pe-2">
-            @for (int i = 0; i < Model.Count; i++)
+            @foreach (var item in Model)
             {
-                var item = Model[i];
                 <div class="col-12 col-md-6 col-xxl-4">
                     @{
                         string name = item.RelatedName + " 编辑记录";
@@ -29,7 +28,7 @@
                         <TabLink Text="@item.RelatedName" Url="@("/entries/index/"+@item.RelatedId)" Icon="fa fa-codepen" class="a-font-color">
                             <div class=" p-3 ">
                                 <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
-                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())"></UserRankTextViewTip>
+                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
                             </div>
                         </TabLink>
                     }
@@ -38,7 +37,7 @@
                         <TabLink Text="@item.RelatedName" Url="@("/articles/index/"+@item.RelatedId)" Icon="fa fa-newspaper-o" class="a-font-color">
                             <div class=" p-3 ">
                                 <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
-                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())"></UserRankTextViewTip>
+                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
                             </div>
                         </TabLink>
                     }
@@ -47,7 +46,7 @@
                         <TabLink Text="@item.RelatedName" Url="@("/tags/index/"+item.RelatedId)" Icon="fa fa-tag" class="a-font-color">
                             <div class=" p-3 ">
                                 <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
-                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())"></UserRankTextViewTip>
+                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
                             </div>
                         </TabLink>
                     }
@@ -56,7 +55,7 @@
                         <TabLink Text="@item.RelatedName" Url="@("/disambigs/index/"+@item.RelatedId)" Icon="fa fa-tag" class="a-font-color">
                             <div class=" p-3 ">
                                 <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
-                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())"></UserRankTextViewTip>
+                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
                             </div>
                         </TabLink>
                     }
@@ -65,7 +64,7 @@
                         <TabLink Text="@item.RelatedName" Url="@("/peripheries/index/"+@item.RelatedId)" Icon="fa fa-tag" class="a-font-color">
                             <div class=" p-3 ">
                                 <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
-                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())"></UserRankTextViewTip>
+                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
                             </div>
                         </TabLink>
                     }

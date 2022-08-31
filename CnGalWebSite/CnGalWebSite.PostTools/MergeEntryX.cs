@@ -238,10 +238,10 @@ namespace CnGalWebSite.PostTools
             foreach (var item in reGameIds)
             {
                 var examineModel = await _httpClient.GetFromJsonAsync<EditAddInforViewModel>(ToolHelper.WebApiPath + "api/entries/EditAddInfor/" + item);
-                var tempStaffs = examineModel.Staffs.Where(s => s.NicknameOfficial == model.SubName);
+                var tempStaffs = examineModel.Staffs.Where(s => s.Name == model.SubName);
                 foreach (var temp in tempStaffs)
                 {
-                    temp.NicknameOfficial = model.HostName;
+                    temp.Name = model.HostName;
                 }
                 if (string.IsNullOrWhiteSpace(examineModel.Publisher) == false)
                 {
@@ -253,7 +253,11 @@ namespace CnGalWebSite.PostTools
                     examineModel.ProductionGroup= examineModel.ProductionGroup.Replace(model.SubName, model.HostName);
 
                 }
+                if (string.IsNullOrWhiteSpace(examineModel.CV) == false)
+                {
+                    examineModel.CV = examineModel.CV.Replace(model.SubName, model.HostName);
 
+                }
                 model.Examines.Add(examineModel);
 
             }

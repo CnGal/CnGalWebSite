@@ -6,6 +6,7 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Space;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Users
@@ -40,6 +41,14 @@ namespace CnGalWebSite.APIServer.Application.Users
         Task<string> GenerateBindGroupQQCode(ApplicationUser user);
 
         Task<Result> BindGroupQQ(string code, long groupQQ);
+
+        void UpdateUserCertificationDataMain(UserCertification userCertification, UserCertificationMain examine);
+
+        void UpdateUserCertificationData(UserCertification userCertification, Examine examine);
+
+        Task UpdateUserIntegral(ApplicationUser user);
+
+        Task<List<string>> GetAllNotCertificatedEntriesAsync(EntryType? type = null);
 
     }
 }

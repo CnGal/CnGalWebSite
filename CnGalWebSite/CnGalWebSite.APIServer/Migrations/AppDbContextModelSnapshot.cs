@@ -240,7 +240,7 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "b852dccb-294d-4fe9-9e3b-4ab67f508022",
+                            ConcurrencyStamp = "353f7ee5-4672-44b9-ab16-5a623bbb1bcd",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
@@ -532,6 +532,9 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("int");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Carousels");
@@ -721,6 +724,40 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.ToTable("Entries");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.EntryAudio", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BriefIntroduction")
+                        .HasColumnType("longtext");
+
+                    b.Property<TimeSpan>("Duration")
+                        .HasColumnType("time(6)");
+
+                    b.Property<int?>("EntryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Thumbnail")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntryId");
+
+                    b.ToTable("EntryAudio");
+                });
+
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.EntryPicture", b =>
                 {
                     b.Property<long>("Id")
@@ -799,6 +836,46 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("EntryId");
 
                     b.ToTable("EntryRelevance");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.EntryStaff", b =>
+                {
+                    b.Property<long>("EntryStaffId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("EntryStaffId");
+
+                    b.Property<string>("CustomName")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("FromEntry")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Modifier")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("PositionGeneral")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PositionOfficial")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SubordinateOrganization")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("ToEntry")
+                        .HasColumnType("int");
+
+                    b.HasKey("EntryStaffId");
+
+                    b.HasIndex("FromEntry");
+
+                    b.HasIndex("ToEntry");
+
+                    b.ToTable("EntryStaffs");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ErrorCount", b =>
@@ -2282,6 +2359,32 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.ToTable("UserAddresses");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserCertification", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("CertificationTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("EntryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId")
+                        .IsUnique();
+
+                    b.HasIndex("EntryId")
+                        .IsUnique();
+
+                    b.ToTable("UserCertifications");
+                });
+
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserIntegral", b =>
                 {
                     b.Property<long>("Id")
@@ -2307,6 +2410,30 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.ToTable("UserIntegrals");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserMonitor", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("EntryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("EntryId");
+
+                    b.ToTable("UserMonitors");
+                });
+
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserOnlineInfor", b =>
                 {
                     b.Property<long>("Id")
@@ -2324,6 +2451,33 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("ApplicationUserId");
 
                     b.ToTable("UserOnlineInfors");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserReviewEditRecord", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<long?>("ExamineId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ReviewedTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("ExamineId");
+
+                    b.ToTable("UserReviewEditRecords");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserSpaceCommentManager", b =>
@@ -2605,6 +2759,9 @@ namespace CnGalWebSite.APIServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<TimeSpan?>("Duration")
+                        .HasColumnType("time(6)");
+
                     b.Property<int?>("FileManagerId")
                         .HasColumnType("int");
 
@@ -2616,6 +2773,9 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.Property<string>("Sha1")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("UploadTime")
                         .HasColumnType("datetime(6)");
@@ -3027,28 +3187,28 @@ namespace CnGalWebSite.APIServer.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            ConcurrencyStamp = "24fea512-dc4e-41a0-a738-b9f24f6d2bcc",
+                            ConcurrencyStamp = "9c308af4-a9ed-4d02-ab8b-e64df1b0276a",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e576",
-                            ConcurrencyStamp = "612cb309-c059-4f2c-9d09-60361b362c61",
+                            ConcurrencyStamp = "1528376f-5923-4023-8b6f-aae94e9cabcd",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e577",
-                            ConcurrencyStamp = "d1482910-2ba7-4057-962f-443353b3dd6f",
+                            ConcurrencyStamp = "d82cfa22-ea8f-4ed4-9eda-f12944545dad",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e578",
-                            ConcurrencyStamp = "8a931ebc-de6c-4ae1-99fd-b87ea725066b",
+                            ConcurrencyStamp = "368d9a96-30fd-47ce-b3e6-87ad77bd0d55",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         });
@@ -3392,6 +3552,14 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Navigation("Disambig");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.EntryAudio", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.Entry", null)
+                        .WithMany("Audio")
+                        .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.EntryPicture", b =>
                 {
                     b.HasOne("CnGalWebSite.DataModel.Model.Entry", null)
@@ -3428,6 +3596,23 @@ namespace CnGalWebSite.APIServer.Migrations
                         .WithMany("Relevances")
                         .HasForeignKey("EntryId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.EntryStaff", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.Entry", "FromEntryNavigation")
+                        .WithMany("EntryStaffFromEntryNavigation")
+                        .HasForeignKey("FromEntry")
+                        .HasConstraintName("FK_EntryStaff_Entry_From");
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Entry", "ToEntryNavigation")
+                        .WithMany("EntryStaffToEntryNavigation")
+                        .HasForeignKey("ToEntry")
+                        .HasConstraintName("FK_EntryStaff_Entry_To");
+
+                    b.Navigation("FromEntryNavigation");
+
+                    b.Navigation("ToEntryNavigation");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Examine", b =>
@@ -3821,6 +4006,23 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserCertification", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", "ApplicationUser")
+                        .WithOne("Certification")
+                        .HasForeignKey("CnGalWebSite.DataModel.Model.UserCertification", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Entry", "Entry")
+                        .WithOne("Certification")
+                        .HasForeignKey("CnGalWebSite.DataModel.Model.UserCertification", "EntryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Entry");
+                });
+
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserIntegral", b =>
                 {
                     b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", "ApplicationUser")
@@ -3831,6 +4033,23 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserMonitor", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", "ApplicationUser")
+                        .WithMany("Monitors")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Entry", "Entry")
+                        .WithMany("Monitors")
+                        .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Entry");
+                });
+
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserOnlineInfor", b =>
                 {
                     b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", "ApplicationUser")
@@ -3839,6 +4058,23 @@ namespace CnGalWebSite.APIServer.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserReviewEditRecord", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", "ApplicationUser")
+                        .WithMany("ReviewEntries")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Examine", "Examine")
+                        .WithMany("ReviewUsers")
+                        .HasForeignKey("ExamineId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Examine");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserSpaceCommentManager", b =>
@@ -4065,6 +4301,8 @@ namespace CnGalWebSite.APIServer.Migrations
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.ApplicationUser", b =>
                 {
+                    b.Navigation("Certification");
+
                     b.Navigation("Examines");
 
                     b.Navigation("FavoriteFolders");
@@ -4077,9 +4315,13 @@ namespace CnGalWebSite.APIServer.Migrations
 
                     b.Navigation("Messages");
 
+                    b.Navigation("Monitors");
+
                     b.Navigation("OperationRecords");
 
                     b.Navigation("PlayedGames");
+
+                    b.Navigation("ReviewEntries");
 
                     b.Navigation("SignInDays");
 
@@ -4139,15 +4381,25 @@ namespace CnGalWebSite.APIServer.Migrations
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Entry", b =>
                 {
+                    b.Navigation("Audio");
+
                     b.Navigation("BackUpArchive");
+
+                    b.Navigation("Certification");
 
                     b.Navigation("EntryRelationFromEntryNavigation");
 
                     b.Navigation("EntryRelationToEntryNavigation");
 
+                    b.Navigation("EntryStaffFromEntryNavigation");
+
+                    b.Navigation("EntryStaffToEntryNavigation");
+
                     b.Navigation("Examines");
 
                     b.Navigation("Information");
+
+                    b.Navigation("Monitors");
 
                     b.Navigation("Outlinks");
 
@@ -4160,6 +4412,11 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Navigation("PlayedGames");
 
                     b.Navigation("Relevances");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.Examine", b =>
+                {
+                    b.Navigation("ReviewUsers");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.FavoriteFolder", b =>

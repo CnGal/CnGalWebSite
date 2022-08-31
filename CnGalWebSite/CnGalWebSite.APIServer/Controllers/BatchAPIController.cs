@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.ImportModel;
@@ -30,11 +31,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<HistoryUser, int> _historyUserRepository;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
+        private readonly IUserService _userService;
 
 
         public BatchAPIController(IRepository<HistoryUser, int> historyUserRepository, IExamineService examineService, IRepository<Periphery, long> peripheryRepository,
-        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor,
-            IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository)
+        UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IUserService userService,
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -45,6 +47,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _historyUserRepository = historyUserRepository;
             _examineService = examineService;
             _peripheryRepository = peripheryRepository;
+            _userService = userService;
         }
 
         [HttpPost]
@@ -117,7 +120,7 @@ namespace CnGalWebSite.APIServer.Controllers
             article.CreateUserId = user.Id;
             await _articleRepository.UpdateAsync(article);
             //更新用户积分
-            await _appHelper.UpdateUserIntegral(user);
+            await _userService.UpdateUserIntegral(user);
             return new Result { Successful = true };
         }
 
@@ -241,7 +244,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 await _examineService.AddNewArticleExaminesAsync(model, user, "批量导入历史数据");
                 //更新用户积分
-                await _appHelper.UpdateUserIntegral(user);
+                await _userService.UpdateUserIntegral(user);
             }
             catch (Exception exc)
             {

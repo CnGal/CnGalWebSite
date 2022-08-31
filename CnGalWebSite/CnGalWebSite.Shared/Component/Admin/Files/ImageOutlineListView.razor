@@ -1,0 +1,112 @@
+﻿@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+@inject ImagesLargeViewService ImagesLargeViewService
+@inject IJSRuntime JS
+
+@if (isReady)
+{
+    <div>
+
+        @if (Model.TotalCount == 0)
+        {
+            <NotFoundTip IsNeedLayput="true" />
+        }
+        else
+        {
+            <div class="row">
+                @foreach (var item in Model.Data)
+                {
+                    <div class="col-12 col-md-6 col-xl-4 col-xxl-3 mb-3">
+                        <ImageInforViewTip Model="item" OnClickImage="OnClickImage"></ImageInforViewTip>
+
+                    </div>
+
+
+                }
+
+            </div>
+        }
+
+        @if (Model.TotalPages > 1)
+        {
+            <MPagination Value="@Model.CurrentPage" Class="my-4" Length="@Model.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
+        }
+
+    </div>
+}
+else
+{
+    <div style="height:300px">
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
+    </div>
+}
+
+
+
+
+@code {
+    [NotNull]
+    public PagedResultDto<ImageInforTipViewModel> Model { get; set; } = new PagedResultDto<ImageInforTipViewModel> { MaxResultCount = 12 ,Sorting="id desc" };
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool isReady;
+
+    private async Task OnPageClick(int pageIndex)
+    {
+        Model.CurrentPage = pageIndex;
+        StateHasChanged();
+        await OnGetNewItems();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OnGetNewItems();
+        isReady = true;
+    }
+
+    private async Task OnGetNewItems()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<PagedSortedAndFilterInput>(ToolHelper.WebApiPath + "api/files/GetImageList", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Model = JsonSerializer.Deserialize<PagedResultDto<ImageInforTipViewModel>>(jsonContent, ToolHelper.options);
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "无法获取图片列表");
+
+            Model = new PagedResultDto<ImageInforTipViewModel> { Data = new List<ImageInforTipViewModel>() };
+        }
+    }
+
+    #region 新建标签页
+
+    public async void OpenNewPage(string url)
+    {
+        await JS.InvokeAsync<string>("openNewPage", url);
+    }
+
+    #endregion
+
+    public async void OnClickImage(ImageInforTipViewModel model)
+    {
+        if (_dataCacheService.IsApp)
+        {
+            OpenNewPage(model.FileName);
+        }
+        else
+        {
+            await ImagesLargeViewService.ViewLargeImages(new ImagesLargeViewModel
+            {
+                Index = Model.Data.IndexOf(model),
+                Pictures = Model.Data.Select(s => new EditImageAloneModel
+                {
+                    Image = s.FileName
+                }).ToList()
+            });
+        }
+
+    }
+}

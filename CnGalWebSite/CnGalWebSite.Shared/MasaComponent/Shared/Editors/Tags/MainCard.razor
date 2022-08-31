@@ -1,6 +1,5 @@
 ﻿
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-home" Title="主要信息" Class="@(ShowTagSearch?"mb-4":Class)" Collapable>
-    <ValidateForm Model="@Model">
         <div class="row mb-4">
             <div class=" col-12 col-md-6 col-lg-3 col-xl-3 mt-2">
                 <ImageCropperButton @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
@@ -28,7 +27,6 @@
                 <BootstrapInput @bind-Value="Model.BriefIntroduction" ShowLabel="true" />
             </div>
         </div>
-    </ValidateForm>
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 

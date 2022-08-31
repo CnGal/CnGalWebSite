@@ -6,7 +6,6 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
-@implements IAsyncDisposable
 
 
 <TitleTip Title="标签版块"></TitleTip>
@@ -43,8 +42,8 @@
                         <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
                     </TableColumns>
                     <RowButtonTemplate>
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-pencil" Text="编辑" IsAsync="true" OnClickWithoutRender="@(()=> { NavigationManager.NavigateTo(Provider,"/tags/edittag/" + ToolHelper.Base64EncodeName(context.Name), context.Name, "fa fa-tag");return Task.CompletedTask; })" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(()=> { NavigationManager.NavigateTo(Provider,"/tags/index/" + ToolHelper.Base64EncodeName(context.Name), context.Name, "fa fa-tag");return Task.CompletedTask; })" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-pencil" Text="编辑" IsAsync="true" OnClickWithoutRender="@(()=> { NavigationManager.NavigateTo("/tags/edittag/" +context.Id);return Task.CompletedTask; })" />
+                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(()=> { NavigationManager.NavigateTo("/tags/index/" +context.Id);return Task.CompletedTask; })" />
                         <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-comments-o" Text="切换显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new int[] { context.Id }, !context.IsHidden, true))" />
                     </RowButtonTemplate>
                 </Table>
@@ -68,72 +67,10 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    #region 获取屏幕大小
-
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime? JSRuntime { get; set; }
-
-
-
-    public bool IsSmallScreen { get; set; }
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; }
-
-
-    private JSInterop<ListTags>? Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            Interop = new JSInterop<ListTags>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
-        }
-    }
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 768))
-        {
-            IsSmallScreen = width < 768;
-
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 768 && width < 2000))
-        {
-            IsNormalScreen = width >= 768 && width < 2000;
-
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 2000))
-        {
-            IsLargeScreen = width >= 2000;
-
-            StateHasChanged();
-        }
-    }
-    #endregion
 
 
     protected override async Task OnInitializedAsync()
     {
-#if DEBUG
-        //Thread.Sleep(10000);
-#endif
         try
         {
             InforModel = await Http.GetFromJsonAsync<ListTagsInforViewModel>(ToolHelper.WebApiPath + "api/tags/listtags");
@@ -224,20 +161,4 @@
         await ToastService.Success("显示标签成功", "显示标签成功");
         await TableRows.QueryAsync();
     }
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
-    {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

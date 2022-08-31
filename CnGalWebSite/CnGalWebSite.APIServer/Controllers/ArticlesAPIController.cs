@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
+using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
@@ -48,9 +49,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IExamineService _examineService;
         private readonly IUserService _userService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IEditRecordService _editRecordService;
 
         public ArticlesAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IUserService userService,
-        IExamineService examineService, IEntryService entryService, IRepository<ApplicationUser, string> userRepository, IWebHostEnvironment webHostEnvironment,
+        IExamineService examineService, IEntryService entryService, IRepository<ApplicationUser, string> userRepository, IWebHostEnvironment webHostEnvironment, IEditRecordService editRecordService,
         UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
         {
@@ -67,6 +69,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _userService = userService;
             _userRepository = userRepository;
             _webHostEnvironment = webHostEnvironment;
+            _editRecordService = editRecordService;
         }
 
         /// <summary>
@@ -280,7 +283,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditArticleMain))
                     {
-                        model.MainState = EditState.locked;
+                        model.MainState = EditState.Locked;
                     }
                     else
                     {
@@ -291,7 +294,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditArticleMainPage))
                     {
-                        model.MainPageState = EditState.locked;
+                        model.MainPageState = EditState.Locked;
                     }
                     else
                     {
@@ -302,7 +305,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (examiningList.Any(s => s == Operation.EditArticleRelevanes))
                     {
-                        model.RelevancesState = EditState.locked;
+                        model.RelevancesState = EditState.Locked;
                     }
                     else
                     {
@@ -574,26 +577,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = true };
                 }
                 var examine = examines.FirstOrDefault(s => s.Value == Operation.EditArticleMain);
-                //序列化
-                var resulte = "";
-                using (TextWriter text = new StringWriter())
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(text, examine.Key);
-                    resulte = text.ToString();
-                }
 
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                {
-                    await _examineService.ExamineEditArticleMainAsync(currentArticle, examine.Key as ExamineMain);
-                    await _examineService.UniversalEditArticleExaminedAsync(currentArticle, user, true, resulte, Operation.EditArticleMain, model.Note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, currentArticle.Id, Operation.EditArticleMain);
-                }
-                else
-                {
-                    await _examineService.UniversalEditArticleExaminedAsync(currentArticle, user, false, resulte, Operation.EditArticleMain, model.Note);
-                }
-
+                //保存并尝试应用审核记录
+                await _editRecordService.SaveAndApplyEditRecord(currentArticle, user, examine.Key, Operation.EditArticleMain, model.Note);
 
                 return new Result { Successful = true, Error = currentArticle.Id.ToString() };
             }
@@ -704,18 +690,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = true };
                 }
                 var examine = examines.FirstOrDefault(s => s.Value == Operation.EditArticleMainPage);
-                var resulte = examine.Key as string;
 
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                {
-                    await _examineService.ExamineEditArticleMainPageAsync(currentArticle, examine.Key as string);
-                    await _examineService.UniversalEditArticleExaminedAsync(currentArticle, user, true, resulte, Operation.EditArticleMainPage, model.Note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, currentArticle.Id, Operation.EditArticleMainPage);
-                }
-                else
-                {
-                    await _examineService.UniversalEditArticleExaminedAsync(currentArticle, user, false, resulte, Operation.EditArticleMainPage, model.Note);
-                }
+                //保存并尝试应用审核记录
+                await _editRecordService.SaveAndApplyEditRecord(currentArticle, user, examine.Key, Operation.EditArticleMainPage, model.Note);
 
 
                 return new Result { Successful = true, Error = currentArticle.Id.ToString() };
@@ -922,26 +899,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = true };
                 }
                 var examine = examines.FirstOrDefault(s => s.Value == Operation.EditArticleRelevanes);
-                //序列化
-                var resulte = "";
-                using (TextWriter text = new StringWriter())
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(text, examine.Key);
-                    resulte = text.ToString();
-                }
 
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                {
-                    await _examineService.ExamineEditArticleRelevancesAsync(currentArticle, examine.Key as ArticleRelevances);
-                    await _examineService.UniversalEditArticleExaminedAsync(currentArticle, user, true, resulte, Operation.EditArticleRelevanes, model.Note);
-                    await _appHelper.AddUserContributionValueAsync(user.Id, currentArticle.Id, Operation.EditArticleRelevanes);
-                }
-                else
-                {
-                    await _examineService.UniversalEditArticleExaminedAsync(currentArticle, user, false, resulte, Operation.EditArticleRelevanes, model.Note);
-                }
-
+                //保存并尝试应用审核记录
+                await _editRecordService.SaveAndApplyEditRecord(currentArticle, user, examine.Key, Operation.EditArticleRelevanes, model.Note);
 
                 return new Result { Successful = true, Error = currentArticle.Id.ToString() };
             }

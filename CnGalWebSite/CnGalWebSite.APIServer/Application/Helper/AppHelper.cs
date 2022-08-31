@@ -114,16 +114,6 @@ namespace CnGalWebSite.APIServer.Application.Helper
             return str.Length < length * 2.5 ? str : string.Concat(str.AsSpan(0, (int)(length * 2.5)), "......");
         }
 
-        public async Task AddUserContributionValueAsync(string userId, long otherId, Operation operation)
-        {
-            //更新用户积分
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
-            {
-                await UpdateUserIntegral(user);
-            }
-        }
-
         public async Task<bool> IsArticleLockedAsync(long articleId, string userId, Operation operation)
         {
             return await _examineRepository.FirstOrDefaultAsync(s => s.ArticleId == articleId && s.ApplicationUserId != userId && s.IsPassed == null && s.Operation == operation) != null;
@@ -464,12 +454,14 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public async Task ArticleReaderNumUpAsync(long articleId)
         {
+            _entryRepository.Clear();
             _ = await _articleRepository.GetRangeUpdateTable().Where(s => s.Id == articleId).Set(s => s.ReaderCount, b => b.ReaderCount + 1).ExecuteAsync();
 
         }
 
         public async Task EntryReaderNumUpAsync(int entryId)
         {
+            _entryRepository.Clear();
             _ = await _entryRepository.GetRangeUpdateTable().Where(s => s.Id == entryId).Set(s => s.ReaderCount, b => b.ReaderCount + 1).ExecuteAsync();
         }
 
@@ -652,7 +644,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             };
         }
 
-        public async Task<EntryInforTipViewModel> GetEntryInforTipViewModel(Entry entry)
+        public EntryInforTipViewModel GetEntryInforTipViewModel(Entry entry)
         {
             //预处理图片
             entry.MainPicture = entry.Type is EntryType.Staff or EntryType.Role
@@ -661,9 +653,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
             var model = new EntryInforTipViewModel
             {
                 Id = entry.Id,
-                Name = entry.Name,
+                Name = string.IsNullOrWhiteSpace(entry.DisplayName) ? entry.Name : entry.DisplayName,
                 Type = entry.Type,
-                DisplayName = string.IsNullOrWhiteSpace(entry.DisplayName) ? entry.Name : entry.DisplayName,
                 MainImage = entry.MainPicture,
                 BriefIntroduction = entry.BriefIntroduction,
                 LastEditTime = entry.LastEditTime,
@@ -674,40 +665,26 @@ namespace CnGalWebSite.APIServer.Application.Helper
             };
 
             //处理附加信息
-            if (entry.Information != null && entry.EntryRelationFromEntryNavigation != null)
+            if (entry.EntryRelationFromEntryNavigation != null&&entry.EntryStaffFromEntryNavigation!=null)
             {
                 if (entry.Type == EntryType.Role)
                 {
                     //查找配音
-                    foreach (var item in entry.Information)
+                    var cvs = entry.EntryStaffFromEntryNavigation.Where(s => s.PositionGeneral == PositionGeneralType.CV);
+                    if (cvs.Any())
                     {
-                        if (item.Modifier == "基本信息" && item.DisplayName == "声优" && string.IsNullOrWhiteSpace(item.DisplayValue) == false)
+                        model.AddInfors.Add(new EntryInforTipAddInforModel
                         {
-                            var cvs = item.DisplayValue.Replace(",", "、").Replace("，", "、").Split("、").ToList();
-                            var cvEntries = await _entryRepository.GetAll().Where(s => cvs.Contains(s.Name)).Select(s => new KeyValuePair<int, string>(s.Id, s.DisplayName)).ToListAsync();
+                            Modifier = "配音",
+                            Contents = cvs.Select(s => new StaffNameModel
+                            {
+                                DisplayName = string.IsNullOrWhiteSpace(s.CustomName) ? (s.ToEntryNavigation?.Name ?? s.Name) : s.CustomName,
+                                Id = s.ToEntryNavigation?.Id ?? -1
+                            }).ToList()
+                        });
 
-                            if (cvEntries.Count != cvs.Count)
-                            {
-                                foreach (var temp in cvs)
-                                {
-                                    if (cvEntries.Select(s => s.Value).Contains(temp) == false)
-                                    {
-                                        cvEntries.Add(new KeyValuePair<int, string>(-1, temp));
-                                    }
-                                }
-                            }
-                            model.AddInfors.Add(new EntryInforTipAddInforModel
-                            {
-                                Modifier = "配音",
-                                Contents = cvEntries.Select(s => new StaffNameModel
-                                {
-                                    DisplayName = s.Value,
-                                    Id = s.Key
-                                }).ToList()
-                            });
-                            break;
-                        }
                     }
+
                     //查找登场游戏
                     var gameNames = new List<StaffNameModel>();
                     foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
@@ -739,24 +716,17 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 else if (entry.Type == EntryType.Staff)
                 {
                     //查找参与作品
-                    var gameNames = new List<StaffNameModel>();
-                    foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
-                    {
-                        var item = nav.ToEntryNavigation;
-                        if (item.Type == EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)
+                    var gameNames = entry.EntryStaffToEntryNavigation
+                        .Where(s => s.PositionGeneral != PositionGeneralType.SpecialThanks && s.ToEntry == entry.Id)
+                        .Where(s => s.FromEntryNavigation != null && s.FromEntryNavigation.IsHidden == false && s.FromEntryNavigation.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.FromEntryNavigation.Name) == false)
+                        .GroupBy(s => s.FromEntry)
+                        .Take(3)
+                        .Select(s => new StaffNameModel
                         {
-                            gameNames.Add(new StaffNameModel
-                            {
-                                DisplayName = item.DisplayName,
-                                Id = item.Id
-                            });
-                            if (gameNames.Count >= 3)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    if (gameNames.Count > 0)
+                            DisplayName = (string.IsNullOrWhiteSpace(s.First().Modifier) ? "" :s.First().Modifier + " - " ) + s.First().FromEntryNavigation.DisplayName,
+                            Id = s.First().FromEntryNavigation.Id
+                        }).ToList();
+                    if (gameNames.Any())
                     {
                         model.AddInfors.Add(new EntryInforTipAddInforModel
                         {
@@ -768,24 +738,17 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 else if (entry.Type == EntryType.ProductionGroup)
                 {
                     //查找参与作品
-                    var gameNames = new List<StaffNameModel>();
-                    foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
-                    {
-                        var item = nav.ToEntryNavigation;
-                        if (item.Type == EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)
+                    var gameNames = entry.EntryStaffToEntryNavigation
+                        .Where(s => s.PositionGeneral != PositionGeneralType.SpecialThanks && s.ToEntry == entry.Id)
+                        .Where(s => s.FromEntryNavigation != null && s.FromEntryNavigation.IsHidden == false && s.FromEntryNavigation.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.FromEntryNavigation.Name) == false)
+                        .GroupBy(s => s.FromEntry)
+                        .Take(3)
+                        .Select(s => new StaffNameModel
                         {
-                            gameNames.Add(new StaffNameModel
-                            {
-                                DisplayName = item.DisplayName,
-                                Id = item.Id
-                            });
-                            if (gameNames.Count >= 3)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    if (gameNames.Count > 0)
+                            DisplayName = (string.IsNullOrWhiteSpace(s.First().Modifier) ? "" : s.First().Modifier + " - ") + s.First().FromEntryNavigation.DisplayName,
+                            Id = s.First().FromEntryNavigation.Id
+                        }).ToList();
+                    if (gameNames.Any())
                     {
                         model.AddInfors.Add(new EntryInforTipAddInforModel
                         {
@@ -904,65 +867,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             return Markdown.ToHtml(str, pipeline);
         }
 
-        public async Task UpdateUserIntegral(ApplicationUser user)
-        {
-            //计算积分
-            //编辑 词条  标签  消歧义页  评论  发表文章 游玩记录
-            //积分  10    8      2         5     50       50
-            //
-            var signInDaysIntegral = 5;
-            var entryIntegral = 50;
-
-            var tagIntegral = signInDaysIntegral * 6;
-            var disambigIntegral = signInDaysIntegral * 6;
-            var peripheryIntegral = entryIntegral;
-            var commentIntegral = signInDaysIntegral;
-            var commentLimited = 5;
-            var articleIntegral = entryIntegral;
-            var playedGameIntegral = entryIntegral;
-
-            try
-            {
-                //编辑
-                var temp_1 = await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.IsPassed == true)
-                 .Select(n => new { Time = n.ApplyTime.Date, n.EntryId, n.TagId, n.ArticleId, n.CommentId, n.DisambigId, n.PeripheryId })
-                 // 分类
-                 .ToListAsync();
-                // 返回汇总样式
-                var temp_2 = temp_1.GroupBy(s => s.Time);
-                var integral_1 = (temp_2.Select(s => s.Where(s => s.EntryId != null).GroupBy(s => s.EntryId).Count()).Sum() * entryIntegral)
-                                  + (temp_2.Select(s => s.Where(s => s.TagId != null).GroupBy(s => s.TagId).Count()).Sum() * tagIntegral)
-                                  + (temp_2.Select(s => s.Where(s => s.DisambigId != null).GroupBy(s => s.DisambigId).Count()).Sum() * disambigIntegral)
-                                  + (temp_2.Select(s => s.Where(s => s.PeripheryId != null).GroupBy(s => s.PeripheryId).Count()).Sum() * peripheryIntegral)
-                                  + (temp_2.Select(s => s.Where(s => s.CommentId != null).GroupBy(s => s.DisambigId)
-                                            .Select(s => s.Count() > commentLimited ? commentLimited : s.Count()).Sum()).Sum() * commentLimited);
-
-
-                //发表文章
-                var integral_2 = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id) * articleIntegral;
-                //签到
-                var integral_3 = await _signInDayRepository.CountAsync(s => s.ApplicationUserId == user.Id) * signInDaysIntegral;
-
-                var integral_4 = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.Integral).Select(s => s.Count).SumAsync();
-                //发表文章
-                var integral_5 = await _playedGameRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.ShowPublicly && string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength) * playedGameIntegral;
-
-                user.DisplayIntegral = integral_1 + integral_2 + integral_3 + integral_4 + integral_5;
-
-
-                //计算贡献值
-
-                var contributionValue_1 = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.ContributionValue).Select(s => s.Count).SumAsync();
-
-                user.DisplayContributionValue = contributionValue_1 + await _examineRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).SumAsync(s => s.ContributionValue);
-
-                _ = await _userManager.UpdateAsync(user);
-            }
-            catch (Exception)
-            {
-
-            }
-        }
+       
 
         public async Task<long> GetUserIntegral(string userId, DateTime time)
         {

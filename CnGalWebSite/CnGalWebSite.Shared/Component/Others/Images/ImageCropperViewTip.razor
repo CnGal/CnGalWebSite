@@ -1,5 +1,5 @@
-﻿@inject IJSRuntime JSRuntime;
-@inject IAppHelper _appHelper;
+﻿@inject IJSRuntime JSRuntime
+@inject IAppHelper _appHelper
 @inject ToastService ToastService
 @using Microsoft.AspNetCore.Http
 
@@ -179,7 +179,7 @@
         try
         {
             //上传
-            var obj = await _appHelper.UploadFilesAsync(await args.GetDataAsync(),file.Name, Type);
+            var obj = await _appHelper.UploadImagesAsync(await args.GetDataAsync(),file.Name, Type);
             if (obj.Uploaded == true)
             {
 
@@ -187,7 +187,7 @@
             }
             else
             {
-                await ToastService.Error("图片上传失败", $"<{file.Name}> " + obj.Error);
+                await ToastService.Error("图片上传失败", $"<{file.Name}> " + obj.Error ?? "无法图床内部传输错误");
                 return;
             }
         }
@@ -208,7 +208,7 @@
     {
         try
         {
-            var obj = await _appHelper.UploadFilesAsync(file,Type);
+            var obj = await _appHelper.UploadImagesAsync(file,Type);
             if (obj.Uploaded == true)
             {
 

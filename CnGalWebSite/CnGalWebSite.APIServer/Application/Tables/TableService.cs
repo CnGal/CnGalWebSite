@@ -269,11 +269,11 @@ namespace CnGalWebSite.APIServer.Application.Tables
         {
             //通过Id获取词条 
             var entries = await _entryRepository.GetAll().AsNoTracking()
-                .Include(s => s.Information).ThenInclude(s => s.Additional)
+                .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Where(s => s.Type == EntryType.Game && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Select(s => new
                 {
-                    s.Information,
+                    s.EntryStaffFromEntryNavigation,
                     s.Name,
                     s.DisplayName
                 })
@@ -283,43 +283,21 @@ namespace CnGalWebSite.APIServer.Application.Tables
             foreach (var inEntry in entries)
             {
 
-                foreach (var item in inEntry.Information)
+                foreach (var item in inEntry.EntryStaffFromEntryNavigation)
                 {
-                    if (item.Modifier == "STAFF")
-                    {
                         var tableModel = new StaffInforTableModel
                         {
-                            RealId = item.Id,
-                            GameName = inEntry.DisplayName ?? inEntry.Name
+                            RealId = item.EntryStaffId,
+                            GameName = inEntry.DisplayName ?? inEntry.Name,
+                            Subcategory = item.Modifier,
+                            SubordinateOrganization = item.SubordinateOrganization,
+                            NicknameOfficial = string.IsNullOrWhiteSpace(item.CustomName) ? (item.ToEntryNavigation?.Name ?? item.Name) : item.CustomName,
+                            PositionGeneral = item.PositionGeneral,
+                            PositionOfficial = item.PositionOfficial,
                         };
-                        foreach (var infor in item.Additional)
-                        {
-                            switch (infor.DisplayName)
-                            {
-                                case "职位（官方称呼）":
-                                    tableModel.PositionOfficial = infor.DisplayValue;
-                                    break;
-                                case "昵称（官方称呼）":
-                                    tableModel.NicknameOfficial = infor.DisplayValue;
-                                    break;
-                                case "职位（通用）":
-                                    tableModel.PositionGeneral = (PositionGeneralType)Enum.Parse(typeof(PositionGeneralType), infor.DisplayValue);
-                                    break;
-                                case "角色":
-                                    tableModel.Role = infor.DisplayValue;
-                                    break;
-                                case "子项目":
-                                    tableModel.Subcategory = infor.DisplayValue;
-                                    break;
-                                case "隶属组织":
-                                    tableModel.SubordinateOrganization = infor.DisplayValue;
-                                    break;
 
-                            }
-
-                        }
                         Infors.Add(tableModel);
-                    }
+                    
                 }
 
             }
@@ -344,14 +322,13 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 var temp = currentItems.Find(s => s.RealId == item.RealId);
                 temp.Id = item.Id;
                 if (item.RealId != temp.RealId || item.GameName != temp.GameName || item.Subcategory != temp.Subcategory || item.PositionOfficial != temp.PositionOfficial
-                    || item.NicknameOfficial != temp.NicknameOfficial || item.PositionGeneral != temp.PositionGeneral || item.Role != temp.Role || item.SubordinateOrganization != temp.SubordinateOrganization)
+                    || item.NicknameOfficial != temp.NicknameOfficial || item.PositionGeneral != temp.PositionGeneral || item.SubordinateOrganization != temp.SubordinateOrganization)
                 {
                     item.GameName = temp.GameName;
                     item.Subcategory = temp.Subcategory;
                     item.PositionOfficial = temp.PositionOfficial;
                     item.NicknameOfficial = temp.NicknameOfficial;
                     item.PositionGeneral = temp.PositionGeneral;
-                    item.Role = temp.Role;
                     item.SubordinateOrganization = temp.SubordinateOrganization;
 
                     await _staffInforTableModelRepository.UpdateAsync(item);

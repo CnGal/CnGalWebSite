@@ -11,6 +11,8 @@ using System.Security.Policy;
 using System.Text.Json;
 using static System.Net.WebRequestMethods;
 using Microsoft.Extensions.Logging;
+using System.IO;
+using CnGalWebSite.DataModel.ViewModel.Others;
 
 namespace CnGalWebSite.DataModel.Application.Helper
 {
@@ -25,22 +27,20 @@ namespace CnGalWebSite.DataModel.Application.Helper
             _logger = logger;
         }
 
-        public async Task<UploadResult> UploadFilesAsync(IBrowserFile file, ImageAspectType type)
+        public async Task<UploadResult> UploadImagesAsync(IBrowserFile file, ImageAspectType type)
         {
-            using var content = new MultipartFormDataContent();
             using var fileContent = new StreamContent(file.OpenReadStream(file.Size));
-            return await UploadFilesAsync(fileContent, file.Name, type);
+            return await UploadImagesAsync(fileContent, file.Name, type,file.Size);
         }
 
-        public async Task<UploadResult> UploadFilesAsync(byte[] bytes, string fileName, ImageAspectType type)
+        public async Task<UploadResult> UploadImagesAsync(byte[] bytes, string fileName, ImageAspectType type)
         {
             //复制数据
-            using var content = new MultipartFormDataContent();
             using var fileContent = new StreamContent(new MemoryStream(bytes));
-            return await UploadFilesAsync(fileContent, fileName, type);
+            return await UploadImagesAsync(fileContent, fileName, type,bytes.LongLength);
         }
 
-        public async Task<UploadResult> UploadFilesAsync(StreamContent steam, string fileName, ImageAspectType type)
+        public async Task<UploadResult> UploadImagesAsync(StreamContent steam, string fileName, ImageAspectType type,long size)
         {
             using var content = new MultipartFormDataContent();
 
@@ -81,36 +81,66 @@ namespace CnGalWebSite.DataModel.Application.Helper
             var result= newUploadResults.FirstOrDefault();
             if(result.Uploaded)
             {
-                await AddUserLoadedFileInfor(result.FileURL, 0);
+                await AddUserLoadedFileInfor(result, UploadFileType.Image);
             }
 
             return result;
         }
+
+        public async Task<UploadResult> UploadAudioAsync(IBrowserFile file)
+        {
+            //复制数据
+            using var fileContent = new StreamContent(file.OpenReadStream(file.Size));
+            using var content = new MultipartFormDataContent();
+
+            double x, y;
+            content.Add(
+                content: fileContent,
+                name: "\"files\"",
+                fileName: file.Name);
+
+            var response = await _httpClient.PostAsync($"{ToolHelper.ImageApiPath}api/files/Upload?type={UploadFileType.Audio}", content);
+
+            var newUploadResults = await response.Content
+                .ReadFromJsonAsync<List<UploadResult>>();
+
+            var result = newUploadResults.FirstOrDefault();
+            if (result.Uploaded)
+            {
+                await AddUserLoadedFileInfor(result, UploadFileType.Audio);
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// 向用户文件管理添加信息
         /// </summary>
-        public async Task AddUserLoadedFileInfor(string url,long size)
+        public async Task AddUserLoadedFileInfor(UploadResult infor, UploadFileType type)
         {
             try
             {
-                ImageInforTipViewModel model = new ImageInforTipViewModel
+                AddUserUploadFileInforModel model = new AddUserUploadFileInforModel
                 {
-                    FileName = url,
-                    FileSize = size,
+                    FileName = infor.FileURL,
+                    FileSize = infor.FileSize,
+                    Duration = infor.Duration,
+                    Sha1 = infor.Sha1,
+                    Type= type
                 };
 
-                var result = await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/files/AddUserLoadedFileInfor", model);
+                var result = await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/files/AddUserUploadFileInfor", model);
                 string jsonContent = result.Content.ReadAsStringAsync().Result;
                 Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
                 //判断结果
                 if (obj.Successful == false)
                 {
-                    _logger.LogError("保存上传文件信息失败：{name}",url);
+                    _logger.LogError("保存上传文件信息失败：{name}", infor.FileURL);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"保存上传文件信息失败：{name}", url);
+                _logger.LogError(ex,"保存上传文件信息失败：{name}", infor.FileURL);
             }
         }
 

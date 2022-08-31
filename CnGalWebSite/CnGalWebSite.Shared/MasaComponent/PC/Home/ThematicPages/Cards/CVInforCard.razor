@@ -1,0 +1,41 @@
+﻿@inject IJSRuntime JS
+
+
+<div class="shadow-sm rounded  bg-opacity p-2 h-100" style=" display: flex; flex-direction: column; align-items: center;">
+    <a href="@("/entries/index/" + Model.Infor.Id)" class="a-font-color">
+
+        <div class="h5 fw-bold mt-2" style="text-align: center; word-break: break-all;">@Model.Infor.Name</div>
+    </a>
+    @if (Model.Audio.Any())
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="播放" Icon="mdi-volume-high" TextStyle OnClick="PlayAudio" Class="mb-2" />
+    }
+    else
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="无语音预览" Icon="mdi-volume-off " Color="grey" TextStyle Class="mb-2" />
+    }
+    <a href="@("/entries/index/" + Model.Infor.Id)" class="a-font-color">
+
+        <img class="w-100" src="@Model.Infor.MainImage">
+    </a>
+</div>
+
+
+
+
+@code {
+    [Parameter]
+    public CVInforViewModel Model { get; set; }
+
+    public async Task PlayAudio()
+    {
+        try
+        {
+            await JS.InvokeAsync<string>("playAudio", Model.Audio.FirstOrDefault()?.Url);
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+}

@@ -15,7 +15,7 @@ namespace CnGalWebSite.APIServer.ExamineX
     {
         Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "");
 
-        Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListExamineAloneModel searchModel);
+        Task<QueryData<ListExamineAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListExamineAloneModel searchModel, ApplicationUser user);
 
         /// <summary>
         /// 将审核列表优化成精简模式以减少流量消耗
@@ -37,48 +37,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="examine"></param>
         /// <returns></returns>
         Task<bool> GetExamineView(ExamineViewModel model, Examine examine);
-        /// <summary>
-        /// 处理 EstablishMain 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="entry">关联词条</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEstablishMainAsync(Entry entry, ExamineMain examine);
-        /// <summary>
-        /// 处理 EstablishAddInfor 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="entry">关联词条</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEstablishAddInforAsync(Entry entry, EntryAddInfor examine);
-        /// <summary>
-        /// 处理 EstablishImages 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="entry">关联词条</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEstablishImagesAsync(Entry entry, EntryImages examine);
-        /// <summary>
-        /// 处理 EstablishRelevances 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="entry">关联词条</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEstablishRelevancesAsync(Entry entry, EntryRelevances examine);
-        /// <summary>
-        /// 处理 EstablishTags 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="entry">关联词条</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEstablishTagsAsync(Entry entry, EntryTags examine);
-        /// <summary>
-        /// 处理 EstablishMainPage 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="entry">关联词条</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEstablishMainPageAsync(Entry entry, string examine);
+      
         /// <summary>
         /// 获取当前用户对该词条部分的待审核记录
         /// </summary>
@@ -87,28 +46,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="operation">用操作表示部分</param>
         /// <returns>审核记录</returns>
         Task<Examine> GetUserEntryActiveExamineAsync(int entryId, string userId, Operation operation);
-        /// <summary>
-        /// 词条 编辑 数据处理完毕后调用该方法 通用
-        /// </summary>
-        /// <param name="entry">词条</param>
-        /// <param name="user">用户</param>
-        /// <param name="isAdmin">是否为管理员</param>
-        /// <param name="examineStr">序列化的审核数据字符串</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <param name="note">备注</param>
-        /// <returns></returns>
-        Task UniversalEditExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
-        /// <summary>
-        /// 词条 创建 数据处理完毕后调用该方法 通用
-        /// </summary>
-        /// <param name="entry">词条</param>
-        /// <param name="user">用户</param>
-        /// <param name="isAdmin">是否为管理员</param>
-        /// <param name="examineStr">序列化的审核数据字符串</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <param name="note">备注</param>
-        /// <returns></returns>
-        Task<bool> UniversalEstablishExaminedAsync(Entry entry, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
+      
         /// <summary>
         /// 为批量导入的词条建立审核记录
         /// </summary>
@@ -126,49 +64,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="operation">用操作表示部分</param>
         /// <returns>审核记录</returns>
         Task<Examine> GetUserArticleActiveExamineAsync(long articleId, string userId, Operation operation);
-        /// <summary>
-        /// 处理 EditArticleMain 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="article">关联文章</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditArticleMainAsync(Article article, ExamineMain examine);
-        /// <summary>
-        /// 文章 创建 数据处理完毕后调用该方法 通用
-        /// </summary>
-        /// <param name="article">文章</param>
-        /// <param name="user">用户</param>
-        /// <param name="isAdmin">是否为管理员</param>
-        /// <param name="examineStr">序列化的审核数据字符串</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <param name="note">备注</param>
-        /// <returns></returns>
-        Task<bool> UniversalCreateArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
-        /// <summary>
-        /// 文章 编辑 数据处理完毕后调用该方法 通用
-        /// </summary>
-        /// <param name="article">文章</param>
-        /// <param name="user">用户</param>
-        /// <param name="isAdmin">是否为管理员</param>
-        /// <param name="examineStr">序列化的审核数据字符串</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <param name="note">备注</param>
-        /// <returns></returns>
-        Task UniversalEditArticleExaminedAsync(Article article, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
-        /// <summary>
-        /// 处理 EditArticleRelevanes 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="article">关联文章</param>
-        /// <param name="articleRelecancesModel">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditArticleRelevancesAsync(Article article, ArticleRelevances examine);
-        /// <summary>
-        /// 处理 EditArticleMainPage 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="article">关联文章</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditArticleMainPageAsync(Article article, string examine);
+      
 
         /// <summary>
         /// 为批量导入的文章建立审核记录
@@ -202,85 +98,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="operation"></param>
         /// <returns></returns>
         Task<Examine> GetUserTagActiveExamineAsync(int tagId, string userId, Operation operation);
-        /// <summary>
-        /// 处理 EditTag 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="tagEdit"></param>
-        /// <returns></returns>
-        Task ExamineTagAsync(DataModel.Model.Tag tag, TagEdit tagEdit);
-
-        /// <summary>
-        /// 标签 编辑 数据处理完毕后调用该方法 通用
-        /// </summary>
-        /// <param name="tag">标签</param>
-        /// <param name="user">用户</param>
-        /// <param name="isAdmin">是否为管理员</param>
-        /// <param name="examineStr">序列化的审核数据字符串</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <param name="note">备注</param>
-        /// <returns></returns>
-        Task UniversalEditTagExaminedAsync(DataModel.Model.Tag tag, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
-        /// <summary>
-        /// 处理 DisambigMain 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="disambig">关联消歧义页</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditDisambigMainAsync(Disambig disambig, DisambigMain examine);
-        /// <summary>
-        /// 消歧义页 创建 数据处理完毕后调用该方法 通用
-        /// </summary>
-        /// <param name="disambig">消歧义页</param>
-        /// <param name="user">用户</param>
-        /// <param name="isAdmin">是否为管理员</param>
-        /// <param name="examineStr">序列化的审核数据字符串</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <param name="note">备注</param>
-        /// <returns></returns>
-        Task<bool> UniversalCreateDisambigExaminedAsync(Disambig disambig, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
-        /// <summary>
-        /// 处理 DisambigRelevanes 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="disambig">关联消歧义页</param>
-        /// <param name="disambigRelevances">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditDisambigRelevancesAsync(Disambig disambig, DisambigRelevances disambigRelevances);
-        /// <summary>
-        /// 消歧义页 编辑 数据处理完毕后调用该方法 通用
-        /// </summary>
-        /// <param name="disambig">消歧义页</param>
-        /// <param name="user">用户</param>
-        /// <param name="isAdmin">是否为管理员</param>
-        /// <param name="examineStr">序列化的审核数据字符串</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <param name="note">备注</param>
-        /// <returns></returns>
-        Task UniversalEditDisambigExaminedAsync(Disambig disambig, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
-        /// <summary>
-        /// 处理 EditUserMain 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="user">关联用户</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditUserMainAsync(ApplicationUser user, UserMain examine);
-        /// <summary>
-        /// 处理 UserMainPage 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="user">关联用户</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditUserMainPageAsync(ApplicationUser user, string examine);
-        /// <summary>
-        /// 用户信息 编辑 数据处理完毕后调用该方法 通用
-        /// </summary>
-        /// <param name="user">用户</param>
-        /// <param name="isAdmin">是否为管理员</param>
-        /// <param name="examineStr">序列化的审核数据字符串</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <param name="note">备注</param>
-        /// <returns></returns>
-        Task UniversalEditUserExaminedAsync(ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
+      
         /// <summary>
         /// 获取当前用户对该 用户信息 部分的待审核记录
         /// </summary>
@@ -289,42 +107,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <returns>审核记录</returns>
         Task<Examine> GetUserInforActiveExamineAsync(string userId, Operation operation);
 
-        /// <summary>
-        /// 处理 PeripheryMain 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="periphery">关联周边</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditPeripheryMainAsync(Periphery periphery, ExamineMain examine);
-        /// <summary>
-        /// 处理 PeripheryImages 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="periphery">关联周边</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditPeripheryImagesAsync(Periphery periphery, PeripheryImages examine);
-        /// <summary>
-        /// 周边 创建 数据处理完毕后调用该方法 通用
-        /// </summary>
-        /// <param name="periphery">周边</param>
-        /// <param name="user">用户</param>
-        /// <param name="isAdmin">是否为管理员</param>
-        /// <param name="examineStr">序列化的审核数据字符串</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <param name="note">备注</param>
-        /// <returns></returns>
-        Task<bool> UniversalCreatePeripheryExaminedAsync(Periphery periphery, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
-        /// <summary>
-        /// 周边 编辑 数据处理完毕后调用该方法 通用
-        /// </summary>
-        /// <param name="periphery">周边</param>
-        /// <param name="user">用户</param>
-        /// <param name="isAdmin">是否为管理员</param>
-        /// <param name="examineStr">序列化的审核数据字符串</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <param name="note">备注</param>
-        /// <returns></returns>
-        Task UniversalEditPeripheryExaminedAsync(Periphery periphery, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
+    
         /// <summary>
         /// 获取当前用户 周边 等待审核
         /// </summary>
@@ -333,45 +116,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="operation"></param>
         /// <returns></returns>
         Task<Examine> GetUserPeripheryActiveExamineAsync(long peripheryId, string userId, Operation operation);
-        /// <summary>
-        /// 处理 PeripheryRelatedEntries 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="periphery">关联周边</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditPeripheryRelatedEntriesAsync(Periphery periphery, PeripheryRelatedEntries examine);
-        /// <summary>
-        /// 处理 TagMain 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="tag">标签</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditTagMainAsync(Tag tag, ExamineMain examine);
-        /// <summary>
-        /// 处理 TagChildTags 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="tag">标签</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditTagChildTagsAsync(Tag tag, TagChildTags examine);
-        /// <summary>
-        /// 处理 TagChildEntries 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="tag">标签</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditTagChildEntriesAsync(Tag tag, TagChildEntries examine);
-        /// <summary>
-        /// 标签 创建 数据处理完毕后调用该方法 通用
-        /// </summary>
-        /// <param name="tag">标签</param>
-        /// <param name="user">用户</param>
-        /// <param name="isAdmin">是否为管理员</param>
-        /// <param name="examineStr">序列化的审核数据字符串</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <param name="note">备注</param>
-        /// <returns></returns>
-        Task<bool> UniversalCreateTagExaminedAsync(Tag tag, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
+      
         /// <summary>
         /// 迁移 EditEntryTags 类型审核记录到新版
         /// </summary>
@@ -385,47 +130,51 @@ namespace CnGalWebSite.APIServer.ExamineX
         Task ReplacePeripheryRelatedEntries();
         Task ReplaceEditTagMainExamineContext();
         Task ReplaceEditTag_1_0_ExamineContext();
-        /// <summary>
-        /// 处理 PeripheryRelatedPeripheries 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="periphery">关联周边</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExamineEditPeripheryRelatedPeripheriesAsync(Periphery periphery, PeripheryRelatedPeripheries examine);
+     
         /// <summary>
         /// 补全审核记录
         /// </summary>
         /// <returns></returns>
         Task ExaminesCompletion();
 
-        /// <summary>
-        /// 评论 发表 数据处理完毕后调用该方法 通用
-        /// </summary>
-        /// <param name="comment">评论</param>
-        /// <param name="user">用户</param>
-        /// <param name="isAdmin">是否为管理员</param>
-        /// <param name="examineStr">序列化的审核数据字符串</param>
-        /// <param name="operation">用操作表示部分</param>
-        /// <param name="note">备注</param>
-        /// <returns></returns>
-        Task UniversalCommentExaminedAsync(Comment comment, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
 
-        /// <summary>
-        /// 处理 PublishComment 审核成功后调用更新数据
-        /// </summary>
-        /// <param name="comment">关联评论</param>
-        /// <param name="examine">审核数据模型</param>
-        /// <returns></returns>
-        Task ExaminePublishCommentTextAsync(Comment comment, CommentText examine);
-
-        Task ExamineEditPlayedGameMainAsync(PlayedGame playedGame, PlayedGameMain examine);
-
-        Task UniversalEditPlayedGameExaminedAsync(PlayedGame playedGame, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note);
 
         Task<object> GenerateModelFromExamines(List<Examine> examines);
 
         Task ExaminesCompletionEntry(Entry newEntry, Entry currentEntry);
 
         Task ExaminesCompletionArticle(Article newArticle, Article currentArticle);
+
+        Task ReplaceEditEntryStaffExamineContext();
+
+        Task ReplaceEntryStaff();
+
+        Task RefreshAllEntryStaffRelevances(bool autoCreate, PositionGeneralType type);
+
+        Task RefreshEntryStaffRelevances(int id, bool autoCreate, PositionGeneralType type);
+
+        /// <summary>
+        /// 添加编辑记录到数据库中
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="user"></param>
+        /// <param name="examineData"></param>
+        /// <param name="operation"></param>
+        /// <param name="type"></param>
+        /// <param name="note"></param>
+        /// <param name="isAdmin"></param>
+        /// <param name="isCreating">是否为创建相关</param>
+        /// <param name="adminRole"></param>
+        /// <returns></returns>
+        Task<Examine> AddEditRecordAsync(object entry, ApplicationUser user, object examineData, Operation operation, string note, bool isAdmin, bool isCreating = false);
+
+        /// <summary>
+        /// 使审核记录真实作用在目标上 仅管理员
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="examine"></param>
+        /// <param name="operation"></param>
+        /// <returns></returns>
+        Task ApplyEditRecordToObject(object entry, object examine, Operation operation);
     }
 }

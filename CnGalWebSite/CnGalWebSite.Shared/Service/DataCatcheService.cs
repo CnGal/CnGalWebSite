@@ -10,6 +10,7 @@ using CnGalWebSite.DataModel.ViewModel.Anniversaries;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.DelayedTasks;
+using CnGalWebSite.DataModel.ViewModel.EditRecords;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.DataModel.ViewModel.Home;
@@ -22,6 +23,7 @@ using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
+using CnGalWebSite.DataModel.ViewModel.ThematicPages;
 using CnGalWebSite.DataModel.ViewModel.Theme;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.Extensions;
@@ -266,6 +268,10 @@ namespace CnGalWebSite.Shared.Service
         /// 随机用户评分
         /// </summary>
         public List<PlayedGameUserScoreRandomModel> RandomUserScoresCatche { get; set; } = new List<PlayedGameUserScoreRandomModel>();
+        /// <summary>
+        /// 内容中心缓存
+        /// </summary>
+        public UserContentCenterViewModel UserContentCenterCatche { get; set; }
 
         /// <summary>
         /// 评论详情
@@ -283,6 +289,10 @@ namespace CnGalWebSite.Shared.Service
         /// 当前登入的用户的信息
         /// </summary>
         public UserInforViewModel UserInfor { get; set; } = new UserInforViewModel { Ranks = new List<RankViewModel>() };
+        /// <summary>
+        /// CV专题页缓存
+        /// </summary>
+        public CVThematicPageViewModel CVThematicPageCache { get; set; }
         /// <summary>
         /// 主页缓存
         /// </summary>
@@ -402,6 +412,7 @@ namespace CnGalWebSite.Shared.Service
             TagIndexPageCatche.Clean();
             PlayedGameOverviewDataCatche.Clean();
 
+            UserContentCenterCatche = null;
             LoginKey = null;
             ThirdPartyLoginTempModel = null;
             UserInfor = new UserInforViewModel { Ranks = new List<RankViewModel>() };

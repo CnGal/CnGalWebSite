@@ -1,0 +1,21 @@
+﻿
+@if (Model.AudioState == EditState.Preview)
+{
+    <div class="mb-3">
+
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditAudio/" + Model.Id)" ExamineType="Operation.EstablishAudio" OnClickRevoke="OnRevoke" />
+    </div>
+}
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="音频试听" Icon="fa fa-fw  fa-volume-up">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.AudioCard Model="Model.Audio" AutoPlay="AutoPlay"/>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public EntryIndexViewModel Model { get; set; }
+    [Parameter]
+    public bool AutoPlay { get; set; } = true;
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+}

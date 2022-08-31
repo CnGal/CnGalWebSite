@@ -14,7 +14,7 @@
                         <div class="comment-username" style="color:gray;">@Time?.ToTimeFromNowString()</div>
                     }
                     <div class="comment-username a-font-color me-2 ms-2">@UserName</div>
-                    <RanksViewCard Model="Ranks" Outline/>
+                    <RanksViewCard Model="Ranks" Outline  ForceDisplayBadge="ForceBadgeShowText"/>
                 </div>
                 <span class="me-2">@Text</span>
 
@@ -32,7 +32,7 @@
             </a>
             <div class="comment-tx-div">
                 <a href="@("/space/index/"+UserId)" class="new-row-warp no-margin">
-                    <RanksViewCard Model="Ranks" Outline/>
+                    <RanksViewCard Model="Ranks" Outline ForceDisplayBadge="ForceBadgeShowText"/>
                     <div class="comment-username a-font-color me-2">@UserName</div>
                     @if (Time != null)
                     {
@@ -43,13 +43,13 @@
             </div>
         </div>
     }
-    @if (_dataCatcheService.IsApp == false)
+    @if (_dataCatcheService.IsApp == false&& ForceBadgeShowText==false)
     {
         <BadgesViewCard Model="Ranks" />
 
     }
 </div>
-@if (_dataCatcheService.IsApp)
+@if (_dataCatcheService.IsApp&& ForceBadgeShowText==false)
 {
     <BadgesViewCard Model="Ranks" Class="mt-4" Styles=" display: flex;justify-content: flex-end;"/>
 
@@ -71,6 +71,8 @@
     public bool IsRight { get; set; }
     [Parameter]
     public DateTime? Time { get; set; }
+    [Parameter]
+    public bool ForceBadgeShowText { get; set; }
 
     [Parameter]
     public List<RankViewModel> Ranks { get; set; } = new List<RankViewModel>();

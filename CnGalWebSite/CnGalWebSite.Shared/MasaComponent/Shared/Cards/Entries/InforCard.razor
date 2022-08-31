@@ -1,0 +1,52 @@
+﻿<a href="@("/entries/index/" + Model.Id)" class="a-font-color h-100">
+
+    <div class="@(Outline?" h-100":"shadow-sm rounded  bg-opacity aticle-home-layout h-100")" style="display: flex; flex-direction: column; justify-content: space-between;">
+        @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
+        {
+            <div class="">
+                <div class="">
+                    <img class="img-fluid" src="@Model.MainImage" alt="@Model.Name">
+                </div>
+                <div class="@(Outline?"pt-2":"p-2")">
+                    <header style=" display: flex; flex-wrap: nowrap;">
+                        <div class="comment-tag bg-main me-2">@Model.Type.GetDisplayName()</div>
+                        <div>@Model.Name</div>
+                    </header>
+                    <div class="text-truncate-3 pt-1" style=" color: gray;">
+                        @Model.BriefIntroduction
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="h-100" style=" display: flex; flex-direction: column; justify-content: center; ">
+                <div class="@(Outline?"pt-2":"p-2")">
+                    <div class="" style="width: 50%; margin-right: auto; margin-left: auto;">
+                        <img class="img-fluid" src="@Model.MainImage" style=" border-radius: 50%;">
+                    </div>
+                    <div class="pt-3">
+                        <header style=" display: flex; justify-content: center; flex-wrap: wrap;">
+                            <div class="comment-tag bg-main m-1">@Model.Type.GetDisplayName()</div>
+                            <div class="m-1">@Model.Name</div>
+                        </header>
+                        <div class="text-truncate-3" style=" color: gray;">
+                            @Model.BriefIntroduction
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+
+    </div>
+</a>
+
+
+
+@code {
+    [Parameter]
+    public EntryInforTipViewModel Model { get; set; }
+    [Parameter]
+    public bool Outline { get; set; }
+}

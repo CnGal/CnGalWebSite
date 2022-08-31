@@ -47,19 +47,19 @@
 
             break;
         case EntryType.ProductionGroup:
-<div class="row">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.QQgroupGroup" Label="QQ群"/>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.WeiboId" Label="微博平台Id" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.BilibiliId" Label="Bilibili平台Id" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.AcFunId" Label="AcFun平台Id" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.ZhihuId" Label="知乎平台Id" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.AfdianId" Label="@("爱发电平台Id（不包括@）")" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.PixivId" Label="Pixiv平台Id" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.TwitterId" Label="Twitter平台Id" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.YouTubeId" Label="YouTube平台Id" />
-    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.FacebookId" Label="Facebook平台Id" />
+            <div class="row">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.QQgroupGroup" Label="QQ群" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.WeiboId" Label="微博平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.BilibiliId" Label="Bilibili平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.AcFunId" Label="AcFun平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.ZhihuId" Label="知乎平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.AfdianId" Label="@("爱发电平台Id（不包括@）")" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.PixivId" Label="Pixiv平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.TwitterId" Label="Twitter平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.YouTubeId" Label="YouTube平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.FacebookId" Label="Facebook平台Id" />
 
-</div>
+            </div>
             break;
         case EntryType.Role:
             <div class="row">
@@ -110,15 +110,18 @@
             break;
         case EntryType.Staff:
             <div class="row">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.WeiboId" Label="微博平台Id"/>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.BilibiliId"  Label="Bilibili平台Id"/>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.AcFunId"   Label="AcFun平台Id"/>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.ZhihuId"   Label="知乎平台Id"/>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.AfdianId"  Label="@("爱发电平台Id（不包括@）")" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.PixivId"  Label="Pixiv平台Id" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.TwitterId"  Label="Twitter平台Id" />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.YouTubeId"   Label="YouTube平台Id"/>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.FacebookId"  Label="Facebook平台Id" />
+                <div class="form-group col-12  col-sm-6">
+                    <BootstrapInput @bind-Value="Model.RealName" ShowLabel="true" />
+                </div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.WeiboId" Label="微博平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.BilibiliId" Label="Bilibili平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.AcFunId" Label="AcFun平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.ZhihuId" Label="知乎平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.AfdianId" Label="@("爱发电平台Id（不包括@）")" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.PixivId" Label="Pixiv平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.TwitterId" Label="Twitter平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.YouTubeId" Label="YouTube平台Id" />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.FacebookId" Label="Facebook平台Id" />
             </div>
             break;
     }

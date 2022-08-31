@@ -52,7 +52,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         [Display(Name = "周边")]
         Periphery,
         [Display(Name = "游玩记录")]
-        PlayedGame
+        PlayedGame,
+        [Display(Name = "用户认证")]
+        UserCertification
     }
 
     public enum ExaminedNormalListPassType

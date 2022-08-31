@@ -36,6 +36,10 @@ else
             <div class="col-12 col-lg-4">
                 <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Model="Model.BasicInfor" />
                 <CnGalWebSite.Shared.MasaComponent.PC.Users.BasicInforCard Model="Model" />
+                @if (_dataCacheService.IsApp == false)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.PC.Users.CertificationCard Model="Model" />
+                }
             </div>
             <div class="col-12 col-lg-8">
 
@@ -79,9 +83,13 @@ else
                     <div class="row">
                         <MTabsItems @bind-Value="TabIndex">
                             <MTabItem Value="1">
+                                @if (_dataCacheService.IsApp)
+                                {
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.CertificationCard Model="Model" />
+                                }
                                 @if (Model.IsCurrentUser)
                                 {
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.Examines.PendingDataCard/>
+                                    <CnGalWebSite.Shared.MasaComponent.PC.Users.Examines.PendingDataCard />
                                 }
                                 @if (Model.IsCurrentUser || string.IsNullOrWhiteSpace(Model.MainPageContext) == false)
                                 {

@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.APIServer.Application.Entries;
+using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Messages;
 using CnGalWebSite.APIServer.Application.Ranks;
@@ -12,6 +13,7 @@ using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -41,16 +43,19 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Message, int> _messageRepository;
         private readonly IRepository<SignInDay, long> _signInDayRepository;
         private readonly IRepository<Article, long> _articleRepository;
+        private readonly IRepository<Entry, int> _entryRepository;
         private readonly IExamineService _examineService;
         private readonly IMessageService _messageService;
         private readonly IUserService _userService;
         private readonly IRankService _rankService;
         private readonly ISteamInforService _steamInforService;
         private readonly IAppHelper _appHelper;
+        private readonly IRepository<UserCertification, long> _userCertificationRepository;
+        private readonly IEditRecordService _editRecordService;
 
-        public SpaceAPIController(IRepository<Message, int> messageRepository, IMessageService messageService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository,
-        UserManager<ApplicationUser> userManager, IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService,
-        IRepository<Examine, long> examineRepository, IExamineService examineService, IRankService rankService, IRepository<FavoriteObject, long> favoriteObjectRepository,
+        public SpaceAPIController(IRepository<Message, int> messageRepository, IMessageService messageService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository, IRepository<Entry, int> entryRepository,
+        UserManager<ApplicationUser> userManager, IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService, IRepository<UserCertification, long> userCertificationRepository,
+        IRepository<Examine, long> examineRepository, IExamineService examineService, IRankService rankService, IRepository<FavoriteObject, long> favoriteObjectRepository, IEditRecordService editRecordService,
         ISteamInforService steamInforService)
         {
             _examineRepository = examineRepository;
@@ -66,6 +71,9 @@ namespace CnGalWebSite.APIServer.Controllers
             _rankService = rankService;
             _favoriteObjectRepository = favoriteObjectRepository;
             _steamInforService = steamInforService;
+            _userCertificationRepository = userCertificationRepository;
+            _editRecordService = editRecordService;
+            _entryRepository = entryRepository;
         }
 
         /// <summary>
@@ -136,10 +144,11 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             try
             {
-                user = await _userManager.Users
+                user = await _userRepository.GetAll().AsNoTracking()
                                           .Include(x => x.SignInDays)
                                           .Include(s => s.FileManager)
-                                          .SingleAsync(x => x.Id == id);
+                                          .Include(x=>x.Certification).ThenInclude(s=>s.Entry)
+                                          .FirstOrDefaultAsync(x => x.Id == id);
             }
             catch
             {
@@ -209,7 +218,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 IsShowGameRecord = user.IsShowGameRecord,
                 BasicInfor = await _userService.GetUserInforViewModel(user),
                 SignInDaysList = user.SignInDays.Select(s => new KeyValuePair<DateTime, int>(s.Time.Date, 1)).ToList(),
-
+                UserCertification = user.Certification?.Entry != null ?_appHelper.GetEntryInforTipViewModel(user.Certification.Entry) : null
 
             };
 
@@ -316,7 +325,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //更新用户积分
-            await _appHelper.UpdateUserIntegral(user);
+            await _userService.UpdateUserIntegral(user);
             await _rankService.UpdateUserRanks(user);
 
             return new Result { Successful = true };
@@ -358,16 +367,10 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
             }
-            //判断是否是管理员
-            if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-            {
-                await _examineService.ExamineEditUserMainPageAsync(user, model.MainPage);
-                await _examineService.UniversalEditUserExaminedAsync(user, true, model.MainPage, Operation.UserMainPage, "");
-            }
-            else
-            {
-                await _examineService.UniversalEditUserExaminedAsync(user, false, model.MainPage, Operation.UserMainPage, "");
-            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(user, user, model.MainPage, Operation.UserMainPage, model.Note);
+
 
             return new Result { Successful = true };
 
@@ -378,7 +381,10 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            user = await _userRepository.GetAll().Include(s => s.ThirdPartyLoginInfors).FirstOrDefaultAsync(s => s.Id == user.Id);
+            user = await _userRepository.GetAll()
+                .Include(s => s.ThirdPartyLoginInfors)
+                .Include(s => s.Certification).ThenInclude(s => s.Entry)
+                .FirstOrDefaultAsync(s => s.Id == user.Id);
 
             //判断用户是否有待审核的主页编辑记录
             var examine = await _examineService.GetUserInforActiveExamineAsync(user.Id, Operation.EditUserMain);
@@ -408,6 +414,31 @@ namespace CnGalWebSite.APIServer.Controllers
             model.LastChangePasswordTime = user.LastChangePasswordTime;
             var temp = user.ThirdPartyLoginInfors.FirstOrDefault(s => s.Type == ThirdPartyLoginType.QQ);
             model.Ranks = await _rankService.GetUserRankListForEdit(user);
+
+
+            //判断用户是否有认证申请
+            examine = await _examineService.GetUserInforActiveExamineAsync(user.Id, Operation.RequestUserCertification);
+            if (examine != null)
+            {
+                var userCertification = new UserCertification();
+                _userService.UpdateUserCertificationData(userCertification, examine);
+
+                model.UserCertificationModel = new EditUserCertificationModel
+                {
+                    IsPending = true,
+                    EntryName = userCertification.Entry.DisplayName,
+                    Note = examine.Note,
+                    Type = userCertification.Entry.Type,
+                };
+            }
+            else
+            {
+                model.UserCertificationModel = new EditUserCertificationModel
+                {
+                    EntryName = user.Certification?.Entry?.DisplayName,
+                    Type = user.Certification?.Entry?.Type ?? EntryType.Staff
+                };
+            }
 
             return model;
         }
@@ -468,24 +499,12 @@ namespace CnGalWebSite.APIServer.Controllers
                     MBgImage = model.MBgImageName,
                     SBgImage = model.SBgImageName
                 };
-                //序列化
-                var resulte = "";
-                using (TextWriter text = new StringWriter())
-                {
-                    var serializer = new JsonSerializer();
-                    serializer.Serialize(text, userMain);
-                    resulte = text.ToString();
-                }
-                //判断是否是管理员
-                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
-                {
-                    await _examineService.ExamineEditUserMainAsync(user, userMain);
-                    await _examineService.UniversalEditUserExaminedAsync(user, true, resulte, Operation.EditUserMain, "");
-                }
-                else
-                {
-                    await _examineService.UniversalEditUserExaminedAsync(user, false, resulte, Operation.EditUserMain, "");
-                }
+
+                //保存并尝试应用审核记录
+                await _editRecordService.SaveAndApplyEditRecord(user, user, userMain, Operation.EditUserMain, model.Note);
+
+
+
             }
 
             if (result.Succeeded)
@@ -761,7 +780,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
-
         /// <summary>
         /// 获取用户待审核的编辑对象列表
         /// </summary>
@@ -774,6 +792,96 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
             return await _examineService.GetUserPendingData(user.Id);
+        }
+
+        /// <summary>
+        /// 编辑用户认证
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<Result>> EditUserCertificationAsync(EditUserCertificationModel model)
+        {
+            //提前判断是否通过人机验证
+            if (_appHelper.CheckRecaptcha(model.Verification) == false)
+            {
+                return BadRequest(new Result { Error = "没有通过人机验证" });
+            }
+            Entry entry = null;
+
+            if(string.IsNullOrWhiteSpace(model.EntryName)==false)
+            {
+                if ((await _userService.GetAllNotCertificatedEntriesAsync()).Contains(model.EntryName)==false)
+                {
+                    return new Result { Successful = false, Error = "词条不存在或被占用" };
+                }
+                entry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Name == model.EntryName);
+
+                if(entry==null)
+                {
+                    return new Result { Successful = false, Error = "词条不存在或被占用" };
+                }
+            }
+
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            var userCertification = await _userCertificationRepository.FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id);
+
+            var userCertificationMain = new UserCertificationMain();
+
+            if (userCertification == null)
+            {
+                if (entry==null)
+                {
+                    return new Result { Successful = true };
+                }
+                else
+                {
+                    userCertification = await _userCertificationRepository.InsertAsync(new UserCertification
+                    {
+                        ApplicationUserId = user.Id
+                    });
+
+                    userCertificationMain.EntryId = entry.Id;
+
+
+                }
+
+            }
+            else
+            {
+                if (entry == null)
+                {
+                       userCertification.EntryId = null;
+                    userCertification.Entry = null;
+
+                    await _userCertificationRepository.UpdateAsync(userCertification);
+
+                    return new Result { Successful = true };
+                }
+                else
+                {
+                    userCertificationMain.EntryId = entry.Id;
+
+                }
+            }
+
+            //保存并尝试应用审核记录
+            await _editRecordService.SaveAndApplyEditRecord(userCertification, user, userCertificationMain, Operation.RequestUserCertification, model.Note, false, false);
+
+            return new Result { Successful = true };
+        }
+
+        /// <summary>
+        /// 获取输入提示
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<string>>> GetAllNotCertificatedEntriesAsync([FromQuery] EntryType type)
+        {
+            return await _userService.GetAllNotCertificatedEntriesAsync(type);
         }
 
     }

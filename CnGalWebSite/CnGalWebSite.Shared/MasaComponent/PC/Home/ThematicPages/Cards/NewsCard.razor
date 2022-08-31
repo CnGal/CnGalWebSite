@@ -1,0 +1,60 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@inject IJSRuntime JS
+
+<div class="rounded shadow-sm bg-opacity  p-4 pt-3 h-100" style=" display: flex; flex-direction: column; ">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="fa fa-fw fa-newspaper-o" Class="mb-2" Outline OutlineHead>
+        <ButtonContent>
+            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
+                <MIcon Left>mdi-share-all-outline  </MIcon>
+                查看更多
+            </MButton>
+
+        </ButtonContent>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    <div class="row" style=" display: flex; height: 100%; flex-direction: column-reverse; justify-content: space-around;">
+
+        @foreach (var item in Model.Take(MaxCount))
+        {
+            <div class="@("mb-3 col-12  pointer "+(Model.IndexOf(item)==MaxCount-1?" d-none d-lg-block ":""))">
+                <HomeNewsAloneTip Model="item" OnClickNews="OnClickNews" />
+            </div>
+        }
+    </div>
+</div>
+       
+
+        @code {
+            [Parameter]
+            public List<HomeNewsAloneViewModel> Model { get; set; } = new List<HomeNewsAloneViewModel>();
+            [Parameter]
+            public int MaxCount { get; set; } = 6;
+            [CascadingParameter]
+            public ErrorHandler ErrorHandler { get; set; }
+
+
+            protected override async Task OnInitializedAsync()
+            {
+
+            }
+
+            public async Task OnClickNews(HomeNewsAloneViewModel model)
+            {
+                try
+                {
+                    await JS.InvokeAsync<string>("trackEvent", "动态", "点击", model.Text, "1", "click");
+                }
+                catch (Exception exc)
+                {
+
+                }
+            }
+
+            public Task OnClickMore()
+            {
+                NavigationManager.NavigateTo("/articles/news");
+                return Task.CompletedTask;
+            }
+
+        }

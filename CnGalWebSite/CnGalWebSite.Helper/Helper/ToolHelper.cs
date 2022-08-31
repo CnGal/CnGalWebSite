@@ -29,8 +29,8 @@ namespace CnGalWebSite.DataModel.Helper
         public static bool IsSSR => WebApiPath == "http://172.17.0.1:2001/";
         public static bool IsWASM => WebApiPath == "https://www.cngal.org/";
 
-        public const string ImageApiPath = "https://api.cngal.top/";
-        //public const string ImageApiPath = "http://localhost:5098/";
+        //public const string ImageApiPath = "https://api.cngal.top/";
+        public const string ImageApiPath = "http://localhost:5098/";
 
 
         public const bool IsMaui = false;
@@ -434,10 +434,9 @@ namespace CnGalWebSite.DataModel.Helper
                     var type = GetGeneralType(PositionGeneral ?? Position);
                     result.Add(new StaffModel
                     {
-                        NicknameOfficial = infor.Replace($"({roleName})", ""),
+                        Name = infor.Replace($"({roleName})", ""),
                         PositionOfficial = Position,
-                        Subcategory = Subcategory,
-                        Role = type == PositionGeneralType.CV ? roleName : null,
+                        Modifier = Subcategory,
                         SubordinateOrganization = type == PositionGeneralType.CV ? null : roleName,
                         PositionGeneral = type
                     });
@@ -519,9 +518,13 @@ namespace CnGalWebSite.DataModel.Helper
             {
                 return PositionGeneralType.FineArts;
             }
-            else if (text.Contains("配音") || text.ToUpper().Contains("CV"))
+            else if ((text.Contains("配音") || text.Contains("声优") || text.ToUpper().Contains("CV"))&&text.Contains("导演")==false && text.Contains("监督") == false && text.Contains("制作") == false && text.Contains("后期") == false && text.Contains("处理") == false && text.Contains("后制") == false)
             {
                 return PositionGeneralType.CV;
+            }
+            else if (text.Contains("感谢") || text.ToUpper().Contains("鸣谢") || text.ToUpper().Contains("致谢"))
+            {
+                return PositionGeneralType.SpecialThanks;
             }
 
             return PositionGeneralType.Other;
@@ -1025,6 +1028,28 @@ namespace CnGalWebSite.DataModel.Helper
 
             return informations;
         }
+        /// <summary>
+        /// 词条 Staff 列表 清理相同项目
+        /// </summary>
+        /// <param name="informations"></param>
+        /// <returns></returns>
+        public static List<EntryStaff> Purge(this List<EntryStaff> informations)
+        {
+            var list = informations.ToList();
+            foreach (var item in list)
+            {
+                if (informations.Count(s => item.Name == s.Name && item.ToEntry == s.ToEntry && s.PositionOfficial == item.PositionOfficial && s.Modifier == item.Modifier) > 1)
+                {
+                    var temp = informations.FirstOrDefault(s => item.Name == s.Name && s.ToEntry == item.ToEntry && s.PositionOfficial == item.PositionOfficial && s.Modifier == item.Modifier);
+                    if (temp != null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
 
         /// <summary>
         /// 词条 关联词条 列表 清理相同项目
@@ -1100,6 +1125,29 @@ namespace CnGalWebSite.DataModel.Helper
         /// <param name="informations"></param>
         /// <returns></returns>
         public static List<EntryPicture> Purge(this List<EntryPicture> informations)
+        {
+            var list = informations.ToList();
+            foreach (var item in list)
+            {
+                if (informations.Count(s => item.Url == s.Url) > 1)
+                {
+                    var temp = informations.FirstOrDefault(s => item.Url == s.Url);
+                    if (temp != null)
+                    {
+                        informations.Remove(temp);
+                    }
+                }
+            }
+
+            return informations;
+        }
+
+        /// <summary>
+        /// 词条 音频 的 列表 清理相同项目
+        /// </summary>
+        /// <param name="informations"></param>
+        /// <returns></returns>
+        public static List<EntryAudio> Purge(this List<EntryAudio> informations)
         {
             var list = informations.ToList();
             foreach (var item in list)

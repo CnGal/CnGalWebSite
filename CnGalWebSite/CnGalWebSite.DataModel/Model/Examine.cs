@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
+
 namespace CnGalWebSite.DataModel.Model
 {
     public class Examine
@@ -66,12 +69,45 @@ namespace CnGalWebSite.DataModel.Model
         /// 前置审核Id
         /// </summary>
         public long? PrepositionExamineId { get; set; }
+
+        public virtual ICollection<UserReviewEditRecord> ReviewUsers { get; set; }
+
+    }
+
+    public class UserReviewEditRecord
+    {
+        public long Id { get; set; }
+
+        public EditRecordReviewState State { get; set; }
+
+        /// <summary>
+        /// 审阅时间
+        /// </summary>
+        public DateTime? ReviewedTime { get; set; }
+
+        public ApplicationUser ApplicationUser { get; set; }
+        public string ApplicationUserId { get; set; }
+
+        public long? ExamineId { get; set; }
+        public Examine Examine { get; set; }
+    }
+
+
+    public enum EditRecordReviewState
+    {
+        [Display(Name ="未读")]
+        UnRead,
+        [Display(Name = "已读")]
+        Reviewed,
+        [Display(Name = "忽略")]
+        Ignored
     }
 
     public enum ExamineVersion
     {
         V1_0,
         V1_1,
+        V1_2,
     }
 
     public enum Operation
@@ -124,5 +160,9 @@ namespace CnGalWebSite.DataModel.Model
         EditPeripheryRelatedPeripheries,
         [Display(Name = "编辑游玩记录")]
         EditPlayedGameMain,
+        [Display(Name = "编辑词条音频")]
+        EstablishAudio,
+        [Display(Name = "申请用户认证")]
+        RequestUserCertification,
     }
 }

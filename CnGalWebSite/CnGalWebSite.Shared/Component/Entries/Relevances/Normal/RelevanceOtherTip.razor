@@ -24,10 +24,10 @@
                     {
                         imageStr = "https://app.cngal.org/_content/CnGalWebSite.Shared/images/2DFan.png";
                     }
-                    else if (Model.DisplayName == "VNDB")
-                    {
-                        imageStr = "https://app.cngal.org/_content/CnGalWebSite.Shared/images/VNDB.png";
-                    }
+                    //else if (Model.DisplayName == "VNDB")
+                    //{
+                    //    imageStr = "https://app.cngal.org/_content/CnGalWebSite.Shared/images/VNDB.png";
+                    //}
                     else if (Model.DisplayName == "App Store")
                     {
                         imageStr = "https://app.cngal.org/_content/CnGalWebSite.Shared/images/AppStore.png";
@@ -60,6 +60,10 @@
                     {
                         imageStr = "https://app.cngal.org/_content/CnGalWebSite.Shared/images/Wikidata.png";
                     }
+                }
+                if(Model.DisplayName== "VNDB")
+                {
+                    Model.DisplayValue = "VNDB.org力争成为一个关于视觉小说的全面的信息数据库";
                 }
 
                 if (string.IsNullOrWhiteSpace(imageStr))

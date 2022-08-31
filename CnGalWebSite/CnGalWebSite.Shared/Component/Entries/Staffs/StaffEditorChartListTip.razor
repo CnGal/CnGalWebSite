@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @implements IAsyncDisposable
+@inject IPopupService PopupService
 
 @if (IsSmallScreen == false)
 {
@@ -16,20 +17,19 @@
            IsPagination="true" PageItemsSource="@PageItemsSource"
            IsStriped="true" IsBordered="true" IsMultipleSelect="true" ShowSearch="true"
            ShowToolbar="true" ShowExtendButtons="true" ShowSkeleton="true"
-           OnQueryAsync="@OnQueryAsync" EditMode="EditMode.InCell"
+           OnQueryAsync="@OnQueryAsync" EditMode="EditMode.InCell" ShowToastAfterSaveOrDeleteModel="false"
            OnAddAsync="@OnAddAsync" OnSaveAsync="@OnSaveAsync" OnDeleteAsync="@OnDeleteAsync">
         <TableToolbarTemplate>
             <TableToolbarButton TItem="StaffModel" Color="Color.Warning" Icon="fa fa-upload" Text="批量导入" OnClickCallback="OnImportClick" />
         </TableToolbarTemplate>
 
         <TableColumns>
-            <TableColumn @bind-Field="@context.Subcategory" Filterable="true" Sortable="true" />
+            <TableColumn @bind-Field="@context.Modifier" Filterable="true" Sortable="true" />
             <TableColumn @bind-Field="@context.PositionOfficial" Filterable="true" Sortable="true" DefaultSort="true" />
-            <TableColumn @bind-Field="@context.NicknameOfficial" Filterable="true" Sortable="true" Searchable="true" />
+            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" />
             <TableColumn @bind-Field="@context.PositionGeneral" Sortable="true" />
-
-            <TableColumn @bind-Field="@context.Role" Filterable="true" Sortable="true" />
             <TableColumn @bind-Field="@context.SubordinateOrganization" Filterable="true" Sortable="true" Searchable="true" />
+            <TableColumn @bind-Field="@context.CustomName" Filterable="true" Sortable="true" Searchable="true" />
         </TableColumns>
     </Table>
 
@@ -45,7 +45,7 @@ else
                     <div class="row">
                         <div class="col mt-2" style="padding-right:0px;">
                             <p class="text-truncate text-center" style="font-size:.875rem">
-                                @Staffs[i].PositionOfficial：@Staffs[i].NicknameOfficial
+                                @Staffs[i].PositionOfficial：@Staffs[i].Name
                             </p>
                         </div>
                         <div class="col-12 d-flex" style="justify-content: space-between;">
@@ -145,35 +145,36 @@ else
     private async Task<bool> OnSaveAsync(StaffModel item, ItemChangedType type)
     {
         //检查数据是否合格
-        if (string.IsNullOrWhiteSpace(item.NicknameOfficial))
+        if (string.IsNullOrWhiteSpace(item.Name))
         {
-            await ToastService.Error("官方昵称是必填项目", "官方昵称是必填项目");
+            await PopupService.ToastAsync("唯一名称是必填项目", AlertTypes.Error);
             return false;
         }
         if (string.IsNullOrWhiteSpace(item.PositionOfficial))
         {
-            await ToastService.Error("官方职位是必填项目", "官方职位是必填项目");
+            await PopupService.ToastAsync("官方职位是必填项目", AlertTypes.Error);
             return false;
         }
-        if (item.Id == 0 && Staffs.Any(s => s.NicknameOfficial == item.NicknameOfficial && s.Subcategory + s.PositionOfficial == item.Subcategory + item.PositionOfficial))
+        if (item.Id == 0 && Staffs.Any(s => s.Name == item.Name && s.Modifier == item.Modifier &&  s.PositionOfficial ==item.PositionOfficial))
         {
-            await ToastService.Error("官方职位和官方称呼必须唯一", "官方职位和官方称呼必须唯一");
+            await PopupService.ToastAsync("官方职位和官方称呼必须唯一", AlertTypes.Error);
             return false;
         }
+
         //检查是否重名
         if (type == ItemChangedType.Add)
         {
-            if (Staffs.Any(s => s.NicknameOfficial == item.NicknameOfficial && s.Subcategory + s.PositionOfficial == item.Subcategory + item.PositionOfficial))
+            if (Staffs.Any(s => s.Name == item.Name && s.Modifier == item.Modifier && s.PositionOfficial == item.PositionOfficial))
             {
-                await ToastService.Error("官方职位和官方称呼必须唯一", "官方职位和官方称呼必须唯一");
+                await PopupService.ToastAsync("官方职位和官方称呼必须唯一", AlertTypes.Error);
                 return false;
             }
         }
         else
         {
-            if (Staffs.Where(s => s.Id != item.Id).Any(s => s.NicknameOfficial == item.NicknameOfficial && s.Subcategory + s.PositionOfficial == item.Subcategory + item.PositionOfficial))
+            if (Staffs.Where(s => s.Id != item.Id).Any(s => s.Name == item.Name && s.Modifier == item.Modifier && s.PositionOfficial == item.PositionOfficial))
             {
-                await ToastService.Error("官方职位和官方称呼必须唯一", "官方职位和官方称呼必须唯一");
+                await PopupService.ToastAsync("官方职位和官方称呼必须唯一", AlertTypes.Error);
                 return false;
             }
         }
@@ -188,6 +189,7 @@ else
             {
                 item.Id = Staffs.Max(i => i.Id) + 1;
             }
+
             Staffs.Add(item);
         }
         else
@@ -195,11 +197,11 @@ else
             var oldItem = Staffs.FirstOrDefault(i => i.Id == item.Id);
             if (oldItem != null)
             {
-                oldItem.Subcategory = item.Subcategory;
+                oldItem.Modifier = item.Modifier;
+                oldItem.CustomName =  item.CustomName;
                 oldItem.PositionOfficial = item.PositionOfficial;
-                oldItem.NicknameOfficial = item.NicknameOfficial;
+                oldItem.Name = item.Name;
                 oldItem.PositionGeneral = item.PositionGeneral;
-                oldItem.Role = item.Role;
                 oldItem.SubordinateOrganization = item.SubordinateOrganization;
             }
         }
@@ -217,22 +219,22 @@ else
     {
         IEnumerable<StaffModel> items = Staffs;
         // 处理高级搜索
-        if (!string.IsNullOrWhiteSpace(SearchModelBasic.NicknameOfficial))
+        if (!string.IsNullOrWhiteSpace(SearchModelBasic.Name))
         {
-            items = items.Where(item => item.NicknameOfficial?.Contains(SearchModelBasic.NicknameOfficial, StringComparison.OrdinalIgnoreCase) ?? false);
+            items = items.Where(item => item.Name?.Contains(SearchModelBasic.Name, StringComparison.OrdinalIgnoreCase) ?? false);
         }
 
         if (!string.IsNullOrWhiteSpace(SearchModelBasic.PositionOfficial))
         {
             items = items.Where(item => item.PositionOfficial?.Contains(SearchModelBasic.PositionOfficial, StringComparison.OrdinalIgnoreCase) ?? false);
         }
-        if (!string.IsNullOrWhiteSpace(SearchModelBasic.Role))
+        if (!string.IsNullOrWhiteSpace(SearchModelBasic.CustomName))
         {
-            items = items.Where(item => item.Role?.Contains(SearchModelBasic.Role, StringComparison.OrdinalIgnoreCase) ?? false);
+            items = items.Where(item => item.CustomName?.Contains(SearchModelBasic.CustomName, StringComparison.OrdinalIgnoreCase) ?? false);
         }
-        if (!string.IsNullOrWhiteSpace(SearchModelBasic.Subcategory))
+        if (!string.IsNullOrWhiteSpace(SearchModelBasic.Modifier))
         {
-            items = items.Where(item => item.Subcategory?.Contains(SearchModelBasic.Subcategory, StringComparison.OrdinalIgnoreCase) ?? false);
+            items = items.Where(item => item.Modifier?.Contains(SearchModelBasic.Modifier, StringComparison.OrdinalIgnoreCase) ?? false);
         }
         if (!string.IsNullOrWhiteSpace(SearchModelBasic.SubordinateOrganization))
         {
@@ -249,10 +251,10 @@ else
             // 处理 SearchText 模糊搜索
             if (!string.IsNullOrWhiteSpace(options.SearchText))
             {
-                items = items.Where(item => (item.NicknameOfficial?.Contains(options.SearchText) ?? false)
+                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
                              || (item.PositionOfficial?.Contains(options.SearchText) ?? false)
-                             || (item.Role?.Contains(options.SearchText) ?? false)
-                             || (item.Subcategory?.Contains(options.SearchText) ?? false)
+                             || (item.CustomName?.Contains(options.SearchText) ?? false)
+                             || (item.Modifier?.Contains(options.SearchText) ?? false)
                              || (item.SubordinateOrganization?.Contains(options.SearchText) ?? false));
             }
         }
@@ -270,7 +272,7 @@ else
         {
             // 外部未进行排序，内部自动进行排序处理
             var invoker = SortLambdaCacheBasic.GetOrAdd(typeof(StaffModel), key => LambdaExtensions.GetSortLambda<StaffModel>().Compile());
-            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder) options.SortOrder);
+            items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
             isSorted = true;
         }
 
@@ -320,9 +322,9 @@ else
                 // Trace.Log("保存按钮被点击");
                 var item = (StaffModel)context.Model;
 
-                if (Staffs.Where(s => s.Id != item.Id).Any(s => s.NicknameOfficial == item.NicknameOfficial && s.Subcategory + s.PositionOfficial == item.Subcategory + item.PositionOfficial))
+                if (Staffs.Where(s => s.Id != item.Id).Any(s => s.Name == item.Name && s.Modifier == item.Modifier && s.PositionOfficial == item.PositionOfficial))
                 {
-                    await ToastService.Error("官方职位和官方称呼必须唯一", "官方职位和官方称呼必须唯一");
+                    await PopupService.ToastAsync("官方职位和官方称呼必须唯一", AlertTypes.Error);
                     return false;
                 }
 
@@ -356,9 +358,9 @@ else
             {
                 // Trace.Log("保存按钮被点击");
                 var item = (StaffModel)context.Model;
-                if (Staffs.Any(s => s.NicknameOfficial == item.NicknameOfficial && s.Subcategory + s.PositionOfficial == item.Subcategory + item.PositionOfficial))
+                if (Staffs.Any(s => s.Name == item.Name && s.Modifier == item.Modifier && s.PositionOfficial == item.PositionOfficial))
                 {
-                    await ToastService.Error("官方职位和官方称呼必须唯一", "官方职位和官方称呼必须唯一");
+                    await PopupService.ToastAsync("官方职位和官方称呼必须唯一", AlertTypes.Error);
                     return false;
                 }
                 Staffs.Add(item);

@@ -1,0 +1,11 @@
+﻿<div class="@("rounded shadow-sm bg-opacity h-100 p-3 "+Class)">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.AudioCard Model="Model" AutoPlay="false"/>
+</div>
+
+@code {
+    [Parameter]
+    public List<AudioViewModel> Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+}

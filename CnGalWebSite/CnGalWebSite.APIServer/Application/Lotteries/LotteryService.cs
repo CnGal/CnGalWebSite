@@ -206,7 +206,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                     UserId = user.ApplicationUserId
                 });
                 //更新用户积分
-                await _appHelper.UpdateUserIntegral(await _userRepository.FirstOrDefaultAsync(s => s.Id == user.ApplicationUserId));
+                await _userService.UpdateUserIntegral(await _userRepository.FirstOrDefaultAsync(s => s.Id == user.ApplicationUserId));
             }
         }
 

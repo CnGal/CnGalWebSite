@@ -554,7 +554,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                 {
                     if (examiningList.Any(s => s == Operation.EditPeripheryMain))
                     {
-                        model.MainState = EditState.locked;
+                        model.MainState = EditState.Locked;
                     }
                     else
                     {
@@ -566,7 +566,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
 
                     if (examiningList.Any(s => s == Operation.EditPeripheryImages))
                     {
-                        model.ImagesState = EditState.locked;
+                        model.ImagesState = EditState.Locked;
                     }
                     else
                     {
@@ -577,7 +577,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                 {
                     if (examiningList.Any(s => s == Operation.EditPeripheryRelatedEntries))
                     {
-                        model.RelatedEntriesState = EditState.locked;
+                        model.RelatedEntriesState = EditState.Locked;
                     }
                     else
                     {
@@ -588,7 +588,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                 {
                     if (examiningList.Any(s => s == Operation.EditPeripheryRelatedPeripheries))
                     {
-                        model.RelatedPeripheriesState = EditState.locked;
+                        model.RelatedPeripheriesState = EditState.Locked;
                     }
                     else
                     {
@@ -601,7 +601,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
         }
 
 
-        public async Task<PeripheryViewModel> GetPeripheryViewModel(Periphery periphery)
+        public PeripheryViewModel GetPeripheryViewModel(Periphery periphery)
         {
             //建立视图模型
             var model = new PeripheryViewModel
@@ -699,7 +699,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
 
             foreach (var item in entries)
             {
-                model.Entries.Add(await _appHelper.GetEntryInforTipViewModel(item));
+                model.Entries.Add( _appHelper.GetEntryInforTipViewModel(item));
             }
 
             //获取所有关联周边
@@ -883,12 +883,12 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             return examines;
         }
 
-        public async Task<List<PeripheryViewModel>> ConcompareAndGenerateModel(Periphery currentPeriphery, Periphery newPeriphery)
+        public List<PeripheryViewModel> ConcompareAndGenerateModel(Periphery currentPeriphery, Periphery newPeriphery)
         {
             var model = new List<PeripheryViewModel>
             {
-                await GetPeripheryViewModel(currentPeriphery),
-                await GetPeripheryViewModel(newPeriphery)
+                 GetPeripheryViewModel(currentPeriphery),
+                 GetPeripheryViewModel(newPeriphery)
             };
 
 
