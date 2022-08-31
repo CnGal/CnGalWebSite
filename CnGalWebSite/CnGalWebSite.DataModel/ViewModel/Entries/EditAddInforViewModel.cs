@@ -93,6 +93,9 @@ namespace CnGalWebSite.DataModel.ViewModel
         [Display(Name = "Facebook平台Id")]
         public string FacebookId { get; set; }
 
+        [Display(Name = "姓名")]
+        public string RealName { get; set; }
+
         #endregion
 
         #region 制作组

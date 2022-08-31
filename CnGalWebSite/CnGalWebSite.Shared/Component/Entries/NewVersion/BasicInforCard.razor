@@ -144,13 +144,17 @@
                     {
                         <BasicInforAloneTip Icon="fa-fire" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
-                    else if (item.DisplayName == "昵称（官方称呼）")
+                    else if (item.DisplayName == "姓名")
                     {
-                        <BasicInforAloneTip Icon="fa-vcard-o" Text="@("昵称："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="fa-vcard-o" Text="@("姓名："+item.DisplayValue)" Class="col-12" />
                     }
                     else if (item.DisplayName == "别称")
                     {
                         <BasicInforAloneTip Icon="fa-id-card" Text="@("别称："+item.DisplayValue)" Class="col-12" />
+                    }
+                    else if (item.DisplayName == "昵称（官方称呼）")
+                    {
+                        <BasicInforAloneTip Icon="fa-vcard-o" Text="@("昵称："+item.DisplayValue)" Class="col-12" />
                     }
                     else
                     {

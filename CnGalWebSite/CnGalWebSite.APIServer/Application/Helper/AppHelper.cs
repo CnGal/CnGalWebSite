@@ -653,9 +653,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
             var model = new EntryInforTipViewModel
             {
                 Id = entry.Id,
-                Name = entry.Name,
+                Name = string.IsNullOrWhiteSpace(entry.DisplayName) ? entry.Name : entry.DisplayName,
                 Type = entry.Type,
-                DisplayName = string.IsNullOrWhiteSpace(entry.DisplayName) ? entry.Name : entry.DisplayName,
                 MainImage = entry.MainPicture,
                 BriefIntroduction = entry.BriefIntroduction,
                 LastEditTime = entry.LastEditTime,

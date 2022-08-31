@@ -1,0 +1,40 @@
+﻿@inject IJSRuntime JS
+
+<div class="rounded shadow-sm">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaCarousel Model="Images" OnClick="OnClick" AspectRatio="4/3D"/>
+</div>
+@code {
+    [Parameter]
+    public List<CarouselViewModel> Model { get; set; } = new List<CarouselViewModel>();
+
+    private List<CarouselViewModel> Images = new List<CarouselViewModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        Images = Model.OrderByDescending(s => s.Priority).Take(3).ToList();
+        if (Model.Count >= 6)
+        {
+            Images.AddRange(Model.Where(s => Images.Any(x => s.Image == x.Image) == false).ToList().Random().Take(3));
+
+        }
+        else
+        {
+            Images.AddRange(Model.Where(s => Images.Any(x => s.Image == x.Image) == false));
+        }
+
+    }
+
+
+    private async Task OnClick(CarouselViewModel model)
+    {
+        try
+        {
+            await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", model.Note ?? model.Link, "1", "click");
+        }
+        catch (Exception exc)
+        {
+
+        }
+    }
+}

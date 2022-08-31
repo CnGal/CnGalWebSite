@@ -1,7 +1,6 @@
 ﻿@inject ToastService ToastService
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
-@inject IServiceProvider Provider
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
 
@@ -50,12 +49,6 @@
         }
     }
 
-    #region 新建标签页
-    public async void OpenNewPage(string url)
-    {
-        await JS.InvokeAsync<string>("openNewPage", url);
-    }
-    #endregion
     public async Task OnClickNews(HomeNewsAloneViewModel model)
     {
 

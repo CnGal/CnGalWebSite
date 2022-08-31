@@ -9,7 +9,7 @@
             </div>
             <div class="@(_dataCacheService.IsApp?"p-2":"p-3")">
                 <header class="@("text-truncate-2 "+(_dataCacheService.IsApp?"mb-1":""))">
-                    <h5 class="fw-bold" style="@(" display: inline;"+(_dataCacheService.IsApp?"font-size: large;":""))">@Model.DisplayName</h5>
+                    <h5 class="fw-bold" style="@(" display: inline;"+(_dataCacheService.IsApp?"font-size: large;":""))">@Model.Name</h5>
                 </header>
                 <div class="text-truncate-4" style="@(_dataCacheService.IsApp?"color: gray;font-size:small;":"")">
                     @Model.BriefIntroduction

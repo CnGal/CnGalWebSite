@@ -1,0 +1,79 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+<div>
+    <MChip Class="ma-1" OnClick="()=>OnClickTag(null)" Small TextColor="@(!_dataCacheService.CVThematicPageCache.SelectedTags.Any(s=>Model.Children.Select(s=>s.Title).Contains(s))?"white":"")"
+           Color="@Color"
+           Outlined="_dataCacheService.CVThematicPageCache.SelectedTags.Any(s=>Model.Children.Select(s=>s.Title).Contains(s))">
+        @Model.Title.Replace("配音演员", "").Replace("按STAFF性别分","性别")
+    </MChip>
+    @foreach (var item in Model.Children)
+    {
+        <MChip Class="ma-1" OnClick="()=>OnClickTag(item)" Small TextColor="@(_dataCacheService.CVThematicPageCache.SelectedTags.Any(s=>s==item.Title)?"white":"")"
+               Color="@Color"
+               Outlined="!_dataCacheService.CVThematicPageCache.SelectedTags.Any(s=>s==item.Title)">
+            @item.Title.Replace("STAFF", "")
+        </MChip>
+    }
+
+    <MChip Class="ma-1" OnClick="OnClickUnlabeled" Small TextColor="@(_dataCacheService.CVThematicPageCache.UnlabeledTags.Any(s=>s==Model.Title)?"white":"")"
+           Color="@Color"
+           Outlined="!_dataCacheService.CVThematicPageCache.UnlabeledTags.Any(s=>s==Model.Title)">
+        未标注
+    </MChip>
+</div>
+
+@code {
+    [Parameter]
+    public TagTreeModel Model { get; set; } = new TagTreeModel();
+    [Parameter]
+    public string Color { get; set; }
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    public async Task OnClickTag(TagTreeModel model)
+    {
+
+        if (model == null)
+        {
+            Model.Children.ForEach(s => _dataCacheService.CVThematicPageCache.SelectedTags.Remove(s.Title));
+        }
+
+        if (_dataCacheService.CVThematicPageCache.SelectedTags.Contains(model.Title))
+        {
+            _dataCacheService.CVThematicPageCache.SelectedTags.Remove(model.Title);
+        }
+        else
+        {
+            _dataCacheService.CVThematicPageCache.SelectedTags.Add(model.Title);
+        }
+
+        await OnChanged.InvokeAsync();
+    }
+
+    public async Task OnClickUnlabeled()
+    {
+        if (_dataCacheService.CVThematicPageCache.UnlabeledTags.Contains(Model.Title))
+        {
+            _dataCacheService.CVThematicPageCache.UnlabeledTags.Remove(Model.Title);
+        }
+        else
+        {
+            _dataCacheService.CVThematicPageCache.UnlabeledTags.Add(Model.Title);
+        }
+
+        //清空筛选
+        Model.Children.ForEach(s => _dataCacheService.CVThematicPageCache.SelectedTags.Remove(s.Title));
+
+        StateHasChanged();
+
+        await OnChanged.InvokeAsync();
+
+    }
+}

@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.Entries;
+﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Tags;
@@ -9,7 +10,9 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Tags;
+using CnGalWebSite.DataModel.ViewModel.ThematicPages;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -34,14 +37,17 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
+        private readonly IRepository<Article, long> _articleRepository;
         private readonly IAppHelper _appHelper;
         private readonly ITagService _tagService;
         private readonly IEntryService _entryService;
         private readonly IExamineService _examineService;
         private readonly IEditRecordService _editRecordService;
+        private readonly IArticleService _articleService;
+        private readonly IRepository<Carousel, int> _carouselRepository;
 
-        public TagsAPIController(UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<Tag, int> tagRepository, ITagService tagService, IEditRecordService editRecordService,
-        IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<Examine, long> examineRepository, IEntryService entryService)
+        public TagsAPIController(UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<Tag, int> tagRepository, ITagService tagService, IEditRecordService editRecordService, IRepository<Article, long> articleRepository,
+        IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<Examine, long> examineRepository, IEntryService entryService, IRepository<Carousel, int> carouselRepository, IArticleService articleService)
         {
             _userManager = userManager;
             _tagRepository = tagRepository;
@@ -52,6 +58,9 @@ namespace CnGalWebSite.APIServer.Controllers
             _examineRepository = examineRepository;
             _entryService = entryService;
             _editRecordService = editRecordService;
+            _carouselRepository = carouselRepository;
+            _articleRepository = articleRepository;
+            _articleService = articleService;
         }
 
 
@@ -832,6 +841,162 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             return model;
+        }
+
+        /// <summary>
+        /// 获取CV专题页数据
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<CVThematicPageViewModel>> GetCVThematicPageViewModel()
+        {
+
+            var model = new CVThematicPageViewModel();
+
+            //获取Tag
+            var tag = await _tagRepository.GetAll().AsNoTracking()
+               .Include(s => s.InverseParentCodeNavigation).ThenInclude(s => s.InverseParentCodeNavigation)
+               .FirstOrDefaultAsync(s => s.Name == "配音演员相关");
+
+            if (tag != null)
+            {
+                foreach (var item in tag.InverseParentCodeNavigation)
+                {
+                    var temp = new TagTreeModel
+                    {
+                        Title = item.Name,
+                        Id = item.Id,
+                        Children = item.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false)
+                        .Select(s => new TagTreeModel
+                        {
+                            Id = s.Id,
+                            Title = s.Name,
+                        }).ToList()
+                    };
+
+                    model.Tags.Add(temp);
+                }
+            }
+
+
+
+            //获取性别
+            tag = await _tagRepository.GetAll().AsNoTracking()
+               .Include(s => s.InverseParentCodeNavigation)
+               .FirstOrDefaultAsync(s => s.Name == "按STAFF性别分");
+            if (tag != null)
+            {
+               
+                    var temp = new TagTreeModel
+                    {
+                        Title = tag.Name,
+                        Id = tag.Id,
+                        Children = tag.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false)
+                        .Select(s => new TagTreeModel
+                        {
+                            Id = s.Id,
+                            Title = s.Name,
+                        }).ToList()
+                    };
+
+                    model.Tags.Add(temp);
+                
+            }
+
+            //删除没有二级标签的标签
+            model.Tags.RemoveAll(s => s.Children.Any() == false);
+
+            //获取CV
+
+            tag = await _tagRepository.GetAll()
+                .Include(s => s.Entries).ThenInclude(s => s.Audio)
+                .Include(s => s.Entries).ThenInclude(s => s.Tags)
+                .FirstOrDefaultAsync(s => s.Name == "配音");
+
+            if (tag != null)
+            {
+                foreach (var item in tag.Entries)
+                {
+                    var temp = new CVInforViewModel
+                    {
+                        Infor = _appHelper.GetEntryInforTipViewModel(item),
+                        Audio=item.Audio.Select(s=>new AudioViewModel
+                        {
+                            BriefIntroduction=s.BriefIntroduction,
+                            Duration=s.Duration,
+                            Name=s.Name,
+                            Priority=s.Priority,
+                            Thumbnail=s.Thumbnail,
+                            Url=s.Url
+                        }).OrderByDescending(s=>s.Priority).ToList()
+                    };
+                    foreach (var infor in item.Tags)
+                    {
+                        temp.Tags.Add(new TagsViewModel
+                        {
+                            Name = infor.Name,
+                            Id = infor.Id
+                        });
+                    }
+                    model.CVInfors.Add(temp);
+
+                }
+            }
+
+            //打乱CV顺序
+            model.CVInfors.Random();
+
+            //获取轮播图
+            var carouses = await _carouselRepository.GetAll().AsNoTracking().Where(s => s.Type == CarouselType.ThematicPage).OrderByDescending(s => s.Priority).ToListAsync();
+
+            
+            foreach (var item in carouses)
+            {
+                model.Carousels.Add(new CarouselViewModel
+                {
+                    Image = _appHelper.GetImagePath(item.Image, ""),
+                    Link = item.Link,
+                    Note = item.Note,
+                    Priority = item.Priority,
+                    Type = item.Type,
+                });
+            }
+
+            //获取新闻
+            //获取近期发布的文章
+            var article_result2 = await _articleRepository.GetAll().AsNoTracking()
+                .Include(s => s.CreateUser)
+                .Include(s => s.Entries).ThenInclude(s => s.Tags)
+                .Where(s => s.IsHidden != true && s.Type == ArticleType.News)
+                .Where(s => string.IsNullOrWhiteSpace(s.Name)==false)
+                .Where(s => s.Entries.Any(s => s.Tags.Any(s => s.Name == "配音")))
+                .OrderByDescending(s => s.RealNewsTime).ThenByDescending(s => s.PubishTime)
+                .Take(6).ToListAsync();
+
+            if (article_result2 != null)
+            {
+                foreach (var item in article_result2)
+                {
+                    var infor = await _articleService.GetNewsModelAsync(item);
+                    var temp = new HomeNewsAloneViewModel
+                    {
+                        ArticleId = item.Id,
+                        Text = infor.Title,
+                        Time = infor.HappenedTime,
+                        Type = infor.NewsType ?? "动态",
+                        GroupId = infor.GroupId,
+                        Image = infor.Image,
+                        Link = infor.Link,
+                        Title = infor.GroupName,
+                        UserId = infor.UserId,
+                    };
+                    model.News.Add(temp);
+                }
+            }
+
+            return model;
+
         }
 
     }

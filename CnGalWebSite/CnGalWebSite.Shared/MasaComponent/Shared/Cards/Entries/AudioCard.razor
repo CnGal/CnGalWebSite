@@ -15,8 +15,11 @@
             <div class="mb-4">
                 <MBorder Color="@_dataCacheService.ThemeSetting.Theme" Style="border-radius:0;margin: auto 0;" Width="@("2px")">
                     <div class="ms-4">
-                        <div class="h6 fw-bold">@currentAudio.Name</div>
-                        <div style=" color: gray; " class="text-truncate-1">@currentAudio.BriefIntroduction</div>
+                        <div class="h6 fw-bold mb-0">@currentAudio.Name</div>
+                        @if (string.IsNullOrWhiteSpace(currentAudio.BriefIntroduction) == false)
+                        {
+                            <div style=" color: gray; " class="text-truncate-1 mt-2">@currentAudio.BriefIntroduction</div>
+                        }
 
                     </div>
                 </MBorder>

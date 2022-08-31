@@ -467,7 +467,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 if (isSame == false)
                 {
-                    var entryNew = await _entryRepository.FirstOrDefaultAsync(s => s.Id.ToString() == infor.CustomName);
+                    var entryNew = await _entryRepository.FirstOrDefaultAsync(s => s.Id == infor.StaffId);
                     entry.EntryStaffFromEntryNavigation.Add(new EntryStaff
                     {
                         Modifier = infor.Modifier,
@@ -2273,6 +2273,12 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     {
                         if (item.Modifier == "基本信息")
                         {
+                            switch (item.DisplayName)
+                            {
+                                case "姓名":
+                                    model.RealName = item.DisplayValue;
+                                    break;
+                            }
 
                         }
                         else if (item.Modifier == "相关网站")
@@ -2677,6 +2683,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                     break;
                 case EntryType.Staff:
+                    newEntry.Information.Add(new BasicEntryInformation { Modifier = "基本信息", DisplayName = "姓名", DisplayValue = model.RealName });
                     break;
             }
             //序列化相关网站

@@ -1,9 +1,6 @@
-﻿@inject HttpClient Http
-@inject ToastService? ToastService
-
-
+﻿
 <div style="display:flex;">
-    <a  style="display: flex;align-items: center;" href="@(Model.GroupId == -1?("/space/index/" + Model.UserId):("/entries/index/" + Model.GroupId + "/10"))">
+    <a  style="display: flex;align-items: center;" href="@(Model.GroupId == -1?("/space/index/" + Model.UserId):("/entries/index/" + Model.GroupId + ""))">
         <img class="shadow-sm -sm" src="@Model.Image" alt="@Model.Title" style="height: 50px;width: 50px;border-radius: 50%;" />
     </a>
     <a  class="comment-tx-div a-font-color" style=" flex: 1 1 auto; width: 0;" @onclick="@(()=>OnClickNews.InvokeAsync(Model))" href="@(string.IsNullOrWhiteSpace(Model.Link) ? ("/articles/index/" + Model.ArticleId) : Model.Link)" target="@(string.IsNullOrWhiteSpace(Model.Link)?"":"_blank")">

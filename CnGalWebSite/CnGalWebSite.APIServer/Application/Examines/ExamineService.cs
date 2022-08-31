@@ -5363,7 +5363,6 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     }
                     else
                     {
-                        temp.Name = staff.Name;
                         temp.ToEntry = staff.Id;
                         temp.ToEntryNavigation = staff;
                     }
@@ -5407,7 +5406,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
                 //删除旧数据
                 var list = entry.Information.ToList();
-                list.RemoveAll(s => s.Modifier == "STAFF" || s.DisplayName == "发行商" || s.DisplayName == "制作组" || s.DisplayName == "声优");
+                list.RemoveAll(s => s.Modifier == "STAFF" || s.DisplayName == "发行商" || s.DisplayName == "制作组" || s.DisplayName == "声优" || s.DisplayName == "昵称"||s.DisplayName== "昵称（官方称呼）");
                 list.RemoveAll(s => s.Modifier == "基本信息" && s.DisplayName == "昵称");
                 entry.Information = list;
 
@@ -5483,6 +5482,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                  .Include(s => s.Outlinks)
                  .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
                  .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                  .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
                  .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
                  .FirstOrDefaultAsync(s => s.Id == entryId);
@@ -5766,9 +5766,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
         {
             var currentEntry = await _entryRepository.GetAll()
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s => s.Information).ThenInclude(s => s.Additional)
                 .FirstOrDefaultAsync(s => s.Id == id);
             var entry = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s=>s.Information).ThenInclude(s=>s.Additional)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             var admin = await _userManager.FindByIdAsync(_configuration["ExamineAdminId"]);
@@ -5818,7 +5820,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
 
             //保存更改
-            currentEntry.Information.Clear();
+
             var examines = _entryService.ExaminesCompletion(currentEntry, entry);
 
             if (examines.Any(s => s.Value == Operation.EstablishAddInfor) == false)

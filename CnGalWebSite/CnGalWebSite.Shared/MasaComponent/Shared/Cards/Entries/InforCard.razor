@@ -10,7 +10,7 @@
                 <div class="@(Outline?"pt-2":"p-2")">
                     <header style=" display: flex; flex-wrap: nowrap;">
                         <div class="comment-tag bg-main me-2">@Model.Type.GetDisplayName()</div>
-                        <div>@Model.DisplayName</div>
+                        <div>@Model.Name</div>
                     </header>
                     <div class="text-truncate-3 pt-1" style=" color: gray;">
                         @Model.BriefIntroduction
@@ -28,7 +28,7 @@
                     <div class="pt-3">
                         <header style=" display: flex; justify-content: center; flex-wrap: wrap;">
                             <div class="comment-tag bg-main m-1">@Model.Type.GetDisplayName()</div>
-                            <div class="m-1">@Model.DisplayName</div>
+                            <div class="m-1">@Model.Name</div>
                         </header>
                         <div class="text-truncate-3" style=" color: gray;">
                             @Model.BriefIntroduction

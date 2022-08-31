@@ -20,6 +20,7 @@ using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
+using CnGalWebSite.DataModel.ViewModel.ThematicPages;
 using CnGalWebSite.DataModel.ViewModel.Theme;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.ViewModel.Articles;
@@ -154,6 +155,8 @@ namespace CnGalWebSite.Shared.Service
         DiscountPageHelper DiscountPageCatcheHelper { get; set; }
 
         SpaceViewCacheModel SpaceViewCache { get; set; }
+
+        CVThematicPageViewModel CVThematicPageCache { get; set; }
 
 
         Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>> GetHomePageListCardMode(string apiUrl, string type, int maxCount, bool isRefresh);

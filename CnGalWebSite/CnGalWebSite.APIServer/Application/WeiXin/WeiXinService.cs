@@ -133,11 +133,11 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             {
                 if (item.entry != null)
                 {
-                    _ = sb.AppendLine($"【{item.entry.Type.GetDisplayName()}】 <a href=\"https://www.cngal.org/entries/index/{item.entry.Id}\">{item.entry.DisplayName}</a>");
+                    _ = sb.AppendLine($"【{item.entry.Type.GetDisplayName()}】 <a href=\"https://www.cngal.org/entries/index/{item.entry.Id}\">{item.entry.Name}</a>");
                 }
                 else if (item.article != null)
                 {
-                    _ = sb.AppendLine($"【{item.article.Type.GetDisplayName()}】 <a href=\"https://www.cngal.org/articles/index/{item.article.Id}\">{item.article.DisplayName}</a>");
+                    _ = sb.AppendLine($"【{item.article.Type.GetDisplayName()}】 <a href=\"https://www.cngal.org/articles/index/{item.article.Id}\">{item.article.Name}</a>");
                 }
                 else if (item.tag != null)
                 {
@@ -199,7 +199,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             var model = _appHelper.GetEntryInforTipViewModel(entry);
 
 
-            _ = sb.AppendLine($"{model.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/entries/index/{model.Id}\">{model.DisplayName}</a>");
+            _ = sb.AppendLine($"{model.Type.GetDisplayName()} - <a href=\"https://www.cngal.org/entries/index/{model.Id}\">{model.Name}</a>");
             if (string.IsNullOrWhiteSpace(model.BriefIntroduction) == false)
             {
                 _ = sb.AppendLine($"{model.BriefIntroduction.Abbreviate(plainText ? 30 : 23)}");

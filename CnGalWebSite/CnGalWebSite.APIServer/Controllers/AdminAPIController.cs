@@ -3,6 +3,7 @@ using CnGalWebSite.APIServer.Application.Charts;
 using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.ErrorCounts;
+using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Favorites;
 using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -25,6 +26,7 @@ using CnGalWebSite.APIServer.Model;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
+using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
@@ -105,15 +107,17 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<SteamInforTableModel, long> _steamInforTableModelRepository;
         private readonly IRepository<OperationRecord, long> _operationRecordRepository;
         private readonly IRepository<RankUser, long> _rankUsersRepository;
+        private readonly IRepository<EntryStaff, long> _entryStaffRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IChartService _chartService;
         private readonly ILogger<AdminAPIController> _logger;
         private readonly ISteamInforService _steamInforService;
+        private readonly IEditRecordService _editRecordService;
 
-        public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
+        public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<EntryStaff, long> entryStaffRepository,
         IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
         IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, IHistoryDataService historyDataService,
-        IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService,
+        IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService, IEditRecordService editRecordService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IWebHostEnvironment webHostEnvironment,
         UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IEntryService entryService, IRepository<SearchCache, long> searchCacheRepository,
         IArticleService articleService, IUserService userService, RoleManager<IdentityRole> roleManager, IExamineService examineService, IRepository<Rank, long> rankRepository, INewsService newsService, ISteamInforService steamInforService,
@@ -184,6 +188,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _operationRecordRepository = operationRecordRepository;
             _rankUsersRepository = rankUsersRepository;
             _steamInforService = steamInforService;
+            _entryStaffRepository = entryStaffRepository;
+            _editRecordService = editRecordService;
         }
 
         /// <summary>
@@ -649,7 +655,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     Link = item.Link,
                     Priority = item.Priority,
                     Note = item.Note,
-                    Image = _appHelper.GetImagePath(item.Image, "")
+                    Image = _appHelper.GetImagePath(item.Image, ""),
+                    Type=item.Type,
                 });
 
             }
@@ -683,6 +690,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         Link = item.Link,
                         Priority = item.Priority,
                         Note = item.Note,
+                        Type=item.Type
                     });
                 }
             }
@@ -843,12 +851,99 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-
-                //await _examineService.ReplaceEditEntryStaffExamineContext();
-                //await _examineService.ReplaceEntryStaff();
-
+                ////迁移词条附加信息Staff审核记录
+                await _examineService.ReplaceEditEntryStaffExamineContext();
+                ////迁移词条Staff
+                await _examineService.ReplaceEntryStaff();
+                //刷新所有词条Staff关联 创建不存在的CV
                 await _examineService.RefreshAllEntryStaffRelevances(true, PositionGeneralType.CV);
-                //await _examineService.RefreshEntryStaffRelevances(3002,true, PositionGeneralType.CV);
+               
+
+                var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+
+                
+
+                //批量添加CV标签
+                var cvIds = await _entryStaffRepository.GetAll().AsNoTracking()
+                    .Include(s => s.ToEntryNavigation)
+                    .Where(s => s.PositionGeneral == PositionGeneralType.CV && s.ToEntry != null && s.ToEntryNavigation.Type == EntryType.Staff)
+                    .Select(s => s.ToEntry)
+                    .GroupBy(s => s)
+                    .Select(s => s.First().Value)
+                    .ToListAsync();
+
+                foreach (var cvId in cvIds)
+                {
+                    //获取数据
+                    var currentEntry = await _entryRepository.GetAll().Include(s => s.Tags).FirstOrDefaultAsync(x => x.Id == cvId);
+                    var newEntry = await _entryRepository.GetAll().AsNoTracking()
+                        .Include(s => s.Tags)
+                        .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information)
+                        .FirstOrDefaultAsync(x => x.Id == cvId);
+
+                    if (currentEntry == null)
+                    {
+                        continue;
+                    }
+
+                    //初始化
+                    var model = new EditEntryTagViewModel
+                    {
+                        Tags = currentEntry.Tags.Select(s => new RelevancesModel
+                        {
+                            DisplayName = s.Name,
+                        }).ToList()
+                    };
+
+                    //检查词条参数 添加标签
+                    model.Tags.Add(new RelevancesModel { DisplayName = "配音" });
+                    model.Tags.RemoveAll(s=>s.DisplayName == "男性STAFF");
+
+                    if (newEntry.EntryRelationFromEntryNavigation.Any(s => s.ToEntryNavigation.Information.Any(s => s.DisplayName == "性别" && s.DisplayValue == "Man")))
+                    {
+                        model.Tags.Add(new RelevancesModel { DisplayName = "男性STAFF" });
+                    }
+                    else if (newEntry.EntryRelationFromEntryNavigation.Any(s => s.ToEntryNavigation.Information.Any(s => s.DisplayName == "性别" && s.DisplayValue == "Women")))
+                    {
+                        model.Tags.Add(new RelevancesModel { DisplayName = "女性STAFF" });
+                    }
+
+                    //生成审核记录
+
+                    var tags = new List<Tag>();
+
+                    var tagNames = new List<string>();
+                    tagNames.AddRange(model.Tags.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                    tagNames = tagNames.Distinct().ToList();
+
+                    foreach (var item in tagNames)
+                    {
+                        var infor = await _tagRepository.GetAll().Where(s => s.Name == item).FirstOrDefaultAsync();
+                        if (infor == null)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            tags.Add(infor);
+                        }
+                    }
+                    _entryService.SetDataFromEditTagsViewModel(newEntry, model, tags);
+
+                    var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
+
+                    if (examines.Any(s => s.Value == Operation.EstablishTags) == false)
+                    {
+                        continue;
+                    }
+                    var examine = examines.FirstOrDefault(s => s.Value == Operation.EstablishTags);
+
+                    //保存并尝试应用审核记录
+                    await _editRecordService.SaveAndApplyEditRecord(currentEntry, admin, examine.Key, Operation.EstablishTags, "批量添加CV标签");
+
+                    _entryRepository.Clear();
+                }
+
 
                 return new Result { Successful = true };
             }

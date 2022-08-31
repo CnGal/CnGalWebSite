@@ -43,7 +43,7 @@
                     @foreach (var item in Model.Carousels.OrderByDescending(s=>s.Priority))
                     {
                         <div class="col-12 col-lg-6 col-xxl-4 mb-4">
-                            <NormalImageCard Image="@item.Image" Link="@item.Link" Name="@item.Note" />
+                            <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@item.Image" Link="@item.Link" Name="@item.Note" />
                         </div>
                     }
                 </div>
@@ -60,7 +60,7 @@
                     @foreach (var item in Model.Links.OrderByDescending(s => s.Priority))
                     {
                         <div class="col-12 col-lg-6 col-xxl-4 mb-4">
-                            <NormalImageCard Image="@item.Image" Link="@item.Link" Name="@item.Name" />
+                            <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@item.Image" Link="@item.Link" Name="@item.Name" />
                         </div>
                     }
 
@@ -76,19 +76,19 @@
             <div>
                 <div class="row">
                     <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
-                        <NormalImageCard Image="@Model.AppImage"  Name="词条主图" />
+                        <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@Model.AppImage"  Name="词条主图" />
                     </div>
                     <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
-                        <NormalImageCard Image="@Model.CertificateImage" Name="文章主图" />
+                        <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@Model.CertificateImage" Name="文章主图" />
                     </div>
                     <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
-                        <NormalImageCard Image="@Model.UserImage" Name="头像" />
+                        <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@Model.UserImage" Name="头像" />
                     </div>
                     <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
-                        <NormalImageCard Image="@Model.UserBackgroundImage"  Name="用户信息卡片背景图" />
+                        <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@Model.UserBackgroundImage"  Name="用户信息卡片背景图" />
                     </div>
                     <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-4">
-                        <NormalImageCard Image="@Model.BackgroundImage" Name="网站背景图" />
+                        <CnGalWebSite.Shared.Component.Admin.Files.NormalImageCard Image="@Model.BackgroundImage" Name="网站背景图" />
                     </div>
                 </div>
             </div>

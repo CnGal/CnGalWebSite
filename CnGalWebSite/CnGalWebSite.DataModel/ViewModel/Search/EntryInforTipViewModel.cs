@@ -10,10 +10,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Search
         public int Id { get; set; }
         [Display(Name = "类型")]
         public EntryType Type { get; set; }
-        [Display(Name = "唯一名称")]
+        [Display(Name = "名称")]
         public string Name { get; set; }
-        [Display(Name = "显示名称")]
-        public string DisplayName { get; set; }
         [Display(Name = "主图")]
         public string MainImage { get; set; }
         [Display(Name = "简介")]

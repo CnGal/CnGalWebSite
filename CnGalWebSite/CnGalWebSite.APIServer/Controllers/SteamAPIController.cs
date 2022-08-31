@@ -145,14 +145,14 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.Add(new SteamInforTipViewModel
                 {
                     SteamId = item.SteamId,
-                    EntryId = item.EntryId ?? 0,
+                    Id = item.EntryId ?? 0,
                     EvaluationCount = item.EvaluationCount,
                     BriefIntroduction = item.Entry.BriefIntroduction,
                     PriceLowestString = item.PriceLowestString,
                     PriceNowString = item.PriceNowString,
                     CutLowest = item.CutLowest,
                     CutNow = item.CutNow,
-                    Image = _appHelper.GetImagePath(item.Entry.MainPicture, "app.png"),
+                    MainImage = _appHelper.GetImagePath(item.Entry.MainPicture, "app.png"),
                     LowestTime = item.LowestTime,
                     Name = item.Entry.DisplayName,
                     OriginalPrice = item.OriginalPrice,
