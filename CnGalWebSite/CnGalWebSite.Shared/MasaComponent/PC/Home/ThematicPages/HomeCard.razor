@@ -8,7 +8,7 @@
         @if (_dataCacheService.CVThematicPageCache.News.Any())
         {
             <div class="@("col-12 mb-4 "+(_dataCacheService.CVThematicPageCache.Carousels.Any()?"col-lg-5":""))">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.NewsCard Model="_dataCacheService.CVThematicPageCache.News"/>
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.NewsCard Model="_dataCacheService.CVThematicPageCache.News" />
 
             </div>
         }
@@ -18,18 +18,18 @@
                 <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.CarouselCard Model="_dataCacheService.CVThematicPageCache.Carousels" />
             </div>
         }
-    <div class="col-12">
-        <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.TagsCard Model="_dataCacheService.CVThematicPageCache" OnChanged="()=>OnChanged()" />
+        <div class="col-12">
+            <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.TagsCard Model="_dataCacheService.CVThematicPageCache" OnChanged="()=>OnChanged()" />
 
-    </div>
-  
-            @foreach (var item in Model.Skip((_dataCacheService.CVThematicPageCache.CurrentPage - 1) * MaxCount).Take(MaxCount))
-            {
+        </div>
 
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2 mb-4">
-                    <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.CVInforCard Model="item" />
-                </div>
-            }
+        @foreach (var item in Model.Skip((_dataCacheService.CVThematicPageCache.CurrentPage - 1) * MaxCount).Take(MaxCount))
+        {
+
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2 mb-4">
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.CVInforCard Model="item" />
+            </div>
+        }
 
 
         @if (TotalPages > 1)
@@ -37,6 +37,12 @@
             <MPagination Value="@_dataCacheService.CVThematicPageCache.CurrentPage" Class="my-4" Length="@TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
         }
 
+    </div>
+}
+else
+{
+    <div style="height:300px">
+        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
     </div>
 }
 
@@ -76,7 +82,7 @@
 
     }
 
-    public Task OnChanged(bool isInit=false)
+    public Task OnChanged(bool isInit = false)
     {
         Model.Clear();
         Model.AddRange(_dataCacheService.CVThematicPageCache.CVInfors);
@@ -115,7 +121,7 @@
         }
 
         //重置页数
-        if(isInit==false)
+        if (isInit == false)
         {
             _dataCacheService.CVThematicPageCache.CurrentPage = 1;
         }
