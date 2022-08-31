@@ -68,10 +68,13 @@ else
                 <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4") ">
                     @if (EntryView.SteamId > 0 && EntryView.IsHideOutlink == false)
                     {
-                        <div class="mb-4">
-                            <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                            <div class="mb-4">
+                                <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
 
-                        </div>
+                            </div>
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+          
                     }
                     @if (EntryView.Information.Any())
                     {
@@ -118,9 +121,12 @@ else
                             <MTabItem Value="1">
                                 @if (EntryView.Audio.Any())
                                 {
-                                    <div class="mb-4">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
-                                    </div>
+                                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                                        <div class="mb-4">
+                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
+                                        </div>
+
+                                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
                                 }
                                 @if (EntryView.Pictures.Count != 0)
                                 {
@@ -149,9 +155,7 @@ else
                                     @if (EntryView.CanComment)
                                     {
 
-                                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
                                             <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
-                                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                                     }
                                 </div>
                             </MTabItem>
@@ -180,9 +184,12 @@ else
                     <div>
                         @if (EntryView.Audio.Any())
                         {
-                            <div class="mb-4">
-                                <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
-                            </div>
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                                <div class="mb-4">
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="EntryView" OnRevoke="OnRevoke" />
+                                </div>
+
+                            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
                         }
                         @if (EntryView.Pictures.Count != 0)
                         {
@@ -211,9 +218,7 @@ else
                             @if (EntryView.CanComment)
                             {
 
-                                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
                                     <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
-                                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
                             }
                         </div>
                     </div>
@@ -228,10 +233,13 @@ else
                     }
                     @if (EntryView.SteamId > 0 && EntryView.IsHideOutlink == false)
                     {
-                        <div class="mb-4">
-                            <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                            <div class="mb-4">
+                                <CnGalWebSite.Shared.Component.Entries.NewVersion.SteamInforCard Model="EntryView" />
 
-                        </div>
+                            </div>
+
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
                     }
 
                     @if (EntryView.Information.Any())

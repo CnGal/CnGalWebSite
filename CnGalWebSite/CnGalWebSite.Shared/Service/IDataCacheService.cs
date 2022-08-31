@@ -27,6 +27,7 @@ using CnGalWebSite.Helper.ViewModel.Articles;
 using CnGalWebSite.Helper.ViewModel.Comments;
 using CnGalWebSite.Helper.ViewModel.Users;
 using Microsoft.AspNetCore.Components;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -35,6 +36,10 @@ namespace CnGalWebSite.Shared.Service
     public interface IDataCacheService
     {
         bool IsApp { get; set; }
+
+        bool IsMiniMode { get; set; }
+
+        event EventHandler<EventArgs> RefreshRequsted;
 
         EventCallback RefreshApp { get; set; }
 
@@ -162,5 +167,7 @@ namespace CnGalWebSite.Shared.Service
         Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>> GetHomePageListCardMode(string apiUrl, string type, int maxCount, bool isRefresh);
 
         void RefreshAllCatche();
+
+       void OnRefreshRequsted(EventArgs e);
     }
 }

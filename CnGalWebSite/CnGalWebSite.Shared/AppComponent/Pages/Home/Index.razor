@@ -1,4 +1,6 @@
-﻿<CnGalWebSite.Shared.MasaComponent.Shared.Cards.NoticeCard Class="rounded shadow-sm p-2 bg-opacity mb-3" />
+﻿@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.NoticeCard Class="rounded shadow-sm p-2 bg-opacity mb-3" />
 
 <CnGalWebSite.Shared.AppComponent.Pages.Home.ListNews />
 
@@ -13,9 +15,13 @@
 <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeNoticesView" Icon="fa fa-fw  fa-sticky-note-o"
                                                       Title="公告" Type="articles" Url="/updatelog" />
 
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeFriendLinksView" Icon="fa fa-fw  fa-star"
-                                                      Title="友情链接" MaxCount="999" />
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeFriendLinksView" Icon="fa fa-fw  fa-star"
+                                                          Title="友情链接" MaxCount="999" />
+
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
 @code {
 

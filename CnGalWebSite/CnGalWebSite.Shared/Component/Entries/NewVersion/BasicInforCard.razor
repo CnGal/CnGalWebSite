@@ -169,57 +169,59 @@
 }
 
 
-
-@if (Model.IsHideOutlink == false && (Model.Information.Any(s => s.Modifier == "相关网站") || (Model.Information.Any(s => s.Modifier == "基本信息") && Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))))
-{
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相关网站" Icon="fa fa-fw fa-link" Class="mb-4">
-        <div class="ms-1">
-            <div class="row">
-                @if (Model.Information.Any(s => s.Modifier == "相关网站"))
-                {
-                    @foreach (var item in Model.Information.FirstOrDefault(s => s.Modifier == "相关网站").Informations)
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    @if (Model.IsHideOutlink == false && (Model.Information.Any(s => s.Modifier == "相关网站") || (Model.Information.Any(s => s.Modifier == "基本信息") && Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))))
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相关网站" Icon="fa fa-fw fa-link" Class="mb-4">
+            <div class="ms-1">
+                <div class="row">
+                    @if (Model.Information.Any(s => s.Modifier == "相关网站"))
                     {
-                        @if (item.DisplayValue.Contains("bilibili.com"))
+                        @foreach (var item in Model.Information.FirstOrDefault(s => s.Modifier == "相关网站").Informations)
                         {
-                            <BasicInforAloneTip Icon="fa-external-link-square" Text="B站：" Url="@item.DisplayValue" Class="col-12  text-truncate-1" ItemProp="url"/>
-                        }
-                        else if (item.DisplayValue.Contains("weibo.com"))
-                        {
-                            <BasicInforAloneTip Icon=" fa-weibo" Text="微博：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url"/>
-                        }
-                        else if (item.DisplayValue.Contains("youtube.com"))
-                        {
-                            <BasicInforAloneTip Icon="fa-youtube" Text="YouTube：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url"/>
-                        }
-                        else if (item.DisplayValue.Contains("twitter.com"))
-                        {
-                            <BasicInforAloneTip Icon="fa-twitter" Text="Twitter：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url"/>
-                        }
-                        else if (item.DisplayValue.Contains("facebook.com"))
-                        {
-                            <BasicInforAloneTip Icon="fa-facebook" Text="Facebook：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url"/>
-                        }
-                        else
-                        {
-                            <BasicInforAloneTip Icon=" fa-external-link-square" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url"/>
+                            @if (item.DisplayValue.Contains("bilibili.com"))
+                            {
+                                <BasicInforAloneTip Icon="fa-external-link-square" Text="B站：" Url="@item.DisplayValue" Class="col-12  text-truncate-1" ItemProp="url" />
+                            }
+                            else if (item.DisplayValue.Contains("weibo.com"))
+                            {
+                                <BasicInforAloneTip Icon=" fa-weibo" Text="微博：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                            }
+                            else if (item.DisplayValue.Contains("youtube.com"))
+                            {
+                                <BasicInforAloneTip Icon="fa-youtube" Text="YouTube：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                            }
+                            else if (item.DisplayValue.Contains("twitter.com"))
+                            {
+                                <BasicInforAloneTip Icon="fa-twitter" Text="Twitter：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                            }
+                            else if (item.DisplayValue.Contains("facebook.com"))
+                            {
+                                <BasicInforAloneTip Icon="fa-facebook" Text="Facebook：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                            }
+                            else
+                            {
+                                <BasicInforAloneTip Icon=" fa-external-link-square" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                            }
                         }
                     }
-                }
 
-                @if (Model.Information.Any(s => s.Modifier == "基本信息"))
-                {
-                    @if (Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))
+                    @if (Model.Information.Any(s => s.Modifier == "基本信息"))
                     {
-                        var item = Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.FirstOrDefault(s => s.DisplayName == "官网");
-                        <BasicInforAloneTip Icon="fa-coffee" Text="官网：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
+                        @if (Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))
+                        {
+                            var item = Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.FirstOrDefault(s => s.DisplayName == "官网");
+                            <BasicInforAloneTip Icon="fa-coffee" Text="官网：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
+                        }
                     }
-                }
+                </div>
             </div>
-        </div>
 
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
-}
+    }
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
 @code {
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
