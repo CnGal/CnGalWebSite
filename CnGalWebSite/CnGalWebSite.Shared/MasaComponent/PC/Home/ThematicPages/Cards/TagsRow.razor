@@ -44,15 +44,19 @@
         {
             Model.Children.ForEach(s => _dataCacheService.CVThematicPageCache.SelectedTags.Remove(s.Title));
         }
-
-        if (_dataCacheService.CVThematicPageCache.SelectedTags.Contains(model.Title))
-        {
-            _dataCacheService.CVThematicPageCache.SelectedTags.Remove(model.Title);
-        }
         else
         {
-            _dataCacheService.CVThematicPageCache.SelectedTags.Add(model.Title);
+            if (_dataCacheService.CVThematicPageCache.SelectedTags.Contains(model.Title))
+            {
+                _dataCacheService.CVThematicPageCache.SelectedTags.Remove(model.Title);
+            }
+            else
+            {
+                _dataCacheService.CVThematicPageCache.SelectedTags.Add(model.Title);
+            }
         }
+
+
 
         await OnChanged.InvokeAsync();
     }
