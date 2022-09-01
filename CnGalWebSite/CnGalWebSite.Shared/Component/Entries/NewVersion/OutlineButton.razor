@@ -15,7 +15,7 @@
 }
 else
 {
-    <a href="@Url" @onclick="OnClickNull"  class="@((ForceSmall?" bg-context-main ps-2 pe-2 mb-1 ":"btn outline-button-normal")+" me-2  bg-context-"+ColorNum)" style="@(ForceSmall?"border: 1px solid var(--main-color);border-radius: 5px;":"")">
+    <a href="@(string.IsNullOrWhiteSpace(Url)?null:Url)" @onclick="OnClickNull"  class="@((ForceSmall?" bg-context-main ps-2 pe-2 mb-1 ":"btn outline-button-normal")+" me-2  bg-context-"+ColorNum)" style="@(ForceSmall?"border: 1px solid var(--main-color);border-radius: 5px;":"")">
 
         @if (string.IsNullOrWhiteSpace(Url))
         {
