@@ -81,6 +81,10 @@ namespace CnGalWebSite.Shared.Service
         {
             _catches.Remove(_baseUrl + apiUrl);
         }
+        public bool Check(string apiUrl)
+        {
+           return _catches.Any(s => s.Key == _baseUrl + apiUrl);
+        }
         public void Clean()
         {
             _catches.Clear();

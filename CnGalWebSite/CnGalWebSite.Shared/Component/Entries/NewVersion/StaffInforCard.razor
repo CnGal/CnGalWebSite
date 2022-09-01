@@ -46,7 +46,7 @@
                             @foreach (var temp in infor.Names)
                             {
                                 <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="@rx.ToString()" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
-                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" Icon="fa fa-codepen" />
+                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")"/>
                             }
                         </div>
                     }

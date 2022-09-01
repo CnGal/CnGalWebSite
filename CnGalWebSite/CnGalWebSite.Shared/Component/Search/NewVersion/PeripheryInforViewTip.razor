@@ -51,7 +51,7 @@ else
                                         @foreach (var infor in item.Contents)
                                         {
                                             <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id>0)" IsShowExistTag="@IsEdit"
-                                                                                                            Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" Icon="fa fa-codepen" IsNotShowTip="@(infor.Id==-1)" />
+                                                                                                            Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" IsNotShowTip="@(infor.Id==-1)" />
                                         }
                                     </div>
                                 </div>

@@ -12,7 +12,6 @@
                     </div>
                     <div class="ms-2 me-2 w-100">
                         <span class="text-truncate-1">
-                            <span class="app-card-tag">@Model.Type.GetDisplayName()</span>
                             <span class="fw-bold" style=" display: inline;">@Model.Name</span>
                         </span>
                         <span class="text-truncate-2">
@@ -31,8 +30,6 @@
 
                     <div class="ms-2 me-2 w-100">
                         <span class="text-truncate-2">
-
-                            <span class="app-card-tag">@Model.Type.GetDisplayName()</span>
                             <span class="fw-bold" style=" display: inline;">@Model.Name</span>
                         </span>
                         <span class="@((Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)?"text-truncate-1":"text-truncate-2")">
@@ -46,12 +43,12 @@
                                 @foreach (var item in Model.AddInfors)
                                 {
                                     <div class="@(Model.AddInfors.Count==1? "col-12":"col-12 col-lg-6")">
-                                        <div class="h4 mt-1 mb-1" style="margin-bottom: 0.1rem; display: flex;  flex-wrap: wrap; ">
-                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" ColorNum="@ColorNum" />
+                                        <div class="mt-1 mb-1" style="display: flex;  flex-wrap: wrap; ">
+                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton ForceSmall IsTitile="true" Text="@item.Modifier" ColorNum="@ColorNum" />
                                             @foreach (var infor in item.Contents)
                                             {
-                                                <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id>0)" IsShowExistTag="@IsEdit"
-                                                                                                                Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" Icon="fa fa-codepen" IsNotShowTip="@(infor.Id==-1)" />
+                                                <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton ForceSmall IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id>0)" IsShowExistTag="@IsEdit"
+                                                                                                                Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" IsNotShowTip="@(infor.Id==-1)"  />
                                             }
                                         </div>
                                     </div>
@@ -101,7 +98,7 @@ else
                                             @foreach (var infor in item.Contents)
                                             {
                                                 <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id > 0)" IsShowExistTag="@IsEdit"
-                                                                                                                Url="@(infor.Id > 0 ? "/entries/index/" + infor.Id : "")" Icon="fa fa-codepen" IsNotShowTip="@(infor.Id == -1)" />
+                                                                                                                Url="@(infor.Id > 0 ? "/entries/index/" + infor.Id : "")" IsNotShowTip="@(infor.Id == -1)" />
                                             }
                                         </div>
                                     </div>
@@ -142,7 +139,7 @@ else
                                             @foreach (var infor in item.Contents)
                                             {
                                                 <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id > 0)" IsShowExistTag="@IsEdit"
-                                                                                                                Url="@(infor.Id > 0 ? "/entries/index/" + infor.Id : "")" Icon="fa fa-codepen" IsNotShowTip="@(infor.Id == -1)" />
+                                                                                                                Url="@(infor.Id > 0 ? "/entries/index/" + infor.Id : "")" IsNotShowTip="@(infor.Id == -1)" />
                                             }
                                         </div>
                                     </div>

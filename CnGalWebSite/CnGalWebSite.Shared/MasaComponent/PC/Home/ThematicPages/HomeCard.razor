@@ -2,10 +2,11 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 
+
 @if (_dataCacheService.CVThematicPageCache != null)
 {
     <div class="row">
-        @if (_dataCacheService.CVThematicPageCache.News.Any())
+        @if (_dataCacheService.CVThematicPageCache.News.Any()&&_dataCacheService.IsApp==false)
         {
             <div class="@("col-12 mb-4 "+(_dataCacheService.CVThematicPageCache.Carousels.Any()?"col-lg-5":""))">
                 <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.NewsCard Model="_dataCacheService.CVThematicPageCache.News" />
@@ -14,19 +15,18 @@
         }
         @if (_dataCacheService.CVThematicPageCache.Carousels.Any())
         {
-            <div class="@("col-12 mb-4 "+(_dataCacheService.CVThematicPageCache.News.Any()?"col-lg-7":""))">
+            <div class="@("col-12 mb-4 "+(_dataCacheService.CVThematicPageCache.News.Any()&&_dataCacheService.IsApp==false?"col-lg-7":""))">
                 <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.CarouselCard Model="_dataCacheService.CVThematicPageCache.Carousels" />
             </div>
         }
         <div class="col-12">
             <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.TagsCard Model="_dataCacheService.CVThematicPageCache" OnChanged="()=>OnChanged()" />
-
         </div>
 
         @foreach (var item in Model.Skip((_dataCacheService.CVThematicPageCache.CurrentPage - 1) * MaxCount).Take(MaxCount))
         {
 
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2 mb-4">
+            <div class="col-4 col-lg-3 col-xxl-2 mb-4">
                 <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.CVInforCard Model="item" />
             </div>
         }
@@ -34,7 +34,10 @@
 
         @if (TotalPages > 1)
         {
-            <MPagination Value="@_dataCacheService.CVThematicPageCache.CurrentPage" Class="my-4" Length="@TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+            <div class="col-12">
+                <MPagination Value="@_dataCacheService.CVThematicPageCache.CurrentPage" Class="my-4" Length="@TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+
+            </div>
         }
 
     </div>
@@ -52,9 +55,13 @@ else
     [Parameter]
     public List<CVInforViewModel> Model { get; set; } = new List<CVInforViewModel>();
 
-    public int MaxCount { get; set; } = 18;
-
-
+    public int MaxCount
+    {
+        get
+        {
+            return 18;
+        }
+    }
 
     public int TotalPages => ((Model.Count - 1) / MaxCount) + 1;
 

@@ -1114,7 +1114,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                 var isAdd = false;
                 //如果信息值为空 则不显示
-                if (string.IsNullOrWhiteSpace(item.DisplayValue) == true)
+                if (string.IsNullOrWhiteSpace(item?.DisplayValue) == true)
                 {
                     continue;
                 }
@@ -1163,7 +1163,24 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                 if (string.IsNullOrWhiteSpace(publishTime.DisplayValue) == false)
                 {
-                    information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Add(publishTime);
+                    var basic = information.FirstOrDefault(s => s.Modifier == "基本信息");
+                    if (basic == null)
+                    {
+                        basic = new InformationsModel
+                        {
+                            Modifier = "基本信息",
+                            Informations = new List<KeyValueModel>
+                            {
+                               publishTime
+                            }
+                        };
+                        information.Add(basic);
+                    }
+                    else
+                    {
+                        basic.Informations.Add(publishTime);
+                    }
+                    
 
                 }
             }

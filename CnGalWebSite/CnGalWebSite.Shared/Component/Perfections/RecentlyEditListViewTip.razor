@@ -3,77 +3,79 @@
 @inject IDataCacheService _dataCacheService
 
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新编辑" Icon="fa fa-fw fa-pencil" Class="mb-4">
+        <ButtonContent>
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新编辑" Icon="fa fa-fw fa-pencil" Class="mb-4">
-    <ButtonContent>
-
-        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="GetNewRandomList">
-            <MIcon Left>mdi-refresh </MIcon>
-            刷新
-        </MButton>
+            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="GetNewRandomList">
+                <MIcon Left>mdi-refresh </MIcon>
+                刷新
+            </MButton>
 
 
-    </ButtonContent>
-    <ChildContent>
-        <div class="row h-100 ps-2 pe-2">
-            @foreach (var item in Model)
-            {
-                <div class="col-12 col-md-6 col-xxl-4">
-                    @{
-                        string name = item.RelatedName + " 编辑记录";
-                        string context = string.IsNullOrWhiteSpace(item.RelatedName) ? ("Id：" + item.RelatedId) : item.RelatedName;
-                    }
-                    @if (item.Type == ExaminedNormalListModelType.Entry)
-                    {
-                        <TabLink Text="@item.RelatedName" Url="@("/entries/index/"+@item.RelatedId)" Icon="fa fa-codepen" class="a-font-color">
-                            <div class=" p-3 ">
-                                <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
-                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
-                            </div>
-                        </TabLink>
-                    }
-                    else if (item.Type == ExaminedNormalListModelType.Article)
-                    {
-                        <TabLink Text="@item.RelatedName" Url="@("/articles/index/"+@item.RelatedId)" Icon="fa fa-newspaper-o" class="a-font-color">
-                            <div class=" p-3 ">
-                                <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
-                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
-                            </div>
-                        </TabLink>
-                    }
-                    else if (item.Type == ExaminedNormalListModelType.Tag)
-                    {
-                        <TabLink Text="@item.RelatedName" Url="@("/tags/index/"+item.RelatedId)" Icon="fa fa-tag" class="a-font-color">
-                            <div class=" p-3 ">
-                                <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
-                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
-                            </div>
-                        </TabLink>
-                    }
-                    else if (item.Type == ExaminedNormalListModelType.Disambig)
-                    {
-                        <TabLink Text="@item.RelatedName" Url="@("/disambigs/index/"+@item.RelatedId)" Icon="fa fa-tag" class="a-font-color">
-                            <div class=" p-3 ">
-                                <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
-                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
-                            </div>
-                        </TabLink>
-                    }
-                    else if (item.Type == ExaminedNormalListModelType.Periphery)
-                    {
-                        <TabLink Text="@item.RelatedName" Url="@("/peripheries/index/"+@item.RelatedId)" Icon="fa fa-tag" class="a-font-color">
-                            <div class=" p-3 ">
-                                <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
-                                                     Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
-                            </div>
-                        </TabLink>
-                    }
-                </div>
-            }
-        </div>
-    </ChildContent>
+        </ButtonContent>
+        <ChildContent>
+            <div class="row h-100 ps-2 pe-2">
+                @foreach (var item in Model)
+                {
+                    <div class="col-12 col-md-6 col-xxl-4">
+                        @{
+                            string name = item.RelatedName + " 编辑记录";
+                            string context = string.IsNullOrWhiteSpace(item.RelatedName) ? ("Id：" + item.RelatedId) : item.RelatedName;
+                        }
+                        @if (item.Type == ExaminedNormalListModelType.Entry)
+                        {
+                            <TabLink Text="@item.RelatedName" Url="@("/entries/index/"+@item.RelatedId)" Icon="fa fa-codepen" class="a-font-color">
+                                <div class=" p-3 ">
+                                    <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
+                                                         Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
+                                </div>
+                            </TabLink>
+                        }
+                        else if (item.Type == ExaminedNormalListModelType.Article)
+                        {
+                            <TabLink Text="@item.RelatedName" Url="@("/articles/index/"+@item.RelatedId)" Icon="fa fa-newspaper-o" class="a-font-color">
+                                <div class=" p-3 ">
+                                    <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
+                                                         Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
+                                </div>
+                            </TabLink>
+                        }
+                        else if (item.Type == ExaminedNormalListModelType.Tag)
+                        {
+                            <TabLink Text="@item.RelatedName" Url="@("/tags/index/"+item.RelatedId)" Icon="fa fa-tag" class="a-font-color">
+                                <div class=" p-3 ">
+                                    <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
+                                                         Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
+                                </div>
+                            </TabLink>
+                        }
+                        else if (item.Type == ExaminedNormalListModelType.Disambig)
+                        {
+                            <TabLink Text="@item.RelatedName" Url="@("/disambigs/index/"+@item.RelatedId)" Icon="fa fa-tag" class="a-font-color">
+                                <div class=" p-3 ">
+                                    <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
+                                                         Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
+                                </div>
+                            </TabLink>
+                        }
+                        else if (item.Type == ExaminedNormalListModelType.Periphery)
+                        {
+                            <TabLink Text="@item.RelatedName" Url="@("/peripheries/index/"+@item.RelatedId)" Icon="fa fa-tag" class="a-font-color">
+                                <div class=" p-3 ">
+                                    <UserRankTextViewTip UserId="@item.UserId" UserName="@item.UserName" Image="@item.UserImage" Ranks="@item.Ranks" Time="@item.ApplyTime"
+                                                         Text="@("对 "+context+" "+item.Operation.GetDisplayName())" ForceBadgeShowText></UserRankTextViewTip>
+                                </div>
+                            </TabLink>
+                        }
+                    </div>
+                }
+            </div>
+        </ChildContent>
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
 @code {
     int ItemNum = 4;

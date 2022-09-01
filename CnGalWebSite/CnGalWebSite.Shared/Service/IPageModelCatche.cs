@@ -11,5 +11,8 @@ namespace CnGalWebSite.Shared.Service
         void Clean(string apiUrl);
 
         void Clean();
+
+        bool Check(string apiUrl);
+
     }
 }
