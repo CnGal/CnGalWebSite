@@ -803,10 +803,10 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<Result>> EditUserCertificationAsync(EditUserCertificationModel model)
         {
             //提前判断是否通过人机验证
-            if (_appHelper.CheckRecaptcha(model.Verification) == false)
-            {
-                return BadRequest(new Result { Error = "没有通过人机验证" });
-            }
+            //if (_appHelper.CheckRecaptcha(model.Verification) == false)
+            //{
+            //    return BadRequest(new Result { Error = "没有通过人机验证" });
+            //}
             Entry entry = null;
 
             if(string.IsNullOrWhiteSpace(model.EntryName)==false)
@@ -834,6 +834,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 if (entry==null)
                 {
+                    await _examineRepository.DeleteAsync(s => s.ApplicationUserId == user.Id && s.Operation == Operation.RequestUserCertification && s.IsPassed == null);
                     return new Result { Successful = true };
                 }
                 else
@@ -853,11 +854,12 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 if (entry == null)
                 {
-                       userCertification.EntryId = null;
+                    userCertification.EntryId = null;
                     userCertification.Entry = null;
 
-                    await _userCertificationRepository.UpdateAsync(userCertification);
+                    userCertification= await _userCertificationRepository.UpdateAsync(userCertification);
 
+                    await _examineRepository.DeleteAsync(s => s.ApplicationUserId == user.Id && s.Operation == Operation.RequestUserCertification && s.IsPassed == null);
                     return new Result { Successful = true };
                 }
                 else

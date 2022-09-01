@@ -37,6 +37,10 @@
             <MIcon Left>mdi-star</MIcon>
             个人空间
         </MButton>
+        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnNav("/space/editdata"))">
+            <MIcon Left>mdi-pencil</MIcon>
+            编辑资料
+        </MButton>
         @if (MessageCount > 0)
         {
             <MButton Text Block Color="warning" OnClick="OnClickMessage">

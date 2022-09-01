@@ -2,7 +2,6 @@
 @inject IDataCacheService _dataCacheService
 @inject ToastService ToastService
 @inject HttpClient Http
-@inject IPopupService PopupService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="用户认证" Icon="fa fa-fw fa-university" Class="h-100">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
@@ -82,11 +81,11 @@
                     </div>
                 }
 
-                <div class="mt-4" style=" margin-bottom: -10px;">
+                <div class="mt-4 mb-2">
                     备注
                 </div>
                 <div class="col-12">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMarkdown @bind-Context="@Model.UserCertificationModel.Note" Mode="MarkdownEditorMode.wysiwyg" Class="mb-4 mt-4" />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMarkdown @bind-Context="@Model.UserCertificationModel.Note" Mode="MarkdownEditorMode.wysiwyg"/>
                 </div>
             </div>
         </MCardText>
@@ -97,6 +96,10 @@
         </MCardActions>
     </MCard>
 </MDialog>
+
+
+<PToast @ref="_toast" MaxCount="3">
+</PToast>
 @code {
     [Parameter]
     public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
@@ -109,6 +112,8 @@
     public IEnumerable<string> RoleItems { get; set; }
 
     bool Dialog { get; set; }
+
+    PToast _toast;
 
     CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification humanMachineVerification;
 
@@ -142,22 +147,34 @@
         Model.UserCertificationModel.Note = null;
         Model.UserCertificationModel.EntryName = null;
 
-        await humanMachineVerification.StartVerification();
+        //await humanMachineVerification.StartVerification();
+        await ProcUserCertification(null);
     }
     public async Task OnClickBind()
     {
         if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName))
         {
-            await PopupService.ToastAsync("请填写需要认证的词条", AlertTypes.Error);
+            await _toast.AddToast(new ToastConfig
+            {
+                Type = AlertTypes.Error,
+                Title = "请填写需要认证的词条",
+                Duration = 4000,
+            });
             return;
         }
         if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.Note))
         {
-            await PopupService.ToastAsync("请填写一些有助于身份认证的信息", AlertTypes.Error);
+            await _toast.AddToast(new ToastConfig
+            {
+                Type = AlertTypes.Error,
+                Title = "请填写一些有助于身份认证的信息",
+                Duration = 4000,
+            });
             return;
         }
 
-        await humanMachineVerification.StartVerification();
+        // await humanMachineVerification.StartVerification();
+        await ProcUserCertification(null);
     }
 
     public Task OnOpenDialog()
@@ -193,11 +210,21 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await PopupService.ToastAsync(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "取消认证失败" : "已提交用户认证申请失败", AlertTypes.Error);
+                await _toast.AddToast(new ToastConfig
+                {
+                    Type = AlertTypes.Error,
+                    Title = string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "取消认证失败" : "已提交用户认证申请失败",
+                    Duration = 4000,
+                });
             }
             else
             {
-                await PopupService.ToastAsync(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "已取消认证" : "已提交用户认证申请，等待审核通过", AlertTypes.Success);
+                await _toast.AddToast(new ToastConfig
+                {
+                    Type = AlertTypes.Success,
+                    Title = string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "已取消认证" : "已提交用户认证申请，等待审核通过",
+                    Duration = 4000,
+                });
                 Model.UserCertificationModel.IsPending = true;
                 Dialog = false;
                 StateHasChanged();
@@ -205,7 +232,7 @@
         }
         catch (Exception ex)
         {
-            ErrorHandler.ProcessError(ex, "获取身份识别码失败");
+            ErrorHandler.ProcessError(ex, "发送用户认证申请失败");
         }
     }
 
