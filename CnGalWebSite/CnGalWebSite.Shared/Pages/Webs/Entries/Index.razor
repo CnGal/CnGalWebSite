@@ -1,16 +1,12 @@
 ﻿@inject HttpClient Http
 @inject ToastService ToastService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
-@inject IAppHelper _appHelper
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCatcheService
 @inject IStructuredDataService _structuredDataService
-
 @inject DialogService DialogService
 
-@attribute [TabItemOption(Text = "", Icon = "fa fa-codepen")]
-
+@implements IDisposable
 
 @if (string.IsNullOrWhiteSpace(EntryView.Name) == false)
 {
@@ -74,7 +70,7 @@ else
 
                             </div>
                         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-          
+
                     }
                     @if (EntryView.Information.Any())
                     {
@@ -92,7 +88,10 @@ else
                     }
                     @if (EntryView.Type == EntryType.Game)
                     {
-                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
+
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
                     }
                 </div>
                 <div class="@(IsNoLeft?"col-12 ":"col-12 col-lg-8") ">
@@ -155,13 +154,13 @@ else
                                     @if (EntryView.CanComment)
                                     {
 
-                                            <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
+                                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
                                     }
                                 </div>
                             </MTabItem>
                             <MTabItem Value="2">
                                 <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke"></EntryRelevancesNormalListViewTip>
-                                <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" IsGameView="EntryView.Type == EntryType.Game"/>
+                                <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" IsGameView="EntryView.Type == EntryType.Game" />
                             </MTabItem>
 
                             @if (EntryView.Staffs.Count > 0)
@@ -201,7 +200,10 @@ else
 
                         @if (EntryView.Type == EntryType.Game && EntryView.IsScored)
                         {
-                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" Large />
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                                <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" Large />
+
+                            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
                         }
                         <CnGalWebSite.Shared.Component.Entries.NewVersion.MainPageCard Model="EntryView" OnRevoke="OnRevoke" />
                         @if (EntryView.NewsOfEntry.Count != 0)
@@ -218,7 +220,7 @@ else
                             @if (EntryView.CanComment)
                             {
 
-                                    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
+                                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="EntryView.CanComment" CanDeleted="CanDeleted" ObjectId="@EntryView.Id.ToString()" Type="CommentType.CommentEntries" />
                             }
                         </div>
                     </div>
@@ -229,7 +231,10 @@ else
                 <div class="@(IsNoLeft?"d-none":"col-12 col-lg-4 order-1 order-lg-2") ">
                     @if (EntryView.Type == EntryType.Game && EntryView.IsScored == false)
                     {
-                        <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                            <CnGalWebSite.Shared.MasaComponent.PC.Entries.PlayedGames.OverviewCard Id="EntryView.Id" Class="mb-4" />
+
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
                     }
                     @if (EntryView.SteamId > 0 && EntryView.IsHideOutlink == false)
                     {
@@ -319,29 +324,26 @@ else
     }
 
 }
+@if (isFirstLoad==false)
+{
+    <MSnackbar Timeout="-1" @bind-Value="isLoading" Text
+               Color="@_dataCatcheService.ThemeSetting.Theme" Style="min-width:180px;"
+               Elevation="24">
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <MProgressCircular Size="@("20px")" Width="2" Class="me-4" Indeterminate Color="@_dataCatcheService.ThemeSetting.Theme">
+            </MProgressCircular>
+            正在跳转......
+        </div>
 
+    </MSnackbar>
+}
 
 
 @code {
-    private string id = "";
+
     [Parameter]
-    public string Id
-    {
-        get
-        {
-            return id;
-        }
-        set
-        {
-            id = value;
-            if (isFirstLoad == false)
-            {
-                OnInitializedAsync();
-            }
+    public string Id { get; set; }
 
-
-        }
-    }
     public bool IsNoLeft
     {
         get
@@ -354,6 +356,7 @@ else
     public StringNumber TabIndex { get; set; } = 1;
 
     bool isReady = false;
+    bool isLoading = false;
     bool isNotFound = false;
     bool isFirstLoad = true;
     public string CurrentUserRank { get; set; }
@@ -376,7 +379,7 @@ else
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-
+            NavigationManager.LocationChanged += LocationChanged;
             isFirstLoad = false;
         }
         //记录数据
@@ -394,8 +397,11 @@ else
             }
         }
     }
-
     protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+    public async Task Refresh()
     {
         try
         {
@@ -406,7 +412,7 @@ else
             //判断如果名称为空则返回主页
             if (string.IsNullOrWhiteSpace(EntryView.Name))
             {
-                NavigationManager.NavigateTo(Provider, "/entries/home", "词条", "fa fa-codepen");
+                NavigationManager.NavigateTo("/entries/home");
             }
 
             var userState = await authenticationStateTask;
@@ -431,7 +437,6 @@ else
             //isReady = true;
             //StateHasChanged();
         }
-
     }
 
     public async Task GenerateCarouselStructuredDataJson()
@@ -500,7 +505,8 @@ else
                         EntryView.TagState = EditState.Normal;
                         break;
                 }
-                Id = id;
+                _dataCatcheService.EntryIndexPageCatche.Clean(Id);
+                Refresh();
             }
         }
         catch (Exception ex)
@@ -517,4 +523,34 @@ else
     }
 
 
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (Id != EntryView.Id.ToString())
+        {
+            if (_dataCatcheService.EntryIndexPageCatche.Check(Id) == false)
+            {
+                isLoading = true;
+                StateHasChanged();
+                await Refresh();
+                isLoading = false;
+                StateHasChanged();
+            }
+            else
+            {
+                await Refresh();
+            }
+
+        }
+    }
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        NavigationManager.LocationChanged -= LocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

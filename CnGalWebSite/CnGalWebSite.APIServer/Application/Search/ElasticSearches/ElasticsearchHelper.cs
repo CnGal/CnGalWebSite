@@ -218,9 +218,9 @@ namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
             var entryIds = query.Hits.Where(s => s.Index == _entryElasticsearchBaseService.GetIndex()).Select(s => (int)s.Source["id"]).ToList();
 
             var entries = await _entryRepository.GetAll().AsNoTracking()
-                    .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryStaffToEntryNavigation).ThenInclude(s => s.FromEntryNavigation)
+                    .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Where(s => entryIds.Contains(s.Id) && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
 
             var articleIds = query.Hits.Where(s => s.Index == _articleElasticsearchBaseService.GetIndex()).Select(s => (long)s.Source["id"]).ToList();
@@ -301,9 +301,9 @@ namespace CnGalWebSite.APIServer.Application.Search.ElasticSearches
             var entryIds = query.Select(s => s.Id).ToList();
 
             entries = await _entryRepository.GetAll().AsNoTracking()
-                    .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Include(s => s.EntryStaffToEntryNavigation).ThenInclude(s => s.FromEntryNavigation)
+                    .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                     .Where(s => entryIds.Contains(s.Id) && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
 
 

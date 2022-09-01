@@ -1,10 +1,9 @@
 ﻿@inject ToastService ToastService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
 @if (IsTitile)
 {
-    <div class="@("outline-button-title badge me-2 bg-title bg-title-color-"+ColorNum)">
+    <div class="@((ForceSmall?"app-card-tag mb-1 ":"outline-button-title badge bg-title ")+" me-2 bg-title-color-"+ColorNum)" style="@(ForceSmall?"border-radius: 5px;":"")">
 
         <span itemscope itemprop="@ItemProp" itemtype="@ItemType">
             <span itemprop="@(string.IsNullOrWhiteSpace(ItemType)?"":"name")">
@@ -16,36 +15,29 @@
 }
 else
 {
-    @if (string.IsNullOrWhiteSpace(Url))
-    {
-        <div @onclick="OnClickNull"
-             class="@("btn me-2 outline-button-null-url bg-context-"+ColorNum)">
+    <a href="@Url" @onclick="OnClickNull"  class="@((ForceSmall?" bg-context-main ps-2 pe-2 mb-1 ":"btn outline-button-normal")+" me-2  bg-context-"+ColorNum)" style="@(ForceSmall?"border: 1px solid var(--main-color);border-radius: 5px;":"")">
 
-                <span itemprop="@ItemProp">
-                    @Text
-                </span>
-            
-        </div>
-
-    }
-    else
-    {
-        <TabLink Text="@Text" Url="@Url" Icon="@Icon"
-                 class="@("btn me-2 outline-button-normal bg-context-"+ColorNum)">
-
+        @if (string.IsNullOrWhiteSpace(Url))
+        {
+            <span itemprop="@ItemProp">
+                @Text
+            </span>
+        }
+        else
+        {
             <span itemscope itemprop="@ItemProp" itemtype="@ItemType">
                 <span itemprop="@(string.IsNullOrWhiteSpace(ItemType)?"":"name")">
                     @Text
                 </span>
-
             </span>
-            
-            @if (IsShowExistTag)
-            {
-                <i class="fa fa-check-circle fa-fw"></i>
-            }
-        </TabLink>
-    }
+        }
+
+
+        @if (IsShowExistTag)
+        {
+            <i class="fa fa-check-circle fa-fw"></i>
+        }
+    </a>
 }
 
 
@@ -56,8 +48,6 @@ else
     public string Text { get; set; }
     [Parameter]
     public string Url { get; set; }
-    [Parameter]
-    public string Icon { get; set; }
     [Parameter]
     public bool IsExist { get; set; }
     [Parameter]
@@ -72,13 +62,17 @@ else
     [Parameter]
     public string ColorNum { get; set; }
 
+    [Parameter]
+    public bool ForceSmall { get; set; }
+
+
     public async Task OnClickNull()
     {
-        if (IsNotShowTip == false)
+        if (IsNotShowTip == false&&string.IsNullOrWhiteSpace(Url))
         {
             if (IsShowExistTag)
             {
-                NavigationManager.NavigateTo(Provider, "/entries/establishentry?Name=" + Text, "创建词条", "fa-pencil");
+                NavigationManager.NavigateTo( "/entries/establishentry?Name=" + Text);
             }
             else
             {

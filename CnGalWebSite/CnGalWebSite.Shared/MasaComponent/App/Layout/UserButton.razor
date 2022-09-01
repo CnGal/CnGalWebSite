@@ -5,58 +5,64 @@
 
 @if (string.IsNullOrWhiteSpace(Model.PhotoPath) == false)
 {
-    <a class="d-flex a-font-color" href="@("space/index/"+Model.Id)" style="align-items: center; flex-direction: column; ">
-        <img src="@Model.PhotoPath" alt="@Model.Name" style="width:60px;border-radius:50%;" />
-        <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
-            <span class="h6 fw-bold">@Model.Name</span>
-            <span>
-                <i class="fa fa-diamond fa-fw"></i>
-                <span>积分：@Model.Integral</span>
-                <i class="fa fa-magic fa-fw ms-3"></i>
-                <span>Lv @ToolHelper.GetUserLevel(Model.Integral)</span>
-            </span>
-        </div>
-    </a>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        <a class="d-flex a-font-color" href="@("space/index/"+Model.Id)" style="align-items: center; flex-direction: column; ">
+            <img src="@Model.PhotoPath" alt="@Model.Name" style="width:60px;border-radius:50%;" />
+            <div style="display: flex; flex-direction: column; align-items: center; " class="mt-2">
+                <span class="h6 fw-bold">@Model.Name</span>
+                <span>
+                    <i class="fa fa-diamond fa-fw"></i>
+                    <span>积分：@Model.Integral</span>
+                    <i class="fa fa-magic fa-fw ms-3"></i>
+                    <span>Lv @ToolHelper.GetUserLevel(Model.Integral)</span>
+                </span>
+            </div>
+        </a>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
     <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/"))">
         <MIcon Left>mdi-home</MIcon>
         主页
     </MButton>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
 
-    <CnGalWebSite.Shared.MasaComponent.PC.Layout.SignInButton Model="_dataCacheService.UserInfor" Left />
+        <CnGalWebSite.Shared.MasaComponent.PC.Layout.SignInButton Model="_dataCacheService.UserInfor" Left />
 
-    <AuthorizeView Roles="Admin">
-        <Authorized>
-            <MButton Text Block Color="success" OnClick="@(()=>OnClickUrl("/admin/index"))">
-                <MIcon Left>mdi-car-traction-control</MIcon>
-                管理员后台
-            </MButton>
-        </Authorized>
-    </AuthorizeView>
-    <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnClickUrl("/contentcenter"))">
-        <MIcon Left>mdi-database-edit </MIcon>
-        内容中心
-    </MButton>
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <MButton Text Block Color="success" OnClick="@(()=>OnClickUrl("/admin/index"))">
+                    <MIcon Left>mdi-car-traction-control</MIcon>
+                    管理员后台
+                </MButton>
+            </Authorized>
+        </AuthorizeView>
+        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnClickUrl("/contentcenter"))">
+            <MIcon Left>mdi-database-edit </MIcon>
+            内容中心
+        </MButton>
 
-    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSpace">
-        <MIcon Left>mdi-star</MIcon>
-        个人空间
-    </MButton>
-    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/space/messages"))">
-        <MIcon Left>mdi-comment-text-multiple  </MIcon>
-        消息通知
-    </MButton>
-    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/home/editlist"))">
-        <MIcon Left>mdi-plus  </MIcon>
-        创建投稿
-    </MButton>
-    <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnClickUrl("/account/logout"))">
-        <MIcon Left>mdi-logout</MIcon>
-        退出登入
-    </MButton>
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSpace">
+            <MIcon Left>mdi-star</MIcon>
+            个人空间
+        </MButton>
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/space/messages"))">
+            <MIcon Left>mdi-comment-text-multiple  </MIcon>
+            消息通知
+        </MButton>
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/home/editlist"))">
+            <MIcon Left>mdi-plus  </MIcon>
+            创建投稿
+        </MButton>
+        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnClickUrl("/account/logout"))">
+            <MIcon Left>mdi-logout</MIcon>
+            退出登入
+        </MButton>
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    
 
     <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSetting">
         <MIcon Left>mdi-cog</MIcon>

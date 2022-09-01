@@ -29,9 +29,12 @@
             </div>
             @if (HiddenButton == false)
             {
-                <div class="mt-2" style="display: flex; justify-content: flex-end;">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Tag" Id="Model.Id" @bind-IsHidden="@Model.IsHidden" @bind-IsEdit="@Model.IsEdit" />
-                </div>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                    <div class="mt-2" style="display: flex; justify-content: flex-end;">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Tag" Id="Model.Id" @bind-IsHidden="@Model.IsHidden" @bind-IsEdit="@Model.IsEdit" />
+                    </div>
+
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
             }
             @if (ToolHelper.IsMaui)
             {

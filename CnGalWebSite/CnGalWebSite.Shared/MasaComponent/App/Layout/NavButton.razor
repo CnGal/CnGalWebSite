@@ -9,11 +9,15 @@
            Dense>
         <AuthorizeView>
             <Authorized>
-                <UserButton OnClosed="OnClose"  OnClickSetting="OnOpenSetting"/>
+            
+                    <UserButton OnClosed="OnClose" OnClickSetting="OnOpenSetting" />
             </Authorized>
             <NotAuthorized>
-                <LoginButton />
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+                    <LoginButton />
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
                 <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/"))">
                     <MIcon Left>mdi-home</MIcon>
                     主页
