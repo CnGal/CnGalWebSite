@@ -4,11 +4,19 @@
 @if (isReady)
 {
     <div>
-        @if (showChart)
+        @if (_dataCacheService.UserContentCenterCatche.UnReviewEntries.Any() == false && _dataCacheService.UserContentCenterCatche.UnReviewExamines.Any() == false && _dataCacheService.UserContentCenterCatche.PendingExamines.Any() == false)
         {
-            <div class="mb-4">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.Square.EditOverviewCard />
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <div class="p-4" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+                    <div style="width: 100%;">
+                        <img src="https://app.cngal.org/_content/CnGalWebSite.Shared/images/UserMessagesNotFound.png" style="width: 70%;margin-left: 15%;margin-right: 15%;">
+                        <div class="h5 text-center mt-4" style=" font-weight: 600;">
+                            貌似没有待办事项，可以一起快乐摸鱼了呢
+                        </div>
+                    </div>
+                </div>
             </div>
+
 
         }
 
@@ -40,7 +48,7 @@ else
     {
         try
         {
-            if(_dataCacheService.UserContentCenterCatche==null)
+            if (_dataCacheService.UserContentCenterCatche == null)
             {
                 _dataCacheService.UserContentCenterCatche = await Http.GetFromJsonAsync<UserContentCenterViewModel>(ToolHelper.WebApiPath + "api/examines/GetUserContentCenterView");
             }
