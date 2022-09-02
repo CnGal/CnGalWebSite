@@ -964,7 +964,8 @@ namespace CnGalWebSite.APIServer.Controllers
                             Name=item.Name,
                             DisplayName=item.Name,
                             Thumbnail=item.Thumbnail,
-                            Id=item.Id
+                            Id=item.Id,
+                            ReaderCount=item.ReaderCount
                         }),
                         Audio = item.Audio.Select(s => new AudioViewModel
                         {
