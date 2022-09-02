@@ -935,6 +935,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         s.BriefIntroduction,
                         s.Audio,
                         s.Tags,
+                        s.ReaderCount,
                         Entries = s.EntryRelationFromEntryNavigation.Select(s => new
                         {
                             s.ToEntryNavigation.Type,
