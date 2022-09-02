@@ -5,21 +5,21 @@
     <MChip Class="ma-1" OnClick="()=>OnClickTag(null)" Small TextColor="@(!_dataCacheService.CVThematicPageCache.SelectedTags.Any(s=>Model.Children.Select(s=>s.Title).Contains(s))?"white":"")"
            Color="@Color"
            Outlined="_dataCacheService.CVThematicPageCache.SelectedTags.Any(s=>Model.Children.Select(s=>s.Title).Contains(s))">
-        @Model.Title.Replace("配音演员", "").Replace("按STAFF性别分","性别")
+        @Model.Title.Replace("所属配音", "").Replace("配音演员", "").Replace("按STAFF性别分","性别")
     </MChip>
-    @foreach (var item in Model.Children)
+    @foreach (var item in Model.Children.Where(s=>s.Children.Any()|| !HideEmptyTag))
     {
         <MChip Class="ma-1" OnClick="()=>OnClickTag(item)" Small TextColor="@(_dataCacheService.CVThematicPageCache.SelectedTags.Any(s=>s==item.Title)?"white":"")"
                Color="@Color"
                Outlined="!_dataCacheService.CVThematicPageCache.SelectedTags.Any(s=>s==item.Title)">
-            @item.Title.Replace("STAFF", "")
+            @($"{item.Title.Replace("STAFF", "")} ( {item.EntryCount} )")
         </MChip>
     }
 
     <MChip Class="ma-1" OnClick="OnClickUnlabeled" Small TextColor="@(_dataCacheService.CVThematicPageCache.UnlabeledTags.Any(s=>s==Model.Title)?"white":"")"
            Color="@Color"
            Outlined="!_dataCacheService.CVThematicPageCache.UnlabeledTags.Any(s=>s==Model.Title)">
-        未标注
+       @($"未标注 ( {TotalCount-Model.Children.Sum(s=>s.EntryCount)} )") 
     </MChip>
 </div>
 
@@ -28,6 +28,10 @@
     public TagTreeModel Model { get; set; } = new TagTreeModel();
     [Parameter]
     public string Color { get; set; }
+    [Parameter]
+    public bool HideEmptyTag { get; set; }
+    [Parameter]
+    public int TotalCount { get; set; }
     [Parameter]
     public EventCallback OnChanged { get; set; }
 

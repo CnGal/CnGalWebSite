@@ -3,6 +3,7 @@ using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.ThematicPages
@@ -25,6 +26,10 @@ namespace CnGalWebSite.DataModel.ViewModel.ThematicPages
 
         public int CurrentPage { get; set; } = 1;
 
+        public CVThematicPageSortType SortType { get; set; }
+
+        public string SearchString { get; set; }
+
         #endregion
     }
 
@@ -37,6 +42,29 @@ namespace CnGalWebSite.DataModel.ViewModel.ThematicPages
         public List<TagsViewModel> Tags { get; set; } = new List<TagsViewModel>();
 
         public List<AudioViewModel> Audio { get; set; } = new List<AudioViewModel>();
+
+        public DateTime? LastUploadAudioTime { get; set; }
+
+        public int WorkCount { get; set; }
+
+        /// <summary>
+        /// 最近发布作品时间
+        /// </summary>
+        public DateTime? LastPublishTime { get; set; }
+    }
+
+    public enum CVThematicPageSortType
+    {
+        [Display(Name = "默认")]
+        None,
+        [Display(Name = "随机")]
+        Random,
+        [Display(Name = "热度")]
+        ReadCount,
+        [Display(Name = "参与作品数")]
+        WorkCount,
+        [Display(Name = "最近发布")]
+        RecentlyPublish,
     }
 
 }

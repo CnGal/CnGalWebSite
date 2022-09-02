@@ -1,17 +1,27 @@
-﻿@if (Model.ChildEntriesState == EditState.Preview)
+﻿@inject IDataCacheService _dataCacheService
+
+
+@if (Model.ChildEntriesState == EditState.Preview)
 {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/tags/EditChildEntries/" + Model.Id)" ExamineType="Operation.EditTagChildEntries" OnClickRevoke="OnClickRevoke"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/tags/EditChildEntries/" + Model.Id)" ExamineType="Operation.EditTagChildEntries" OnClickRevoke="OnClickRevoke" />
 }
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="子词条" Icon="fa fa-fw fa-codepen" Collapable Outline>
     <div class="row">
-        @foreach (var item in Model.ChildrenEntries)
+        @foreach (var item in Model.ChildrenEntries.Skip((Model.CurrentPage - 1) * MaxCount).Take(MaxCount))
         {
             <div class="@(ForceSmall?"col-12 col-md-6 mb-3":"col-12 col-md-6 col-lg-4 col-xxl-3 mb-3")">
                 <TagChildEntryInforTip Model="item" />
             </div>
         }
+        @if (TotalPages > 1)
+        {
+            <div class="col-12">
+                <MPagination Value="@Model.CurrentPage" Class="my-4" Length="@TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
 
+            </div>
+        }
     </div>
+
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
@@ -22,5 +32,16 @@
     [Parameter]
     public bool ForceSmall { get; set; }
 
+    public int MaxCount { get; set; } = 24;
 
+    public int TotalPages => ((Model.ChildrenEntries.Count - 1) / MaxCount) + 1;
+
+    private Task OnPageClick(int pageIndex)
+    {
+        Model.CurrentPage = pageIndex;
+
+        StateHasChanged();
+
+        return Task.CompletedTask;
+    }
 }

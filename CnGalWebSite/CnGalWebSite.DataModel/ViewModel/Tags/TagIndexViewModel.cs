@@ -57,5 +57,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Tags
         /// 子标签
         /// </summary>
         public List<TagInforTipViewModel> ChildrenTags { get; set; } = new List<TagInforTipViewModel>();
+
+        #region 数据缓存
+        public int CurrentPage { get; set; } = 1;
+
+        #endregion
     }
 }

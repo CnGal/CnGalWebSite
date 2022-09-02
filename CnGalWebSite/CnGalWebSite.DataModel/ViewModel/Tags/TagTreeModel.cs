@@ -10,6 +10,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Tags
 
         public long Id { get; set; }
 
+        public int EntryCount { get; set; }
+
         public List<TagTreeModel> Children { get; set; } = new List<TagTreeModel>();
     }
 }

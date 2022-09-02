@@ -1,0 +1,30 @@
+﻿@inject IDataCacheService _dataCacheService
+
+
+<div class="rounded shadow-sm  bg-opacity mb-4">
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-4">
+
+        <div class="ps-4 pe-4" style=" display: flex; max-width: 400px; width: 100%; align-items: center;">
+            <MTextField Placeholder="可以搜索哦~" TValue="string" Value="@_dataCacheService.CVThematicPageCache.SearchString" ValueChanged="SearchValueChanged" Color="@_dataCacheService.ThemeSetting.Theme"  Class="pt-0"></MTextField>
+        </div>
+        <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.CVThematicPageCache.SortType" ValueChanged="SortValueChanged" TValue="CVThematicPageSortType" Class="pt-0" />
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    public async Task SortValueChanged(CVThematicPageSortType type)
+    {
+        _dataCacheService.CVThematicPageCache.SortType = type;
+        await OnChanged.InvokeAsync();
+    }
+
+    public async Task SearchValueChanged(string str)
+    {
+        _dataCacheService.CVThematicPageCache.SearchString = str;
+        await OnChanged.InvokeAsync();
+    }
+}
