@@ -5,9 +5,11 @@ using CnGalWebSite.DataModel.ViewModel.Files;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.Helper.Helper;
 using FFmpeg.NET;
+using MediaInfo;
 using OneOf.Types;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using System.Security.Policy;
 using System.Text;
 using Tweetinvi.Security;
 
@@ -53,7 +55,7 @@ namespace CnGalWebSite.DrawingBed.Services
                 }
                 else
                 {
-                    result = await CutAudioAsync(pathSaveFile);
+                    result =await CutAudioAsync(pathSaveFile);
                     pathCompressFile = result.FileURL;
                 }
 
@@ -106,7 +108,7 @@ namespace CnGalWebSite.DrawingBed.Services
                 }
                 else
                 {
-                    result = await CutAudioAsync(pathSaveFile);
+                    result =await CutAudioAsync(pathSaveFile);
                     pathCompressFile = result.FileURL;
                 }
 
@@ -121,7 +123,7 @@ namespace CnGalWebSite.DrawingBed.Services
                 {
                     Uploaded = true,
                     Sha1 = sha1,
-                    FileName = file.Name,
+                    FileName = file.FileName,
                     FileURL = uploadedFile,
                     FileSize = (new FileInfo(pathCompressFile)).Length,
                     Duration = result.Duration
@@ -201,15 +203,16 @@ namespace CnGalWebSite.DrawingBed.Services
 
             var newUploadResults = await response.Content.ReadAsStringAsync();
 
-            if(response.StatusCode != System.Net.HttpStatusCode.OK)
+            if(response.StatusCode != System.Net.HttpStatusCode.OK|| string.IsNullOrWhiteSpace(newUploadResults)|| newUploadResults.Contains("http")==false)
             {
                 _logger.LogError("上传文件到 {url} 失败：{filePath}", _configuration["SliotsImageUrl"], filePath);
                 throw new Exception("图床内部传输错误");
             }
 
-            return response.StatusCode == System.Net.HttpStatusCode.OK && string.IsNullOrWhiteSpace(newUploadResults) == false && newUploadResults.Contains("http")
-                ? newUploadResults.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/")
-                : null;
+            _logger.LogInformation("成功上传图片到图床：{url}", url);
+
+            return newUploadResults.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
+              
         }
         #endregion
 
@@ -346,6 +349,9 @@ namespace CnGalWebSite.DrawingBed.Services
         #endregion
 
         #region 处理音频
+
+        private readonly object balanceLock = new object();
+
         /// <summary>
         /// 裁剪音频并转换格式
         /// </summary>
@@ -353,6 +359,7 @@ namespace CnGalWebSite.DrawingBed.Services
         /// <param name="newPath"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
+
         private async Task<CutFileResult> CutAudioAsync(string path)
         {
             var inputFile = new InputFile(path);
@@ -362,15 +369,20 @@ namespace CnGalWebSite.DrawingBed.Services
 
             var options = new ConversionOptions();
             options.AudioBitRate = 127000;
-            options.ExtraArguments= " -codec:a libmp3lame -qscale:a 5 ";
+            options.ExtraArguments = " -codec:a libmp3lame -qscale:a 5 ";
 
             var output = await ffmpeg.ConvertAsync(inputFile, outputFile, options, default);
-            var metadata = await ffmpeg.GetMetaDataAsync(new InputFile(output.FileInfo.FullName), default).ConfigureAwait(false);
+
+            var mediaFile = new MediaInfoWrapper(outputFile.FileInfo.FullName);
+
+            _logger.LogInformation("成功裁剪音频：{url}", output.FileInfo.FullName);
+
             return new CutFileResult
             {
                 FileURL = output.FileInfo.FullName,
-                Duration = metadata.Duration
+                Duration = new TimeSpan(0,0,0,0,mediaFile.Duration)
             };
+
         }
 
         #endregion
@@ -480,7 +492,7 @@ namespace CnGalWebSite.DrawingBed.Services
 
 
         }
-        private static void DeleteFile(string path)
+        private void DeleteFile(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -491,9 +503,9 @@ namespace CnGalWebSite.DrawingBed.Services
             {
                 File.Delete(path);
             }
-            catch
+            catch(Exception ex)
             {
-
+                _logger.LogError(ex, "删除文件失败：{url}", path);
             }
         }
 

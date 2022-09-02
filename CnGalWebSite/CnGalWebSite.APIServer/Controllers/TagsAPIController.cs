@@ -856,7 +856,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //获取Tag
             var tag = await _tagRepository.GetAll().AsNoTracking()
-               .Include(s => s.InverseParentCodeNavigation).ThenInclude(s => s.InverseParentCodeNavigation)
+               .Include(s => s.InverseParentCodeNavigation).ThenInclude(s => s.InverseParentCodeNavigation).ThenInclude(s => s.Entries)
                .FirstOrDefaultAsync(s => s.Name == "配音演员相关");
 
             if (tag != null)
@@ -867,11 +867,12 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         Title = item.Name,
                         Id = item.Id,
-                        Children = item.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false)
+                        Children = item.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false&&((s.Name.Contains("社团")==false&&s.Name.Contains("公司")==false)||s.Entries.Any())).OrderByDescending(s=> s.Entries.Count)
                         .Select(s => new TagTreeModel
                         {
                             Id = s.Id,
                             Title = s.Name,
+                            EntryCount=s.Entries.Count
                         }).ToList()
                     };
 
@@ -883,7 +884,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //获取性别
             tag = await _tagRepository.GetAll().AsNoTracking()
-               .Include(s => s.InverseParentCodeNavigation)
+               .Include(s => s.InverseParentCodeNavigation).ThenInclude(s => s.Entries)
                .FirstOrDefaultAsync(s => s.Name == "按STAFF性别分");
             if (tag != null)
             {
@@ -897,6 +898,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         {
                             Id = s.Id,
                             Title = s.Name,
+                            EntryCount = s.Entries.Count
                         }).ToList()
                     };
 
@@ -908,10 +910,13 @@ namespace CnGalWebSite.APIServer.Controllers
             model.Tags.RemoveAll(s => s.Children.Any() == false);
 
             //获取CV
+            var now = DateTime.Now.ToCstTime();
 
             tag = await _tagRepository.GetAll()
                 .Include(s => s.Entries).ThenInclude(s => s.Audio)
                 .Include(s => s.Entries).ThenInclude(s => s.Tags)
+                .Include(s => s.Entries).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Examines)
+                .Include(s => s.Entries).ThenInclude(s => s.Examines)
                 .FirstOrDefaultAsync(s => s.Name == "配音");
 
             if (tag != null)
@@ -921,15 +926,18 @@ namespace CnGalWebSite.APIServer.Controllers
                     var temp = new CVInforViewModel
                     {
                         Infor = _appHelper.GetEntryInforTipViewModel(item),
-                        Audio=item.Audio.Select(s=>new AudioViewModel
+                        Audio = item.Audio.Select(s => new AudioViewModel
                         {
-                            BriefIntroduction=s.BriefIntroduction,
-                            Duration=s.Duration,
-                            Name=s.Name,
-                            Priority=s.Priority,
-                            Thumbnail=s.Thumbnail,
-                            Url=s.Url
-                        }).OrderByDescending(s=>s.Priority).ToList()
+                            BriefIntroduction = s.BriefIntroduction,
+                            Duration = s.Duration,
+                            Name = s.Name,
+                            Priority = s.Priority,
+                            Thumbnail = s.Thumbnail,
+                            Url = s.Url
+                        }).OrderByDescending(s => s.Priority).ToList(),
+                        LastUploadAudioTime = item.Examines.FirstOrDefault(s => s.Operation == Operation.EstablishAudio && s.IsPassed == true)?.ApplyTime,
+                        LastPublishTime = item.EntryRelationFromEntryNavigation.FirstOrDefault(s => s.ToEntryNavigation.PubulishTime != null && s.ToEntryNavigation.PubulishTime < now)?.ToEntryNavigation.PubulishTime,
+                        WorkCount = item.EntryRelationFromEntryNavigation.Count(s => s.ToEntryNavigation.Type == EntryType.Game)
                     };
                     foreach (var infor in item.Tags)
                     {

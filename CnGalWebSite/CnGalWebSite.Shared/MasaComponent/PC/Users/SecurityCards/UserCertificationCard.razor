@@ -2,6 +2,7 @@
 @inject IDataCacheService _dataCacheService
 @inject ToastService ToastService
 @inject HttpClient Http
+@inject ToastService ToastService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="用户认证" Icon="fa fa-fw fa-university" Class="h-100">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
@@ -97,9 +98,6 @@
     </MCard>
 </MDialog>
 
-
-<PToast @ref="_toast" MaxCount="3">
-</PToast>
 @code {
     [Parameter]
     public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
@@ -113,7 +111,6 @@
 
     bool Dialog { get; set; }
 
-    PToast _toast;
 
     CnGalWebSite.Shared.MasaComponent.Shared.Components.HumanMachineVerification humanMachineVerification;
 
@@ -154,22 +151,13 @@
     {
         if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName))
         {
-            await _toast.AddToast(new ToastConfig
-            {
-                Type = AlertTypes.Error,
-                Title = "请填写需要认证的词条",
-                Duration = 4000,
-            });
+            await ToastService.Error("请填写需要认证的词条", "请填写需要认证的词条");
             return;
         }
         if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.Note))
         {
-            await _toast.AddToast(new ToastConfig
-            {
-                Type = AlertTypes.Error,
-                Title = "请填写一些有助于身份认证的信息",
-                Duration = 4000,
-            });
+
+            await ToastService.Error("请填写一些有助于身份认证的信息", "请填写一些有助于身份认证的信息");
             return;
         }
 
@@ -210,21 +198,13 @@
             //判断结果
             if (obj.Successful == false)
             {
-                await _toast.AddToast(new ToastConfig
-                {
-                    Type = AlertTypes.Error,
-                    Title = string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "取消认证失败" : "已提交用户认证申请失败",
-                    Duration = 4000,
-                });
+                await ToastService.Error(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "取消认证失败" : "已提交用户认证申请失败", obj.Error);
+
             }
             else
             {
-                await _toast.AddToast(new ToastConfig
-                {
-                    Type = AlertTypes.Success,
-                    Title = string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "已取消认证" : "已提交用户认证申请，等待审核通过",
-                    Duration = 4000,
-                });
+                await ToastService.Error(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "已取消认证" : "已提交用户认证申请，等待审核通过", obj.Error);
+
                 Model.UserCertificationModel.IsPending = true;
                 Dialog = false;
                 StateHasChanged();

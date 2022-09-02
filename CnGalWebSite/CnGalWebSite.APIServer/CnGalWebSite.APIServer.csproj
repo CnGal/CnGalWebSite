@@ -33,7 +33,7 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
     <PackageReference Include="htmldiff.net" Version="1.4.0" />
     <PackageReference Include="Markdig" Version="0.30.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Rewrite" Version="2.2.0" />
@@ -54,7 +54,6 @@
     <PackageReference Include="Senparc.Weixin.MP" Version="16.18.0" />
     <PackageReference Include="Senparc.Weixin.MP.Middleware" Version="0.8.0" />
     <PackageReference Include="Senparc.Weixin.MP.MVC" Version="7.12.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.2" />
     <PackageReference Include="Typesense" Version="4.0.1" />

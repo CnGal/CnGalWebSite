@@ -775,8 +775,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.Type = ExaminedNormalListModelType.Entry;
 
             var entry = await _entryRepository.GetAll()
-                   .Include(s => s.Information)
-                     .ThenInclude(s => s.Additional)
+                   .Include(s => s.Information).ThenInclude(s => s.Additional)
+                   .Include(s=>s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
                    .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
             if (entry == null)
             {

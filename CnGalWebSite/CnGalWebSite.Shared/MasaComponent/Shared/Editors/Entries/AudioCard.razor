@@ -57,7 +57,7 @@
         }
         Model.Audio.Add(new EditAudioAloneModel
         {
-            Name = "音频" + (Model.Audio.Count + 1).ToString(),
+            Name =result.FileName?? "音频" + (Model.Audio.Count + 1).ToString(),
             Url = result.FileURL,
             Duration = result.Duration ?? new TimeSpan(0)
         });
