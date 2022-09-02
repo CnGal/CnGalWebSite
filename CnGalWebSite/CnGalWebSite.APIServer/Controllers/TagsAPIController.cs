@@ -867,12 +867,14 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         Title = item.Name,
                         Id = item.Id,
-                        Children = item.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false&&((item.Name.Contains("社团")==false&& item.Name.Contains("公司")==false)||s.Entries.Any())).OrderByDescending(s=> s.Entries.Count)
+                        Children = item.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false && ((item.Name.Contains("社团") == false &&
+                                        item.Name.Contains("公司") == false) || s.Entries.Any(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)))
+                        .OrderByDescending(s => s.Entries.Count(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false))
                         .Select(s => new TagTreeModel
                         {
                             Id = s.Id,
                             Title = s.Name,
-                            EntryCount=s.Entries.Count
+                            EntryCount = s.Entries.Count(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
                         }).ToList()
                     };
 
@@ -922,7 +924,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Where(s => s.Name == "配音")
                 .Select(s => new
                 {
-                    Entries = s.Entries.Select(s => new
+                    Entries = s.Entries.Where(s=>s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false).Select(s => new
                     {
                         s.Id,
                         s.Name,
