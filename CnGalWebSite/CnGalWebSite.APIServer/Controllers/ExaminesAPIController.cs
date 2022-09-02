@@ -198,10 +198,9 @@ namespace CnGalWebSite.APIServer.Controllers
 
                     break;
                 case Operation.EstablishAddInfor:
-
                     entry = await _entryRepository.GetAll()
                                                .Include(s => s.Information).ThenInclude(s => s.Additional)
-                                               .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                                               .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                                                .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
                     break;
                 case Operation.EstablishImages:

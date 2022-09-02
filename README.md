@@ -110,7 +110,7 @@ PWA应用：https://app.cngal.org/
 
 ## 图形演示
 
-![主页](Docs/Images/主页.png)
+![主页](Docs/Images/主页v3.3.png)
 <!-- 把你项目的demo放在这里，可以是具体的访问地址、图片截图、Gif或者视频等。 -->
 
 <span id="nav-5"></span>
