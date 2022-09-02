@@ -2962,7 +2962,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     var publisherEntry = publisherEntries.FirstOrDefault(s => s.Name == publisher);
 
-                    if (newEntry.EntryStaffFromEntryNavigation.Any(s => s.ToEntry == publisherEntry?.Id && s.Name == (publisherEntry == null ? publisher : null)))
+                    if (newEntry.EntryStaffFromEntryNavigation.Any(s => s.ToEntry == publisherEntry?.Id && s.Name == (publisherEntry == null ? publisher : null)&&s.PositionGeneral==type))
                     {
                         continue;
                     }
