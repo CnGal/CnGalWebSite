@@ -168,6 +168,14 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             reEntryIds.AddRange(hostEntry.EntryRelevances.Select(x => x.Id));
             reEntryIds.AddRange(hostEntry.StaffGames.Select(x => x.Id));
 
+            //游戏
+            var reGameIds = subEntry.EntryRelevances.Where(s => s.Type == EntryType.Game||s.Type== EntryType.Role).Select(x => x.Id).ToList();
+            reGameIds.AddRange(subEntry.StaffGames.Select(x => x.Id));
+            reGameIds.AddRange(subEntry.Roles.Select(x => x.Id));
+            reGameIds.AddRange(hostEntry.EntryRelevances.Where(s => s.Type == EntryType.Game || s.Type == EntryType.Role).Select(x => x.Id));
+            reGameIds.AddRange(hostEntry.StaffGames.Select(x => x.Id));
+            reGameIds.AddRange(hostEntry.Roles.Select(x => x.Id));
+
             //替换关联信息
             foreach (var item in reEntryIds)
             {
@@ -182,12 +190,6 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 
             model.CompleteTaskCount++;
 
-
-            //游戏
-            var reGameIds = subEntry.EntryRelevances.Where(s => s.Type == EntryType.Game).Select(x => x.Id).ToList();
-            reGameIds.AddRange(subEntry.StaffGames.Select(x => x.Id));
-            reGameIds.AddRange(hostEntry.EntryRelevances.Where(s => s.Type == EntryType.Game).Select(x => x.Id));
-            reGameIds.AddRange(hostEntry.StaffGames.Select(x => x.Id));
 
             //替换Staff，开发商和发行商
             foreach (var item in reGameIds)
@@ -247,7 +249,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             var temp = list.FirstOrDefault(s => s.DisplayName == oldName);
             if (temp != null)
             {
-                temp.DisPlayValue = newName;
+                temp.DisplayName = newName;
             }
         }
 
@@ -316,7 +318,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                 }
 
                 _logger.LogWarning("{SubName}({SubId}) -> {HostName}({HostId}) 隐藏从词条失败，可能当前未以管理员角色登入，已尝试递交隐藏请求", model.SubName, model.SubId, model.HostName, model.HostId);
-                OnProgressUpdate(model, OutputLevel.Dager, "隐藏从词条失败，可能当前未以管理员角色登入，已尝试递交隐藏请求");
+                OnProgressUpdate(model, OutputLevel.Dager, "已提交编辑记录，等待审核通过");
             }
         }
     }
