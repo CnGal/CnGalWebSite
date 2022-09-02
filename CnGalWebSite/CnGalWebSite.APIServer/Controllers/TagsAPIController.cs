@@ -867,7 +867,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         Title = item.Name,
                         Id = item.Id,
-                        Children = item.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false&&((s.Name.Contains("社团")==false&&s.Name.Contains("公司")==false)||s.Entries.Any())).OrderByDescending(s=> s.Entries.Count)
+                        Children = item.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false&&((item.Name.Contains("社团")==false&& item.Name.Contains("公司")==false)||s.Entries.Any())).OrderByDescending(s=> s.Entries.Count)
                         .Select(s => new TagTreeModel
                         {
                             Id = s.Id,
@@ -875,6 +875,8 @@ namespace CnGalWebSite.APIServer.Controllers
                             EntryCount=s.Entries.Count
                         }).ToList()
                     };
+
+
 
                     model.Tags.Add(temp);
                 }
@@ -912,20 +914,55 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取CV
             var now = DateTime.Now.ToCstTime();
 
-            tag = await _tagRepository.GetAll()
+            var entry = await _tagRepository.GetAll()
                 .Include(s => s.Entries).ThenInclude(s => s.Audio)
                 .Include(s => s.Entries).ThenInclude(s => s.Tags)
                 .Include(s => s.Entries).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Examines)
                 .Include(s => s.Entries).ThenInclude(s => s.Examines)
-                .FirstOrDefaultAsync(s => s.Name == "配音");
+                .Where(s => s.Name == "配音")
+                .Select(s => new
+                {
+                    Entries = s.Entries.Select(s => new
+                    {
+                        s.Id,
+                        s.Name,
+                        s.Type,
+                        s.DisplayName,
+                        s.MainPicture,
+                        s.Thumbnail,
+                        s.BriefIntroduction,
+                        s.Audio,
+                        s.Tags,
+                        Entries = s.EntryRelationFromEntryNavigation.Select(s => new
+                        {
+                            s.ToEntryNavigation.Type,
+                            s.ToEntryNavigation.PubulishTime,
 
-            if (tag != null)
+                        }),
+                        Examines = s.Examines.Select(s => new
+                        {
+                            s.Operation,
+                            s.ApplyTime,
+                            s.IsPassed
+                        })
+                    })
+                })
+                .FirstOrDefaultAsync();
+
+            if (entry != null)
             {
-                foreach (var item in tag.Entries)
+                foreach (var item in entry.Entries)
                 {
                     var temp = new CVInforViewModel
                     {
-                        Infor = _appHelper.GetEntryInforTipViewModel(item),
+                        Infor = _appHelper.GetEntryInforTipViewModel(new Entry
+                        {
+                            Type=item.Type,
+                            Name=item.Name,
+                            DisplayName=item.Name,
+                            Thumbnail=item.Thumbnail,
+                            Id=item.Id
+                        }),
                         Audio = item.Audio.Select(s => new AudioViewModel
                         {
                             BriefIntroduction = s.BriefIntroduction,
@@ -936,8 +973,8 @@ namespace CnGalWebSite.APIServer.Controllers
                             Url = s.Url
                         }).OrderByDescending(s => s.Priority).ToList(),
                         LastUploadAudioTime = item.Examines.FirstOrDefault(s => s.Operation == Operation.EstablishAudio && s.IsPassed == true)?.ApplyTime,
-                        LastPublishTime = item.EntryRelationFromEntryNavigation.FirstOrDefault(s => s.ToEntryNavigation.PubulishTime != null && s.ToEntryNavigation.PubulishTime < now)?.ToEntryNavigation.PubulishTime,
-                        WorkCount = item.EntryRelationFromEntryNavigation.Count(s => s.ToEntryNavigation.Type == EntryType.Game)
+                        LastPublishTime = item.Entries.FirstOrDefault(s => s.PubulishTime != null && s.PubulishTime < now)?.PubulishTime,
+                        WorkCount = item.Entries.Count(s => s.Type == EntryType.Game)
                     };
                     foreach (var infor in item.Tags)
                     {
