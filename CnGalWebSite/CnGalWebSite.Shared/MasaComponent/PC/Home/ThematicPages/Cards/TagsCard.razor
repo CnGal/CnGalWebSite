@@ -3,14 +3,17 @@
 {
     <div class="rounded shadow-sm p-2 bg-opacity mb-4">
         <div class="row">
-            @foreach (var item in Model.Tags.OrderByDescending(s=>s.Children.Count))
+            @{ var i = 0;}
+            @foreach (var item in Model.Tags.OrderByDescending(s => s.Children.Count))
             {
+
                 <div class="col-12 col-lg-6">
-                    <TagsRow Model="item" OnChanged="OnChanged" Color="@(Model.Tags.IndexOf(item) switch {0=>"light-blue",1=>"cyan",2=>"teal",3=>"green",4=>"light-green",_=>"light-blue"})" TotalCount="Model.CVInfors.Count"/>
+                    <TagsRow Model="item" OnChanged="OnChanged" Color="@(i switch {0=>"light-blue",1=>"cyan",2=>"teal",3=>"green",4=>"light-green",_=>"light-blue"})" TotalCount="Model.CVInfors.Count" />
                 </div>
+                i++;
             }
         </div>
-      
+
     </div>
 }
 
