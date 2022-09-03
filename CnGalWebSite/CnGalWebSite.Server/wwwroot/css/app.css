@@ -990,3 +990,8 @@ body {
 a:focus-visible {
     outline: thin dotted;
 }
+
+code {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+}

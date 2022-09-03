@@ -1,4 +1,4 @@
-﻿
+
 #web_bg {
     position: fixed;
     top: 0;
@@ -989,6 +989,11 @@ body {
 /*视觉反馈*/
 a:focus-visible {
     outline: thin dotted;
+}
+
+code {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
 }
 
 .ContributionCalendar-day {
