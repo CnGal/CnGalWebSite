@@ -22,23 +22,21 @@
     @if (string.IsNullOrWhiteSpace(Model.Comments) == false)
     {
         <div>
-            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-fw  fa-tags"></i>&nbsp;&nbsp;批注</h2>
+            <h2 class="fw-bold pb-2 m-0 font-color h5 mt-4"><i class="fa fa-fw  fa-tags"></i>&nbsp;&nbsp;批注</h2>
         </div>
-        <div style=" white-space: break-spaces;" class="mb-2">
+        <div style=" white-space: break-spaces;">
             @Model.Comments
         </div>
     }
     @if (string.IsNullOrWhiteSpace(Model.Note) == false)
     {
         <div>
-            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa  fa-fw fa-sticky-note-o"></i>&nbsp;&nbsp;备注</h2>
+            <h2 class="fw-bold pb-2 m-0 font-color h5 mt-4"><i class="fa  fa-fw fa-sticky-note-o"></i>&nbsp;&nbsp;备注</h2>
         </div>
         <div style=" white-space: break-spaces;">
             @Model.Note
         </div>
     }
-
-
 </div>
 
 @code {

@@ -200,17 +200,17 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                 {
                     temp.Name = model.HostName;
                 }
-                if (string.IsNullOrWhiteSpace(examineModel.Publisher) == false)
+                if (string.IsNullOrWhiteSpace(examineModel.Publisher) == false && examineModel.Publisher != model.HostName)
                 {
                     examineModel.Publisher = examineModel.Publisher.Replace(model.SubName, model.HostName);
 
                 }
-                if (string.IsNullOrWhiteSpace(examineModel.ProductionGroup) == false)
+                if (string.IsNullOrWhiteSpace(examineModel.ProductionGroup) == false && examineModel.ProductionGroup != model.HostName)
                 {
                     examineModel.ProductionGroup = examineModel.ProductionGroup.Replace(model.SubName, model.HostName);
 
                 }
-                if (string.IsNullOrWhiteSpace(examineModel.CV) == false)
+                if (string.IsNullOrWhiteSpace(examineModel.CV) == false&&examineModel.CV!= model.HostName)
                 {
                     examineModel.CV = examineModel.CV.Replace(model.SubName, model.HostName);
 

@@ -518,7 +518,7 @@ namespace CnGalWebSite.DataModel.Helper
             {
                 return PositionGeneralType.FineArts;
             }
-            else if ((text.Contains("配音") || text.Contains("声优") || text.ToUpper().Contains("CV"))&&text.Contains("导演")==false && text.Contains("监督") == false && text.Contains("制作") == false && text.Contains("后期") == false && text.Contains("处理") == false && text.Contains("后制") == false)
+            else if ((text.Contains("配音") || text.Contains("声优") || text.ToUpper().Contains("CV") || text.ToUpper().Contains("CAST")) &&text.Contains("导演")==false && text.Contains("监督") == false && text.Contains("制作") == false && text.Contains("后期") == false && text.Contains("处理") == false && text.Contains("后制") == false)
             {
                 return PositionGeneralType.CV;
             }
