@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using NuGet.Packaging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -859,6 +860,12 @@ namespace CnGalWebSite.APIServer.Controllers
                .Include(s => s.InverseParentCodeNavigation).ThenInclude(s => s.InverseParentCodeNavigation).ThenInclude(s => s.Entries)
                .FirstOrDefaultAsync(s => s.Name == "配音演员相关");
 
+            //获取性别 城市群
+            var tags = await _tagRepository.GetAll().AsNoTracking()
+               .Include(s => s.InverseParentCodeNavigation).ThenInclude(s => s.Entries)
+               .Where(s => s.Name == "按STAFF性别分"||s.Name== "城市群").ToListAsync();
+
+            tag.InverseParentCodeNavigation.AddRange(tags); 
             if (tag != null)
             {
                 foreach (var item in tag.InverseParentCodeNavigation)
@@ -867,7 +874,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         Title = item.Name,
                         Id = item.Id,
-                        Children = item.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false && ((item.Name.Contains("社团") == false &&
+                        Children = item.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false && ((item.Name.Contains("社团") == false && item.Name.Contains("城市群") == false &&
                                         item.Name.Contains("公司") == false) || s.Entries.Any(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)))
                         .OrderByDescending(s => s.Entries.Count(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false))
                         .Select(s => new TagTreeModel
@@ -886,33 +893,10 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
 
-            //获取性别
-            tag = await _tagRepository.GetAll().AsNoTracking()
-               .Include(s => s.InverseParentCodeNavigation).ThenInclude(s => s.Entries)
-               .FirstOrDefaultAsync(s => s.Name == "按STAFF性别分");
-            if (tag != null)
-            {
-               
-                    var temp = new TagTreeModel
-                    {
-                        Title = tag.Name,
-                        Id = tag.Id,
-                        Children = tag.InverseParentCodeNavigation.Where(s => string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false)
-                        .Select(s => new TagTreeModel
-                        {
-                            Id = s.Id,
-                            Title = s.Name,
-                            EntryCount = s.Entries.Count
-                        }).ToList()
-                    };
-
-                    model.Tags.Add(temp);
-                
-            }
 
             //删除没有二级标签的标签
             model.Tags.RemoveAll(s => s.Children.Any() == false);
-
+           
             //获取CV
             var now = DateTime.Now.ToCstTime();
 
