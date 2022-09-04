@@ -872,6 +872,74 @@ namespace CnGalWebSite.APIServer.Application.Users
         }
 
         #region 用户认证
+
+        public async Task<QueryData<ListUserCertificationAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListUserCertificationAloneModel searchModel)
+        {
+            var items = _userCertificationRepository.GetAll()
+                .Include(s => s.ApplicationUser)
+                .Include(s => s.Entry)
+                .Where(s => s.EntryId != null && s.EntryId != 0)
+                .AsNoTracking();
+
+            // 处理高级搜索
+
+            if (!string.IsNullOrWhiteSpace(searchModel.UserId))
+            {
+                items = items.Where(item => item.ApplicationUserId.Contains(searchModel.UserId, StringComparison.OrdinalIgnoreCase));
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.UserName))
+            {
+                items = items.Where(item => item.ApplicationUser.UserName.Contains(searchModel.UserName, StringComparison.OrdinalIgnoreCase));
+            }
+
+
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => item.ApplicationUserId.Contains(options.SearchText));
+            }
+
+            // 排序
+            var isSorted = false;
+            if (!string.IsNullOrWhiteSpace(options.SortName))
+            {
+
+                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+                isSorted = true;
+            }
+
+            // 设置记录总数
+            var total = items.Count();
+
+            // 内存分页
+            var itemsReal = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
+
+            //复制数据
+            var resultItems = new List<ListUserCertificationAloneModel>();
+            foreach (var item in itemsReal)
+            {
+                resultItems.Add(new ListUserCertificationAloneModel
+                {
+                    Id = item.Id,
+                    UserName = item.ApplicationUser?.UserName,
+                    UserId = item.ApplicationUserId,
+                    CertificationTime = item.CertificationTime,
+                    EntryId = item.Entry.Id,
+                    EntryName = item.Entry.Name
+                });
+            }
+
+            return new QueryData<ListUserCertificationAloneModel>()
+            {
+                Items = resultItems,
+                TotalCount = total,
+                IsSorted = isSorted,
+                // IsFiltered = isFiltered
+            };
+        }
+
+
         public async void UpdateUserCertificationDataMain(UserCertification userCertification, UserCertificationMain examine)
         {
             if(examine.EntryId==0)
