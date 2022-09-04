@@ -1363,14 +1363,15 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
 
             //读取音频信息
+            var audioImage = entry.Audio.OrderByDescending(s => s.Priority).FirstOrDefault(s => string.IsNullOrWhiteSpace(s.Thumbnail) == false)?.Thumbnail;
             model.Audio.AddRange(entry.Audio.Select(s => new AudioViewModel
             {
                 BriefIntroduction = s.BriefIntroduction,
                 Name = s.Name,
                 Priority = s.Priority,
                 Url = s.Url,
-                Duration=s.Duration,
-                Thumbnail=_appHelper.GetImagePath( s.Thumbnail, "AudioThumbnail.png")
+                Duration = s.Duration,
+                Thumbnail = _appHelper.GetImagePath(string.IsNullOrWhiteSpace(s.Thumbnail) ? audioImage : s.Thumbnail, "AudioThumbnail.png")
             }).ToList());
 
 

@@ -168,6 +168,6 @@ namespace CnGalWebSite.Shared.Service
 
         void RefreshAllCatche();
 
-       void OnRefreshRequsted(EventArgs e);
+        Task OnRefreshRequsted(EventArgs e);
     }
 }

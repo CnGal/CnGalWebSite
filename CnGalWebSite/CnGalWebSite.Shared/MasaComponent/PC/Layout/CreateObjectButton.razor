@@ -1,5 +1,6 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@implements IDisposable
 
 
 <MMenu OffsetY @bind-Value="menu">
@@ -11,7 +12,7 @@
                     m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                 }
-                <MButton Icon Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs">
+                <MButton Icon Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs" Dark="@_dataCacheService.ThemeSetting.IsDark">
                     <MIcon>mdi-plus</MIcon>
                 </MButton>
             </ActivatorContent>
@@ -52,7 +53,7 @@
                         </MButton>
                     </Authorized>
                 </AuthorizeView>
-              
+
 
             </div>
         </div>
@@ -71,4 +72,28 @@
         NavigationManager.NavigateTo(url);
         return Task.CompletedTask;
     }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        _dataCacheService.RefreshRequsted += RefreshRequsted;
+
+    }
+
+    public async void RefreshRequsted(object sender, EventArgs args)
+    {
+        await InvokeAsync(StateHasChanged);
+
+    }
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

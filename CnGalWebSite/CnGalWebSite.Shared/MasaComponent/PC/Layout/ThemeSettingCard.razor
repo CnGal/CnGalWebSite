@@ -34,8 +34,7 @@
                 <MButton Value="@("deep-orange")" Color="deep-orange" Small Style="min-width: 28px;" />
                 <MButton Value="@("brown")" Color="brown" Small Style="min-width: 28px;" />
                 <MButton Value="@("blue-grey")" Color="blue-grey" Small Style="min-width: 28px;" />
-                <MButton Value="@("grey")" Color="grey" Small Style="min-width: 28px;" />
-                <MButton Value="@("white")" Color="black" Small Style="min-width: 28px;" />
+                <MButton Value="@("grey")" Color="black" Small Style="min-width: 28px;" />
             </MButtonGroup>
         </MCardText>
         <MCardTitle Class="text-h6">
@@ -91,15 +90,6 @@
         return Task.CompletedTask;
     }
 
-    public async Task ReturnOldLayout()
-    {
-        _dataCacheService.ThemeSetting.IsMasa = false;
-        if (CnGalRootTip != null)
-        {
-            await CnGalRootTip.SaveTheme();
-        }
-    }
-
     public async Task ColorValueChanged(StringNumber value)
     {
         if (value == null)
@@ -109,7 +99,7 @@
         colorString = value;
         _dataCacheService.ThemeSetting.Theme = value?.ToString();
 
-        if (_dataCacheService.ThemeSetting.Theme == "white")
+        if (_dataCacheService.ThemeSetting.Theme == "grey")
         {
             _dataCacheService.ThemeSetting.IsDark = true;
         }

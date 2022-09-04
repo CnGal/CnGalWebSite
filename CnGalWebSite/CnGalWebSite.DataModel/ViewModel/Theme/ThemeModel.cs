@@ -12,9 +12,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
 
         public bool IsDebug { get; set; }
 
+        /// <summary>
+        /// 是否背景透明
+        /// </summary>
         public bool IsTransparent { get; set; } = true;
-
-        public bool IsMasa { get; set; } = true;
 
         public bool IsCommentUseMarkdown { get; set; }
 

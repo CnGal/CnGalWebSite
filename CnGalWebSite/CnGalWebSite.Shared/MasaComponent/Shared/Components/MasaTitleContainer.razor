@@ -1,4 +1,5 @@
 ﻿@inject IDataCacheService _dataCacheService
+@implements IDisposable
 
 @if (Small)
 {
@@ -42,7 +43,7 @@ else
                 @ButtonContent
                 @if (Collapable)
                 {
-                     <MasaButton Color="@ButtonColor" Fab XSmall Icon="@(IsCollapsed?"fa fa-chevron-right":"fa fa-chevron-down")" Tooltip="@(IsCollapsed?"展开":"折叠")" OnClick="@(() => OnCollapseChanged(!IsCollapsed))" />
+                    <MasaButton Color="@ButtonColor" Fab XSmall Icon="@(IsCollapsed?"fa fa-chevron-right":"fa fa-chevron-down")" Tooltip="@(IsCollapsed?"展开":"折叠")" OnClick="@(() => OnCollapseChanged(!IsCollapsed))" />
                 }
             </div>
         </div>
@@ -98,4 +99,28 @@ else
         await IsCollapsedChanged.InvokeAsync(state);
         StateHasChanged();
     }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        _dataCacheService.RefreshRequsted += RefreshRequsted;
+
+    }
+
+    public async void RefreshRequsted(object sender, EventArgs args)
+    {
+        await InvokeAsync(StateHasChanged);
+
+    }
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

@@ -1355,6 +1355,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var entries = await _entryRepository.GetAll().Include(s => s.Pictures).AsNoTracking()
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Pictures.Count > 3)
+                .OrderBy(x => EF.Functions.Random())
+                .Take(20)
                 .Select(item => new GameCGModel
                 {
                     Id = item.Id,
@@ -1365,6 +1367,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         Image = s.Url
                     }).ToList()
                 })
+                
                 .ToListAsync();
 
             return entries;
@@ -1378,6 +1381,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game
                         && s.EntryRelationFromEntryNavigation.Count(s => s.ToEntryNavigation.Type == EntryType.Role && string.IsNullOrWhiteSpace(s.ToEntryNavigation.MainPicture) == false) > 4)
+                .OrderBy(x => EF.Functions.Random())
+                .Take(40)
                 .Select(s => new
                 {
                     s.Id,

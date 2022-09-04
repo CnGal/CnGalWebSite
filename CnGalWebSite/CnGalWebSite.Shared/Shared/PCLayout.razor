@@ -21,16 +21,7 @@
     </MTabs>
     <MSpacer></MSpacer>
 
-    <MTooltip Bottom>
-        <ActivatorContent>
-            <MButton Icon Dark Color="@_dataCacheService.ThemeSetting.Theme" Class="mr-6" OnClick="@(()=>OnNavClick("/search"))">
-                <MIcon>mdi-magnify</MIcon>
-            </MButton>
-        </ActivatorContent>
-        <ChildContent>
-            <span>搜索</span>
-        </ChildContent>
-    </MTooltip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="搜索" Icon="mdi-magnify" Class="mr-6" OnClick="@(()=>OnNavClick("/search"))"/>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
         <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
 

@@ -86,7 +86,6 @@ else
 
 
 @code {
-    public bool isMasa = true;
     public bool isDark = false;
     public bool isTransparent = true;
 
@@ -96,8 +95,6 @@ else
     public string theme;
     public string DefaultTheme = "pink lighten-2";
 
-    [Parameter]
-    public EventCallback<bool> OnStateChanged { get; set; }
     [Parameter]
     public EventCallback OnTransparentChanged { get; set; }
     [CascadingParameter]
@@ -277,6 +274,7 @@ else
     public async Task SaveTheme()
     {
         await _localStorage.SetItemAsync("theme", _dataCacheService.ThemeSetting);
+        await Refresh();
     }
 
     private async Task InitMouse()
@@ -294,7 +292,7 @@ else
     /// <summary>
     /// 刷新
     /// </summary>
-    public async void Refresh()
+    public async Task Refresh()
     {
         if (_dataCacheService.ThemeSetting == null)
         {
@@ -303,12 +301,11 @@ else
 
         ProcColor(_dataCacheService.ThemeSetting.Theme);
 
-        if (theme != _dataCacheService.ThemeSetting.Theme || isMasa != _dataCacheService.ThemeSetting.IsMasa || isDark != _dataCacheService.ThemeSetting.IsDark || isTransparent != _dataCacheService.ThemeSetting.IsTransparent)
+        if (theme != _dataCacheService.ThemeSetting.Theme|| isDark != _dataCacheService.ThemeSetting.IsDark || isTransparent != _dataCacheService.ThemeSetting.IsTransparent)
         {
-            await OnStateChanged.InvokeAsync(isMasa != _dataCacheService.ThemeSetting.IsMasa);
             await _dataCacheService.ThemeChanged.InvokeAsync(colorMain);
+            await _dataCacheService.RefreshApp.InvokeAsync();
 
-            isMasa = _dataCacheService.ThemeSetting.IsMasa;
             theme = _dataCacheService.ThemeSetting.Theme;
             isDark = _dataCacheService.ThemeSetting.IsDark;
             isTransparent = _dataCacheService.ThemeSetting.IsTransparent;

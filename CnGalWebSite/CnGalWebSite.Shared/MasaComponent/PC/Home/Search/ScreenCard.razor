@@ -1,26 +1,30 @@
-﻿<div class="rounded shadow-sm p-2 bg-opacity">
+﻿@inject IDataCacheService _dataCacheService
+@implements IDisposable
+
+
+<div class="rounded shadow-sm p-2 bg-opacity">
     <div class="row">
         <div class="col-12 col-lg-6">
-            <SortChipsList Model="Model" Color="blue" OnChanged="OnChanged" />
+            <SortChipsList Model="Model" Color="@GetColor(0)" OnChanged="OnChanged" />
 
         </div>
         <div class="col-12 col-lg-6">
-            <TimeChipsList FixedModel="Times" InputData="Model.Times" Color="light-blue" OnChanged="OnChanged" />
+            <TimeChipsList FixedModel="Times" InputData="Model.Times" Color="@GetColor(1)" OnChanged="OnChanged" />
 
         </div>
         <div class="col-12 col-lg-6">
-            <TypeChipsList FixedModel="EntryTypes" InputData="Model.Types" Color="cyan" OnChanged="OnChanged" />
+            <TypeChipsList FixedModel="EntryTypes" InputData="Model.Types" Color="@GetColor(2)" OnChanged="OnChanged" />
 
         </div>
         <div class="col-12 col-lg-6">
-            <TypeChipsList FixedModel="ArticleTypes" InputData="Model.Types" Color="teal" OnChanged="OnChanged" />
+            <TypeChipsList FixedModel="ArticleTypes" InputData="Model.Types" Color="@GetColor(3)" OnChanged="OnChanged" />
 
         </div>
         <div class="col-12 col-lg-6">
-            <TypeChipsList FixedModel="PeripheryTypes" InputData="Model.Types" Color="green" OnChanged="OnChanged" />
+            <TypeChipsList FixedModel="PeripheryTypes" InputData="Model.Types" Color="@GetColor(4)" OnChanged="OnChanged" />
         </div>
         <div class="col-12 col-lg-6">
-            <TypeChipsList FixedModel="TagTypes" InputData="Model.Types" Color="light-green" OnChanged="OnChanged" />
+            <TypeChipsList FixedModel="TagTypes" InputData="Model.Types" Color="@GetColor(5)" OnChanged="OnChanged" />
         </div>
     </div>
 </div>
@@ -37,5 +41,33 @@
     List<SearchType> TagTypes { get; set; } = SearchInputModel.GetTagTypes();
     List<SearchTimeModel> Times { get; set; } = SearchInputModel.GetTimes();
 
+    public string GetColor(int index)
+    {
+        var baseStr = _dataCacheService.ThemeSetting.Theme.Split(' ').FirstOrDefault();
 
+        return $"{baseStr} {index switch { 0 => "darken-3", 1 => "darken-2", 2 => "darken-1", 3 => "lighten-1", 4 => "lighten-2", 5 => "lighten-3", 6 => "lighten-4", _ => "lighten-5" }}";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        _dataCacheService.RefreshRequsted += RefreshRequsted;
+
+    }
+
+    public async void RefreshRequsted(object sender, EventArgs args)
+    {
+        await InvokeAsync(StateHasChanged);
+
+    }
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }
