@@ -12,6 +12,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -1353,10 +1354,16 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<GameCGModel>>> GetGameCGsAsync()
         {
-            var entries = await _entryRepository.GetAll().Include(s => s.Pictures).AsNoTracking()
+            var entryIds = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Pictures)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Pictures.Count > 3)
-                .OrderBy(x => EF.Functions.Random())
-                .Take(20)
+                .Select(s => s.Id).ToListAsync();
+
+            entryIds = entryIds.Random().Take(20).ToList();
+
+            var entries = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Pictures)
+                .Where(s=> entryIds.Contains(s.Id))
                 .Select(item => new GameCGModel
                 {
                     Id = item.Id,
@@ -1367,7 +1374,6 @@ namespace CnGalWebSite.APIServer.Controllers
                         Image = s.Url
                     }).ToList()
                 })
-                
                 .ToListAsync();
 
             return entries;
@@ -1377,12 +1383,17 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<GameRoleModel>>> GetGameRolesAsync()
         {
-            var entries = await _entryRepository.GetAll().AsNoTracking()
+            var entryIds = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Type == EntryType.Game
                         && s.EntryRelationFromEntryNavigation.Count(s => s.ToEntryNavigation.Type == EntryType.Role && string.IsNullOrWhiteSpace(s.ToEntryNavigation.MainPicture) == false) > 4)
-                .OrderBy(x => EF.Functions.Random())
-                .Take(40)
+                .Select(s => s.Id).ToListAsync();
+
+            entryIds = entryIds.Random().Take(40).ToList();
+
+            var entries = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                 .Where(s => entryIds.Contains(s.Id))
                 .Select(s => new
                 {
                     s.Id,
