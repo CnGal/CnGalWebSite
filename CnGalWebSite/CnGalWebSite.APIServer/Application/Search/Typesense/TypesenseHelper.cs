@@ -461,10 +461,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             var entryIds = model.Hits.Where(s => s.Document.Type == 0).Select(s => s.Document.OriginalId).ToList();
 
             var entries = await _entryRepository.GetAll().AsNoTracking().Include(s => s.Information)
+                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                    .Include(s => s.EntryStaffToEntryNavigation).ThenInclude(s => s.FromEntryNavigation)
                     .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                    .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                .Where(s => entryIds.Contains(s.Id) && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
+                    .Where(s => entryIds.Contains(s.Id) && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
 
             var articleIds = model.Hits.Where(s => s.Document.Type == 1).Select(s => s.Document.OriginalId).ToList();
 
