@@ -86,7 +86,7 @@
                     备注
                 </div>
                 <div class="col-12">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMarkdown @bind-Context="@Model.UserCertificationModel.Note" Mode="MarkdownEditorMode.wysiwyg"/>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMarkdown @bind-Context="@Model.UserCertificationModel.Note" Mode="MarkdownEditorMode.wysiwyg" />
                 </div>
             </div>
         </MCardText>
@@ -203,7 +203,9 @@
             }
             else
             {
-                await ToastService.Error(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "已取消认证" : "已提交用户认证申请，等待审核通过", obj.Error);
+
+                var content = string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "已取消认证" : "已提交用户认证申请，等待审核通过";
+                await ToastService.Error(content, content, obj.Successful);
 
                 Model.UserCertificationModel.IsPending = true;
                 Dialog = false;
