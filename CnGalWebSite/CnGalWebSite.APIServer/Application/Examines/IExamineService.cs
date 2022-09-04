@@ -116,20 +116,6 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="operation"></param>
         /// <returns></returns>
         Task<Examine> GetUserPeripheryActiveExamineAsync(long peripheryId, string userId, Operation operation);
-      
-        /// <summary>
-        /// 迁移 EditEntryTags 类型审核记录到新版
-        /// </summary>
-        /// <returns></returns>
-        Task MigrationEditEntryTagsExamineRecord();
-        Task MigrationEditArticleRelevanceExamineRecord();
-        Task MigrationEditEntryRelevanceExamineRecord();
-        Task ReplaceEditEntryMainExamineContext();
-        Task ReplaceEditArticleMainExamineContext();
-        Task ReplaceEditPeripheryMainExamineContext();
-        Task ReplacePeripheryRelatedEntries();
-        Task ReplaceEditTagMainExamineContext();
-        Task ReplaceEditTag_1_0_ExamineContext();
      
         /// <summary>
         /// 补全审核记录
@@ -160,11 +146,9 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="user"></param>
         /// <param name="examineData"></param>
         /// <param name="operation"></param>
-        /// <param name="type"></param>
         /// <param name="note"></param>
         /// <param name="isAdmin"></param>
         /// <param name="isCreating">是否为创建相关</param>
-        /// <param name="adminRole"></param>
         /// <returns></returns>
         Task<Examine> AddEditRecordAsync(object entry, ApplicationUser user, object examineData, Operation operation, string note, bool isAdmin, bool isCreating = false);
 

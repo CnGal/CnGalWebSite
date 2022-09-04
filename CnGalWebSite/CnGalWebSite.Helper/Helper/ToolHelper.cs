@@ -354,7 +354,6 @@ namespace CnGalWebSite.DataModel.Helper
             var result = new List<string>();
 
             text = text.Replace("，", ",").Replace("、", ",").Replace("：", ":").Replace("\r\n", "\n");
-            var Subcategory = string.Empty;
             //按行分割
             var lines = text.Split('\n');
 
@@ -472,7 +471,7 @@ namespace CnGalWebSite.DataModel.Helper
                 {
                     continue;
                 }
-                else if ((pairs.Length == 1 || (pairs.Length == 2 && string.IsNullOrWhiteSpace(pairs[1]))) && item.Contains(":"))
+                else if ((pairs.Length == 1 || (pairs.Length == 2 && string.IsNullOrWhiteSpace(pairs[1]))) && item.Contains(':'))
                 {
                     Subcategory = pairs[0];
                     continue;
@@ -1165,7 +1164,7 @@ namespace CnGalWebSite.DataModel.Helper
             return informations;
         }
 
-        public static string GetImagePath(string image, string defaultStr, bool mediumImage = false)
+        public static string GetImagePath(string image, string defaultStr)
         {
 
             if (string.IsNullOrWhiteSpace(image) == true)

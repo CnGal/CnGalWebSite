@@ -470,7 +470,7 @@ namespace CnGalWebSite.DrawingBed.Services
                 {
                     foreach (var item in dir.GetDirectories())
                     {
-                        if (!item.ToString().Contains("$") && (!item.ToString().Contains("Boot")))
+                        if (!item.ToString().Contains('$') && (!item.ToString().Contains("Boot")))
                         {
                             // Console.WriteLine(item);
 

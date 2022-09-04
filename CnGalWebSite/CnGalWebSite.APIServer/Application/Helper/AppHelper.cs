@@ -100,9 +100,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
             return await _examineRepository.FirstOrDefaultAsync(s => s.EntryId == entryId && s.ApplicationUserId != userId && s.IsPassed == null && s.Operation == operation) != null;
         }
 
-        public string GetImagePath(string image, string defaultStr, bool mediumImage = false)
+        public string GetImagePath(string image, string defaultStr)
         {
-            return ToolHelper.GetImagePath(image, defaultStr, mediumImage);
+            return ToolHelper.GetImagePath(image, defaultStr);
         }
 
         public string GetStringAbbreviation(string str, int length)
