@@ -20,8 +20,12 @@
                 头衔<MIcon>mdi-medal-outline</MIcon>
             </MTab>
             <MTab Value="3">
+                认证<MIcon>mdi-star</MIcon>
+            </MTab>
+            <MTab Value="4">
                 操作记录<MIcon>mdi-text-search</MIcon>
             </MTab>
+
         </MTabs>
     </div>
     <MTabsItems @bind-Value="TabIndex">
@@ -40,6 +44,13 @@
 
         </MTabItem>
         <MTabItem Value="3">
+            <div class="  rounded shadow-sm p-3 bg-opacity">
+                <CnGalWebSite.Shared.Component.Admin.Users.ListUserCertifications />
+
+            </div>
+
+        </MTabItem>
+        <MTabItem Value="4">
             <div class="  rounded shadow-sm p-3 bg-opacity">
                 <CnGalWebSite.Shared.Component.Admin.Users.ListOperationRecords />
 

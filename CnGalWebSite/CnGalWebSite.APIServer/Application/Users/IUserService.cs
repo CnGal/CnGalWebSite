@@ -50,5 +50,7 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         Task<List<string>> GetAllNotCertificatedEntriesAsync(EntryType? type = null);
 
+        Task<QueryData<ListUserCertificationAloneModel>> GetPaginatedResult(DataModel.ViewModel.Search.QueryPageOptions options, ListUserCertificationAloneModel searchModel);
+
     }
 }

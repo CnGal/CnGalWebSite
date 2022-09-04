@@ -205,7 +205,7 @@
             {
 
                 var content = string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "已取消认证" : "已提交用户认证申请，等待审核通过";
-                await ToastService.Error(content, content, obj.Successful);
+                await ToastService.Success(content, content);
 
                 Model.UserCertificationModel.IsPending = true;
                 Dialog = false;
