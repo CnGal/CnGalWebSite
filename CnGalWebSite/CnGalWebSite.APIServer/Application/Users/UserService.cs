@@ -940,7 +940,7 @@ namespace CnGalWebSite.APIServer.Application.Users
         }
 
 
-        public async void UpdateUserCertificationDataMain(UserCertification userCertification, UserCertificationMain examine)
+        public async Task UpdateUserCertificationDataMain(UserCertification userCertification, UserCertificationMain examine)
         {
             if(examine.EntryId==0)
             {
@@ -956,7 +956,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             userCertification.CertificationTime = DateTime.Now.ToCstTime();
         }
 
-        public void UpdateUserCertificationData(UserCertification userCertification, Examine examine)
+        public async Task UpdateUserCertificationData(UserCertification userCertification, Examine examine)
         {
             switch (examine.Operation)
             {
@@ -968,7 +968,7 @@ namespace CnGalWebSite.APIServer.Application.Users
                         userCertificationMain = (UserCertificationMain)serializer.Deserialize(str, typeof(UserCertificationMain));
                     }
 
-                    UpdateUserCertificationDataMain(userCertification, userCertificationMain);
+                    await UpdateUserCertificationDataMain(userCertification, userCertificationMain);
                     break;
             }
 

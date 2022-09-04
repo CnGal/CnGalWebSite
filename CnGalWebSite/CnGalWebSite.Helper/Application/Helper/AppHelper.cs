@@ -93,7 +93,6 @@ namespace CnGalWebSite.DataModel.Application.Helper
             using var fileContent = new StreamContent(file.OpenReadStream(file.Size));
             using var content = new MultipartFormDataContent();
 
-            double x, y;
             content.Add(
                 content: fileContent,
                 name: "\"files\"",

@@ -32,7 +32,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <param name="image">图片名称</param>
         /// <param name="defaultStr">默认名称</param>
         /// <returns>图片路径</returns>
-        string GetImagePath(string image, string defaultStr, bool mediumImage = false);
+        string GetImagePath(string image, string defaultStr);
 
         /// <summary>
         /// 获取字符串的缩略
