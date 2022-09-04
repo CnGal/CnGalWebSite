@@ -3,6 +3,8 @@ using CnGalWebSite.DataModel.ViewModel.Entries;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+
 namespace CnGalWebSite.DataModel.ViewModel
 {
     public class EditAddInforViewModel : BaseEntryEditModel
@@ -120,15 +122,24 @@ namespace CnGalWebSite.DataModel.ViewModel
             {
                 foreach (var item in Staffs)
                 {
+                    if (string.IsNullOrWhiteSpace(item.Name)&&string.IsNullOrWhiteSpace(item.Name))
+                    {
+                        return new Result { Error = $"请填写名称，并检查是否存在空行" };
+                    }
                     if (string.IsNullOrWhiteSpace(item.PositionOfficial))
                     {
-                        return new Result { Error = "Staff必须填写官方职位" };
+                        return new Result { Error = $"【{item.Name}】没有填写名称" };
                     }
                     if (string.IsNullOrWhiteSpace(item.Name))
                     {
-                        return new Result { Error = "Staff必须填写唯一名称" };
+                        return new Result { Error = $"【{item.PositionOfficial}】没有填写职位" };
+                    }
+                    if (Staffs.Where(s => s.Id != item.Id).Any(s => s.Name == item.Name && s.Modifier == item.Modifier && s.PositionOfficial == item.PositionOfficial))
+                    {
+                        return new Result { Error = $"重复的项目【{item.Modifier}{item.PositionOfficial}：{item.Name}】" };
                     }
                 }
+                
             }
 
             return new Result { Successful = true };

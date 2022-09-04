@@ -1190,14 +1190,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
             if (model.Type == EntryType.Game)
             {
                 model.Staffs = new List<StaffInforModel>
-            {
-                new StaffInforModel
                 {
-                    Modifier = "",
-                    StaffList = new List<StaffValue>()
-                }
-            };
-                foreach (var item in entry.EntryStaffFromEntryNavigation)
+                    new StaffInforModel
+                    {
+                        Modifier = "",
+                        StaffList = new List<StaffValue>()
+                    }
+                };
+                foreach (var item in entry.EntryStaffFromEntryNavigation.OrderBy(s=>s.PositionGeneral).ThenBy(s=>s.PositionOfficial))
                 {
 
                     var isAdd = false;

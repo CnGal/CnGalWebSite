@@ -1,13 +1,10 @@
 ﻿@inject HttpClient Http
-@inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
-@implements IAsyncDisposable
 @inject IPopupService PopupService
+@inject DialogService DialogService
 
-@if (IsSmallScreen == false)
-{
     <style>
         .table-wrapper {
             min-height: 400px;
@@ -16,7 +13,7 @@
     <Table TItem="StaffModel" @ref="StaffsTable"
            IsPagination="true" PageItemsSource="@PageItemsSource"
            IsStriped="true" IsBordered="true" IsMultipleSelect="true" ShowSearch="true"
-           ShowToolbar="true" ShowExtendButtons="true" ShowSkeleton="true"
+           ShowToolbar="true" ShowExtendButtons="true" ShowSkeleton="true" IsExcel
            OnQueryAsync="@OnQueryAsync" EditMode="EditMode.InCell" ShowToastAfterSaveOrDeleteModel="false"
            OnAddAsync="@OnAddAsync" OnSaveAsync="@OnSaveAsync" OnDeleteAsync="@OnDeleteAsync">
         <TableToolbarTemplate>
@@ -33,42 +30,10 @@
         </TableColumns>
     </Table>
 
-}
-else
-{
-    <div class="row">
-        @for (int i = 0; i < Staffs.Count; i++)
-        {
-            int temp = i;
-            <div class="col-12 col-md-6 col-lg-4 col-xxl-3 mb-3">
-                <div class="card p-3" style="background-color:transparent">
-                    <div class="row">
-                        <div class="col mt-2" style="padding-right:0px;">
-                            <p class="text-truncate text-center" style="font-size:.875rem">
-                                @Staffs[i].PositionOfficial：@Staffs[i].Name
-                            </p>
-                        </div>
-                        <div class="col-12 d-flex" style="justify-content: space-between;">
-                            <Button IsOutline="true" Size="Size.Small" Color="Color.Danger" Icon="fa fa-trash-o" @onclick="@(()=> DeleteStaff(temp))" Text="删除"></Button>
-                            <Button IsOutline="true" Size="Size.Small" Color="Color.Success" Icon="fa fa-pencil" @onclick="@(()=> EditStaff(temp))" Text="编辑" class="ms-1"></Button>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        }
-
-        <div class="mt-2">
-            <Button Color="Color.Primary" IsOutline="true" style="width:100px" @onclick="@(() => AddStaff())" Text="添加" Icon="fa fa-plus"></Button>
-            <Button Color="Color.Success" IsOutline="true" class="ms-2" style="width:100px" @onclick="@(() => OnImportClick(null))" Text="导入" Icon="fa fa-upload"></Button>
-
-        </div>
-    </div>
-}
 
 @code{
-    [Parameter]
-    public List<StaffModel> Staffs { get; set; }
+        [Parameter]
+        public List<StaffModel> Staffs { get; set; }
 
     private IEnumerable<int> PageItemsSource => new int[] { 10, 20, 40, 80, 200, 1000 };
 
@@ -78,107 +43,22 @@ else
 
     Table<StaffModel> StaffsTable;
 
-    #region 获取屏幕大小
 
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime JSRuntime { get; set; }
-
-
-
-    public bool IsSmallScreen { get; set; } = true;
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; }
-
-
-    private JSInterop<StaffEditorChartListTip> Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            Interop = new JSInterop<StaffEditorChartListTip>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
-        }
-    }
-
-
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 1100))
-        {
-            IsSmallScreen = width < 1100;
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 1100 && width < 768))
-        {
-            IsNormalScreen = width >= 1100 && width < 768;
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 768))
-        {
-            IsLargeScreen = width >= 768;
-            StateHasChanged();
-        }
-    }
-    #endregion
     protected override async Task OnInitializedAsync()
     {
 
     }
-    private static Task<StaffModel> OnAddAsync() => Task.FromResult(new StaffModel());
+
+    private Task<StaffModel> OnAddAsync()
+    {
+        var foo = new StaffModel();
+        Staffs.Insert(0, foo);
+
+        return Task.FromResult(foo);
+    }
 
     private async Task<bool> OnSaveAsync(StaffModel item, ItemChangedType type)
     {
-        //检查数据是否合格
-        if (string.IsNullOrWhiteSpace(item.Name))
-        {
-            await PopupService.ToastAsync("唯一名称是必填项目", AlertTypes.Error);
-            return false;
-        }
-        if (string.IsNullOrWhiteSpace(item.PositionOfficial))
-        {
-            await PopupService.ToastAsync("官方职位是必填项目", AlertTypes.Error);
-            return false;
-        }
-        if (item.Id == 0 && Staffs.Any(s => s.Name == item.Name && s.Modifier == item.Modifier &&  s.PositionOfficial ==item.PositionOfficial))
-        {
-            await PopupService.ToastAsync("官方职位和官方称呼必须唯一", AlertTypes.Error);
-            return false;
-        }
-
-        //检查是否重名
-        if (type == ItemChangedType.Add)
-        {
-            if (Staffs.Any(s => s.Name == item.Name && s.Modifier == item.Modifier && s.PositionOfficial == item.PositionOfficial))
-            {
-                await PopupService.ToastAsync("官方职位和官方称呼必须唯一", AlertTypes.Error);
-                return false;
-            }
-        }
-        else
-        {
-            if (Staffs.Where(s => s.Id != item.Id).Any(s => s.Name == item.Name && s.Modifier == item.Modifier && s.PositionOfficial == item.PositionOfficial))
-            {
-                await PopupService.ToastAsync("官方职位和官方称呼必须唯一", AlertTypes.Error);
-                return false;
-            }
-        }
-        // 增加数据演示代码
         if (item.Id == 0)
         {
             if (Staffs.Count == 0)
@@ -189,28 +69,22 @@ else
             {
                 item.Id = Staffs.Max(i => i.Id) + 1;
             }
+        }
 
-            Staffs.Add(item);
-        }
-        else
+
+        if (Staffs.Where(s => s.Id != item.Id).Any(s => s.Name == item.Name && s.Modifier == item.Modifier && s.PositionOfficial == item.PositionOfficial))
         {
-            var oldItem = Staffs.FirstOrDefault(i => i.Id == item.Id);
-            if (oldItem != null)
-            {
-                oldItem.Modifier = item.Modifier;
-                oldItem.CustomName =  item.CustomName;
-                oldItem.PositionOfficial = item.PositionOfficial;
-                oldItem.Name = item.Name;
-                oldItem.PositionGeneral = item.PositionGeneral;
-                oldItem.SubordinateOrganization = item.SubordinateOrganization;
-            }
+            await PopupService.ToastAsync($"已存在【{item.Modifier}{item.PositionOfficial}：{item.Name}】", AlertTypes.Error);
+            return false;
         }
+
+
         return true;
     }
 
     private Task<bool> OnDeleteAsync(IEnumerable<StaffModel> items)
     {
-        items.ToList().ForEach(i => Staffs.Remove(i));
+        Staffs.RemoveAll(i => items.Contains(i));
         return Task.FromResult(true);
     }
 
@@ -291,87 +165,6 @@ else
         });
     }
 
-    [Inject]
-    [NotNull]
-    private DialogService? DialogService { get; set; }
-
-    public async Task DeleteStaff(int i)
-    {
-        Staffs.RemoveAt(i);
-        StateHasChanged();
-        await ToastService.Success("删除成功", "成功删除Staff成员");
-    }
-    public async Task EditStaff(int i)
-    {
-        var items = Utility.GenerateEditorItems<StaffModel>();
-        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
-        //item.Data = Foo.GenerateHobbys(Localizer);
-
-        var option = new EditDialogOption<StaffModel>()
-        {
-            Title = "编辑STAFF",
-            Model = Staffs[i],
-            Items = items,
-            OnCloseAsync = () =>
-            {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
-            OnEditAsync = async context =>
-            {
-                // Trace.Log("保存按钮被点击");
-                var item = (StaffModel)context.Model;
-
-                if (Staffs.Where(s => s.Id != item.Id).Any(s => s.Name == item.Name && s.Modifier == item.Modifier && s.PositionOfficial == item.PositionOfficial))
-                {
-                    await PopupService.ToastAsync("官方职位和官方称呼必须唯一", AlertTypes.Error);
-                    return false;
-                }
-
-                Staffs[i] = item;
-                StateHasChanged();
-                await ToastService.Success("修改成功", "成功修改Staff成员");
-                return true;
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
-    }
-    public async Task AddStaff()
-    {
-        StaffModel model = new StaffModel();
-        var items = Utility.GenerateEditorItems<StaffModel>();
-        // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
-        //item.Data = Foo.GenerateHobbys(Localizer);
-
-        var option = new EditDialogOption<StaffModel>()
-        {
-            Title = "添加STAFF",
-            Model = model,
-            Items = items,
-            OnCloseAsync = () =>
-            {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
-            OnEditAsync = async context =>
-            {
-                // Trace.Log("保存按钮被点击");
-                var item = (StaffModel)context.Model;
-                if (Staffs.Any(s => s.Name == item.Name && s.Modifier == item.Modifier && s.PositionOfficial == item.PositionOfficial))
-                {
-                    await PopupService.ToastAsync("官方职位和官方称呼必须唯一", AlertTypes.Error);
-                    return false;
-                }
-                Staffs.Add(item);
-                StateHasChanged();
-                await ToastService.Success("添加成功", "成功添加Staff成员");
-                return true;
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
-    }
 
     public async Task OnImportClick(IEnumerable<StaffModel> items)
     {
@@ -393,6 +186,7 @@ else
         //检查是否符合要求
         foreach (var item in model)
         {
+            Staffs.Add(item);
             await OnSaveAsync(item, ItemChangedType.Add);
         }
         if (StaffsTable != null)
@@ -401,22 +195,4 @@ else
         }
         StateHasChanged();
     }
-
-
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
-    {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }
