@@ -200,7 +200,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Name = item.Name,
                     Type = item.Type,
                     DisplayName = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName,
-                    MainImage = _appHelper.GetImagePath(item.MainPicture, "app.png", true),
+                    MainImage = _appHelper.GetImagePath(item.MainPicture, "app.png"),
                     BriefIntroduction = item.BriefIntroduction,
                     LastEditTime = item.LastEditTime,
                     ReaderCount = item.ReaderCount,
