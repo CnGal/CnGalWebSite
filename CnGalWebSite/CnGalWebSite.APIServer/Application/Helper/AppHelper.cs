@@ -633,7 +633,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 DisplayName = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName,
                 CreateUserName = item.CreateUser?.UserName,
                 CreateUserId = item.CreateUserId,
-                MainImage = GetImagePath(item.MainPicture, "certificate.png", true),
+                MainImage = GetImagePath(item.MainPicture, "certificate.png"),
                 BriefIntroduction = item.BriefIntroduction,
                 LastEditTime = item.LastEditTime,
                 ReaderCount = item.ReaderCount,
@@ -648,8 +648,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
         {
             //预处理图片
             entry.MainPicture = entry.Type is EntryType.Staff or EntryType.Role
-                ? GetImagePath(entry.Thumbnail, "user.png", true)
-                : GetImagePath(entry.MainPicture, "app.png", true);
+                ? GetImagePath(entry.Thumbnail, "user.png")
+                : GetImagePath(entry.MainPicture, "app.png");
             var model = new EntryInforTipViewModel
             {
                 Id = entry.Id,
@@ -769,7 +769,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 Id = item.Id,
                 Name = item.Name,
-                MainImage = GetImagePath(item.MainPicture, "app.png", true),
+                MainImage = GetImagePath(item.MainPicture, "app.png"),
                 BriefIntroduction = item.BriefIntroduction,
                 LastEditTime = item.LastEditTime,
                 ReaderCount = item.ReaderCount
@@ -779,7 +779,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
         public PeripheryInforTipViewModel GetPeripheryInforTipViewModel(Periphery periphery)
         {
             //预处理图片
-            periphery.MainPicture = GetImagePath(periphery.MainPicture, "app.png", true);
+            periphery.MainPicture = GetImagePath(periphery.MainPicture, "app.png");
 
 
             periphery.BriefIntroduction = GetStringAbbreviation(periphery.BriefIntroduction, 50);

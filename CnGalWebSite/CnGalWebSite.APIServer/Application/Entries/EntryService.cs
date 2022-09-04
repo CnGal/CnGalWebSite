@@ -1159,7 +1159,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 };
 
                 publishTime.DisplayValue = entry.Information.FirstOrDefault(s => s.DisplayName.Contains("发行时间"))?.DisplayValue;
-                publishTime.DisplayValue = entry.Information.FirstOrDefault(s => s.DisplayName.Contains("发行时间备注"))?.DisplayValue;
+                if (string.IsNullOrWhiteSpace(publishTime.DisplayValue))
+                {
+                    publishTime.DisplayValue = entry.Information.FirstOrDefault(s => s.DisplayName.Contains("发行时间备注"))?.DisplayValue;
+                }
 
                 if (string.IsNullOrWhiteSpace(publishTime.DisplayValue) == false)
                 {
