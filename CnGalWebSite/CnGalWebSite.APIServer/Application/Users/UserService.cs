@@ -881,8 +881,8 @@ namespace CnGalWebSite.APIServer.Application.Users
             }
             else
             {
-                userCertification.EntryId = userCertification.EntryId;
-                userCertification.Entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == userCertification.EntryId);
+                userCertification.EntryId = examine.EntryId;
+                userCertification.Entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == examine.EntryId);
             }
 
             userCertification.CertificationTime = DateTime.Now.ToCstTime();
