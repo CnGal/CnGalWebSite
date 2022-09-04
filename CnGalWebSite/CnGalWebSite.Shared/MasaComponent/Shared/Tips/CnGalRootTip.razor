@@ -2,7 +2,7 @@
 @inject IServiceProvider _serviceProvider
 
 <ErrorHandler>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" OnStateChanged="OnStateChanged" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" />
     <ImagesLargeViewTip/>
     <FloatToolTip  @ref="floatToolTip"/>
     <UserLicenseAgreementTip/>
@@ -21,34 +21,11 @@
         CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip styleTip;
         FloatToolTip floatToolTip;
 
-        public async Task ChangeDisplayMode()
-        {
-            if (floatToolTip != null)
-            {
-                await floatToolTip.Refresh();
-            }
-        }
-
         public async Task SaveTheme()
         {
             if (styleTip != null)
             {
                 await styleTip.SaveTheme();
-                styleTip.Refresh();
             }
-        }
-
-
-        public async Task OnStateChanged(bool refreshApp)
-        {
-            if (refreshApp)
-            {
-                await _dataCacheService.RefreshApp.InvokeAsync();
-            }
-            if (floatToolTip != null)
-            {
-                await floatToolTip.Refresh();
-            }
-            StateHasChanged();
         }
     }

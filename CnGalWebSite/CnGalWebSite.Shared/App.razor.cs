@@ -58,12 +58,8 @@ namespace CnGalWebSite.Shared
 
         public async Task OnRefresh()
         {
-            _dataCacheService.OnRefreshRequsted(null);
+            await _dataCacheService.OnRefreshRequsted(null);
             StateHasChanged();
-            if(cngalRootTip!=null)
-            {
-               await cngalRootTip.ChangeDisplayMode();
-            }
         }
 
 

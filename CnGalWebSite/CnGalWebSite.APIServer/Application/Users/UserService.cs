@@ -878,12 +878,10 @@ namespace CnGalWebSite.APIServer.Application.Users
             {
                 userCertification.EntryId = null;
                 userCertification.Entry = null;
-                userCertification.ApplicationUserId = null;
-                userCertification.ApplicationUser = null;
             }
             else
             {
-                userCertification.EntryId = examine.EntryId;
+                userCertification.EntryId = userCertification.EntryId;
                 userCertification.Entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id == userCertification.EntryId);
             }
 

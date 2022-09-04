@@ -18,7 +18,7 @@
 
     public async void RefreshRequsted(object sender, EventArgs args)
     {
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
 
     }
     #region 释放实例

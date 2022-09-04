@@ -407,10 +407,10 @@ namespace CnGalWebSite.Shared.Service
         }
 
 
-        public void OnRefreshRequsted(EventArgs e)
+        public async Task OnRefreshRequsted(EventArgs e)
         {
             EventHandler<EventArgs> handler = RefreshRequsted;
-            handler?.Invoke(this, e);
+            await Task.Run(() => handler?.Invoke(this, e));
         }
 
 

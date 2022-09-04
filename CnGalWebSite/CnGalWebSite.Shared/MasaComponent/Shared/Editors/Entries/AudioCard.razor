@@ -6,6 +6,9 @@
         <thead>
             <tr>
                 <th class="text-left">
+                    缩略图
+                </th>
+                <th class="text-left">
                     名称
                 </th>
                 <th class="text-left">
@@ -23,6 +26,7 @@
             @foreach (var item in Model.Audio.OrderByDescending(s => s.Priority))
             {
                 <tr @key="item.Url">
+                    <td><img src="@(string.IsNullOrWhiteSpace(item.Thumbnail)?"https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/AudioThumbnail.png":item.Thumbnail)" class="h-100 p-1" alt="@item.Name"/></td>
                     <td style="min-width: 100px; ">@item.Name</td>
                     <td style="overflow-wrap: anywhere; min-width: 200px; ">@item.BriefIntroduction</td>
                     <td>

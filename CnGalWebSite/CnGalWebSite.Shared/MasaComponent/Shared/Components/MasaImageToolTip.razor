@@ -1,4 +1,5 @@
 ﻿@inject IDataCacheService _dataCacheService
+@implements IDisposable
 
 <MTooltip Left>
     <ActivatorContent>
@@ -21,7 +22,7 @@
         }
     </ActivatorContent>
     <ChildContent>
-        <img src="@Image" class="pt-3 pb-3"/>
+        <img src="@Image" class="pt-3 pb-3" />
     </ChildContent>
 </MTooltip>
 
@@ -31,4 +32,28 @@
 
     [Parameter]
     public string Image { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        _dataCacheService.RefreshRequsted += RefreshRequsted;
+
+    }
+
+    public async void RefreshRequsted(object sender, EventArgs args)
+    {
+        await InvokeAsync(StateHasChanged);
+
+    }
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }
