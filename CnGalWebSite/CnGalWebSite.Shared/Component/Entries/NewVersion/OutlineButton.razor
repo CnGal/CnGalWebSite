@@ -33,7 +33,7 @@ else
         }
 
 
-        @if (IsShowExistTag)
+        @if (IsShowExistTag&&string.IsNullOrWhiteSpace(Url)==false)
         {
             <i class="fa fa-check-circle fa-fw"></i>
         }
