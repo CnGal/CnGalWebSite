@@ -2960,7 +2960,9 @@ namespace CnGalWebSite.APIServer.Application.Entries
         {
             if (string.IsNullOrWhiteSpace(text) == false)
             {
-                var publishers = text.Replace("，", ",").Replace("、", ",").Split(',');
+                var publishers = text.Replace("，", ",").Replace("、", ",").Split(',').ToList();
+                publishers.RemoveAll(s => string.IsNullOrWhiteSpace(s));
+
                 var publisherEntries = await _entryRepository.GetAll().Where(s => publishers.Contains(s.Name)).ToListAsync();
                 foreach (var publisher in publishers)
                 {

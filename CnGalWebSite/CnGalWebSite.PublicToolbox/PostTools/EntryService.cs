@@ -12,6 +12,7 @@ using CnGalWebSite.DataModel.ViewModel.PostTools;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.Helper.Helper;
 using Microsoft.Extensions.Logging;
+using System.Security.Policy;
 
 namespace CnGalWebSite.PublicToolbox.PostTools
 {
@@ -200,21 +201,10 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                 {
                     temp.Name = model.HostName;
                 }
-                if (string.IsNullOrWhiteSpace(examineModel.Publisher) == false && examineModel.Publisher != model.HostName)
-                {
-                    examineModel.Publisher = examineModel.Publisher.Replace(model.SubName, model.HostName);
 
-                }
-                if (string.IsNullOrWhiteSpace(examineModel.ProductionGroup) == false && examineModel.ProductionGroup != model.HostName)
-                {
-                    examineModel.ProductionGroup = examineModel.ProductionGroup.Replace(model.SubName, model.HostName);
-
-                }
-                if (string.IsNullOrWhiteSpace(examineModel.CV) == false&&examineModel.CV!= model.HostName)
-                {
-                    examineModel.CV = examineModel.CV.Replace(model.SubName, model.HostName);
-
-                }
+                examineModel.Publisher = ReplaceEntryName(examineModel.Publisher, model.SubName, model.HostName);
+                examineModel.ProductionGroup = ReplaceEntryName(examineModel.ProductionGroup, model.SubName, model.HostName);
+                examineModel.CV = ReplaceEntryName(examineModel.CV, model.SubName, model.HostName);
 
                 model.Examines.Add(examineModel);
 
@@ -253,6 +243,38 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             }
         }
 
+        private string ReplaceEntryName(string text, string oldName, string newName)
+        {
+            StringBuilder result = new StringBuilder();
+            if(string.IsNullOrWhiteSpace(text))
+            {
+                return text;
+            }
+
+            var texts= text.Replace("，", ",").Replace("、", ",").Split(',').ToList();
+            texts.RemoveAll(s => string.IsNullOrWhiteSpace(s));
+
+            foreach (var item in texts)
+            {
+                if(result.Length > 0)
+                    {
+                        result.Append(',');
+                    }
+                if (item == oldName)
+                {
+                   
+                    result.Append(newName);
+                }
+                else
+                {
+                    result.Append(item);
+                }
+            }
+
+            return result.ToString();
+          
+        }
+
         private async Task GetMergeEntryId(MergeEntryModel model)
         {
             //获取词条
@@ -276,6 +298,11 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                     "EditRelevancesViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/editrelevances", item as EditRelevancesViewModel),
                     _ => null
                 };
+
+                if(result.StatusCode!= System.Net.HttpStatusCode.OK)
+                {
+                    throw new Exception("服务器网络异常，或代码存在Bug，请联系管理员");
+                }
 
                 var jsonContent = result.Content.ReadAsStringAsync().Result;
                 var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);

@@ -93,6 +93,7 @@
             await PopupService.ToastAsync("你还没有填写合并的词条哦", AlertTypes.Error);
             return;
         }
+        Model.ForEach(s => s.CompleteTaskCount = 0);
         await OnFinshInput.InvokeAsync();
     }
 }
