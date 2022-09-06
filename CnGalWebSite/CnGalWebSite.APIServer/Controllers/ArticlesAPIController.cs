@@ -1325,14 +1325,23 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<GameEvaluationsModel>>> GetGameEvaluationsAsync()
         {
-            var entries = await _entryRepository.GetAll().Include(s => s.Articles).ThenInclude(s => s.CreateUser).AsNoTracking()
+            var entryIds = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Articles.Count(s => s.Type == ArticleType.Evaluation) > 0)
-                .Select(s => new
-                {
-                    s.Id,
-                    s.DisplayName,
-                    Articles = s.Articles.Where(s => s.Type == ArticleType.Evaluation)
-                })
+                .Select(s => s.Id)
+                .ToListAsync();
+
+            entryIds = entryIds.Random().Take(20).ToList();
+
+            var entries = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
+                .Where(s=> entryIds.Contains(s.Id))
+                 .Select(s => new
+                 {
+                     s.Id,
+                     s.DisplayName,
+                     Articles = s.Articles.Where(s => s.Type == ArticleType.Evaluation)
+                 })
                 .ToListAsync();
 
             var model = new List<GameEvaluationsModel>();
@@ -1365,12 +1374,20 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<ArticleInforTipViewModel>>> GetRandomArticlesAsync()
         {
-            var articles = await _articleRepository.GetAll().Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && string.IsNullOrWhiteSpace(s.MainPicture) == false
-            && (s.Type != ArticleType.News && s.Type != ArticleType.Evaluation)).ToListAsync();
-            articles.Random();
+            var articleIds = await _articleRepository.GetAll()
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && string.IsNullOrWhiteSpace(s.MainPicture) == false
+                        && (s.Type != ArticleType.News && s.Type != ArticleType.Evaluation))
+                .Select(s=>s.Id)
+                .ToListAsync();
+
+            articleIds = articleIds.Random().Take(40).ToList();
+
+            var articles = await _articleRepository.GetAll()
+                .Where(s => articleIds.Contains(s.Id))
+                .ToListAsync();
 
             var model = new List<ArticleInforTipViewModel>();
-            foreach (var item in articles.Take(64))
+            foreach (var item in articles)
             {
                 model.Add(_appHelper.GetArticleInforTipViewModel(item));
             }
