@@ -140,7 +140,7 @@ else
         Model = _dataCacheService.CVThematicPageCache.SortType switch
         {
             CVThematicPageSortType.Random => Model.Random(),
-            CVThematicPageSortType.None => Model.OrderByDescending(s => s.LastUploadAudioTime).ToList(),
+            CVThematicPageSortType.None => Model.OrderByDescending(s => s.LastUploadAudioTime).ThenBy(s=>s.Infor.MainImage).ToList(),
             CVThematicPageSortType.ReadCount => Model.OrderByDescending(s => s.Infor.ReaderCount).ToList(),
             CVThematicPageSortType.WorkCount => Model.OrderByDescending(s => s.WorkCount).ToList(),
             CVThematicPageSortType.RecentlyPublish => Model.OrderByDescending(s => s.LastPublishTime).ToList(),
