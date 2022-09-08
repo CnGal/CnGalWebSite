@@ -2,10 +2,10 @@
 @implements IDisposable
 
 
-@if (TotalPages > 1)
+@if (Length > 1)
 {
 
-    <MPagination Value="@Value" Class="my-4" Length="@TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+    <MPagination Value="@Value" Class="my-4" Length="@Length" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
 }
 @code {
     [Parameter]
