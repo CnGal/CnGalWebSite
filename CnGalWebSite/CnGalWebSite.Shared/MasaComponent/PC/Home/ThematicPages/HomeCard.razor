@@ -3,54 +3,57 @@
 @inject HttpClient Http
 
 
-@if (_dataCacheService.CVThematicPageCache != null)
-{
-    <div class="row">
-        @if (_dataCacheService.CVThematicPageCache.News.Any() && _dataCacheService.IsApp == false)
-        {
-            <div class="@("col-12 mb-4 "+(_dataCacheService.CVThematicPageCache.Carousels.Any()?"col-lg-5":""))">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.NewsCard Model="_dataCacheService.CVThematicPageCache.News" />
+<div>
+    @if (_dataCacheService.CVThematicPageCache != null)
+    {
+        <div class="row">
+            @if (_dataCacheService.CVThematicPageCache.News.Any() && _dataCacheService.IsApp == false)
+            {
+                <div class="@("col-12 mb-4 "+(_dataCacheService.CVThematicPageCache.Carousels.Any()?"col-lg-5":""))">
+                    <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.NewsCard Model="_dataCacheService.CVThematicPageCache.News" />
 
+                </div>
+            }
+            @if (_dataCacheService.CVThematicPageCache.Carousels.Any())
+            {
+                <div class="@("col-12 mb-4 "+(_dataCacheService.CVThematicPageCache.News.Any()&&_dataCacheService.IsApp==false?"col-lg-7":""))">
+                    <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.CarouselCard Model="_dataCacheService.CVThematicPageCache.Carousels" />
+                </div>
+            }
+            <div class="col-12">
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.TagsCard Model="_dataCacheService.CVThematicPageCache" OnChanged="()=>OnChanged()" />
             </div>
-        }
-        @if (_dataCacheService.CVThematicPageCache.Carousels.Any())
-        {
-            <div class="@("col-12 mb-4 "+(_dataCacheService.CVThematicPageCache.News.Any()&&_dataCacheService.IsApp==false?"col-lg-7":""))">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.CarouselCard Model="_dataCacheService.CVThematicPageCache.Carousels" />
+            <div class="col-12">
+                <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.SearchCard OnChanged="()=>OnChanged()" />
             </div>
-        }
-        <div class="col-12">
-            <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.TagsCard Model="_dataCacheService.CVThematicPageCache" OnChanged="()=>OnChanged()" />
+
+            @foreach (var item in Model.Skip((_dataCacheService.CVThematicPageCache.CurrentPage - 1) * MaxCount).Take(MaxCount))
+            {
+
+                <div class="col-4 col-lg-3 col-xxl-2 mb-4">
+                    <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.CVInforCard Model="item" />
+                </div>
+            }
+
+
         </div>
-        <div class="col-12">
-            <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.SearchCard OnChanged="()=>OnChanged()" />
-        </div>
-
-        @foreach (var item in Model.Skip((_dataCacheService.CVThematicPageCache.CurrentPage - 1) * MaxCount).Take(MaxCount))
-        {
-
-            <div class="col-4 col-lg-3 col-xxl-2 mb-4">
-                <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.CVInforCard Model="item" />
-            </div>
-        }
-
-
         @if (TotalPages > 1)
         {
-            <div class="col-12">
-                <MPagination Value="@_dataCacheService.CVThematicPageCache.CurrentPage" Class="my-4" Length="@TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
 
-            </div>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.CVThematicPageCache.CurrentPage" Length="@TotalPages" ValueChanged="OnPageClick" />
+
+
         }
 
-    </div>
-}
-else
-{
-    <div style="height:300px">
-        <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
-    </div>
-}
+    }
+    else
+    {
+        <div style="height:300px">
+            <CnGalWebSite.Shared.AppComponent.Normal.Loading.LoadingTip Height="100%" />
+        </div>
+    }
+
+</div>
 
 
 @code {
@@ -131,7 +134,7 @@ else
         }
 
         //搜索
-        if(string.IsNullOrWhiteSpace(_dataCacheService.CVThematicPageCache.SearchString)==false)
+        if (string.IsNullOrWhiteSpace(_dataCacheService.CVThematicPageCache.SearchString) == false)
         {
             Model.RemoveAll(s => s.Infor.Name.ToUpper().Contains(_dataCacheService.CVThematicPageCache.SearchString.ToUpper()) == false && _dataCacheService.CVThematicPageCache.SearchString.ToUpper().Contains(s.Infor.Name.ToUpper()) == false);
         }
@@ -140,7 +143,7 @@ else
         Model = _dataCacheService.CVThematicPageCache.SortType switch
         {
             CVThematicPageSortType.Random => Model.Random(),
-            CVThematicPageSortType.None => Model.OrderByDescending(s => s.LastUploadAudioTime).ThenBy(s=>s.Infor.MainImage).ToList(),
+            CVThematicPageSortType.None => Model.OrderByDescending(s => s.LastUploadAudioTime).ThenBy(s => s.Infor.MainImage).ToList(),
             CVThematicPageSortType.ReadCount => Model.OrderByDescending(s => s.Infor.ReaderCount).ToList(),
             CVThematicPageSortType.WorkCount => Model.OrderByDescending(s => s.WorkCount).ToList(),
             CVThematicPageSortType.RecentlyPublish => Model.OrderByDescending(s => s.LastPublishTime).ToList(),

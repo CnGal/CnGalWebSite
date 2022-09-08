@@ -1,0 +1,46 @@
+﻿@inject IDataCacheService _dataCacheService
+@implements IDisposable
+
+
+@if (TotalPages > 1)
+{
+
+    <MPagination Value="@Value" Class="my-4" Length="@TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+}
+@code {
+    [Parameter]
+    public int Length { get; set; }
+    [Parameter]
+    public int Value { get; set; }
+    [Parameter]
+    public EventCallback<int> ValueChanged { get; set; }
+
+    private async Task OnPageClick(int pageIndex)
+    {
+        await ValueChanged.InvokeAsync(pageIndex);
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        _dataCacheService.RefreshRequsted += RefreshRequsted;
+
+    }
+
+    public async void RefreshRequsted(object sender, EventArgs args)
+    {
+        await InvokeAsync(StateHasChanged);
+
+    }
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

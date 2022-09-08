@@ -1,22 +1,20 @@
-﻿<MCarousel Cycle Height="@("inherit")"
-           HideDelimiterBackground
-           Interval="4000"
-           HideDelimiters="HideDelimiters"
-           ShowArrowsOnHover>
-    @foreach(var item in Model.OrderByDescending(s=>s.Priority))
-    {
-        
-        <MCarouselItem>
-            <MResponsive AspectRatio="AspectRatio">
-                <a href="@item.Link" target="_blank" style="width: 100%;" @onclick="@(()=>OnClick.InvokeAsync(item))">
-                    <img src="@item.Image" alt="@item.Note" style="width: 100%;" />
-                </a>
-            </MResponsive>
-        </MCarouselItem>
-    }
+﻿
+<MResponsive AspectRatio="AspectRatio">
+    <MCarousel Cycle Height="@("inherit")"
+               HideDelimiterBackground
+               Interval="4000"
+               HideDelimiters="HideDelimiters"
+               ShowArrowsOnHover>
+        @foreach (var item in Model.OrderByDescending(s => s.Priority))
+        {
 
-</MCarousel>
+            <MCarouselItem Src="@item.Image" Href="@item.Link">
 
+            </MCarouselItem>
+        }
+
+    </MCarousel>
+</MResponsive>
 @code {
     [Parameter]
     public List<CarouselViewModel> Model { get; set; }
