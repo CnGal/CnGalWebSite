@@ -69,7 +69,7 @@
 
                 @if (DataModel.pagedResultDto.TotalPages > 1)
                 {
-                        <MPagination Value="@DataModel.pagedResultDto.CurrentPage" Class="my-4" Length="@DataModel.pagedResultDto.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" ></MPagination>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@DataModel.pagedResultDto.CurrentPage" Length="@DataModel.pagedResultDto.TotalPages" ValueChanged="OnPageClick"/>
 
                 }
 

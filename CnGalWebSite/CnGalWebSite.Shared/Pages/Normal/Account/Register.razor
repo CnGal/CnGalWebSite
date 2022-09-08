@@ -123,6 +123,7 @@
             if (result.Successful)
             {
                 _dataCacheService.UserName = Model.Name;
+                _dataCacheService.UserEmail = Model.Email;
                 NavigationManager.NavigateTo("/account/ConfirmEmailRegister/" + ReturnUrl);
             }
             else

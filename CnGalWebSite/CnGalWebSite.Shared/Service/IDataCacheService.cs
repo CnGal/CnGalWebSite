@@ -59,6 +59,8 @@ namespace CnGalWebSite.Shared.Service
 
         string UserName { get; set; }
 
+        string UserEmail { get; set; }
+
         bool IsOnThirdPartyLogin { get; set; }
 
         UserAuthenticationTypeModel UserAuthenticationTypeModel { get; set; }

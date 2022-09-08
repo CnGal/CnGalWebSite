@@ -93,6 +93,10 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public string UserName { get; set; } = string.Empty;
         /// <summary>
+                                                             /// 历史用户临时储存电子邮箱
+                                                             /// </summary>
+        public string UserEmail { get; set; } = string.Empty;
+        /// <summary>
         /// 是否正在使用第三方登入
         /// </summary>
         public bool IsOnThirdPartyLogin { get; set; } = true;
