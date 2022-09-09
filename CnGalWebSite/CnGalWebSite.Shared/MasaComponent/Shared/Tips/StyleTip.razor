@@ -23,11 +23,11 @@
             color: white;
         }
     </style>
-    @if(_dataCacheService.IsApp)
+    @if (_dataCacheService.IsApp)
     {
         <style>
             .bg-opacity {
-            background-color: transparent;
+                background-color: transparent;
             }
         </style>
     }
@@ -36,8 +36,8 @@ else
 {
     <!-- <link rel="stylesheet" href="//app.cngal.org/_content/CnGalWebSite.Shared/editor.md/css/editormd.min.css" media="none" onload="this.media='all'" />
     -->
-    <link rel="stylesheet" href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/github-markdown-css/4.0.0/github-markdown.min.css"  />
-    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/styles/atom-one-light.min.css"  />
+    <link rel="stylesheet" href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/github-markdown-css/4.0.0/github-markdown.min.css" />
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/highlight.js/10.6.0/styles/atom-one-light.min.css" />
     <link rel="stylesheet" href="https://app.cngal.org/_content/CnGalWebSite.Shared/css/Lighting-mode.min.css" />
 
     <style>
@@ -45,6 +45,7 @@ else
             margin-right: 20px;
             box-shadow: 0 0.5rem 1rem rgb(255, 255, 255, 15%) !important;
         }
+
         .m-application a {
             color: var(--main-color);
         }
@@ -57,16 +58,15 @@ else
             .bg-opacity {
                 background-color: rgba(255, 255, 255, 0.7) !important;
             }
-
         </style>
 
     }
     else
     {
         <style>
-                #web_bg {
-                    display: none;
-                }
+            #web_bg {
+                display: none;
+            }
         </style>
     }
 }
@@ -89,7 +89,7 @@ else
     public bool isDark = false;
     public bool isTransparent = true;
 
-    public string colorMain ;
+    public string colorMain;
     public string colorHover;
     public string colorActive;
     public string theme;
@@ -102,7 +102,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if(DateTime.Now.ToCstTime().Day==1&& DateTime.Now.ToCstTime().Month==4)
+        if (DateTime.Now.ToCstTime().Day == 1 && DateTime.Now.ToCstTime().Month == 4)
         {
             DefaultTheme = "green";
         }
@@ -301,7 +301,7 @@ else
 
         ProcColor(_dataCacheService.ThemeSetting.Theme);
 
-        if (theme != _dataCacheService.ThemeSetting.Theme|| isDark != _dataCacheService.ThemeSetting.IsDark || isTransparent != _dataCacheService.ThemeSetting.IsTransparent)
+        if (theme != _dataCacheService.ThemeSetting.Theme || isDark != _dataCacheService.ThemeSetting.IsDark || isTransparent != _dataCacheService.ThemeSetting.IsTransparent)
         {
             await _dataCacheService.ThemeChanged.InvokeAsync(colorMain);
             await _dataCacheService.RefreshApp.InvokeAsync();

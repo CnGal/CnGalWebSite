@@ -3,6 +3,9 @@ using CnGalWebSite.DataModel.Application.Examines;
 using CnGalWebSite.DataModel.Application.Helper;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
 using CnGalWebSite.Maui.Services;
+using CnGalWebSite.PublicToolbox.DataRepositories;
+using CnGalWebSite.PublicToolbox.PostTools;
+using CnGalWebSite.Shared.DataRepositories;
 using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -47,6 +50,19 @@ namespace CnGalWebSite.Maui
             builder.Services.AddScoped<IAppHelper, AppHelper>();
             builder.Services.AddScoped(x => new ExamineService());
             builder.Services.AddScoped(x => new ImagesLargeViewService());
+
+            //添加工具箱
+            builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            builder.Services.AddScoped<IEntryService, EntryService>();
+            builder.Services.AddScoped<IArticleService, ArticleService>();
+            builder.Services.AddScoped<IImageService, ImageService>();
+            //services.AddScoped<IEventBase, EventBase>();
+
+            //添加预渲染状态记录
+            builder.Services.AddScoped<IApplicationStateService, ApplicationStateService>();
+
+            //添加结构化数据
+            builder.Services.AddScoped<IStructuredDataService, StructuredDataService>();
 
             //MASA组件库
             builder.Services.AddMasaBlazor();
