@@ -77,8 +77,8 @@
     {
         try
         {
-            GameRecords = await _dataCacheService.UserGameRecordDataCatche.GetCatche(UserId);
-            SteamUserInfors = await _dataCacheService.UserSteamInforDataCatche.GetCatche(UserId);
+            GameRecords = await _dataCacheService.UserGameRecordDataCatche.GetCache(UserId);
+            SteamUserInfors = await _dataCacheService.UserSteamInforDataCatche.GetCache(UserId);
             isReady = true;
         }
         catch (Exception ex)

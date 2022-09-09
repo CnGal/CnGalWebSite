@@ -243,8 +243,8 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
             }
             catch { }
 
-            var fs = new FileStream(path, FileMode.Create, FileAccess.ReadWrite); //可以指定盘符，也可以指定任意文件名，还可以为word等文件
-            var sw = new StreamWriter(fs); // 创建写入流
+            using var fs = new FileStream(path, FileMode.Create, FileAccess.ReadWrite); //可以指定盘符，也可以指定任意文件名，还可以为word等文件
+            using var sw = new StreamWriter(fs); // 创建写入流
 
             //获取词条名称和id 文章id
             var entryIds = await _entryRepository.GetAll().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();

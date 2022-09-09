@@ -136,7 +136,7 @@ else
             isReady = false;
             StateHasChanged();
             //获取标签信息
-            Model = await _dataCatcheService.TagIndexPageCatche.GetCatche(Id);
+            Model = await _dataCatcheService.TagIndexPageCatche.GetCache(Id);
             //判断标签名称是否为空 为空则跳转到主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {

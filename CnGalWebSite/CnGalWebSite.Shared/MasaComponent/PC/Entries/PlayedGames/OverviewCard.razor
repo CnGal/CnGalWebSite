@@ -98,7 +98,7 @@
     {
         try
         {
-            Model = await _dataCacheService.PlayedGameOverviewDataCatche.GetCatche(Id.ToString(), true);
+            Model = await _dataCacheService.PlayedGameOverviewDataCatche.GetCache(Id.ToString());
             Model.UserScores.Random();
             isReady = true;
             StateHasChanged();

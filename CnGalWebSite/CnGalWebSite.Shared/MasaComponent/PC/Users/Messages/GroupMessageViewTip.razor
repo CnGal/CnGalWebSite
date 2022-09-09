@@ -14,7 +14,7 @@ else
 
     @if (TotalPages > 1)
     {
-        <MPagination Value="@CurrentPage" Class="my-4" Length="@TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@CurrentPage"  Length="@TotalPages" ValueChanged="OnPageClick"/>
     }
 }
 

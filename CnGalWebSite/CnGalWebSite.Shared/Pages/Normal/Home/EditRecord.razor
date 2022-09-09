@@ -237,7 +237,7 @@ else
     {
         try
         {
-            ExaminesOverview = await _dataCatcheService.ExaminesOverviewCatche.GetCatche(ContrastId.ToString(), true);
+            ExaminesOverview = await _dataCatcheService.ExaminesOverviewCatche.GetCache(ContrastId.ToString());
 
             await OnRefreshContrastView(ContrastId.ToString(), CurrentId.ToString());
 
@@ -283,25 +283,25 @@ else
             StateHasChanged();
             if (ExaminesOverview.Type == ExaminedNormalListModelType.Entry)
             {
-                EntryContrast = await _dataCatcheService.EntryContrastEditRecordViewCatche.GetCatche(conId + "/" + (curId=="0"?ExaminesOverview.Examines.Last().Id: curId), true);
+                EntryContrast = await _dataCatcheService.EntryContrastEditRecordViewCatche.GetCache(conId + "/" + (curId=="0"?ExaminesOverview.Examines.Last().Id: curId));
                 ContrastId = EntryContrast.ContrastId;
                 CurrentId = EntryContrast.CurrentId;
             }
             else if (ExaminesOverview.Type == ExaminedNormalListModelType.Article)
             {
-                ArticleContrast = await _dataCatcheService.ArticleContrastEditRecordViewCatche.GetCatche(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId), true);
+                ArticleContrast = await _dataCatcheService.ArticleContrastEditRecordViewCatche.GetCache(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId));
                 ContrastId = ArticleContrast.ContrastId;
                 CurrentId = ArticleContrast.CurrentId;
             }
             else if (ExaminesOverview.Type == ExaminedNormalListModelType.Periphery)
             {
-                PeripheryContrast = await _dataCatcheService.PeripheryContrastEditRecordViewCatche.GetCatche(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId), true);
+                PeripheryContrast = await _dataCatcheService.PeripheryContrastEditRecordViewCatche.GetCache(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId));
                 ContrastId = PeripheryContrast.ContrastId;
                 CurrentId = PeripheryContrast.CurrentId;
             }
             else if (ExaminesOverview.Type == ExaminedNormalListModelType.Tag)
             {
-                TagContrast = await _dataCatcheService.TagContrastEditRecordViewCatche.GetCatche(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId), true);
+                TagContrast = await _dataCatcheService.TagContrastEditRecordViewCatche.GetCache(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId));
                 ContrastId = TagContrast.ContrastId;
                 CurrentId = TagContrast.CurrentId;
             }

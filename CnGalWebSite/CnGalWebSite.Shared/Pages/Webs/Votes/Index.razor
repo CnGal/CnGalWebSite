@@ -172,7 +172,7 @@ else
 
 
             //获取周边信息
-            Model = await _dataCatcheService.VoteIndexPageCatche.GetCatche(Id);
+            Model = await _dataCatcheService.VoteIndexPageCatche.GetCache(Id);
             //判断投票名称是否为空 为空则跳转到主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {
@@ -202,7 +202,8 @@ else
 
     public async Task OnVoted()
     {
-        Model = await _dataCatcheService.VoteIndexPageCatche.GetCatche(Id, false);
+        _dataCatcheService.VoteIndexPageCatche.Clean(Id);
+        Model = await _dataCatcheService.VoteIndexPageCatche.GetCache(Id);
         StateHasChanged();
     }
     public async Task OnReVoted()

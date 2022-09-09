@@ -124,7 +124,7 @@
             {
                 Date = new DateOnly(Year, Month, 1);
             }
-            Model = await _dataCacheService.PublishGameTimesDataCatche.GetCatche($"?year={Year}&month={Month}");
+            Model = await _dataCacheService.PublishGameTimesDataCatche.GetCache($"?year={Year}&month={Month}");
 
             isReady = true;
 

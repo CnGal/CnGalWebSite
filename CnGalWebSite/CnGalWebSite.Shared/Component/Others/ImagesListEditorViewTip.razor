@@ -14,25 +14,24 @@
 @if (Model.Count != 0)
 {
     <div class="row mt-3">
-        @for (int i = 0; i < Model.Count; i++)
+        @foreach (var item in Model.OrderByDescending(s=>s.Priority))
         {
-            int temp = i;
             <div class="col-12 col-md-6 col-xl-4 col-xxl-3 col mb-3">
                 <div class="card ps-3 pt-2 pb-2 pe-3 h-100" style="background-color:transparent">
                     <div class="h-100">
                         <div>
-                            <img src="@Model[i].Image" class="card-img" alt="...">
+                            <img src="@item.Image" class="card-img" alt="...">
                         </div>
                         <div class=" mt-2">
                             <p class="text-center" style="font-size: medium; word-break: break-word; ">
-                                @(Model[i].Note??"")
+                                @(item.Note??"")
                             </p>
                         </div>
 
                     </div>
                     <div style="display: flex; justify-content: space-between;">
-                        <Button Color="Color.Success" IsOutline="true" Size="Size.Small" Icon="fa fa-pencil" Text="编辑" ButtonType="ButtonType.Button" @onclick="@(()=> EditImage(temp))"></Button>
-                        <Button Color="Color.Danger" IsOutline="true" Size="Size.Small" Icon="fa fa-trash-o" Text="删除" ButtonType="ButtonType.Button" @onclick="@(()=> DeleteImage(temp))"></Button>
+                        <Button Color="Color.Success" IsOutline="true" Size="Size.Small" Icon="fa fa-pencil" Text="编辑" ButtonType="ButtonType.Button" @onclick="@(()=> EditImage(item))"></Button>
+                        <Button Color="Color.Danger" IsOutline="true" Size="Size.Small" Icon="fa fa-trash-o" Text="删除" ButtonType="ButtonType.Button" @onclick="@(()=> DeleteImage(item))"></Button>
                     </div>
                 </div>
             </div>
@@ -49,13 +48,13 @@
     [NotNull]
     private DialogService? DialogService { get; set; }
 
-    public async Task DeleteImage(int i)
+    public async Task DeleteImage(TValue model)
     {
-        Model.RemoveAt(i);
+        Model.Remove(model);
         StateHasChanged();
         await ToastService.Success("删除成功", "成功删除图片");
     }
-    public async Task EditImage(int i)
+    public async Task EditImage(TValue model)
     {
         var items = Utility.GenerateEditorItems<TValue>();
         // var item = items.First(i => i.GetFieldName() == nameof(Foo.Hobby));
@@ -64,7 +63,7 @@
         var option = new EditDialogOption<TValue>()
         {
             Title = "编辑图片",
-            Model = Model[i],
+            Model = model,
             Items = items,
             OnCloseAsync = () =>
             {
@@ -74,7 +73,8 @@
             OnEditAsync = async context =>
             {
                 // Trace.Log("保存按钮被点击");
-                Model[i] = (TValue)context.Model;
+                Model.Remove(model);
+                Model.Add((TValue)context.Model);
                 StateHasChanged();
                 await ToastService.Success("修改成功", "成功修改图片");
                 return true;

@@ -181,7 +181,7 @@ else
             isReady = false;
             isNotFound = true;
 
-            Model = await _dataCatcheService.VoteIndexPageCatche.GetCatche(Id, true);
+            Model = await _dataCatcheService.VoteIndexPageCatche.GetCache(Id);
 
             //判断如果名称为空则返回主页
             if (string.IsNullOrWhiteSpace(Model.Name))
@@ -208,7 +208,7 @@ else
 
     public async Task OnVoted()
     {
-        Model = await _dataCatcheService.VoteIndexPageCatche.GetCatche(Id, false);
+        Model = await _dataCatcheService.VoteIndexPageCatche.GetCache(Id);
         StateHasChanged();
     }
     public Task OnReVoted()

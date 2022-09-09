@@ -111,10 +111,10 @@ else
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
-    public bool IsAdmin { get; set; } = false;
-    public bool CanDeleted { get; set; } = false;
+
     string LastLookName = "";
     bool isFrist = true;
+    bool CanDeleted;
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
@@ -150,7 +150,7 @@ else
             isReady = false;
             isNotFound = false;
             //获取文章信息
-            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCatche(Id);
+            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache(Id);
             //判断文章名称是否为空 为空则跳转到主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {
@@ -164,17 +164,16 @@ else
             var user = userState.User;
             if (user.Identity.Name == Model.UserInfor.Name)
             {
-                CurrentUserRank = "作者";
+                Model.Authority = true;
                 CanDeleted = true;
             }
             if (user.IsInRole("Editor"))
             {
-                IsAdmin = true;
-                CanDeleted = true;
+                Model.Authority = true;
             }
 
             //生成轮播结构数据
-           await  GenerateCarouselStructuredDataJson();
+            await  GenerateCarouselStructuredDataJson();
 
         }
         catch (Exception exc)

@@ -412,7 +412,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             foreach (var item in examines)
             {
-                if (item.Operation == Operation.EstablishMain)
+                if (item.EntryId!=null&& item.EntryId != 0)
                 {
                     var infor = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == item.EntryId.Value);
                     await _entryService.UpdateEntryDataAsync(infor, item);
@@ -427,7 +427,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Type = ExaminedNormalListModelType.Entry
                     });
                 }
-                else if (item.Operation == Operation.EditArticleMain)
+                else if (item.ArticleId != null && item.ArticleId != 0)
                 {
                     var infor = await _articleRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == item.ArticleId.Value);
                     await _articleService.UpdateArticleData(infor, item);
@@ -441,7 +441,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Type = ExaminedNormalListModelType.Article
                     });
                 }
-                else if (item.Operation == Operation.EditTagMain)
+                else if (item.TagId != null && item.TagId != 0)
                 {
                     var infor = await _tagRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == item.TagId.Value);
                     await _tagService.UpdateTagDataAsync(infor, item);
@@ -455,7 +455,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Type = ExaminedNormalListModelType.Tag
                     });
                 }
-                else if (item.Operation == Operation.EditPeripheryMain)
+                else if (item.PeripheryId != null && item.PeripheryId != 0)
                 {
                     var infor = await _peripheryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == item.PeripheryId.Value);
                     await _peripheryService.UpdatePeripheryDataAsync(infor, item);
@@ -828,7 +828,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 model.Pictures.Add(new PicturesAloneViewModel
                 {
                     Url = item.Url,
-                    Note = item.Note
+                    Note = item.Note,
+                    Priority = item.Priority,
                 });
             }
 
@@ -2351,7 +2352,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 model.Pictures.Add(new PicturesAloneViewModel
                 {
                     Url = item.Url,
-                    Note = item.Note
+                    Note = item.Note,
+                    Priority = item.Priority,
                 });
             }
 

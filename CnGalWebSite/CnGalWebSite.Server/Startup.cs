@@ -71,6 +71,8 @@ namespace CnGalWebSite.Server
             services.AddScoped<IImageService, ImageService>();
             //services.AddScoped<IEventBase, EventBase>();
 
+            //添加预渲染状态记录
+ services.AddScoped<IApplicationStateService, ApplicationStateService>();
             //添加真实IP
             services.Configure<ForwardedHeadersOptions>(options =>
             {

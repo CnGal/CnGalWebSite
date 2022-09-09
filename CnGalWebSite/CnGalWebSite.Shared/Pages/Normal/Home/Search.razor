@@ -130,7 +130,7 @@
                 try
                 {
                     var url = ToolHelper.WebApiPath + "api/home/search" + NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Replace("search", "");
-                    DataModel = await _dataCacheService.SearchViewCatche.GetCatche(url);
+                    DataModel = await _dataCacheService.SearchViewCatche.GetCache(url);
 
                 }
                 catch (Exception ex)

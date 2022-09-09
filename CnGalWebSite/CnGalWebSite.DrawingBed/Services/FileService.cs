@@ -340,8 +340,7 @@ namespace CnGalWebSite.DrawingBed.Services
             {
                 stmMemory.Write(buffer, 0, i);
             }
-            byte[] fileBytes;
-            fileBytes = stmMemory.ToArray();//文件流Byte
+
             using var fs = new FileStream(destinationPath, FileMode.OpenOrCreate);
             stmMemory.WriteTo(fs);
         }

@@ -144,14 +144,25 @@ namespace CnGalWebSite.APIServer.Application.Examines
             };
         }
 
+        /// <summary>
+        /// 用于保存审核记录时检查权限
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="user"></param>
+        /// <param name="allowEditor"></param>
+        /// <returns></returns>
         public async Task<bool> CheckUserExaminePermission(object entry,ApplicationUser user,  bool allowEditor = true)
         {
             var adminRole = allowEditor ? "Editor" : "Admin";
             var isAdmin = await _userManager.IsInRoleAsync(user, adminRole);
 
-            if (isAdmin == false && entry is Entry && allowEditor)
+            if (isAdmin == false  && allowEditor)
             {
-                if (await _userCertificationRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.EntryId != null && s.EntryId == (entry as Entry).Id))
+                if (entry is Entry && await _userCertificationRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.EntryId != null && s.EntryId == (entry as Entry).Id))
+                {
+                    isAdmin = true;
+                }
+                else if (entry is ApplicationUser && await _userCertificationRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.EntryId != null))
                 {
                     isAdmin = true;
                 }
@@ -160,17 +171,30 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return isAdmin;
         }
 
+        /// <summary>
+        /// 用于获取审核记录视图时检查权限
+        /// </summary>
+        /// <param name="examine"></param>
+        /// <param name="user"></param>
+        /// <param name="allowEditor"></param>
+        /// <returns></returns>
         public async Task<bool> CheckUserExaminePermission(Examine examine, ApplicationUser user, bool allowEditor = true)
         {
             var adminRole = allowEditor ? "Editor" : "Admin";
             var isAdmin = await _userManager.IsInRoleAsync(user, adminRole);
 
-            if (isAdmin == false && examine.EntryId!=null && allowEditor)
+            if (isAdmin == false && allowEditor)
             {
-                if (await _userCertificationRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.EntryId != null && s.EntryId == examine.EntryId))
+                //当前词条为对应认证词条
+                if (examine.EntryId != null && await _userCertificationRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.EntryId != null && s.EntryId == examine.EntryId))
+                {
+                    isAdmin = true;
+                }//当前用户为认证用户且编辑自身资料
+                else if (await _userCertificationRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.EntryId != null) && (examine.Operation == Operation.UserMainPage || examine.Operation == Operation.EditUserMain))
                 {
                     isAdmin = true;
                 }
+
             }
 
             return isAdmin;
@@ -178,7 +202,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         public async Task SaveAndApplyEditRecord(object entry, ApplicationUser user, object examineData, Operation operation,  string note, bool isCreating = false, bool allowEditor = true)
         {
-            //判断是否是管理员
+            //判断是否有权限直接编辑
             var isAdmin = await CheckUserExaminePermission(entry,user,allowEditor);
 
             //添加审核记录

@@ -24,7 +24,7 @@
         try
         {
 
-            Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView", true);
+            Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCache(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView");
 
             Images = Carousels.OrderByDescending(s => s.Priority).Take(3).ToList();
             if (Carousels.Count >= 6)

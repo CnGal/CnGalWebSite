@@ -4,7 +4,7 @@
 
 
 <MTimeline Class="ms-2 me-2" Dense="_dataCacheService.IsApp||Model.Count<3">
-    @foreach (var item in Model.OrderByDescending(s => s.ApplyTime))
+    @foreach (var item in Model.Where(s=>s.IsPassed==true).OrderByDescending(s => s.ApplyTime))
     {
         <MTimelineItem Large>
             <IconContent>

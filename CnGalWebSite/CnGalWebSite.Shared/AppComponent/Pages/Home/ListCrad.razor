@@ -28,7 +28,7 @@
 
 @code {
     [Parameter]
-    public List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel> Items { get; set; } = new List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>();
+    public List<MainImageCardModel> Items { get; set; } = new List<MainImageCardModel>();
     [Parameter]
     public string Title { get; set; }
     [Parameter]
@@ -37,20 +37,25 @@
     public string API { get; set; }
     [Parameter]
     public string Icon { get; set; }
-    [Parameter]
-    public string Type { get; set; }
 
     [Parameter]
     public int MaxCount { get; set; } = 6;
 
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        Items = await GetHomeCards(API, Type, false) ?? new List<Normal.Cards.MainImageCardModel>();
+        try
+        {
+            //获取主页信息
+            Items = await _dataCacheService.HomeListCardsCache.GetCache(API);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取主页词条列表失败");
+        }
 
-    }
-
-    private async Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>>GetHomeCards(string apiUrl, string type, bool isRefresh)
-    {
-        return await _dataCacheService.GetHomePageListCardMode(apiUrl, type, MaxCount, isRefresh);
     }
 }
