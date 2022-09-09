@@ -218,7 +218,10 @@ namespace CnGalWebSite.Shared.Service
         /// 游戏发售时间列表缓存
         /// </summary>
         public IPageModelCatche<List<EntryInforTipViewModel>> PublishGameTimesDataCatche { get; set; }
-
+        /// <summary>
+        /// 主页缓存
+        /// </summary>
+        public IPageModelCatche<List<MainImageCardModel>> HomeListCardsCache { get; set; }
         /// <summary>
         /// 用户待审核对象列表缓存
         /// </summary>
@@ -304,10 +307,7 @@ namespace CnGalWebSite.Shared.Service
         /// CV专题页缓存
         /// </summary>
         public CVThematicPageViewModel CVThematicPageCache { get; set; }
-        /// <summary>
-        /// 主页缓存
-        /// </summary>
-        public List<KeyValuePair<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>, string>> HomeListCards { get; set; } = new List<KeyValuePair<List<AppComponent.Normal.Cards.MainImageCardModel>, string>>();
+
         /// <summary>
         /// 搜索页面缓存
         /// </summary>
@@ -335,81 +335,39 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<FavoriteFoldersViewModel> userFavoriteFoldersDataCatche,
         IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> userFavoriteObjectsDataCatche,
         IPageModelCatche<PlayedGameOverviewModel> playedGameOverviewDataCatche,
-        IPageModelCatche<List<EntryInforTipViewModel>> publishGameTimesDataCatche)
+        IPageModelCatche<List<EntryInforTipViewModel>> publishGameTimesDataCatche,
+        IPageModelCatche<List<MainImageCardModel>> homeListCardsCache)
         {
             _httpClient = httpClient;
-            (EntryIndexPageCatche = entryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/entries/GetEntryView/");
-            (ArticleIndexPageCatche = articleIndexPageCatche).Init(ToolHelper.WebApiPath + "api/articles/GetArticleView/");
-            (PeripheryIndexPageCatche = peripheryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/peripheries/GetPeripheryView/");
-            (VoteIndexPageCatche = voteIndexPageCatche).Init(ToolHelper.WebApiPath + "api/votes/GetVoteView/");
-            (LotteryIndexPageCatche = lotteryIndexPageCatche).Init(ToolHelper.WebApiPath + "api/lotteries/GetLotteryView/");
-            (TagIndexPageCatche = tagIndexPageCatche).Init(ToolHelper.WebApiPath + "api/tags/gettag/");
-            (ExaminesOverviewCatche = examinesOverviewCatche).Init(ToolHelper.WebApiPath + "api/examines/GetExaminesOverview/");
-            (EntryContrastEditRecordViewCatche = entryContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/entries/GetContrastEditRecordViews/");
-            (ArticleContrastEditRecordViewCatche = articleContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/articles/GetContrastEditRecordViews/");
-            (PeripheryContrastEditRecordViewCatche = peripheryContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/peripheries/GetContrastEditRecordViews/");
-            (TagContrastEditRecordViewCatche = tagContrastEditRecordViewCatche).Init(ToolHelper.WebApiPath + "api/tags/GetContrastEditRecordViews/");
-            (PlayedGameOverviewDataCatche = playedGameOverviewDataCatche).Init(ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameOverview/");
-            (CommentDataCatche = commentDataCatche).Init(ToolHelper.WebApiPath + "api/comments/GetComments/");
-            (PersonalSpaceDataCatche = personalSpaceDataCatche).Init(ToolHelper.WebApiPath + "api/space/getuserview/");
-            (UserGameRecordDataCatche = userGameRecordDataCatche).Init(ToolHelper.WebApiPath + "api/playedgame/GetUserGameRecords/");
-            (UserSteamInforDataCatche = userSteamInforDataCatche).Init(ToolHelper.WebApiPath + "api/steam/GetUserSteamInfor/");
-            (UserArticleListDataCatche = userArticleListDataCatche).Init(ToolHelper.WebApiPath + "api/space/GetUserArticles/");
-            (UserExaminesDataCatche = userExaminesDataCatche).Init(ToolHelper.WebApiPath + "api/space/GetUserEditRecord");
-            (UserFavoriteFoldersDataCatche = userFavoriteFoldersDataCatche).Init(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/");
-            (UserFavoriteObjectsDataCatche = userFavoriteObjectsDataCatche).Init(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteObjectList");
-            (PublishGameTimesDataCatche = publishGameTimesDataCatche).Init(ToolHelper.WebApiPath + "api/entries/GetPublishGamesByTime");
+            (EntryIndexPageCatche = entryIndexPageCatche).Init(nameof(EntryIndexPageCatche), ToolHelper.WebApiPath + "api/entries/GetEntryView/");
+            (ArticleIndexPageCatche = articleIndexPageCatche).Init(nameof(ArticleIndexPageCatche), ToolHelper.WebApiPath + "api/articles/GetArticleView/");
+            (PeripheryIndexPageCatche = peripheryIndexPageCatche).Init(nameof(PeripheryIndexPageCatche), ToolHelper.WebApiPath + "api/peripheries/GetPeripheryView/");
+            (VoteIndexPageCatche = voteIndexPageCatche).Init(nameof(VoteIndexPageCatche), ToolHelper.WebApiPath + "api/votes/GetVoteView/");
+            (LotteryIndexPageCatche = lotteryIndexPageCatche).Init(nameof(LotteryIndexPageCatche), ToolHelper.WebApiPath + "api/lotteries/GetLotteryView/");
+            (TagIndexPageCatche = tagIndexPageCatche).Init(nameof(TagIndexPageCatche), ToolHelper.WebApiPath + "api/tags/gettag/");
+            (ExaminesOverviewCatche = examinesOverviewCatche).Init(nameof(ExaminesOverviewCatche), ToolHelper.WebApiPath + "api/examines/GetExaminesOverview/");
+            (EntryContrastEditRecordViewCatche = entryContrastEditRecordViewCatche).Init(nameof(EntryContrastEditRecordViewCatche), ToolHelper.WebApiPath + "api/entries/GetContrastEditRecordViews/");
+            (ArticleContrastEditRecordViewCatche = articleContrastEditRecordViewCatche).Init(nameof(ArticleContrastEditRecordViewCatche), ToolHelper.WebApiPath + "api/articles/GetContrastEditRecordViews/");
+            (PeripheryContrastEditRecordViewCatche = peripheryContrastEditRecordViewCatche).Init(nameof(PeripheryContrastEditRecordViewCatche), ToolHelper.WebApiPath + "api/peripheries/GetContrastEditRecordViews/");
+            (TagContrastEditRecordViewCatche = tagContrastEditRecordViewCatche).Init(nameof(TagContrastEditRecordViewCatche), ToolHelper.WebApiPath + "api/tags/GetContrastEditRecordViews/");
+            (PlayedGameOverviewDataCatche = playedGameOverviewDataCatche).Init(nameof(PlayedGameOverviewDataCatche), ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameOverview/");
+            (CommentDataCatche = commentDataCatche).Init(nameof(CommentDataCatche), ToolHelper.WebApiPath + "api/comments/GetComments/");
+            (PersonalSpaceDataCatche = personalSpaceDataCatche).Init(nameof(PersonalSpaceDataCatche), ToolHelper.WebApiPath + "api/space/getuserview/");
+            (UserGameRecordDataCatche = userGameRecordDataCatche).Init(nameof(UserGameRecordDataCatche), ToolHelper.WebApiPath + "api/playedgame/GetUserGameRecords/");
+            (UserSteamInforDataCatche = userSteamInforDataCatche).Init(nameof(UserSteamInforDataCatche), ToolHelper.WebApiPath + "api/steam/GetUserSteamInfor/");
+            (UserArticleListDataCatche = userArticleListDataCatche).Init(nameof(UserArticleListDataCatche), ToolHelper.WebApiPath + "api/space/GetUserArticles/");
+            (UserExaminesDataCatche = userExaminesDataCatche).Init(nameof(UserExaminesDataCatche), ToolHelper.WebApiPath + "api/space/GetUserEditRecord");
+            (UserFavoriteFoldersDataCatche = userFavoriteFoldersDataCatche).Init(nameof(UserFavoriteFoldersDataCatche), ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/");
+            (UserFavoriteObjectsDataCatche = userFavoriteObjectsDataCatche).Init(nameof(UserFavoriteObjectsDataCatche), ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteObjectList");
+            (PublishGameTimesDataCatche = publishGameTimesDataCatche).Init(nameof(PublishGameTimesDataCatche), ToolHelper.WebApiPath + "api/entries/GetPublishGamesByTime");
+            (HomeListCardsCache = homeListCardsCache).Init(nameof(HomeListCardsCache), ToolHelper.WebApiPath);
 
-            (LineChartDataCatche = lineChartDataCatche).Init("");
-            HomePageNewsCatche = homePageNewsCatche;
-            HomePageCarouselsCatche = homePageCarouselsCatche;
-            SearchViewCatche = searchViewCatche;
+            (LineChartDataCatche = lineChartDataCatche).Init(nameof(LineChartDataCatche), "");
+            (HomePageNewsCatche = homePageNewsCatche).Init(nameof(HomePageNewsCatche), "");
+            (HomePageCarouselsCatche = homePageCarouselsCatche).Init(nameof(HomePageCarouselsCatche), "");
+            (SearchViewCatche = searchViewCatche).Init(nameof(SearchViewCatche), "");
             _navigationManager = navigationManager;
         }
-
-        public async Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>> GetHomePageListCardMode(string apiUrl, string type, int maxCount, bool isRefresh)
-        {
-            //查找是否存在缓存
-            if (isRefresh == false)
-            {
-                var model = HomeListCards.FirstOrDefault(s => s.Value == apiUrl);
-                if (model.Key != null)
-                {
-                    return model.Key;
-                }
-            }
-            else
-            {
-                HomeListCards.RemoveAll(s => s.Value == apiUrl);
-            }
-
-            //获取新数据
-            var items = new List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>();
-            try
-            {
-                var model = await _httpClient.GetFromJsonAsync<List<EntryHomeAloneViewModel>>(ToolHelper.WebApiPath + apiUrl);
-                //转换数据
-                foreach (var item in model.Take(maxCount))
-                {
-                    items.Add(new AppComponent.Normal.Cards.MainImageCardModel
-                    {
-                        CommentCount = item.CommentCount,
-                        Image = item.Image,
-                        Name = item.DisPlayName,
-                        ReadCount = item.ReadCount,
-                        Url = string.IsNullOrWhiteSpace(type) ? item.DisPlayValue : (_navigationManager.BaseUri+type + "/index/" + item.Id),
-                        IsOutlink= string.IsNullOrWhiteSpace(type)
-                    });
-                }
-                HomeListCards.Add(new KeyValuePair<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>, string>(items, apiUrl));
-                return items;
-            }
-            catch (Exception)
-            {
-                return new List<AppComponent.Normal.Cards.MainImageCardModel>();
-            }
-        }
-
 
         public async Task OnRefreshRequsted(EventArgs e)
         {

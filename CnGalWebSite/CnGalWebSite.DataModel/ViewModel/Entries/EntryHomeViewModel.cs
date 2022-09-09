@@ -3,26 +3,35 @@ namespace CnGalWebSite.DataModel.ViewModel
 {
     public class EntryHomeViewModel
     {
-        public List<EntryHomeAloneViewModel> Games { get; set; } = new List<EntryHomeAloneViewModel>();
-        public List<EntryHomeAloneViewModel> Groups { get; set; } = new List<EntryHomeAloneViewModel>();
-        public List<EntryHomeAloneViewModel> Roles { get; set; } = new List<EntryHomeAloneViewModel>();
-        public List<EntryHomeAloneViewModel> Staffs { get; set; } = new List<EntryHomeAloneViewModel>();
+        public List<MainImageCardModel> Games { get; set; } = new List<MainImageCardModel>();
+        public List<MainImageCardModel> Groups { get; set; } = new List<MainImageCardModel>();
+        public List<MainImageCardModel> Roles { get; set; } = new List<MainImageCardModel>();
+        public List<MainImageCardModel> Staffs { get; set; } = new List<MainImageCardModel>();
     }
-    public class EntryHomeAloneViewModel
+    public class MainImageCardModel
     {
-        public string Image { get; set; }
-
-        public string DisPlayName { get; set; }
-
+        public long Id { get; set; }
         /// <summary>
-        /// 目前 只用于友情链接的Link
+        /// 名称
         /// </summary>
-        public string DisPlayValue { get; set; }
-
+        public string Name { get; set; }
+        /// <summary>
+        /// 主图
+        /// </summary>
+        public string Image { get; set; }
+        /// <summary>
+        /// 跳转链接
+        /// </summary>
+        public string Url { get; set; }
+        /// <summary>
+        /// 阅读数
+        /// </summary>
         public int ReadCount { get; set; }
-
+        /// <summary>
+        /// 评论数
+        /// </summary>
         public int CommentCount { get; set; }
 
-        public long Id { get; set; }
+        public bool IsOutlink { get; set; }
     }
 }

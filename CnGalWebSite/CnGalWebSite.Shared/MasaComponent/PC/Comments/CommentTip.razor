@@ -70,7 +70,7 @@
     {
         try
         {
-            Model = await _dataCacheService.CommentDataCatche.GetCatche((int)Type + "/" + ObjectId);
+            Model = await _dataCacheService.CommentDataCatche.GetCache((int)Type + "/" + ObjectId);
             StateHasChanged();
         }
         catch (Exception ex)

@@ -63,7 +63,7 @@ else
         {
             isReady = false;
             //获取文章信息
-            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCatche(Id.ToString(),true);
+            Model = await _dataCatcheService.ArticleIndexPageCatche.GetCache(Id.ToString());
            
             isReady = true;
             StateHasChanged();

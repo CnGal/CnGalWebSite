@@ -123,7 +123,7 @@
             }
 
 
-            Model = await _dataCacheService.LineChartDataCatche.GetCatche(BaseUrl + $"?Type={Type}&AfterTime={Model.AfterTime.ToBinary()}&BeforeTime={Model.BeforeTime.ToBinary()}", true);
+            Model = await _dataCacheService.LineChartDataCatche.GetCache(BaseUrl + $"?Type={Type}&AfterTime={Model.AfterTime.ToBinary()}&BeforeTime={Model.BeforeTime.ToBinary()}");
 
             if (Stacked)
             {

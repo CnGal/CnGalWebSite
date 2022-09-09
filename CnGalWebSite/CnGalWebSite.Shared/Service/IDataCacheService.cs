@@ -127,6 +127,7 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
 
+        IPageModelCatche<List<MainImageCardModel>> HomeListCardsCache { get; set; }
 
         UserPendingDataCacheModel UserPendingDataCatche { get; set; }
 
@@ -164,9 +165,6 @@ namespace CnGalWebSite.Shared.Service
         SpaceViewCacheModel SpaceViewCache { get; set; }
 
         CVThematicPageViewModel CVThematicPageCache { get; set; }
-
-
-        Task<List<CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCardModel>> GetHomePageListCardMode(string apiUrl, string type, int maxCount, bool isRefresh);
 
         void RefreshAllCatche();
 

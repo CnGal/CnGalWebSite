@@ -187,6 +187,8 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string Note { get; set; }
         [Display(Name = "链接")]
         public string Url { get; set; }
+        [Display(Name = "优先级")]
+        public int Priority { get; set; }
     }
 
     public enum EditState

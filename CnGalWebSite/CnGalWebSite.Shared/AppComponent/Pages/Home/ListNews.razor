@@ -38,7 +38,7 @@
 
             try
             {
-                var model =await _dataCacheService.HomePageNewsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeNewsView",true);
+                var model =await _dataCacheService.HomePageNewsCatche.GetCache(ToolHelper.WebApiPath + "api/home/GetHomeNewsView");
 
                 foreach (var item in model.Take(3))
                 {

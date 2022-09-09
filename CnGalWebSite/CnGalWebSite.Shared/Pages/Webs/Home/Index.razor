@@ -55,7 +55,7 @@
         {
 
 
-            Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView", true);
+            Carousels = await _dataCacheService.HomePageCarouselsCatche.GetCache(ToolHelper.WebApiPath + "api/home/GetHomeCarouselsView");
 
             Images = Carousels.OrderByDescending(s => s.Priority).Take(3).ToList();
             if (Carousels.Count >= 6)
@@ -82,12 +82,12 @@
     public async Task GenerateCarouselStructuredDataJson()
     {
         var urls = new List<string>();
-        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeRecentIssuelGameView", "entries", 12, false)).Select(s => s.Url));
-        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeNewestGameView", "entries", 12, false)).Select(s => s.Url));
-        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeRecentEditView", "entries", 12, false)).Select(s => s.Url));
-        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeNoticesView", "articles", 12, false)).Select(s => s.Url));
-        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeArticlesView", "articles", 12, false)).Select(s => s.Url));
-        urls.AddRange((await _dataCacheService.GetHomePageListCardMode("api/home/GetHomeNewsView", "articles", 12, false)).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.HomeListCardsCache.GetCache("api/home/GetHomeRecentIssuelGameView")).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.HomeListCardsCache.GetCache("api/home/GetHomeNewestGameView")).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.HomeListCardsCache.GetCache("api/home/GetHomeRecentEditView")).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.HomeListCardsCache.GetCache("api/home/GetHomeNoticesView")).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.HomeListCardsCache.GetCache("api/home/GetHomeArticlesView")).Select(s => s.Url));
+        urls.AddRange((await _dataCacheService.HomeListCardsCache.GetCache("api/home/GetHomeNewsView")).Select(s => s.Url));
         await _structuredDataService.SetStructuredData(urls);
 
     }

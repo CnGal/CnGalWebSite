@@ -51,7 +51,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<EntryHomeAloneViewModel>>> GetHomeNewestGameViewAsync()
+        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeNewestGameViewAsync()
         {
             return await _homeService.GetHomeNewestGameViewAsync();
         }
@@ -60,7 +60,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<EntryHomeAloneViewModel>>> GetHomeRecentEditViewAsync()
+        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeRecentEditViewAsync()
         {
             return await _homeService.GetHomeRecentEditViewAsync();
 
@@ -70,19 +70,9 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<EntryHomeAloneViewModel>>> GetHomeRecentIssuelGameViewAsync()
+        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeRecentIssuelGameViewAsync()
         {
             return await _homeService.GetHomeRecentIssuelGameViewAsync();
-
-        }
-        /// <summary>
-        /// 获取 优先级最高的游戏或制作组
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<List<EntryHomeAloneViewModel>>> GetHomeFriendEntriesViewAsync()
-        {
-            return await _homeService.GetHomeFriendEntriesViewAsync();
 
         }
 
@@ -91,7 +81,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<EntryHomeAloneViewModel>>> GetHomeFriendLinksViewAsync()
+        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeFriendLinksViewAsync()
         {
             return await _homeService.GetHomeFriendLinksViewAsync();
 
@@ -102,7 +92,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<EntryHomeAloneViewModel>>> GetHomeNoticesViewAsync()
+        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeNoticesViewAsync()
         {
             return await _homeService.GetHomeNoticesViewAsync();
 
@@ -112,7 +102,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<EntryHomeAloneViewModel>>> GetHomeArticlesViewAsync()
+        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeArticlesViewAsync()
         {
             return await _homeService.GetHomeArticlesViewAsync();
 

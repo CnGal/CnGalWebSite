@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
+
 namespace CnGalWebSite.DataModel.ExamineModel
 {
     public class EntryImages
@@ -13,6 +16,8 @@ namespace CnGalWebSite.DataModel.ExamineModel
         public string Note { get; set; }
 
         public string Modifier { get; set; }
+
+        public int Priority { get; set; }
 
         public bool IsDelete { get; set; }
     }

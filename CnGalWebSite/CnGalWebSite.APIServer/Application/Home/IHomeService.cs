@@ -11,41 +11,34 @@ namespace CnGalWebSite.APIServer.Application.Home
         /// 获取即将发售游戏
         /// </summary>
         /// <returns></returns>
-        Task<List<EntryHomeAloneViewModel>> GetHomeNewestGameViewAsync();
+        Task<List<MainImageCardModel>> GetHomeNewestGameViewAsync();
         /// <summary>
         /// 获取近期编辑的游戏或制作组
         /// </summary>
         /// <returns></returns>
-        Task<List<EntryHomeAloneViewModel>> GetHomeRecentEditViewAsync();
+        Task<List<MainImageCardModel>> GetHomeRecentEditViewAsync();
 
         /// <summary>
         /// 获取近期发售的游戏
         /// </summary>
         /// <returns></returns>
-        Task<List<EntryHomeAloneViewModel>> GetHomeRecentIssuelGameViewAsync();
-        /// <summary>
-        /// 获取 优先级最高的游戏或制作组
-        /// </summary>
-        /// <returns></returns>
-        Task<List<EntryHomeAloneViewModel>> GetHomeFriendEntriesViewAsync();
-
-
+        Task<List<MainImageCardModel>> GetHomeRecentIssuelGameViewAsync();
         /// <summary>
         /// 获取友情链接 
         /// </summary>
         /// <returns></returns>
-        Task<List<EntryHomeAloneViewModel>> GetHomeFriendLinksViewAsync();
+        Task<List<MainImageCardModel>> GetHomeFriendLinksViewAsync();
 
         /// <summary>
         /// 获取通知
         /// </summary>
         /// <returns></returns>
-        Task<List<EntryHomeAloneViewModel>> GetHomeNoticesViewAsync();
+        Task<List<MainImageCardModel>> GetHomeNoticesViewAsync();
         /// <summary>
         /// 获取最近发布的文章
         /// </summary>
         /// <returns></returns>
-        Task<List<EntryHomeAloneViewModel>> GetHomeArticlesViewAsync();
+        Task<List<MainImageCardModel>> GetHomeArticlesViewAsync();
 
         /// <summary>
         /// 获取轮播图

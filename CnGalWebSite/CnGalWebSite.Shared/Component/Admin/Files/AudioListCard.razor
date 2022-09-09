@@ -64,7 +64,7 @@
     </MSimpleTable>
     @if (Model.TotalPages > 1)
     {
-        <MPagination Value="@Model.CurrentPage" Class="my-4" Length="@Model.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@Model.CurrentPage"  Length="@Model.TotalPages" ValueChanged="OnPageClick" />
     }
 }
 else

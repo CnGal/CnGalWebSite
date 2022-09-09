@@ -408,7 +408,7 @@ else
             isReady = false;
             isNotFound = false;
             //获取词条信息
-            EntryView = await _dataCatcheService.EntryIndexPageCatche.GetCatche(Id);
+            EntryView = await _dataCatcheService.EntryIndexPageCatche.GetCache(Id);
             //判断如果名称为空则返回主页
             if (string.IsNullOrWhiteSpace(EntryView.Name))
             {

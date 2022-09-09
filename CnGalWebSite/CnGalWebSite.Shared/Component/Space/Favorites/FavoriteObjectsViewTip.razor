@@ -37,7 +37,7 @@
 
 @if (pagedResultDto.TotalPages > 1)
 {
-    <MPagination Value="@pagedResultDto.CurrentPage" Class="my-4" Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme" TotalVisible="7"></MPagination>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@pagedResultDto.CurrentPage"  Length="@pagedResultDto.TotalPages" ValueChanged="OnPageClick"/>
 }
 @if (pagedResultDto.Data.Count == 0&&isReady)
 {
@@ -80,7 +80,7 @@
         _dataCacheService.SpaceViewCache.FavoriteObjectsCurrentPage = pageIndex;
         try
         {
-            pagedResultDto = await _dataCacheService.UserFavoriteObjectsDataCatche.GetCatche($"?maxResultCount={10}&currentPage={pageIndex}&folderId={Id}");
+            pagedResultDto = await _dataCacheService.UserFavoriteObjectsDataCatche.GetCache($"?maxResultCount={10}&currentPage={pageIndex}&folderId={Id}");
             StateHasChanged();
         }
         catch (Exception ex)

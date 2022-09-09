@@ -7,7 +7,7 @@
 <div @onclick="OnClickNews" style="cursor:pointer;">
     <div class="@(Model.IsNeedLayout?"rounded shadow-sm p-2 bg-opacity":"")" style="cursor: pointer;display:flex; ">
         <div style="display: flex;align-items: center;">
-            <img class="shadow-sm" src="@Model.Image" style="height: 50px;width: 50px;border-radius: 50%;" />
+            <img class="shadow-sm" src="@Model.Image" alt="@Model.Title" style="height: 50px;width: 50px;border-radius: 50%;" />
         </div>
         <div class="comment-tx-div" style=" flex: 1 1 auto; width: 0;">
             <div class="new-row-warp no-margin">

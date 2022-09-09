@@ -512,6 +512,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         {
                             pic.Modifier = item.Modifier;
                             pic.Note = item.Note;
+                            pic.Priority = item.Priority;
                         }
                         isAdd = true;
                         break;
@@ -523,7 +524,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     {
                         Url = item.Url,
                         Note = item.Note,
-                        Modifier = item.Modifier
+                        Modifier = item.Modifier,
+                        Priority = item.Priority
                     });
                 }
             }
@@ -1157,11 +1159,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     DisplayName = "发行时间"
                 };
+                publishTime.DisplayValue = entry.Information.FirstOrDefault(s => s.DisplayName.Contains("发行时间备注"))?.DisplayValue;
 
-                publishTime.DisplayValue = entry.Information.FirstOrDefault(s => s.DisplayName.Contains("发行时间"))?.DisplayValue;
                 if (string.IsNullOrWhiteSpace(publishTime.DisplayValue))
                 {
-                    publishTime.DisplayValue = entry.Information.FirstOrDefault(s => s.DisplayName.Contains("发行时间备注"))?.DisplayValue;
+                    publishTime.DisplayValue = entry.Information.FirstOrDefault(s => s.DisplayName.Contains("发行时间"))?.DisplayValue;
                 }
 
                 if (string.IsNullOrWhiteSpace(publishTime.DisplayValue) == false)
@@ -1183,7 +1185,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     {
                         basic.Informations.Add(publishTime);
                     }
-                    
+
 
                 }
             }
@@ -1306,7 +1308,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             //读取词条信息
             var pictures = new List<EntryPicture>();
-            foreach (var item in entry.Pictures)
+            foreach (var item in entry.Pictures.OrderByDescending(s=>s.Priority))
             {
                 pictures.Add(new EntryPicture
                 {
@@ -1688,6 +1690,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     Url = item.Url,
                     Note = item.Note,
+                    Priority = item.Priority,
                     Modifier = item.Modifier,
                     IsDelete = true
                 });
@@ -1700,11 +1703,12 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     if (item.Url == infor.Url)
                     {
-                        if (item.Note != infor.Note || item.Modifier != infor.Modifier)
+                        if (item.Note != infor.Note || item.Modifier != infor.Modifier || item.Priority != infor.Priority)
                         {
                             item.Modifier = infor.Modifier;
                             item.IsDelete = false;
                             item.Note = infor.Note;
+                            item.Priority = infor.Priority;
                         }
                         else
                         {
@@ -1721,6 +1725,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     {
                         Url = infor.Url,
                         Modifier = infor.Modifier,
+                        Priority = infor.Priority,
                         Note = infor.Note,
                         IsDelete = false
                     });
@@ -2415,7 +2420,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     Image = _appHelper.GetImagePath(item.Url, ""),
                     Modifier = item.Modifier,
-                    Note = item.Note
+                    Note = item.Note,
+                    Priority = item.Priority,
                 });
             }
 
@@ -2813,7 +2819,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     Url = item.Image,
                     Modifier = item.Modifier,
-                    Note = item.Note
+                    Note = item.Note,
+                    Priority = item.Priority,
                 });
 
             }

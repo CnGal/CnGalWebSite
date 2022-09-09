@@ -1,11 +1,9 @@
 ﻿@inject HttpClient Http
-@inject ExamineService _examineService
-@inject ToastService? ToastService
-@inject ILocalStorageService _localStorage
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
+@inject IApplicationStateService _applicationStateService
+
 
 @if (string.IsNullOrWhiteSpace(Model.BasicInfor.Name) == false)
 {
@@ -289,13 +287,14 @@ else
 
             var userState = await authenticationStateTask;
             var user = userState.User;
-            if (string.IsNullOrWhiteSpace(id) && user.Identity.IsAuthenticated == false)
-            {
-                return;
-            }
 
             //获取用户基本信息
-            Model =await _dataCacheService.PersonalSpaceDataCatche.GetCatche(Id);
+            Model =await _dataCacheService.PersonalSpaceDataCatche.GetCache(Id);
+
+            if (_applicationStateService.InPreRendered)
+            {
+                _dataCacheService.PersonalSpaceDataCatche.Clean(Id);
+            }
 
             if (Model.IsCurrentUser)
             {
@@ -307,10 +306,7 @@ else
                 IsAdmin = true;
                 CanDeleted = true;
             }
-            //Id = Model.Id;
 
-            //复制用户Id
-            PlayedGameInput.FilterText = Model.Id;
 
             isReady = true;
             StateHasChanged();
@@ -327,14 +323,8 @@ else
 
     private async Task EditMainPage()
     {
-        try
-        {
-            NavigationManager.NavigateTo(Provider, "/space/editmainpage/" + Model.Id, "编辑主页", "fa fa-pencil");
-        }
-        catch
-        {
-            await ToastService.Error("跳转到编辑页面失败", "可未知错误，请在确保网络正常后联系开发人员");
-        }
+        NavigationManager.NavigateTo("/space/editmainpage/" + Model.Id);
+
     }
 
     public Task TabValueChanged(StringNumber index)

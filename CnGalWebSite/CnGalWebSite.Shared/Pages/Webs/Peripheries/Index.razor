@@ -170,7 +170,7 @@ else
             isReady = false;
             isNotFound = false;
             //获取周边信息
-            Model = await _dataCatcheService.PeripheryIndexPageCatche.GetCatche(Id);
+            Model = await _dataCatcheService.PeripheryIndexPageCatche.GetCache(Id);
             //判断周边名称是否为空 为空则跳转到主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {

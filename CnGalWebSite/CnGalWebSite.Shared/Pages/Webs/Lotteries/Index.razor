@@ -187,7 +187,7 @@ else
 
 
             //获取周边信息
-            Model = await _dataCacheService.LotteryIndexPageCatche.GetCatche(Id);
+            Model = await _dataCacheService.LotteryIndexPageCatche.GetCache(Id);
             //判断投票名称是否为空 为空则跳转到主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {

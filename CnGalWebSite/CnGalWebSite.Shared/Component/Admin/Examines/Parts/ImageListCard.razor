@@ -2,7 +2,7 @@
 @inject IDataCacheService _dataCatcheService
 
 <div class="row">
-    @foreach (var item in Model)
+    @foreach (var item in Model.OrderByDescending(s=>s.Priority))
     {
         <div class="col-12 col-lg-6 pb-4 pointer" @onclick="()=>OnClickImage(Model.IndexOf(item))">
             <ImageCard Model="item" />

@@ -22,9 +22,9 @@ namespace CnGalWebSite.Shared
         [CascadingParameter]
         private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnParametersSetAsync()
         {
-            await base.OnInitializedAsync();
+            await base.OnParametersSetAsync();
 
             I18n.SetCulture(System.Globalization.CultureInfo.GetCultureInfo("zh-CN"));//将语言切换成zh-CN
 
@@ -59,13 +59,16 @@ namespace CnGalWebSite.Shared
         public async Task OnRefresh()
         {
             await _dataCacheService.OnRefreshRequsted(null);
-            StateHasChanged();
+            //StateHasChanged();
         }
 
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
+
+            //已经结束预渲染
+            _applicationStateService.InPreRendered = false;
 
             if (firstRender && (OperatingSystem.IsBrowser() || ToolHelper.IsMaui))
             {

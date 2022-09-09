@@ -31,7 +31,7 @@
 
         @if (_dataCacheService.UserPendingDataCatche.TotalPages > 1)
         {
-            <MPagination Value="@_dataCacheService.UserPendingDataCatche.CurrentPage" Class="my-4" Length="@_dataCacheService.UserPendingDataCatche.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.UserPendingDataCatche.CurrentPage" Length="@_dataCacheService.UserPendingDataCatche.TotalPages" ValueChanged="OnPageClick"/>
         }
 
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>

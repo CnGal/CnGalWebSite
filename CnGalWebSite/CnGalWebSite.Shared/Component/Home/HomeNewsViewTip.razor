@@ -39,7 +39,7 @@
 
         try
         {
-            Items = await _dataCacheService.HomePageNewsCatche.GetCatche(ToolHelper.WebApiPath + "api/home/GetHomeNewsView", true);
+            Items = await _dataCacheService.HomePageNewsCatche.GetCache(ToolHelper.WebApiPath + "api/home/GetHomeNewsView");
 
             StateHasChanged();
         }

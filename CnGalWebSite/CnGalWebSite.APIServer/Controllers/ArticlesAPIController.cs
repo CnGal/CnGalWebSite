@@ -1018,76 +1018,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             return await _articleRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Name).ToArrayAsync();
         }
-        /// <summary>
-        /// 获取随机词条列表 
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("{type}")]
-        [AllowAnonymous]
-        public async Task<ActionResult<List<EntryHomeAloneViewModel>>> GetRandomArticleListViewAsync(ArticleType type)
-        {
-            var model = new List<EntryHomeAloneViewModel>();
-            var length = await _articleRepository.GetAll().AsNoTracking().Where(s => s.Type == type && s.IsHidden != true && s.Name != null && s.Name != "").CountAsync();
-            var length_1 = 12;
-            List<Article> groups;
-            if (length > length_1)
-            {
-                var random = new Random();
-                var temp = random.Next(0, length - length_1);
 
-                groups = await _articleRepository.GetAll().AsNoTracking().Where(s => s.Type == type && s.IsHidden != true && s.Name != null && s.Name != "").Skip(temp).Take(length_1).ToListAsync();
-            }
-            else
-            {
-                groups = await _articleRepository.GetAll().AsNoTracking().Where(s => s.Type == type && s.IsHidden != true && s.Name != null && s.Name != "").Take(length_1).ToListAsync();
-            }
-            foreach (var item in groups)
-            {
-                model.Add(new EntryHomeAloneViewModel
-                {
-                    Id = item.Id,
-                    Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png"),
-                    DisPlayName = item.DisplayName ?? item.Name,
-                    CommentCount = item.CommentCount,
-                    ReadCount = item.ReaderCount,
-                    //DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
-                });
-            }
-            return model;
-        }
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<ActionResult<List<EntryHomeAloneViewModel>>> GetRandomArticleListViewAsync()
-        {
-            var model = new List<EntryHomeAloneViewModel>();
-            var length = await _articleRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && s.Name != null && s.Name != "").CountAsync();
-            var length_1 = 12;
-            List<Article> groups;
-            if (length > length_1)
-            {
-                var random = new Random();
-                var temp = random.Next(0, length - length_1);
 
-                groups = await _articleRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && s.Name != null && s.Name != "").Skip(temp).Take(length_1).ToListAsync();
-            }
-            else
-            {
-                groups = await _articleRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && s.Name != null && s.Name != "").Take(length_1).ToListAsync();
-            }
-            foreach (var item in groups)
-            {
-                model.Add(new EntryHomeAloneViewModel
-                {
-                    Id = item.Id,
-                    Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png"),
-                    DisPlayName = item.DisplayName ?? item.Name,
-                    CommentCount = item.CommentCount,
-                    ReadCount = item.ReaderCount,
-                    //DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
-                });
-            }
-            return model;
-        }
         /// <summary>
         /// 获取所有文章名称ID对
         /// </summary>

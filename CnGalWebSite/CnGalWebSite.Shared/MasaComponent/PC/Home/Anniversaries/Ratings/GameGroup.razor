@@ -30,7 +30,7 @@
 
 @if (_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages > 1)
 {
-    <MPagination Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage" Class="my-4" Length="@_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages" ValueChanged="OnPageClick" Color="@_dataCacheService.ThemeSetting.Theme"></MPagination>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage" Length="@_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages" ValueChanged="OnPageClick"/>
 }
 
 @if (Items.Any() == false && isReady)
@@ -149,7 +149,7 @@
         {
             try
             {
-                var temp = await _dataCacheService.PlayedGameOverviewDataCatche.GetCatche(model.Id.ToString(), true);
+                var temp = await _dataCacheService.PlayedGameOverviewDataCatche.GetCache(model.Id.ToString());
                 temp.UserScores.Random();
                 await overviewDialog.Refresh(true, temp);
             }

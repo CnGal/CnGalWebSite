@@ -9,6 +9,7 @@ using CnGalWebSite.Shared.DataRepositories;
 using CnGalWebSite.Shared.MasaComponent.Shared.Tips;
 using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -63,6 +64,9 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.AddScoped<IEntryService, EntryService>();
             builder.Services.AddScoped<IArticleService, ArticleService>();
             builder.Services.AddScoped<IImageService, ImageService>();
+            //添加预渲染状态记录
+            builder.Services.AddScoped<IApplicationStateService, ApplicationStateService>();
+
             //添加结构化数据
             builder.Services.AddScoped<IStructuredDataService, StructuredDataService>();
             builder.RootComponents.Add<StructuredDataTip>("head::after");

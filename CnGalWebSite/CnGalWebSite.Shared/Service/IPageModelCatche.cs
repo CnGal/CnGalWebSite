@@ -1,12 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace CnGalWebSite.Shared.Service
 {
     public interface IPageModelCatche<TModel> where TModel : class
     {
-        void Init(string baseUrl, bool useNewtonsoft = false);
+        void Init(string name, string baseUrl, bool useNewtonsoft = false);
 
-        Task<TModel> GetCatche(string apiUrl, bool noRefresh = true);
+        Task<TModel> GetCache(string apiUrl);
 
         void Clean(string apiUrl);
 

@@ -37,9 +37,9 @@ namespace CnGalWebSite.APIServer.Application.Home
             _articleService = articleService;
         }
 
-        public async Task<List<EntryHomeAloneViewModel>> GetHomeNewestGameViewAsync()
+        public async Task<List<MainImageCardModel>> GetHomeNewestGameViewAsync()
         {
-            var model = new List<EntryHomeAloneViewModel>();
+            var model = new List<MainImageCardModel>();
             var dateTime = DateTime.Now.ToCstTime();
             //获取即将发售
             var entry_result1 = await _entryRepository.GetAll().AsNoTracking()
@@ -49,11 +49,13 @@ namespace CnGalWebSite.APIServer.Application.Home
             {
                 foreach (var item in entry_result1)
                 {
-                    model.Add(new EntryHomeAloneViewModel
+                    model.Add(new MainImageCardModel
                     {
                         Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
-                        DisPlayName = item.DisplayName ?? item.Name,
+                        Name = item.DisplayName ,
+                        IsOutlink=false,
+                        Url="entries/index/"+item.Id,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
                         // DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
@@ -64,9 +66,9 @@ namespace CnGalWebSite.APIServer.Application.Home
             return model;
         }
 
-        public async Task<List<EntryHomeAloneViewModel>> GetHomeRecentEditViewAsync()
+        public async Task<List<MainImageCardModel>> GetHomeRecentEditViewAsync()
         {
-            var model = new List<EntryHomeAloneViewModel>();
+            var model = new List<MainImageCardModel>();
             var tempDateTimeNow = DateTime.Now.ToCstTime();
 
             var entryIds = await _entryRepository.GetAll().AsNoTracking().OrderByDescending(s => s.PubulishTime)
@@ -83,11 +85,12 @@ namespace CnGalWebSite.APIServer.Application.Home
             {
                 foreach (var item in entry_result2)
                 {
-                    model.Add(new EntryHomeAloneViewModel
+                    model.Add(new MainImageCardModel
                     {
                         Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
-                        DisPlayName = item.DisplayName ?? item.Name,
+                        Name = item.DisplayName,
+                        Url = "entries/index/" + item.Id,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
                         //  DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
@@ -97,9 +100,9 @@ namespace CnGalWebSite.APIServer.Application.Home
             return model;
         }
 
-        public async Task<List<EntryHomeAloneViewModel>> GetHomeRecentIssuelGameViewAsync()
+        public async Task<List<MainImageCardModel>> GetHomeRecentIssuelGameViewAsync()
         {
-            var model = new List<EntryHomeAloneViewModel>();
+            var model = new List<MainImageCardModel>();
 
             //获取近期新作
             var tempDateTimeNow = DateTime.Now.ToCstTime();
@@ -109,11 +112,12 @@ namespace CnGalWebSite.APIServer.Application.Home
             {
                 foreach (var item in entry_result3)
                 {
-                    model.Add(new EntryHomeAloneViewModel
+                    model.Add(new MainImageCardModel
                     {
                         Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
-                        DisPlayName = item.DisplayName ?? item.Name,
+                        Name = item.DisplayName,
+                        Url = "entries/index/" + item.Id,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
                         //  DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
@@ -124,36 +128,9 @@ namespace CnGalWebSite.APIServer.Application.Home
 
         }
 
-        public async Task<List<EntryHomeAloneViewModel>> GetHomeFriendEntriesViewAsync()
+        public async Task<List<MainImageCardModel>> GetHomeFriendLinksViewAsync()
         {
-            var model = new List<EntryHomeAloneViewModel>();
-
-            //获取友情置顶词条 根据优先级排序
-            var entry_result4 = await _entryRepository.GetAll().AsNoTracking().OrderByDescending(s => s.Priority)
-                .Where(s => (s.Type == EntryType.Game || s.Type == EntryType.ProductionGroup) && s.Name != null && s.Name != "" && s.IsHidden != true).Take(12).ToListAsync();
-            if (entry_result4 != null)
-            {
-                foreach (var item in entry_result4)
-                {
-                    model.Add(new EntryHomeAloneViewModel
-                    {
-                        Id = item.Id,
-                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
-                        DisPlayName = item.DisplayName ?? item.Name,
-                        CommentCount = item.CommentCount,
-                        ReadCount = item.ReaderCount,
-                        //DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
-                    });
-                }
-
-            }
-
-            return model;
-        }
-
-        public async Task<List<EntryHomeAloneViewModel>> GetHomeFriendLinksViewAsync()
-        {
-            var model = new List<EntryHomeAloneViewModel>();
+            var model = new List<MainImageCardModel>();
 
             //获取友情置顶词条 根据优先级排序
             var entry_result4 = await _friendLinkRepository.GetAll().AsNoTracking().OrderByDescending(s => s.Priority)
@@ -162,12 +139,13 @@ namespace CnGalWebSite.APIServer.Application.Home
             {
                 foreach (var item in entry_result4)
                 {
-                    model.Add(new EntryHomeAloneViewModel
+                    model.Add(new MainImageCardModel
                     {
                         Id = item.Id,
                         Image = _appHelper.GetImagePath(item.Image, "app.png"),
-                        DisPlayValue = item.Link,
-                        DisPlayName = item.Name,
+                        Url = item.Link,
+                        Name = item.Name,
+                        IsOutlink=true,
                         CommentCount = -1,
                         ReadCount = -1
                         //DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
@@ -178,20 +156,21 @@ namespace CnGalWebSite.APIServer.Application.Home
             return model;
         }
 
-        public async Task<List<EntryHomeAloneViewModel>> GetHomeNoticesViewAsync()
+        public async Task<List<MainImageCardModel>> GetHomeNoticesViewAsync()
         {
-            var model = new List<EntryHomeAloneViewModel>();
+            var model = new List<MainImageCardModel>();
 
             //获取公告
             var articles = await _articleRepository.GetAll().Where(s => s.IsHidden != true).AsNoTracking().OrderByDescending(s => s.Priority).ThenByDescending(s => s.PubishTime)
                 .Where(s => s.Type == ArticleType.Notice && s.IsHidden != true).Take(12).ToListAsync();
             foreach (var item in articles)
             {
-                model.Add(new EntryHomeAloneViewModel
+                model.Add(new MainImageCardModel
                 {
                     Id = item.Id,
                     Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png"),
-                    DisPlayName = item.DisplayName ?? item.Name,
+                    Name = item.DisplayName ,
+                    Url = "articles/index/" + item.Id,
                     CommentCount = item.CommentCount,
                     ReadCount = item.ReaderCount,
                     //DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
@@ -201,9 +180,9 @@ namespace CnGalWebSite.APIServer.Application.Home
 
         }
 
-        public async Task<List<EntryHomeAloneViewModel>> GetHomeArticlesViewAsync()
+        public async Task<List<MainImageCardModel>> GetHomeArticlesViewAsync()
         {
-            var model = new List<EntryHomeAloneViewModel>();
+            var model = new List<MainImageCardModel>();
 
             //获取近期发布的文章
             var article_result2 = await _articleRepository.GetAll().Where(s => s.IsHidden != true && s.Type != ArticleType.Notice && s.Type != ArticleType.News).AsNoTracking().OrderByDescending(s => s.PubishTime).ThenByDescending(s => s.Id)
@@ -212,11 +191,12 @@ namespace CnGalWebSite.APIServer.Application.Home
             {
                 foreach (var item in article_result2)
                 {
-                    model.Add(new EntryHomeAloneViewModel
+                    model.Add(new MainImageCardModel
                     {
                         Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "certificate.png"),
-                        DisPlayName = item.DisplayName ?? item.Name,
+                        Name = item.DisplayName,
+                        Url = "articles/index/" + item.Id,
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
                         //DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)

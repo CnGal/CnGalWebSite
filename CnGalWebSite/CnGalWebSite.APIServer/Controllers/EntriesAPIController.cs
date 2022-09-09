@@ -366,45 +366,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return await _entryService.GetPaginatedResult(input);
         }
 
-
-        /// <summary>
-        /// 获取随机词条列表 
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("{type}")]
-        [AllowAnonymous]
-        public async Task<ActionResult<List<EntryHomeAloneViewModel>>> GetRandomEntryListViewAsync(EntryType type)
-        {
-            var model = new List<EntryHomeAloneViewModel>();
-            var length = await _entryRepository.GetAll().AsNoTracking().Where(s => s.Type == type && s.IsHidden != true && s.Name != null && s.Name != "").CountAsync();
-            var length_1 = (type == EntryType.Game || type == EntryType.ProductionGroup) ? 16 : 24;
-            List<Entry> groups;
-            if (length > length_1)
-            {
-                var random = new Random();
-                var temp = random.Next(0, length - length_1);
-
-                groups = await _entryRepository.GetAll().AsNoTracking().Where(s => s.Type == type && s.IsHidden != true && s.Name != null && s.Name != "").Skip(temp).Take(length_1).ToListAsync();
-            }
-            else
-            {
-                groups = await _entryRepository.GetAll().AsNoTracking().Where(s => s.Type == type && s.IsHidden != true && s.Name != null && s.Name != "").Take(length_1).ToListAsync();
-            }
-            foreach (var item in groups)
-            {
-                model.Add(new EntryHomeAloneViewModel
-                {
-                    Id = item.Id,
-                    Image = ((type == EntryType.Game || type == EntryType.ProductionGroup) ? _appHelper.GetImagePath(item.MainPicture, "app.png") : _appHelper.GetImagePath(item.Thumbnail, "user.png")),
-                    DisPlayName = item.DisplayName ?? item.Name,
-                    CommentCount = item.CommentCount,
-                    ReadCount = item.ReaderCount,
-                    // DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
-                });
-            }
-            return model;
-        }
-
         [HttpGet("{id}")]
         public async Task<ActionResult<EditMainViewModel>> EditMainAsync(int id)
         {
