@@ -18,13 +18,7 @@ namespace CnGalWebSite.Maui
             _overviewService.Init(this);
 
             InitializeComponent();
-#if ANDROID
-            blazorWebView.UrlLoading +=
-                (sender, urlLoadingEventArgs) =>
-                {
-                    urlLoadingEventArgs.UrlLoadingStrategy = UrlLoadingStrategy.OpenExternally;
-                };
-#endif
+
             Loaded += MainPage_LoadedAsync;
         }
 

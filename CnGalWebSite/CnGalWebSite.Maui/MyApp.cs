@@ -41,8 +41,10 @@ namespace CnGalWebSite.Maui
 
         public override void Quit()
         {
+#if ANDROID
             var applicationService = new ApplicationService();
             applicationService.CloseApplication();
+#endif
         }
 
         public override void ThemeChanged(string theme)

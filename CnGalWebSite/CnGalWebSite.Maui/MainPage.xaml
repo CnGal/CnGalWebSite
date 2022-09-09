@@ -1,16 +1,15 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:b="clr-namespace:Microsoft.AspNetCore.Components.WebView.Maui;assembly=Microsoft.AspNetCore.Components.WebView.Maui"
-             xmlns:local="clr-namespace:CnGalWebSite.Maui;assembly=CnGalWebSite.Maui"
+             xmlns:local="clr-namespace:CnGalWebSite.Maui"
              x:Class="CnGalWebSite.Maui.MainPage"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
 
     <Grid>
-        <b:BlazorWebView HostPage="wwwroot/index.html" x:Name="blazorWebView">
-            <b:BlazorWebView.RootComponents>
-                <b:RootComponent Selector="#app" ComponentType="{x:Type local:MyApp}" />
-            </b:BlazorWebView.RootComponents>
-        </b:BlazorWebView>
+        <BlazorWebView HostPage="wwwroot/index.html">
+            <BlazorWebView.RootComponents>
+                <RootComponent Selector="#app" ComponentType="{x:Type local:MyApp}" />
+            </BlazorWebView.RootComponents>
+        </BlazorWebView>
         <Grid x:Name="OverviewGrid" BackgroundColor="{DynamicResource PageBackgroundColor}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>

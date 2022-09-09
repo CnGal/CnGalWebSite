@@ -7,10 +7,13 @@
                ShowArrowsOnHover>
         @foreach (var item in Model.OrderByDescending(s => s.Priority))
         {
+                <MCarouselItem >
+                    <a href="@item.Link" target="_blank" style="width: 100%;" @onclick="@(()=>OnClick.InvokeAsync(item))">
+                        <img src="@item.Image" alt="@item.Note" style="width: 100%;" />
+                    </a>
+                </MCarouselItem>
+      
 
-            <MCarouselItem Src="@item.Image" Href="@item.Link">
-
-            </MCarouselItem>
         }
 
     </MCarousel>
