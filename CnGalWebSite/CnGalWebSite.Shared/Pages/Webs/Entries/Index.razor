@@ -36,7 +36,7 @@ else
 }
 else
 {
-    @if (isReady)
+    @if (_dataCatcheService.EntryIndexPageCatche.Check(Id)||isReady)
     {
         <div class="row" itemscope itemtype="@(EntryView.Type== EntryType.Game?("http://schema.org/SoftwareApplication"):(EntryView.Type== EntryType.Role?("http://schema.org/Role"):(EntryView.Type== EntryType.ProductionGroup?("http://schema.org/Organization"):("http://schema.org/Person"))))">
             <div class="col-12 mb-4">
@@ -405,7 +405,6 @@ else
     {
         try
         {
-            isReady = false;
             isNotFound = false;
             //获取词条信息
             EntryView = await _dataCatcheService.EntryIndexPageCatche.GetCache(Id);
@@ -433,9 +432,9 @@ else
         }
         catch (Exception exc)
         {
-            //isNotFound = true;
-            //isReady = true;
-            //StateHasChanged();
+            isNotFound = true;
+            isReady = true;
+            StateHasChanged();
         }
     }
 

@@ -16,7 +16,7 @@
                             c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                         }
                         <MButton Icon Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs">
-                            <img style="width:35px;border-radius:50%;" src="@_dataCacheService.UserInfor.PhotoPath" alt="@_dataCacheService.UserInfor.Name" />
+                            <img style="width: 35px; border-radius: 50%; aspect-ratio: 1" src="@_dataCacheService.UserInfor.PhotoPath" alt="@_dataCacheService.UserInfor.Name" />
                         </MButton>
                     </ActivatorContent>
                     <ChildContent>
