@@ -1,5 +1,5 @@
 ﻿
-<MResponsive AspectRatio="AspectRatio" Class="w-100">
+<MResponsive AspectRatio="AspectRatio">
     <MCarousel Cycle Height="@("inherit")"
                HideDelimiterBackground
                Interval="4000"
@@ -7,9 +7,9 @@
                ShowArrowsOnHover>
         @foreach (var item in Model.OrderByDescending(s => s.Priority))
         {
-                <MCarouselItem >
-                    <a href="@item.Link" target="_blank" style="width: 100%;" @onclick="@(()=>OnClick.InvokeAsync(item))">
-                        <img src="@item.Image" alt="@item.Note" style="@($"width: 100%; aspect-ratio: {AspectRatio.ToDouble()};")" />
+                <MCarouselItem>
+                    <a href="@item.Link" target="_blank" @onclick="@(()=>OnClick.InvokeAsync(item))">
+                        <img src="@item.Image" alt="@item.Note" class="w-100" style="@($" aspect-ratio: {AspectRatio.ToDouble()};")" />
                     </a>
                 </MCarouselItem>
       
