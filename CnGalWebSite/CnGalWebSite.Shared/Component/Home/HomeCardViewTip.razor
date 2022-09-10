@@ -2,39 +2,26 @@
 @if (ShowCount)
 {
 
-        <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color">
-            <div class=" h-100 ">
-                <img loading="lazy" src="@Image" class="card-img-top" alt="@Name" />
-                <div class="pt-2">
-                    <span class="home-card-name-text">@Name</span>
-                    @if (ShowCount)
-                    {
-                        <div class="row" style="color:gray">
-                            <div class="col-6">
-                                <i class="fa fa-eye fa-fw "></i>
-                                <span class="article-infor-text">@ReadCount</span>
-                            </div>
-                            <div class="col-6">
-                                <i class="fa fa-comments-o fa-fw "></i>
-                                <span class="article-infor-text">@CommentCount</span>
-                            </div>
-                        </div>
-                    }
-
-                </div>
+    <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color">
+        <img loading="lazy" src="@Image" class="card-img-top" alt="@Name" style="aspect-ratio: 460/215;" />
+        <span class="home-card-name-text pt-2">@Name</span>
+        @if (ShowCount)
+        {
+            <div style="color:gray">
+                <i class="fa fa-eye fa-fw " style=" width: 50%; text-align: start;">&nbsp;@ReadCount</i>
+                <i class="fa fa-comments-o fa-fw ">&nbsp;@CommentCount</i>
             </div>
-        </a>
+        }
+    </a>
 
 }
 else
 {
     <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color" itemprop="url">
-        <div class=" h-100 ">
-            <img loading="lazy" src="@Image" class="card-img-top" alt="@Name" itemprop="image" />
-            <div class="pt-2">
-                <span class="home-card-name-text" itemprop="name">@Name</span>
-            </div>
-        </div>
+        <img loading="lazy" src="@Image" class="card-img-top" alt="@Name" itemprop="image" style="aspect-ratio:460/215;" />
+
+        <span class="home-card-name-text pt-2" itemprop="name">@Name</span>
+
     </a>
 }
 

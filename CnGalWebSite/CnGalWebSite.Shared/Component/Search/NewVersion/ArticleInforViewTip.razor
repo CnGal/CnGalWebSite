@@ -6,7 +6,7 @@
         <div class="@((Outline?"":"div-shadow rounded  bg-opacity ")+" h-100")">
             <div style="display: flex; align-items: center;">
                 <div>
-                    <img loading="lazy" style=" width: 160px; " src="@Model.MainImage">
+                    <img loading="lazy" style=" width: 160px; " src="@Model.MainImage" alt="@Model.Name">
                 </div>
                 <div class="me-2 ms-2">
                     <header class="text-truncate-1">
@@ -27,7 +27,7 @@ else
         <div class="@((Outline?"":"div-shadow rounded  bg-opacity  ps-3 pe-3 pb-3 ")+" h-100")">
             <div class="mb-2" style="display:flex;">
                 <div class="@((Outline?"":"pt-3"))">
-                    <img loading="lazy"  style=" width: 250px; " src="@Model.MainImage">
+                    <img loading="lazy"  style=" width: 250px; " src="@Model.MainImage"  alt="@Model.Name">
                 </div>
                 <div class="@((Outline?"":" pt-3")+" ps-3")">
                     <header class="text-truncate-2">

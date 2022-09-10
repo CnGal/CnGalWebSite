@@ -1,5 +1,5 @@
 ﻿
-<MResponsive AspectRatio="AspectRatio">
+<MResponsive AspectRatio="AspectRatio" Class="w-100">
     <MCarousel Cycle Height="@("inherit")"
                HideDelimiterBackground
                Interval="4000"
@@ -9,7 +9,7 @@
         {
                 <MCarouselItem >
                     <a href="@item.Link" target="_blank" style="width: 100%;" @onclick="@(()=>OnClick.InvokeAsync(item))">
-                        <img src="@item.Image" alt="@item.Note" style="width: 100%;" />
+                        <img src="@item.Image" alt="@item.Note" style="@($"width: 100%; aspect-ratio: {AspectRatio.ToDouble()};")" />
                     </a>
                 </MCarouselItem>
       

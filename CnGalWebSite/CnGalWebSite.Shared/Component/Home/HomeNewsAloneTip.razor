@@ -1,5 +1,4 @@
 ﻿
-<div style="display:flex;">
     <a  style="display: flex;align-items: center;" href="@(Model.GroupId == -1?("/space/index/" + Model.UserId):("/entries/index/" + Model.GroupId + ""))">
         <img class="shadow-sm -sm" src="@Model.Image" alt="@Model.Title" style="height: 50px;width: 50px;border-radius: 50%;" />
     </a>
@@ -11,7 +10,6 @@
         </div>
         <div class="comment-time text-truncate" style="width: 100%;">@Model.Text</div>
     </a>
-</div>
 
 
 @code {
