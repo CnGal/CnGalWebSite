@@ -55,27 +55,26 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// </summary>
         public bool IsHideOutlink { get; set; }
         /// <summary>
-        /// 是否有评分
+        /// 是否有评分 仅限游戏词条
         /// </summary>
         public bool IsScored { get; set; }
-        /// <summary>
-        /// 是否查看编辑记录状态
-        /// </summary>
-        public bool IsExamineList { get; set; }
         /// <summary>
         /// 是否配音 仅限游戏词条
         /// </summary>
         public bool IsDubbing { get; set; } = true;
 
-        public int DisambigId { get; set; }
-
-        public string DisambigName { get; set; }
-
-        [Display(Name = "制作组")]
+        /// <summary>
+        /// 制作组
+        /// </summary>
         public List<StaffNameModel> ProductionGroups { get; set; } = new List<StaffNameModel>();
-        [Display(Name = "发行商")]
+        /// <summary>
+        /// 发行商
+        /// </summary>
         public List<StaffNameModel> Publishers { get; set; } = new List<StaffNameModel>();
 
+        /// <summary>
+        /// 主要信息编辑状态
+        /// </summary>
         public EditState MainState { get; set; }
         public EditState MainPageState { get; set; }
         public EditState ImagesState { get; set; }
@@ -101,17 +100,17 @@ namespace CnGalWebSite.DataModel.ViewModel
         public List<StaffInforModel> Staffs { get; set; } = new List<StaffInforModel> { };
 
         /// <summary>
-        /// 动态动态
+        /// 动态
         /// </summary>
         public List<NewsModel> NewsOfEntry { get; set; } = new List<NewsModel> { };
 
         /// <summary>
-        /// 角色信息 
+        /// 游戏的关联角色列表  和相关词条没有重叠
         /// </summary>
         public List<EntryInforTipViewModel> Roles { get; set; } = new List<EntryInforTipViewModel> { };
 
         /// <summary>
-        /// STAFF的关联游戏列表
+        /// STAFF的关联游戏列表 和相关词条没有重叠
         /// </summary>
         public List<EntryInforTipViewModel> StaffGames { get; set; } = new List<EntryInforTipViewModel> { };
 
@@ -144,10 +143,6 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// 音频列表
         /// </summary>
         public List<AudioViewModel> Audio { get; set; } = new List<AudioViewModel>();
-        /// <summary>
-        /// 审核记录 也是编辑记录
-        /// </summary>
-        public List<ExaminedNormalListModel> Examines { get; set; } = new List<ExaminedNormalListModel> { };
 
         /// <summary>
         /// 标签列表
@@ -214,6 +209,9 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string NewsType { get; set; }
         public string Image { get; set; }
 
+        /// <summary>
+        /// GroupId无效则使用作者Id
+        /// </summary>
         public string UserId { get; set; }
 
         public DateTime HappenedTime { get; set; }
@@ -221,12 +219,18 @@ namespace CnGalWebSite.DataModel.ViewModel
 
     public class StaffInforModel
     {
+        /// <summary>
+        /// 分组
+        /// </summary>
         public string Modifier { get; set; }
         public List<StaffValue> StaffList { get; set; }
     }
 
     public class StaffValue
     {
+        /// <summary>
+        /// 职位
+        /// </summary>
         public string Modifier { get; set; }
         public List<StaffNameModel> Names { get; set; }
     }
@@ -234,7 +238,7 @@ namespace CnGalWebSite.DataModel.ViewModel
     public class StaffNameModel
     {
         /// <summary>
-        /// 显示名称
+        /// 名称
         /// </summary>
         public string DisplayName { get; set; }
 

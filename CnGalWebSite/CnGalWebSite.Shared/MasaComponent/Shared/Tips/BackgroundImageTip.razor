@@ -1,7 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
 
 
-@if (_dataCacheService.ThemeSetting.IsTransparent && _dataCacheService.ThemeSetting.IsDark == false)
+@if (_dataCacheService.ThemeSetting.IsTransparent)
 {
     if (string.IsNullOrWhiteSpace(BigImage) == false)
     {
@@ -12,6 +12,11 @@
         <div id="web_bg" style="@($"background-image: url({SmallImage})")" class="d-md-none"></div>
 
     }
+    @if (_dataCacheService.ThemeSetting.IsDark)
+    {
+        <div id="web_bg" style="background-color: rgba(36,36,36,0.9);z-index:-8"></div>
+    }
+
 }
 
 @code {

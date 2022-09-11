@@ -145,7 +145,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //通过Id获取词条 
-            var entry = await _entryRepository.GetAll().Include(s => s.Disambig)
+            var entry = await _entryRepository.GetAll()
                     .Include(s => s.Outlinks)
                     .Include(s=>s.Audio)
                     .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
@@ -227,7 +227,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //建立视图模型
             var model = await _entryService.GetEntryIndexViewModelAsync(entry);
-            model.Examines = await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => s.EntryId == entry.Id && s.IsPassed == true).OrderByDescending(s => s.Id), true);
 
             if (user != null)
             {

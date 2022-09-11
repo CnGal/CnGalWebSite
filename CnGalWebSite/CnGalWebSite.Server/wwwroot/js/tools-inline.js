@@ -209,7 +209,7 @@ function setStructuredData(data) {
 
 var audio = new Audio();
 function playAudio(url) {
-    if (audio.currentTime == 0) {
+    if (audio.currentTime == 0 || audio.currentTime == audio.duration || audio.src != url) {
         audio.src = url;
         audio.play();
     }

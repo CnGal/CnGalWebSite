@@ -21,7 +21,7 @@ body {
 }
 
 .bg-opacity {
-    background-color: #242424!important;
+    background-color: rgba(36,36,36,0.9) !important;
 }
 .bg-theme {
     background-color: #242424!important;
@@ -498,9 +498,7 @@ body {
     color: white !important;
 }
 
-#web_bg {
-    display: none;
-}
+
 .div-shadow {
     box-shadow: 0 0.5rem 1rem rgba(255, 255,255, 0.08) !important;
     transition: all .6s ease;
@@ -678,9 +676,7 @@ input.form-control{
 }
 
 /*修正Masa样式对Bootsharp的影响*/
-.m-main__wrap {
-    background-color: #303030;
-}
+
 .markdown-body {
     background-color: transparent; 
 }

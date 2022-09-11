@@ -62,10 +62,10 @@
     public PersonalSpaceViewModel Model { get; set; }
 
 
-    public Task OnClickEdit()
+    public void OnClickEdit()
     {
         NavigationManager.NavigateTo("/space/editdata/" + Model.Id);
-        return Task.CompletedTask;
+       
     }
 
 }
