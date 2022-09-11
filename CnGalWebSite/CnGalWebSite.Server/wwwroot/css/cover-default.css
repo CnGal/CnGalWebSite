@@ -350,3 +350,17 @@ input.te-image-file-input {
 .theme--light.m-tabs-items {
     background-color: transparent;
 }
+/*Markdown样式*/
+
+.markdown-body h3 {
+    font-size: 1.38em !important;
+}
+.markdown-body h4 {
+    font-size: 1.25em !important;
+}
+.markdown-body h5 {
+    font-size: 1.13em !important;
+}
+.markdown-body h6 {
+    font-size: 1em !important;
+}
