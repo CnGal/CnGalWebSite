@@ -503,6 +503,9 @@ else
                     case Operation.EstablishTags:
                         EntryView.TagState = EditState.Normal;
                         break;
+                    case Operation.EstablishAudio:
+                        EntryView.AudioState = EditState.Normal;
+                        break;
                 }
                 _dataCatcheService.EntryIndexPageCatche.Clean(Id);
                 Refresh();

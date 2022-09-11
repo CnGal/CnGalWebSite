@@ -1018,8 +1018,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 BriefIntroduction = entry.BriefIntroduction,
                 Type = entry.Type,
                 CanComment = entry.CanComment ?? true,
-                DisambigId = entry.DisambigId ?? 0,
-                DisambigName = entry.Disambig?.Name,
                 AnotherName = entry.AnotherName,
                 IsHidden = entry.IsHidden,
                 IsHideOutlink = entry.IsHideOutlink,
