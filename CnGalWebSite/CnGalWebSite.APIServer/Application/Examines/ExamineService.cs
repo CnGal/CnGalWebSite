@@ -4676,6 +4676,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 var entry = await _entryRepository.GetAll().AsNoTracking()
                  .Include(s => s.Outlinks)
+                 .Include(s => s.Audio)
                  .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
                  .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                  .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)

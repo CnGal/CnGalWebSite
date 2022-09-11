@@ -18,7 +18,7 @@
 
         @foreach (var item in Model.Take(MaxCount))
         {
-            <div class="@("mb-3 col-12  pointer "+(Model.IndexOf(item)==MaxCount-1?" d-none d-lg-block ":""))">
+            <div class="@("mb-3 col-12  pointer"+(Model.IndexOf(item)==MaxCount-1?" d-none d-lg-flex ":" d-flex "))">
                 <HomeNewsAloneTip Model="item" OnClickNews="OnClickNews" />
             </div>
         }
