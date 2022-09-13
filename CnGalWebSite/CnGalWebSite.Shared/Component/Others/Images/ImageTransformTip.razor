@@ -13,6 +13,9 @@
     [Parameter]
     public EventCallback<string> TextChanged { get; set; }
 
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
     public async Task OnClick()
     {
         if (string.IsNullOrWhiteSpace(Text))
@@ -22,34 +25,42 @@
 
         System.Text.StringBuilder sb = new System.Text.StringBuilder(Text);
         sb.Replace("media.st.dl.pinyuncloud.com", "media.st.dl.eccdnx.com");
+        sb.Replace("pic.cngal.top", "image.cngal.org");
         //提取全部图片
         var oldImages = ToolHelper.GetImageLinks(sb.ToString());
         //判断外部图片
-        oldImages.RemoveAll(s => s.Contains("image.cngal.org") || s.Contains("pic.cngal.top"));
+        oldImages.RemoveAll(s => s.Contains("image.cngal.org") );
         //依次转存
         //替换原图片
         foreach (var item in oldImages)
         {
-
-            var result = await Http.PostAsJsonAsync(ToolHelper.ImageApiPath + "api/files/linkToImgUrl", new TransferDepositFileModel
+            try
             {
-                Url = item,
-            });
-            if (result.IsSuccessStatusCode)
-            {
-                var jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = JsonSerializer.Deserialize<LinkToImgResult>(jsonContent, ToolHelper.options);
-
-                if (obj.Successful)
+                var result = await Http.PostAsJsonAsync(ToolHelper.ImageApiPath + "api/files/linkToImgUrl", new TransferDepositFileModel
                 {
-                    //向用户文件管理添加信息
-                    await _appHelper.AddUserLoadedFileInfor(new UploadResult
-                    {
-                        FileURL = obj.Url,
-                    }, UploadFileType.Image);
+                    Url = item,
+                });
+                if (result.IsSuccessStatusCode)
+                {
+                    var jsonContent = result.Content.ReadAsStringAsync().Result;
+                    var obj = JsonSerializer.Deserialize<LinkToImgResult>(jsonContent, ToolHelper.options);
 
-                    sb.Replace(item, obj.Url);
+                    if (obj.Successful)
+                    {
+                        //向用户文件管理添加信息
+                        await _appHelper.AddUserLoadedFileInfor(new UploadResult
+                        {
+                            FileURL = obj.Url,
+                        }, UploadFileType.Image);
+
+                        sb.Replace(item, obj.Url);
+                    }
                 }
+
+            }
+            catch(Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "图片转存失败", "图片大小超过3MB", "将图片压缩后再上传，大图可上传到相册");
             }
 
         }

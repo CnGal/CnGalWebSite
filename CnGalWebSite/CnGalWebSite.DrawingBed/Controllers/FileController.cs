@@ -93,7 +93,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
 
             try
             {
-                var res = (url.Contains("image.cngal.org") || url.Contains("pic.cngal.top")) && x == 0 && y == 0
+                var res = (url.Contains("image.cngal.org")) && x == 0 && y == 0
                               ? url
                               : (await _fileService.TransferDepositFile(url, x, y, type)).FileURL;
 

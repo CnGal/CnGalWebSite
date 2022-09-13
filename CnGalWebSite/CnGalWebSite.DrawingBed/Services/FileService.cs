@@ -219,7 +219,7 @@ namespace CnGalWebSite.DrawingBed.Services
         #region 处理文件
         private static string GetFileSuffixName(string path, UploadFileType type)
         {
-            var temp = path.Split('.');
+            var temp = path.Split('?').First().Split('.');
             var defaultName = type switch { UploadFileType.Audio => "mp3", UploadFileType.Image => "png", _ => "png" };
             var Suffix = temp.Length == 1 ? defaultName : temp[^1];
             return Suffix.Length > 4 ? defaultName : Suffix;

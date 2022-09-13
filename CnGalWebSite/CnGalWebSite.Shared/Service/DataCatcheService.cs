@@ -367,6 +367,8 @@ namespace CnGalWebSite.Shared.Service
             (HomePageCarouselsCatche = homePageCarouselsCatche).Init(nameof(HomePageCarouselsCatche), "");
             (SearchViewCatche = searchViewCatche).Init(nameof(SearchViewCatche), "");
             _navigationManager = navigationManager;
+
+            
         }
 
         public async Task OnRefreshRequsted(EventArgs e)

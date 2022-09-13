@@ -53,7 +53,7 @@
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
     <PackageReference Include="BootstrapBlazor.TableExport" Version="6.0.0" />
-    <PackageReference Include="Chronos.Blazor.Cropper" Version="1.2.7" />
+    <PackageReference Include="Chronos.Blazor.Cropper" Version="1.2.11" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.5" />
   </ItemGroup>
 

@@ -17,16 +17,11 @@
             <MStepperContent Step="1">
                 @if (isReady)
                 {
-                    <InputDataCard Model="Model" EntryItems="EntryItems" OnFinshInput="OnStart"/>
+                    <InputDataCard Model="Model" EntryItems="EntryItems" OnFinshInput="OnStart" />
                 }
                 else
                 {
-                    <div>
-                        <h3 class="mb-3 text-center">正在加载</h3>
-                        <div class="d-flex" style="justify-content: center;">
-                            <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
-                        </div>
-                    </div>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard />
                 }
 
             </MStepperContent>
