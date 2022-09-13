@@ -11,60 +11,56 @@
         <MCardText>
             更新会有一天左右的延迟
         </MCardText>
-            <Scroll style="max-height:600px;" class="ps-6 pe-6">
-                @if (isReady)
-                {
-                    <MExpansionPanels @bind-Values="panel" Class="mt-2 mb-2" Multiple>
-                        @if (Model.Any(s => s.Level == PerfectionCheckLevel.High))
-                        {
-                            <MExpansionPanel @key="1">
-                                <MExpansionPanelHeader>
-                                    急需完善
-                                </MExpansionPanelHeader>
-                                <MExpansionPanelContent>
-                                    @foreach (var item in Model.Where(s => s.Level == PerfectionCheckLevel.High))
-                                    {
-                                        <PerfectionCheckAloneViewTip Model="@item"></PerfectionCheckAloneViewTip>
-                                    }
-                                </MExpansionPanelContent>
-                            </MExpansionPanel>
-                        }
-                        <MExpansionPanel @key="2">
+        <Scroll style="max-height:600px;" class="ps-6 pe-6">
+            @if (isReady)
+            {
+                <MExpansionPanels @bind-Values="panel" Class="mt-2 mb-2" Multiple>
+                    @if (Model.Any(s => s.Level == PerfectionCheckLevel.High))
+                    {
+                        <MExpansionPanel @key="1">
                             <MExpansionPanelHeader>
-                                待完善
+                                急需完善
                             </MExpansionPanelHeader>
                             <MExpansionPanelContent>
-                                @foreach (var item in Model.Where(s => s.Level != PerfectionCheckLevel.High && s.Level != PerfectionCheckLevel.None))
+                                @foreach (var item in Model.Where(s => s.Level == PerfectionCheckLevel.High))
                                 {
                                     <PerfectionCheckAloneViewTip Model="@item"></PerfectionCheckAloneViewTip>
                                 }
                             </MExpansionPanelContent>
                         </MExpansionPanel>
-                        <MExpansionPanel @key="3">
-                            <MExpansionPanelHeader>
-                                已完善
-                            </MExpansionPanelHeader>
-                            <MExpansionPanelContent>
-                                @foreach (var item in Model.Where(s => s.Level == PerfectionCheckLevel.None))
-                                {
-                                    <PerfectionCheckAloneViewTip Model="@item"></PerfectionCheckAloneViewTip>
-                                }
-                            </MExpansionPanelContent>
-                        </MExpansionPanel>
-                    </MExpansionPanels>
-                }
-                else
-                {
-                    <div>
-                        <h3 class="mb-3 text-center">正在加载</h3>
-                        <div class="d-flex" style="justify-content: center;">
-                            <Spinner Color="Color.Primary" Size="Size.ExtraLarge"></Spinner>
-                        </div>
-                    </div>
-                }
+                    }
+                    <MExpansionPanel @key="2">
+                        <MExpansionPanelHeader>
+                            待完善
+                        </MExpansionPanelHeader>
+                        <MExpansionPanelContent>
+                            @foreach (var item in Model.Where(s => s.Level != PerfectionCheckLevel.High && s.Level != PerfectionCheckLevel.None))
+                            {
+                                <PerfectionCheckAloneViewTip Model="@item"></PerfectionCheckAloneViewTip>
+                            }
+                        </MExpansionPanelContent>
+                    </MExpansionPanel>
+                    <MExpansionPanel @key="3">
+                        <MExpansionPanelHeader>
+                            已完善
+                        </MExpansionPanelHeader>
+                        <MExpansionPanelContent>
+                            @foreach (var item in Model.Where(s => s.Level == PerfectionCheckLevel.None))
+                            {
+                                <PerfectionCheckAloneViewTip Model="@item"></PerfectionCheckAloneViewTip>
+                            }
+                        </MExpansionPanelContent>
+                    </MExpansionPanel>
+                </MExpansionPanels>
+            }
+            else
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard />
+
+            }
 
 
-            </Scroll>
+        </Scroll>
        
         <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
             <MSpacer></MSpacer>

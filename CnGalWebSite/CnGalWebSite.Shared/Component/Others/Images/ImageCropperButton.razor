@@ -36,6 +36,8 @@
 
     </div>
 </div>
+
+<ImageCropperViewTip OnUploadedImage="OnUploaded" @ref="imageCropperViewTip"/>
 @code {
     [Parameter]
     public ImageAspectType Type { get; set; }
@@ -59,6 +61,7 @@
     }
     [Parameter]
     public bool IsMainImage { get; set; }
+
     [Parameter]
     public string ImagePath { get; set; }
 
@@ -70,9 +73,10 @@
     [Parameter]
     public string Text { get; set; } = "上传图片";
 
-    public List<UploadFile> uploadFiles { get; set; } = new List<UploadFile>();
-
     public string Id = "input" + new Random().Next();
+
+    ImageCropperViewTip imageCropperViewTip;
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
@@ -90,22 +94,11 @@
                 Type = ImageAspectType.None;
             }
         }
-        var option = new DialogOption()
-        {
-            Title = "裁剪图片",
-            ShowCloseButton = false,
-            Size= Size.Large
-        };
-        option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<ImageCropperViewTip>(new Dictionary<string, object>
-        {
-            [nameof(ImageCropperViewTip.Type)] = Type,
-            [nameof(ImageCropperViewTip.file)] = args.File,
-            [nameof(ImageCropperViewTip.Id)] = Id,
-            [nameof(ImageCropperViewTip.OnUploadedImage)] = EventCallback.Factory.Create<string>(this, async (url) => await OnUploaded(url)),
-            [nameof(ImageCropperViewTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
 
-        }).Render();
-        await DialogService.Show(option);
+        if(imageCropperViewTip!=null)
+        {
+            await imageCropperViewTip.OnInputFileChange(args.File,Type);
+        }
     }
 
     public async Task OnUploaded(string url)
@@ -129,7 +122,7 @@
             }
             else
             {
-                await ToastService.Error("图片上传失败", $"<{file.FileName}> " + obj.Error);
+                await ToastService.Error("图片上传失败", obj.Error?? "图片上传失败");
             }
 
         }
@@ -142,8 +135,6 @@
     public async Task OnClean()
     {
         ImagePath = null;
-
-        uploadFiles.Clear();
 
         await ImagePathChanged.InvokeAsync(null);
         StateHasChanged();

@@ -1,174 +1,112 @@
 ﻿@inject IJSRuntime JSRuntime
 @inject IAppHelper _appHelper
 @inject ToastService ToastService
-@using Microsoft.AspNetCore.Http
+@inject IDataCacheService _dataCacheService
 
-<style>
-    .modal-footer {
-        display: none;
-    }
-</style>
-<div class="card" style="border:0px;background-color:transparent;">
-    <div class="card-body py-0">
-        <Cropper CropperHeight="300" InitCropWidth="200" InitCropHeight="200" MaxCropedHeight="1080" MaxCropedWidth="1920"
-                 @ref="cropper"
-                 PureCSharpProcessing="!ToolHelper.IsWASM"
-                 AspectRatio="AspectRatio"
-                 RequireAspectRatio="@IsAspectRatioEnabled"
-                 InputId="@Id"
-                 ImageFile="file"
-                 @bind-Ratio="ratio"
-                 OnSizeChanged="HandleCropSizeChanged"
-                 AnimeGifEnable="true"></Cropper>
-    </div>
-    <div class="mt-1 text-center justify-content-center">
-        @if (cropper != null)
-        {
-            <Slider Value="@((int)ratio)" ValueChanged="OnRatioChange"></Slider>
-        }
-    </div>
-    <div class="mt-1 flex-column">
-        <div class="input-group">
-            <div class="input-group-text">
-                <input @bind="IsAspectRatioEnabled" class="form-check-input mt-0" type="checkbox" value="" aria-label="Checkbox for following text input">
-            </div>
-            <span class="input-group-text">长宽比</span>
-            <input @onchange="OnAspectWidthChanged" value="@AspectWidth" type="number" class="form-control" placeholder="输入长度">
-            <span class="input-group-text fw-bold">:</span>
-            <input @onchange="OnAspectHeightChanged" value="@AspectHeight" type="number" class="form-control" placeholder="输入宽度">
-        </div>
+<MDialog @bind-Value="Dialog"
+         Width="1000">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            裁剪图片
+        </MCardTitle>
+        <MCardText>
+            @(ToolHelper.IsWASM?"暂不支持gif格式":"直接上传可以更加快捷地裁剪图片")
+        </MCardText>
 
-    </div>
-
-    <div class="mt-3" style=" display: flex; justify-content: flex-end;">
-        <Button Color="Color.Primary" Icon="fa fa-fw fa-clone" class="me-3" @onclick="CancelCropAsync" IsAsync="true" Text="直接上传"></Button>
-        <Button Color="Color.Success" Icon="fa fa-fw fa-cut" @onclick="DoneCrop" IsAsync="true" Text="确认裁剪"></Button>
-
-    </div>
-
-</div>
-@code {
-
-    private ImageAspectType _Type;
-    [Parameter]
-    public ImageAspectType Type
-    {
-        get
-        {
-            return _Type;
-        }
-        set
-        {
-            switch (value)
+        <MCardText Class="pb-0">
+            @if (Dialog&&ShowCroper)
             {
-                case ImageAspectType._1_1:
-                    AspectWidth = 1;
-                    AspectHeight = 1;
-                    AspectRatio = AspectHeight / AspectWidth;
-                    break;
-                case ImageAspectType._16_9:
-                    AspectWidth = 460;
-                    AspectHeight = 215;
-                    AspectRatio = AspectHeight / AspectWidth;
-                    break;
-                case ImageAspectType._9_16:
-                    AspectWidth = 9;
-                    AspectHeight = 16;
-                    AspectRatio = AspectHeight / AspectWidth;
-                    break;
-                case ImageAspectType._4_1A2:
-                    AspectWidth = 40;
-                    AspectHeight = 12;
-                    AspectRatio = AspectHeight / AspectWidth;
-                    break;
-                case ImageAspectType.None:
-                    IsAspectRatioEnabled = false;
-                    break;
+                
+                    <Cropper CropperHeight="500" InitCropWidth="200" InitCropHeight="200" MaxCropedHeight="1080" MaxCropedWidth="1920"
+                             @ref="cropper"
+                             PureCSharpProcessing="!ToolHelper.IsWASM"
+                             AspectRatio="AspectRatio"                    
+                             RequireAspectRatio="@IsAspectRatioEnabled"
+                             ImageFile="File"
+                             IsImageLocked="false"
+                             @bind-Ratio="ImageRatio"
+                             OnSizeChanged="HandleCropSizeChanged"
+                             AnimeGifEnable></Cropper>
+                    <MSlider @bind-Value="ImageRatio" TValue="double" Max="3" Step="0.01" Min="0.5" PrependIcon="mdi-fit-to-screen-outline " Color="@_dataCacheService.ThemeSetting.Theme" TrackColor="@_dataCacheService.ThemeSetting.Theme" Class="mt-3" OnPrependClick="OnReset"></MSlider>
+
             }
-            _Type = value;
-        }
-    }
+
+
+        </MCardText>
+        <MCardActions Class="pb-4 pe-6 ps-6 pt-0">
+            <MSpacer></MSpacer>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="直接上传" IsAsync="true" OnClick="@CancelCropAsync" Icon="mdi-upload " Color="primary" TextStyle />
+
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="裁剪" IsAsync="true" OnClick="DoneCrop" Icon="mdi-content-cut " Color="green" TextStyle />
+        </MCardActions>
+    </MCard>
+</MDialog>
+@code {
+    bool Dialog { get; set; }
 
     [Parameter]
     public EventCallback<string> OnUploadedImage { get; set; }
-    [Parameter]
-    public EventCallback OnClickClose { get; set; }
-
-    [Parameter]
-    public string Id { get; set; }
 
     private Cropper cropper;
-    [Parameter]
-    public IBrowserFile file { get; set; }
 
+    IBrowserFile File;
+
+    ImageAspectType Type;
 
     private string PreviewImagePath { get; set; }
-    private string ImageBase64String { get; set; }
 
-    private readonly string prompt = "Image cropped! Parsing to base64...";
-
-    private bool ShowCroper { get; set; } = false;
+    private bool ShowCroper { get; set; } = true;
 
     private bool IsAspectRatioEnabled { get; set; } = true;
 
     private double AspectRatio { get; set; } = 1d;
 
-    private double ratio = 1;
+    private double ImageRatio { get; set; } = 1;
 
-    private double AspectWidth { get; set; } = 1;
-
-
-
-    private void OnAspectWidthChanged(ChangeEventArgs eventArgs)
+    public Task OnInputFileChange(IBrowserFile file, ImageAspectType type)
     {
-        try
+        PreviewImagePath = null;
+
+        File = file;
+        IsAspectRatioEnabled = true;
+        Type = type;
+        switch (type)
         {
-            AspectWidth = double.Parse((string)eventArgs.Value);
-
-            AspectRatio = AspectHeight / AspectWidth;
+            case ImageAspectType._1_1:
+                AspectRatio = 1 / 1;
+                break;
+            case ImageAspectType._16_9:
+                AspectRatio = (double)215 / 460;
+                break;
+            case ImageAspectType._9_16:
+                AspectRatio = (double)16 / 9;
+                break;
+            case ImageAspectType._4_1A2:
+                AspectRatio = (double)12 / 40;
+                break;
+            case ImageAspectType.None:
+                IsAspectRatioEnabled = false;
+                break;
         }
-        catch
-        {
 
-        }
-    }
+        Dialog = true;
 
-    private double AspectHeight { get; set; } = 1;
-
-    private void OnAspectHeightChanged(ChangeEventArgs eventArgs)
-    {
-        try
-        {
-            AspectHeight = double.Parse((string)eventArgs.Value);
-
-            AspectRatio = AspectHeight / AspectWidth;
-
-        }
-        catch
-        {
-
-        }
-    }
-
-    private Task OnRatioChange(int args)
-    {
-        ratio = (double)args / 10;
+        StateHasChanged();
         return Task.CompletedTask;
     }
 
-    private void OnInputFileChange(InputFileChangeEventArgs args)
+    private Task OnReset()
     {
-        PreviewImagePath = null;
-        file = args.File;
-        ShowCroper = true;
+        ImageRatio= cropper.Ratio = 1;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
 
-    private double CropCurrentWidth { get; set; }
-    private double CropCurrentHeight { get; set; }
-    private void HandleCropSizeChanged((double, double) cropSize)
+    private Task HandleCropSizeChanged((double, double) cropSize)
     {
-        CropCurrentWidth = cropSize.Item1;
-        CropCurrentHeight = cropSize.Item2;
+        ShowCroper = true;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
 
     private async Task DoneCrop()
@@ -179,7 +117,7 @@
         try
         {
             //上传
-            var obj = await _appHelper.UploadImagesAsync(await args.GetDataAsync(),file.Name, Type);
+            var obj = await _appHelper.UploadImagesAsync(await args.GetDataAsync(), File.Name, Type);
             if (obj.Uploaded == true)
             {
 
@@ -187,7 +125,7 @@
             }
             else
             {
-                await ToastService.Error("图片上传失败", $"<{file.Name}> " + obj.Error ?? "无法图床内部传输错误");
+                await ToastService.Error("图片上传失败", $"<{File.Name}> " + obj.Error ?? "无法图床内部传输错误");
                 return;
             }
         }
@@ -198,17 +136,17 @@
         }
         //回调
         await OnUploadedImage.InvokeAsync(PreviewImagePath);
-        await OnClickClose.InvokeAsync();
+        Dialog = false;
+        ShowCroper = false;
+        StateHasChanged();
 
-
-        args.Dispose();
     }
 
     private async Task CancelCropAsync()
     {
         try
         {
-            var obj = await _appHelper.UploadImagesAsync(file,Type);
+            var obj = await _appHelper.UploadImagesAsync(File, Type);
             if (obj.Uploaded == true)
             {
 
@@ -217,7 +155,7 @@
             }
             else
             {
-                await ToastService.Error("图片上传失败", $"<{file.Name}> {obj.Error}");
+                await ToastService.Error("图片上传失败", $"<{File.Name}> {obj.Error}");
                 return;
             }
         }
@@ -232,7 +170,10 @@
             await OnUploadedImage.InvokeAsync(PreviewImagePath);
 
         }
-        await OnClickClose.InvokeAsync();
+
+        ShowCroper = false;
+        Dialog = false;
+        StateHasChanged();
 
     }
 
