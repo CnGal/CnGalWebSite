@@ -3,7 +3,7 @@
 @inject ToastService ToastService
 @inject IDataCacheService _dataCacheService
 
-<MDialog @bind-Value="Dialog"
+<MDialog Value="Dialog" ValueChanged="DialogChanged"
          Width="1000">
     <MCard>
         <MCardTitle Class="text-h5">
@@ -14,21 +14,19 @@
         </MCardText>
 
         <MCardText Class="pb-0">
-            @if (Dialog&&ShowCroper)
+            @if (Dialog)
             {
-                
-                    <Cropper CropperHeight="500" InitCropWidth="200" InitCropHeight="200" MaxCropedHeight="1080" MaxCropedWidth="1920"
-                             @ref="cropper"
-                             PureCSharpProcessing="!ToolHelper.IsWASM"
-                             AspectRatio="AspectRatio"                    
-                             RequireAspectRatio="@IsAspectRatioEnabled"
-                             ImageFile="File"
-                             IsImageLocked="false"
-                             @bind-Ratio="ImageRatio"
-                             OnSizeChanged="HandleCropSizeChanged"
-                             AnimeGifEnable></Cropper>
-                    <MSlider @bind-Value="ImageRatio" TValue="double" Max="3" Step="0.01" Min="0.5" PrependIcon="mdi-fit-to-screen-outline " Color="@_dataCacheService.ThemeSetting.Theme" TrackColor="@_dataCacheService.ThemeSetting.Theme" Class="mt-3" OnPrependClick="OnReset"></MSlider>
-
+                <Cropper @bind-Ratio="@ImageRatio" CropperHeight="500" InitCropWidth="200" InitCropHeight="200" MaxCropedHeight="1080" MaxCropedWidth="1920"
+                         @ref="cropper"
+                         PureCSharpProcessing="!ToolHelper.IsWASM"
+                         AspectRatio="AspectRatio"
+                         RequireAspectRatio="@IsAspectRatioEnabled"
+                         ImageFile="File"
+                         IsImageLocked="false"
+                         OnLoad="OnLoad"
+                         AnimeGifEnable></Cropper>
+                <MSlider @bind-Value="ImageRatio" TValue="double" Max="3" Step="0.01" Min="0.5" PrependIcon="mdi-fit-to-screen-outline " Color="@_dataCacheService.ThemeSetting.Theme" TrackColor="@_dataCacheService.ThemeSetting.Theme" Class="mt-3" OnPrependClick="OnReset"></MSlider>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Class="@(isReady?"d-none":"")" Color="white" Style="position: absolute; top: 0; bottom: 0;left: 0;right: 0; display: flex;justify-content: center;flex-direction: column;align-items: center;color:white;" />
             }
 
 
@@ -41,6 +39,7 @@
         </MCardActions>
     </MCard>
 </MDialog>
+
 @code {
     bool Dialog { get; set; }
 
@@ -55,7 +54,7 @@
 
     private string PreviewImagePath { get; set; }
 
-    private bool ShowCroper { get; set; } = true;
+    private bool isReady { get; set; } = false;
 
     private bool IsAspectRatioEnabled { get; set; } = true;
 
@@ -91,20 +90,20 @@
 
         Dialog = true;
 
+
         StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public Task OnLoad()
+    {
+        isReady = true;
         return Task.CompletedTask;
     }
 
     private Task OnReset()
     {
-        ImageRatio= cropper.Ratio = 1;
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-
-    private Task HandleCropSizeChanged((double, double) cropSize)
-    {
-        ShowCroper = true;
+        ImageRatio =1;
         StateHasChanged();
         return Task.CompletedTask;
     }
@@ -137,7 +136,7 @@
         //回调
         await OnUploadedImage.InvokeAsync(PreviewImagePath);
         Dialog = false;
-        ShowCroper = false;
+        isReady = false;
         StateHasChanged();
 
     }
@@ -171,10 +170,20 @@
 
         }
 
-        ShowCroper = false;
+        isReady = false;
         Dialog = false;
         StateHasChanged();
 
     }
 
+    public Task DialogChanged(bool value)
+    {
+        Dialog=value;
+        if(value==false)
+        {
+            isReady = false;
+        }
+
+        return Task.CompletedTask;
+    }
 }
