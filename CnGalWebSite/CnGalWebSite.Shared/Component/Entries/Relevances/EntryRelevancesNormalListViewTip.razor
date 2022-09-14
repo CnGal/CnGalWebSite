@@ -31,7 +31,7 @@
         var castWorks = Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.CV)));
         @if (castWorks.Any())
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-paper-plane" Title="配音作品" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-paper-plane" Title="@("配音作品"+(castWorks.Count()>4?$" ({castWorks.Count()})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in castWorks)
                     {
@@ -47,7 +47,7 @@
         var participationWorks = Model.StaffGames.Where(s => s.AddInfors == null || s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) != PositionGeneralType.CV && ToolHelper.GetGeneralType(s.DisplayName) != PositionGeneralType.SpecialThanks)));
         @if (participationWorks.Any())
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-paper-plane-o" Title="参与作品" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-paper-plane-o" Title="@("参与作品"+(participationWorks.Count()>4?$" ({participationWorks.Count()})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in participationWorks)
                     {
@@ -64,7 +64,7 @@
 
         @if (appreciatedParticWorks.Any())
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-star-o" Title="特别感谢" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-star-o" Title="@("特别感谢"+(appreciatedParticWorks.Count()>4?$" ({appreciatedParticWorks.Count()})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in appreciatedParticWorks)
                     {
@@ -79,7 +79,7 @@
         }
         @if (Model.EntryRelevances.Any(s => s.Type == EntryType.Game))
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-gamepad" Title="相关游戏" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-gamepad" Title="@("相关游戏"+(Model.EntryRelevances.Count(s => s.Type == EntryType.Game)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.Game)})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in Model.EntryRelevances.Where(s => s.Type == EntryType.Game))
                     {
@@ -93,7 +93,7 @@
         }
         @if (Model.EntryRelevances.Any(s => s.Type == EntryType.Staff))
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-star" Title="相关STAFF" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-star" Title="@("相关STAFF"+(Model.EntryRelevances.Count(s => s.Type == EntryType.Staff)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.Staff)})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in Model.EntryRelevances.Where(s => s.Type == EntryType.Staff))
                     {
@@ -107,7 +107,7 @@
         }
         @if (Model.EntryRelevances.Any(s => s.Type == EntryType.Role))
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-group" Title="相关角色" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-group"  Title="@("相关角色"+(Model.EntryRelevances.Count(s => s.Type == EntryType.Role)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.Role)})":""))"  Outline Collapable>
                 <div class="row">
                     @foreach (var item in Model.EntryRelevances.Where(s => s.Type == EntryType.Role))
                     {
@@ -121,7 +121,7 @@
         }
         @if (Model.EntryRelevances.Any(s => s.Type == EntryType.ProductionGroup))
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-object-group" Title="相关制作组" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-object-group"  Title="@("相关制作组"+(Model.EntryRelevances.Count(s => s.Type == EntryType.ProductionGroup)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.ProductionGroup)})":""))"  Outline Collapable>
                 <div class="row">
                     @foreach (var item in Model.EntryRelevances.Where(s => s.Type == EntryType.ProductionGroup))
                     {
