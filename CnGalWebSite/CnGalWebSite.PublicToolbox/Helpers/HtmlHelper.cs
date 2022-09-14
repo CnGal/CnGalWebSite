@@ -54,7 +54,6 @@ namespace CnGalWebSite.PublicToolbox.Helpers
             Stream stream = null;
             StreamReader reader = null;
             var str = string.Empty;
-            var encoding = Encoding.Default;
 
             //请求地址
             request = (HttpWebRequest)WebRequest.Create(url);

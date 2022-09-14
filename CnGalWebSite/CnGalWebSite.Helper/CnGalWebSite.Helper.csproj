@@ -9,12 +9,12 @@
 
   <ItemGroup>
     <PackageReference Include="BootstrapBlazor" Version="6.6.2" />
-    <PackageReference Include="Masa.Blazor" Version="0.6.0-preview.5" />
+    <PackageReference Include="Masa.Blazor" Version="0.6.0-preview.6" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.4" />
-    <PackageReference Include="NodaTime" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.9" />
+    <PackageReference Include="NodaTime" Version="3.1.2" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.18" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.20" />
   </ItemGroup>
 
   <ItemGroup>
