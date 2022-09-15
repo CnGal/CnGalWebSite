@@ -995,3 +995,34 @@ code {
     white-space: pre-wrap !important;
     word-wrap: break-word !important;
 }
+/*wasm加载*/
+.loading-progress {
+    position: relative;
+    display: block;
+    width: 5rem;
+    height: 5rem;
+}
+
+.loading-progress circle {
+    fill: none;
+    stroke: #e0e0e0;
+    stroke-width: 0.3rem;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+}
+
+.loading-progress circle:last-child {
+    stroke: #F06292;
+    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+    transition: stroke-dasharray 0.05s ease-in-out;
+}
+
+.loading-progress-text {
+    position: absolute;
+    font-weight: bold;
+    color: #F06292;
+}
+
+.loading-progress-text:after {
+    content: var(--blazor-load-percentage-text, "Loading");
+}

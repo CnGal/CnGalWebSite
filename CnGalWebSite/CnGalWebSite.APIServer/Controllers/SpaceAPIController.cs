@@ -421,14 +421,14 @@ namespace CnGalWebSite.APIServer.Controllers
             if (examine != null)
             {
                 var userCertification = new UserCertification();
-                _userService.UpdateUserCertificationData(userCertification, examine);
+               await  _userService.UpdateUserCertificationData(userCertification, examine);
 
                 model.UserCertificationModel = new EditUserCertificationModel
                 {
                     IsPending = true,
                     EntryName = userCertification.Entry.DisplayName,
                     Note = examine.Note,
-                    Type = userCertification.Entry.Type,
+                    Type = userCertification.Entry.Type == EntryType.ProductionGroup? UserCertificationType.Group: UserCertificationType.Staff,
                 };
             }
             else
@@ -436,7 +436,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.UserCertificationModel = new EditUserCertificationModel
                 {
                     EntryName = user.Certification?.Entry?.DisplayName,
-                    Type = user.Certification?.Entry?.Type ?? EntryType.Staff
+                    Type = (user.Certification?.Entry?.Type ?? EntryType.Staff) == EntryType.ProductionGroup ? UserCertificationType.Group : UserCertificationType.Staff
                 };
             }
 

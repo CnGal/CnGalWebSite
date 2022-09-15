@@ -55,27 +55,15 @@
         <MCardText Style="color:black;">
             <div class="row">
                 <div class="col-12  col-sm-6">
-                    <Select TValue="EntryType" Value="Model.UserCertificationModel.Type" ValueChanged="OnTypeChanged" ShowLabel="true" DisplayText="类型"></Select>
+                    <Select TValue="UserCertificationType" Value="Model.UserCertificationModel.Type" ValueChanged="OnTypeChanged" ShowLabel="true" DisplayText="类型"></Select>
                 </div>
-                @if (Model.UserCertificationModel.Type == EntryType.Game)
-                {
-                    <div class="col-12  col-sm-6">
-                        <AutoComplete Items="@GameItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.UserCertificationModel.EntryName" DisplayText="认证的词条" ShowLabel="true" />
-                    </div>
-                }
-                else if (Model.UserCertificationModel.Type == EntryType.Staff)
+                @if (Model.UserCertificationModel.Type == UserCertificationType.Staff)
                 {
                     <div class="col-12  col-sm-6">
                         <AutoComplete Items="@StaffItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.UserCertificationModel.EntryName" DisplayText="认证的词条" ShowLabel="true" />
                     </div>
                 }
-                else if (Model.UserCertificationModel.Type == EntryType.Role)
-                {
-                    <div class="col-12  col-sm-6">
-                        <AutoComplete Items="@RoleItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.UserCertificationModel.EntryName" DisplayText="认证的词条" ShowLabel="true" />
-                    </div>
-                }
-                else if (Model.UserCertificationModel.Type == EntryType.ProductionGroup)
+                else if (Model.UserCertificationModel.Type == UserCertificationType.Group)
                 {
                     <div class="col-12  col-sm-6">
                         <AutoComplete Items="@GroupItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.UserCertificationModel.EntryName" DisplayText="认证的词条" ShowLabel="true" />
@@ -124,10 +112,10 @@
         try
         {
             //获取所有词条
-            GameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Game);
+            //GameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Game);
             StaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Staff);
             GroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.ProductionGroup);
-            RoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Role);
+            //RoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Role);
 
             isReady = true;
             StateHasChanged();
@@ -218,7 +206,7 @@
         }
     }
 
-    public Task OnTypeChanged(EntryType type)
+    public Task OnTypeChanged(UserCertificationType type)
     {
         Model.UserCertificationModel.Type = type;
 

@@ -114,4 +114,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         public bool IsShow { get; set; }
 
     }
+
+
 }
