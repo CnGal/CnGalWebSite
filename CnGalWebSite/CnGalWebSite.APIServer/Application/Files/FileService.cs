@@ -22,6 +22,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using SortOrder = BootstrapBlazor.Components.SortOrder;
 using Microsoft.Extensions.Logging;
+using System.Security.Policy;
 
 namespace CnGalWebSite.APIServer.Application.Files
 {
@@ -54,7 +55,7 @@ namespace CnGalWebSite.APIServer.Application.Files
 
         public async Task<PagedResultDto<ImageInforTipViewModel>> GetImagePaginatedResult(PagedSortedAndFilterInput input)
         {
-            var query = _userFileRepository.GetAll().Where(s=>s.Type== UploadFileType.Image).AsNoTracking();
+            var query = _userFileRepository.GetAll().Where(s => s.Type == UploadFileType.Image).AsNoTracking();
 
             //判断输入的查询名称是否为空
             if (!string.IsNullOrWhiteSpace(input.FilterText))
@@ -130,9 +131,9 @@ namespace CnGalWebSite.APIServer.Application.Files
                         UploadTime = s.UploadTime,
                         UserId = s.FileManager.ApplicationUserId,
                         UserName = s.FileManager.ApplicationUser.UserName,
-                        Duration=s.Duration,
+                        Duration = s.Duration,
                         Sha1 = s.Sha1,
-                        Type=s.Type
+                        Type = s.Type
                     }).ToListAsync();
             }
             else
@@ -203,9 +204,9 @@ namespace CnGalWebSite.APIServer.Application.Files
                     FileSize = item.FileSize,
                     UploadTime = item.UploadTime,
                     UserId = item.UserId,
-                    Duration= item.Duration,
-                    Type= item.Type,
-                    Sha1= item.Sha1,
+                    Duration = item.Duration,
+                    Type = item.Type,
+                    Sha1 = item.Sha1,
                 });
             }
 
@@ -242,7 +243,7 @@ namespace CnGalWebSite.APIServer.Application.Files
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"转存图片失败：{url}", url);
+                _logger.LogError(ex, "转存图片失败：{url}", url);
                 return url;
             }
 
@@ -257,7 +258,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                     return null;
                 }
 
-                if(url.Contains("http")==false)
+                if (url.Contains("http") == false)
                 {
                     url = "https:" + url;
                 }
@@ -296,19 +297,28 @@ namespace CnGalWebSite.APIServer.Application.Files
 
         public async Task TransferAllMainImages(int maxCount)
         {
-            var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("?") == false&&s.MainPicture.Contains("default")==false)
+            var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
                 .OrderBy(s => s.Id)
                 .Take(maxCount).ToListAsync();
 
             foreach (var item in entries)
             {
-                var temp = await TransferDepositFile(item.MainPicture);
-                if (string.IsNullOrWhiteSpace(temp) == false)
+                try
                 {
-                    item.MainPicture = temp;
-                    await _entryRepository.UpdateAsync(item);
-                    _logger.LogInformation("转存 词条 - {name}({id}) 主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
+                    var temp = await TransferDepositFile(item.MainPicture);
+                    if (string.IsNullOrWhiteSpace(temp) == false)
+                    {
+                        item.MainPicture = temp;
+                        await _entryRepository.UpdateAsync(item);
+                        _logger.LogInformation("转存 词条 - {name}({id}) 主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "转存词条 - {Name}({Id}) 主图失败", item.Name, item.Id);
+                    throw;
+                }
+
             }
 
             var articles = await _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
@@ -317,12 +327,20 @@ namespace CnGalWebSite.APIServer.Application.Files
 
             foreach (var item in articles)
             {
-                var temp = await TransferDepositFile(item.MainPicture);
-                if (string.IsNullOrWhiteSpace(temp) == false)
+                try
                 {
-                    item.MainPicture = temp;
-                    await _articleRepository.UpdateAsync(item);
-                    _logger.LogInformation("转存 文章 - {name}({id}) 主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
+                    var temp = await TransferDepositFile(item.MainPicture);
+                    if (string.IsNullOrWhiteSpace(temp) == false)
+                    {
+                        item.MainPicture = temp;
+                        await _articleRepository.UpdateAsync(item);
+                        _logger.LogInformation("转存 文章 - {name}({id}) 主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "转存文章 - {Name}({Id}) 主图失败", item.Name, item.Id);
+                    throw;
                 }
             }
         }
