@@ -45,9 +45,6 @@ namespace CnGalWebSite.DataModel.Helper
         public const int MinValidPlayImpressionsLength = 30;
 
         //临时储存的信息
-
-
-
         public static List<string> GetImageLinks(string context)
         {
             var result = new List<string>();
