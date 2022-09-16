@@ -19,11 +19,12 @@
                 <div class="form-group col-12  col-sm-6">
                     <AutoComplete Items="@EntryGroupItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.ProductionGroup" ShowLabel="true" />
                 </div>
+
                 <div class="form-group col-12  col-sm-6">
                     <BootstrapInput @bind-Value="Model.Engine" ShowLabel="true" />
                 </div>
                 <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.Publisher" ShowLabel="true" />
+                    <AutoComplete Items="@EntryGroupItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="Model.Publisher" ShowLabel="true" />
                 </div>
                 <div class="form-group col-12  col-sm-6">
                     <BootstrapInput @bind-Value="Model.IssueMethod" ShowLabel="true" />

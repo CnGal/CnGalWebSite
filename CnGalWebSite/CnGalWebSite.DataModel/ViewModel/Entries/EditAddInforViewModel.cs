@@ -160,11 +160,11 @@ namespace CnGalWebSite.DataModel.ViewModel
         [Display(Name = "分组")]
         public string Modifier { get; set; }
 
-        [Display(Name = "官方职位")]
+        [Display(Name = "★官方职位")]
         [Required(ErrorMessage = "请填写官方职位")]
         public string PositionOfficial { get; set; }
 
-        [Display(Name = "唯一名称")]
+        [Display(Name = "★唯一名称")]
         [Required(ErrorMessage = "请填写唯一名称")]
         public string Name { get; set; }
 
@@ -172,7 +172,6 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string CustomName { get; set; }
 
         [Display(Name = "通用职位")]
-        [Required(ErrorMessage = "请填写通用职位")]
         public PositionGeneralType PositionGeneral { get; set; }
 
         [Display(Name = "隶属组织")]

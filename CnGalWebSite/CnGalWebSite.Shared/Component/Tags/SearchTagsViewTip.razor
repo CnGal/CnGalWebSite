@@ -15,7 +15,7 @@
                ItemText="r => r.Title"
                ItemChildren="r => r.Children"
                Activatable
-               Selectable
+               Selectable="Model!=null"
                SelectedColor="@_dataCacheService.ThemeSetting.Theme"
                ValueChanged="ValueChanged"
                Value="selectedItems"
@@ -90,7 +90,14 @@
 
     public Task Refresh()
     {
-        selectedItems = Model.Where(s=>string.IsNullOrWhiteSpace(s.DisplayName)==false).Select(s => s.DisplayName).ToList();
+        if (Model != null)
+        {
+            selectedItems = Model.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName).ToList();
+        }
+        else
+        {
+            selectedItems.Clear();
+        }
         StateHasChanged();
         return Task.CompletedTask;
     }
@@ -100,9 +107,14 @@
         items.RemoveAll(s => lastTags.Contains(s) == false);
         selectedItems = items;
 
-        Model.RemoveAll(s => items.Contains(s.DisplayName) == false&& lastTags.Contains(s.DisplayName));
-        Model.AddRange(items.Where(s => Model.Select(s => s.DisplayName).Contains(s) == false).Select(s => new RelevancesModel { DisplayName = s }));
+        if (Model != null)
+        {
+            Model.RemoveAll(s => items.Contains(s.DisplayName) == false && lastTags.Contains(s.DisplayName));
+            Model.AddRange(items.Where(s => Model.Select(s => s.DisplayName).Contains(s) == false).Select(s => new RelevancesModel { DisplayName = s }));
+        }
+
         await OnInput.InvokeAsync();
+
     }
 
     private async Task OnSearch(string text)
