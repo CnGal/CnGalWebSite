@@ -252,6 +252,11 @@ namespace CnGalWebSite.APIServer.Application.Files
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(url))
+                {
+                    return null;
+                }
+
                 if(url.Contains("http")==false)
                 {
                     url = "https:" + url;

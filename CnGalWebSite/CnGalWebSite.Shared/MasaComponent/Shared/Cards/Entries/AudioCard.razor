@@ -1,4 +1,5 @@
 ﻿@inject IDataCacheService _dataCacheService
+@inject IJSRuntime JS
 
 <style>
     .theme--light.m-icon {
@@ -62,7 +63,21 @@
             currentAudio = Model.FirstOrDefault();
         }
     }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            try
+            {
+                await JS.InvokeAsync<string>("playAudio", null);
+            }
+            catch (Exception ex)
+            {
 
+            }
+        }
+
+    }
     public Task OnClick(AudioViewModel model)
     {
         if (currentAudio == model)

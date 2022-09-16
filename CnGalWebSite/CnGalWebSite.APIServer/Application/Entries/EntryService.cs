@@ -1367,7 +1367,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             //读取音频信息
             var audioImage = entry.Audio.OrderByDescending(s => s.Priority).FirstOrDefault(s => string.IsNullOrWhiteSpace(s.Thumbnail) == false)?.Thumbnail;
-            model.Audio.AddRange(entry.Audio.Select(s => new AudioViewModel
+            model.Audio.AddRange(entry.Audio.OrderByDescending(s=>s.Priority).Select(s => new AudioViewModel
             {
                 BriefIntroduction = s.BriefIntroduction,
                 Name = s.Name,
