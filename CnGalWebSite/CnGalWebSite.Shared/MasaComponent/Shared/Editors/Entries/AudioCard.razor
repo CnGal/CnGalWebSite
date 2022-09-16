@@ -1,4 +1,7 @@
 ﻿@inject IPopupService PopupService
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
+    音频属于较为敏感的信息，需由制作组或本人<strong>亲自/同意</strong>上传
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-volume-up" Title="音频试听" Class="@Class" Collapable>
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.AudioUploadButton OnUploaded="OnUploaded" Class="mb-4" />
@@ -26,11 +29,11 @@
             @foreach (var item in Model.Audio.OrderByDescending(s => s.Priority))
             {
                 <tr @key="item.Url">
-                    <td><img src="@(string.IsNullOrWhiteSpace(item.Thumbnail)?"https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/AudioThumbnail.png":item.Thumbnail)" class="h-100 p-1" alt="@item.Name"/></td>
+                    <td><img src="@(string.IsNullOrWhiteSpace(item.Thumbnail)?"https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/AudioThumbnail.png":item.Thumbnail)" class="h-100 p-1" alt="@item.Name" /></td>
                     <td style="min-width: 100px; ">@item.Name</td>
                     <td style="overflow-wrap: anywhere; min-width: 200px; ">@item.BriefIntroduction</td>
                     <td>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@item.Url" Class="w-100"/>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAudio Src="@item.Url" Class="w-100" />
                     </td>
                     <td>
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="编辑" OnClick="@(()=>OnEdit(item))" Icon="mdi-pencil" Color="success" />
@@ -54,14 +57,14 @@
 
     public async Task OnUploaded(UploadResult result)
     {
-        if (Model.Audio.Any(s=>s.Url== result.FileURL))
+        if (Model.Audio.Any(s => s.Url == result.FileURL))
         {
             await PopupService.ToastAsync($"这个音频已经添加过了哦~", AlertTypes.Error);
             return;
         }
         Model.Audio.Add(new EditAudioAloneModel
         {
-            Name =result.FileName?? "音频" + (Model.Audio.Count + 1).ToString(),
+            Name = result.FileName ?? "音频" + (Model.Audio.Count + 1).ToString(),
             Url = result.FileURL,
             Duration = result.Duration ?? new TimeSpan(0)
         });
