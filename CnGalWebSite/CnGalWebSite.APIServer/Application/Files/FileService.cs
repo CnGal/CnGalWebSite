@@ -297,7 +297,7 @@ namespace CnGalWebSite.APIServer.Application.Files
 
         public async Task TransferAllMainImages(int maxCount)
         {
-            var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
+            var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
                 .OrderBy(s => s.Id)
                 .Take(maxCount).ToListAsync();
 
@@ -321,7 +321,7 @@ namespace CnGalWebSite.APIServer.Application.Files
 
             }
 
-            var articles = await _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
+            var articles = await _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false&&s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
                 .OrderBy(s => s.Id)
                .Take(maxCount).ToListAsync();
 

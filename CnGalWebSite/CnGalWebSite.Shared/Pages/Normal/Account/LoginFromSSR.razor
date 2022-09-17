@@ -13,7 +13,7 @@
 @inject IAppHelper? _appHelper
 
 <TitleTip NoIndex></TitleTip>
-<CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+@*<CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
     <style>
         .swal2-icon.swal2-info {
             border-color: #009ef7;
@@ -39,7 +39,7 @@
         </div>
     </div>
 
-</CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>
+</CnGalWebSite.Shared.MasaComponent.Shared.Tips.LoginPagesRoot>*@
 
 
 
@@ -83,6 +83,14 @@
         {
 
         }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+            {
+            await OnClickLeft();
+            }
     }
 
     private Task OnClickLeft()

@@ -769,7 +769,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<UserArticleListModel>> GetUserArticles(string id)
         {
-            var articles = await _articleRepository.GetAll().Include(s=>s.CreateUser).AsNoTracking().Where(s => s.CreateUserId == id).ToListAsync();
+            var articles = await _articleRepository.GetAll().Include(s=>s.CreateUser).AsNoTracking().Where(s => s.CreateUserId == id&&s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false).ToListAsync();
 
             var model =new UserArticleListModel();
             foreach (var item in articles.OrderByDescending(s=>s.Id))
