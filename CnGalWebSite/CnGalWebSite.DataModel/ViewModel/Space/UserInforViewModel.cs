@@ -13,7 +13,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 
         public int EditCount { get; set; }
         public int ArticleCount { get; set; }
-        public int FavoriteCount { get; set; }
+        public int ArticleReadCount { get; set; }
 
         public int SignInDays { get; set; }
         public bool IsSignIn { get; set; }
