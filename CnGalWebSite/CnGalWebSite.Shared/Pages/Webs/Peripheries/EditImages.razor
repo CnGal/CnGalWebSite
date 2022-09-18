@@ -57,20 +57,23 @@
 
     AutoSaveTip<EditPeripheryImagesViewModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            //获取所有词条
-            Model = await Http.GetFromJsonAsync<EditPeripheryImagesViewModel>(ToolHelper.WebApiPath + "api/peripheries/editimages/" + Id);
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑周边相册失败");
+            try
+            {
+                //获取所有词条
+                Model = await Http.GetFromJsonAsync<EditPeripheryImagesViewModel>(ToolHelper.WebApiPath + "api/peripheries/editimages/" + Id);
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑周边相册失败");
+            }
         }
     }
-
     private async Task OnSubmit()
     {
         try

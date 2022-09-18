@@ -93,16 +93,20 @@ else
 
     AutoSaveTip<EditLotteryModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            Model = await Http.GetFromJsonAsync<EditLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/EditLottery/" + Id);
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+            try
+            {
+                Model = await Http.GetFromJsonAsync<EditLotteryModel>(ToolHelper.WebApiPath + "api/lotteries/EditLottery/" + Id);
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+            }
         }
     }
     private async Task OnSubmit()

@@ -59,8 +59,8 @@ else
 @code {
 
 
-    [Parameter]
-    public string Id { get; set; }
+        [Parameter]
+        public string Id { get; set; }
     public EditMainViewModel Model { get; set; } = new EditMainViewModel();
     private bool isReady = false;
     [NotNull]
@@ -69,17 +69,21 @@ else
     public ErrorHandler ErrorHandler { get; set; }
 
     AutoSaveTip<EditMainViewModel> autoSave { get; set; }
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            //获取词条信息
-            Model = await Http.GetFromJsonAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/editmain/" + Id);
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑词条主要信息失败");
+            try
+            {
+                //获取词条信息
+                Model = await Http.GetFromJsonAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/editmain/" + Id);
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑词条主要信息失败");
+            }
         }
     }
 

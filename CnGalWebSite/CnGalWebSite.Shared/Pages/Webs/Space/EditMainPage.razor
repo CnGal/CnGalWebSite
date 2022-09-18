@@ -53,16 +53,20 @@
 
     AutoSaveTip<EditUserMainPageViewModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            Model = await Http.GetFromJsonAsync<EditUserMainPageViewModel>(ToolHelper.WebApiPath + "api/space/editmainpage");
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑用户主页失败");
+            try
+            {
+                Model = await Http.GetFromJsonAsync<EditUserMainPageViewModel>(ToolHelper.WebApiPath + "api/space/editmainpage");
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑用户主页失败");
+            }
         }
     }
 

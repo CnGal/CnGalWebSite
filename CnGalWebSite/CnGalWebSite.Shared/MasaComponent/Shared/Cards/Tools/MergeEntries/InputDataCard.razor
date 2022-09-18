@@ -1,55 +1,63 @@
 ﻿@inject IDataCacheService _dataCacheService
+@inject HttpClient Http
 
 @inject IPopupService PopupService
-
-<div class="@Class">
-    <div class="pb-2" style="display: flex; justify-content: center;">被合并的词条 -> 合并到的词条</div>
-    <div class="row mb-4">
-        <div class="col-12 col-sm-6 mb-4">
-            <AutoComplete Items="@EntryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="model.SubName" placeholder="被合并的词条" />
+@if (isReady)
+{
+    <div class="@Class">
+        <div class="pb-2" style="display: flex; justify-content: center;">被合并的词条 -> 合并到的词条</div>
+        <div class="row mb-4">
+            <div class="col-12 col-sm-6 mb-4">
+                <AutoComplete Items="@EntryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="model.SubName" placeholder="被合并的词条" />
+            </div>
+            <div class="col-12 col-sm-6 mb-4">
+                <AutoComplete Items="@EntryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="model.HostName" placeholder="合并到的词条" />
+            </div>
+            <div class="col-12 col-sm-6 mb-2">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="OnAdd" Icon="mdi-plus" />
+            </div>
         </div>
-        <div class="col-12 col-sm-6 mb-4">
-            <AutoComplete Items="@EntryItems" IsLikeMatch="true" IgnoreCase="true" @bind-Value="model.HostName" placeholder="合并到的词条" />
-        </div>
-        <div class="col-12 col-sm-6 mb-2">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="OnAdd" Icon="mdi-plus" />
-        </div>
-    </div>
-    <MSimpleTable Class="mb-4">
-        <thead>
-            <tr>
-                <th class="text-left">
-                    被合并的词条
-                </th>
-                <th class="text-left">
-                    合并到的词条
-                </th>
-                <th class="text-left">
-                    操作
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr @key="item.SubName">
-                    <td>@item.SubName</td>
-                    <td>@item.HostName</td>
-                    <td>
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="删除" TextStyle OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
-                    </td>
+        <MSimpleTable Class="mb-4">
+            <thead>
+                <tr>
+                    <th class="text-left">
+                        被合并的词条
+                    </th>
+                    <th class="text-left">
+                        合并到的词条
+                    </th>
+                    <th class="text-left">
+                        操作
+                    </th>
                 </tr>
-            }
-        </tbody>
-    </MSimpleTable>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr @key="item.SubName">
+                        <td>@item.SubName</td>
+                        <td>@item.HostName</td>
+                        <td>
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="删除" TextStyle OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </MSimpleTable>
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="下一步" Depressed Icon="mdi-arrow-down-bold-outline" OnClick="OnClickFinshInput" Class="mb-2" />
-</div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="下一步" Depressed Icon="mdi-arrow-down-bold-outline" OnClick="OnClickFinshInput" Class="mb-2" />
+    </div>
+
+}
+else
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard />
+}
 
 
 @code {
-    [Parameter]
-    public IEnumerable<string> EntryItems { get; set; }
+
+
     [Parameter]
     public List<MergeEntryModel> Model { get; set; }
     [Parameter]
@@ -58,6 +66,25 @@
     public EventCallback OnFinshInput { get; set; }
 
     MergeEntryModel model = new MergeEntryModel();
+    private bool isReady = false;
+    public IEnumerable<string> EntryItems { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //获取所有词条
+            EntryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList");
+            isReady = true;
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
+        }
+    }
 
     public async Task OnAdd()
     {
@@ -71,7 +98,7 @@
             await PopupService.ToastAsync("被合并的词条只能添加一次", AlertTypes.Error);
             return;
         }
-        if(model.SubName==model.HostName)
+        if (model.SubName == model.HostName)
         {
             await PopupService.ToastAsync("不能合并同一个词条哦", AlertTypes.Error);
             return;
@@ -80,7 +107,7 @@
         model = new MergeEntryModel();
     }
 
-    public  Task OnDelete(MergeEntryModel model)
+    public Task OnDelete(MergeEntryModel model)
     {
         Model.Remove(model);
         return Task.CompletedTask;
@@ -88,7 +115,7 @@
 
     public async Task OnClickFinshInput()
     {
-        if(Model.Count==0)
+        if (Model.Count == 0)
         {
             await PopupService.ToastAsync("你还没有填写合并的词条哦", AlertTypes.Error);
             return;

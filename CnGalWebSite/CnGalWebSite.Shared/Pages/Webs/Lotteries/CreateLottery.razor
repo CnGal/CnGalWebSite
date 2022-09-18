@@ -56,15 +56,19 @@
 
     AutoSaveTip<EditLotteryModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+            try
+            {
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+            }
         }
     }
     private async Task OnSubmit()

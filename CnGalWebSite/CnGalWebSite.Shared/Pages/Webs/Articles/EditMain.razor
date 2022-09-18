@@ -58,18 +58,22 @@
 
     AutoSaveTip<EditArticleMainViewModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            //获取文章信息
-            Model = await Http.GetFromJsonAsync<EditArticleMainViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlemain/" + Id);
+            try
+            {
+                //获取文章信息
+                Model = await Http.GetFromJsonAsync<EditArticleMainViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlemain/" + Id);
 
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑文章主要信息失败");
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑文章主要信息失败");
+            }
         }
     }
 
@@ -83,7 +87,7 @@
             //判断结果
             if (obj.Successful == false)
             {
-             
+
                 await ToastService.Error("编辑文章主要信息失败", obj.Error);
             }
             else

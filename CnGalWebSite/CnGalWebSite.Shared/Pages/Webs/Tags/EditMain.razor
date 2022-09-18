@@ -63,22 +63,25 @@ else
 
     AutoSaveTip<EditTagMainViewModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            //获取所有标签
-            TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags");
+            try
+            {
+                //获取所有标签
+                TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags");
 
-            Model = await Http.GetFromJsonAsync<EditTagMainViewModel>(ToolHelper.WebApiPath + "api/tags/editmain/" + Id);
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑标签主要信息失败");
+                Model = await Http.GetFromJsonAsync<EditTagMainViewModel>(ToolHelper.WebApiPath + "api/tags/editmain/" + Id);
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑标签主要信息失败");
+            }
         }
     }
-
     private async Task OnSubmit()
     {
         try

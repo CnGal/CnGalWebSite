@@ -68,21 +68,24 @@ else
     public ErrorHandler ErrorHandler { get; set; }
     AutoSaveTip<EditEntryTagViewModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
-        try
+        if (firstRender)
         {
-            //获取词条信息
-            Model = await Http.GetFromJsonAsync<EditEntryTagViewModel>(ToolHelper.WebApiPath + "api/entries/edittags/" + Id);
-            //获取所有标签
-            TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags");
+            try
+            {
+                //获取词条信息
+                Model = await Http.GetFromJsonAsync<EditEntryTagViewModel>(ToolHelper.WebApiPath + "api/entries/edittags/" + Id);
+                //获取所有标签
+                TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags");
 
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑词条标签失败");
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑词条标签失败");
+            }
         }
     }
 

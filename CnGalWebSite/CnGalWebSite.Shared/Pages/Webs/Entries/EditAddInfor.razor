@@ -77,22 +77,25 @@ else
     public ErrorHandler ErrorHandler { get; set; }
     AutoSaveTip<EditAddInforViewModel> autoSave { get; set; }
 
-
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            //获取词条信息
-            Model = await Http.GetFromJsonAsync<EditAddInforViewModel>(ToolHelper.WebApiPath + "api/entries/EditAddInfor/" + Id);
-            //获取所有词条
-            EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2");
-            EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3");
+            try
+            {
+                //获取词条信息
+                Model = await Http.GetFromJsonAsync<EditAddInforViewModel>(ToolHelper.WebApiPath + "api/entries/EditAddInfor/" + Id);
+                //获取所有词条
+                EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2");
+                EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3");
 
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑词条附加信息失败");
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑词条附加信息失败");
+            }
         }
     }
 

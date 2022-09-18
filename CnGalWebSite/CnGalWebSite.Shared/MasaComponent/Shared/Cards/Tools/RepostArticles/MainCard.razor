@@ -1,5 +1,4 @@
-﻿@inject HttpClient Http
-@inject IDataCacheService _dataCacheService
+﻿@inject IDataCacheService _dataCacheService
 
 <MDialog @bind-Value="Dialog"
          Width="800">
@@ -15,16 +14,7 @@
                 输入要转载的文章链接
             </MStepperStep>
             <MStepperContent Step="1">
-                @if (isReady)
-                {
                     <InputDataCard Model="Model" OnFinshInput="OnStart" />
-                }
-                else
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard />
-
-                }
-
             </MStepperContent>
             <MStepperStep Step="2" Complete="_step>2" Color="@_dataCacheService.ThemeSetting.Theme">
                 正在处理文章
@@ -53,8 +43,6 @@
     private IEnumerable<string> ArticleItems { get; set; } = new string[1] { "" };
     private IEnumerable<string> EntryGameItems { get; set; } = new string[1] { "" };
 
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
     ProcCard procCard;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -63,22 +51,7 @@
             StateHasChanged();
         }
     }
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            //获取所有词条
-            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
-            ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
-
-            isReady = true;
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取所有词条文章名称失败");
-        }
-    }
+   
     public async Task OnStart()
     {
         _step = 2;
