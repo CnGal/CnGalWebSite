@@ -65,24 +65,28 @@
     private List<string> ArticleItems { get; set; } = new List<string>();
 
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            //获取文章信息
-            Model = await Http.GetFromJsonAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlerelevances/" + Id);
-            //获取所有词条
-            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
-            EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1");
-            EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2");
-            EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3");
-            //获取所有文章
-            ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑文章关联信息失败");
+            try
+            {
+                //获取文章信息
+                Model = await Http.GetFromJsonAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlerelevances/" + Id);
+                //获取所有词条
+                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
+                EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1");
+                EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2");
+                EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3");
+                //获取所有文章
+                ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑文章关联信息失败");
+            }
         }
     }
 

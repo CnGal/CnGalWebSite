@@ -74,18 +74,22 @@ else
     AutoSaveTip<EditMainPageViewModel> autoSave { get; set; }
 
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            //获取词条信息
-            Model = await Http.GetFromJsonAsync<EditMainPageViewModel>(ToolHelper.WebApiPath + "api/entries/editmainpage/" + Id);
+            try
+            {
+                //获取词条信息
+                Model = await Http.GetFromJsonAsync<EditMainPageViewModel>(ToolHelper.WebApiPath + "api/entries/editmainpage/" + Id);
 
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑词条主页失败");
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑词条主页失败");
+            }
         }
     }
 

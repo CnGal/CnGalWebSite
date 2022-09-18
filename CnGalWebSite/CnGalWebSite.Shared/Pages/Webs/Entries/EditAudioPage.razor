@@ -51,8 +51,8 @@ else
 
 
 @code {
-    [Parameter]
-    public string Id { get; set; }
+        [Parameter]
+        public string Id { get; set; }
     public EditAudioViewModel Model { get; set; } = new EditAudioViewModel();
     bool isReady = false;
 
@@ -60,22 +60,24 @@ else
     public ErrorHandler ErrorHandler { get; set; }
     AutoSaveTip<EditAudioViewModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
-        try
+        if (firstRender)
         {
-            //获取词条信息
-            Model = await Http.GetFromJsonAsync<EditAudioViewModel>(ToolHelper.WebApiPath + "api/entries/editaudio/" + Id);
+            try
+            {
+                //获取词条信息
+                Model = await Http.GetFromJsonAsync<EditAudioViewModel>(ToolHelper.WebApiPath + "api/entries/editaudio/" + Id);
 
-            isReady = true;
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑词条音频失败");
-        }
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑词条音频失败");
+            }
 
+        }
     }
 
     private async Task OnSubmit()

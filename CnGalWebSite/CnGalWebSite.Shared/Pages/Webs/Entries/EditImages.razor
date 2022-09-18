@@ -54,8 +54,8 @@ else
 
 
 @code {
-    [Parameter]
-    public string Id { get; set; }
+        [Parameter]
+        public string Id { get; set; }
     public EditImagesViewModel Model { get; set; } = new EditImagesViewModel();
     bool isReady = false;
 
@@ -63,22 +63,25 @@ else
     public ErrorHandler ErrorHandler { get; set; }
     AutoSaveTip<EditImagesViewModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
-        try
+        if (firstRender)
         {
-            //获取词条信息
-            Model = await Http.GetFromJsonAsync<EditImagesViewModel>(ToolHelper.WebApiPath + "api/entries/editimages/" + Id);
 
-            isReady = true;
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑词条相册失败");
-        }
+            try
+            {
+                //获取词条信息
+                Model = await Http.GetFromJsonAsync<EditImagesViewModel>(ToolHelper.WebApiPath + "api/entries/editimages/" + Id);
 
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑词条相册失败");
+            }
+
+        }
     }
 
     private async Task OnSubmit()

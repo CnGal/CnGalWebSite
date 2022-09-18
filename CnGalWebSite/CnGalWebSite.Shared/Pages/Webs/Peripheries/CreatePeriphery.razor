@@ -61,23 +61,27 @@
     AutoSaveTip<CreatePeripheryViewModel> autoSave { get; set; }
 
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            //获取所有词条
-            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
-            EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1");
-            EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2");
-            EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3");
+            try
+            {
+                //获取所有词条
+                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
+                EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1");
+                EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2");
+                EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3");
 
-            PeripheryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/peripheries/GetAllPeripheries");
+                PeripheryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/peripheries/GetAllPeripheries");
 
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取所有词条名称列表失败");
+            }
         }
     }
 

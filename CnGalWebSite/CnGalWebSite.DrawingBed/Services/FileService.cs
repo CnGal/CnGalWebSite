@@ -19,15 +19,15 @@ namespace CnGalWebSite.DrawingBed.Services
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfiguration _configuration;
-        private readonly IHttpClientFactory _clientFactory;
+        private readonly HttpClient _httpClient;
         private readonly string _imageTempPath = "";
         private readonly string _audioTempPath = "";
         private readonly string _fileTempPath = "";
         private readonly ILogger<FileService> _logger;
 
-        public FileService(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ILogger<FileService> logger)
+        public FileService(HttpClient httpClient, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ILogger<FileService> logger)
         {
-            _clientFactory = clientFactory;
+            _httpClient = httpClient;
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
             _logger = logger;
@@ -195,11 +195,9 @@ namespace CnGalWebSite.DrawingBed.Services
                 content: new StringContent(GetFileBase64(filePath)),
                 name: "source");
 
-            using var client = _clientFactory.CreateClient();
-
             var url = _configuration["SliotsImageUrl"] + "api/1/upload/?format=txt&key=" + _configuration["SliotsImageAPIToken"];
 
-            var response = await client.PostAsync(url, content);
+            var response = await _httpClient.PostAsync(url, content);
 
             var newUploadResults = await response.Content.ReadAsStringAsync();
 
@@ -240,10 +238,7 @@ namespace CnGalWebSite.DrawingBed.Services
 
         public async Task<string> SaveFileFromUrl(string url, UploadFileType type)
         {
-
-            using var client = _clientFactory.CreateClient();
-
-            var Bytes = await client.GetByteArrayAsync(url);
+            var Bytes = await _httpClient.GetByteArrayAsync(url);
 
 
             using Stream stream = new MemoryStream(Bytes);
@@ -317,8 +312,7 @@ namespace CnGalWebSite.DrawingBed.Services
         /// <returns></returns>
         private async Task<string> CheckSameFileFromServer(string sha1)
         {
-            using var client = _clientFactory.CreateClient();
-            var result = await client.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/files/GetSameFile?sha1=" + sha1);
+            var result = await _httpClient.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/files/GetSameFile?sha1=" + sha1);
             if(result.Successful&&string.IsNullOrWhiteSpace(result.Error)==false)
             {
                 return result.Error;

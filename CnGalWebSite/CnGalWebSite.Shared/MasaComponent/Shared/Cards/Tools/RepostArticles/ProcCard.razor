@@ -1,6 +1,7 @@
 ﻿@inject IArticleService _articleService
 @implements IDisposable
 @inject IDataCacheService _dataCacheService
+@inject HttpClient Http
 
 <div>
     <div>@($"{item.Url} ({index}/{Model.Count})")</div>
@@ -12,23 +13,25 @@
 </div>
 
 @code {
-    [Parameter]
-    public List<RepostArticleModel> Model { get; set; }
-    [Parameter]
-    public string Class { get; set; }
-    [Parameter]
-    public IEnumerable<string> ArticleItems { get; set; }
-    [Parameter]
-    public IEnumerable<string> EntryGameItems { get; set; }
+        [Parameter]
+        public List<RepostArticleModel> Model { get; set; }
+        [Parameter]
+        public string Class { get; set; }
+        [Parameter]
+        public IEnumerable<string> ArticleItems { get; set; }
+        [Parameter]
+        public IEnumerable<string> EntryGameItems { get; set; }
 
-    int index = 0;
-    string infor = "";
-    RepostArticleModel item = new RepostArticleModel();
+        int index = 0;
+        string infor = "";
+        RepostArticleModel item = new RepostArticleModel();
 
     private System.Threading.Timer mytimer;
 
 
 
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
     public async void OnProgressUpdate(KeyValuePair<OutputLevel, string> model)
     {
@@ -62,21 +65,38 @@
         }
     }
 
+
     public async Task Proc()
     {
-        mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 500);
-
-        _articleService.ProgressUpdate += OnProgressUpdate;
-
-        for (index = 0; index < Model.Count; index++)
+        try
         {
-            item = Model[index];
-            await _articleService.ProcArticle(item,ArticleItems,EntryGameItems);
+            //获取所有词条
+            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
+            ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
+
+            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 500);
+
+            _articleService.ProgressUpdate += OnProgressUpdate;
+
+            for (index = 0; index < Model.Count; index++)
+            {
+                item = Model[index];
+                await _articleService.ProcArticle(item, ArticleItems, EntryGameItems);
+            }
+
         }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有词条文章名称失败");
+            return;
+        }
+        finally
+        {
+            mytimer.Dispose();
+            mytimer = null;
 
-        mytimer.Dispose();
-
-        _articleService.ProgressUpdate -= OnProgressUpdate;
+            _articleService.ProgressUpdate -= OnProgressUpdate;
+        }
     }
 
     #region 释放实例

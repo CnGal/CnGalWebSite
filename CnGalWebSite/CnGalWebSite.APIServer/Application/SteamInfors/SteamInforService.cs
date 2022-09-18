@@ -23,18 +23,18 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<SteamUserInfor, long> _steamUserInforRepository;
         private readonly IConfiguration _configuration;
-        private readonly IHttpClientFactory _clientFactory;
+        private readonly HttpClient _httpClient;
         private readonly ILogger<SteamInforService> _logger;
 
         public SteamInforService(IRepository<SteamInfor, long> steamInforRepository, IRepository<ApplicationUser, string> userRepository, IRepository<Entry, int> entryRepository,
         IConfiguration configuration, IRepository<PlayedGame, long> playedGameRepository, IRepository<SteamUserInfor, long> steamUserInforRepository, ILogger<SteamInforService> logger,
-        IHttpClientFactory clientFactory)
+        HttpClient httpClient)
         {
             _steamInforRepository = steamInforRepository;
             _userRepository = userRepository;
             _configuration = configuration;
             _playedGameRepository = playedGameRepository;
-            _clientFactory = clientFactory;
+            _httpClient = httpClient;
             _steamUserInforRepository = steamUserInforRepository;
             _entryRepository = entryRepository;
             _logger = logger;
@@ -104,9 +104,8 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         public async Task<SteamInfor> UpdateSteamInfor(int steamId, int entryId)
         {
             //获取信息
-            using var client = _clientFactory.CreateClient();
-
-            var jsonContent = await client.GetStringAsync("https://api.isthereanydeal.com/v01/game/overview/?key=" + _configuration["IsthereanydealAPIToken"] + "&region=cn&country=CN&shop=steam&ids=app%2F" + steamId + "&allowed=steam");
+            
+            var jsonContent = await _httpClient.GetStringAsync("https://api.isthereanydeal.com/v01/game/overview/?key=" + _configuration["IsthereanydealAPIToken"] + "&region=cn&country=CN&shop=steam&ids=app%2F" + steamId + "&allowed=steam");
             var thirdResult = JObject.Parse(jsonContent);
             var steamNowJson = new SteamNowJson
             {
@@ -126,7 +125,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             try
             {
                 //尝试使用官方api获取信息
-                jsonContent = await client.GetStringAsync("https://store.steampowered.com/api/appdetails/?appids=" + steamId + "&cc=cn&filters=price_overview");
+                jsonContent = await _httpClient.GetStringAsync("https://store.steampowered.com/api/appdetails/?appids=" + steamId + "&cc=cn&filters=price_overview");
                 officialResult = JObject.Parse(jsonContent);
 
 
@@ -135,7 +134,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             {
                 try
                 {
-                    jsonContent = await client.GetStringAsync("https://store.steampowered.com/api/appdetails/?appids=" + steamId + "&cc=cn&filters=price_overview");
+                    jsonContent = await _httpClient.GetStringAsync("https://store.steampowered.com/api/appdetails/?appids=" + steamId + "&cc=cn&filters=price_overview");
                     officialResult = JObject.Parse(jsonContent);
 
                 }
@@ -339,8 +338,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             {
                 try
                 {
-                    using var client = _clientFactory.CreateClient();
-                    var jsonContent = await client.GetStringAsync("https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + item);
+                    var jsonContent = await _httpClient.GetStringAsync("https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + item);
                     var obj = JObject.Parse(jsonContent);
                     var temp = obj["response"].ToObject<UserSteamResponseJson>();
                     steamGames.games.AddRange(temp.games);
@@ -399,9 +397,8 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
         public async Task<SteamEvaluation> GetSteamEvaluationAsync(int id)
         {
-            using var client = _clientFactory.CreateClient();
 
-            var content = await client.GetStringAsync("https://store.steampowered.com/app/" + id);
+            var content = await _httpClient.GetStringAsync("https://store.steampowered.com/app/" + id);
 
             var document = new HtmlDocument();
             document.LoadHtml(content);
@@ -424,8 +421,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             var steamUser = new SteamUserInforJson();
             try
             {
-                using var client = _clientFactory.CreateClient();
-                var jsonContent = await client.GetStringAsync("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=" + _configuration["SteamAPIToken"] + "&steamids=" + SteamId);
+                var jsonContent = await _httpClient.GetStringAsync("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=" + _configuration["SteamAPIToken"] + "&steamids=" + SteamId);
                 var obj = JObject.Parse(jsonContent);
                 steamUser = obj.ToObject<SteamUserInforJson>();
             }

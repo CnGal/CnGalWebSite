@@ -88,18 +88,22 @@
 
     AutoSaveTip<EditUserDataViewModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
 
-        try
-        {
-            //获取词条信息
-            Model = await Http.GetFromJsonAsync<EditUserDataViewModel>(ToolHelper.WebApiPath + "api/space/edituserdata/");
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑用户资料失败");
+            try
+            {
+                //获取词条信息
+                Model = await Http.GetFromJsonAsync<EditUserDataViewModel>(ToolHelper.WebApiPath + "api/space/edituserdata/");
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑用户资料失败");
+            }
         }
     }
 

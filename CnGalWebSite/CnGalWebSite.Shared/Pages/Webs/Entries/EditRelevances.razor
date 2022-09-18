@@ -54,8 +54,8 @@ else
 </div>
 
 @code {
-    [Parameter]
-    public string Id { get; set; }
+        [Parameter]
+        public string Id { get; set; }
     public EditRelevancesViewModel Model { get; set; } = new EditRelevancesViewModel();
     private List<string> EntryGameItems { get; set; } = new List<string>();
     private List<string> EntryRoleItems { get; set; } = new List<string>();
@@ -70,26 +70,29 @@ else
 
     AutoSaveTip<EditRelevancesViewModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            //获取词条信息
-            Model = await Http.GetFromJsonAsync<EditRelevancesViewModel>(ToolHelper.WebApiPath + "api/entries/editrelevances/" + Id);
-            //获取所有词条
-            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
-            EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1");
-            EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2");
-            EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3");
-            //获取所有文章
-            ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
-            isReady = true;
-            StateHasChanged();
+            try
+            {
+                //获取词条信息
+                Model = await Http.GetFromJsonAsync<EditRelevancesViewModel>(ToolHelper.WebApiPath + "api/entries/editrelevances/" + Id);
+                //获取所有词条
+                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
+                EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1");
+                EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2");
+                EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3");
+                //获取所有文章
+                ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles");
+                isReady = true;
+                StateHasChanged();
 
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑词条关联信息失败");
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑词条关联信息失败");
+            }
         }
     }
 

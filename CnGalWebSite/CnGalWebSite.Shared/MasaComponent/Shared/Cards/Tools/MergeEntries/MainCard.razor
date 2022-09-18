@@ -15,14 +15,11 @@
                 输入要合并的词条
             </MStepperStep>
             <MStepperContent Step="1">
-                @if (isReady)
+                @if (Dialog)
                 {
-                    <InputDataCard Model="Model" EntryItems="EntryItems" OnFinshInput="OnStart" />
+                    <InputDataCard Model="Model"  OnFinshInput="OnStart" />
                 }
-                else
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard />
-                }
+            
 
             </MStepperContent>
             <MStepperStep Step="2" Complete="_step>2" Color="@_dataCacheService.ThemeSetting.Theme">
@@ -48,34 +45,11 @@
     bool Dialog { get; set; }
 
     public List<MergeEntryModel> Model { get; set; } = new List<MergeEntryModel>();
-    private bool isReady = false;
     private IEnumerable<string> EntryItems { get; set; } = new string[1] { "" };
 
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
-    ProcCard procCard;
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            StateHasChanged();
-        }
-    }
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            //获取所有词条
-            EntryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList");
 
-            isReady = true;
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取所有词条名称失败");
-        }
-    }
+    ProcCard procCard;
+
     public async Task OnStart()
     {
         _step = 2;

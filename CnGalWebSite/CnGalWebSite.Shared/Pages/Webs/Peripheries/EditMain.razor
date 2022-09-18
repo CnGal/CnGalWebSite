@@ -57,22 +57,25 @@
     public ErrorHandler ErrorHandler { get; set; }
     AutoSaveTip<EditPeripheryMainViewModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
 
-        try
-        {
-            //获取所有词条
-            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
-            Model = await Http.GetFromJsonAsync<EditPeripheryMainViewModel>(ToolHelper.WebApiPath + "api/peripheries/editmain/" + Id);
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑周边主要信息失败");
+            try
+            {
+                //获取所有词条
+                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
+                Model = await Http.GetFromJsonAsync<EditPeripheryMainViewModel>(ToolHelper.WebApiPath + "api/peripheries/editmain/" + Id);
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑周边主要信息失败");
+            }
         }
     }
-
     private async Task OnSubmit()
     {
         try

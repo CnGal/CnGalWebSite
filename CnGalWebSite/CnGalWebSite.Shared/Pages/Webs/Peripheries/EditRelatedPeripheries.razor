@@ -58,19 +58,23 @@
 
     AutoSaveTip<EditPeripheryRelatedPeripheriesViewModel> autoSave { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        try
+        if (firstRender)
         {
-            //获取所有词条
-            PeripheryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/peripheries/GetAllPeripheries");
+            try
+            {
+                //获取所有词条
+                PeripheryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/peripheries/GetAllPeripheries");
 
-            Model = await Http.GetFromJsonAsync<EditPeripheryRelatedPeripheriesViewModel>(ToolHelper.WebApiPath + "api/peripheries/editrelatedperipheries/" + Id);
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取编辑周边关联周边信息失败");
+                Model = await Http.GetFromJsonAsync<EditPeripheryRelatedPeripheriesViewModel>(ToolHelper.WebApiPath + "api/peripheries/editrelatedperipheries/" + Id);
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑周边关联周边信息失败");
+            }
         }
     }
 

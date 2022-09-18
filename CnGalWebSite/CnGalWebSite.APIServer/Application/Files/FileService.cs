@@ -32,7 +32,7 @@ namespace CnGalWebSite.APIServer.Application.Files
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IAppHelper _appHelper;
-        private readonly IHttpClientFactory _clientFactory;
+        private readonly HttpClient _httpClient;
         private readonly IRepository<FileManager, int> _fileManagerRepository;
         private readonly IConfiguration _configuration;
         private readonly ILogger<FileService> _logger;
@@ -40,12 +40,12 @@ namespace CnGalWebSite.APIServer.Application.Files
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<UserFile>, string, SortOrder, IEnumerable<UserFile>>> SortLambdaCache = new();
 
 
-        public FileService(IAppHelper appHelper, IRepository<UserFile, int> userFileRepository, IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository, IConfiguration configuration,
+        public FileService(IAppHelper appHelper, IRepository<UserFile, int> userFileRepository, HttpClient httpClient, IRepository<FileManager, int> fileManagerRepository, IConfiguration configuration,
             IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, ILogger<FileService> logger)
         {
             _userFileRepository = userFileRepository;
             _appHelper = appHelper;
-            _clientFactory = clientFactory;
+            _httpClient = httpClient;
             _fileManagerRepository = fileManagerRepository;
             _configuration = configuration;
             _entryRepository = entryRepository;
@@ -223,10 +223,9 @@ namespace CnGalWebSite.APIServer.Application.Files
         {
             try
             {
-                using var client = _clientFactory.CreateClient();
                 //client.Timeout = TimeSpan.FromSeconds(30);
 
-                var result = await client.PostAsJsonAsync($"{_configuration["TransferDepositFileAPI"]}api/files/linkToImgUrl?url={url}&x={x}&y={y}", new TransferDepositFileModel());
+                var result = await _httpClient.PostAsJsonAsync($"{_configuration["TransferDepositFileAPI"]}api/files/linkToImgUrl?url={url}&x={x}&y={y}", new TransferDepositFileModel());
                 var jsonContent = result.Content.ReadAsStringAsync().Result;
                 var obj = System.Text.Json.JsonSerializer.Deserialize<LinkToImgResult>(jsonContent, ToolHelper.options);
 
@@ -262,10 +261,9 @@ namespace CnGalWebSite.APIServer.Application.Files
                 {
                     url = "https:" + url;
                 }
-                using var client = _clientFactory.CreateClient();
 
                 using var content = new MultipartFormDataContent();
-                using var fileContent = new StreamContent(await client.GetStreamAsync(url));
+                using var fileContent = new StreamContent(await _httpClient.GetStreamAsync(url));
 
                 content.Add(
                     content: fileContent,
@@ -273,7 +271,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                     fileName: "test.png");
                 content.Add(new StringContent(_configuration["TucangCCAPIToken"]), "token");
 
-                var response = await client.PostAsync("https://tucang.cc/api/v1/upload", content);
+                var response = await _httpClient.PostAsync("https://tucang.cc/api/v1/upload", content);
 
                 var newUploadResults = await response.Content.ReadAsStringAsync();
                 var result = JObject.Parse(newUploadResults);
