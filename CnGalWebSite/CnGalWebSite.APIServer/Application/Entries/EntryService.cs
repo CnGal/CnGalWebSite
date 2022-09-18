@@ -1196,7 +1196,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     new StaffInforModel
                     {
-                        Modifier = "",
+                        Modifier =null,
                         StaffList = new List<StaffValue>()
                     }
                 };
@@ -1207,7 +1207,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                     //尝试获取staff的显示名称
                     var displayName = string.IsNullOrWhiteSpace(item.CustomName) ? (item.ToEntryNavigation?.DisplayName ?? item.Name) : item.CustomName;
-                    var mainModifier = item.Modifier;
+                    var mainModifier = string.IsNullOrWhiteSpace(item.Modifier) ? null : item.Modifier;
                     var secordModifier = item.PositionOfficial;
                     var staffId = item.ToEntry ?? 0;
 
