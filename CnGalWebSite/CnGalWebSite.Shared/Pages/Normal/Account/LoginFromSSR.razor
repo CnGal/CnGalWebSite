@@ -61,36 +61,38 @@
     public ErrorHandler ErrorHandler { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var result = await Http.PostAsJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = Code });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            LoginResult obj = JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
-            //判断结果
-            if (obj.Code == LoginResultCode.OK)
-            {
-                if (await AuthService.Login(obj.Token) == false)
-                {
-                    ErrorHandler.ProcessError(new Exception(), "获取令牌成功，但是尝试登入失败");
-                }
-                else
-                {
 
-                }
-            }
-        }
-        catch (Exception exc)
-        {
-
-        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if(firstRender)
+        {
+            try
             {
-            await OnClickLeft();
+                var result = await Http.PostAsJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = Code });
+                string jsonContent = result.Content.ReadAsStringAsync().Result;
+                LoginResult obj = JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
+                //判断结果
+                if (obj.Code == LoginResultCode.OK)
+                {
+                    if (await AuthService.Login(obj.Token) == false)
+                    {
+                        ErrorHandler.ProcessError(new Exception(), "获取令牌成功，但是尝试登入失败");
+                    }
+                    else
+                    {
+
+                    }
+                }
             }
+            catch (Exception exc)
+            {
+
+            }
+
+            await OnClickLeft();
+        }
     }
 
     private Task OnClickLeft()
