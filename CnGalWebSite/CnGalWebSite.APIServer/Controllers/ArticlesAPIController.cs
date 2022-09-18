@@ -155,7 +155,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //读取审核信息
             if (user != null)
             {
-                examineQuery = await _examineRepository.GetAll()
+                examineQuery = await _examineRepository.GetAll().AsNoTracking()
                                .Where(s => s.ArticleId == article.Id && s.ApplicationUserId == user.Id && s.IsPassed == null
                                && (s.Operation == Operation.EditArticleMain || s.Operation == Operation.EditArticleMainPage || s.Operation == Operation.EditArticleRelevanes))
                                .Select(s => new Examine
