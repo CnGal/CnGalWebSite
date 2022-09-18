@@ -4,6 +4,7 @@ using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Steam;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -197,14 +198,18 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<EntryInforTipViewModel>>> GetFreeGamesAsync()
         {
-            var tag = await _tagRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Name == "免费");
-            if (tag == null)
-            {
-                return NotFound("未找到免费的标签");
-            }
+            var entryIds = await _tagRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entries)
+                .Where(s => s.Name == "免费")
+                .Select(s => s.Entries.Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).Select(s=>s.Id).ToList())
+                .FirstOrDefaultAsync();
+
+            entryIds = entryIds.ToList().Random().Take(30).ToList();
+
+            var entries = await _entryRepository.GetAll().AsNoTracking().Where(s => entryIds.Contains(s.Id)).ToListAsync();
 
             var model = new List<EntryInforTipViewModel>();
-            foreach (var entry in tag.Entries.Where(s=>s.IsHidden==false))
+            foreach (var entry in entries)
             {
                 model.Add( _appHelper.GetEntryInforTipViewModel(entry));
             }

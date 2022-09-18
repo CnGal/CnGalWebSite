@@ -905,6 +905,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.Entries).ThenInclude(s => s.Tags)
                 .Include(s => s.Entries).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Examines)
                 .Include(s => s.Entries).ThenInclude(s => s.Examines)
+                .Include(s=>s.Entries).ThenInclude(s=>s.Certification)
                 .Where(s => s.Name == "配音")
                 .Select(s => new
                 {
@@ -920,6 +921,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         s.Audio,
                         s.Tags,
                         s.ReaderCount,
+                        IsCertificated=s.Certification!=null,
                         Entries = s.EntryRelationFromEntryNavigation.Select(s => new
                         {
                             s.ToEntryNavigation.Type,
@@ -962,7 +964,8 @@ namespace CnGalWebSite.APIServer.Controllers
                         }).OrderByDescending(s => s.Priority).ToList(),
                         LastUploadAudioTime = item.Examines.FirstOrDefault(s => s.Operation == Operation.EstablishAudio && s.IsPassed == true)?.ApplyTime,
                         LastPublishTime = item.Entries.FirstOrDefault(s => s.PubulishTime != null && s.PubulishTime < now)?.PubulishTime,
-                        WorkCount = item.Entries.Count(s => s.Type == EntryType.Game)
+                        WorkCount = item.Entries.Count(s => s.Type == EntryType.Game),
+                        IsCertificated=item.IsCertificated
                     };
                     foreach (var infor in item.Tags)
                     {
