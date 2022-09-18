@@ -30,7 +30,7 @@
             @foreach (var item in Model.Skip((_dataCacheService.CVThematicPageCache.CurrentPage - 1) * MaxCount).Take(MaxCount))
             {
 
-                <div class="col-4 col-lg-3 col-xxl-2 mb-4">
+                <div class="col-4 col-lg-2 mb-4">
                     <CnGalWebSite.Shared.MasaComponent.PC.Home.ThematicPages.Cards.CVInforCard Model="item" />
                 </div>
             }
@@ -143,7 +143,7 @@
         Model = _dataCacheService.CVThematicPageCache.SortType switch
         {
             CVThematicPageSortType.Random => Model.Random(),
-            CVThematicPageSortType.None => Model.OrderByDescending(s => s.LastUploadAudioTime).ThenBy(s => s.Infor.MainImage).ToList(),
+            CVThematicPageSortType.None => Model.OrderByDescending(s => s.LastUploadAudioTime).ThenByDescending(s=>s.IsCertificated).ThenBy(s => s.Infor.MainImage).ToList(),
             CVThematicPageSortType.ReadCount => Model.OrderByDescending(s => s.Infor.ReaderCount).ToList(),
             CVThematicPageSortType.WorkCount => Model.OrderByDescending(s => s.WorkCount).ToList(),
             CVThematicPageSortType.RecentlyPublish => Model.OrderByDescending(s => s.LastPublishTime).ToList(),

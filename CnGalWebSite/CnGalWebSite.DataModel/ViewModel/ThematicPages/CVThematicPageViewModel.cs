@@ -47,6 +47,8 @@ namespace CnGalWebSite.DataModel.ViewModel.ThematicPages
 
         public int WorkCount { get; set; }
 
+        public bool IsCertificated { get; set; }
+
         /// <summary>
         /// 最近发布作品时间
         /// </summary>

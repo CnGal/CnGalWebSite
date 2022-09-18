@@ -2001,7 +2001,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
         {
             var model = new EditMainViewModel
             {
-                MainPicturePath = _appHelper.GetImagePath(entry.MainPicture, "app.png"),
                 Thumbnail = entry.Thumbnail,
                 MainPicture = entry.MainPicture,
                 BackgroundPicture = entry.BackgroundPicture,

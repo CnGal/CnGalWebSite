@@ -23,9 +23,6 @@ namespace CnGalWebSite.DataModel.ViewModel
         [Display(Name = "小背景图")]
         public string SmallBackgroundPicture { get; set; }
 
-        [Display(Name = "主图")]
-        public string MainPicturePath { get; set; }
-
         public override Result Validate()
         {
             if (string.IsNullOrWhiteSpace(Name))
