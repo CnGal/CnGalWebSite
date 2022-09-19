@@ -8,13 +8,17 @@
 </style>
 @if (currentAudio != null)
 {
-    <div style="display:flex;">
-        <div class="me-4">
-            <img src="@currentAudio.Thumbnail" alt="@currentAudio.Name" style="width:150px;height:150px;" />
-        </div>
-        <div class="w-100">
+    <div class="@(ToolHelper.IsApp?"d-flex":"")">
+        @if ((string.IsNullOrWhiteSpace(currentAudio.Thumbnail) == false && currentAudio.Thumbnail.Contains("default")) || _dataCacheService.IsApp== false)
+        {
+            <div class="@(ToolHelper.IsApp?"me-4":"mb-4")">
+                <img src="@currentAudio.Thumbnail" alt="@currentAudio.Name" style="width:150px;height:150px;" />
+            </div>
+        }
+
+        <div class="@(ToolHelper.IsApp?"w-100":"")">
             <div class="mb-4">
-                <MBorder Color="@_dataCacheService.ThemeSetting.Theme" Style="border-radius:0;margin: auto 0;" Width="@("2px")">
+                <MBorder Color="@_dataCacheService.ThemeSetting.Theme" Style="border-radius:0;margin: auto 0;" Width="@("4px")">
                     <div class="ms-4">
                         <div class="h6 fw-bold mb-0">@currentAudio.Name</div>
                         @if (string.IsNullOrWhiteSpace(currentAudio.BriefIntroduction) == false)
@@ -26,15 +30,19 @@
                 </MBorder>
 
             </div>
-            <MSimpleTable Class=" overflow-auto" Style="max-height:150px;">
+            <MSimpleTable Class=" overflow-auto" Style="max-height:150px;background-color:transparent">
                 <tbody>
                     @{ int index = 0; }
                     @foreach (var item in Model.OrderByDescending(s => s.Priority))
                     {
                         <tr class="@(item==currentAudio?"font-color fw-bold":"")" @key="item.Url" @onclick="@(()=>OnClick(item))">
                             <td class="p-0" style="height: 30px; width: 0px;"><MIcon Style="@(item== currentAudio?"color:var(--main-color)!important;":"")" Size="@("20px")">mdi-play-box</MIcon></td>
-                            <td style="min-width: 100px;height:30px; ">@($"{++index}. {item.Name}" )</td>
-                            <td style="min-width: 100px; height: 30px; display: flex; justify-content: flex-end; align-items: center;">
+                            <td style="height:30px; ">
+                                <div  class="text-truncate-1">
+                                    @($"{++index}. {item.Name}" )
+                                </div>
+                            </td>
+                            <td style="height: 30px; display: flex; justify-content: flex-end; align-items: center;">
                                 @(item.Duration.TotalMinutes.ToString("0") + ":"+(item.Duration.TotalSeconds%60).ToString("00"))
                             </td>
                         </tr>
@@ -50,8 +58,8 @@
 @code {
     [Parameter]
     public List<AudioViewModel> Model { get; set; }
-    [Parameter]
-    public bool AutoPlay { get; set; } = true;
+
+    public bool AutoPlay { get; set; } = false;
 
     AudioViewModel currentAudio;
 
@@ -62,6 +70,8 @@
         {
             currentAudio = Model.FirstOrDefault();
         }
+        AutoPlay = false;
+
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -85,6 +95,7 @@
             return Task.CompletedTask;
         }
         currentAudio = model;
+        AutoPlay = true;
         StateHasChanged();
         return Task.CompletedTask;
 
