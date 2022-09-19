@@ -8,14 +8,12 @@
 }
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="音频试听" Icon="fa fa-fw  fa-volume-up">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.AudioCard Model="Model.Audio" AutoPlay="AutoPlay"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.AudioCard Model="Model.Audio"/>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
-    [Parameter]
-    public bool AutoPlay { get; set; } = true;
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
 }

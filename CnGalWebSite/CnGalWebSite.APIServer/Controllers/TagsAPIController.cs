@@ -821,9 +821,23 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<RandomTagModel>>> GetRandomTagsAsync()
         {
-            var tags = await _tagRepository.GetAll().AsNoTracking()
+            var tagIds = await _tagRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entries)
                 .Where(s => s.Entries.Count > 3 && s.Name != "免费")
+                .Select(s => s.Id)
+                .ToListAsync();
+
+            tagIds = tagIds.Random().Take(10).ToList();
+
+            var tags = await _tagRepository.GetAll().AsNoTracking()
+                .Include(s => s.Entries)
+                .Where(s => tagIds.Contains(s.Id))
+                .Select(s => new
+                {
+                    s.Id,
+                    s.Name,
+                    Entries= s.Entries.OrderBy(x => EF.Functions.Random()).Take(12)
+                })
                 .ToListAsync();
 
             var model = new List<RandomTagModel>();
@@ -834,9 +848,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     Id = item.Id,
                     Name = item.Name
                 };
-                foreach (var infor in item.Entries.ToList().Random().Take(12))
+                foreach (var infor in item.Entries)
                 {
-                    temp.Entries.Add( _appHelper.GetEntryInforTipViewModel(infor));
+                    temp.Entries.Add(_appHelper.GetEntryInforTipViewModel(infor));
                 }
                 model.Add(temp);
             }
