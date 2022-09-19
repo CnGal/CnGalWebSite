@@ -8,15 +8,15 @@
 </style>
 @if (currentAudio != null)
 {
-    <div class="@(ToolHelper.IsApp?"d-flex":"")">
+    <div class="@(_dataCacheService.IsApp?"":"d-flex")">
         @if ((string.IsNullOrWhiteSpace(currentAudio.Thumbnail) == false && currentAudio.Thumbnail.Contains("default")) || _dataCacheService.IsApp== false)
         {
-            <div class="@(ToolHelper.IsApp?"me-4":"mb-4")">
+            <div class="@(_dataCacheService.IsApp?"mb-4":"me-4")">
                 <img src="@currentAudio.Thumbnail" alt="@currentAudio.Name" style="width:150px;height:150px;" />
             </div>
         }
 
-        <div class="@(ToolHelper.IsApp?"w-100":"")">
+        <div class="@(_dataCacheService.IsApp?"":"w-100")">
             <div class="mb-4">
                 <MBorder Color="@_dataCacheService.ThemeSetting.Theme" Style="border-radius:0;margin: auto 0;" Width="@("4px")">
                     <div class="ms-4">
