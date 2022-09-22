@@ -37,10 +37,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-
             try
             {
                 Model = await Http.GetFromJsonAsync<ServerStaticOverviewModel>(ToolHelper.WebApiPath + "api/admin/GetServerStaticDataOverview");

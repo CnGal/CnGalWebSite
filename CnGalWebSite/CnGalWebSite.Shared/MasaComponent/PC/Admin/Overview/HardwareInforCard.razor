@@ -1,6 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
 
-<div  style="display:flex; flex-direction: column; align-items: center; ">
+<div  style="flex-direction: column; align-items: center; " class="w-100 d-flex">
     <MProgressCircular Value="@Model.Percentage" Size="100" Width="5" Rotate="270" Class="mb-4" Color="@_dataCacheService.ThemeSetting.Theme">@Model.Percentage.ToString("0.0")%</MProgressCircular>
     <div class="h5 fw-bold mb-4">@Model.Name</div>
 
