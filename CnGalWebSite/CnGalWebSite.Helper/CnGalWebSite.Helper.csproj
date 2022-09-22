@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="BootstrapBlazor" Version="6.6.2" />
+    <PackageReference Include="Hardware.Info" Version="10.0.1" />
     <PackageReference Include="Masa.Blazor" Version="0.6.0-preview.6" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.9" />

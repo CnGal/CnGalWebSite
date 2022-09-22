@@ -5,6 +5,7 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.Extensions;
+using Hardware.Info;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
@@ -1209,7 +1210,9 @@ namespace CnGalWebSite.DataModel.Helper
         /// 获取服务器动态数据概览
         /// </summary>
         /// <returns></returns>
-    
+
+        static readonly IHardwareInfo hardwareInfo = new HardwareInfo();
+
         public static async Task<ServerRealTimeOverviewModel> GetServerRealTimeDataOverview()
         {
             var begin = DateTime.Now.ToCstTime();
@@ -1217,15 +1220,16 @@ namespace CnGalWebSite.DataModel.Helper
             ServerRealTimeOverviewModel model = new ServerRealTimeOverviewModel();
 
             using var proc = Process.GetCurrentProcess();
-            var mem = proc.WorkingSet64;
-            var privateMemorySize64 = proc.PrivateMemorySize64;
-            var virtualMemorySize64 = proc.VirtualMemorySize64;
 
             model.CPUUtilization = await GetCpuUsageForProcess();
-            model.MemoryUsedSize = privateMemorySize64;
-            model.MemoryTotalSize = mem;
+         
             model.CPUCoreNumber = Environment.ProcessorCount;
             model.TotalProcessorTime = proc.TotalProcessorTime;
+
+            hardwareInfo.RefreshMemoryStatus();
+
+            model.MemoryUsedSize =(long)( hardwareInfo.MemoryStatus.TotalPhysical - hardwareInfo.MemoryStatus.AvailablePhysical);
+            model.MemoryTotalSize = (long)hardwareInfo.MemoryStatus.TotalPhysical;
 
             var end = DateTime.Now.ToCstTime();
 
@@ -1234,6 +1238,7 @@ namespace CnGalWebSite.DataModel.Helper
             return model;
 
         }
+
         private static async Task<double> GetCpuUsageForProcess()
         {
             var startTime = DateTime.UtcNow;
