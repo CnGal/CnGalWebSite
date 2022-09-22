@@ -41,7 +41,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -871,66 +873,58 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
         /// <summary>
-        /// 获取网站数据概览
+        /// 获取服务器动态数据概览
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<OverviewDataViewModel>> GetOverviewData()
+        public async Task<ActionResult<ServerRealTimeOverviewModel>> GetServerRealTimeDataOverview()
         {
-            try
-            {
-                var tempDateTimeNow = DateTime.Now.ToCstTime();
-                //获取数据
-                var model = new OverviewDataViewModel
-                {
-                    TotalRegisterCount = await _userRepository.CountAsync(),
-                    YesterdayRegisterCount = await _userRepository.CountAsync(s => s.RegistTime.Date == tempDateTimeNow.AddDays(-1).Date),
-                    TodayRegisterCount = await _userRepository.CountAsync(s => s.RegistTime.Date == tempDateTimeNow.Date),
-                    TodayOnlineCount = await _userRepository.CountAsync(s => s.LastOnlineTime.Date == tempDateTimeNow.Date),
+            return await ToolHelper.GetServerRealTimeDataOverview();
+        }
+        private static async Task<double> GetCpuUsageForProcess()
+        {
+            var startTime = DateTime.UtcNow;
+            var startCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
 
-                    TotalEntryCount = await _entryRepository.CountAsync(),
-                    YesterdayEditEntryCount = await _examineRepository.CountAsync(s => s.IsPassed == true && s.PassedTime != null && s.PassedTime.Value.Date == tempDateTimeNow.AddDays(-1).Date && (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishMainPage)),
-                    TodayEditEntryCount = await _entryRepository.CountAsync(s => s.LastEditTime.Date == tempDateTimeNow.Date),
+            await Task.Delay(500);
 
-                    TotalArticleCount = await _articleRepository.LongCountAsync(),
-                    YesterdayCreateArticleCount = await _articleRepository.LongCountAsync(s => s.CreateTime.Date == tempDateTimeNow.AddDays(-1).Date),
-                    YesterdayEditArticleCount = await _examineRepository.LongCountAsync(s => s.IsPassed == true && s.PassedTime != null && s.PassedTime.Value.Date == tempDateTimeNow.AddDays(-1).Date && (s.Operation == Operation.EditArticleMain || s.Operation == Operation.EditArticleRelevanes || s.Operation == Operation.EditArticleMainPage)),
-                    TodayCreateArticleCount = await _articleRepository.LongCountAsync(s => s.CreateTime.Date == tempDateTimeNow.Date),
-                    TodayEditArticleCount = await _articleRepository.LongCountAsync(s => s.LastEditTime.Date == tempDateTimeNow.Date),
+            var endTime = DateTime.UtcNow;
+            var endCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
 
-                    TotalTagCount = await _tagRepository.CountAsync(),
-                    YesterdayEditTagCount = await _examineRepository.CountAsync(s => s.IsPassed == true && s.PassedTime != null && s.PassedTime.Value.Date == tempDateTimeNow.AddDays(-1).Date && (s.Operation == Operation.EditTag)),
-                    TodayEditTagCount = await _examineRepository.CountAsync(s => s.IsPassed == true && s.PassedTime != null && s.PassedTime.Value.Date == tempDateTimeNow.Date && (s.Operation == Operation.EditTag)),
+            var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
+            var totalMsPassed = (endTime - startTime).TotalMilliseconds;
 
-                    TotalExamineCount = await _examineRepository.LongCountAsync(),
-                    YesterdayTotalExamineCount = await _examineRepository.LongCountAsync(s => s.ApplyTime.Date == tempDateTimeNow.AddDays(-1).Date),
-                    TodayTotalExamineCount = await _examineRepository.LongCountAsync(s => s.ApplyTime.Date == tempDateTimeNow.Date),
-                    TotalExaminingCount = await _examineRepository.LongCountAsync(s => s.IsPassed == null),
+            var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
 
-                    TotalCommentCount = await _commentRepository.LongCountAsync(),
-                    YesterdayCommentCount = await _commentRepository.LongCountAsync(s => s.CommentTime.Date == tempDateTimeNow.AddDays(-1).Date),
-                    TodayCommentCount = await _commentRepository.LongCountAsync(s => s.CommentTime.Date == tempDateTimeNow.Date),
+            return cpuUsageTotal * 100;
+        }
+        /// <summary>
+        /// 获取服务器静态数据概览
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<ServerStaticOverviewModel>> GetServerStaticDataOverview()
+        {
+            var model = new ServerStaticOverviewModel();
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var now = DateTime.Now.ToCstTime().AddDays(-7);
 
-                    TotalMessageCount = await _messageRepository.LongCountAsync(),
-                    YesterdayMessageCount = await _messageRepository.LongCountAsync(s => s.PostTime.Date == tempDateTimeNow.AddDays(-1).Date),
-                    TodayMessageCount = await _messageRepository.LongCountAsync(s => s.PostTime.Date == tempDateTimeNow.Date),
 
-                    TotalFileCount = await _userFileRepository.CountAsync(),
-                    TotalFileSpace = await _userFileRepository.GetAll().SumAsync(s => s.FileSize) ?? 0,
-                    YesterdayFileCount = await _userFileRepository.CountAsync(s => s.UploadTime.Date == tempDateTimeNow.AddDays(-1).Date),
-                    YesterdayFileSpace = await _userFileRepository.GetAll().Where(s => s.UploadTime.Date == tempDateTimeNow.AddDays(-1).Date).SumAsync(s => s.FileSize) ?? 0,
-                    TodayFileCount = await _userFileRepository.CountAsync(s => s.UploadTime.Date == tempDateTimeNow.Date),
-                    TodayFileSpace = await _userFileRepository.GetAll().Where(s => s.UploadTime.Date == tempDateTimeNow.Date).SumAsync(s => s.FileSize) ?? 0,
-                };
+            model.LastUpdateTime = System.IO.File.GetLastWriteTime(assembly.Location);
+            model.SystemName = Environment.OSVersion.ToString();
+            model.SDKVersion = RuntimeInformation.FrameworkDescription;
+            model.ServerName = Environment.MachineName;
 
-                return model;
-            }
-            catch (Exception exc)
-            {
-                return BadRequest(exc.Message);
-            }
+            model.UserTotalNumber = await _userRepository.GetAll().CountAsync();
+            model.UserVerifyEmailNumber = await _userRepository.GetAll().CountAsync(s => s.EmailConfirmed);
+            model.UserSecondaryVerificationNumber = await _userRepository.GetAll().CountAsync(s => s.IsPassedVerification);
+            model.UserActiveNumber = await _userRepository.GetAll().CountAsync(s => s.LastOnlineTime > now);
+
+            return model;
 
         }
+
+
 
         /// <summary>
         /// 获取图表 管理员限定

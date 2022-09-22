@@ -1,4 +1,5 @@
-﻿using BootstrapBlazor.Components;
+﻿using BlazorComponent;
+using BootstrapBlazor.Components;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Application.Examines.Dtos;
 using CnGalWebSite.DataModel.Helper;
@@ -309,16 +310,18 @@ namespace CnGalWebSite.Shared.Service
         public CVThematicPageViewModel CVThematicPageCache { get; set; }
 
         /// <summary>
+        /// 主页Tab
+        /// </summary>
+        public StringNumber HomeTabIndex { get; set; }
+
+        /// <summary>
         /// 搜索页面缓存
         /// </summary>
         public IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
 
-        private readonly HttpClient _httpClient;
-        private readonly NavigationManager _navigationManager;
-
-        public DataCatcheService(HttpClient httpClient, IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche, IPageModelCatche<VoteViewModel> voteIndexPageCatche,
+        public DataCatcheService(IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche, IPageModelCatche<VoteViewModel> voteIndexPageCatche,
         IPageModelCatche<PeripheryViewModel> peripheryIndexPageCatche, IPageModelCatche<TagIndexViewModel> tagIndexPageCatche, IPageModelCatche<List<HomeNewsAloneViewModel>> homePageNewsCatche,
-        IPageModelCatche<List<CarouselViewModel>> homePageCarouselsCatche, IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche, NavigationManager navigationManager,
+        IPageModelCatche<List<CarouselViewModel>> homePageCarouselsCatche, IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
         IPageModelCatche<LotteryViewModel> lotteryIndexPageCatche,
         IPageModelCatche<ArticleContrastEditRecordViewModel> articleContrastEditRecordViewCatche,
         IPageModelCatche<PeripheryContrastEditRecordViewModel> peripheryContrastEditRecordViewCatche,
@@ -338,7 +341,6 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<List<EntryInforTipViewModel>> publishGameTimesDataCatche,
         IPageModelCatche<List<MainImageCardModel>> homeListCardsCache)
         {
-            _httpClient = httpClient;
             (EntryIndexPageCatche = entryIndexPageCatche).Init(nameof(EntryIndexPageCatche), ToolHelper.WebApiPath + "api/entries/GetEntryView/");
             (ArticleIndexPageCatche = articleIndexPageCatche).Init(nameof(ArticleIndexPageCatche), ToolHelper.WebApiPath + "api/articles/GetArticleView/");
             (PeripheryIndexPageCatche = peripheryIndexPageCatche).Init(nameof(PeripheryIndexPageCatche), ToolHelper.WebApiPath + "api/peripheries/GetPeripheryView/");
@@ -366,9 +368,6 @@ namespace CnGalWebSite.Shared.Service
             (HomePageNewsCatche = homePageNewsCatche).Init(nameof(HomePageNewsCatche), "");
             (HomePageCarouselsCatche = homePageCarouselsCatche).Init(nameof(HomePageCarouselsCatche), "");
             (SearchViewCatche = searchViewCatche).Init(nameof(SearchViewCatche), "");
-            _navigationManager = navigationManager;
-
-            
         }
 
         public async Task OnRefreshRequsted(EventArgs e)

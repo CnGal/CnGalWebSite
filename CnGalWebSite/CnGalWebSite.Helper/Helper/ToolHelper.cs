@@ -1,9 +1,11 @@
 ﻿using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.Extensions;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -1203,7 +1205,52 @@ namespace CnGalWebSite.DataModel.Helper
             }
         }
 
+        /// <summary>
+        /// 获取服务器动态数据概览
+        /// </summary>
+        /// <returns></returns>
+    
+        public static async Task<ServerRealTimeOverviewModel> GetServerRealTimeDataOverview()
+        {
+            var begin = DateTime.Now.ToCstTime();
 
+            ServerRealTimeOverviewModel model = new ServerRealTimeOverviewModel();
+
+            using var proc = Process.GetCurrentProcess();
+            var mem = proc.WorkingSet64;
+            var privateMemorySize64 = proc.PrivateMemorySize64;
+            var virtualMemorySize64 = proc.VirtualMemorySize64;
+
+            model.CPUUtilization = await GetCpuUsageForProcess();
+            model.MemoryUsedSize = privateMemorySize64;
+            model.MemoryTotalSize = mem;
+            model.CPUCoreNumber = Environment.ProcessorCount;
+            model.TotalProcessorTime = proc.TotalProcessorTime;
+
+            var end = DateTime.Now.ToCstTime();
+
+            model.TimeSpanGetData = end - begin;
+
+            return model;
+
+        }
+        private static async Task<double> GetCpuUsageForProcess()
+        {
+            var startTime = DateTime.UtcNow;
+            var startCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
+
+            await Task.Delay(500);
+
+            var endTime = DateTime.UtcNow;
+            var endCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
+
+            var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
+            var totalMsPassed = (endTime - startTime).TotalMilliseconds;
+
+            var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
+
+            return cpuUsageTotal * 100;
+        }
     }
         public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions
         {

@@ -3,107 +3,34 @@
 @attribute [Authorize(Roles = "Admin")]
 @inject HttpClient Http
 @inject ToastService ToastService
-@implements IDisposable
+@inject IDataCacheService _dataCacheService
 
 
 <TitleTip Title="网站数据概览"></TitleTip>
 
-
 <div class="row">
     <div class="col-12">
-        <div class="  rounded shadow-sm  bg-opacity p-3 mb-3">
-            <h3 class="fw-bold text-center">网站数据概览</h3>
-            <p class="text-center" style="color: gray;margin-top:20px">
-                <i class="fa fa-spin fa-link fa-fw "></i>
-                <span class="article-infor-text">实时刷新中</span>&nbsp;&nbsp;&nbsp;
+        <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.ServerInforCard Model="Model" />
 
-                <i class="fa fa-calendar-o fa-fw "></i>
-                <span class="article-infor-text">@DateTime.Now.ToCstTime().ToString("F")</span>
-            </p>
-        </div>
     </div>
+    <div class="@(ToolHelper.IsWASM ?"col-12":"col-12 col-lg-6")">
+        <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.APIServerDataCard />
 
-    @if (IsReady)
+    </div>
+    @if (ToolHelper.IsWASM == false)
     {
-        <div class="col-12 col-md-6 col-xl-4 pb-3">
-            <RealTimeDataTip Title="用户" Context="@(new Dictionary<string, string>
-                                               {
-                                                   ["总注册用户"] = Model.TotalRegisterCount.ToString(),
-                                                   ["昨日注册用户"] = Model.YesterdayRegisterCount.ToString(),
-                                                   ["今日注册用户"] = Model.TodayRegisterCount.ToString(),
-                                                   ["今日在线用户"] = Model.TodayOnlineCount.ToString()
-                                               })"></RealTimeDataTip>
+        <div class="col-12 col-lg-6">
+            <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.BlazorServerDataCard/>
         </div>
-        <div class="col-12 col-md-6 col-xl-4 pb-3">
-            <RealTimeDataTip Title="词条" Context="@(new Dictionary<string, string>
-                                               {
-                                                   ["总词条"] = Model.TotalEntryCount.ToString(),
-                                                   ["昨日编辑词条"] = Model.YesterdayEditEntryCount.ToString(),
-                                                   ["今日编辑词条"] = Model.TodayEditEntryCount.ToString()
-                                               })"></RealTimeDataTip>
-        </div>
-        <div class="col-12 col-md-6 col-xl-4 pb-3">
-            <RealTimeDataTip Title="文章" Context="@(new Dictionary<string, string>
-                                               {
-                                                   ["总文章"] = Model.TotalArticleCount.ToString(),
-                                                   ["昨日发表文章"] = Model.YesterdayCreateArticleCount.ToString(),
-                                                   ["昨日编辑文章"] = Model.YesterdayEditArticleCount.ToString(),
-                                                   ["今日发表文章"] = Model.TodayCreateArticleCount.ToString(),
-                                                   ["今日编辑文章"] = Model.TodayEditArticleCount.ToString(),
-                                               })"></RealTimeDataTip>
-        </div>
-        <div class="col-12 col-md-6 col-xl-4 pb-3">
-            <RealTimeDataTip Title="标签" Context="@(new Dictionary<string, string>
-                                               {
-                                                   ["总标签"] = Model.TotalTagCount.ToString(),
-                                                   ["昨日编辑标签"] = Model.YesterdayEditTagCount.ToString(),
-                                                   ["今日编辑标签"] = Model.TodayEditTagCount.ToString(),
-                                               })"></RealTimeDataTip>
-        </div>
-        <div class="col-12 col-md-6 col-xl-4 pb-3">
-            <RealTimeDataTip Title="审核" Context="@(new Dictionary<string, string>
-                                               {
-                                                   ["总审核"] = Model.TotalExamineCount.ToString(),
-                                                   ["待审核"] = Model.TotalExaminingCount.ToString(),
-                                                   ["昨日审核"] = Model.YesterdayTotalExamineCount.ToString(),
-                                                   ["今日审核"] = Model.TodayTotalExamineCount.ToString(),
-                                               })"></RealTimeDataTip>
-        </div>
-        <div class="col-12 col-md-6 col-xl-4 pb-3">
-            <RealTimeDataTip Title="评论" Context="@(new Dictionary<string, string>
-                                               {
-                                                   ["总评论"] = Model.TotalCommentCount.ToString(),
-                                                   ["昨日评论"] = Model.YesterdayCommentCount.ToString(),
-                                                   ["今日评论"] = Model.TodayCommentCount.ToString(),
-                                               })"></RealTimeDataTip>
-        </div>
-        <div class="col-12 col-md-6 col-xl-4 pb-3">
-            <RealTimeDataTip Title="消息" Context="@(new Dictionary<string, string>
-                                               {
-                                                   ["总消息"] = Model.TotalMessageCount.ToString(),
-                                                   ["昨日消息"] = Model.YesterdayMessageCount.ToString(),
-                                                   ["今日消息"] = Model.TodayMessageCount.ToString(),
-                                               })"></RealTimeDataTip>
-        </div>
-        <div class="col-12 col-md-6 col-xl-4 pb-3">
-            <RealTimeDataTip Title="文件" Context="@(new Dictionary<string, string>
-                                               {
-                                                   ["文件总数"] = Model.TotalFileCount.ToString(),
-                                                   ["文件总大小"] = ((double)Model.TotalFileSpace/(1024*1024)).ToString("0.00")+" MB",
-                                                   ["昨日文件数"] = Model.YesterdayFileCount.ToString(),
-                                                   ["昨日文件大小"] = ((double)Model.YesterdayFileSpace/(1024*1024)).ToString("0.00")+" MB",
-                                                   ["今日文件数"] = Model.TodayFileCount.ToString(),
-                                                   ["今日文件大小"] = ((double)Model.TodayFileSpace/(1024*1024)).ToString("0.00")+" MB",
-                                               })"></RealTimeDataTip>
-        </div>
-
     }
-
-
+    <div class="col-12">
+        <CnGalWebSite.Shared.MasaComponent.PC.Admin.Overview.UserDataCard Model="Model"/>
+    </div>
 </div>
+
 @code {
 
-    public OverviewDataViewModel Model = new OverviewDataViewModel();
+    public ServerStaticOverviewModel Model = new ServerStaticOverviewModel();
     bool IsReady = false;
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
@@ -113,60 +40,20 @@
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            IsReady = true;
-            //启动定时器
-            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(RefreshDate), null, 0, 100);
-        }
-    }
 
-
-    System.Threading.Timer mytimer;
-    static int count = -1;
-    public async void RefreshDate(object o)
-    {
-        count++;
-        if (count % 100 == 0)
-        {
-            await InvokeAsync(async () =>
+            try
             {
-                try
-                {
-                    Model = await Http.GetFromJsonAsync<OverviewDataViewModel>(ToolHelper.WebApiPath + "api/admin/GetOverviewData");
-                    if (Model == null)
-                    {
-                        Model = new OverviewDataViewModel();
-                    }
-                    StateHasChanged();
-                }
-                catch (Exception ex)
-                {
-                    if (mytimer != null)
-                    {
-                        await mytimer.DisposeAsync();
-                    }
-
-
-                    ErrorHandler.ProcessError(ex, "刷新网站数据概览失败");
-                }
-
-            });
-        }
-        else
-        {
-            await InvokeAsync(() =>
-            {
+                Model = await Http.GetFromJsonAsync<ServerStaticOverviewModel>(ToolHelper.WebApiPath + "api/admin/GetServerStaticDataOverview");
+                IsReady = true;
                 StateHasChanged();
-            });
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "刷新网站数据概览失败");
+            }
+
         }
     }
 
-    public void Dispose()
-    {
-        if (mytimer != null)
-        {
-            mytimer?.Dispose();
 
-            mytimer = null;
-        }
-    }
 }

@@ -24,7 +24,7 @@
             </Grid.ColumnDefinitions>
             <ActivityIndicator IsRunning="true"   Grid.Column="1" Grid.Row="1" />
 
-            <VerticalStackLayout Grid.Column="1" Grid.Row="3" >
+            <VerticalStackLayout Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="3" >
                 <Label Text="CnGal资料站" FontAttributes="Bold"  FontSize="Medium" HorizontalTextAlignment="Center"/>
                 <Label Text="愿每一个CnGal创作者的作品都能不被忘记"  HorizontalTextAlignment="Center"/>
             </VerticalStackLayout>
