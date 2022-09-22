@@ -1,0 +1,64 @@
+﻿@inject IDataCacheService _dataCacheService
+
+@if (Model.UserTotalNumber != 0)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="用户" Icon="fa fa-fw fa-users" Class="mb-4">
+        <div class="row">
+            @foreach (var item in Items)
+            {
+                <div class="col-12 col-md-4 col-xxl-3 d-flex" style=" align-items: center;">
+
+                    <MProgressCircular Value="@item.Percentage" Size="70" Width="5" Rotate="270" Color="@_dataCacheService.ThemeSetting.Theme">@item.Percentage.ToString("0.0")%</MProgressCircular>
+
+
+                    <div style="display: flex; flex-direction: column;" class="ms-4">
+                        <div class="h6 mb-1 fw-bold text-truncate-1">@item.Name</div>
+                        <div class="text-truncate-1">@item.Value</div>
+                    </div>
+                </div>
+            }
+
+
+        </div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+}
+
+
+@code {
+    [Parameter]
+    public ServerStaticOverviewModel Model { get; set; }
+
+    private List<InforModel> Items { get; set; } = new List<InforModel>();
+
+    class InforModel
+    {
+        public string Name { get; set; }
+        public long Value { get; set; }
+        public double Percentage { get; set; }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Items.Clear();
+        Items.Add(new InforModel
+        {
+            Name = "已验证邮箱",
+            Value = Model.UserVerifyEmailNumber,
+            Percentage = 100.0 * Model.UserVerifyEmailNumber / Model.UserTotalNumber
+        });
+        Items.Add(new InforModel
+        {
+            Name = "二次身份验证",
+            Value = Model.UserSecondaryVerificationNumber,
+            Percentage = 100.0 * Model.UserSecondaryVerificationNumber / Model.UserTotalNumber
+        });
+        Items.Add(new InforModel
+        {
+            Name = "7天在线",
+            Value = Model.UserActiveNumber,
+            Percentage = 100.0 * Model.UserActiveNumber / Model.UserTotalNumber
+        });
+    }
+
+}

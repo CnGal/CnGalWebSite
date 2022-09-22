@@ -1,0 +1,38 @@
+﻿@inject IDataCacheService _dataCacheService
+
+<div  style="display:flex; flex-direction: column; align-items: center; ">
+    <MProgressCircular Value="@Model.Percentage" Size="100" Width="5" Rotate="270" Class="mb-4" Color="@_dataCacheService.ThemeSetting.Theme">@Model.Percentage.ToString("0.0")%</MProgressCircular>
+    <div class="h5 fw-bold mb-4">@Model.Name</div>
+
+    <div class="d-flex">
+        @foreach (var infor in Model.Items)
+        {
+            <div style="display: flex; flex-direction: column;" class="ms-4">
+                <div class="h6 mb-1 fw-bold text-truncate-1  text-center">@infor.Value</div>
+                <div class="text-truncate-1  text-center">@infor.Name</div>
+            </div>
+        }
+
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public HardwareModel Model { get; set; }
+
+    public class HardwareModel
+    {
+        public string Name { get; set; }
+        public double Percentage { get; set; }
+
+        public List<InforModel> Items = new List<InforModel>();
+    }
+
+    public class InforModel
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
+    }
+
+}

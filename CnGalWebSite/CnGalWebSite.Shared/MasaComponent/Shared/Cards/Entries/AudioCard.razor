@@ -9,7 +9,7 @@
 @if (currentAudio != null)
 {
     <div class="@(_dataCacheService.IsApp?"":"d-flex")">
-        @if ((string.IsNullOrWhiteSpace(currentAudio.Thumbnail) == false && currentAudio.Thumbnail.Contains("default")) || _dataCacheService.IsApp== false)
+        @if ((string.IsNullOrWhiteSpace(currentAudio.Thumbnail) == false && currentAudio.Thumbnail.Contains("default"))==false || _dataCacheService.IsApp== false)
         {
             <div class="@(_dataCacheService.IsApp?"mb-4":"me-4")">
                 <img src="@currentAudio.Thumbnail" alt="@currentAudio.Name" style="width:150px;height:150px;" />

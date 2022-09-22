@@ -20,7 +20,7 @@
         color: var(--main-color) !important;
     }
 </style>
-<MTabsItems @bind-Value="TabIndex" Class="pb-12">
+<MTabsItems @bind-Value="_dataCacheService.HomeTabIndex" Class="pb-12">
     <MTabItem Value="0">
         <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCarousel />
 
@@ -48,7 +48,6 @@
         <AuthorizeView>
             <Authorized>
                 <CnGalWebSite.Shared.Pages.Webs.Space.Index Id="@_dataCacheService.UserInfor.Id"></CnGalWebSite.Shared.Pages.Webs.Space.Index>
-
             </Authorized>
             <NotAuthorized>
                 <div class="w-100" style="height: calc(100vh); display: flex; justify-content: center; align-items: center; ">
@@ -60,7 +59,7 @@
 </MTabsItems>
 
 <MFooter Fixed Padless>
-    <MBottomNavigation @bind-Value="TabIndex" Shift Grow>
+    <MBottomNavigation @bind-Value="_dataCacheService.HomeTabIndex" Shift Grow>
         <MButton ActiveClass="font-color">
             <span>主页</span>
 
@@ -101,9 +100,6 @@
 </MFooter>
 
 @code {
-
-    [Parameter]
-    public StringNumber TabIndex { get; set; }
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

@@ -1,4 +1,5 @@
-﻿using BootstrapBlazor.Components;
+﻿using BlazorComponent;
+using BootstrapBlazor.Components;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
@@ -165,6 +166,8 @@ namespace CnGalWebSite.Shared.Service
         SpaceViewCacheModel SpaceViewCache { get; set; }
 
         CVThematicPageViewModel CVThematicPageCache { get; set; }
+
+        StringNumber HomeTabIndex { get; set; }
 
         void RefreshAllCatche();
 

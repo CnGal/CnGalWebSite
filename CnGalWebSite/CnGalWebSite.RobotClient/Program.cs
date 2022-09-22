@@ -7,7 +7,7 @@ var cacheX = new CacheX();
 
 
 OutputHelper.Repeat();
-OutputHelper.WriteCenter("CnGal资料站 看板娘 v3.3.27", 1.8);
+OutputHelper.WriteCenter("CnGal资料站 看板娘 v3.3.29", 1.8);
 OutputHelper.Repeat();
 
 
@@ -73,7 +73,7 @@ var miraiTask = Task.Run(async () =>
 
             if (result != null)
             {
-                foreach (var item in groupX.Groups)
+                foreach (var item in groupX.Groups.Where(s=>s.IsHidden==false&&s.ForceMatch==false))
                 {
                     result.SendTo = item.GroupId;
                     await clientX.SendMessage(result);
@@ -94,7 +94,7 @@ var miraiTask = Task.Run(async () =>
 
             if (result != null)
             {
-                foreach (var item in groupX.Groups)
+                foreach (var item in groupX.Groups.Where(s => s.IsHidden == false && s.ForceMatch == false))
                 {
                     result.SendTo = item.GroupId;
                     await clientX.SendMessage(result);

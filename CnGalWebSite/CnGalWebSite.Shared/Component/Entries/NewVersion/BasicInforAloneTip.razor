@@ -12,10 +12,10 @@
             </span>
         }
 
-            <span itemprop="@ItemProp">
-                @Text
-            </span>
-        
+        <span itemprop="@ItemProp">
+            @Text
+        </span>
+
 
     </span>
 }
@@ -26,9 +26,9 @@ else
         <span class="@Class" style=" word-break: break-all;">
             <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text
 
-                <a class="font-color" @onclick="OnClick" itemprop="@ItemProp">@Url</a>
+            <a class="font-color" @onclick="OnClick" itemprop="@ItemProp">@Url</a>
 
-            
+
         </span>
     }
     else
@@ -37,8 +37,8 @@ else
             <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text
 
 
-                <a href="@Url" target="_blank" itemprop="@ItemProp">@Url</a>
-            
+            <a href="@Url" target="_blank" itemprop="@ItemProp">@Url</a>
+
         </span>
 
     }

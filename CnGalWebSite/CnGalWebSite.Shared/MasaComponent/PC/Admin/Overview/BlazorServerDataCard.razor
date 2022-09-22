@@ -1,0 +1,137 @@
+﻿@inject HttpClient Http
+@inject ToastService ToastService
+@inject IDataCacheService _dataCacheService
+@implements IDisposable
+
+@if (IsReady)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="Blazor Server" Icon="fa fa-fw fa-server" Class="mb-4">
+        <div class="row">
+            @foreach (var item in Items)
+            {
+                <div class="col-12 col-md-6 d-flex mt-2">
+                    <HardwareInforCard Model="item" />
+                </div>
+
+            }
+        </div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+
+@code {
+
+    public ServerRealTimeOverviewModel Model { get; set; } = new ServerRealTimeOverviewModel();
+
+    List<HardwareInforCard.HardwareModel> Items { get; set; } = new List<HardwareInforCard.HardwareModel>();
+
+    bool IsReady;
+    TimeSpan NetworkLatency;
+    private System.Threading.Timer mytimer;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool IsRefresh = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 2);
+        }
+    }
+
+    public async void Send(object o)
+    {
+        await InvokeAsync(async () =>
+        {
+            await GetData();
+            ProcData();
+            StateHasChanged();
+        });
+
+    }
+
+    public async Task GetData()
+    {
+        if (IsRefresh)
+        {
+            return;
+        }
+        IsRefresh = true;
+        try
+        {
+            Model =await ToolHelper.GetServerRealTimeDataOverview();
+
+            IsReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取API服务器动态数据失败");
+        }
+
+        IsRefresh = false;
+    }
+
+    public void ProcData()
+    {
+        Items.Clear();
+        Items.Add(new HardwareInforCard.HardwareModel
+        {
+            Name = "CPU利用率",
+            Percentage = Model.CPUUtilization,
+            Items = new List<HardwareInforCard.InforModel>
+{
+                new HardwareInforCard.InforModel
+                {
+                    Name="核心数",
+                    Value=$"{ Model.CPUCoreNumber} 个"
+                },
+                new HardwareInforCard.InforModel
+                {
+                    Name="活动时长",
+                    Value=Model.TotalProcessorTime.ToOmitString()
+                },
+                new HardwareInforCard.InforModel
+                {
+                    Name="计算耗时",
+                    Value=Model.TimeSpanGetData.ToOmitString()
+                }
+            }
+        }); ;
+
+        Items.Add(new HardwareInforCard.HardwareModel
+        {
+            Name = "内存利用率",
+            Percentage = 100 * (double)Model.MemoryUsedSize / Model.MemoryTotalSize,
+            Items = new List<HardwareInforCard.InforModel>
+{
+                new HardwareInforCard.InforModel
+                {
+                    Name="工作集",
+                    Value=$"{ (double)Model.MemoryTotalSize/1024/1024:0.0} MB"
+                },
+                new HardwareInforCard.InforModel
+                {
+                    Name="已使用",
+                    Value=$"{(double) Model.MemoryUsedSize/1024/1024:0.0} MB"
+                }
+            }
+        });
+    }
+
+    #region 释放实例
+    public void Dispose()
+    {
+        if (mytimer != null)
+        {
+            mytimer.Dispose();
+            mytimer = null;
+        }
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+
+}

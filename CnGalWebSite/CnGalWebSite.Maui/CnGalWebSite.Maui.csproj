@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net6.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks>net7.0-android</TargetFrameworks>
     <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
     <!-- <TargetFrameworks>$(TargetFrameworks);net6.0-tizen</TargetFrameworks> -->
     <OutputType>Exe</OutputType>
@@ -20,8 +19,8 @@
     <ApplicationIdGuid>6B09C854-D216-4521-991B-3EEB85D890E6</ApplicationIdGuid>
 
     <!-- Versions -->
-    <ApplicationVersion>5</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.5</ApplicationDisplayVersion>
+    <ApplicationVersion>6</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.6</ApplicationDisplayVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
@@ -60,7 +59,7 @@
     <ProjectReference Include="..\CnGalWebSite.Shared\CnGalWebSite.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-android'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0-android'">
     <PackageReference Include="Plugin.CurrentActivity">
       <Version>2.1.0.4</Version>
     </PackageReference>

@@ -1,0 +1,65 @@
+﻿@inject IDataCacheService _dataCacheService
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="服务器基本信息" Icon="fa fa-fw fa-info-circle" Class="mb-4">
+    <div class="row">
+        @foreach (var item in Items)
+        {
+            <div class="col-12 col-md-6 col-xxl-3 d-flex mt-2" style=" align-items: center;">
+
+                <MIcon Color="@_dataCacheService.ThemeSetting.Theme" Large>@item.Icon</MIcon>
+
+                <div style="display: flex; flex-direction: column;" class="ms-4">
+                    <div class="h6 mb-1 fw-bold text-truncate-1">@item.Name</div>
+                    <div class="text-truncate-1">@item.Value</div>
+                </div>
+            </div>
+        }
+
+
+    </div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+
+@code {
+    [Parameter]
+    public ServerStaticOverviewModel Model { get; set; }
+
+    private List<InforModel> Items { get; set; } = new List<InforModel>();
+
+    class InforModel
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public string Icon { get; set; }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Items.Clear();
+        Items.Add(new InforModel
+        {
+            Name = "服务器名称",
+            Value = Model.ServerName,
+            Icon = "mdi-server "
+        });
+        Items.Add(new InforModel
+        {
+            Name = "系统",
+            Value = Model.SystemName,
+            Icon = "mdi-cpu-64-bit"
+        });
+        Items.Add(new InforModel
+        {
+            Name = "运行时",
+            Value = Model.SDKVersion,
+            Icon = "mdi-cpu-64-bit"
+        });
+        Items.Add(new InforModel
+        {
+            Name = "最后更新时间",
+            Value = Model.LastUpdateTime.ToString("yyyy-MM-dd HH:mm"),
+            Icon = "mdi-clock-outline"
+        });
+    }
+
+}

@@ -67,7 +67,7 @@ namespace CnGalWebSite.RobotClient
         public async Task ReplyFromGroupAsync(GroupMessageSender s, MeowMiraiLib.Msg.Type.Message[] e)
         {
             //忽略未关注的群聊
-            var group = _groupX.Groups.FirstOrDefault(x => x.GroupId == s.group.id);
+            var group = _groupX.Groups.FirstOrDefault(x => x.GroupId == s.group.id && x.IsHidden == false);
             if (group == null)
             {
                 return;
@@ -76,8 +76,8 @@ namespace CnGalWebSite.RobotClient
             var message = ConversionMeaasge(e);
             if (group.ForceMatch)
             {
-                var name = _messageArgs.FirstOrDefault();
-                if (name != null && message.Contains(name.Value) == false)
+                var name = _messageArgs.FirstOrDefault(s => s.Name == "name")?.Value ?? "看板娘";
+                if ((name != null && message.Contains(name) == false) || message.Contains("介绍") == false)
                 {
                     return;
                 }
