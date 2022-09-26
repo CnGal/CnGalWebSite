@@ -37,37 +37,29 @@ else
 
 @code {
 
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
+        [CascadingParameter]
+        public ErrorHandler ErrorHandler { get; set; }
 
 
-    bool isReady;
-    bool showChart;
+        bool isReady;
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            if (_dataCacheService.UserContentCenterCatche == null)
-            {
-                _dataCacheService.UserContentCenterCatche = await Http.GetFromJsonAsync<UserContentCenterViewModel>(ToolHelper.WebApiPath + "api/examines/GetUserContentCenterView");
-            }
-
-            isReady = true;
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取内容中心视图数据");
-        }
-
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+  protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            showChart = true;
-            StateHasChanged();
+            try
+            {
+                if (_dataCacheService.UserContentCenterCatche == null)
+                {
+                    _dataCacheService.UserContentCenterCatche = await Http.GetFromJsonAsync<UserContentCenterViewModel>(ToolHelper.WebApiPath + "api/examines/GetUserContentCenterView");
+                }
+
+                isReady = true;
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "无法获取内容中心视图数据");
+            }
         }
     }
 }

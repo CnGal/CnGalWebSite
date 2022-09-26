@@ -293,7 +293,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             {
                 var result = item.GetType().Name switch
                 {
-                    "EditArticleRelevancesViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/editarticlerelevances", item as EditArticleRelevancesViewModel),
+                    "EditArticleRelevancesViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/articles/editarticlerelevances", item as EditArticleRelevancesViewModel),
                     "EditAddInforViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/EditAddInfor", item as EditAddInforViewModel),
                     "EditRelevancesViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/editrelevances", item as EditRelevancesViewModel),
                     _ => null
