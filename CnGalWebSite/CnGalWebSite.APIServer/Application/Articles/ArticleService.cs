@@ -550,7 +550,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             }
             if (infor1 != null)
             {
-                var group = await _entryRepository.FirstOrDefaultAsync(s => s.Name == infor1.DisplayName);
+                var group = await _entryRepository.FirstOrDefaultAsync(s => s.Name == infor1.Name);
                 if (group != null)
                 {
                     model.Image = string.IsNullOrWhiteSpace(group.Thumbnail) ? _appHelper.GetImagePath(article.CreateUser.PhotoPath, "user.png") : _appHelper.GetImagePath(group.Thumbnail, "user.png");
