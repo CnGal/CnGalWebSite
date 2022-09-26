@@ -42,8 +42,6 @@ namespace CnGalWebSite.RobotClient
         /// <returns></returns>
         public async Task ReplyFromFriendAsync(FriendMessageSender s, MeowMiraiLib.Msg.Type.Message[] e)
         {
-
-
             await ReplyMessageAsync(RobotReplyRange.Friend, ConversionMeaasge(e), s.id, s.id, s.nickname);
         }
 

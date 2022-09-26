@@ -37,13 +37,13 @@ else
 
 @code {
 
-        [CascadingParameter]
-        public ErrorHandler ErrorHandler { get; set; }
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
 
 
-        bool isReady;
+    bool isReady;
 
-  protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
@@ -55,6 +55,7 @@ else
                 }
 
                 isReady = true;
+                StateHasChanged();
             }
             catch (Exception ex)
             {
