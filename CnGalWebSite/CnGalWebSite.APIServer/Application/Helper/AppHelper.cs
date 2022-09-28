@@ -664,6 +664,20 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 AddInfors = new List<EntryInforTipAddInforModel>()
             };
 
+            //处理音频
+            if(entry.Audio!=null&&entry.Audio.Any())
+            {
+                model.Audio.AddRange(entry.Audio.Select(s => new AudioViewModel
+                {
+                    BriefIntroduction = s.BriefIntroduction,
+                    Duration = s.Duration,
+                    Name = s.Name,
+                    Priority = s.Priority,
+                    Thumbnail = s.Thumbnail,
+                    Url = s.Url,
+                }).OrderByDescending(s => s.Priority));
+            }
+
             //处理附加信息
             if (entry.EntryRelationFromEntryNavigation != null&&entry.EntryStaffFromEntryNavigation!=null)
             {

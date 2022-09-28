@@ -313,19 +313,11 @@
 }
 
 .article-home-tag {
-    background-color: #D979A2;
     color: white;
-    border-radius: 3px;
-    border-radius: 2px;
-    margin-left: 0px;
-    font-size: 15px;
-    padding-left: 8px;
-    padding-top: 1px;
-    padding-bottom: 0.5px;
-    padding-right: 8px;
-    margin-top: 3px;
-    margin-bottom: 3px;
     display: inline-block;
+    border-radius: 4px;
+    padding-right: 8px;
+    padding-left: 8px;
 }
 
 .article-home-infor-text {
@@ -336,6 +328,7 @@
     margin-left: auto;
     margin-right: auto;
     max-width: 1140px;
+
 }
 
 @media(min-width: 576px){

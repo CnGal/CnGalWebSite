@@ -8,37 +8,22 @@
             <img class="w-100 mb-2 ps-2 pe-2" src="@Model.Infor.MainImage" style="border-radius: 50%;">
             <div class="mb-1 text-truncate-2" style="text-align: center; word-break: break-all;">@Model.Infor.Name</div>
         </a>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-            @if (Model.Audio.Any())
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="播放" Icon="mdi-volume-high" TextStyle OnClick="PlayAudio" Class="mb-2" />
-            }
-            else
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="无语音预览" Icon="mdi-volume-off " Color="grey" TextStyle Class="mb-2" />
-            }
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" ForceDisplay Class="mb-2"/>
+
+       
     </div>
 
 }
 else
 {
-    <div class="shadow-sm rounded  bg-opacity p-4 pb-0 h-100" style=" display: flex; flex-direction: column; align-items: center;">
-        <a href="@("/entries/index/" + Model.Infor.Id)" class="a-font-color">
-            <img class="w-100 mb-4" src="@Model.Infor.MainImage" style="border-radius: 50%;">
-            <div class="h5 fw-bold text-truncate-2" style="text-align: center; word-break: break-all;">@Model.Infor.Name</div>
-        </a>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-            @if (Model.Audio.Any())
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="播放" Icon="mdi-volume-high" TextStyle OnClick="PlayAudio" Class="mb-2" />
-            }
-            else
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="无语音预览" Icon="mdi-volume-off " Color="grey" TextStyle Class="mb-2" />
-            }
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-    </div>
+<div class="shadow-sm rounded  bg-opacity p-4 pb-0 h-100" style=" display: flex; flex-direction: column; align-items: center;">
+    <a href="@("/entries/index/" + Model.Infor.Id)" class="a-font-color">
+        <img class="w-100 mb-4" src="@Model.Infor.MainImage" style="border-radius: 50%;">
+        <div class="h5 fw-bold text-truncate-2" style="text-align: center; word-break: break-all;">@Model.Infor.Name</div>
+    </a>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" ForceDisplay Class="mb-2" />
+
+</div>
 
 }
 

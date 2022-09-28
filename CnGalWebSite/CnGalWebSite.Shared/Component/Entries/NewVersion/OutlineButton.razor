@@ -1,43 +1,31 @@
 ﻿@inject ToastService ToastService
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
-@if (IsTitile)
+
+<a href="@(EntryId>0?$"/entries/index/{EntryId}":null)">
+    <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))"
+           Color="@Color"
+           Small
+           TextColor="@(IsTitile?"white":Color)"
+           Outlined="!IsTitile"
+           OnClick="OnClick">
+        @if (IsShowExistTag && IsTitile == false && EntryId > 0)
+        {
+            <MIcon Color="@Color" Small Left>mdi-check-circle</MIcon>
+        }
+        @Text
+    </MChip>
+</a>
+
+
+@if (string.IsNullOrWhiteSpace(ItemProp) == false && string.IsNullOrWhiteSpace(ItemType) == false)
 {
-    <div class="@((ForceSmall?"app-card-tag mb-1 ":"outline-button-title badge bg-title ")+" me-2 bg-title-color-"+ColorNum)" style="@(ForceSmall?"border-radius: 5px;":"")">
-
-        <span itemscope itemprop="@ItemProp" itemtype="@ItemType">
-            <span itemprop="@(string.IsNullOrWhiteSpace(ItemType)?"":"name")">
-                @Text
-            </span>
-        </span>
+    <div itemscope itemprop="@ItemProp" itemtype="@ItemType">
+        <meta itemprop="name" content="@Text" />
 
     </div>
-}
-else
-{
-    <a href="@(string.IsNullOrWhiteSpace(Url)?null:Url)" @onclick="OnClickNull"  class="@((ForceSmall?" bg-context-main ps-2 pe-2 mb-1 ":"btn outline-button-normal")+" me-2  bg-context-"+ColorNum)" style="@(ForceSmall?"border: 1px solid var(--main-color);border-radius: 5px;":"")">
 
-        @if (string.IsNullOrWhiteSpace(Url))
-        {
-            <span itemprop="@ItemProp">
-                @Text
-            </span>
-        }
-        else
-        {
-            <span itemscope itemprop="@ItemProp" itemtype="@ItemType">
-                <span itemprop="@(string.IsNullOrWhiteSpace(ItemType)?"":"name")">
-                    @Text
-                </span>
-            </span>
-        }
-
-
-        @if (IsShowExistTag&&string.IsNullOrWhiteSpace(Url)==false)
-        {
-            <i class="fa fa-check-circle fa-fw"></i>
-        }
-    </a>
 }
 
 
@@ -47,9 +35,7 @@ else
     [Parameter]
     public string Text { get; set; }
     [Parameter]
-    public string Url { get; set; }
-    [Parameter]
-    public bool IsExist { get; set; }
+    public int EntryId { get; set; }
     [Parameter]
     public bool IsNotShowTip { get; set; }
 
@@ -59,27 +45,46 @@ else
     public string ItemProp { get; set; }
     [Parameter]
     public string ItemType { get; set; }
+
+    private string color;
     [Parameter]
-    public string ColorNum { get; set; }
-
-    [Parameter]
-    public bool ForceSmall { get; set; }
-
-
-    public async Task OnClickNull()
+    public string Color
     {
-        if (IsNotShowTip == false&&string.IsNullOrWhiteSpace(Url))
+        get
         {
-            if (IsShowExistTag)
-            {
-                NavigationManager.NavigateTo( "/entries/establishentry?Name=" + Text);
-            }
-            else
-            {
-                await ToastService.Error("该词条不存在", "你可以亲自创建“" + Text + "”哦~");
+            return color ?? _dataCacheService.ThemeSetting.Theme;
+        }
+        set
+        {
+            color = value;
+        }
+    }
 
+
+
+
+    public async Task OnClick()
+    {
+        if(EntryId>0)
+        {
+            //NavigationManager.NavigateTo("/entries/index/" + EntryId);
+        }
+        else
+        {
+            if (IsNotShowTip == false)
+            {
+                if (IsShowExistTag)
+                {
+                    NavigationManager.NavigateTo("/entries/establishentry?Name=" + Text);
+                }
+                else
+                {
+                    await ToastService.Error("该词条不存在", "你可以亲自创建“" + Text + "”哦~");
+
+                }
             }
         }
+
 
 
     }

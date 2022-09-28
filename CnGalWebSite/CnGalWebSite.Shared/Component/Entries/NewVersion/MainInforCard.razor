@@ -71,12 +71,11 @@
 
                         @if (Model.ProductionGroups.Count > 0)
                         {
-                            <OutlineButton IsTitile="true" Text="制作组" ColorNum="pr" />
+                            <OutlineButton IsTitile="true" Text="制作组" Color="grey darken-3" />
 
                             @foreach (var temp in Model.ProductionGroups)
                             {
-                                <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
-                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" ItemProp="author" ItemType="http://schema.org/Organization" />
+                                <OutlineButton IsTitile="false" Text="@temp.DisplayName"  IsShowExistTag="Model.IsEdit" EntryId="temp.Id" Color="grey darken-3" ItemProp="author" ItemType="http://schema.org/Organization" />
                             }
                         }
                     </div>
@@ -85,12 +84,11 @@
                     <div class="h4 m-0" style="display: flex; flex-wrap: wrap; ">
                         @if (Model.Publishers.Count > 0)
                         {
-                            <OutlineButton IsTitile="true" Text="发行商" ColorNum="pr" />
+                            <OutlineButton IsTitile="true" Text="发行商"  Color="grey darken-3"/>
 
                             @foreach (var temp in Model.Publishers)
                             {
-                                <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="pr" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
-                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")" ItemProp="publisher" ItemType="http://schema.org/Organization" />
+                                <OutlineButton IsTitile="false" Text="@temp.DisplayName"  IsShowExistTag="Model.IsEdit" EntryId="temp.Id"  Color="grey darken-3"   ItemProp="publisher" ItemType="http://schema.org/Organization" />
                             }
                         }
                     </div>

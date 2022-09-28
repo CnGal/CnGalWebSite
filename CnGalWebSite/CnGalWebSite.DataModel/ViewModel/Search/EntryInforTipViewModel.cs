@@ -29,6 +29,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Search
         public int CommentCount { get; set; }
 
         public List<EntryInforTipAddInforModel> AddInfors { get; set; } = new List<EntryInforTipAddInforModel>() { };
+
+        public List<AudioViewModel> Audio { get; set; } = new List<AudioViewModel>();
     }
 
     public class EntryInforTipAddInforModel
