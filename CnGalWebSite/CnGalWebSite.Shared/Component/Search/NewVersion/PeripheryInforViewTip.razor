@@ -38,7 +38,7 @@ else
                     <span class="text-truncate-3">
                         @Model.BriefIntroduction
                     </span>
-                    @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && string.IsNullOrWhiteSpace(ColorNum) == false)
+                    @if (Model.AddInfors != null && Model.AddInfors.Count > 0 )
                     {
 
                         <div class="d-none d-sm-flex row">
@@ -47,11 +47,10 @@ else
                             {
                                 <div class="@(Model.AddInfors.Count==1? "col-12":"col-12 col-lg-6")">
                                     <div class="h4 mt-2" style="margin-bottom: 0.1rem; display: flex;  flex-wrap: wrap; ">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" ColorNum="@ColorNum" />
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" />
                                         @foreach (var infor in item.Contents)
                                         {
-                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" ColorNum="@ColorNum" IsExist="@( infor.Id>0)" IsShowExistTag="@IsEdit"
-                                                                                                            Url="@(infor.Id>0? "/entries/index/" + infor.Id:"")" IsNotShowTip="@(infor.Id==-1)" />
+                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName"  IsShowExistTag="@IsEdit" EntryId="infor.Id" IsNotShowTip />
                                         }
                                     </div>
                                 </div>
@@ -84,8 +83,6 @@ else
 @code {
     [Parameter]
     public PeripheryInforTipViewModel Model { get; set; }
-    [Parameter]
-    public string ColorNum { get; set; }
     [Parameter]
     public bool IsEdit { get; set; }
 }

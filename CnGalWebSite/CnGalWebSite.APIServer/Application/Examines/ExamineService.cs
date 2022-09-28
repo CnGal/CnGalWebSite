@@ -2646,7 +2646,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 }
             });
 
-            model.AfterModel.MainPage = examine.Note;
+            model.AfterModel.MainPage = _appHelper.MarkdownToHtml(examine.Note);
 
             if (examine.IsPassed == true)
             {

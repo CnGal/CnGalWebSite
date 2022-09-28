@@ -1,0 +1,34 @@
+﻿@inject IJSRuntime JS
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    @if (string.IsNullOrWhiteSpace(Url) == false)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="播放" Icon="mdi-volume-high" TextStyle OnClick="PlayAudio" Class="@Class" XSmall="XSmall"/>
+    }
+    else if (ForceDisplay)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="无语音预览" Icon="mdi-volume-off " Color="grey" TextStyle Class="@Class" XSmall="XSmall"/>
+    }
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
+@code {
+    [Parameter]
+    public string Url { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+    [Parameter]
+    public bool XSmall { get; set; }
+    [Parameter]
+    public bool ForceDisplay { get; set; }
+
+    public async Task PlayAudio()
+    {
+        try
+        {
+            await JS.InvokeAsync<string>("playAudio", Url);
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+}

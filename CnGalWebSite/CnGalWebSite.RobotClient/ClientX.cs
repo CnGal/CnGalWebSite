@@ -189,15 +189,30 @@ namespace CnGalWebSite.RobotClient
         {
             if (model.Range == RobotReplyRange.Channel)
             {
+                if (model.MasudaMessage == null)
+                {
+                    return;
+                }
+
                 _ = await MasudaClient.ReplyMessageAsync(msg, model.MasudaMessage);
             }
             else if (model.Range == RobotReplyRange.Friend)
             {
+                if(model.MiraiMessage==null)
+                {
+                    return;
+                }
+
                 var j = model.MiraiMessage.SendToFriend(model.SendTo, MiraiClient);
                 Console.WriteLine(j);
             }
             else
             {
+                if (model.MiraiMessage == null)
+                {
+                    return;
+                }
+
                 var j = model.MiraiMessage.SendToGroup(model.SendTo, MiraiClient);
                 Console.WriteLine(j);
             }

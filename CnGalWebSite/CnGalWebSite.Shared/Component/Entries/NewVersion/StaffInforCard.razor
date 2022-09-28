@@ -2,54 +2,37 @@
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="Staff" TextColor="bg-color-1" ButtonColor="red darken-2" Icon="fa fa-fw fa-sitemap" Collapable>
         <ButtonContent>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Color="red darken-2" XSmall Icon="mdi-database-export" Tooltip="导出STAFF" OnClick="OnExport" StopPropagation Class="me-4"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Color="red darken-2" XSmall Icon="mdi-database-export" Tooltip="导出STAFF" OnClick="OnExport" StopPropagation Class="me-4" />
         </ButtonContent>
         <ChildContent>
-            <div class="row">
-                @{ int rx = 1;}
+            <div>
+                @{ int index = 0;}
                 @foreach (var item in Model.Staffs)
                 {
-                    bool isUsed = true;
-
-
-
-                    @if (string.IsNullOrWhiteSpace(item.Modifier) == false)
-                    {
-                        rx++;
-                        if (rx > 11)
+                    <div class="@(Model.Staffs.IndexOf(item)<Model.Staffs.Count-1?"mb-2":"")">
+                        @if (string.IsNullOrWhiteSpace(item.Modifier) == false)
                         {
-                            rx = 1;
-                        }
-                        isUsed = true;
-                        <h3 class="col-12 h6 @("bg-color-"+rx.ToString()) ">
-                            @item.Modifier
-                        </h3>
-                    }
 
-                    @foreach (var infor in item.StaffList)
-                    {
-                        if (isUsed == false)
-                        {
-                            rx++;
-                            if (rx > 11)
-                            {
-                                rx = 1;
-                            }
+                            <h3 class="fw-bold ma-1 h6 @ColorExtensions.GetGradientColor(index,true)">
+                                @item.Modifier
+                            </h3>
+                            index++;
                         }
-                        else
-                        {
-                            isUsed = false;
-                        }
-                        <div class="h4 col-12 mb-2" style="margin-bottom: 0.1rem; display: flex; flex-wrap: wrap; ">
-                            <OutlineButton IsTitile="true" Text="@infor.Modifier" ColorNum="@rx.ToString()" />
 
-                            @foreach (var temp in infor.Names)
-                            {
-                                <OutlineButton IsTitile="false" Text="@temp.DisplayName" ColorNum="@rx.ToString()" IsExist="@( temp.Id>0)" IsShowExistTag="Model.IsEdit"
-                                               Url="@(temp.Id>0? "/entries/index/" + temp.Id:"")"/>
-                            }
-                        </div>
-                    }
+                        @foreach (var infor in item.StaffList)
+                        {
+                            <div style=" display: flex; flex-wrap: wrap; ">
+                                <OutlineButton IsTitile="true" Text="@infor.Modifier" Color="@ColorExtensions.GetGradientColor(index)" />
+
+                                @foreach (var temp in infor.Names)
+                                {
+                                    <OutlineButton IsTitile="false" Text="@temp.DisplayName" IsShowExistTag="Model.IsEdit" EntryId="@temp.Id" Color="@ColorExtensions.GetGradientColor(index)" />
+                                }
+                            </div>
+                            index++;
+                        }
+                    </div>
+                
                 }
 
             </div>
@@ -66,21 +49,12 @@
             <MCardTitle Class="text-h5">
                 导出STAFF
             </MCardTitle>
-            <MCardText Style=" white-space: pre-line;">
-                <Scroll style="max-height:500px;">
-
+            <MCardText>
+                <PCopyableText Style=" white-space: pre-line!important; display: flex; flex-direction: column; align-items: flex-start;">
                     @Model.Staffs.Export()
-
-                </Scroll>
+                </PCopyableText>
+             
             </MCardText>
-            <MCardActions>
-                <MSpacer></MSpacer>
-                <MButton Color="green darken-1"
-                         Text
-                         OnClick="()=> export = false">
-                    关闭
-                </MButton>
-            </MCardActions>
         </MCard>
     </MDialog>
 }
@@ -88,6 +62,11 @@
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
     bool export;
+
+    public string GetColor(int index, bool isText = false)
+    {
+        return ColorExtensions.GetGradientColor(index, isText);
+    }
 
     public Task OnExport()
     {
