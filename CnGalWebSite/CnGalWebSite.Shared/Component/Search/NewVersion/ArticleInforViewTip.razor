@@ -23,40 +23,40 @@
 }
 else
 {
-    <TabLink Icon="fa fa-newspaper-o" Url="@("/articles/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
-        <div class="@((Outline?"":"div-shadow rounded  bg-opacity  ps-3 pe-3 pb-3 ")+" h-100")">
-            <div class="mb-2" style="display:flex;">
-                <div class="@((Outline?"":"pt-3"))">
-                    <img loading="lazy"  style=" width: 250px; " src="@Model.MainImage"  alt="@Model.Name">
-                </div>
-                <div class="@((Outline?"":" pt-3")+" ps-3")">
-                    <header class="text-truncate-2">
-                        <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
-                        <h5 class="fw-bold" style=" display: inline;">@Model.DisplayName</h5>
-                    </header>
-                    <span class="text-truncate-3">
-                        @Model.BriefIntroduction
-                    </span>
-                </div>
+    <div class="@((Outline?"":"shadow-sm rounded  bg-opacity  ps-3 pe-3 pb-3 ")+" h-100")">
+        <div class="mb-2" style="display:flex;">
+            <a href="@("/articles/index/" + Model.Id)" class="@((Outline?"":"pt-3"))">
+                <img loading="lazy" style=" width: 250px; " src="@Model.MainImage" alt="@Model.Name">
+            </a>
+            <div class="@((Outline?"":" pt-3")+" ps-3")">
+                <a href="@("/articles/index/" + Model.Id)" class="a-font-color text-truncate-2 mb-1">
+                    <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
+                    <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                </a>
+
+                <a href="@("/articles/index/" + Model.Id)" class="text-truncate-3 a-font-color">
+                    @Model.BriefIntroduction
+                </a>
             </div>
-            <span style="color: gray;">
-                <i class="fa fa-calendar fa-fw"></i>
-                <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
-
-                <i class="fa fa-commenting-o fa-fw"></i>
-                <span class="article-home-infor-text">@(Model.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
-
-                <i class="fa fa-eye fa-fw d-none d-sm-inline"></i>
-                <span class="article-home-infor-text d-none d-sm-inline">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
-
-                <i class="fa fa-thumbs-o-up fa-fw d-none d-sm-inline"></i>
-                <span class="article-home-infor-text d-none d-sm-inline">@(Model.ThumbsUpCount)人点赞&nbsp;&nbsp;&nbsp;</span>
-
-                <i class="fa fa-user fa-fw"></i>
-                <span class="article-home-infor-text">@Model.CreateUserName&nbsp;&nbsp;&nbsp;</span>
-            </span>
         </div>
-    </TabLink>
+
+        <a href="@("/articles/index/" + Model.Id)" style="color: gray;">
+            <i class="fa fa-calendar fa-fw"></i>
+            <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+
+            <i class="fa fa-commenting-o fa-fw"></i>
+            <span class="article-home-infor-text">@(Model.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
+
+            <i class="fa fa-eye fa-fw d-none d-sm-inline"></i>
+            <span class="article-home-infor-text d-none d-sm-inline">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
+
+            <i class="fa fa-thumbs-o-up fa-fw d-none d-sm-inline"></i>
+            <span class="article-home-infor-text d-none d-sm-inline">@(Model.ThumbsUpCount)人点赞&nbsp;&nbsp;&nbsp;</span>
+
+            <i class="fa fa-user fa-fw"></i>
+            <span class="article-home-infor-text">@Model.CreateUserName&nbsp;&nbsp;&nbsp;</span>
+        </a>
+    </div>
 
 }
 

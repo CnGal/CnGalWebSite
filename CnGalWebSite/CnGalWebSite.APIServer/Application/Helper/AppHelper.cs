@@ -811,7 +811,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             };
 
             //处理附加信息
-            if (periphery.Entries != null)
+            if (periphery.RelatedEntries != null&&periphery.RelatedEntries.Any())
             {
                 var temp = new EntryInforTipAddInforModel
                 {
@@ -819,12 +819,12 @@ namespace CnGalWebSite.APIServer.Application.Helper
                     Contents = new List<StaffNameModel>()
                 };
                 model.AddInfors.Add(temp); ;
-                foreach (var item in periphery.Entries)
+                foreach (var item in periphery.RelatedEntries)
                 {
                     temp.Contents.Add(new StaffNameModel
                     {
-                        DisplayName = item.Entry.DisplayName,
-                        Id = item.Entry.Id,
+                        DisplayName = item.DisplayName,
+                        Id = item.Id,
                     });
 
 
