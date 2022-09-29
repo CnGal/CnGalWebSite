@@ -35,7 +35,7 @@
                         </a>
                         <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" Class="ms-2" />
                     </div>
-                
+
 
 
                     <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  ? "text-truncate-1" : "text-truncate-2"))">
@@ -43,9 +43,6 @@
                     </a>
                     @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && ShowAddInfors)
                     {
-
-
-
                         <div class="d-flex row">
 
                             @foreach (var item in Model.AddInfors)
@@ -83,13 +80,13 @@ else
                 </a>
 
                 <div class="pt-3 ps-3" style=" width: 100%;">
-                    <a href="@("/entries/index/" + Model.Id)" class="a-font-color text-truncate-1 mb-2">
+                    <a href="@("/entries/index/" + Model.Id)" class="a-font-color text-truncate-1 mb-2" style="display: flex; align-items: flex-end;">
                         @if (ShowType)
                         {
                             <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
                         }
 
-                        <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                        <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
                     </a>
 
                     <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  ? "text-truncate-2" : "text-truncate-4"))">
@@ -101,21 +98,21 @@ else
 
                     @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && ShowAddInfors)
                     {
-                            <div class="d-none d-sm-flex row">
+                        <div class="d-none d-sm-flex row">
 
-                                @foreach (var item in Model.AddInfors)
-                                {
-                                    <div class="@(Model.AddInfors.Count == 1 ? "col-12" : "col-12 col-lg-6")">
-                                        <div class="mt-1" style="display: flex;  flex-wrap: wrap; ">
-                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" />
-                                            @foreach (var infor in item.Contents)
-                                            {
-                                                <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" IsShowExistTag="@IsEdit" EntryId="infor.Id" IsNotShowTip />
-                                            }
-                                        </div>
+                            @foreach (var item in Model.AddInfors)
+                            {
+                                <div class="@(Model.AddInfors.Count == 1 ? "col-12" : "col-12 col-lg-6")">
+                                    <div class="mt-1" style="display: flex;  flex-wrap: wrap; ">
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" />
+                                        @foreach (var infor in item.Contents)
+                                        {
+                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" IsShowExistTag="@IsEdit" EntryId="infor.Id" IsNotShowTip />
+                                        }
                                     </div>
-                                }
-                            </div>
+                                </div>
+                            }
+                        </div>
 
                     }
                 </div>
@@ -125,14 +122,14 @@ else
         }
         else
         {
-            <div class=" pb-3" style="display:flex;">
+            <div style="display:flex;">
                 <a href="@("/entries/index/" + Model.Id)" class="a-font-color pt-3 p-0 ps-2">
                     <img src="@Model.MainImage" style="border-radius: 50%;width: 116px;" alt="@Model.Name" />
                 </a>
 
                 <div class="pt-3 ps-3" style=" width: 100%;">
                     <div style=" display: flex; align-items: center;" class="mb-2">
-                        <a href="@("/entries/index/" + Model.Id)" class="a-font-color text-truncate-2">
+                        <a href="@("/entries/index/" + Model.Id)" class="a-font-color text-truncate-2" style="display: flex; align-items: center;">
                             @if (ShowType)
                             {
                                 <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
@@ -142,35 +139,33 @@ else
                         </a>
                         <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" Class="ms-2" />
                     </div>
-                   
-                     
-                  
+
                     <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  ? "text-truncate-2" : "text-truncate-4"))">
                         @Model.BriefIntroduction
                     </a>
 
-                    @if (Model.AddInfors != null && Model.AddInfors.Count > 0&& ShowAddInfors)
+                    @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && ShowAddInfors)
                     {
 
 
 
-                            <div class="d-none d-sm-flex row">
+                        <div class="d-none d-sm-flex row">
 
-                                @foreach (var item in Model.AddInfors)
-                                {
-                                    <div class="@(Model.AddInfors.Count == 1 ? "col-12" : "col-12 col-lg-6")">
-                                        <div class="mt-1" style="display: flex;  flex-wrap: wrap; ">
-                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" />
-                                            @foreach (var infor in item.Contents)
-                                            {
-                                                <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" IsShowExistTag="@IsEdit" EntryId="infor.Id" IsNotShowTip />
-                                            }
-                                        </div>
+                            @foreach (var item in Model.AddInfors)
+                            {
+                                <div class="@(Model.AddInfors.Count == 1 ? "col-12" : "col-12 col-lg-6")">
+                                    <div class="mt-1" style="display: flex;  flex-wrap: wrap; ">
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="true" Text="@item.Modifier" />
+                                        @foreach (var infor in item.Contents)
+                                        {
+                                            <CnGalWebSite.Shared.Component.Entries.NewVersion.OutlineButton IsTitile="false" Text="@infor.DisplayName" IsShowExistTag="@IsEdit" EntryId="infor.Id" IsNotShowTip />
+                                        }
                                     </div>
+                                </div>
 
-                                }
+                            }
 
-                            </div>
+                        </div>
                     }
 
                 </div>

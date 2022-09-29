@@ -3,20 +3,34 @@
 @inject IDataCacheService _dataCacheService
 
 
-<a href="@(EntryId>0?$"/entries/index/{EntryId}":null)">
+@if (IsTitile)
+{
     <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))"
            Color="@Color"
            Small
-           TextColor="@(IsTitile?"white":Color)"
-           Outlined="!IsTitile"
-           OnClick="OnClick">
-        @if (IsShowExistTag && IsTitile == false && EntryId > 0)
-        {
-            <MIcon Color="@Color" Small Left>mdi-check-circle</MIcon>
-        }
+           TextColor="white"
+           Outlined="!IsTitile">
         @Text
     </MChip>
-</a>
+}
+else
+{
+    <a href="@(EntryId>0?$"/entries/index/{EntryId}":null)">
+        <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))"
+               Color="@Color"
+               Small
+               TextColor="@Color"
+               Outlined="!IsTitile"
+               OnClick="OnClick">
+            @if (IsShowExistTag && EntryId > 0)
+            {
+                <MIcon Color="@Color" Small Left>mdi-check-circle</MIcon>
+            }
+            @Text
+        </MChip>
+    </a>
+
+}
 
 
 @if (string.IsNullOrWhiteSpace(ItemProp) == false && string.IsNullOrWhiteSpace(ItemType) == false)
@@ -65,13 +79,13 @@
 
     public async Task OnClick()
     {
-        if(EntryId>0)
+        if (EntryId > 0)
         {
             //NavigationManager.NavigateTo("/entries/index/" + EntryId);
         }
         else
         {
-            if (IsNotShowTip == false)
+            if (IsNotShowTip == false && IsTitile == false)
             {
                 if (IsShowExistTag)
                 {

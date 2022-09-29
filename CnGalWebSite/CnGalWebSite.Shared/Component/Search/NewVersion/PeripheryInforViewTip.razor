@@ -31,9 +31,9 @@ else
         </a>
 
         <div class="pt-3 ps-3" style=" width: 100%;">
-            <a href="@("/entries/index/" + Model.Id)" class="a-font-color text-truncate-1 mb-2">
+            <a href="@("/entries/index/" + Model.Id)" class="a-font-color text-truncate-1 mb-2"  style=" display: flex; align-items: flex-end;">
                 <div class="article-home-tag">周边</div>
-                <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
             </a>
 
             <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  ? "text-truncate-2" : "text-truncate-4"))">

@@ -32,16 +32,16 @@ else
                 <img loading="lazy" style=" width: 250px; " src="@Model.MainImage" alt="@Model.Name">
             </a>
             <div class="pt-3 ps-3">
-                <a href="@("/tags/index/" + Model.Id)" class="a-font-color text-truncate-2 mb-1">
-                    <div class="article-home-tag">标签</div>
-                    <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
-                </a>
+                    <a href="@("/tags/index/" + Model.Id)" class="a-font-color text-truncate-2 mb-1" style=" display: flex; align-items: flex-end;">
+                        <div class="article-home-tag">标签</div>
+                        <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
+                    </a>
 
-                <a href="@("/tags/index/" + Model.Id)" class="text-truncate-3 a-font-color">
-                    @Model.BriefIntroduction
-                </a>
+                    <a href="@("/tags/index/" + Model.Id)" class="text-truncate-3 a-font-color">
+                        @Model.BriefIntroduction
+                    </a>
+                </div>
             </div>
-        </div>
     </div>
 
 }
