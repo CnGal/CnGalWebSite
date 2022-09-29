@@ -3,7 +3,7 @@
 @if (_dataCatcheService.IsApp)
 {
     <TabLink Icon="fa fa-newspaper-o" Url="@("/articles/index/" + Model.Id)" Text="@Model.Name" class="a-font-color">
-        <div class="@((Outline?"":"div-shadow rounded  bg-opacity ")+" h-100")">
+        <div class="div-shadow rounded  bg-opacity h-100">
             <div style="display: flex; align-items: center;">
                 <div>
                     <img loading="lazy" style=" width: 160px; " src="@Model.MainImage" alt="@Model.Name">
@@ -23,21 +23,24 @@
 }
 else
 {
-    <div class="@((Outline?"":"shadow-sm rounded  bg-opacity  ps-3 pe-3 pb-3 ")+" h-100")">
+    <div class="shadow-sm rounded  bg-opacity  ps-3 pe-3 pb-3">
         <div class="mb-2" style="display:flex;">
-            <a href="@("/articles/index/" + Model.Id)" class="@((Outline?"":"pt-3"))">
+            <a href="@("/articles/index/" + Model.Id)" class="pt-3">
                 <img loading="lazy" style=" width: 250px; " src="@Model.MainImage" alt="@Model.Name">
             </a>
-            <div class="@((Outline?"":" pt-3")+" ps-3")">
-                <a href="@("/articles/index/" + Model.Id)" class="a-font-color text-truncate-2 mb-1">
-                    <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
-                    <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
-                </a>
+            <div class=" pt-3 ps-3">
+               
+                    <a href="@("/articles/index/" + Model.Id)" class="a-font-color text-truncate-2 mb-1" style=" display: flex; align-items: flex-end;">
+                        <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
+                        <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
+                    </a>
+           
+                 
 
-                <a href="@("/articles/index/" + Model.Id)" class="text-truncate-3 a-font-color">
-                    @Model.BriefIntroduction
-                </a>
-            </div>
+                    <a href="@("/articles/index/" + Model.Id)" class="text-truncate-3 a-font-color">
+                        @Model.BriefIntroduction
+                    </a>
+                </div>
         </div>
 
         <a href="@("/articles/index/" + Model.Id)" style="color: gray;">
@@ -64,6 +67,4 @@ else
 @code {
     [Parameter]
     public ArticleInforTipViewModel Model { get; set; }
-    [Parameter]
-    public bool Outline { get; set; }
 }
