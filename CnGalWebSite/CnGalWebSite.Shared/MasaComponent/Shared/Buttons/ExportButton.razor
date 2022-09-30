@@ -3,12 +3,12 @@
 @inject IJSRuntime JS
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMenu Text="导出数据" Icon="mdi-database-export " TextStyle Color="success">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMenu Text="导出数据" Icon="mdi-database-export " TextStyle>
     <div style=" display: flex; flex-direction: column;">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="CSV" Icon="mdi-file-delimited-outline" OnClick="()=>OnExportExcel(false)" IsAsync Color="success"/>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="CSV" Icon="mdi-file-delimited-outline" OnClick="()=>OnExportExcel(false)" IsAsync />
 
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="Json" Icon="mdi-code-json " IsAsync OnClick="OnExportJson" Color="success"/>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="Excel" Icon="mdi-microsoft-excel " IsAsync OnClick="()=>OnExportExcel(true)" Color="success"/>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="Json" Icon="mdi-code-json " IsAsync OnClick="OnExportJson" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton TextStyle Text="Excel" Icon="mdi-microsoft-excel " IsAsync OnClick="()=>OnExportExcel(true)" />
     </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMenu>
 

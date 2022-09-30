@@ -275,7 +275,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //获取词条
-            var games = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.Entry).Where(s => s.ApplicationUserId == id).ToListAsync();
+            var games = await _playedGameRepository.GetAll().AsNoTracking().Include(s => s.Entry).ThenInclude(s=>s.Tags).Where(s => s.ApplicationUserId == id).ToListAsync();
             var gameIds = games.Select(s => s.Id).ToList();
             //提前加载预览
             //获取审核记录
@@ -310,6 +310,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     ShowPublicly = item.ShowPublicly,
                     SystemSocre = item.SystemSocre,
                     CVSocre = item.CVSocre,
+                    IsDubbing = item.Entry.Tags.Any(s => s.Name == "无配音") == false
                 });
             }
 
