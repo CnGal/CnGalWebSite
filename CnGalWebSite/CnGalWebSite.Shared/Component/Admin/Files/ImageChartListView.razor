@@ -6,7 +6,7 @@
 
 <Table TItem="ListFileAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
        ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
     <TableColumns>
         <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
         <TableColumn @bind-Field="@context.FileName" Searchable="true" Sortable="true" Width="200" TextWrap="true" />
@@ -38,8 +38,6 @@
     {
         try
         {
-            options.Filters = new List<IFilterAction>();
-            options.Searchs = new List<IFilterAction>();
 
             var result = await Http.PostAsJsonAsync<FilesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetFileList", new FilesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;

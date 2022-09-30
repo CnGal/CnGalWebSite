@@ -18,31 +18,37 @@
 }
 else
 {
-    <Table TItem="SteamInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
-           OnQueryAsync="@OnQuerySteamAsync" SearchModel="@SearchModelSteam" ShowSearch="true" ShowLoading="true"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
-           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
-        <TableColumns>
-            <TableColumn @bind-Field="@context.EntryId" Filterable="true" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="100" TextWrap="true" Fixed="true" />
-            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.SteamId" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
-            <TableColumn @bind-Field="@context.OriginalPrice" Filterable="true" Sortable="true" Width="100" TextWrap="true" Formatter="PriceFormatter" />
-            <TableColumn @bind-Field="@context.PriceNow" Filterable="true" Sortable="true" Width="100" TextWrap="true" Formatter="PriceFormatter" />
-            <TableColumn @bind-Field="@context.CutNow" Filterable="true" Sortable="true" Width="150" TextWrap="true" Formatter="CutFormatter" />
-            <TableColumn @bind-Field="@context.PriceLowest" Filterable="true" Sortable="true" Width="150" TextWrap="true" Formatter="PriceLowestFormatter" />
-            <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="CutLowestFormatter" />
-            <TableColumn @bind-Field="@context.EvaluationCount" Filterable="true" Sortable="true" Width="170" TextWrap="true" />
-            <TableColumn @bind-Field="@context.RecommendationRate" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="RecommendationRateFormatter" />
-        </TableColumns>
-        <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.SteamId))" />
-        </RowButtonTemplate>
+<Table TItem="SteamInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
+       OnQueryAsync="@OnQuerySteamAsync" SearchModel="@SearchModelSteam" ShowSearch="true" ShowLoading="true"
+       ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
+       ShowToolbar="true" ShowDefaultButtons="false" @ref="table">
+    <TableToolbarTemplate>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton TItem="SteamInforTableModel"  Columns="table.Columns"  Items="ModelSteam.SteamInfors" Name="Steam信息汇总表" />
+    </TableToolbarTemplate>
 
-    </Table>
+    <TableColumns>
+        <TableColumn @bind-Field="@context.EntryId" Filterable="true" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="100" TextWrap="true" Fixed="true" />
+        <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+        <TableColumn @bind-Field="@context.SteamId" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
+        <TableColumn @bind-Field="@context.OriginalPrice" Filterable="true" Sortable="true" Width="100" TextWrap="true" Formatter="PriceFormatter" />
+        <TableColumn @bind-Field="@context.PriceNow" Filterable="true" Sortable="true" Width="100" TextWrap="true" Formatter="PriceFormatter" />
+        <TableColumn @bind-Field="@context.CutNow" Filterable="true" Sortable="true" Width="150" TextWrap="true" Formatter="CutFormatter" />
+        <TableColumn @bind-Field="@context.PriceLowest" Filterable="true" Sortable="true" Width="150" TextWrap="true" Formatter="PriceLowestFormatter" />
+        <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="CutLowestFormatter" />
+        <TableColumn @bind-Field="@context.EvaluationCount" Filterable="true" Sortable="true" Width="170" TextWrap="true" />
+        <TableColumn @bind-Field="@context.RecommendationRate" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="RecommendationRateFormatter" />
+    </TableColumns>
+    <RowButtonTemplate>
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.SteamId))" />
+    </RowButtonTemplate>
+
+</Table>
 }
 
 
 @code {
+    Table<SteamInforTableModel> table;
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
@@ -82,7 +88,16 @@ else
 
     public async Task<string> PriceFormatter(object price)
     {
-        string res = ((double)(int)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)price).Value / 100).ToString("0.00");
+        int model = 0;
+        if(price is int)
+        {
+            model = (Int32)price;
+        }
+        else
+        {
+            model = (Int32)(price as BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>).Value;
+        }
+        string res = ((double)model / 100).ToString("0.00");
         if (res == "-0.01")
         {
             res = "未发售";
@@ -100,7 +115,18 @@ else
 
     public async Task<string> PriceLowestFormatter(object price)
     {
-        string res = ((double)(int)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)price).Value / 100).ToString("0.00");
+        int model = 0;
+        if (price is int)
+        {
+            model = (Int32)price;
+        }
+        else
+        {
+            model = (Int32)(price as BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>).Value;
+        }
+        string res = ((double)model / 100).ToString("0.00");
+
+
         if (res == "-0.01")
         {
             res = "未记录";
@@ -118,62 +144,65 @@ else
 
     public async Task<string> CutLowestFormatter(object cut)
     {
-        string res = ((int)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)cut).Value).ToString();
-        if (res == "-1")
+        int model = 0;
+        if (cut is int)
         {
-            res = "未记录";
+            model = (Int32)cut;
         }
-        else if (res == "-2")
+        else
         {
-            res = "未更新";
+            model = (Int32)(cut as BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>).Value;
         }
-        else if (res == "-3")
+
+        return model switch
         {
-            res = "已下架";
-        }
-        return res;
+            -1 => "未记录",
+            -2 => "未更新",
+            -3 => "已下架",
+            _ => model.ToString()
+        };
     }
 
     public async Task<string> CutFormatter(object cut)
     {
-        string res = ((int)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)cut).Value).ToString();
-        if (res == "-1")
+        int model = 0;
+        if (cut is int)
         {
-            res = "未发售";
-        }
-        else if (res == "-2")
-        {
-            res = "未更新";
-        }
-        else if (res == "-3")
-        {
-            res = "已下架";
-        }
-        return res;
-    }
-    public async Task<string> RecommendationRateFormatter(object cut)
-    {
-        string res = ((int)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)cut).Value).ToString();
-        if (res == "0")
-        {
-            res = "无";
-        }
-
-
-        return res;
-    }
-    public async Task<string> LowestTimeFormatter(object cut)
-    {
-        DateTime res = (DateTime)((BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>)cut).Value;
-        if (res == DateTime.MinValue || res.Year == 1970)
-        {
-            return "未记录";
+            model = (Int32)cut;
         }
         else
         {
-            return res.ToString("yyyy-MM-dd");
+            model = (Int32)(cut as BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>).Value;
         }
+
+
+        return model switch
+        {
+            -1 => "未发售",
+            -2 => "未更新",
+            -3 => "已下架",
+            _ => model.ToString()
+        };
+
     }
+    public async Task<string> RecommendationRateFormatter(object cut)
+    {
+        int model = 0;
+        if (cut is int)
+        {
+            model = (Int32)cut;
+        }
+        else
+        {
+            model = (Int32)(cut as BootstrapBlazor.Components.TableColumnContext<CnGalWebSite.DataModel.ViewModel.Tables.SteamInforTableModel, System.Object>).Value;
+        }
+        return model switch
+        {
+            0 => "无",
+            _=> model.ToString()
+        };
+    }
+
 
     private Task<QueryData<SteamInforTableModel>> OnQuerySteamAsync(QueryPageOptions options)
     {

@@ -11,7 +11,7 @@
 
 <Table TItem="ListUserAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
        ShowExtendButtons="true" ExtendButtonColumnWidth="300" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
     <TableToolbarTemplate>
         <TableToolbarButton TItem="ListUserAloneModel" Color="Color.Primary" Icon="fa fa-plus" Text="添加新用户" OnClickCallback="@((IEnumerable<ListUserAloneModel> items)=> { return CreateUser(); })" IsAsync="true" />
         <TableToolbarButton TItem="ListUserAloneModel" Color="Color.Success" Icon="fa fa-database" Text="解封" OnClickCallback="OnUnBanUsersClick" IsAsync="true" />
@@ -76,9 +76,6 @@
     {
         try
         {
-            options.Filters = new List<IFilterAction>();
-            options.Searchs = new List<IFilterAction>();
-
             var result = await Http.PostAsJsonAsync<UsersPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetUserList", new UsersPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListUserAloneModel>>(jsonContent, ToolHelper.options);

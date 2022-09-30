@@ -9,7 +9,7 @@
 
     <Table TItem="ListRobotReplyAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
            ShowExtendButtons="true" ExtendButtonColumnWidth="120" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+            ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
         <TableToolbarTemplate>
             <TableToolbarButton TItem="ListRobotReplyAloneModel" Color="Color.Warning" Icon="fa fa-upload" Text="导入"
                                 OnClickCallback="@(async (IEnumerable<ListRobotReplyAloneModel> e)=> {await OnImportModel(new ImportRobotsModel());})" IsAsync="true" />
@@ -69,9 +69,6 @@
     {
         try
         {
-            options.Filters = new List<IFilterAction>();
-            options.Searchs = new List<IFilterAction>();
-
             var result = await Http.PostAsJsonAsync<RobotRepliesPagesInfor>(ToolHelper.WebApiPath + "api/robot/GetRobotReplyList", new RobotRepliesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListRobotReplyAloneModel>>(jsonContent, ToolHelper.options);

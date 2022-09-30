@@ -42,8 +42,6 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.AddBootstrapBlazor();
             //动态修改标题
             builder.RootComponents.Add<HeadOutlet>("head::after");
-            // 增加 Table Excel 导出服务
-            builder.Services.AddBootstrapBlazorTableExcelExport();
 
             builder.Services.AddBlazoredLocalStorage();
 

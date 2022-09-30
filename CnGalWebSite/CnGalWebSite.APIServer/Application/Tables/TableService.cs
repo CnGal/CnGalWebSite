@@ -51,6 +51,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
 
                 var entries = await _entryRepository.GetAll().AsNoTracking()
                      .Include(s => s.Information).Include(s => s.Tags)
+                     .Include(s=>s.EntryStaffFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
                      .Where(s => s.Type == EntryType.Game && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
                      .Select(s => new
                      {
@@ -60,7 +61,8 @@ namespace CnGalWebSite.APIServer.Application.Tables
                          s.Name,
                          s.PubulishTime,
                          s.Information,
-                         Tags = s.Tags.Select(s => s.Name).ToList()
+                         Tags = s.Tags.Select(s => s.Name).ToList(),
+                         Staffs=s.EntryStaffFromEntryNavigation.Where(s=>s.PositionGeneral== PositionGeneralType.Publisher|| s.PositionGeneral == PositionGeneralType.ProductionGroup)
                      })
                      .AsSingleQuery()
                      .ToListAsync();
@@ -101,18 +103,6 @@ namespace CnGalWebSite.APIServer.Application.Tables
                                 case "原作":
                                     tableModel.Original = item.DisplayValue;
                                     break;
-                                case "制作组":
-                                    if (string.IsNullOrWhiteSpace(tableModel.ProductionGroup))
-                                    {
-                                        tableModel.ProductionGroup = item.DisplayValue;
-                                    }
-                                    break;
-                                case "制作组名称":
-                                    if (string.IsNullOrWhiteSpace(tableModel.ProductionGroup))
-                                    {
-                                        tableModel.ProductionGroup = item.DisplayValue;
-                                    }
-                                    break;
                                 case "游戏平台":
 
                                     tableModel.GamePlatforms = item.DisplayValue;
@@ -120,9 +110,6 @@ namespace CnGalWebSite.APIServer.Application.Tables
                                     break;
                                 case "引擎":
                                     tableModel.Engine = item.DisplayValue;
-                                    break;
-                                case "发行商":
-                                    tableModel.Publisher = item.DisplayValue;
                                     break;
                                 case "发行方式":
                                     tableModel.IssueMethod = item.DisplayValue;
@@ -139,6 +126,25 @@ namespace CnGalWebSite.APIServer.Application.Tables
                             }
                         }
                     }
+
+                    //添加制作组发行商
+                    foreach(var item in infor.Staffs.Where(s => s.PositionGeneral == PositionGeneralType.Publisher))
+                    {
+                        if (string.IsNullOrWhiteSpace( tableModel.Publisher)==false)
+                        {
+                            tableModel.Publisher += "、";
+                        }
+                        tableModel.Publisher += string.IsNullOrWhiteSpace(item.CustomName) ? (item.ToEntryNavigation?.Name ?? item.Name) : item.CustomName;
+                    }
+                    foreach (var item in infor.Staffs.Where(s=>s.PositionGeneral== PositionGeneralType.ProductionGroup))
+                    {
+                        if (string.IsNullOrWhiteSpace(tableModel.ProductionGroup) == false)
+                        {
+                            tableModel.ProductionGroup += "、";
+                        }
+                        tableModel.ProductionGroup += string.IsNullOrWhiteSpace(item.CustomName) ? (item.ToEntryNavigation?.Name ?? item.Name) : item.CustomName;
+                    }
+
                     Infors.Add(tableModel);
                 }
 
@@ -227,7 +233,17 @@ namespace CnGalWebSite.APIServer.Application.Tables
                                 tableModel.QQgroupGroup = item.DisplayValue;
                                 break;
                         }
+
                     }
+
+                        if (item.DisplayValue?.Contains("weibo.com") ?? false)
+                        {
+                            tableModel.MicroBlog = item.DisplayValue;
+                        }
+                        else if (item.DisplayValue?.Contains("bilibili.com") ?? false)
+                        {
+                            tableModel.Bilibili = item.DisplayValue;
+                        }
                 }
                 Infors.Add(tableModel);
             }
@@ -252,11 +268,14 @@ namespace CnGalWebSite.APIServer.Application.Tables
             {
                 var temp = currentItems.Find(s => s.RealId == item.RealId);
                 temp.Id = item.Id;
-                if (item.RealId != temp.RealId || item.Name != temp.Name || item.QQgroupGroup != temp.QQgroupGroup || item.AnotherNameGroup != temp.AnotherNameGroup)
+                if (item.RealId != temp.RealId || item.Name != temp.Name || item.QQgroupGroup != temp.QQgroupGroup || item.AnotherNameGroup != temp.AnotherNameGroup || item.MicroBlog != temp.MicroBlog || item.Bilibili != temp.Bilibili)
                 {
                     item.Name = temp.Name;
                     item.AnotherNameGroup = temp.AnotherNameGroup;
                     item.QQgroupGroup = temp.QQgroupGroup;
+                    item.MicroBlog = temp.MicroBlog;
+                    item.Bilibili = temp.Bilibili;
+
 
                     await _groupInforTableModelRepository.UpdateAsync(item);
                 }
@@ -273,7 +292,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 .Where(s => s.Type == EntryType.Game && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Select(s => new
                 {
-                    s.EntryStaffFromEntryNavigation,
+                    EntryStaffFromEntryNavigation= s.EntryStaffFromEntryNavigation.Where(s=>s.PositionGeneral!= PositionGeneralType.Publisher&& s.PositionGeneral != PositionGeneralType.ProductionGroup&&s.PositionGeneral!= PositionGeneralType.SpecialThanks),
                     s.Name,
                     s.DisplayName
                 })
@@ -293,7 +312,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
                             SubordinateOrganization = item.SubordinateOrganization,
                             NicknameOfficial = string.IsNullOrWhiteSpace(item.CustomName) ? (item.ToEntryNavigation?.Name ?? item.Name) : item.CustomName,
                             PositionGeneral = item.PositionGeneral,
-                            PositionOfficial = item.PositionOfficial,
+                            PositionOfficial = item.PositionOfficial
                         };
 
                         Infors.Add(tableModel);
@@ -367,39 +386,13 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 };
                 foreach (var item in infor.Information)
                 {
-                    if (item.Modifier == "基本信息")
+                    if(item.DisplayValue?.Contains("weibo.com")??false)
                     {
-                        switch (item.DisplayName)
-                        {
-                            case "昵称（官方称呼）":
-                                tableModel.Nickname = item.DisplayValue;
-                                break;
-                        }
+                        tableModel.MicroBlog = item.DisplayValue;
                     }
-                    else if (item.Modifier == "相关网站")
+                    else if (item.DisplayValue?.Contains("bilibili.com") ?? false)
                     {
-                        switch (item.DisplayName)
-                        {
-                            case "Bilibili":
-                                tableModel.Bilibili = item.DisplayValue;
-                                break;
-                            case "B站":
-                                tableModel.Bilibili = item.DisplayValue;
-                                break;
-                            case "微博":
-                                tableModel.MicroBlog = item.DisplayValue;
-                                break;
-                            case "博客":
-                                tableModel.Blog = item.DisplayValue;
-                                break;
-
-                            case "Lofter":
-                                tableModel.Lofter = item.DisplayValue;
-                                break;
-                            case "其他活动网站":
-                                tableModel.Other = item.DisplayValue;
-                                break;
-                        }
+                        tableModel.Bilibili = item.DisplayValue;
                     }
                 }
                 Infors.Add(tableModel);
@@ -425,18 +418,13 @@ namespace CnGalWebSite.APIServer.Application.Tables
             {
                 var temp = currentItems.Find(s => s.RealId == item.RealId);
                 temp.Id = item.Id;
-                if (item.RealId != temp.RealId || item.Name != temp.Name || item.AnotherName != temp.AnotherName || item.Nickname != temp.Nickname
-                    || item.Bilibili != temp.Bilibili || item.MicroBlog != temp.MicroBlog || item.Blog != temp.Blog || item.Lofter != temp.Lofter
-                     || item.Other != temp.Other)
+                if (item.RealId != temp.RealId || item.Name != temp.Name || item.AnotherName != temp.AnotherName 
+                    || item.Bilibili != temp.Bilibili || item.MicroBlog != temp.MicroBlog )
                 {
                     item.Name = temp.Name;
                     item.AnotherName = temp.AnotherName;
-                    item.Nickname = temp.Nickname;
                     item.MicroBlog = temp.MicroBlog;
                     item.Bilibili = temp.Bilibili;
-                    item.Blog = temp.Blog;
-                    item.Lofter = temp.Lofter;
-                    item.Other = temp.Other;
 
                     await _makerInforTableModelRepository.UpdateAsync(item);
                 }

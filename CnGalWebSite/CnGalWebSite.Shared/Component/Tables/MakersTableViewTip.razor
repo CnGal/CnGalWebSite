@@ -17,30 +17,31 @@
 }
 else
 {
-    <Table TItem="MakerInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
-           OnQueryAsync="@OnQueryMakerAsync" SearchModel="@SearchModelMaker" ShowSearch="true" ShowLoading="true"
-           ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
-           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
-        <TableColumns>
-            <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" TextWrap="true" Fixed="true" />
-            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.AnotherName" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Nickname" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Bilibili" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.MicroBlog" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Blog" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Lofter" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-            <TableColumn @bind-Field="@context.Other" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
-        </TableColumns>
-        <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.RealId))" />
-        </RowButtonTemplate>
+<Table TItem="MakerInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
+       OnQueryAsync="@OnQueryMakerAsync" SearchModel="@SearchModelMaker" ShowSearch="true" ShowLoading="true"
+       ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
+       ShowToolbar="true" ShowDefaultButtons="false" @ref="table">
+    <TableToolbarTemplate>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton TItem="MakerInforTableModel" Columns="table.Columns"   Items="ModelMaker.MakerInfors" Name="制作人汇总表" />
+    </TableToolbarTemplate>
+    <TableColumns>
+        <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" TextWrap="true" Fixed="true" />
+        <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
+        <TableColumn @bind-Field="@context.AnotherName" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
+        <TableColumn @bind-Field="@context.Bilibili" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
+        <TableColumn @bind-Field="@context.MicroBlog" Filterable="true" Sortable="true" Width="200" TextWrap="true" />
+    </TableColumns>
+    <RowButtonTemplate>
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.RealId))" />
+    </RowButtonTemplate>
 
-    </Table>
+</Table>
 }
 
 
 @code {
+    Table<MakerInforTableModel> table;
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 

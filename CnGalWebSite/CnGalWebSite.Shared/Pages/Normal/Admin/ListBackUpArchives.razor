@@ -30,7 +30,7 @@
             <div class=" rounded shadow-sm -lg p-4 bg-opacity">
                 <Table TItem="ListBackUpArchiveAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
                        ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true IsAutoRefresh="@IsAutoRefresh"
-                       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+                        ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
                     <TableToolbarTemplate>
                         <TableToolbarButton TItem="ListBackUpArchiveAloneModel" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" OnClickCallback="OnRunClick" IsAsync="true" />
                         <TableToolbarButton TItem="ListBackUpArchiveAloneModel" Color="Color.Primary" Icon="fa fa-spin fa-spinner fa-fw" Text="切换自动刷新" OnClickCallback="ClickIsAutoRefresh" />
@@ -86,9 +86,6 @@
     {
         try
         {
-            options.Filters = new List<IFilterAction>();
-            options.Searchs = new List<IFilterAction>();
-
             var result = await Http.PostAsJsonAsync<BackUpArchivesPagesInfor>(ToolHelper.WebApiPath + "api/BackUpArchives/GetBackUpArchiveList", new BackUpArchivesPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListBackUpArchiveAloneModel>>(jsonContent, ToolHelper.options);

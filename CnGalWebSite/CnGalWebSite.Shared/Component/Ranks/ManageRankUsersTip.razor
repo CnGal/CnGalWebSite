@@ -7,7 +7,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-users" Title="@Title" Class="mb-4">
     <Table TItem="ListRankUserAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
            ShowExtendButtons="true" ExtendButtonColumnWidth="170" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+            ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
         <TableToolbarTemplate>
             <TableToolbarButton TItem="ListRankUserAloneModel" Color="Color.Warning" Icon="fa fa-plus" Text="添加" OnClickCallback="@((IEnumerable<ListRankUserAloneModel> items)=> { return OnAddRankUser(); })" IsAsync="true" />
             <TableToolbarButton TItem="ListRankUserAloneModel" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
@@ -63,9 +63,6 @@
     {
         try
         {
-            options.Filters = new List<IFilterAction>();
-            options.Searchs = new List<IFilterAction>();
-
             var result = await Http.PostAsJsonAsync<RankUsersPagesInfor>(ToolHelper.WebApiPath + "api/ranks/GetRankUserList", new RankUsersPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options, RankId = Id });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListRankUserAloneModel>>(jsonContent, ToolHelper.options);
