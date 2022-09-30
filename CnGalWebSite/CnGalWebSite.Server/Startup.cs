@@ -44,10 +44,6 @@ namespace CnGalWebSite.Server
 
             services.AddScoped(sp => new HttpClient());
 
-
-            // 增加 Table Excel 导出服务
-            services.AddBootstrapBlazorTableExcelExport();
-
             services.AddBlazoredLocalStorage();
 
             services.AddAuthorizationCore();

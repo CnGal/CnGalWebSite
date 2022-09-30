@@ -39,7 +39,7 @@
             <div class=" rounded shadow-sm -lg p-4 bg-opacity">
                 <Table TItem="ListMessageAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
                        ShowExtendButtons="true" ExtendButtonColumnWidth="200" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-                       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+                        ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
                     <TableToolbarTemplate>
                         <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Success" Icon="fa fa-database" Text="已读" OnClickCallback="OnReadedClick" IsAsync="true" />
                         <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Primary" Icon="fa fa-pencil-square-o" Text="未读" OnClickCallback="OnNotReadedClick" IsAsync="true" />
@@ -169,9 +169,6 @@
     {
         try
         {
-            options.Filters = new List<IFilterAction>();
-            options.Searchs = new List<IFilterAction>();
-
             var result = await Http.PostAsJsonAsync<MessagesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetMessageList", new MessagesPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListMessageAloneModel>>(jsonContent, ToolHelper.options);

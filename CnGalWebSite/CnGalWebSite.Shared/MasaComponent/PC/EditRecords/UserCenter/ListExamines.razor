@@ -21,7 +21,7 @@ else
 
     <Table TItem="ListExamineAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelExamine" ShowSearch="true" @ref="TableRows"
            ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true" IsAutoRefresh="@IsAutoRefresh">
+            ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true" IsAutoRefresh="@IsAutoRefresh">
         <TableToolbarTemplate>
             <TableToolbarButton TItem="ListExamineAloneModel" Color="Color.Success" Icon="fa fa-paper-plane-o" Text="通过审核" OnClickCallback="OnPassedExamineClick" IsAsync="true" />
             <TableToolbarButton TItem="ListExamineAloneModel" Color="Color.Danger" Icon="fa fa-unlink" Text="驳回审核" OnClickCallback="OnUnPassedExamineClick" IsAsync="true" />
@@ -81,9 +81,6 @@ else
     {
         try
         {
-            options.Filters = new List<IFilterAction>();
-            options.Searchs = new List<IFilterAction>();
-
             var result = await Http.PostAsJsonAsync<ExaminesPagesInfor>(ToolHelper.WebApiPath + "api/examines/GetExamineList", new ExaminesPagesInfor { SearchModel = SearchModelExamine, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
 

@@ -11,7 +11,7 @@
             <hr />
             <Table TItem="ListDisambigAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
                    ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-                   ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+                    ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
                 <TableColumns>
                     <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
                     <TableColumn @bind-Field="@context.Name" Searchable="true" Sortable="true" Width="100" />
@@ -53,9 +53,6 @@
     {
         try
         {
-            options.Filters = new List<IFilterAction>();
-            options.Searchs = new List<IFilterAction>();
-
             var result = await Http.PostAsJsonAsync<DisambigsPagesInfor>(ToolHelper.WebApiPath + "api/disambigs/GetDisambigListNormal", new DisambigsPagesInfor { SearchModel = searchModel, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListDisambigAloneModel>>(jsonContent, ToolHelper.options);

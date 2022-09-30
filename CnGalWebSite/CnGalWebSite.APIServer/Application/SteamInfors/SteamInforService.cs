@@ -290,6 +290,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             {
                 steam.PriceNow = 0;
                 steam.CutNow = 0;
+                steam.OriginalPrice = 0;
                 steam.PriceNowString = "¥ 0.00";
             }
 

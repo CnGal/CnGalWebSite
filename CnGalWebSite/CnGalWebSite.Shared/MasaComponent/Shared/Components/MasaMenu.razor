@@ -1,0 +1,60 @@
+﻿@inject IDataCacheService _dataCacheService
+@implements IDisposable
+
+<MMenu OffsetY>
+    <ActivatorContent>
+        <MButton Color="@(Color??_dataCacheService.ThemeSetting.Theme)" @attributes="@context.Attrs" Dark Text="TextStyle">
+            @if (string.IsNullOrWhiteSpace(Icon) == false)
+            {
+                <MIcon Left>@Icon</MIcon>
+            }
+            @Text
+        </MButton>
+    </ActivatorContent>
+
+    <ChildContent>
+        <div class="bg-theme">
+            @ChildContent
+        </div>
+
+    </ChildContent>
+</MMenu>
+
+@code {
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public bool TextStyle { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public string Color { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        _dataCacheService.RefreshRequsted += RefreshRequsted;
+
+    }
+
+    public async void RefreshRequsted(object sender, EventArgs args)
+    {
+        await InvokeAsync(StateHasChanged);
+
+    }
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

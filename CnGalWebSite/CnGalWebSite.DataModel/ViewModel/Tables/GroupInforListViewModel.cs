@@ -18,5 +18,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Tables
         public string QQgroupGroup { get; set; }
         [Display(Name = "别称")]
         public string AnotherNameGroup { get; set; }
+
+        [Display(Name = "B站")]
+        public string Bilibili { get; set; }
+        [Display(Name = "微博")]
+        public string MicroBlog { get; set; }
     }
 }

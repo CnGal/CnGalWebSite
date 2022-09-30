@@ -20,7 +20,7 @@ else
 {
     <Table TItem="WinnerDataModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true ExtendButtonColumnWidth="80" FixedExtendButtonsColumn="true"
            OnQueryAsync="@OnQueryStaffAsync" SearchModel="@SearchModelStaff" ShowSearch="true" ShowLoading="true"  ShowExtendButtons="true" 
-           ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false">
+            ShowToolbar="true" ShowDefaultButtons="false">
         <TableColumns>
             <TableColumn @bind-Field="@context.Number" Sortable="true" DefaultSort="true" Fixed="true" Width="60" />
             <TableColumn @bind-Field="@context.UserName" Filterable Sortable Searchable DefaultSort TextWrap Width="180" />

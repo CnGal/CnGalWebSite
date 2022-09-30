@@ -9,7 +9,7 @@
 
 <Table TItem="ListRankAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
        ShowExtendButtons="true" ExtendButtonColumnWidth="240" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
     <TableToolbarTemplate>
         <TableToolbarButton TItem="ListRankAloneModel" Color="Color.Success" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
         <TableToolbarButton TItem="ListRankAloneModel" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
@@ -77,9 +77,6 @@
     {
         try
         {
-            options.Filters = new List<IFilterAction>();
-            options.Searchs = new List<IFilterAction>();
-
             var result = await Http.PostAsJsonAsync<RanksPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetRankList", new RanksPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListRankAloneModel>>(jsonContent, ToolHelper.options);

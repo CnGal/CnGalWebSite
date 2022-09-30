@@ -32,9 +32,6 @@ namespace CnGalWebSite.Maui
 
             //依赖注入主页
             builder.Services.AddSingleton<MainPage>();
-
-            // 增加 Table Excel 导出服务
-            builder.Services.AddBootstrapBlazorTableExcelExport();
             //本地储存服务
             builder.Services.AddBlazoredLocalStorage();
 

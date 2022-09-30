@@ -28,7 +28,7 @@
             <div class=" rounded shadow-sm -lg p-4 bg-opacity">
                 <Table TItem="ListVoteAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelArticle" ShowSearch="true" @ref="TableRows"
                        ShowExtendButtons="true" ExtendButtonColumnWidth="340" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-                       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+                        ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
                     <TableToolbarTemplate>
                         <TableToolbarButton TItem="ListVoteAloneModel" Color="Color.Primary" Icon="fa fa-arrow-up" Text="增权重" OnClickCallback="OnPriorityUpClick" IsAsync="true" />
                         <TableToolbarButton TItem="ListVoteAloneModel" Color="Color.Success" Icon="fa fa-arrow-down" Text="降权重" OnClickCallback="OnPriorityDownClick" IsAsync="true" />
@@ -107,9 +107,6 @@
     {
         try
         {
-            options.Filters = new List<IFilterAction>();
-            options.Searchs = new List<IFilterAction>();
-
             var result = await Http.PostAsJsonAsync<VotesPagesInfor>(ToolHelper.WebApiPath + "api/admin/GetVoteList", new VotesPagesInfor { SearchModel = SearchModelArticle, Options = (QueryPageOptionsHelper)options });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             return JsonSerializer.Deserialize<QueryData<ListVoteAloneModel>>(jsonContent, ToolHelper.options);

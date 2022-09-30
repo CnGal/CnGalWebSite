@@ -11,7 +11,7 @@
                 <hr />
                 <Table TItem="ListMessageAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
                        ShowExtendButtons="true" ExtendButtonColumnWidth="200" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-                       ShowExportButton="true" ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+                        ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
                     <TableToolbarTemplate>
                         <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Info" Icon="fa fa-plus" Text="发送消息" OnClickCallback="@((IEnumerable<ListMessageAloneModel> items)=> { return PostMessage(); })" IsAsync="true" />
                         <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Success" Icon="fa fa-database" Text="已读" OnClickCallback="OnReadedClick" IsAsync="true" />
@@ -71,8 +71,6 @@
     {
         try
         {
-            options.Filters = new List<IFilterAction>();
-            options.Searchs = new List<IFilterAction>();
             SearchModelUser.ApplicationUserId = Id;
 
             var result = await Http.PostAsJsonAsync<MessagesPagesInfor>(ToolHelper.WebApiPath + "api/space/GetMessagesListNormal", new MessagesPagesInfor { SearchModel = SearchModelUser, Options = (QueryPageOptionsHelper)options });
