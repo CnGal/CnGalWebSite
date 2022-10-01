@@ -243,7 +243,7 @@ namespace CnGalWebSite.APIServer.Application.Home
 
         public async Task<List<CarouselViewModel>> GetHomeCarouselsViewAsync()
         {
-            var carouses = await _carouselRepository.GetAll().AsNoTracking().Where(s=>s.Type== CarouselType.Home).OrderByDescending(s => s.Priority).ToListAsync();
+            var carouses = await _carouselRepository.GetAll().AsNoTracking().Where(s=>s.Type== CarouselType.Home&&s.Priority>=0).OrderByDescending(s => s.Priority).ToListAsync();
 
             var model = new List<CarouselViewModel>();
             foreach (var item in carouses)
