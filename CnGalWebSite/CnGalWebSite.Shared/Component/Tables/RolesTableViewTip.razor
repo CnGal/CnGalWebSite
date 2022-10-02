@@ -1,6 +1,7 @@
 ﻿@inject HttpClient Http
 @inject ToastService? ToastService
 @inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
 
 @if (!isReady)
 {
@@ -17,38 +18,38 @@
 }
 else
 {
-<Table TItem="RoleInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
-       OnQueryAsync="@OnQueryRoleAsync" SearchModel="@SearchModelRole" ShowSearch="true" ShowLoading="true"
-       ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
-       ShowToolbar="true" ShowDefaultButtons="false" @ref="table">
-    <TableToolbarTemplate>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton TItem="RoleInforTableModel" Columns="table.Columns"   Items="ModelRole.RoleInfors" Name="角色汇总表" />
-    </TableToolbarTemplate>
-    <TableColumns>
-        <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" TextWrap="true" Fixed="true" />
-        <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
-        <TableColumn @bind-Field="@context.GameName" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.CV" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.AnotherNameRole" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.Gender" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.Birthday" Filterable="true" Sortable="true" FormatString="MM-dd" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.Haircolor" Filterable="true" Sortable="true" Searchable="true" Width="100" TextWrap="true" />
-        <TableColumn @bind-Field="@context.Pupilcolor" Filterable="true" Sortable="true" Searchable="true" Width="100" TextWrap="true" />
-        <TableColumn @bind-Field="@context.FigureData" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.FigureSubjective" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.ClothesAccessories" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.Character" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.RoleIdentity" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.BloodType" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.RoleHeight" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.RoleAge" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.RoleTaste" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-    </TableColumns>
-    <RowButtonTemplate>
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.RealId))" />
-    </RowButtonTemplate>
+    <Table TItem="RoleInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
+           OnQueryAsync="@OnQueryRoleAsync" SearchModel="@SearchModelRole" ShowSearch="true" ShowLoading="true"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
+           ShowToolbar="true" ShowDefaultButtons="false" @ref="table">
+        <TableToolbarTemplate>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton TItem="RoleInforTableModel" Columns="table.Columns" Items="ModelRole.RoleInfors" Name="角色汇总表" />
+        </TableToolbarTemplate>
+        <TableColumns>
+            <TableColumn @bind-Field="@context.RealId" Filterable="true" Sortable="true" Width="100" TextWrap="true" Fixed="true" />
+            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.GameName" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.CV" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.AnotherNameRole" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Gender" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Birthday" Filterable="true" Sortable="true" FormatString="MM-dd" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Haircolor" Filterable="true" Sortable="true" Searchable="true" Width="100" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Pupilcolor" Filterable="true" Sortable="true" Searchable="true" Width="100" TextWrap="true" />
+            <TableColumn @bind-Field="@context.FigureData" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.FigureSubjective" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.ClothesAccessories" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Character" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.RoleIdentity" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.BloodType" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.RoleHeight" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.RoleAge" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.RoleTaste" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.RealId))" />
+        </RowButtonTemplate>
 
-</Table>
+    </Table>
 }
 
 
@@ -73,10 +74,10 @@ else
     [Parameter]
     public EventCallback<NavigateModel> OnClickUrl { get; set; }
 
-    public Task OnLook(long id)
+    public async Task OnLook(long id)
     {
-        NavigationManager.NavigateTo("/entries/index/" + id);
-        return Task.CompletedTask;
+        await _dataCacheService.OpenNewPage.InvokeAsync(ToolHelper.WebApiPath + "entries/index/" + id);
+
 
     }
     protected override async Task OnInitializedAsync()

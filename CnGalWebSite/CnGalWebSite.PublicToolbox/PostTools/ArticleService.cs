@@ -60,7 +60,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "获取链接内容失败 {Link}", model.Url);
-                    OnProgressUpdate(model, OutputLevel.Dager, "链接格式不正确");
+                    OnProgressUpdate(model, OutputLevel.Dager, "获取文章失败，请检查链接格式或联系管理员");
                     return;
                 }
 
@@ -134,22 +134,30 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             var name = "";
             string image = null;
             string author = null;
+            var mainNode = node.FirstChild.ChildNodes.FirstOrDefault(s => s.HasClass("App-main")).FirstChild;
             //正文
             try
             {
-                htmlStr = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes.MaxBy(s => s.InnerText.Length).LastChild.LastChild.InnerHtml;
+                htmlStr = mainNode.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes.MaxBy(s => s.InnerText.Length).LastChild.LastChild.InnerHtml;
             }
-            catch
+            catch(Exception ex)
             {
-
+                throw new Exception("无法获取知乎文章内容，请联系管理员",ex);
             }
+
+            //检查是否获取到正文
+            if (string.IsNullOrWhiteSpace(htmlStr))
+            {
+                throw new Exception("无法获取知乎文章内容，请联系管理员");
+            }
+
             //主图
             try
             {
-                var tempNode = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.FirstOrDefault(s => s.Name == "img");
+                var tempNode = mainNode.ChildNodes.FirstOrDefault(s => s.Name == "img");
                 if (tempNode == null)
                 {
-                    tempNode = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.FirstOrDefault(s => s.OuterHtml.Contains("background-image"));
+                    tempNode = mainNode.ChildNodes.FirstOrDefault(s => s.OuterHtml.Contains("background-image"));
                     if (tempNode != null)
                     {
                         image = ToolHelper.MidStrEx(tempNode.OuterHtml, "url(", "?source");
@@ -167,7 +175,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             //标题
             try
             {
-                name = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes[0].FirstChild.InnerText;
+                name = mainNode.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes[0].FirstChild.InnerText;
             }
             catch
             {
@@ -176,7 +184,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             //作者
             try
             {
-                author = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes[0].ChildNodes[1].FirstChild.FirstChild.LastChild.FirstChild.InnerText;
+                author = mainNode.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes[0].ChildNodes[1].FirstChild.FirstChild.LastChild.FirstChild.InnerText;
             }
             catch
             {
@@ -185,7 +193,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             //时间
             try
             {
-                var times = node.FirstChild.ChildNodes[2].FirstChild.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes.Where(s => s.InnerText.Contains("发布于") || s.InnerText.Contains("编辑于")).Select(s => s.InnerText.Replace("发布于 ", "").Replace("编辑于 ", ""));
+                var times = mainNode.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes.Where(s => s.InnerText.Contains("发布于") || s.InnerText.Contains("编辑于")).Select(s => s.InnerText.Replace("发布于 ", "").Replace("编辑于 ", ""));
                 foreach (var item in times)
                 {
                     try
@@ -208,6 +216,10 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             var converter = new ReverseMarkdown.Converter();
 
 
+            if(string.IsNullOrWhiteSpace(htmlStr))
+            {
+                throw new Exception("无法获取知乎文章内容，请联系管理员");
+            }
 
             model.MainPage = converter.Convert(htmlStr);
             model.MainPage = await ProgressImage(model, model.MainPage, RepostArticleType.ZhiHu);
