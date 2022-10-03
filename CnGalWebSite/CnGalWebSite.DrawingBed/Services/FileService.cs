@@ -35,6 +35,10 @@ namespace CnGalWebSite.DrawingBed.Services
             _imageTempPath = Path.Combine(_webHostEnvironment.WebRootPath, "temp", "images");
             _fileTempPath = Path.Combine(_webHostEnvironment.WebRootPath, "temp", "files");
             _audioTempPath = Path.Combine(_webHostEnvironment.WebRootPath, "temp", "audio");
+
+            Directory.CreateDirectory(_imageTempPath);
+            Directory.CreateDirectory(_fileTempPath);
+            Directory.CreateDirectory(_audioTempPath);
         }
 
         public async Task<UploadResult> TransferDepositFile(string url,double x=0,double y=0, UploadFileType type= UploadFileType.Image)

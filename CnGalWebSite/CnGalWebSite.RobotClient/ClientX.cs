@@ -155,9 +155,9 @@ namespace CnGalWebSite.RobotClient
         /// <returns>是否超过限制</returns>
         private async Task<bool> CheckLimit(RobotReplyRange range, long memberId, string memberName, Masuda.Net.Models.Message msg = null)
         {
-            //判断该用户是否连续10次互动 1分钟内
-            var singleCount = _post.Count(x => (DateTime.Now.ToCstTime() - x.PostTime).TotalMinutes <= 1 && x.QQ == memberId);
-            var totalCount = _post.Count(x => (DateTime.Now.ToCstTime() - x.PostTime).TotalMinutes <= 1);
+            //判断该用户是否连续10次互动 5分钟内
+            var singleCount = _post.Count(x => (DateTime.Now.ToCstTime() - x.PostTime).TotalMinutes <= 5 && x.QQ == memberId);
+            var totalCount = _post.Count(x => (DateTime.Now.ToCstTime() - x.PostTime).TotalMinutes <= 5);
 
 
             if (singleCount == _setting.SingleLimit)
