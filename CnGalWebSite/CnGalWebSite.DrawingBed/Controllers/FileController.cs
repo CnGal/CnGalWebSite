@@ -68,7 +68,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         /// <param name="url"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<LinkToImgResult>> linkToImgUrlAsync([FromQuery] string url, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type)
+        public async Task<ActionResult<UploadResult>> linkToImgUrlAsync([FromQuery] string url, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type)
         {
             if (string.IsNullOrWhiteSpace(url))
             {
@@ -93,29 +93,15 @@ namespace CnGalWebSite.DrawingBed.Controllers
 
             try
             {
-                var res = (url.Contains("image.cngal.org")) && x == 0 && y == 0
-                              ? url
-                              : (await _fileService.TransferDepositFile(url, x, y, type)).FileURL;
+               var result= await _fileService.TransferDepositFile(url, x, y, type);
 
-                return string.IsNullOrWhiteSpace(res)
-                    ? (ActionResult<LinkToImgResult>)new LinkToImgResult
-                    {
-                        Successful = false,
-                        OriginalUrl = url,
-                    }
-                    : (ActionResult<LinkToImgResult>)new LinkToImgResult
-                    {
-                        OriginalUrl = url,
-                        Url = res,
-                        Successful = true,
-
-                    };
+                return result;
             }
             catch (Exception ex)
             {
-                return new LinkToImgResult
+                return new UploadResult
                 {
-                    Successful = false,
+                    Uploaded = false,
                     OriginalUrl = url,
                     Error = ex.Message
                 };

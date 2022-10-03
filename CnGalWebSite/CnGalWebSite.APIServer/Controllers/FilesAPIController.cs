@@ -56,41 +56,8 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return new Result { Successful = false, Error = "该用户不存在" };
             }
-            //加载文件管理
-            var fileManager = await _fileManagerRepository.GetAll().Include(s => s.UserFiles).FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id);
-            if (fileManager == null)
-            {
-                fileManager = new FileManager
-                {
-                    ApplicationUser = user,
-                    ApplicationUserId = user.Id,
-                    TotalSize = 500 * 1024 * 1024,
-                    UsedSize = 0,
-                    UserFiles = new List<UserFile>()
-                };
-                fileManager = await _fileManagerRepository.InsertAsync(fileManager);
-            }
 
-            //检测是否已添加相同文件
-            if(string.IsNullOrWhiteSpace(model.Sha1)==false&&await _userFileRepository.GetAll().AnyAsync(s=>s.Sha1==model.Sha1))
-            {
-                return new Result { Successful = true };
-            }
-
-
-            fileManager.UserFiles.Add(new UserFile
-            {
-                FileName = model.FileName,
-                UploadTime = DateTime.Now.ToCstTime(),
-                FileSize = model.FileSize,
-                Sha1 = model.Sha1,
-                Duration = model.Duration,
-                Type = model.Type,
-                UserId = fileManager.ApplicationUserId
-            });
-            fileManager.UsedSize += (model.FileSize ?? 0);
-            //更新用户文件列表
-            await _fileManagerRepository.UpdateAsync(fileManager);
+            await _fileService.AddUserUploadFileInfor(user.Id, model);
 
             return new Result { Successful = true };
 

@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using SortOrder = BootstrapBlazor.Components.SortOrder;
 using Microsoft.Extensions.Logging;
 using System.Security.Policy;
+using Microsoft.AspNetCore.Http;
 
 namespace CnGalWebSite.APIServer.Application.Files
 {
@@ -219,35 +220,6 @@ namespace CnGalWebSite.APIServer.Application.Files
             });
         }
 
-        public async Task<string> SaveImageAsync(string url, string userId, double x = 0, double y = 0)
-        {
-            try
-            {
-                //client.Timeout = TimeSpan.FromSeconds(30);
-
-                var result = await _httpClient.PostAsJsonAsync($"{_configuration["TransferDepositFileAPI"]}api/files/linkToImgUrl?url={url}&x={x}&y={y}", new TransferDepositFileModel());
-                var jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = System.Text.Json.JsonSerializer.Deserialize<LinkToImgResult>(jsonContent, ToolHelper.options);
-
-                if (obj.Successful)
-                {
-                    _logger.LogInformation("转存图片成功：{url}", obj.Url);
-                    return obj.Url;
-                }
-                else
-                {
-                    _logger.LogError("转存图片失败：{url}", url);
-                    return url;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "转存图片失败：{url}", url);
-                return url;
-            }
-
-        }
-
         public async Task<string> TransferDepositFile(string url)
         {
             try
@@ -291,6 +263,42 @@ namespace CnGalWebSite.APIServer.Application.Files
                 _logger.LogError(ex, "转存图片失败：{url}", url);
                 throw;
             }
+        }
+
+        public async Task<string> SaveImageAsync(string url, string userId, double x = 0, double y = 0)
+        {
+            try
+            {
+                var result = await _httpClient.PostAsJsonAsync($"{ToolHelper.ImageApiPath}api/files/linkToImgUrl?url={url}&x={x}&y={y}", new TransferDepositFileModel());
+                var jsonContent = result.Content.ReadAsStringAsync().Result;
+                var obj = System.Text.Json.JsonSerializer.Deserialize<UploadResult>(jsonContent, ToolHelper.options);
+
+                if (obj.Uploaded)
+                {
+                    await AddUserUploadFileInfor(userId, new AddUserUploadFileInforModel
+                    {
+                        Sha1 = obj.Sha1,
+                        FileSize = obj.FileSize,
+                        Duration = obj.Duration,
+                        FileName = obj.Url,
+                        Type = UploadFileType.Image
+                    });
+
+                    _logger.LogInformation("转存图片成功：{url}", obj.Url);
+                    return obj.Url;
+                }
+                else
+                {
+                    _logger.LogError("转存图片失败：{url}", url);
+                    return url;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "转存图片失败：{url}", url);
+                return url;
+            }
+
         }
 
         public async Task TransferAllMainImages(int maxCount)
@@ -341,6 +349,70 @@ namespace CnGalWebSite.APIServer.Application.Files
                     throw;
                 }
             }
+        }
+
+        public async Task AddUserUploadFileInfor(string userId, AddUserUploadFileInforModel model)
+        {
+            //加载文件管理
+            var fileManager = await _fileManagerRepository.GetAll().Include(s => s.UserFiles).FirstOrDefaultAsync(s => s.ApplicationUserId == userId);
+            if (fileManager == null)
+            {
+                fileManager = new FileManager
+                {
+                    ApplicationUserId = userId,
+                    TotalSize = 500 * 1024 * 1024,
+                    UsedSize = 0,
+                    UserFiles = new List<UserFile>()
+                };
+                fileManager = await _fileManagerRepository.InsertAsync(fileManager);
+            }
+
+            //检测是否已添加相同文件
+            if (string.IsNullOrWhiteSpace(model.Sha1) == false && await _userFileRepository.GetAll().AnyAsync(s => s.Sha1 == model.Sha1))
+            {
+                return;
+            }
+
+
+            fileManager.UserFiles.Add(new UserFile
+            {
+                FileName = model.FileName,
+                UploadTime = DateTime.Now.ToCstTime(),
+                FileSize = model.FileSize,
+                Sha1 = model.Sha1,
+                Duration = model.Duration,
+                Type = model.Type,
+                UserId = fileManager.ApplicationUserId
+            });
+            fileManager.UsedSize += (model.FileSize ?? 0);
+            //更新用户文件列表
+            await _fileManagerRepository.UpdateAsync(fileManager);
+        }
+
+        /// <summary>
+        /// 转存字符串中的图片 并添加到用户文件
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<string> TransformImagesAsync(string text,string userId)
+        {
+            var temp = await ToolHelper.TransformImagesAsync(text, _httpClient);
+            text = temp.Text;
+
+            foreach (var infor in temp.UploadResults)
+            {
+                await AddUserUploadFileInfor(userId, new AddUserUploadFileInforModel
+                {
+                    Sha1 = infor.Sha1,
+                    FileSize = infor.FileSize,
+                    Duration = infor.Duration,
+                    FileName = infor.Url,
+                    Type = UploadFileType.Image
+                });
+            }
+
+            return text;
         }
     }
 }

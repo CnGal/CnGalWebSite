@@ -19,5 +19,10 @@ namespace CnGalWebSite.APIServer.Application.Files
         Task<string> TransferDepositFile(string url);
 
         Task TransferAllMainImages(int maxCount);
+
+        Task AddUserUploadFileInfor(string userId, AddUserUploadFileInforModel model);
+
+        Task<string> TransformImagesAsync(string text, string userId);
+
     }
 }

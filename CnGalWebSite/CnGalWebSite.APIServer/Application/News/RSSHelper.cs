@@ -1,24 +1,26 @@
 ﻿using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Files;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace CnGalWebSite.APIServer.Application.News
 {
     public class RSSHelper : IRSSHelper
     {
-        private readonly IHttpClientFactory _clientFactory;
+        private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly IFileService _fileService;
 
-        public RSSHelper(IHttpClientFactory clientFactory, IConfiguration configuration, IFileService fileService)
+        public RSSHelper(HttpClient httpClient, IConfiguration configuration, IFileService fileService)
         {
-            _clientFactory = clientFactory;
+            _httpClient = httpClient;
             _configuration = configuration;
             _fileService = fileService;
         }
@@ -26,10 +28,9 @@ namespace CnGalWebSite.APIServer.Application.News
         public async Task<List<OriginalRSS>> GetOriginalWeibo(long id, DateTime fromTime)
         {
             var model = new List<OriginalRSS>();
-            using var client = _clientFactory.CreateClient();
-
+          
             //获取最新微博数据
-            var xmlStr = await client.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
+            var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
             //反序列化数据
             var doc = new XmlDocument();
             doc.LoadXml(xmlStr);
@@ -65,20 +66,15 @@ namespace CnGalWebSite.APIServer.Application.News
             }
 
             //将图片上传到图床
-            //foreach (var item in model)
-            //{
-            //    var images = ToolHelper.GetImageLinks(item.Description);
-            //    foreach (var temp in images)
-            //    {
-            //        var infor = await _fileService.SaveImageAsync(temp, _configuration["NewsAdminId"]);
-
-            //        //替换图片
-            //        item.Description = item.Description.Replace(temp, infor);
-            //    }
-            //}
+            foreach (var item in model)
+            {
+                item.Description= await _fileService.TransformImagesAsync(item.Description, _configuration["NewsAdminId"]);
+            }
 
             return model;
         }
+
+
 
         public async Task<WeiboUserInfor> GetWeiboUserInfor(long id)
         {
@@ -87,10 +83,10 @@ namespace CnGalWebSite.APIServer.Application.News
                 WeiboId = id
             };
 
-            using var client = _clientFactory.CreateClient();
+     
 
             //获取最新微博数据
-            var xmlStr = await client.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id.ToString());
+            var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id.ToString());
             //反序列化数据
             var doc = new XmlDocument();
             doc.LoadXml(xmlStr);
@@ -150,10 +146,9 @@ namespace CnGalWebSite.APIServer.Application.News
             try
             {
                 var model = new OriginalRSS();
-                using var client = _clientFactory.CreateClient();
 
                 //获取最新微博数据
-                var xmlStr = await client.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
+                var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
                 //反序列化数据
                 var doc = new XmlDocument();
                 doc.LoadXml(xmlStr);
@@ -198,10 +193,9 @@ namespace CnGalWebSite.APIServer.Application.News
         public async Task<OriginalRSS> GetOriginalWeibo(long id, string keyWord)
         {
             var model = new OriginalRSS();
-            using var client = _clientFactory.CreateClient();
 
             //获取最新微博数据
-            var xmlStr = await client.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
+            var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
             //反序列化数据
             var doc = new XmlDocument();
             doc.LoadXml(xmlStr);
@@ -230,14 +224,11 @@ namespace CnGalWebSite.APIServer.Application.News
 
                 if (weibo.Link.Contains(keyWord))
                 {
-                    //var images = ToolHelper.GetImageLinks(weibo.Description);
-                    //foreach (var temp in images)
-                    //{
-                    //    var infor = await _fileService.SaveImageAsync(temp, _configuration["NewsAdminId"]);
+                    //将图片上传到图床
 
-                    //    //替换图片
-                    //    weibo.Description = weibo.Description.Replace(temp, infor);
-                    //}
+                    weibo.Description= await _fileService.TransformImagesAsync(weibo.Description, _configuration["NewsAdminId"]);
+                    
+
                     return weibo;
                 }
             }
