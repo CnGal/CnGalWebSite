@@ -911,7 +911,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
             var converter = new ReverseMarkdown.Converter();
 
-            return converter.Convert(description);
+            return converter.Convert(description).Replace("\\[\\]", "[]");
         }
 
         public async Task<string> GetMicroblogMainImage(string description)

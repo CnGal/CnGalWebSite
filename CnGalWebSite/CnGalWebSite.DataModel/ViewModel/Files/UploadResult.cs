@@ -15,7 +15,11 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 处理过的文件url
         /// </summary>
-        public string FileURL { get; set; }
+        public string Url { get; set; }
+        /// <summary>
+        /// 原始文件Url
+        /// </summary>
+        public string OriginalUrl { get; set; }
         /// <summary>
         /// 错误信息
         /// </summary>

@@ -115,8 +115,8 @@
             var obj = await _appHelper.UploadImagesAsync(file.File, Type);
             if (obj.Uploaded == true)
             {
-                ImagePath = obj.FileURL;
-                await ImagePathChanged.InvokeAsync(obj.FileURL);
+                ImagePath = obj.Url;
+                await ImagePathChanged.InvokeAsync(obj.Url);
 
                 StateHasChanged();
             }

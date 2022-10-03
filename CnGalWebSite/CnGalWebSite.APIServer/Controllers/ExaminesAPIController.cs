@@ -352,7 +352,15 @@ namespace CnGalWebSite.APIServer.Controllers
                     return new Result { Successful = false, Error = "获取审核数据失败" };
                 }
                 //应用审核记录
-                await _examineService.ApplyEditRecordToObject(entry, examineData, examine.Operation);
+                try
+                {
+                    await _examineService.ApplyEditRecordToObject(entry, examineData, examine.Operation);
+                }
+                catch(Exception ex)
+                {
+                    return new Result { Successful = false, Error = "应用审核记录失败，错误信息：" + ex.Message };
+                }
+               
 
 
                 //修改审核状态

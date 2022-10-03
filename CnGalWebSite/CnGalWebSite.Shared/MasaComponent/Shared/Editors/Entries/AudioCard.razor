@@ -57,7 +57,7 @@
 
     public async Task OnUploaded(UploadResult result)
     {
-        if (Model.Audio.Any(s => s.Url == result.FileURL))
+        if (Model.Audio.Any(s => s.Url == result.Url))
         {
             await PopupService.ToastAsync($"这个音频已经添加过了哦~", AlertTypes.Error);
             return;
@@ -65,7 +65,7 @@
         Model.Audio.Add(new EditAudioAloneModel
         {
             Name = result.FileName ?? "音频" + (Model.Audio.Count + 1).ToString(),
-            Url = result.FileURL,
+            Url = result.Url,
             Duration = result.Duration ?? new TimeSpan(0)
         });
 

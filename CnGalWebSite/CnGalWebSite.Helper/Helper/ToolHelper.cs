@@ -1,11 +1,15 @@
-﻿using CnGalWebSite.DataModel.ExamineModel;
+﻿using CnGalWebSite.DataModel.Application.Helper;
+using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Files;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.Extensions;
+using CnGalWebSite.Helper.ViewModel.Files;
 using System.Diagnostics;
+using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -1233,6 +1237,59 @@ namespace CnGalWebSite.DataModel.Helper
 
             return model;
 
+        }
+
+        public static async Task<TransformImageResult> TransformImagesAsync(string text,HttpClient _httpClient)
+        {
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return new TransformImageResult { Text = text };
+            }
+
+            var model = new TransformImageResult();
+
+            StringBuilder sb = new StringBuilder(text);
+            sb.Replace("media.st.dl.pinyuncloud.com", "media.st.dl.eccdnx.com");
+            sb.Replace("pic.cngal.top", "image.cngal.org");
+            //提取全部图片
+            var oldImages = ToolHelper.GetImageLinks(sb.ToString());
+            //判断外部图片
+            oldImages.RemoveAll(s => s.Contains("image.cngal.org"));
+            //依次转存
+            //替换原图片
+            foreach (var item in oldImages)
+            {
+                try
+                {
+                    var result = await _httpClient.PostAsJsonAsync($"{ImageApiPath}api/files/linkToImgUrl?url={item}", new TransferDepositFileModel());
+                    if (result.IsSuccessStatusCode)
+                    {
+                        var jsonContent = result.Content.ReadAsStringAsync().Result;
+                        var obj = JsonSerializer.Deserialize<UploadResult>(jsonContent, ToolHelper.options);
+
+                        if (obj.Uploaded)
+                        {
+                            model.UploadResults.Add(obj);
+
+                            sb.Replace(item, obj.Url);
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    //ErrorHandler.ProcessError(ex, "图片转存失败", "图片大小超过3MB", "将图片压缩后再上传，大图可上传到相册");
+                }
+
+            }
+            //保存
+            sb.Replace("<br>", "\n");
+            sb.Replace("\\[\\]", "[]");
+
+            model.Text = sb.ToString();
+
+            return model;
         }
 
         private static async Task<double> GetCpuUsageForProcess()

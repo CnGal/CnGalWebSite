@@ -121,7 +121,7 @@ namespace CnGalWebSite.DataModel.Application.Helper
             {
                 AddUserUploadFileInforModel model = new AddUserUploadFileInforModel
                 {
-                    FileName = infor.FileURL,
+                    FileName = infor.Url,
                     FileSize = infor.FileSize,
                     Duration = infor.Duration,
                     Sha1 = infor.Sha1,
@@ -134,12 +134,12 @@ namespace CnGalWebSite.DataModel.Application.Helper
                 //判断结果
                 if (obj.Successful == false)
                 {
-                    _logger.LogError("保存上传文件信息失败：{name}", infor.FileURL);
+                    _logger.LogError("保存上传文件信息失败：{name}", infor.Url);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"保存上传文件信息失败：{name}", infor.FileURL);
+                _logger.LogError(ex,"保存上传文件信息失败：{name}", infor.Url);
             }
         }
 

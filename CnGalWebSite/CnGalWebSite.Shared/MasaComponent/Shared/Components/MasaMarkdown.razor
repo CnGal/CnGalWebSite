@@ -87,12 +87,12 @@
             {
                 if (mMarkdown != null)
                 {
-                    await mMarkdown.InsertValueAsync($"\n![]({item.FileURL})\n");
+                    await mMarkdown.InsertValueAsync($"\n![]({item.Url})\n");
 
                     //向用户文件管理添加信息
                     await _appHelper.AddUserLoadedFileInfor(new UploadResult
                     {
-                        FileURL = item.FileURL,
+                        Url = item.Url,
                     }, UploadFileType.Image);
 
                 }
@@ -119,7 +119,7 @@
                 //向用户文件管理添加信息
                 await _appHelper.AddUserLoadedFileInfor(new UploadResult
                 {
-                    FileURL = model.Url,
+                    Url = model.Url,
                 }, UploadFileType.Image);
 
             }

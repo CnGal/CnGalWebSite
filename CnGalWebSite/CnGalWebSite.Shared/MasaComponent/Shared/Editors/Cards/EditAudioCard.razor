@@ -52,7 +52,7 @@
 
     public Task OnUploaded(UploadResult result)
     {
-        Model.Url = result.FileURL;
+        Model.Url = result.Url;
         Model.Duration = result.Duration??new TimeSpan(0);
 
 

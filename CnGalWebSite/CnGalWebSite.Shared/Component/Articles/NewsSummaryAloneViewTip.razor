@@ -43,7 +43,36 @@
                 @(item.DisplayName+" - "+item.LastEditTime.ToTimeFromNowString())
             </MExpansionPanelHeader>
             <MExpansionPanelContent>
-                <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item" Outline />
+                <div class="mb-2" style="display:flex;">
+                    <a href="@("/articles/index/" + item.Id)">
+                        <img loading="lazy" style=" width: 250px; " src="@item.MainImage" alt="@item.Name">
+                    </a>
+                    <div class="ps-3">
+                        <a href="@("/articles/index/" + item.Id)" class="a-font-color text-truncate-2 mb-1" style=" display: flex; align-items: flex-end;">                   
+                            <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@item.Name</h3>
+                        </a>
+                        <a href="@("/articles/index/" + item.Id)" class="text-truncate-3 a-font-color">
+                            @Model.BriefIntroduction
+                        </a>
+                    </div>
+                </div>
+
+                <a href="@("/articles/index/" + item.Id)" style="color: gray;">
+                    <i class="fa fa-calendar fa-fw"></i>
+                    <span class="article-home-infor-text">@item.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+
+                    <i class="fa fa-commenting-o fa-fw"></i>
+                    <span class="article-home-infor-text">@(item.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
+
+                    <i class="fa fa-eye fa-fw d-none d-sm-inline"></i>
+                    <span class="article-home-infor-text d-none d-sm-inline">@(item.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
+
+                    <i class="fa fa-thumbs-o-up fa-fw d-none d-sm-inline"></i>
+                    <span class="article-home-infor-text d-none d-sm-inline">@(item.ThumbsUpCount)人点赞&nbsp;&nbsp;&nbsp;</span>
+
+                    <i class="fa fa-user fa-fw"></i>
+                    <span class="article-home-infor-text">@item.CreateUserName&nbsp;&nbsp;&nbsp;</span>
+                </a>
             </MExpansionPanelContent>
         </MExpansionPanel>
     }

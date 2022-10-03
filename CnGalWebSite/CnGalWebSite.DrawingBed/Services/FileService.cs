@@ -71,7 +71,7 @@ namespace CnGalWebSite.DrawingBed.Services
                 {
                     Uploaded = true,
                     Sha1 = sha1,
-                    FileURL = uploadedFile,
+                    Url = uploadedFile,
                     FileSize = result.FileSize,
                     Duration = result.Duration
                 };
@@ -124,7 +124,7 @@ namespace CnGalWebSite.DrawingBed.Services
                     Uploaded = true,
                     Sha1 = sha1,
                     FileName = file.FileName,
-                    FileURL = uploadedFile,
+                    Url = uploadedFile,
                     FileSize = (new FileInfo(pathCompressFile)).Length,
                     Duration = result.Duration
                 };
