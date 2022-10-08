@@ -77,6 +77,7 @@ namespace CnGalWebSite.DrawingBed.Services
                     Sha1 = sha1,
                     Url = uploadedFile,
                     FileSize = result.FileSize,
+                    OriginalUrl=url,
                     Duration = result.Duration
                 };
             }

@@ -11,6 +11,7 @@ using Senparc.CO2NET.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.OperationRecords
@@ -152,7 +153,7 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
             }
 
             //判断是否本地调用
-            if (ip == _configuration["InternalIp"]||ip.Contains("192.168"))
+            if (ip == _configuration["InternalIp"] || ip.Contains("192.168") || Regex.IsMatch(ip, @"^(172\.)([\\s\\S]*)(\.0\.1)$"))
             {
                 ip = userIp ?? "";
             }
