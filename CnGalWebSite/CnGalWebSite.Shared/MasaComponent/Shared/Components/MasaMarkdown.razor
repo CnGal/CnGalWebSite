@@ -110,17 +110,14 @@
     {
         try
         {
-            var model = JsonSerializer.Deserialize<LinkToImgResult>(res, ToolHelper.options);
-            if (mMarkdown != null && model.Url != model.OriginalUrl && string.IsNullOrWhiteSpace(model.Url) == false && string.IsNullOrWhiteSpace(model.OriginalUrl) == false)
+            var model = JsonSerializer.Deserialize<UploadResult>(res, ToolHelper.options);
+            if (mMarkdown != null && model.Url != model.OriginalUrl && string.IsNullOrWhiteSpace(model.Url) == false)
             {
                 Context = Context.Replace(model.OriginalUrl, model.Url);
                 await ContextChanged.InvokeAsync(Context);
 
                 //向用户文件管理添加信息
-                await _appHelper.AddUserLoadedFileInfor(new UploadResult
-                {
-                    Url = model.Url,
-                }, UploadFileType.Image);
+                await _appHelper.AddUserLoadedFileInfor(model, UploadFileType.Image);
 
             }
         }
