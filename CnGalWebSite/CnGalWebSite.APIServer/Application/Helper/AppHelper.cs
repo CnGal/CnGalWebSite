@@ -894,7 +894,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 //找到注释
                 var infor = new Regex(@"(?<=\!\[)(.+?)(?=\]\(.*?\))", RegexOptions.IgnoreCase).Match(item).Value;
 
-                if(string.IsNullOrWhiteSpace( infor))
+                if(string.IsNullOrWhiteSpace( infor)||infor.ToLower()== "image")
                 {
                     continue;
                 }
