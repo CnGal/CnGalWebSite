@@ -393,7 +393,8 @@ namespace CnGalWebSite.DrawingBed.Services
 
         public string CompressImage(string path)
         {
-            return new FileInfo(path).Length > 2 * 1024 * 1024 ? GetPicThumbnail(path, 0.7) : path;
+            //不再裁剪图片
+            return new FileInfo(path).Length > 1024 * 1024 * 1024 ? GetPicThumbnail(path, 0.7) : path;
         }
 
         /// <summary>

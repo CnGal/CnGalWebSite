@@ -6,6 +6,7 @@ using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.Helper.Extensions;
 using Markdig;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -889,11 +890,6 @@ namespace CnGalWebSite.APIServer.Application.News
             }
         }
 
-        /*      public string GetMicroblogBriefIntroduction(string description)
-              {
-                  var str=StripHTML(description);
-                  return _appHelper.GetStringAbbreviation(GetMicroblogTitle(str), 50);
-              }*/
 
         public string GetMicroblogMainPage(string description, string author)
         {
@@ -916,70 +912,8 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public async Task<string> GetMicroblogMainImage(string description)
         {
-            var links = ToolHelper.GetImageLinks(description);
+            var links = description.GetImageLinks();
             return links.Any() ? await _fileService.SaveImageAsync(links.Last(), _configuration["NewsAdminId"], 460, 215) : "";
-        }
-
-
-        /// <summary>
-        /// 去除HTML标记
-        /// </summary>
-        /// <param name="strHtml">包括HTML的源码 </param>
-        /// <returns>已经去除后的文字</returns>
-        public static string StripHTML(string strHtml)
-        {
-            string[] aryReg ={
-                @"<script[^>]*?>.*?</script>",
-
-                @"<(\/\s*)?!?((\w+:)?\w+)(\w+(\s*=?\s*(([""'])(\\[""'tbnr]|[^\7])*?\7|\w+)|.{0})|\s)*?(\/\s*)?>",
-                @"([\r\n])[\s]+",
-                @"&(quot|#34);",
-                @"&(amp|#38);",
-                @"&(lt|#60);",
-                @"&(gt|#62);",
-                @"&(nbsp|#160);",
-                @"&(iexcl|#161);",
-                @"&(cent|#162);",
-                @"&(pound|#163);",
-                @"&(copy|#169);",
-                @"&#(\d+);",
-                @"-->",
-                @"<!--.*\n"
-
-            };
-
-            string[] aryRep = {
-                "",
-                "",
-                "",
-                "\"",
-                "&",
-                "<",
-                ">",
-                " ",
-                "\xa1",//chr(161),
-                "\xa2",//chr(162),
-                "\xa3",//chr(163),
-                "\xa9",//chr(169),
-                "",
-                "\r\n",
-                ""
-            };
-
-            var newReg = aryReg[0];
-            var strOutput = strHtml;
-            for (var i = 0; i < aryReg.Length; i++)
-            {
-                var regex = new Regex(aryReg[i], RegexOptions.IgnoreCase);
-                strOutput = regex.Replace(strOutput, aryRep[i]);
-            }
-
-            strOutput.Replace("<", "");
-            strOutput.Replace(">", "");
-            strOutput.Replace("\r\n", "");
-
-
-            return strOutput;
         }
 
         private int WeekOfYear(DateTime curDay)

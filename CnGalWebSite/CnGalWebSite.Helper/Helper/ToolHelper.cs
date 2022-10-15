@@ -50,70 +50,6 @@ namespace CnGalWebSite.DataModel.Helper
         public const int MaxEditorCount = 200;
         public const int MinValidPlayImpressionsLength = 30;
 
-        //临时储存的信息
-        public static List<string> GetImageLinks(string context)
-        {
-            var result = new List<string>();
-            //查找符合markdown语法的图片
-            var linshi = context.Split('!');
-            for (var i = 1; i < linshi.Length; i++)
-            {
-                try
-                {
-                    var temp = MidStrEx(linshi[i], "[image](", ")");
-                    if (string.IsNullOrWhiteSpace(temp))
-                    {
-                        temp = MidStrEx(linshi[i], "[image.png](", ")");
-                    }
-                    if (string.IsNullOrWhiteSpace(temp))
-                    {
-                        temp = MidStrEx(linshi[i], "[](", ")");
-                    }
-                    if (string.IsNullOrWhiteSpace(temp) == false && temp.Contains("data:image") == false)
-                    {
-                        result.Add(temp);
-                    }
-                }
-                catch
-                {
-
-                }
-
-            }
-            //查找符合html语法的图片
-            linshi = context.Split("<img");
-            if (linshi.Length > 1)
-            {
-                var linshi2 = new List<string>();
-                for (var i = 1; i < linshi.Length; i++)
-                {
-                    var linshi3 = linshi[i].Split(">");
-                    if (linshi3.Length >= 1)
-                    {
-                        linshi2.Add(linshi3[0]);
-                    }
-                }
-                //提取
-                foreach (var item in linshi2)
-                {
-                    try
-                    {
-                        var temp = MidStrEx(item, "src=\"", "\"");
-                        if (string.IsNullOrWhiteSpace(temp) == false && temp.Contains("data:image") == false)
-                        {
-                            result.Add(temp);
-                        }
-                    }
-                    catch
-                    {
-
-                    }
-                }
-
-            }
-            return result;
-        }
-
         public static string MidStrEx(string sourse, string startstr, string endstr)
         {
             var result = string.Empty;
@@ -1253,7 +1189,7 @@ namespace CnGalWebSite.DataModel.Helper
             sb.Replace("media.st.dl.pinyuncloud.com", "media.st.dl.eccdnx.com");
             sb.Replace("pic.cngal.top", "image.cngal.org");
             //提取全部图片
-            var oldImages = ToolHelper.GetImageLinks(sb.ToString());
+            var oldImages = sb.ToString().GetImageLinks();
             //判断外部图片
             oldImages.RemoveAll(s => s.Contains("image.cngal.org"));
             //依次转存

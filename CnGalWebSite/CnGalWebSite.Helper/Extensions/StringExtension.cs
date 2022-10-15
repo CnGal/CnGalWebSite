@@ -73,5 +73,39 @@ namespace CnGalWebSite.Helper.Extensions
             return Regex.Matches(value, "http[s]?://(?:(?!http[s]?://)[a-zA-Z]|[0-9]|[$\\-_@.&+/]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+").Select(s => s.ToString().Trim()).ToList();
         }
 
+        /// <summary>    
+        /// 取得HTML中所有图片的 URL。    
+        /// </summary>    
+        /// <param name="sHtmlText">HTML代码</param>    
+        /// <returns>图片的URL列表</returns>    
+        public static List<string> GetImageLinks(this string sHtmlText)
+        {
+            // 定义正则表达式用来匹配 img 标签    
+            Regex regImg = new Regex(@"(<img\b[^<>]*?\bsrc[\s\t\r\n]*=[\s\t\r\n]*[""']?[\s\t\r\n]*(?<imgUrl>[^\s\t\r\n""'<>]*)[^<>]*?/?[\s\t\r\n]*>)", RegexOptions.IgnoreCase);
+
+            // 搜索匹配的字符串    
+            MatchCollection matches = regImg.Matches(sHtmlText);
+            int i = 0;
+            string[] sUrlList = new string[matches.Count];
+
+            // 取得匹配项列表    
+            foreach (Match match in matches)
+                sUrlList[i++] = match.Groups["imgUrl"].Value;
+
+            var model = sUrlList.ToList();
+
+
+            //匹配 Markdown 中的图片
+            regImg = new Regex(@"(?<=\!\[.*?\]\()(.+?)(?=\))", RegexOptions.IgnoreCase);
+
+            // 搜索匹配的字符串    
+            matches = regImg.Matches(sHtmlText);
+            model.AddRange(matches.Select(s => s.Value));
+
+            //移除空项目
+            model.Purge().RemoveAll(s => string.IsNullOrWhiteSpace(s));
+            return model;
+        }
+
     }
 }

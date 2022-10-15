@@ -1020,3 +1020,16 @@ code {
 .loading-progress-text:after {
     content: var(--blazor-load-percentage-text, "Loading");
 }
+/*图片注释*/
+img + strong {
+    display: flex;
+    justify-content: center;
+    font-weight: inherit !important;
+    margin-top: .66667em;
+    color: #999;
+    font-size: .9em
+}
+
+a img + strong {
+    color: var(--main-color) !important;
+}

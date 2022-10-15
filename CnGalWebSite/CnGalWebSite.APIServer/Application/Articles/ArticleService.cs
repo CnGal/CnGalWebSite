@@ -603,8 +603,8 @@ namespace CnGalWebSite.APIServer.Application.Articles
             model.SmallBackgroundPicture = _appHelper.GetImagePath(article.SmallBackgroundPicture, "");
 
             //初始化主页Html代码
-            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
-            model.MainPage = Markdown.ToHtml(model.MainPage ?? "", pipeline);
+           
+            model.MainPage = _appHelper.MarkdownToHtml(article.MainPage);
 
 
 
