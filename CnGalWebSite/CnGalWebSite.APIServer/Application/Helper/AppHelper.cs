@@ -5,6 +5,7 @@ using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.Helper.Extensions;
 using Gt3_server_csharp_aspnetcoremvc_bypass.Controllers.Sdk;
 using Markdig;
 using Microsoft.AspNetCore.Hosting;
@@ -26,6 +27,7 @@ using System.Linq.Dynamic.Core;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Helper
@@ -871,14 +873,39 @@ namespace CnGalWebSite.APIServer.Application.Helper
             return MarkdownToHtml(resulte);
         }
 
-        public string MarkdownToHtml(string str)
+        public string MarkdownToHtml(string text)
         {
-            if (str == null)
+            if (text == null)
             {
                 return "";
             }
-            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
-            return Markdown.ToHtml(str, pipeline);
+
+            var sb = new StringBuilder(text);
+
+            //为图片添加注释
+
+            //查找所有图片链接
+            var regImg = new Regex(@"\!\[.*?]\(.*?\)", RegexOptions.IgnoreCase);
+
+            var matches = regImg.Matches(text);
+
+            foreach (var item in matches.Where(s=>string.IsNullOrWhiteSpace(s.Value)==false).Select(s=>s.Value).ToList().Purge())
+            {
+                //找到注释
+                var infor = new Regex(@"(?<=\!\[)(.+?)(?=\]\(.*?\))", RegexOptions.IgnoreCase).Match(item).Value;
+
+                if(string.IsNullOrWhiteSpace( infor))
+                {
+                    continue;
+                }
+
+                sb = sb.Replace(item, $"{item}**{infor}**\n");
+            }
+
+            
+
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().UseFigures().Build();
+           return Markdown.ToHtml(sb.ToString(), pipeline);
         }
 
        

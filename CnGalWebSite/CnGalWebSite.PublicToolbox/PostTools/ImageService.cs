@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Helper;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Files;
 using CnGalWebSite.DataModel.ViewModel.HistoryData;
 using CnGalWebSite.PublicToolbox.DataRepositories;
@@ -24,7 +25,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
         {
             try
             {
-                var result = await _httpClient.PostAsJsonAsync($"https://api.cngal.top/api/files/linkToImgUrl?url={url}&x={x}&y={y}", new TransferDepositFileModel
+                var result = await _httpClient.PostAsJsonAsync($"{ToolHelper.ImageApiPath}api/files/linkToImgUrl?url={url}&x={x}&y={y}", new TransferDepositFileModel
                 {
                     Url = url,
                     X = x,
@@ -32,9 +33,9 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                 });
 
                 var jsonContent = result.Content.ReadAsStringAsync().Result;
-                var obj = System.Text.Json.JsonSerializer.Deserialize<LinkToImgResult>(jsonContent, ToolHelper.options);
+                var obj = System.Text.Json.JsonSerializer.Deserialize<UploadResult>(jsonContent, ToolHelper.options);
 
-                if (obj.Successful)
+                if (obj.Uploaded)
                 {
                     var temp = obj.Url;
                     _logger.LogInformation("上传完成：{link}", temp);
@@ -58,16 +59,20 @@ namespace CnGalWebSite.PublicToolbox.PostTools
         public async Task<string> GetImage(string url, double x = 0, double y = 0)
         {
             var image = _imageRepository.GetAll().FirstOrDefault(s => s.OldUrl == url && s.X == x && s.Y == y);
-            if (image == null)
+            if (image == null || string.IsNullOrWhiteSpace(image.NewUrl) || image.NewUrl == url)
             {
-                var newUrl = await UploadImageAsync(url,x,y);
-                _ = await _imageRepository.InsertAsync(new OriginalImageToDrawingBedUrl
+                var newUrl = await UploadImageAsync(url, x, y);
+                if (newUrl != url)
                 {
-                    NewUrl = newUrl,
-                    OldUrl = url,
-                    X = x,
-                    Y = y
-                });
+                    _ = await _imageRepository.InsertAsync(new OriginalImageToDrawingBedUrl
+                    {
+                        NewUrl = newUrl,
+                        OldUrl = url,
+                        X = x,
+                        Y = y
+                    });
+                }
+
                 return newUrl;
             }
             else

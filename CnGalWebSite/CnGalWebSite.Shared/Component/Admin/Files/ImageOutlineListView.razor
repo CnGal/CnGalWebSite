@@ -7,29 +7,33 @@
 {
     <div>
 
-        @if (Model.TotalCount == 0)
-        {
-            <NotFoundTip IsNeedLayput="true" />
-        }
-        else
-        {
-            <div class="row">
-                @foreach (var item in Model.Data)
-                {
-                    <div class="col-12 col-md-6 col-xl-4 col-xxl-3 mb-3">
-                        <ImageInforViewTip Model="item" OnClickImage="OnClickImage"></ImageInforViewTip>
+        <div>
 
-                    </div>
+            @if (Model.TotalCount == 0)
+            {
+                <NotFoundTip IsNeedLayput="true" />
+            }
+            else
+            {
+                <div class="row">
+                    @foreach (var item in Model.Data)
+                    {
+                        <div class="col-12 col-md-6 col-xl-4 col-xxl-3 mb-3">
+                            <ImageInforViewTip Model="item" OnClickImage="OnClickImage"></ImageInforViewTip>
+
+                        </div>
 
 
-                }
+                    }
 
-            </div>
-        }
+                </div>
+            }
+
+        </div>
 
         @if (Model.TotalPages > 1)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@Model.CurrentPage" Length="@Model.TotalPages" ValueChanged="OnPageClick"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@Model.CurrentPage" Length="@Model.TotalPages" ValueChanged="OnPageClick" />
         }
 
     </div>
@@ -46,7 +50,7 @@ else
 
 @code {
     [NotNull]
-    public PagedResultDto<ImageInforTipViewModel> Model { get; set; } = new PagedResultDto<ImageInforTipViewModel> { MaxResultCount = 12 ,Sorting="id desc" };
+    public PagedResultDto<ImageInforTipViewModel> Model { get; set; } = new PagedResultDto<ImageInforTipViewModel> { MaxResultCount = 12, Sorting = "id desc" };
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 

@@ -229,7 +229,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             {
                 model.OriginalAuthor = author;
             }
-            model.Image = image ?? ToolHelper.GetImageLinks(model.MainPage).FirstOrDefault();
+            model.Image = image ?? model.MainPage.GetImageLinks().FirstOrDefault();
            
         }
 
@@ -285,7 +285,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             {
                 model.OriginalAuthor = author;
             }
-            model.Image = image ?? ToolHelper.GetImageLinks(model.MainPage).FirstOrDefault();
+            model.Image = image ?? model.MainPage.GetImageLinks().FirstOrDefault();
   
         }
 
@@ -305,13 +305,26 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                     var textTemp = item.Split("<figure");
                     if (textTemp.Length > 1)
                     {
+                        //获取图片链接
                         var image = ToolHelper.MidStrEx(textTemp[1], "data-original=\"", "\">");
+                        if(string.IsNullOrWhiteSpace(image))
+                        {
+                            image = ToolHelper.MidStrEx(textTemp[1], "<img src=\"", "\"");
+                        }
+                        if(string.IsNullOrWhiteSpace(image))
+                        {
+                            continue;
+                        }
+
+                        //获取注释
+                        var figure = textTemp[1].MidStrEx("<figcaption>", "</figcaption>");
 
                         OnProgressUpdate(model, OutputLevel.Infor, $"获取图片 {image}");
 
                         var newImage = await _imageService.GetImage(image);
 
-                        text = text.Replace("<figure" + ToolHelper.MidStrEx(text, "<figure", "</figure>") + "</figure>", "\n![image](" + newImage + ")\n");
+                        //替换
+                        text = text.Replace("<figure" + ToolHelper.MidStrEx(text, "<figure", "</figure>") + "</figure>", $"\n![{figure??""}]({newImage})\n");
                     }
 
                     model.CompleteTaskCount++;
@@ -321,7 +334,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             else if (type == RepostArticleType.XiaoHeiHe)
             {
 
-                var images = ToolHelper.GetImageLinks(text);
+                var images = text.GetImageLinks();
                 model.TotalTaskCount += images.Count;
                 foreach (var temp in images)
                 {

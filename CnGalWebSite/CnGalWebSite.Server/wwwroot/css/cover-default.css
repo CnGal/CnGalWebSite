@@ -265,9 +265,9 @@ input.te-image-file-input {
    
 }
 
-.markdown-body b, .markdown-body strong {
+/*.markdown-body b, .markdown-body strong {
     font-weight: bolder!important;
-}
+}*/
 
 /*修正Masa样式对Bootsharp的影响*/
 .row {
