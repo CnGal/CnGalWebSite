@@ -103,7 +103,7 @@ namespace CnGalWebSite.Helper.Extensions
             model.AddRange(matches.Select(s => s.Value));
 
             //移除空项目
-            model.Purge().RemoveAll(s => string.IsNullOrWhiteSpace(s));
+            model.Purge().RemoveAll(s => string.IsNullOrWhiteSpace(s)||s.Contains("video.weibo.com")|| s.Contains(".mp4"));
             return model;
         }
 

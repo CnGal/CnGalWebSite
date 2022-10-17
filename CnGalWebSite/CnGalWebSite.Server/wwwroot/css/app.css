@@ -314,11 +314,11 @@
 
 .article-home-tag {
     color: white;
-    display: inline-block;
     border-radius: 4px;
     padding-right: 8px;
     padding-left: 8px;
-    margin-right: 8px; 
+    margin-right: 8px;
+    word-break: keep-all;
 }
 
 .article-home-infor-text {
