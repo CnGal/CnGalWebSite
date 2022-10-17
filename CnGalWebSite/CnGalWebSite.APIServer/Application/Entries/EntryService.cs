@@ -1451,7 +1451,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                                 Modifier = "职位",
                                 Contents = tempStaffs.Select(s => new StaffNameModel
                                 {
-                                    DisplayName = s.PositionOfficial ?? s.PositionGeneral.GetDisplayName(),
+                                    DisplayName = (string.IsNullOrWhiteSpace(s.Modifier) ? "" : s.Modifier + " - ") + (s.PositionOfficial ?? s.PositionGeneral.GetDisplayName()),
                                     Id = -1
                                 }).ToList()
                             });

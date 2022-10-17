@@ -739,7 +739,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                         .Take(3)
                         .Select(s => new StaffNameModel
                         {
-                            DisplayName = (string.IsNullOrWhiteSpace(s.First().Modifier) ? "" :s.First().Modifier + " - " ) + s.First().FromEntryNavigation.DisplayName,
+                            DisplayName =s.First().FromEntryNavigation.DisplayName,
                             Id = s.First().FromEntryNavigation.Id
                         }).ToList();
                     if (gameNames.Any())
@@ -761,7 +761,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                         .Take(3)
                         .Select(s => new StaffNameModel
                         {
-                            DisplayName = (string.IsNullOrWhiteSpace(s.First().Modifier) ? "" : s.First().Modifier + " - ") + s.First().FromEntryNavigation.DisplayName,
+                            DisplayName = s.First().FromEntryNavigation.DisplayName,
                             Id = s.First().FromEntryNavigation.Id
                         }).ToList();
                     if (gameNames.Any())
