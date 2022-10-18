@@ -152,26 +152,26 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             }
 
             //主图
-            try
-            {
-                var tempNode = mainNode.ChildNodes.FirstOrDefault(s => s.Name == "img");
-                if (tempNode == null)
-                {
-                    tempNode = mainNode.ChildNodes.FirstOrDefault(s => s.OuterHtml.Contains("background-image"));
-                    if (tempNode != null)
-                    {
-                        image = ToolHelper.MidStrEx(tempNode.OuterHtml, "url(", "?source");
-                    }
-                }
-                else
-                {
-                    image = ToolHelper.MidStrEx(tempNode.OuterHtml, "src=\"", "\"");
-                }
-            }
-            catch
-            {
+            //try
+            //{
+            //    var tempNode = mainNode.ChildNodes.FirstOrDefault(s => s.Name == "img");
+            //    if (tempNode == null)
+            //    {
+            //        tempNode = mainNode.ChildNodes.FirstOrDefault(s => s.OuterHtml.Contains("background-image"));
+            //        if (tempNode != null)
+            //        {
+            //            image = ToolHelper.MidStrEx(tempNode.OuterHtml, "url(", "?source");
+            //        }
+            //    }
+            //    else
+            //    {
+            //        image = ToolHelper.MidStrEx(tempNode.OuterHtml, "src=\"", "\"");
+            //    }
+            //}
+            //catch
+            //{
 
-            }
+            //}
             //标题
             try
             {
@@ -184,7 +184,8 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             //作者
             try
             {
-                author = mainNode.ChildNodes.MaxBy(s => s.InnerText.Length).ChildNodes[0].ChildNodes[1].FirstChild.FirstChild.LastChild.FirstChild.InnerText;
+                author = mainNode.ChildNodes.FirstOrDefault(s=>s.Name=="article").ChildNodes.FirstOrDefault(s => s.HasClass("Post-Author")).ChildNodes.FirstOrDefault(s => s.HasClass("AuthorInfo")).ChildNodes.FirstOrDefault(s => s.HasClass("AuthorInfo")).ChildNodes.FirstOrDefault(s => s.HasClass("AuthorInfo-content")).ChildNodes.FirstOrDefault(s => s.HasClass("AuthorInfo-head")).InnerText;
+
             }
             catch
             {
@@ -221,8 +222,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                 throw new Exception("无法获取知乎文章内容，请联系管理员");
             }
 
-            model.MainPage = converter.Convert(htmlStr);
-            model.MainPage = await ProgressImage(model, model.MainPage, RepostArticleType.ZhiHu);
+            model.MainPage = await ProgressImage(model, converter.Convert(htmlStr), RepostArticleType.ZhiHu);
             model.Title = name;
             model.OriginalAuthor = ToolHelper.MidStrEx(model.MainPage, "原作者：", "\r").Replace("*", "").Split("丨").FirstOrDefault()?.Trim();
             if (string.IsNullOrWhiteSpace(model.OriginalAuthor) && author != null)
@@ -423,10 +423,11 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                 }
             };
 
-        
+            var entries = games.ToList();
+            entries.RemoveAll(s => s == "幻觉" || s == "画师" || s == "她");
 
             //查找关联词条
-            foreach (var item in games.Where(s => s != "幻觉" && s != "画师"))
+            foreach (var item in entries)
             {
                 if (model.MainPage.Contains(item))
                 {
@@ -437,7 +438,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                 }
 
             }
-            foreach (var item in games)
+            foreach (var item in entries)
             {
 
                 if (model.Title.Contains(item))
