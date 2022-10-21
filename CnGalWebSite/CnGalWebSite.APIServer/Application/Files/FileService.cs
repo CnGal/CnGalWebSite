@@ -220,6 +220,11 @@ namespace CnGalWebSite.APIServer.Application.Files
             });
         }
 
+        /// <summary>
+        /// 转存图片到公共图床
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public async Task<string> TransferDepositFile(string url)
         {
             try
@@ -265,6 +270,14 @@ namespace CnGalWebSite.APIServer.Application.Files
             }
         }
 
+        /// <summary>
+        /// 保存图片到本地图床
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="userId"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public async Task<string> SaveImageAsync(string url, string userId, double x = 0, double y = 0)
         {
             try

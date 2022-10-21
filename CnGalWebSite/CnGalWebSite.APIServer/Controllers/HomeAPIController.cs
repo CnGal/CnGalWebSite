@@ -137,8 +137,13 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         /// <summary>
-        /// 搜索
+        /// 
         /// </summary>
+        /// <param name="Types"></param>
+        /// <param name="Times">时间戳 格式 13位 xxx-xxx</param>
+        /// <param name="Text"></param>
+        /// <param name="Sort"></param>
+        /// <param name="Page"></param>
         /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<SearchViewModel>> SearchAsync([FromQuery] string[] Types, [FromQuery] string[] Times, [FromQuery] string Text, [FromQuery] string Sort, [FromQuery] int Page)
