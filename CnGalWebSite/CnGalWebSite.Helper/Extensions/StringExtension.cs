@@ -103,9 +103,29 @@ namespace CnGalWebSite.Helper.Extensions
             model.AddRange(matches.Select(s => s.Value));
 
             //移除空项目
-            model.Purge().RemoveAll(s => string.IsNullOrWhiteSpace(s)||s.Contains("video.weibo.com")|| s.Contains(".mp4"));
+            model.Purge().RemoveAll(s => string.IsNullOrWhiteSpace(s) || s.Contains("video.weibo.com") || s.Contains(".mp4"));
             return model;
         }
 
+        /// <summary>
+        /// 将时间戳字符串转化成时间
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public static DateTime  TransTime(this string str)
+        {
+            DateTime nowTime;
+            if (str.Length == 13)
+            {
+                nowTime = new DateTime(1970, 1, 1, 8, 0, 0).AddMilliseconds(long.Parse( str));
+            }
+            else
+            {
+                nowTime = new DateTime(1970, 1, 1, 8, 0, 0).AddSeconds(long.Parse(str));
+            }
+            return nowTime;
+        }
     }
+
+   
 }

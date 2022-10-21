@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Application.Dtos;
+using CnGalWebSite.Helper.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
@@ -193,6 +194,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
                         }
                     }
                 }
+                //解析时间
                 if (Times!=null&& Times.Length != 0)
                 {
                     model.Times.Clear();
@@ -259,8 +261,8 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
             try
             {
                 var times = Text.Split('-');
-                model.AfterTime = DateTime.FromBinary(long.Parse(times[0]));
-                model.BeforeTime = DateTime.FromBinary(long.Parse(times[1]));
+                model.AfterTime = times[0].TransTime();
+                model.BeforeTime = times[1].TransTime();
 
                 return true;
 
@@ -274,7 +276,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
 
         public override string ToString()
         {
-            return $"{AfterTime.ToBinary()}-{BeforeTime.ToBinary()}";
+            return $"{new DateTimeOffset(AfterTime).ToUnixTimeMilliseconds()}-{new DateTimeOffset(BeforeTime).ToUnixTimeMilliseconds()}";
         }
 
     }

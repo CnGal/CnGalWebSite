@@ -721,12 +721,12 @@ namespace CnGalWebSite.APIServer.Application.News
             {
                 Type = ArticleType.News,
                 RSS = originalRSS,
-                Title = GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 15).Trim().Replace("\n","").Replace("\r", ""),
-                BriefIntroduction = GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 500),
+                Title =(await GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 15)).Trim().Replace("\n","").Replace("\r", ""),
+                BriefIntroduction =await GetMicroblogTitle(originalRSS.Title, originalRSS.Description, authorString, 500),
                 Author = authorString,
-                MainPage = GetMicroblogMainPage(originalRSS.Description, authorString),
+                MainPage =await GetMicroblogMainPage(originalRSS.Description, authorString),
                 Link = originalRSS.Link,
-                MainPicture = await GetMicroblogMainImage(GetMicroblogMainPage(originalRSS.Description, authorString)),
+                MainPicture = await GetMicroblogMainImage(await GetMicroblogMainPage(originalRSS.Description, authorString)),
                 PublishTime = originalRSS.PublishTime,
                 State = GameNewsState.Edit
             };
@@ -826,14 +826,14 @@ namespace CnGalWebSite.APIServer.Application.News
             return result;
         }
 
-        public string GetMicroblogTitle(string title, string description, string author, int maxLength)
+        public async Task<string> GetMicroblogTitle(string title, string description, string author, int maxLength)
         {
             //分割出转发之前的文本
             var temp = title.Split(":&ensp;");
             if (true) //(temp.Length <= 1)
             {
                 var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
-                title = Markdown.ToPlainText(GetMicroblogMainPage(description, author), pipeline);
+                title = Markdown.ToPlainText(await GetMicroblogMainPage(description, author), pipeline);
                 if (title.Split(": ").Length > 1)
                 {
                     title = title.Split(": ")[1];
@@ -891,7 +891,7 @@ namespace CnGalWebSite.APIServer.Application.News
         }
 
 
-        public string GetMicroblogMainPage(string description, string author)
+        public async Task<string> GetMicroblogMainPage(string description, string author)
         {
             var temp = description.Split("- 转发");
             if (temp.Length > 1)
@@ -907,7 +907,25 @@ namespace CnGalWebSite.APIServer.Application.News
 
             var converter = new ReverseMarkdown.Converter();
 
-            return converter.Convert(description).Replace("\\[\\]", "[]");
+            var markdown= converter.Convert(description).Replace("\\[\\]", "[]");
+
+            //处理视频
+            if (markdown.Contains("<video controls=\"controls\""))
+            {
+                var videoHtml = markdown.MidStrEx("<video", "</video>");
+                if (string.IsNullOrWhiteSpace(videoHtml) == false)
+                {
+                    //提取图片
+                    var image = videoHtml.MidStrEx("poster=\"", "\"");
+                    //提取链接
+                    var link = videoHtml.MidStrEx("<a href=\"", "\"");
+                    //替换
+                    markdown = markdown.Replace($"<video{videoHtml}</video>", $"![]({await _fileService.SaveImageAsync( image, _configuration["NewsAdminId"])})\n视频无法显示，请前往[微博视频]({link})观看\n");
+                }
+
+            }
+
+            return markdown;
         }
 
         public async Task<string> GetMicroblogMainImage(string description)
