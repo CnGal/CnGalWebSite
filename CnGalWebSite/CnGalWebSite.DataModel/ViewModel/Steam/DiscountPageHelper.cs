@@ -12,7 +12,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
 
         public int MaxCount { get; set; } = 12;
 
-        public int TotalPages => (Items.Count / MaxCount) + 1;
+        public int TotalPages => ((Items.Count-1) / MaxCount) + 1;
 
         public int CurrentPage { get; set; } = 1;
 

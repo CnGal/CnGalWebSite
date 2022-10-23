@@ -153,7 +153,7 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
             }
 
             //判断是否本地调用
-            if (ip == _configuration["InternalIp"] || ip.Contains("192.168") || Regex.IsMatch(ip, @"^(172\.)([\\s\\S]*)(\.0\.1)$"))
+            if ( Regex.IsMatch(ip, @"^(127\.0\.0\.1)|(localhost)|(10\.\d{1,3}\.\d{1,3}\.\d{1,3})|(172\.((1[6-9])|(2\d)|(3[01]))\.\d{1,3}\.\d{1,3})|(192\.168\.\d{1,3}\.\d{1,3})$"))
             {
                 ip = userIp ?? "";
             }

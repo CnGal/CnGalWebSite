@@ -862,7 +862,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-
+                await _steamInforService.UpdateSteamInfor(323490, 42);
                 return new Result { Successful = true };
             }
             catch (Exception ex)
