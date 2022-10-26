@@ -22,7 +22,7 @@ namespace CnGalWebSite.Helper.Extensions
 
         public static string MidStrEx(this string sourse, string startstr, string endstr)
         {
-            var result = string.Empty;
+            string result = null;
             int startindex, endindex;
             try
             {

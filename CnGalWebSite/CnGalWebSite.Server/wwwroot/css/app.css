@@ -1033,3 +1033,17 @@ img + strong {
 a img + strong {
     color: var(--main-color) !important;
 }
+
+/*视频注释*/
+iframe + p > strong  {
+    display: flex;
+    justify-content: center;
+    font-weight: inherit !important;
+    margin-top: .66667em;
+    color: #999;
+    font-size: .9em
+}
+
+a iframe + p > strong {
+    color: var(--main-color) !important;
+}
