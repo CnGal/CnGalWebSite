@@ -1035,7 +1035,7 @@ a img + strong {
 }
 
 /*视频注释*/
-iframe + p > strong  {
+.aspect-ratio + p > strong {
     display: flex;
     justify-content: center;
     font-weight: inherit !important;
@@ -1044,6 +1044,22 @@ iframe + p > strong  {
     font-size: .9em
 }
 
-a iframe + p > strong {
+a .aspect-ratio + p > strong {
     color: var(--main-color) !important;
 }
+/* 这个规则规定了iframe父元素容器的尺寸，我们要去它的宽高比应该是 25:14 */
+.aspect-ratio {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56%; /* 高度应该是宽度的56% */
+}
+
+    /* 设定iframe的宽度和高度，让iframe占满整个父元素容器 */
+    .aspect-ratio iframe {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+    }
