@@ -887,9 +887,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
             //查找所有图片链接
             var regImg = new Regex(@"\!\[.*?]\(.*?\)", RegexOptions.IgnoreCase);
 
-            var matches = regImg.Matches(text);
+            var images = regImg.Matches(text).Where(s => string.IsNullOrWhiteSpace(s.Value) == false).Select(s => s.Value).ToList().Purge();
 
-            foreach (var item in matches.Where(s=>string.IsNullOrWhiteSpace(s.Value)==false).Select(s=>s.Value).ToList().Purge())
+            foreach (var item in images)
             {
                 //找到注释
                 var infor = new Regex(@"(?<=\!\[)(.+?)(?=\]\(.*?\))", RegexOptions.IgnoreCase).Match(item).Value;
@@ -902,7 +902,29 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 sb = sb.Replace(item, $"{item}**{infor}**\n");
             }
 
-            
+            //转换Bilibili视频
+
+            var regLink = new Regex(@"\[.*?]\(.*?\)", RegexOptions.IgnoreCase);
+
+            var links = regLink.Matches(text).Select(s=>s.Value);
+            links=links.Where(s => string.IsNullOrWhiteSpace(s) == false&&s.Contains("https://www.bilibili.com/video")).ToList().Purge();
+
+            foreach (var item in links)
+            {
+                var id = item.MidStrEx("https://www.bilibili.com/video/", "/") ?? item.MidStrEx("https://www.bilibili.com/video/", "?") ?? item.MidStrEx("https://www.bilibili.com/video/", ")");
+                //找到注释
+                var infor = new Regex(@"(?<=\[)(.+?)(?=\]\(.*?\))", RegexOptions.IgnoreCase).Match(item).Value;
+
+                if (string.IsNullOrWhiteSpace(id) || (id[0] != 'B' && id[0] != 'a'))
+                {
+                    continue;
+                }
+
+
+                sb = sb.Replace(item, $"<iframe src=\"https://player.bilibili.com/player.html?{(id[0] == 'B' ? $"bvid={id}" : id[0] == 'a' ? $"aid={id[2..^1]}" : "")}\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" width=\"100%\" height=\"500px\"></iframe>\n\n{(string.IsNullOrWhiteSpace(infor) ? "" :$"**{infor}**\n\n" )}");
+
+            }
+           
 
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().UseFigures().Build();
            return Markdown.ToHtml(sb.ToString(), pipeline);
