@@ -181,7 +181,7 @@
                         {
                             @if (item.DisplayValue.Contains("bilibili.com"))
                             {
-                                <BasicInforAloneTip Icon="fa-external-link-square" Text="B站：" Url="@item.DisplayValue" Class="col-12  text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="fa-external-link-square" Text="@item.DisplayName" Url="@item.DisplayValue" Class="col-12  text-truncate-1" ItemProp="url" />
                             }
                             else if (item.DisplayValue.Contains("weibo.com"))
                             {

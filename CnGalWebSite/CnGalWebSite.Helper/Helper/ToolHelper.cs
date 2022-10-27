@@ -492,16 +492,10 @@ namespace CnGalWebSite.DataModel.Helper
             {
                 return false;
             }
-            //电信手机号码正则
-            var dianxin = @"^1[3578][01379]\d{8}$";
-            var regexDX = new Regex(dianxin);
-            //联通手机号码正则
-            var liantong = @"^1[34578][01256]\d{8}";
-            var regexLT = new Regex(liantong);
-            //移动手机号码正则
-            var yidong = @"^(1[012345678]\d{8}|1[345678][012356789]\d{8})$";
-            var regexYD = new Regex(yidong);
-            if (regexDX.IsMatch(input) || regexLT.IsMatch(input) || regexYD.IsMatch(input))
+            
+            var regexDX = new Regex(@"^1(3[0-9]|4[01456879]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])\d{8}$");
+           
+            if (regexDX.IsMatch(input))
             {
                 return true;
             }
