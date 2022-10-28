@@ -223,8 +223,7 @@ namespace CnGalWebSite.APIServer.Controllers
             };
 
             //提前将MarkDown语法转为Html
-            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().Build();
-            model.MainPageContext = Markdig.Markdown.ToHtml(model.MainPageContext ?? "", pipeline);
+            model.MainPageContext = _appHelper.MarkdownToHtml(model.MainPageContext);
 
             //计算各个部分编辑数目
             model.EditEntryNum = examines.Count(s => (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishMainPage));

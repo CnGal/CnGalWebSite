@@ -26,17 +26,17 @@ else
 {
 <div class="shadow-sm rounded  bg-opacity ps-3 pe-3 pb-3 h-100">
     <div style="display:flex;">
-        <a href="@("/entries/index/" + Model.Id)" class="a-font-color pt-3 pb-3">
+        <a href="@("/peripheries/index/" + Model.Id)" class="a-font-color pt-3 pb-3">
             <img loading="lazy" style=" width: 250px; " src="@Model.MainImage" alt="@Model.Name">
         </a>
 
         <div class="pt-3 ps-3" style=" width: 100%;">
-            <a href="@("/entries/index/" + Model.Id)" class="a-font-color text-truncate-1 mb-2"  style=" display: flex; align-items: center;">
+            <a href="@("/peripheries/index/" + Model.Id)" class="a-font-color text-truncate-1 mb-2"  style=" display: flex; align-items: center;">
                 <div class="article-home-tag">周边</div>
                 <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
             </a>
 
-            <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  ? "text-truncate-2" : "text-truncate-4"))">
+            <a href="@("/peripheries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  ? "text-truncate-2" : "text-truncate-4"))">
                 @Model.BriefIntroduction
             </a>
 
@@ -61,7 +61,7 @@ else
         </div>
 
     </div>
-    <a href="@("/entries/index/" + Model.Id)" class="a-font-color">
+    <a href="@("/peripheries/index/" + Model.Id)" class="a-font-color">
         <span style="color: gray;" class="pb-3">
             <i class="fa fa-calendar fa-fw"></i>
             <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
