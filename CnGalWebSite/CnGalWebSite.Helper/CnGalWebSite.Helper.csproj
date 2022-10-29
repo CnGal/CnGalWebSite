@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="BootstrapBlazor" Version="6.6.2" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageReference Include="Masa.Blazor" Version="0.6.0-rc.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.9" />

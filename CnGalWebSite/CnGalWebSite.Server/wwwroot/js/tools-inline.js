@@ -2,7 +2,9 @@
 function openNewPage(url) {
     window.open(url, "_blank");
 }
-
+function navigateTo(url) {
+    window.open(url, "_self");
+}
 
 
 function getResponseFromRecaptcha(id) {

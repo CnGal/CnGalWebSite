@@ -75,7 +75,8 @@ else
 
                     </div>
                 </div>
-                    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentArticle" />
+
+                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentArticle" />
 
             }
         </div>
@@ -173,7 +174,7 @@ else
             }
 
             //生成轮播结构数据
-            await  GenerateCarouselStructuredDataJson();
+            await GenerateCarouselStructuredDataJson();
 
         }
         catch (Exception exc)
