@@ -873,6 +873,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
             return MarkdownToHtml(resulte);
         }
 
+        #region Markdown 转 Html
+
         public string MarkdownToHtml(string text)
         {
             if (text == null)
@@ -882,8 +884,41 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
             var sb = new StringBuilder(text);
 
-            //为图片添加注释
+            //去除代码块
+            text = RemoveCode(text);
 
+            //为图片添加注释
+            sb=ProcImageText(sb, text);
+           
+
+            //转换Bilibili视频
+
+            sb=ProcBilibiliVideo(sb,text);
+           
+           
+
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().UseFigures().Build();
+           return Markdown.ToHtml(sb.ToString(), pipeline);
+        }
+
+        private string RemoveCode(string text)
+        {
+            while(true)
+            {
+                var mid = text.MidStrEx("```", "```");
+                if(string.IsNullOrWhiteSpace(mid))
+                {
+                    break;
+                }
+
+                text = text.Replace($"```{mid}```","");
+            }
+
+            return text;
+        }
+
+        private StringBuilder ProcImageText(StringBuilder sb,string text)
+        {
             //查找所有图片链接
             var regImg = new Regex(@"\!\[.*?]\(.*?\)", RegexOptions.IgnoreCase);
 
@@ -894,7 +929,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 //找到注释
                 var infor = new Regex(@"(?<=\!\[)(.+?)(?=\]\(.*?\))", RegexOptions.IgnoreCase).Match(item).Value;
 
-                if(string.IsNullOrWhiteSpace( infor)||infor.ToLower()== "image")
+                if (string.IsNullOrWhiteSpace(infor) || infor.ToLower() == "image")
                 {
                     continue;
                 }
@@ -902,12 +937,15 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 sb = sb.Replace(item, $"{item}**{infor}**\n");
             }
 
-            //转换Bilibili视频
+            return sb;
+        }
 
+        private StringBuilder ProcBilibiliVideo(StringBuilder sb,string text)
+        {
             var regLink = new Regex(@"\[.*?]\(.*?\)", RegexOptions.IgnoreCase);
 
-            var links = regLink.Matches(text).Select(s=>s.Value);
-            links=links.Where(s => string.IsNullOrWhiteSpace(s) == false&&s.Contains("https://www.bilibili.com/video")).ToList().Purge();
+            var links = regLink.Matches(text).Select(s => s.Value);
+            links = links.Where(s => string.IsNullOrWhiteSpace(s) == false && s.Contains("https://www.bilibili.com/video")).ToList().Purge();
 
             foreach (var item in links)
             {
@@ -921,16 +959,15 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 }
 
 
-                sb = sb.Replace(item, $"<div class=\"aspect-ratio\"><iframe src=\"https://player.bilibili.com/player.html?{(id[0] == 'B' ? $"bvid={id}" : id[0] == 'a' ? $"aid={id[2..^1]}" : "")}&high_quality=1\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" width=\"100%\" height=\"500px\"></iframe></div>\n\n{(string.IsNullOrWhiteSpace(infor) ? "" :$"**{infor}**\n\n" )}");
+                sb = sb.Replace(item, $"<div class=\"aspect-ratio\"><iframe src=\"https://player.bilibili.com/player.html?{(id[0] == 'B' ? $"bvid={id}" : id[0] == 'a' ? $"aid={id[2..^1]}" : "")}&high_quality=1\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" width=\"100%\" height=\"500px\"></iframe></div>\n\n{(string.IsNullOrWhiteSpace(infor) ? "" : $"**{infor}**\n\n")}");
 
             }
-           
 
-            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseSoftlineBreakAsHardlineBreak().UseFigures().Build();
-           return Markdown.ToHtml(sb.ToString(), pipeline);
+            return sb;
         }
 
-       
+        #endregion
+
 
         public async Task<long> GetUserIntegral(string userId, DateTime time)
         {
