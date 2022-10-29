@@ -1,0 +1,9 @@
+﻿
+<div style=" box-sizing: border-box; min-width: 0px; padding-bottom: 20px; position: sticky; margin-left: -280px; top: 88px; width: 250px; z-index: 1; float: left; ">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalog Model="@Model.MainPage" Url="@($"/articles/index/{Model.Id}")"/>
+</div>
+
+@code {
+    [Parameter]
+    public ArticleViewModel Model { get; set; } = new ArticleViewModel();
+}

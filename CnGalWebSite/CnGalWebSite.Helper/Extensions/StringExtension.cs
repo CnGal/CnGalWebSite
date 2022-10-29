@@ -1,4 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using CnGalWebSite.Helper.ViewModel.Articles;
+using HtmlAgilityPack;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace CnGalWebSite.Helper.Extensions
 {
@@ -125,6 +128,7 @@ namespace CnGalWebSite.Helper.Extensions
             }
             return nowTime;
         }
+      
     }
 
    
