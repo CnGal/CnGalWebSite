@@ -15,6 +15,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -674,32 +675,32 @@ namespace CnGalWebSite.APIServer.Application.News
                 weeklyNews.MainPage = "";
             }
             var strList = weeklyNews.MainPage.Split("[Foot]");
-            var model = strList[0] + "\n\n";
+            var model = new StringBuilder($"{strList[0]}\n\n");
 
             //目录
-            model += "## 概览\n";
+            model.AppendLine("## 概览");
             foreach (var item in weeklyNews.News)
             {
-                model += "- **" + item.Author + "** - " + item.Title + "\n\n";
+                model.Append($"- **{item.Author}** - {item.Title}\n\n");
             }
             //正文
-            model += "## 正文\n";
+            model.AppendLine("## 正文");
             foreach (var item in weeklyNews.News)
             {
-                model += "**" + item.Author + " - " + item.Title + "** \n\n" + item.BriefIntroduction + "\n\n" + "[原文链接 - " + item.PublishTime.ToString("yyyy/M/d HH:mm") + "](" + item.Link + ")\n\n";
+                model.Append($"### {item.Author} - {item.Title}\n\n{item.BriefIntroduction}\n\n[原文链接 - {item.PublishTime:yyyy/M/d HH:mm}]({item.Link})\n\n");
                 if (string.IsNullOrWhiteSpace(item.MainPicture) == false)
                 {
-                    model += "![image](" + item.MainPicture + ")\n\n";
+                    model.Append($"![{item.Title}]({item.MainPicture})\n\n");
                 }
-                model += "---------------\n\n";
+                model.Append("---------------\n\n");
             }
 
             if (strList.Count() > 1)
             {
-                model += strList[1];
+                model.Append(strList[1]);
             }
 
-            return model;
+            return model.ToString();
         }
 
         public async Task<GameNews> ProcessingOriginalRSS(OriginalRSS originalRSS)

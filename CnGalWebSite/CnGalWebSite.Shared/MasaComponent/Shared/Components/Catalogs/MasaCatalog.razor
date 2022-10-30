@@ -3,26 +3,32 @@
 
 @implements IDisposable
 
-<div class="rounded shadow-sm  bg-opacity">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-list" Title="目录" Collapable Outline OutlineHead Class="p-3">
-        <div class="overflow-x-auto p-3 pt-0" style="height: calc(100vh - 180px)">
-            <MTreeview OpenAll
-                       Color="@_dataCacheService.ThemeSetting.Theme"
-                       Items="CatalogItems"
-                       TItem="ArticleCatalogModel"
-                       TKey="string"
-                       Activatable
-                       ItemKey="u => u.Href"
-                       ItemChildren="u => u.Nodes"
-                       ItemText="u => u.Text"
-                       OpenOnClick
-                       OnActiveUpdate="OnActiveUpdate">
-            </MTreeview>
+@if (Model != null && Model.Any())
+{
+    <div class="rounded shadow-sm  bg-opacity">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-list" Title="目录" Collapable Outline OutlineHead Class="p-3">
+            <div class="overflow-x-auto p-3 pt-0" style="max-height: calc(100vh - 180px)">
+                <MTreeview OpenAll
+                           Color="@_dataCacheService.ThemeSetting.Theme"
+                           Items="CatalogItems"
+                           TItem="ArticleCatalogModel"
+                           TKey="string"
+                           Activatable
+                           ItemKey="u => u.Href"
+                           ItemChildren="u => u.Nodes"
+                           ItemText="u => u.Text"
+                           OnActiveUpdate="OnActiveUpdate">
+                </MTreeview>
 
-        </div>
 
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-</div>
+
+
+            </div>
+
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </div>
+}
+
 
 
 @code {
