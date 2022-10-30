@@ -3,7 +3,7 @@
 
 @implements IDisposable
 
-@if (Model != null && Model.Any())
+@if (CatalogItems != null && CatalogItems.Any()&&_dataCacheService.IsApp==false)
 {
     <div class="rounded shadow-sm  bg-opacity">
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-list" Title="目录" Collapable Outline OutlineHead Class="p-3">
