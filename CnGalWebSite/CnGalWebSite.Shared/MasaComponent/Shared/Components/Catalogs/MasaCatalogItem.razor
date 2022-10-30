@@ -1,0 +1,32 @@
+﻿@inject IJSRuntime JS
+@inject IDataCacheService _dataCacheService
+
+
+<div style=" display: flex; flex-direction: column; align-items: flex-start;">
+    @foreach (var item in Model)
+    {
+        <MasaButton TextStyle Text="@($"{new String(' ', Level)}{item.Text}")" OnClick="()=>OnActiveUpdate(item)" Color="@(item.IsActive?_dataCacheService.ThemeSetting.Theme:"grey")" />
+        @if (item.Nodes != null && item.Nodes.Any())
+        {
+            <MasaCatalogItem Model="item.Nodes" Level="Level+1"  Url="@Url"/>
+        }
+
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public List<ArticleCatalogModel> Model { get; set; }
+    [Parameter]
+    public int Level { get; set; }
+    [Parameter]
+    public string Url { get; set; }
+
+    public async Task OnActiveUpdate(ArticleCatalogModel model)
+    {
+        model.IsActive = true;
+        await JS.InvokeAsync<string>("navigateTo", $"{Url}#{model.Href}");
+
+    }
+}

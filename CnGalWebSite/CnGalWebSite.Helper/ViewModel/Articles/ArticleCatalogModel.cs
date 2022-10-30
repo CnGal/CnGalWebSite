@@ -1,9 +1,4 @@
 ﻿using HtmlAgilityPack;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CnGalWebSite.Helper.ViewModel.Articles
 {
@@ -13,9 +8,11 @@ namespace CnGalWebSite.Helper.ViewModel.Articles
 
         public string Href { get; set; }
 
+        public bool IsActive { get; set; }
+
         public List<ArticleCatalogModel> Nodes { get; set; } = new List<ArticleCatalogModel>();
 
-        class Heading
+        private class Heading
         {
             public int Id { get; set; }
             public int Pid { get; set; } = -1;
@@ -29,9 +26,9 @@ namespace CnGalWebSite.Helper.ViewModel.Articles
         /// </summary>
         /// <param name="html"></param>
         /// <returns></returns>
-        public static List<ArticleCatalogModel> GetCatalog( string html)
+        public static List<ArticleCatalogModel> GetCatalog(string html)
         {
-            if(string.IsNullOrWhiteSpace(html))
+            if (string.IsNullOrWhiteSpace(html))
             {
                 return new List<ArticleCatalogModel>();
             }
@@ -44,7 +41,7 @@ namespace CnGalWebSite.Helper.ViewModel.Articles
 
             foreach (var item in document.DocumentNode.ChildNodes)
             {
-                if (item.Name.StartsWith('h'))
+                if (item.Name[0] == 'h' && item.Name[1] >= '1' && item.Name[1] <= '6')
                 {
                     //创建节点
                     var node = new Heading
