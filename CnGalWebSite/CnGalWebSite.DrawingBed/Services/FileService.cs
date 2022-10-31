@@ -215,16 +215,17 @@ namespace CnGalWebSite.DrawingBed.Services
 
             var newUploadResults = await response.Content.ReadAsStringAsync();
 
-            if(response.StatusCode != System.Net.HttpStatusCode.OK|| string.IsNullOrWhiteSpace(newUploadResults)|| newUploadResults.Contains("http")==false)
+            if (response.StatusCode != System.Net.HttpStatusCode.OK || string.IsNullOrWhiteSpace(newUploadResults) || newUploadResults.Contains("http") == false)
             {
-                _logger.LogError("上传文件到 {url} 失败：{filePath}", _configuration["SliotsImageUrl"], filePath);
+                _logger.LogError("上传文件到图床失败：{filePath}", filePath);
                 throw new Exception("图床内部传输错误");
             }
 
-            _logger.LogInformation("成功上传图片到图床：{url}", url);
 
-            return newUploadResults.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
-              
+
+            var result = newUploadResults.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
+            _logger.LogInformation("成功上传图片到图床：{url}", result);
+            return result;
         }
         #endregion
 
