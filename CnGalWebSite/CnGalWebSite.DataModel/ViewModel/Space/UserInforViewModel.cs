@@ -18,7 +18,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         public int SignInDays { get; set; }
         public bool IsSignIn { get; set; }
 
-        public List<RankViewModel> Ranks { get; set; }
+        public List<RankViewModel> Ranks { get; set; } = new List<RankViewModel>();
 
     }
 }
