@@ -52,7 +52,12 @@
 
     public Task<string> FileSizeFormatter(object price)
     {
-        string res = ((double)(long?)((BootstrapBlazor.Components.TableColumnContext<ListFileAloneModel, System.Object>)price).Value / 1024 / 1024).ToString("0.00");
+        long? size = (long?)((BootstrapBlazor.Components.TableColumnContext<ListFileAloneModel, System.Object>)price).Value;
+        if (size == null)
+        {
+            return Task.FromResult("无");
+        }
+        string res = ((double)size / 1024 / 1024).ToString("0.00");
         if (res == "0.00")
         {
             res = "无";

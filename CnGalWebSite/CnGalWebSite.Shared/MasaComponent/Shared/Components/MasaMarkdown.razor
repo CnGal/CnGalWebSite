@@ -87,14 +87,10 @@
             {
                 if (mMarkdown != null)
                 {
-                    await mMarkdown.InsertValueAsync($"\n![]({item.Url})\n");
+                    await mMarkdown.InsertValueAsync($"\n![{item.FileName}]({item.Url})\n");
 
                     //向用户文件管理添加信息
-                    await _appHelper.AddUserLoadedFileInfor(new UploadResult
-                    {
-                        Url = item.Url,
-                    }, UploadFileType.Image);
-
+                    await _appHelper.AddUserLoadedFileInfor(item, UploadFileType.Image);
                 }
             }
         }
