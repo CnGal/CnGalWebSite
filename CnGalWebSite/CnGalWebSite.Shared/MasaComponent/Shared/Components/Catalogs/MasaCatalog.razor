@@ -6,7 +6,7 @@
 @if (CatalogItems != null && CatalogItems.Any()&&_dataCacheService.IsApp==false)
 {
     <div class="rounded shadow-sm  bg-opacity">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-list" Title="目录" Collapable Outline OutlineHead Class="p-3">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-list" Title="目录" Collapable IsCollapsed="_dataCacheService.ThemeSetting.IsHiddeArticleCatalog" IsCollapsedChanged="IsCollapsedChanged" Outline OutlineHead Class="p-3">
             <div class="overflow-x-auto p-3 pt-0" style="max-height: calc(100vh - 180px)">
                 <MTreeview OpenAll
                            Color="@_dataCacheService.ThemeSetting.Theme"
@@ -56,6 +56,11 @@
 
     }
 
+    public async Task IsCollapsedChanged(bool value)
+    {
+        _dataCacheService.ThemeSetting.IsHiddeArticleCatalog = value;
+        await _dataCacheService.ThemeChanged.InvokeAsync();
+    }
 
     public async void RefreshRequsted(object sender, EventArgs args)
     {

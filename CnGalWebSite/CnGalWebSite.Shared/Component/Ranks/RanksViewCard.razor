@@ -1,18 +1,23 @@
-﻿@if (Outline)
+﻿
+@if (Model != null && Model.Any())
 {
-    @foreach (var item in Model)
+    @if (Outline)
     {
-        <RankAloneViewTip Model="item" ForceDisplayBadge="ForceDisplayBadge" Class="mt-1 mb-1 me-2"></RankAloneViewTip>
-    }
-}
-else
-{
-    <div class="@((NoLeftPandding?"":"ps-2 ")+Class) " style="@("display: flex; flex-wrap: wrap;"+(Center?"justify-content: center;":""))">
         @foreach (var item in Model)
         {
             <RankAloneViewTip Model="item" ForceDisplayBadge="ForceDisplayBadge" Class="mt-1 mb-1 me-2"></RankAloneViewTip>
         }
-    </div>
+    }
+    else
+    {
+        <div class="@((NoLeftPandding?"":"ps-2 ")+Class) " style="@("display: flex; flex-wrap: wrap;"+(Center?"justify-content: center;":""))">
+            @foreach (var item in Model)
+            {
+                <RankAloneViewTip Model="item" ForceDisplayBadge="ForceDisplayBadge" Class="mt-1 mb-1 me-2"></RankAloneViewTip>
+            }
+        </div>
+    }
+
 }
 
 @code {

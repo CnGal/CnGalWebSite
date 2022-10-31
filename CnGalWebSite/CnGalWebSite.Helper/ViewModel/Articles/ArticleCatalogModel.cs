@@ -41,7 +41,7 @@ namespace CnGalWebSite.Helper.ViewModel.Articles
 
             foreach (var item in document.DocumentNode.ChildNodes)
             {
-                if (item.Name[0] == 'h' && item.Name[1] >= '1' && item.Name[1] <= '6')
+                if (item.Name[0] == 'h' && item.Name[1] >= '1' && item.Name[1] <= '6'&&string.IsNullOrWhiteSpace( item.InnerText)==false)
                 {
                     //创建节点
                     var node = new Heading

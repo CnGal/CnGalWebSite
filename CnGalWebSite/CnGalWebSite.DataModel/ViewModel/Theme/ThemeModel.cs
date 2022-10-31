@@ -17,6 +17,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         /// </summary>
         public bool IsTransparent { get; set; } = true;
 
+        /// <summary>
+        /// 是否隐藏文章目录
+        /// </summary>
+        public bool IsHiddeArticleCatalog { get; set; }
+
         public bool IsCommentUseMarkdown { get; set; }
 
         public int PlayedGameInforCount { get; set; } = 3;

@@ -89,8 +89,11 @@
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton>
             }
-
-            <CatalogCard Model="Model"/>
+            @if(HiddenCatalog==false)
+            {
+<CatalogCard Model="Model" />
+            }
+            
 
             <MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
             <div>
@@ -115,6 +118,8 @@
     public bool HiddenTitle { get; set; }
     [Parameter]
     public bool Outline { get; set; }
+    [Parameter]
+    public bool HiddenCatalog { get; set; }
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
 

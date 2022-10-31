@@ -3262,7 +3262,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         {
             //序列化审核数据
             var resulte = "";
-            if (operation == Operation.EstablishMainPage)
+            if (operation == Operation.EstablishMainPage|| operation == Operation.EditArticleMainPage||operation== Operation.UserMainPage)
             {
                 resulte = examineData as string;
             }
