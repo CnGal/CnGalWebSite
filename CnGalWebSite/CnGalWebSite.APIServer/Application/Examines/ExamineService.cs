@@ -3140,7 +3140,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             switch (examine.Type)
             {
                 case CommentType.CommentArticle:
-                    if (examine.PubulicUserId == comment.Article.CreateUser.Id)
+                    if (examine.PubulicUserId == comment.Article.CreateUserId)
                     {
                         break;
                     }
@@ -3154,12 +3154,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Link = "articles/index/" + comment.Article.Id,
                         LinkTitle = comment.Article.Name,
                         Type = MessageType.ArticleReply,
-                        ApplicationUserId = comment.Article.CreateUser.Id,
+                        ApplicationUserId = comment.Article.CreateUserId,
                         AdditionalInfor = comment.Id.ToString()
                     };
                     break;
                 case CommentType.CommentUser:
-                    if (user.Id == comment.UserSpaceCommentManager.ApplicationUser.Id)
+                    if (user.Id == comment.UserSpaceCommentManager.ApplicationUserId)
                     {
                         break;
                     }
@@ -3170,15 +3170,15 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         Image = user.PhotoPath,
                         // Rank = "系统",
                         Text = "在你的空间下留言『\n" + examine.Text + "\n』",
-                        Link = "space/index/" + comment.UserSpaceCommentManager.ApplicationUser.Id,
+                        Link = "space/index/" + comment.UserSpaceCommentManager.ApplicationUserId,
                         LinkTitle = comment.ApplicationUser.UserName,
                         Type = MessageType.SpaceReply,
-                        ApplicationUserId = comment.UserSpaceCommentManager.ApplicationUser.Id,
+                        ApplicationUserId = comment.UserSpaceCommentManager.ApplicationUserId,
                         AdditionalInfor = comment.Id.ToString()
                     };
                     break;
                 case CommentType.ReplyComment:
-                    if (user.Id == comment.ParentCodeNavigation.ApplicationUser.Id)
+                    if (user.Id == comment.ParentCodeNavigation.ApplicationUserId)
                     {
                         break;
                     }
@@ -3188,10 +3188,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         PostTime = DateTime.Now.ToCstTime(),
                         Image = user.PhotoPath,
                         // Rank = "系统",
-                        Text = "在主题『" + (comment.Article?.DisplayName ?? comment.Entry?.DisplayName ?? comment.Periphery?.DisplayName ?? comment.Vote?.DisplayName ?? comment.Lottery?.DisplayName ?? comment.UserSpaceCommentManager?.ApplicationUser?.UserName) + "』你的评论『" + _appHelper.GetStringAbbreviation(comment.ParentCodeNavigation.Text, 20) + "』下回复了你『\n" + examine.Text + "\n』",
+                        Text = "在主题『" + (comment.Article?.DisplayName ?? comment.Entry?.DisplayName ?? comment.Periphery?.DisplayName ?? comment.Vote?.DisplayName ?? comment.Lottery?.DisplayName ?? comment.UserSpaceCommentManager?.ApplicationUserId) + "』你的评论『" + _appHelper.GetStringAbbreviation(comment.ParentCodeNavigation.Text, 20) + "』下回复了你『\n" + examine.Text + "\n』",
                         Type = MessageType.CommentReply,
                         Link = comment.ArticleId != null ? $"articles/index/{comment.ArticleId}" : (comment.EntryId != null ? $"entries/index/{comment.EntryId}" : (comment.PeripheryId != null ? $"peripheries/index/{comment.PeripheryId}" : (comment.VoteId != null ? $"votes/index/{comment.VoteId}" : (comment.LotteryId != null ? $"lotteries/index/{comment.LotteryId}" : "")))),
-                        ApplicationUserId = comment.ParentCodeNavigation.ApplicationUser.Id,
+                        ApplicationUserId = comment.ParentCodeNavigation.ApplicationUserId,
                         AdditionalInfor = comment.Id.ToString()
                     };
                     break;

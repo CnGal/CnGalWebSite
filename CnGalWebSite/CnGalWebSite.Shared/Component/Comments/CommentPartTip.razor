@@ -46,7 +46,7 @@
             {
 
                 <CommentPartTip Model="item" IsChild="true" OnRefresh="OnRely_Comment"
-                                Deepth="Deepth+1" ParentCommentUserName="@Model.UserName" CanDeleted="@CanDeleted" ></CommentPartTip>
+                                Deepth="Deepth+1"  ParentCommentModel="@Model" CanDeleted="@CanDeleted" ></CommentPartTip>
             }
         }
 
@@ -64,7 +64,7 @@
     @foreach (var item in Model.InverseParentCodeNavigation)
     {
         <CommentPartTip Model="item" IsChild="true" OnRefresh="OnRely_Comment"
-                        Deepth="Deepth+1" ParentCommentUserName="@Model.UserName" CanDeleted="@CanDeleted" ></CommentPartTip>
+                        Deepth="Deepth+1" ParentCommentModel="@Model" CanDeleted="@CanDeleted" ></CommentPartTip>
     }
 }
 
@@ -79,7 +79,7 @@
     public EventCallback OnRefresh { get; set; }
 
     [Parameter]
-    public string ParentCommentUserName { get; set; }
+    public CommentViewModel ParentCommentModel { get; set; }
 
     public long LastId { get; set; }
 
@@ -97,7 +97,7 @@
 
     private string StringMarked { get; set; }
 
-    public string ReplyTip { get { return Deepth > MaxDeepth ? "回复@" + ParentCommentUserName + "：\n" : ""; } }
+    public string ReplyTip { get { return Deepth > MaxDeepth ? $"回复<a href=\"/space/index/{ParentCommentModel.ApplicationUserId}\">@{ParentCommentModel.UserName}</a>\n": ""; } }
 
 
     [CascadingParameter]

@@ -36,7 +36,7 @@
         if (string.IsNullOrWhiteSpace(Text) == false)
         {
             var url = NavigationManager.Uri.Replace(NavigationManager.BaseUri, "");
-            Text = Text.Replace("href=\"#", $"href=\"{url}#").Replace("<img ", "<img loading=\"lazy\" ").Replace("<a href=", "<a target=\"_blank\" href=");
+            Text = Text.Replace("href=\"#", $"href=\"{url}#").Replace("<img ", "<img loading=\"lazy\" ").Replace("<a href=\"http", "<a target=\"_blank\" href=\"http");
         }
     }
 
