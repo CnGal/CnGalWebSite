@@ -23,7 +23,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Coments
         /// <summary>
         /// 发表评论的用户
         /// </summary>
-        public string ApplicationUserId { get; set; }
+        public string ApplicationUserId{ get; set; }
 
         public string UserImage { get; set; }
 

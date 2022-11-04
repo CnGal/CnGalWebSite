@@ -184,7 +184,8 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             //作者
             try
             {
-                author = mainNode.ChildNodes.FirstOrDefault(s=>s.Name=="article").ChildNodes.FirstOrDefault(s => s.HasClass("Post-Author")).ChildNodes.FirstOrDefault(s => s.HasClass("AuthorInfo")).ChildNodes.FirstOrDefault(s => s.HasClass("AuthorInfo")).ChildNodes.FirstOrDefault(s => s.HasClass("AuthorInfo-content")).ChildNodes.FirstOrDefault(s => s.HasClass("AuthorInfo-head")).InnerText;
+                var temp= mainNode.ChildNodes.FirstOrDefault(s => s.Name == "article").ChildNodes.FirstOrDefault(s => s.HasClass("Post-Header")).ChildNodes.FirstOrDefault(s => s.HasClass("Post-Author")).ChildNodes.FirstOrDefault(s => s.HasClass("AuthorInfo")).ChildNodes.FirstOrDefault(s => s.HasClass("AuthorInfo")).ChildNodes.FirstOrDefault(s => s.HasClass("AuthorInfo-content"));
+                author = temp.ChildNodes.FirstOrDefault(s => s.HasClass("AuthorInfo-head")).InnerText;
 
             }
             catch
