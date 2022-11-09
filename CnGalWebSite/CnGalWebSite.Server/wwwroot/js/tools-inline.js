@@ -209,8 +209,8 @@ function setStructuredData(data) {
     structuredData.innerText = data;
 }
 
-var audio = new Audio();
 function playAudio(url) {
+    var audio = document.getElementById("bgMusic");
     if (url != null && (audio.currentTime == 0 || audio.currentTime == audio.duration || audio.src != url)) {
         audio.src = url;
         audio.play();
