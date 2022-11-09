@@ -68,7 +68,7 @@ namespace CnGalWebSite.DrawingBed.Services
                 var uploadedFile = await CheckSameFileFromServer(sha1);
                 if (string.IsNullOrWhiteSpace(uploadedFile))
                 {
-                    if (url.Contains("image.cngal.org"))
+                    if (url.Contains("image.cngal.org")&&x==0&&y==0)
                     {
                         //原链接已经在图床中，直接返回
                         uploadedFile = url;
