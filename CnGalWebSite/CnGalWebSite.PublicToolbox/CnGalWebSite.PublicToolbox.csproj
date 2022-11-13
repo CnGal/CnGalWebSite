@@ -15,4 +15,8 @@
     <ProjectReference Include="..\CnGalWebSite.Helper\CnGalWebSite.Helper.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="CnGalWebSite.PublicToolbox.Extentions" />
+  </ItemGroup>
+
 </Project>

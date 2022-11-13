@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.Helper.Extensions
+﻿using CnGalWebSite.DataModel.Helper;
+
+namespace CnGalWebSite.Helper.Extensions
 {
     public static class DateTimeExtension
     {
@@ -50,5 +52,7 @@
                 return $"{now.Days:0.0} day";
             }
         }
+
+       
     }
 }

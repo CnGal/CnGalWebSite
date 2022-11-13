@@ -6,9 +6,12 @@ using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.Search.ElasticSearches;
 using CnGalWebSite.APIServer.Application.Typesense;
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.APIServer.Extentions;
 using CnGalWebSite.APIServer.Infrastructure;
 using CnGalWebSite.APIServer.MessageHandlers;
+using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -26,6 +29,7 @@ using Microsoft.OpenApi.Models;
 using NetCore.AutoRegisterDi;
 using NETCore.MailKit.Extensions;
 using NETCore.MailKit.Infrastructure.Internal;
+using Newtonsoft.Json;
 using Senparc.Weixin.AspNet;
 using Senparc.Weixin.Entities;
 using Senparc.Weixin.MP;
@@ -62,7 +66,18 @@ namespace CnGalWebSite.APIServer
                     }).UseBatchEF_MySQLPomelo());
             // services.AddMvc(async => async.EnableEndpointRouting = false);
             //不使用终结点路由
-            services.AddControllersWithViews(a => a.EnableEndpointRouting = false);
+            services.AddControllersWithViews(a => a.EnableEndpointRouting = false)
+                //配置Json
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+                    options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+                });
+            //设置Json格式化配置
+            ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+            ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+
+
             //依赖注入辅助类
             services.AddScoped<IAppHelper, AppHelper>();
             services.AddScoped<IRSSHelper, RSSHelper>();

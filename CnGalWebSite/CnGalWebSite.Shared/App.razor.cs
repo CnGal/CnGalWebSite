@@ -146,7 +146,7 @@ namespace CnGalWebSite.Shared
             {
                 try
                 {
-                    await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/MakeUserOnline");
+                    await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/MakeUserOnline", ToolHelper.options);
                 }
                 catch
                 {

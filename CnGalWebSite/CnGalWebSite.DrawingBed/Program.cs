@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DrawingBed.Services;
+﻿using CnGalWebSite.DataModel.Helper;
+using CnGalWebSite.DrawingBed.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IFileService, FileService>();
+
+//设置Json格式化配置
+ToolHelper.SetJsonSerializerOptions();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

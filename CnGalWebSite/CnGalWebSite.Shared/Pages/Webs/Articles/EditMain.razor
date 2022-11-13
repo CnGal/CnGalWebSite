@@ -65,7 +65,7 @@
             try
             {
                 //获取文章信息
-                Model = await Http.GetFromJsonAsync<EditArticleMainViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlemain/" + Id);
+                Model = await Http.GetFromJsonAsync<EditArticleMainViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlemain/" + Id, ToolHelper.options);
 
                 isReady = true;
                 StateHasChanged();
@@ -92,7 +92,7 @@
             }
             else
             {
-                autoSave.Clean();
+                await autoSave.Clean();
 
                 await ToastService.Success("编辑文章主要信息成功", "编辑文章主要信息成功，等待审核通过");
                 NavigationManager.NavigateTo(Provider, "/articles/index/" + Model.Id, Model.Name, "fa fa-newspaper-o");

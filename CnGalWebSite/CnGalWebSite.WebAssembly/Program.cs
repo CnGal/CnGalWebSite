@@ -1,11 +1,13 @@
 ﻿using Blazored.LocalStorage;
 using CnGalWebSite.DataModel.Application.Examines;
 using CnGalWebSite.DataModel.Application.Helper;
+using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
 using CnGalWebSite.PublicToolbox.DataRepositories;
 using CnGalWebSite.PublicToolbox.PostTools;
 using CnGalWebSite.Shared;
 using CnGalWebSite.Shared.DataRepositories;
+using CnGalWebSite.Shared.Extentions;
 using CnGalWebSite.Shared.MasaComponent.Shared.Tips;
 using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
@@ -72,6 +74,10 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.BuildServiceProvider(validateScopes: false);
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            //设置Json格式化配置
+            ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+            ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
 
             var host = builder.Build();
 
