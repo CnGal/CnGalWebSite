@@ -227,7 +227,7 @@
     {
         try
         {
-            UserFavoriteInfor = await Http.GetFromJsonAsync<FavoriteFoldersViewModel>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteInforFromFolderId/" + id);
+            UserFavoriteInfor = await Http.GetFromJsonAsync<FavoriteFoldersViewModel>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteInforFromFolderId/" + id, ToolHelper.options);
         }
         catch(Exception ex)
         {

@@ -55,7 +55,7 @@
         try
         {
             await ToastService.Success("正在置顶最新发行的游戏", "任务执行需要一定时间，请稍安勿躁");
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/admin/MakeNewestGamesTop");
+            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/admin/MakeNewestGamesTop", ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {
@@ -99,7 +99,7 @@
         try
         {
             await ToastService.Success("正在获取所有游戏的SteamId", "任务执行需要一定时间，请稍安勿躁");
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/steam/GetAllEntriesSteam");
+            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/steam/GetAllEntriesSteam", ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {
@@ -120,7 +120,7 @@
         try
         {
             await ToastService.Success("正在更新所有游戏Steam信息", "任务执行需要一定时间，请稍安勿躁");
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/steam/UpdateAllSteamInfor");
+            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/steam/UpdateAllSteamInfor", ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {
@@ -141,7 +141,7 @@
         try
         {
             await ToastService.Success("正在刷新搜索缓存", "任务执行需要一定时间，请稍安勿躁哦");
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/admin/RefreshSearchData");
+            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/admin/RefreshSearchData", ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {
@@ -162,7 +162,7 @@
         try
         {
             await ToastService.Success("正在执行临时脚本", "任务执行需要一定时间，请稍安勿躁哦");
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/admin/TempFunction");
+            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/admin/TempFunction", ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {

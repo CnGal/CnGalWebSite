@@ -74,7 +74,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditGameNewsModel>(ToolHelper.WebApiPath + "api/news/EditGameNews/" + Id);
+            Model = await Http.GetFromJsonAsync<EditGameNewsModel>(ToolHelper.WebApiPath + "api/news/EditGameNews/" + Id, ToolHelper.options);
 
             isReady = true;
             StateHasChanged();
@@ -135,7 +135,7 @@
         await OnSave();
         try
         {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/PublishGameNews/" + Id);
+            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/PublishGameNews/" + Id, ToolHelper.options);
             if (result.Successful)
             {
                 await OnRefreshTable.InvokeAsync();
@@ -163,7 +163,7 @@
 
         try
         {
-            ArticleViewModel model = await Http.GetFromJsonAsync<ArticleViewModel>(ToolHelper.WebApiPath + "api/news/GetGameNewsPreview/" + Id);
+            ArticleViewModel model = await Http.GetFromJsonAsync<ArticleViewModel>(ToolHelper.WebApiPath + "api/news/GetGameNewsPreview/" + Id, ToolHelper.options);
 
             if (previewArticleTip != null)
             {

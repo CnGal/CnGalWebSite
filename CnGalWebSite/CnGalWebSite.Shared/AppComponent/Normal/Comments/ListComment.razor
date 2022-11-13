@@ -74,7 +74,7 @@ else
         {
             isReady = false;
             StateHasChanged();
-            var model = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)Type + "/" + (UserId??ObjectId.ToString()) + "/1/100");
+            var model = await Http.GetFromJsonAsync<PagedResultDto<CommentViewModel>>(ToolHelper.WebApiPath + "api/comments/GetComments/" + (int)Type + "/" + (UserId??ObjectId.ToString()) + "/1/100", ToolHelper.options);
             Model = model.Data;
             isReady = true;
             StateHasChanged();

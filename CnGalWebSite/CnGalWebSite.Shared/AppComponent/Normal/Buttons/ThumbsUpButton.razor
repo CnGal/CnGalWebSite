@@ -31,7 +31,7 @@
             try
             {
                 //获取文章信息
-                var AsyncModel = await Http.GetFromJsonAsync<ArticleAsyncInforViewModel>(ToolHelper.WebApiPath + "api/articles/GetArticleAsyncInfor/" + Id);
+                var AsyncModel = await Http.GetFromJsonAsync<ArticleAsyncInforViewModel>(ToolHelper.WebApiPath + "api/articles/GetArticleAsyncInfor/" + Id, ToolHelper.options);
                 IsThumbsUp = AsyncModel.IsThumbsUp;
                 isReady = true;
                 StateHasChanged();

@@ -65,9 +65,9 @@
             try
             {
                 //获取所有词条
-                PeripheryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/peripheries/GetAllPeripheries");
+                PeripheryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/peripheries/GetAllPeripheries", ToolHelper.options);
 
-                Model = await Http.GetFromJsonAsync<EditPeripheryRelatedPeripheriesViewModel>(ToolHelper.WebApiPath + "api/peripheries/editrelatedperipheries/" + Id);
+                Model = await Http.GetFromJsonAsync<EditPeripheryRelatedPeripheriesViewModel>(ToolHelper.WebApiPath + "api/peripheries/editrelatedperipheries/" + Id, ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }

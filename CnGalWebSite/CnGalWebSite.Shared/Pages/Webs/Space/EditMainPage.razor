@@ -59,7 +59,7 @@
         {
             try
             {
-                Model = await Http.GetFromJsonAsync<EditUserMainPageViewModel>(ToolHelper.WebApiPath + "api/space/editmainpage");
+                Model = await Http.GetFromJsonAsync<EditUserMainPageViewModel>(ToolHelper.WebApiPath + "api/space/editmainpage", ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }

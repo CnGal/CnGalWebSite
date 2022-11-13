@@ -132,7 +132,7 @@
             try
             {
                 //获取文章信息
-                Model = await Http.GetFromJsonAsync<List<CnGalWebSite.DataModel.Model.Message>>(ToolHelper.WebApiPath + "api/space/GetUserMessages");
+                Model = await Http.GetFromJsonAsync<List<CnGalWebSite.DataModel.Model.Message>>(ToolHelper.WebApiPath + "api/space/GetUserMessages", ToolHelper.options);
 
                 Model = Model.OrderByDescending(s => s.PostTime).ToList();
 
@@ -167,7 +167,7 @@
         {
             try
             {
-                var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/ReadedAllMessages/");
+                var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/ReadedAllMessages/", ToolHelper.options);
                 //判断结果
                 if (obj.Successful == false)
                 {

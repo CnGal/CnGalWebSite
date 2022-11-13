@@ -155,7 +155,7 @@
         try
         {
 
-            var data = await Http.GetFromJsonAsync<DrawLotteryDataModel>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryData/" + Id);
+            var data = await Http.GetFromJsonAsync<DrawLotteryDataModel>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryData/" + Id, ToolHelper.options);
             var model = new ExportLotteryDataModel();
             var prizeId = 1;
             foreach (var item in data.Awards)

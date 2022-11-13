@@ -189,7 +189,7 @@
 #endif
         try
         {
-            InforModel = await Http.GetFromJsonAsync<ListCommentsInforViewModel>(ToolHelper.WebApiPath + "api/admin/listcomments");
+            InforModel = await Http.GetFromJsonAsync<ListCommentsInforViewModel>(ToolHelper.WebApiPath + "api/admin/listcomments", ToolHelper.options);
         }
         catch(Exception ex)
         {

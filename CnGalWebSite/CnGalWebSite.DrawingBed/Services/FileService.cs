@@ -184,7 +184,7 @@ namespace CnGalWebSite.DrawingBed.Services
             var client = new OssClient(endpoint, accessKeyId, accessKeySecret);
 
             // 填写Object完整路径，完整路径中不能包含Bucket名称，例如exampledir/exampleobject.txt
-            var objectName = $"audio/upload/{DateTime.Now.ToCstTime():yyyyMMdd}/{DateTime.Now.ToCstTime().ToBinary()}.mp3";
+            var objectName = $"audio/upload/{DateTime.UtcNow:yyyyMMdd}/{DateTime.UtcNow.ToBinary()}.mp3";
             try
             {
                 // 上传文件

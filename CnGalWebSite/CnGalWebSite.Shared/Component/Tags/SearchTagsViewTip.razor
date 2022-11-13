@@ -57,7 +57,7 @@
         try
         {
             //获取所有标签
-            Items = await Http.GetFromJsonAsync<List<TagTreeModel>>(ToolHelper.WebApiPath + "api/tags/GetTagsTreeView");
+            Items = await Http.GetFromJsonAsync<List<TagTreeModel>>(ToolHelper.WebApiPath + "api/tags/GetTagsTreeView", ToolHelper.options);
 
             //遍历寻找最后一级的标签
             foreach (var item in Items)

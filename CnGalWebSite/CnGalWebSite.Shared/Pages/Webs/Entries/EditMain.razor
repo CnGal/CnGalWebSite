@@ -76,7 +76,7 @@ else
             try
             {
                 //获取词条信息
-                Model = await Http.GetFromJsonAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/editmain/" + Id);
+                Model = await Http.GetFromJsonAsync<EditMainViewModel>(ToolHelper.WebApiPath + "api/entries/editmain/" + Id, ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }

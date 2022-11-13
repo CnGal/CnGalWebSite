@@ -90,7 +90,7 @@
         {
             isReady = false;
             //获取文章信息
-            Model = await Http.GetFromJsonAsync<DisambigViewModel>(ToolHelper.WebApiPath + "api/disambigs/GetDisambigView/" + Id);
+            Model = await Http.GetFromJsonAsync<DisambigViewModel>(ToolHelper.WebApiPath + "api/disambigs/GetDisambigView/" + Id, ToolHelper.options);
             isReady = true;
             StateHasChanged();
         }

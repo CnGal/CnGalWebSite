@@ -33,7 +33,7 @@ else
 
         try
         {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/signIn");
+            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/signIn", ToolHelper.options);
             if (result.Successful == true)
             {
                 Model.IsSignIn = true;

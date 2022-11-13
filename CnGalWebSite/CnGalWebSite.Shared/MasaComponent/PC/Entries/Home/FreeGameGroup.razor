@@ -41,7 +41,7 @@
         {
             if(_dataCacheService.FreeGamesCatche.Count==0)
             {
-                _dataCacheService.FreeGamesCatche= await Http.GetFromJsonAsync<List<EntryInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetFreeGames");
+                _dataCacheService.FreeGamesCatche= await Http.GetFromJsonAsync<List<EntryInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetFreeGames", ToolHelper.options);
             }
 
             _dataCacheService.FreeGamesCatche.Random();

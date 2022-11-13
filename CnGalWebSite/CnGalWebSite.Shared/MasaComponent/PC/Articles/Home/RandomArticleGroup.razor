@@ -41,7 +41,7 @@
         {
             if (_dataCacheService.RandomArticlesCatche.Count == 0)
             {
-                _dataCacheService.RandomArticlesCatche = await Http.GetFromJsonAsync<List<ArticleInforTipViewModel>>(ToolHelper.WebApiPath + "api/articles/GetRandomArticles");
+                _dataCacheService.RandomArticlesCatche = await Http.GetFromJsonAsync<List<ArticleInforTipViewModel>>(ToolHelper.WebApiPath + "api/articles/GetRandomArticles", ToolHelper.options);
             }
             _dataCacheService.RandomArticlesCatche.Random();
         }

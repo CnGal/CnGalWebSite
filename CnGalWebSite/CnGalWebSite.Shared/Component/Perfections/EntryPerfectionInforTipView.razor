@@ -47,7 +47,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<PerfectionInforTipViewModel>(ToolHelper.WebApiPath + "api/perfections/GetEntryPerfection/" + EntryId);
+            Model = await Http.GetFromJsonAsync<PerfectionInforTipViewModel>(ToolHelper.WebApiPath + "api/perfections/GetEntryPerfection/" + EntryId, ToolHelper.options);
             color = ToolHelper.GetEntryPerfectionLevelColor(Model.Level);
             isReady = true;
             StateHasChanged();

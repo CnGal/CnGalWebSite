@@ -17,7 +17,7 @@
                 _dataCacheService.DelayedTaskList = taskList;
             }
             //确保网络连通
-            if (await Http.GetFromJsonAsync<List<HomeNewsAloneViewModel>>(ToolHelper.WebApiPath + "api/home/GetHomeNewsView") == null)
+            if (await Http.GetFromJsonAsync<List<HomeNewsAloneViewModel>>(ToolHelper.WebApiPath + "api/home/GetHomeNewsView", ToolHelper.options) == null)
             {
                 return;
             }

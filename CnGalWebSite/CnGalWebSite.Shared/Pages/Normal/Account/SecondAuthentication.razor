@@ -162,7 +162,7 @@
     {
         try
         {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/SecondAuthentication");
+            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/account/SecondAuthentication", ToolHelper.options);
             if (result.Successful == true)
             {
                 return true;

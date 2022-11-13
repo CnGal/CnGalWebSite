@@ -60,7 +60,7 @@
         {
             if (_dataCacheService.GameRolesCatche.Count == 0)
             {
-                _dataCacheService.GameRolesCatche = await Http.GetFromJsonAsync<List<GameRoleModel>>(ToolHelper.WebApiPath + "api/entries/GetGameRoles");
+                _dataCacheService.GameRolesCatche = await Http.GetFromJsonAsync<List<GameRoleModel>>(ToolHelper.WebApiPath + "api/entries/GetGameRoles", ToolHelper.options);
             }
 
             Items = _dataCacheService.GameRolesCatche.Random().Take(12).ToList();

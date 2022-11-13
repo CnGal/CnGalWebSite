@@ -88,7 +88,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<List<PerfectionCheckViewModel>>(ToolHelper.WebApiPath + "api/perfections/GetEntryPerfectionCheckList/" + PerfectionId);
+            Model = await Http.GetFromJsonAsync<List<PerfectionCheckViewModel>>(ToolHelper.WebApiPath + "api/perfections/GetEntryPerfectionCheckList/" + PerfectionId, ToolHelper.options);
 
             panel.Clear();
             if(Model.Any(s => s.Level == PerfectionCheckLevel.High))

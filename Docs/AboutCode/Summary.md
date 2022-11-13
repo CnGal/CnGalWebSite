@@ -21,7 +21,17 @@
 ## API端项目结构
 - Application 文件夹下是各个模块的公共方法，例如 BackUpArchiveService 是互联网档案馆备份模块的公共方法类。
 - Controller 文件夹下是控制器，最外层暴露给用户的接口
-- IRepository 是数据仓储接口，例如 IRepository\<Entry\> 是 词条仓储，提供了一些方法操作数据库
+- IRepository 是数据仓储接口，例如 `IRepository<Entry>` 是 词条仓储，提供了一些方法操作数据库
 - AppDbContext 是数据库上下文
 - appsettings.json 是配置文件
 
+## 关于时区处理
+### API Server
+- 内部处理使用 `UTC+0:00`
+- 通过EF Core操作数据库时，保存前转换成 `UTC+8:00` ，读取后转换成 `UTC+0:00`
+- 使用 `UTC+0:00` 通过API返回数据
+
+### Blazor Server, WebAssembly, DrawingBed
+- 内部统一使用本地时区处理并显示
+- 向API发送数据时，使用本地时区，API端负责转换，若不指定时区，默认与API服务器时区一致
+- 接收API数据时，转换为本地时区

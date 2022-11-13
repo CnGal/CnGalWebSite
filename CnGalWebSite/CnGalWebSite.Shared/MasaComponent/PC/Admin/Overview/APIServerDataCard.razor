@@ -65,7 +65,7 @@
         try
         {
             var begin = DateTime.Now.ToCstTime();
-            Model = await Http.GetFromJsonAsync<ServerRealTimeOverviewModel>(ToolHelper.WebApiPath + "api/admin/GetServerRealTimeDataOverview");
+            Model = await Http.GetFromJsonAsync<ServerRealTimeOverviewModel>(ToolHelper.WebApiPath + "api/admin/GetServerRealTimeDataOverview", ToolHelper.options);
             var end = DateTime.Now.ToCstTime();
 
             NetworkLatency = end - begin - Model.TimeSpanGetData;

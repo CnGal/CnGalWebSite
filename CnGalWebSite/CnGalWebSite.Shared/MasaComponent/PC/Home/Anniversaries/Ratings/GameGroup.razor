@@ -68,7 +68,7 @@
         {
             if (_dataCacheService.JudgableGamesCatche.Count == 0)
             {
-                _dataCacheService.JudgableGamesCatche = await Http.GetFromJsonAsync<List<JudgableGameViewModel>>(ToolHelper.WebApiPath + "api/anniversaries/GetAllJudgableGames");
+                _dataCacheService.JudgableGamesCatche = await Http.GetFromJsonAsync<List<JudgableGameViewModel>>(ToolHelper.WebApiPath + "api/anniversaries/GetAllJudgableGames", ToolHelper.options);
             }
 
             var searchString = _dataCacheService.ThemeSetting.AnniversariesSetting.SearchString;

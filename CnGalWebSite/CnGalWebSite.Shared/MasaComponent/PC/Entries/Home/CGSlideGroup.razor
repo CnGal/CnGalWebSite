@@ -24,7 +24,7 @@
         {
             if (_dataCacheService.GameCGsCatche.Count == 0)
             {
-                _dataCacheService.GameCGsCatche = await Http.GetFromJsonAsync<List<GameCGModel>>(ToolHelper.WebApiPath + "api/entries/GetGameCGs");
+                _dataCacheService.GameCGsCatche = await Http.GetFromJsonAsync<List<GameCGModel>>(ToolHelper.WebApiPath + "api/entries/GetGameCGs", ToolHelper.options);
             }
 
             _dataCacheService.GameCGsCatche.Random();

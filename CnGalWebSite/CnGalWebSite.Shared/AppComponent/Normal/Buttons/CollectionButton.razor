@@ -56,7 +56,7 @@
     {
         try
         {
-            Result obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/peripheries/UnCollectPeriphery/" + Id);
+            Result obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/peripheries/UnCollectPeriphery/" + Id, ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {
@@ -78,7 +78,7 @@
     {
         try
         {
-            Result obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/peripheries/CollectPeriphery/" + Id);
+            Result obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/peripheries/CollectPeriphery/" + Id, ToolHelper.options);
 
             //判断结果
             if (obj.Successful == false)

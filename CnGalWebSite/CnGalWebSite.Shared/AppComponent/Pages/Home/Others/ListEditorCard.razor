@@ -80,7 +80,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<List<ExaminedNormalListModel>>(ToolHelper.WebApiPath + "api/perfections/GetRecentlyEditList");
+            Model = await Http.GetFromJsonAsync<List<ExaminedNormalListModel>>(ToolHelper.WebApiPath + "api/perfections/GetRecentlyEditList", ToolHelper.options);
 
         }
         catch (Exception ex)

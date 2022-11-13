@@ -103,7 +103,7 @@
         try
         {
             //获取服务器基本信息
-            Model = await Http.GetFromJsonAsync<TableViewModel>(ToolHelper.WebApiPath + "api/tables/Gettableview");
+            Model = await Http.GetFromJsonAsync<TableViewModel>(ToolHelper.WebApiPath + "api/tables/Gettableview", ToolHelper.options);
             StateHasChanged();
         }
         catch (Exception ex)

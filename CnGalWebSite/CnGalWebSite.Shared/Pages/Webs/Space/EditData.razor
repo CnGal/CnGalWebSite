@@ -96,7 +96,7 @@
             try
             {
                 //获取词条信息
-                Model = await Http.GetFromJsonAsync<EditUserDataViewModel>(ToolHelper.WebApiPath + "api/space/edituserdata/");
+                Model = await Http.GetFromJsonAsync<EditUserDataViewModel>(ToolHelper.WebApiPath + "api/space/edituserdata/", ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }

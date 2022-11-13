@@ -85,7 +85,7 @@ else
     {
         try
         {
-            var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode");
+            var geetestCodeModel = await Http.GetFromJsonAsync<GeetestCodeModel>(ToolHelper.WebApiPath + "api/account/GetGeetestCode", ToolHelper.options);
 
             objRef = DotNetObjectReference.Create(this);
             await JS.InvokeAsync<string>("initGeetestBindCAPTCHA", objRef, geetestCodeModel.Gt, geetestCodeModel.Challenge, geetestCodeModel.Success);

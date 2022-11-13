@@ -55,7 +55,7 @@
                 if (obj.Successful == false)
                 {
                     //验证失败 获取该用户的验证类型
-                    var model = await Http.GetFromJsonAsync<UserAuthenticationTypeModel>(ToolHelper.WebApiPath + "api/account/GetUserAuthenticationType");
+                    var model = await Http.GetFromJsonAsync<UserAuthenticationTypeModel>(ToolHelper.WebApiPath + "api/account/GetUserAuthenticationType", ToolHelper.options);
                     _dataCacheService.UserAuthenticationTypeModel = model;
                     //判断是否开启手机验证
                     if (IsOnPhone == false)

@@ -44,7 +44,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditUserDataViewModel>(ToolHelper.WebApiPath + "api/space/EditUserData");
+            Model = await Http.GetFromJsonAsync<EditUserDataViewModel>(ToolHelper.WebApiPath + "api/space/EditUserData", ToolHelper.options);
             isReady = true;
         }
         catch (Exception ex)

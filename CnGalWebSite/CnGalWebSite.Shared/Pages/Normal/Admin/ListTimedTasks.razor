@@ -160,7 +160,7 @@
     {
         try
         {
-            InforModel = await Http.GetFromJsonAsync<ListTimedTasksInforViewModel>(ToolHelper.WebApiPath + "api/timedtasks/listtimedtasks");
+            InforModel = await Http.GetFromJsonAsync<ListTimedTasksInforViewModel>(ToolHelper.WebApiPath + "api/timedtasks/listtimedtasks", ToolHelper.options);
         }
         catch(Exception ex)
         {

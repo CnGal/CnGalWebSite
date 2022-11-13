@@ -46,7 +46,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<PrizeViewModel>(ToolHelper.WebApiPath + "api/lotteries/GetUserPrize/" + Id);
+            Model = await Http.GetFromJsonAsync<PrizeViewModel>(ToolHelper.WebApiPath + "api/lotteries/GetUserPrize/" + Id, ToolHelper.options);
 
             isReady = true;
             StateHasChanged();

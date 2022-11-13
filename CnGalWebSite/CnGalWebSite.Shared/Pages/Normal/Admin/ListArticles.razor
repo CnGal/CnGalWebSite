@@ -188,7 +188,7 @@
 #endif
         try
         {
-            InforModel = await Http.GetFromJsonAsync<GetArticleCountModel>(ToolHelper.WebApiPath + "api/articles/getarticlecount");
+            InforModel = await Http.GetFromJsonAsync<GetArticleCountModel>(ToolHelper.WebApiPath + "api/articles/getarticlecount", ToolHelper.options);
 
         }
         catch(Exception ex)

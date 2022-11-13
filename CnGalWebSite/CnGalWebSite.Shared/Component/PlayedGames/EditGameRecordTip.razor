@@ -126,7 +126,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditGameRecordModel>(ToolHelper.WebApiPath + "api/playedgame/EditGameRecord/" + Id);
+            Model = await Http.GetFromJsonAsync<EditGameRecordModel>(ToolHelper.WebApiPath + "api/playedgame/EditGameRecord/" + Id, ToolHelper.options);
             isReady = true;
         }
         catch (Exception ex)

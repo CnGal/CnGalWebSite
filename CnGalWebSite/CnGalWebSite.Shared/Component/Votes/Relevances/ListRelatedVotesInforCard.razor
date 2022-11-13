@@ -37,7 +37,7 @@
         }
         try
         {
-            Model = await Http.GetFromJsonAsync<List<VoteCardViewModel>>(ToolHelper.WebApiPath + "api/votes/GetRelatedVotes/" + (int)Type + "/" + Id);
+            Model = await Http.GetFromJsonAsync<List<VoteCardViewModel>>(ToolHelper.WebApiPath + "api/votes/GetRelatedVotes/" + (int)Type + "/" + Id, ToolHelper.options);
 
         }
         catch (Exception ex)

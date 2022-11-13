@@ -69,9 +69,9 @@ else
             try
             {
                 //获取所有词条
-                EntryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList");
+                EntryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList", ToolHelper.options);
 
-                Model = await Http.GetFromJsonAsync<EditTagChildEntriesViewModel>(ToolHelper.WebApiPath + "api/tags/EditChildEntries/" + Id);
+                Model = await Http.GetFromJsonAsync<EditTagChildEntriesViewModel>(ToolHelper.WebApiPath + "api/tags/EditChildEntries/" + Id, ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }

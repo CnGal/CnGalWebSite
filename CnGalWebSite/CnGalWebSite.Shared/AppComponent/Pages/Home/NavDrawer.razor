@@ -82,7 +82,7 @@
                 {
                     _dataCacheService.UserInfor = new UserInforViewModel { Ranks = new List<RankViewModel>() };
                 }
-                var model = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + userId);
+                var model = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + userId, ToolHelper.options);
 
                 StateHasChanged();
                 _dataCacheService.UserInfor = model;

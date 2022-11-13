@@ -156,7 +156,7 @@
 #endif
         try
         {
-            InforModel = await Http.GetFromJsonAsync<ListMessagesInforViewModel>(ToolHelper.WebApiPath + "api/admin/listmessages");
+            InforModel = await Http.GetFromJsonAsync<ListMessagesInforViewModel>(ToolHelper.WebApiPath + "api/admin/listmessages", ToolHelper.options);
         }
         catch(Exception ex)
         {

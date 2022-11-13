@@ -73,7 +73,7 @@
     {
         try
         {
-            InforModel = await Http.GetFromJsonAsync<ListBackUpArchivesInforViewModel>(ToolHelper.WebApiPath + "api/BackUpArchives/listBackUpArchives");
+            InforModel = await Http.GetFromJsonAsync<ListBackUpArchivesInforViewModel>(ToolHelper.WebApiPath + "api/BackUpArchives/listBackUpArchives", ToolHelper.options);
         }
         catch(Exception ex)
         {

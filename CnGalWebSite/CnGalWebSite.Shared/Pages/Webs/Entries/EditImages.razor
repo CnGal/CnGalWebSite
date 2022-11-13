@@ -71,7 +71,7 @@ else
             try
             {
                 //获取词条信息
-                Model = await Http.GetFromJsonAsync<EditImagesViewModel>(ToolHelper.WebApiPath + "api/entries/editimages/" + Id);
+                Model = await Http.GetFromJsonAsync<EditImagesViewModel>(ToolHelper.WebApiPath + "api/entries/editimages/" + Id, ToolHelper.options);
 
                 isReady = true;
                 StateHasChanged();

@@ -72,7 +72,7 @@
     {
         try
         {
-            InforModel = await Http.GetFromJsonAsync<ListFavoriteFoldersInforViewModel>(ToolHelper.WebApiPath + "api/admin/ListFavoriteFolders");
+            InforModel = await Http.GetFromJsonAsync<ListFavoriteFoldersInforViewModel>(ToolHelper.WebApiPath + "api/admin/ListFavoriteFolders", ToolHelper.options);
 
         }
         catch(Exception ex)
