@@ -74,7 +74,7 @@ else
         try
         {
             //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            ModelGroup = await Http.GetFromJsonAsync<GroupInforListViewModel>(ToolHelper.WebApiPath + "api/tables/GetGroupInforList");
+            ModelGroup = await Http.GetFromJsonAsync<GroupInforListViewModel>(ToolHelper.WebApiPath + "api/tables/GetGroupInforList", ToolHelper.options);
             isReady = true;
         }
         catch (Exception ex)

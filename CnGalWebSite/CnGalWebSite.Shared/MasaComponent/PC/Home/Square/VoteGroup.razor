@@ -41,7 +41,7 @@
         {
             if (_dataCacheService.VoteCardsCatche.Count == 0)
             {
-                _dataCacheService.VoteCardsCatche = await Http.GetFromJsonAsync<List<VoteCardViewModel>>(ToolHelper.WebApiPath + "api/votes/GetVoteCards");
+                _dataCacheService.VoteCardsCatche = await Http.GetFromJsonAsync<List<VoteCardViewModel>>(ToolHelper.WebApiPath + "api/votes/GetVoteCards", ToolHelper.options);
             }
 
             _dataCacheService.VoteCardsCatche.Random();

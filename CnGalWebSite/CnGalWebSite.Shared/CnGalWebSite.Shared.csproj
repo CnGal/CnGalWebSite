@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,7 +52,7 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
+    <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
     <PackageReference Include="Chronos.Blazor.Cropper" Version="1.2.11" />
     <PackageReference Include="EPPlus" Version="6.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0" />
@@ -80,6 +81,10 @@
   
   <ItemGroup>
     <Content Include="..\CnGalWebSite.Server\wwwroot\scripts\check.min.js" Link="wwwroot\js\check.min.js" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Using Include="CnGalWebSite.Shared.Extentions" />
   </ItemGroup>
 
 </Project>

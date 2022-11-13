@@ -93,7 +93,7 @@
 #endif
         try
         {
-            InforModel = await Http.GetFromJsonAsync<ListVotesInforViewModel>(ToolHelper.WebApiPath + "api/admin/listVotes");
+            InforModel = await Http.GetFromJsonAsync<ListVotesInforViewModel>(ToolHelper.WebApiPath + "api/admin/listVotes", ToolHelper.options);
 
         }
         catch (Exception ex)

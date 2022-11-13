@@ -187,7 +187,7 @@
             if (Type == ExaminedNormalListModelType.Entry)
             {
 
-                var model = await Http.GetFromJsonAsync<EditEntryInforBindModel>(ToolHelper.WebApiPath + "api/entries/GetEntryEditInforBindModel/" + Id);
+                var model = await Http.GetFromJsonAsync<EditEntryInforBindModel>(ToolHelper.WebApiPath + "api/entries/GetEntryEditInforBindModel/" + Id, ToolHelper.options);
 
                 Examines = model.Examines;
 
@@ -209,7 +209,7 @@
             }
             else if (Type == ExaminedNormalListModelType.Article)
             {
-                var model = await Http.GetFromJsonAsync<EditArticleInforBindModel>(ToolHelper.WebApiPath + "api/articles/GetArticleEditInforBindModel/" + Id);
+                var model = await Http.GetFromJsonAsync<EditArticleInforBindModel>(ToolHelper.WebApiPath + "api/articles/GetArticleEditInforBindModel/" + Id, ToolHelper.options);
 
                 Examines = model.Examines;
 
@@ -220,7 +220,7 @@
             }
             else if (Type == ExaminedNormalListModelType.Periphery)
             {
-                var model = await Http.GetFromJsonAsync<EditPeripheryInforBindModel>(ToolHelper.WebApiPath + "api/Peripheries/GetPeripheryEditInforBindModel/" + Id);
+                var model = await Http.GetFromJsonAsync<EditPeripheryInforBindModel>(ToolHelper.WebApiPath + "api/Peripheries/GetPeripheryEditInforBindModel/" + Id, ToolHelper.options);
 
                 Examines = model.Examines;
 
@@ -232,7 +232,7 @@
             }
             else if (Type == ExaminedNormalListModelType.Tag)
             {
-                var model = await Http.GetFromJsonAsync<EditTagInforBindModel>(ToolHelper.WebApiPath + "api/tags/GetTagEditInforBindModel/" + Id);
+                var model = await Http.GetFromJsonAsync<EditTagInforBindModel>(ToolHelper.WebApiPath + "api/tags/GetTagEditInforBindModel/" + Id, ToolHelper.options);
 
                 Examines = model.Examines;
 

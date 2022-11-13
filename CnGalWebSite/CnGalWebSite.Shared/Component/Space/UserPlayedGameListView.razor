@@ -106,7 +106,7 @@
     {
         try
         {
-            var model = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/playedgame/RefreshPlayedGameSteamInfor");
+            var model = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/playedgame/RefreshPlayedGameSteamInfor", ToolHelper.options);
             if (model.Successful)
             {
                 _dataCacheService.UserGameRecordDataCatche.Clean(UserId);

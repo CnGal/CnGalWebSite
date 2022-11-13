@@ -73,7 +73,7 @@
     {
         try
         {
-            InforModel = await Http.GetFromJsonAsync<ListTagsInforViewModel>(ToolHelper.WebApiPath + "api/tags/listtags");
+            InforModel = await Http.GetFromJsonAsync<ListTagsInforViewModel>(ToolHelper.WebApiPath + "api/tags/listtags", ToolHelper.options);
         }
         catch(Exception ex)
         {

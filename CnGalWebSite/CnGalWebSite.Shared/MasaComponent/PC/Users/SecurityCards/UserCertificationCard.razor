@@ -112,10 +112,10 @@
         try
         {
             //获取所有词条
-            //GameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Game);
-            StaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Staff);
-            GroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.ProductionGroup);
-            //RoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Role);
+            //GameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Game, ToolHelper.options);
+            StaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Staff, ToolHelper.options);
+            GroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.ProductionGroup, ToolHelper.options);
+            //RoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/space/GetAllNotCertificatedEntries?type=" + EntryType.Role, ToolHelper.options);
 
             isReady = true;
             StateHasChanged();

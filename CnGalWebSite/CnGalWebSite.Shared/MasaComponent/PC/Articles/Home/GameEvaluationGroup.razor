@@ -24,7 +24,7 @@
         {
             if (_dataCacheService.GameEvaluationsCatche.Count == 0)
             {
-                _dataCacheService.GameEvaluationsCatche = await Http.GetFromJsonAsync<List<GameEvaluationsModel>>(ToolHelper.WebApiPath + "api/articles/GetGameEvaluations");
+                _dataCacheService.GameEvaluationsCatche = await Http.GetFromJsonAsync<List<GameEvaluationsModel>>(ToolHelper.WebApiPath + "api/articles/GetGameEvaluations", ToolHelper.options);
             }
 
             _dataCacheService.GameEvaluationsCatche.Random();

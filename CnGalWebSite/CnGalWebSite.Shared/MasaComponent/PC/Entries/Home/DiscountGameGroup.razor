@@ -43,7 +43,7 @@
         {
             if (_dataCacheService.DiscountPageCatcheHelper.IsInit == false)
             {
-                _dataCacheService.DiscountPageCatcheHelper.Init(await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame"));
+                _dataCacheService.DiscountPageCatcheHelper.Init(await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame", ToolHelper.options));
             }
 
 

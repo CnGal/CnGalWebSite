@@ -52,7 +52,7 @@
 
         try
         {
-            Model = await Http.GetFromJsonAsync<List<LotteryCardViewModel>>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryCards");
+            Model = await Http.GetFromJsonAsync<List<LotteryCardViewModel>>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryCards", ToolHelper.options);
             isReady = true;
         }
         catch (Exception ex)

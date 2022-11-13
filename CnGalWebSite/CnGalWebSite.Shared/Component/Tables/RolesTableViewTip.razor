@@ -85,7 +85,7 @@ else
         try
         {
             //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            ModelRole = await Http.GetFromJsonAsync<RoleInforListViewModel>(ToolHelper.WebApiPath + "api/tables/GetRoleInforList");
+            ModelRole = await Http.GetFromJsonAsync<RoleInforListViewModel>(ToolHelper.WebApiPath + "api/tables/GetRoleInforList", ToolHelper.options);
             isReady = true;
         }
         catch (Exception ex)

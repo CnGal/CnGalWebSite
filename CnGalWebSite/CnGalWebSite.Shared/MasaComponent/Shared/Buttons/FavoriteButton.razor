@@ -81,7 +81,7 @@
     {
         try
         {
-            var userFavoriteInfor = await Http.GetFromJsonAsync<IsObjectInUserFavoriteFolderResult>(ToolHelper.WebApiPath + "api/favorites/IsObjectInUserFavoriteFolder/" + Id + "/" + Type);
+            var userFavoriteInfor = await Http.GetFromJsonAsync<IsObjectInUserFavoriteFolderResult>(ToolHelper.WebApiPath + "api/favorites/IsObjectInUserFavoriteFolder/" + Id + "/" + Type, ToolHelper.options);
 
             if (userFavoriteInfor != null)
             {
@@ -100,7 +100,7 @@
     {
         try
         {
-            UserFavoriteInfor = await Http.GetFromJsonAsync<FavoriteFoldersViewModel>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/" + id);
+            UserFavoriteInfor = await Http.GetFromJsonAsync<FavoriteFoldersViewModel>(ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/" + id, ToolHelper.options);
         }
         catch (Exception ex)
         {

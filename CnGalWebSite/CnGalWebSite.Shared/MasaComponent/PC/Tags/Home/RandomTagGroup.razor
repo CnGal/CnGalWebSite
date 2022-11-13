@@ -44,7 +44,7 @@
         {
             if (_dataCacheService.RandomTagsCatche.Count == 0)
             {
-                _dataCacheService.RandomTagsCatche = await Http.GetFromJsonAsync<List<RandomTagModel>>(ToolHelper.WebApiPath + "api/tags/GetRandomTags");
+                _dataCacheService.RandomTagsCatche = await Http.GetFromJsonAsync<List<RandomTagModel>>(ToolHelper.WebApiPath + "api/tags/GetRandomTags", ToolHelper.options);
             }
 
             _dataCacheService.RandomTagsCatche.Random();

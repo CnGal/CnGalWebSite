@@ -43,7 +43,7 @@ else
     {
         try
         {
-            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/ReadedAllMessages/");
+            var obj = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/space/ReadedAllMessages/", ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {

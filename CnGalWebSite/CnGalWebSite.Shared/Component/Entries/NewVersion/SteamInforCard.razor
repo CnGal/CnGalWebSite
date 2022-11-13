@@ -92,7 +92,7 @@
             {
                 return;
             }
-            SteamInfor = await Http.GetFromJsonAsync<SteamInfor>(ToolHelper.WebApiPath + "api/steam/Getsteaminfor/" + Model.SteamId + "/" + Model.Id);
+            SteamInfor = await Http.GetFromJsonAsync<SteamInfor>(ToolHelper.WebApiPath + "api/steam/Getsteaminfor/" + Model.SteamId + "/" + Model.Id, ToolHelper.options);
             IsReady = true;
             StateHasChanged();
         }

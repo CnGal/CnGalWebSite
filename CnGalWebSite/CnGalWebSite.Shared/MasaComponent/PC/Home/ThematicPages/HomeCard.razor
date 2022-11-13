@@ -82,7 +82,7 @@
         {
             if (_dataCacheService.CVThematicPageCache == null)
             {
-                _dataCacheService.CVThematicPageCache = await Http.GetFromJsonAsync<CVThematicPageViewModel>(ToolHelper.WebApiPath + "api/tags/GetCVThematicPageViewModel");
+                _dataCacheService.CVThematicPageCache = await Http.GetFromJsonAsync<CVThematicPageViewModel>(ToolHelper.WebApiPath + "api/tags/GetCVThematicPageViewModel", ToolHelper.options);
             }
 
             await OnChanged(true);

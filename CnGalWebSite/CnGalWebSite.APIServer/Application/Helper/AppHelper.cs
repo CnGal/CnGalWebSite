@@ -299,16 +299,16 @@ namespace CnGalWebSite.APIServer.Application.Helper
             ApplicationUser result = null;
             if (string.IsNullOrWhiteSpace(bearer) || !bearer.Contains("Bearer"))
             {
-                try
-                {
-                    var name = context.User.Claims.FirstOrDefault(s => s.Type == ClaimTypes.Name).Value;
-                    //获取当前用户ID
-                    result = await _userManager.FindByNameAsync(name);
-                }
-                catch
-                {
+                //try
+                //{
+                //    var name = context.User.Claims.FirstOrDefault(s => s.Type == ClaimTypes.Name).Value;
+                //    //获取当前用户ID
+                //    result = await _userManager.FindByNameAsync(name);
+                //}
+                //catch
+                //{
 
-                }
+                //}
                 return null;
             }
             else

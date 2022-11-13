@@ -58,7 +58,7 @@
 
                 try
                 {
-                    var Model = await Http.GetFromJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/GetOneTimeCode");
+                    var Model = await Http.GetFromJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/GetOneTimeCode", ToolHelper.options);
                     NavigationManager.NavigateTo("https://app.cngal.org/account/loginfromssr?Code=" + Model.Code + "&ReturnUrl=" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
                 }
                 catch (Exception ex)

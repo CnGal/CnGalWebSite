@@ -65,7 +65,7 @@
             try
             {
                 //获取文章信息
-                Model = await Http.GetFromJsonAsync<EditArticleMainPageViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlemainpage/" + Id);
+                Model = await Http.GetFromJsonAsync<EditArticleMainPageViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlemainpage/" + Id, ToolHelper.options);
 
                 isReady = true;
                 StateHasChanged();

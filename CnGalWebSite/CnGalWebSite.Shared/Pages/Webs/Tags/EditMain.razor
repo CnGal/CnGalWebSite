@@ -70,9 +70,9 @@ else
             try
             {
                 //获取所有标签
-                TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags");
+                TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags", ToolHelper.options);
 
-                Model = await Http.GetFromJsonAsync<EditTagMainViewModel>(ToolHelper.WebApiPath + "api/tags/editmain/" + Id);
+                Model = await Http.GetFromJsonAsync<EditTagMainViewModel>(ToolHelper.WebApiPath + "api/tags/editmain/" + Id, ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }

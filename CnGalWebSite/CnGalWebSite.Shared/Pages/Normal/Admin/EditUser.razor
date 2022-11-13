@@ -180,7 +180,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditUserViewModel>(ToolHelper.WebApiPath + "api/admin/edituser/" + Id);
+            Model = await Http.GetFromJsonAsync<EditUserViewModel>(ToolHelper.WebApiPath + "api/admin/edituser/" + Id, ToolHelper.options);
 
             //设置用户角色
             foreach (var item in Model.Roles)

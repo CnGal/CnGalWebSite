@@ -51,7 +51,7 @@ else
             {
                 if (_dataCacheService.UserContentCenterCatche == null)
                 {
-                    _dataCacheService.UserContentCenterCatche = await Http.GetFromJsonAsync<UserContentCenterViewModel>(ToolHelper.WebApiPath + "api/examines/GetUserContentCenterView");
+                    _dataCacheService.UserContentCenterCatche = await Http.GetFromJsonAsync<UserContentCenterViewModel>(ToolHelper.WebApiPath + "api/examines/GetUserContentCenterView", ToolHelper.options);
                 }
 
                 isReady = true;

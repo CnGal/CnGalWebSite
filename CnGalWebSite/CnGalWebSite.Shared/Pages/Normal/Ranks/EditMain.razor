@@ -78,7 +78,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditRankViewModel>(ToolHelper.WebApiPath + "api/ranks/EditRank/" + Id);
+            Model = await Http.GetFromJsonAsync<EditRankViewModel>(ToolHelper.WebApiPath + "api/ranks/EditRank/" + Id, ToolHelper.options);
             isReady = true;
         }
         catch (Exception ex)

@@ -51,7 +51,7 @@
         {
             if (_dataCacheService.RandomUserScoresCatche.Count == 0)
             {
-                _dataCacheService.RandomUserScoresCatche = await Http.GetFromJsonAsync<List<PlayedGameUserScoreRandomModel>>(ToolHelper.WebApiPath + "api/playedgame/GetRandomUserScores");
+                _dataCacheService.RandomUserScoresCatche = await Http.GetFromJsonAsync<List<PlayedGameUserScoreRandomModel>>(ToolHelper.WebApiPath + "api/playedgame/GetRandomUserScores", ToolHelper.options);
             }
             _dataCacheService.RandomUserScoresCatche.Random();
         }

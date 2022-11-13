@@ -184,7 +184,7 @@ namespace CnGalWebSite.DrawingBed.Services
             var client = new OssClient(endpoint, accessKeyId, accessKeySecret);
 
             // 填写Object完整路径，完整路径中不能包含Bucket名称，例如exampledir/exampleobject.txt
-            var objectName = $"audio/upload/{DateTime.Now.ToCstTime():yyyyMMdd}/{DateTime.Now.ToCstTime().ToBinary()}.mp3";
+            var objectName = $"audio/upload/{DateTime.UtcNow:yyyyMMdd}/{DateTime.UtcNow.ToBinary()}.mp3";
             try
             {
                 // 上传文件
@@ -222,10 +222,10 @@ namespace CnGalWebSite.DrawingBed.Services
             }
 
 
-
-            var result = newUploadResults.Replace("http://local.host/", "https://pic.cngal.top/").Replace("pic.cngal.top", "image.cngal.org").Replace("http://image.cngal.org/", "https://image.cngal.org/");
+            var result = newUploadResults.Replace("local.host", "image.cngal.org").Replace("http://", "https://");
             _logger.LogInformation("成功上传图片到图床：{url}", result);
             return result;
+
         }
         #endregion
 
@@ -358,8 +358,6 @@ namespace CnGalWebSite.DrawingBed.Services
 
         #region 处理音频
 
-        private readonly object balanceLock = new object();
-
         /// <summary>
         /// 裁剪音频并转换格式
         /// </summary>
@@ -381,7 +379,7 @@ namespace CnGalWebSite.DrawingBed.Services
 
             var output = await ffmpeg.ConvertAsync(inputFile, outputFile, options, default);
 
-            var mediaFile = new MediaInfoWrapper(outputFile.FileInfo.FullName);
+            var mediaFile = new MediaInfoWrapper(outputFile.FileInfo.FullName,_logger);
 
             _logger.LogInformation("成功裁剪音频：{url}", output.FileInfo.FullName);
 

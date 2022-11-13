@@ -65,8 +65,8 @@
             try
             {
                 //获取所有词条
-                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
-                Model = await Http.GetFromJsonAsync<EditPeripheryMainViewModel>(ToolHelper.WebApiPath + "api/peripheries/editmain/" + Id);
+                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0", ToolHelper.options);
+                Model = await Http.GetFromJsonAsync<EditPeripheryMainViewModel>(ToolHelper.WebApiPath + "api/peripheries/editmain/" + Id, ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }

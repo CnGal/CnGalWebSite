@@ -44,11 +44,12 @@ namespace CnGalWebSite.DataModel.Helper
 
         public static readonly JsonSerializerOptions options = new()
         {
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
         };
 
         public const int MaxEditorCount = 200;
         public const int MinValidPlayImpressionsLength = 30;
+
 
         public static string MidStrEx(string sourse, string startstr, string endstr)
         {
@@ -1146,7 +1147,7 @@ namespace CnGalWebSite.DataModel.Helper
 
         public static async Task<ServerRealTimeOverviewModel> GetServerRealTimeDataOverview()
         {
-            var begin = DateTime.Now.ToCstTime();
+            var begin = DateTime.Now;
 
             ServerRealTimeOverviewModel model = new ServerRealTimeOverviewModel();
 
@@ -1161,7 +1162,7 @@ namespace CnGalWebSite.DataModel.Helper
             model.CPUCoreNumber = Environment.ProcessorCount;
             model.TotalProcessorTime = proc.TotalProcessorTime;
 
-            var end = DateTime.Now.ToCstTime();
+            var end = DateTime.Now;
 
             model.TimeSpanGetData = end - begin;
 

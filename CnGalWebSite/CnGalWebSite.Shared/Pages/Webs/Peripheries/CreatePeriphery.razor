@@ -68,12 +68,12 @@
             try
             {
                 //获取所有词条
-                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0");
-                EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1");
-                EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2");
-                EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3");
+                EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0", ToolHelper.options);
+                EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1", ToolHelper.options);
+                EntryGroupItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/2", ToolHelper.options);
+                EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3", ToolHelper.options);
 
-                PeripheryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/peripheries/GetAllPeripheries");
+                PeripheryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/peripheries/GetAllPeripheries", ToolHelper.options);
 
                 isReady = true;
                 StateHasChanged();

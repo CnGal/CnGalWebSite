@@ -35,7 +35,7 @@
 
         try
         {
-            Model = await Http.GetFromJsonAsync<List<GameOverviewPeripheriesModel>>(ToolHelper.WebApiPath + "api/peripheries/GetUserOverviewPeripheries/" + UserId);
+            Model = await Http.GetFromJsonAsync<List<GameOverviewPeripheriesModel>>(ToolHelper.WebApiPath + "api/peripheries/GetUserOverviewPeripheries/" + UserId, ToolHelper.options);
             isReady = true;
         }
         catch(Exception ex)

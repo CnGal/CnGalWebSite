@@ -38,7 +38,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<PerfectionLevelOverviewModel>(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLevelOverview");
+            Model = await Http.GetFromJsonAsync<PerfectionLevelOverviewModel>(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLevelOverview", ToolHelper.options);
             await OnPieInit();
             await OnBarInit();
             isReady = true;

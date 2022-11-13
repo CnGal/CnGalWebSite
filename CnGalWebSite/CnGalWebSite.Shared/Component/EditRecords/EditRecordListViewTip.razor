@@ -66,17 +66,17 @@
             {
                 if (Type == ExaminedNormalListModelType.Article)
                 {
-                    var model = await Http.GetFromJsonAsync<EditArticleInforBindModel>(ToolHelper.WebApiPath + "api/articles/GetArticleEditInforBindModel/" + Id);
+                    var model = await Http.GetFromJsonAsync<EditArticleInforBindModel>(ToolHelper.WebApiPath + "api/articles/GetArticleEditInforBindModel/" + Id, ToolHelper.options);
                     Model = model.Examines;
                 }
                 else if (Type == ExaminedNormalListModelType.Periphery)
                 {
-                    var model = await Http.GetFromJsonAsync<EditPeripheryInforBindModel>(ToolHelper.WebApiPath + "api/peripheries/GetPeripheryEditInforBindModel/" + Id);
+                    var model = await Http.GetFromJsonAsync<EditPeripheryInforBindModel>(ToolHelper.WebApiPath + "api/peripheries/GetPeripheryEditInforBindModel/" + Id, ToolHelper.options);
                     Model = model.Examines;
                 }
                 else if (Type == ExaminedNormalListModelType.Tag)
                 {
-                    var model = await Http.GetFromJsonAsync<EditTagInforBindModel>(ToolHelper.WebApiPath + "api/tags/GetTagEditInforBindModel/" + Id);
+                    var model = await Http.GetFromJsonAsync<EditTagInforBindModel>(ToolHelper.WebApiPath + "api/tags/GetTagEditInforBindModel/" + Id, ToolHelper.options);
                     Model = model.Examines;
                 }
 

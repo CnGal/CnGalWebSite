@@ -77,7 +77,7 @@ else
         try
         {
             //获取所有词条
-            EntryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList");
+            EntryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList", ToolHelper.options);
             isReady = true;
         }
         catch (Exception ex)

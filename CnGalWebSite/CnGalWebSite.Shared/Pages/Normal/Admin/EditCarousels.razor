@@ -57,7 +57,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditCarouselsViewModel>(ToolHelper.WebApiPath + "api/admin/editcarousels");
+            Model = await Http.GetFromJsonAsync<EditCarouselsViewModel>(ToolHelper.WebApiPath + "api/admin/editcarousels", ToolHelper.options);
 
             StateHasChanged();
             isReady = true;

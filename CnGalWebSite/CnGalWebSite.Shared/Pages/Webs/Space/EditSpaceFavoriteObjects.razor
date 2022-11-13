@@ -103,7 +103,7 @@ else
             try
             {
                 //获取词条信息
-                Model = await Http.GetFromJsonAsync<EditFavoriteFolderViewModel>(ToolHelper.WebApiPath + "api/favorites/EditFavoriteFolder/" + Id);
+                Model = await Http.GetFromJsonAsync<EditFavoriteFolderViewModel>(ToolHelper.WebApiPath + "api/favorites/EditFavoriteFolder/" + Id, ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }

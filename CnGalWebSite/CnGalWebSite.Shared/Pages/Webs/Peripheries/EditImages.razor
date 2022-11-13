@@ -64,7 +64,7 @@
             try
             {
                 //获取所有词条
-                Model = await Http.GetFromJsonAsync<EditPeripheryImagesViewModel>(ToolHelper.WebApiPath + "api/peripheries/editimages/" + Id);
+                Model = await Http.GetFromJsonAsync<EditPeripheryImagesViewModel>(ToolHelper.WebApiPath + "api/peripheries/editimages/" + Id, ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }

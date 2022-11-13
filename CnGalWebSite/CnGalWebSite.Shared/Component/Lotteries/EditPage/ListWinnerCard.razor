@@ -96,7 +96,7 @@ else
         try
         {
             //因为server端在处理大量数据时会断开连接 所以一切数据从服务端加载
-            Model = await Http.GetFromJsonAsync<List<WinnerDataModel>>(ToolHelper.WebApiPath + "api/lotteries/GetWinnerDatas/" + Id);
+            Model = await Http.GetFromJsonAsync<List<WinnerDataModel>>(ToolHelper.WebApiPath + "api/lotteries/GetWinnerDatas/" + Id, ToolHelper.options);
             isReady = true;
         }
         catch (Exception ex)

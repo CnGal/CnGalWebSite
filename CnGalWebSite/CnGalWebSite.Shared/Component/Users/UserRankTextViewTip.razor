@@ -91,7 +91,7 @@
             {
                 return;
             }
-            var model = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + UserId);
+            var model = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + UserId, ToolHelper.options);
             Ranks = model.Ranks;
             StateHasChanged();
         }

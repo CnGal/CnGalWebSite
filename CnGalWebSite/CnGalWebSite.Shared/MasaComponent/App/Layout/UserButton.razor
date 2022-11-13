@@ -136,7 +136,7 @@
 
                 if (string.IsNullOrWhiteSpace(userId) == false)
                 {
-                    Model = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + userId);
+                    Model = await Http.GetFromJsonAsync<UserInforViewModel>(ToolHelper.WebApiPath + "api/space/GetUserData/" + userId, ToolHelper.options);
 
 
                     _dataCacheService.UserInfor = Model;

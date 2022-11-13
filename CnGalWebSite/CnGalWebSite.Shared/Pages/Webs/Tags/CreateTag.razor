@@ -69,8 +69,8 @@
             try
             {
                 //获取所有标签
-                TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags");
-                EntryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList");
+                TagItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/tags/GetAllTags", ToolHelper.options);
+                EntryItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/home/GetSearchTipList", ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }

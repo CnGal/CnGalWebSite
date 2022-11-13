@@ -55,7 +55,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditFriendLinksViewModel>(ToolHelper.WebApiPath + "api/admin/editfriendlinks");
+            Model = await Http.GetFromJsonAsync<EditFriendLinksViewModel>(ToolHelper.WebApiPath + "api/admin/editfriendlinks", ToolHelper.options);
 
             StateHasChanged();
             isReady = true;

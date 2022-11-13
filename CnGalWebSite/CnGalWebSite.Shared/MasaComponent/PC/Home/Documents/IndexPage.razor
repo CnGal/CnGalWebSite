@@ -33,7 +33,7 @@
         {
             if (_dataCacheService.DocumentsCatche.Count == 0)
             {
-                _dataCacheService.DocumentsCatche = await Http.GetFromJsonAsync<List<DocumentViewModel>>(ToolHelper.WebApiPath + "api/home/GetDocuments");
+                _dataCacheService.DocumentsCatche = await Http.GetFromJsonAsync<List<DocumentViewModel>>(ToolHelper.WebApiPath + "api/home/GetDocuments", ToolHelper.options);
             }
             foreach (var item in _dataCacheService.DocumentsCatche)
             {

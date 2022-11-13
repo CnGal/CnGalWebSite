@@ -41,7 +41,7 @@
         {
             try
             {
-                Model = await Http.GetFromJsonAsync<ServerStaticOverviewModel>(ToolHelper.WebApiPath + "api/admin/GetServerStaticDataOverview");
+                Model = await Http.GetFromJsonAsync<ServerStaticOverviewModel>(ToolHelper.WebApiPath + "api/admin/GetServerStaticDataOverview", ToolHelper.options);
                 IsReady = true;
                 StateHasChanged();
             }

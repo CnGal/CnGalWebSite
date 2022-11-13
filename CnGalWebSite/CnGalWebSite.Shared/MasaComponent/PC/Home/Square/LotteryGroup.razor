@@ -41,7 +41,7 @@
         {
             if (_dataCacheService.LotteryCardsCatche.Count == 0)
             {
-                _dataCacheService.LotteryCardsCatche = await Http.GetFromJsonAsync<List<LotteryCardViewModel>>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryCards");
+                _dataCacheService.LotteryCardsCatche = await Http.GetFromJsonAsync<List<LotteryCardViewModel>>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryCards", ToolHelper.options);
             }
 
             _dataCacheService.LotteryCardsCatche.Random();

@@ -41,7 +41,7 @@
         {
             if (_dataCacheService.WeeklyNewsOverviewCatche.Count == 0)
             {
-                _dataCacheService.WeeklyNewsOverviewCatche = await Http.GetFromJsonAsync<List<ArticleInforTipViewModel>>(ToolHelper.WebApiPath + "api/news/GetWeeklyNewsOverview");
+                _dataCacheService.WeeklyNewsOverviewCatche = await Http.GetFromJsonAsync<List<ArticleInforTipViewModel>>(ToolHelper.WebApiPath + "api/news/GetWeeklyNewsOverview", ToolHelper.options);
             }
         }
         catch (Exception ex)

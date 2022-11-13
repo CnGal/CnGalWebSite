@@ -32,7 +32,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<List<PerfectionInforTipViewModel>>(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLevelRadomList/" + (int)Level);
+            Model = await Http.GetFromJsonAsync<List<PerfectionInforTipViewModel>>(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLevelRadomList/" + (int)Level, ToolHelper.options);
         }
         catch (Exception ex)
         {

@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Model;
+﻿using CnGalWebSite.APIServer.Extentions;
+using CnGalWebSite.APIServer.Model;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Tables;
@@ -86,6 +87,21 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<UserCertification> UserCertifications { get; set; }
         public DbSet<UserMonitor> UserMonitors { get; set; }
         public DbSet<UserReviewEditRecord> UserReviewEditRecords { get; set; }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+
+            //保存时将UTC时间+8小时 配合历史数据UTC+8时区
+            //读取时-8小时 转换成UTC时间
+
+            configurationBuilder
+                .Properties<DateTime>()
+                .HaveConversion(typeof(EFCoreUtcValueConverter));
+
+            configurationBuilder
+               .Properties<DateTime?>()
+               .HaveConversion(typeof(EFCoreUtcNullableValueConverter));
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

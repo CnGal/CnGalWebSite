@@ -120,7 +120,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<DrawLotteryDataModel>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryData/" + Id);
+            Model = await Http.GetFromJsonAsync<DrawLotteryDataModel>(ToolHelper.WebApiPath + "api/lotteries/GetLotteryData/" + Id, ToolHelper.options);
             await GetAward();
             isReady = true;
         }

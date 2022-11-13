@@ -122,7 +122,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<EditWeeklyNewsModel>(ToolHelper.WebApiPath + "api/news/EditWeeklyNews/" + Id);
+            Model = await Http.GetFromJsonAsync<EditWeeklyNewsModel>(ToolHelper.WebApiPath + "api/news/EditWeeklyNews/" + Id, ToolHelper.options);
 
 
             isReady = true;
@@ -182,7 +182,7 @@
         await OnSave();
         try
         {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/PublishWeelyNews/" + Id);
+            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/PublishWeelyNews/" + Id, ToolHelper.options);
             if (result.Successful)
             {
                 await ToastService.Success("发布周报成功", "发布周报成功");
@@ -207,7 +207,7 @@
 
         try
         {
-            ArticleViewModel model = await Http.GetFromJsonAsync<ArticleViewModel>(ToolHelper.WebApiPath + "api/news/GetWeelyNewsPreview/" + Id);
+            ArticleViewModel model = await Http.GetFromJsonAsync<ArticleViewModel>(ToolHelper.WebApiPath + "api/news/GetWeelyNewsPreview/" + Id, ToolHelper.options);
 
 
             if (previewArticleTip != null)
@@ -233,7 +233,7 @@
     {
         try
         {
-            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/ResetWeelyNews/" + Id);
+            var result = await Http.GetFromJsonAsync<Result>(ToolHelper.WebApiPath + "api/news/ResetWeelyNews/" + Id, ToolHelper.options);
             if (result.Successful)
             {
                 await DataChanged();

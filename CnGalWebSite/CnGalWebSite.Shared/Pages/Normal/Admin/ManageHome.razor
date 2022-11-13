@@ -113,7 +113,7 @@
     {
         try
         {
-            Model = await Http.GetFromJsonAsync<ManageHomeViewModel>(ToolHelper.WebApiPath + "api/admin/managehome");
+            Model = await Http.GetFromJsonAsync<ManageHomeViewModel>(ToolHelper.WebApiPath + "api/admin/managehome", ToolHelper.options);
         }
         catch (Exception ex)
         {

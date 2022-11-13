@@ -57,7 +57,7 @@
     {
         try
         {
-            InforModel = await Http.GetFromJsonAsync<ListRobotsInforViewModel>(ToolHelper.WebApiPath + "api/robot/listrobots");
+            InforModel = await Http.GetFromJsonAsync<ListRobotsInforViewModel>(ToolHelper.WebApiPath + "api/robot/listrobots", ToolHelper.options);
         }
         catch (Exception ex)
         {

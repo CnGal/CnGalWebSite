@@ -67,7 +67,7 @@ else
             try
             {
                 //获取词条信息
-                Model = await Http.GetFromJsonAsync<EditAudioViewModel>(ToolHelper.WebApiPath + "api/entries/editaudio/" + Id);
+                Model = await Http.GetFromJsonAsync<EditAudioViewModel>(ToolHelper.WebApiPath + "api/entries/editaudio/" + Id, ToolHelper.options);
 
                 isReady = true;
                 StateHasChanged();
