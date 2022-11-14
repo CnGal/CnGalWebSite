@@ -47,9 +47,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IExamineService _examineService;
         private readonly IPerfectionService _perfectionService;
         private readonly IEditRecordService _editRecordService;
+        private readonly ILogger<EntriesAPIController> _logger;
 
         public EntriesAPIController(UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository,
-        IPerfectionService perfectionService, IRepository<Examine, long> examineRepository, IArticleService articleService, IEditRecordService editRecordService,
+        IPerfectionService perfectionService, IRepository<Examine, long> examineRepository, IArticleService articleService, IEditRecordService editRecordService, ILogger<EntriesAPIController> logger,
         IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IExamineService examineService)
         {
             _userManager = userManager;
@@ -64,6 +65,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _articleService = articleService;
             _peripheryRepository = peripheryRepository;
             _editRecordService = editRecordService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -1125,7 +1127,17 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> HiddenEntryAsync(HiddenEntryModel model)
         {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
             await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+
+            foreach(var item in model.Ids)
+            {
+                 _logger.LogInformation("管理员 - {name}({id}){operation}词条 - Id:{entryId}", user.UserName, user.Id, (model.IsHidden ? "隐藏" : "取消隐藏"), item);
+            }
+           
+
             return new Result { Successful = true };
         }
         [HttpPost]

@@ -156,7 +156,7 @@
                 {
                     GamePlatforms.Add(new SelectedItem
                     {
-                        Text = item.GamePlatformType.ToString(),
+                        Text = item.GamePlatformType.GetDisplayName(),
                         Value = item.GamePlatformType.ToString(),
                         Active = item.IsSelected
                     });

@@ -2043,7 +2043,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         new GamePlatformModel { GamePlatformType = GamePlatformType.Mac, IsSelected = false },
                         new GamePlatformModel { GamePlatformType = GamePlatformType.NS, IsSelected = false },
                         new GamePlatformModel { GamePlatformType = GamePlatformType.PS, IsSelected = false },
-                        new GamePlatformModel { GamePlatformType = GamePlatformType.HarmonyOS, IsSelected = false }
+                        new GamePlatformModel { GamePlatformType = GamePlatformType.HarmonyOS, IsSelected = false },
+                        new GamePlatformModel { GamePlatformType = GamePlatformType.H5, IsSelected = false }
 };
                     //遍历基本信息
                     foreach (var item in entry.Information)

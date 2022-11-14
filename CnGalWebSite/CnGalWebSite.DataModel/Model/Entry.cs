@@ -371,7 +371,26 @@ namespace CnGalWebSite.DataModel.Model
 
     public enum GamePlatformType
     {
-        Windows, Linux, Mac, IOS, Android, PS, NS, DOS, HarmonyOS
+        [Display(Name = "Windows")]
+        Windows,
+        [Display(Name = "Linux")]
+        Linux,
+        [Display(Name = "macOS")]
+        Mac,
+        [Display(Name = "iOS")]
+        IOS,
+        [Display(Name = "Android")]
+        Android,
+        [Display(Name = "PS")]
+        PS,
+        [Display(Name = "NS")]
+        NS,
+        [Display(Name = "DOS")]
+        DOS,
+        [Display(Name = "HarmonyOS")]
+        HarmonyOS,
+        [Display(Name = "H5")]
+        H5
     }
 
     public enum PositionGeneralType
