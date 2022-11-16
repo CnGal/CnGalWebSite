@@ -58,6 +58,10 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 
         public async Task<string> GetImage(string url, double x = 0, double y = 0)
         {
+            if(url.Contains("http")==false)
+            {
+                url = "https:" + url;
+            }
             var image = _imageRepository.GetAll().FirstOrDefault(s => s.OldUrl == url && s.X == x && s.Y == y);
             if (image == null || string.IsNullOrWhiteSpace(image.NewUrl) || image.NewUrl == url)
             {

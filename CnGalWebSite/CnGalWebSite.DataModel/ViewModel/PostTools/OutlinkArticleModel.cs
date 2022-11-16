@@ -39,6 +39,7 @@ namespace CnGalWebSite.DataModel.ViewModel.PostTools
     public enum RepostArticleType
     {
         ZhiHu,
-        XiaoHeiHe
+        XiaoHeiHe,
+        Bilibili
     }
 }

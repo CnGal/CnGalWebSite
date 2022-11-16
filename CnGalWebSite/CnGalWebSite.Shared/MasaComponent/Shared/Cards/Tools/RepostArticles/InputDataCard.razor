@@ -4,14 +4,18 @@
 
 <div class="@Class">
     <div class="pb-2" style="display: flex; justify-content: center; text-align: center;">
-        目前只支持知乎链接，格式如下<br />
-        https://zhuanlan.zhihu.com/p/480692805
+        目前只支持知乎和B站链接，格式如下<br />
+        https://zhuanlan.zhihu.com/p/480692805 , https://www.bilibili.com/read/cv19750701
+
     </div>
     <div class="row mb-4">
-        <div class="col-12 col-sm-3 mb-4">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="model.Type" TValue="ArticleType" Lable="类型"/>
+        <div class="col-12 col-sm-3">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="model.Type" TValue="ArticleType" Lable="类型" />
         </div>
-        <div class="col-12 col-sm-9 mb-4">
+        <div class="col-12 col-sm-9">
+            <MTextField Label="标题（可不填，将自动获取）" @bind-Value="@model.Title" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
+        </div>
+        <div class="col-12  mb-4">
             <MTextField Label="链接" @bind-Value="@model.Url" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
         </div>
         <div class="col-12 mb-2">
@@ -23,6 +27,9 @@
             <tr>
                 <th class="text-left">
                     类型
+                </th>
+                <th class="text-left">
+                    标题
                 </th>
                 <th class="text-left">
                     链接
@@ -37,6 +44,7 @@
             {
                 <tr @key="item.Url">
                     <td>@item.Type.GetDisplayName()</td>
+                    <td>@item.Title</td>
                     <td>@item.Url</td>
                     <td>
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="删除" TextStyle OnClick="@(()=>OnDelete(item))" Icon="mdi-trash-can" Color="error" />
@@ -64,13 +72,13 @@
     protected override async Task OnInitializedAsync()
     {
         items.Clear();
-        for(var i=0;i<9;i++)
+        for (var i = 0; i < 9; i++)
         {
             items.Add(new KeyValuePair<string, ArticleType>(((ArticleType)i).GetDisplayName(), (ArticleType)i));
         }
     }
 
-    public Task  ValueChanged(ArticleType type)
+    public Task ValueChanged(ArticleType type)
     {
         model.Type = type;
         return Task.CompletedTask;
@@ -83,7 +91,7 @@
             await PopupService.ToastAsync("先填写文章链接哦", AlertTypes.Error);
             return;
         }
-        if (model.Url.Contains("zhuanlan.zhihu.com")==false)
+        if (!model.Url.Contains("zhuanlan.zhihu.com") && !model.Url.Contains("www.bilibili.com"))
         {
             await PopupService.ToastAsync("链接格式不正确", AlertTypes.Error);
             return;
