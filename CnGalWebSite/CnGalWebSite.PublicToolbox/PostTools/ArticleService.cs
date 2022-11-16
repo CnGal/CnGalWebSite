@@ -212,7 +212,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             }
 
             model.MainPage = await ProgressImage(model, converter.Convert(htmlStr));
-            model.Title ??= name;
+            model.Title =string.IsNullOrWhiteSpace(model.Title)? name:model.Title;
             model.OriginalAuthor = ToolHelper.MidStrEx(model.MainPage, "原作者：", "\r").Replace("*", "").Split("丨").FirstOrDefault()?.Trim();
             if (string.IsNullOrWhiteSpace(model.OriginalAuthor) && author != null)
             {
@@ -285,7 +285,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             }
 
             model.MainPage = await ProgressImage(model, converter.Convert(htmlStr));
-            model.Title ??= name ?? model.MainPage.Abbreviate(10);
+            model.Title = string.IsNullOrWhiteSpace(model.Title) ? (name ?? model.MainPage.Abbreviate(10) ): model.Title;
 
             model.OriginalAuthor = author;
 
