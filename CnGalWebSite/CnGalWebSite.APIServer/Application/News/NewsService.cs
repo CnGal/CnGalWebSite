@@ -639,7 +639,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public string GenerateWeeklyNewsTitle(WeeklyNews weeklyNews)
         {
-            return $"CnGal每周速报（{weeklyNews.CreateTime.AddDays(6 - (int)weeklyNews.CreateTime.DayOfWeek).Year}年第{WeekOfYear(weeklyNews.CreateTime.AddDays(6 - (int)weeklyNews.CreateTime.DayOfWeek))}周）";
+            return $"CnGal每周速报（{weeklyNews.CreateTime.Year}年第{WeekOfYear(weeklyNews.CreateTime)}周）";
         }
 
         public string GenerateWeeklyNewsBriefIntroduction(WeeklyNews weeklyNews)
@@ -938,7 +938,7 @@ namespace CnGalWebSite.APIServer.Application.News
         private int WeekOfYear(DateTime curDay)
         {
 
-            var firstdayofweek = Convert.ToInt32(DateTime.Parse(curDay.Year.ToString() + "-01-01T00:00:00.000000Z").DayOfWeek);
+            var firstdayofweek = (int)DateTime.Parse(curDay.Year.ToString() + "-01-01T00:00:00.000000Z").ToUniversalTime().DayOfWeek;
 
             var days = curDay.DayOfYear;
 
