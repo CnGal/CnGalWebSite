@@ -31,11 +31,19 @@
 
 ## 人机验证
 
+### 极验
+
 采用极验人机验证，参阅 [极验技术文档](https://docs.geetest.com/sensebot/deploy/client/web)
 
 先调用 GetGeetestCode 接口获取极验初始化参数，再按照极验文档中的方法初始化人机验证，用户通过人机验证后会得到 Challenge，Validate，Seccode
 
-在需要人机验证的接口中把上述参数传递过去即可
+### 用户身份识别
+ - Cookie：本地地生成随机字符串并保存到LocalStorage
+ - IP：调用API或通过其他方式获取用户真实IP，也可以填写内网IP，服务器会获取调用方IP
+
+### 使用方法
+ - 根据接口说明传递即可
+ - 建议封装，方便调用
 
 ## 注册
 
