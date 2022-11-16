@@ -47,7 +47,8 @@ namespace CnGalWebSite.Server
                 {
                     options.MaximumReceiveMessageSize = int.MaxValue;
                 });
-
+            //本地化
+            services.AddLocalization();
 
             _ = services.AddBootstrapBlazor();
 

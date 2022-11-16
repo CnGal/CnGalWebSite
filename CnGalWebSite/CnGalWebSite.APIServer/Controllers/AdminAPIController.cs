@@ -862,7 +862,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _steamInforService.UpdateSteamInfor(323490, 42);
+                await _weeklyNewsRepository.GetRangeUpdateTable().Set(s => s.CreateTime, b => b.CreateTime.AddHours(8)).ExecuteAsync();
                 return new Result { Successful = true };
             }
             catch (Exception ex)
