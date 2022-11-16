@@ -44,7 +44,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 };
 
                 var pubDate = (XmlElement)item.SelectSingleNode("pubDate");
-                weibo.PublishTime = GMT2Local(pubDate.InnerText);
+                weibo.PublishTime = DateTime.Parse(pubDate.InnerText).ToUniversalTime();
 
                 //微博时间是否早于起始时间
                 if (weibo.PublishTime <= fromTime)
@@ -102,45 +102,6 @@ namespace CnGalWebSite.APIServer.Application.News
             return model;
         }
 
-
-
-        /// <summary>
-        /// GMT时间转成本地时间
-        /// </summary>
-        /// <param name="gmt">字符串形式的GMT时间</param>
-        /// <returns></returns>
-        public static DateTime GMT2Local(string gmt)
-        {
-            var dt = DateTime.MinValue;
-            try
-            {
-                var pattern = "";
-                if (gmt.IndexOf("+0") != -1)
-                {
-                    gmt = gmt.Replace("GMT", "");
-                    pattern = "ddd, dd MMM yyyy HH':'mm':'ss zzz";
-                }
-                if (gmt.ToUpper().IndexOf("GMT") != -1)
-                {
-                    pattern = "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'";
-                }
-                if (pattern != "")
-                {
-                    dt = DateTime.ParseExact(gmt, pattern, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AdjustToUniversal);
-                    dt = dt.AddHours(8);
-                }
-                else
-                {
-                    dt = Convert.ToDateTime(gmt);
-                }
-            }
-            catch
-            {
-
-            }
-            return dt;
-        }
-
         public async Task<OriginalRSS> CorrectOriginalWeiboInfor(string Text, long id)
         {
             try
@@ -162,7 +123,7 @@ namespace CnGalWebSite.APIServer.Application.News
                     };
 
                     var pubDate = (XmlElement)item.SelectSingleNode("pubDate");
-                    weibo.PublishTime = GMT2Local(pubDate.InnerText);
+                    weibo.PublishTime = DateTime.Parse(pubDate.InnerText).ToUniversalTime();
 
                     var author = (XmlElement)item.SelectSingleNode("author");
                     weibo.Author = author.InnerText;
@@ -209,7 +170,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 };
 
                 var pubDate = (XmlElement)item.SelectSingleNode("pubDate");
-                weibo.PublishTime = GMT2Local(pubDate.InnerText);
+                weibo.PublishTime = DateTime.Parse(pubDate.InnerText).ToUniversalTime();
 
                 var title = (XmlElement)item.SelectSingleNode("title");
                 weibo.Title = title.InnerText;
