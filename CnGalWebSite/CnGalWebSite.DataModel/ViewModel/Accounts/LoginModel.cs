@@ -13,6 +13,9 @@ namespace CnGalWebSite.DataModel.Model
         [Display(Name = "记住我")]
         public bool RememberMe { get; set; } = true;
 
+        /// <summary>
+        /// 是否进行二次身份验证
+        /// </summary>
         public bool isNeedVerification { get; set; }
 
         public HumanMachineVerificationResult Verification { get; set; }=new HumanMachineVerificationResult();

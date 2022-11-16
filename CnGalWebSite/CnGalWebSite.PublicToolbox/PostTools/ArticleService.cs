@@ -68,7 +68,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             }
             if (articles.Any(s => s == model.Title))
             {
-                OnProgressUpdate(model, OutputLevel.Dager, $"{model.Url} 与现有文章《{model.Title}》重名，请手动上传");
+                OnProgressUpdate(model, OutputLevel.Dager, $"与现有文章《{model.Title}》重名，请手动上传");
                 return;
             }
 
@@ -76,13 +76,23 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             OnProgressUpdate(model, OutputLevel.Infor, $"裁剪主图");
 
             await CutImage(model);
-
             model.CompleteTaskCount++;
-            OnProgressUpdate(model, OutputLevel.Infor, $"生成文章");
 
-            var article = GenerateArticle(model, games);
+            CreateArticleViewModel article = null;
+            try
+            {
+                OnProgressUpdate(model, OutputLevel.Infor, $"生成文章");
+                 article = GenerateArticle(model, games);
+                model.CompleteTaskCount++;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "生成文章失败 {Link}", model.Url);
+                OnProgressUpdate(model, OutputLevel.Dager, "生成文章失败，原因：" + ex.Message);
+                return;
+            }
+          
 
-            model.CompleteTaskCount++;
             OnProgressUpdate(model, OutputLevel.Infor, $"提交审核");
 
             model.Id = await SubmitArticle(article);
@@ -150,28 +160,6 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             {
                 throw new Exception("无法获取知乎文章内容，请联系管理员");
             }
-
-            //主图
-            //try
-            //{
-            //    var tempNode = mainNode.ChildNodes.FirstOrDefault(s => s.Name == "img");
-            //    if (tempNode == null)
-            //    {
-            //        tempNode = mainNode.ChildNodes.FirstOrDefault(s => s.OuterHtml.Contains("background-image"));
-            //        if (tempNode != null)
-            //        {
-            //            image = ToolHelper.MidStrEx(tempNode.OuterHtml, "url(", "?source");
-            //        }
-            //    }
-            //    else
-            //    {
-            //        image = ToolHelper.MidStrEx(tempNode.OuterHtml, "src=\"", "\"");
-            //    }
-            //}
-            //catch
-            //{
-
-            //}
             //标题
             try
             {
@@ -223,8 +211,8 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                 throw new Exception("无法获取知乎文章内容，请联系管理员");
             }
 
-            model.MainPage = await ProgressImage(model, converter.Convert(htmlStr), RepostArticleType.ZhiHu);
-            model.Title = name;
+            model.MainPage = await ProgressImage(model, converter.Convert(htmlStr));
+            model.Title ??= name;
             model.OriginalAuthor = ToolHelper.MidStrEx(model.MainPage, "原作者：", "\r").Replace("*", "").Split("丨").FirstOrDefault()?.Trim();
             if (string.IsNullOrWhiteSpace(model.OriginalAuthor) && author != null)
             {
@@ -234,7 +222,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
            
         }
 
-        private async Task ProcXiaoHeiHeArticleFromHtmlAsync(RepostArticleModel model, string html)
+        private async Task ProcBilibiliArticleFromHtmlAsync(RepostArticleModel model, string html)
         {
 
             var document = new HtmlDocument();
@@ -242,58 +230,71 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 
             var node = document.GetElementbyId("app");
             var htmlStr = "";
-            var name = "";
+            string name = null;
             string image = null;
             string author = null;
-
-            //主图标题
-            try
-            {
-                name = node.ChildNodes.FirstOrDefault(s => s.HasClass("article-header")).ChildNodes.FirstOrDefault(s => s.HasClass("title")).InnerText;
-            }
-            catch
-            {
-
-            }
-
-
-            //作者
-            try
-            {
-                model.OriginalAuthor = node.ChildNodes.FirstOrDefault(s => s.HasClass("user-bar")).ChildNodes.FirstOrDefault(s => s.HasClass("row-1")).ChildNodes.FirstOrDefault(s => s.HasClass("info")).ChildNodes.FirstOrDefault(s => s.HasClass("top")).InnerText;
-            }
-            catch
-            {
-
-            }
-
+            var mainNode = node.ChildNodes.FirstOrDefault(s => s.HasClass("article-detail"));
             //正文
             try
             {
-                htmlStr = node.ChildNodes.FirstOrDefault(s => s.HasClass("article-content")).FirstChild.InnerHtml;
+                htmlStr = document.GetElementbyId("read-article-holder").InnerHtml;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("无法获取知乎文章内容，请联系管理员", ex);
+            }
+
+            //检查是否获取到正文
+            if (string.IsNullOrWhiteSpace(htmlStr))
+            {
+                throw new Exception("无法获取知乎文章内容，请联系管理员");
+            }
+
+            //标题
+            try
+            {
+                var inner = mainNode.ChildNodes.FirstOrDefault(s => s.HasClass("fixed-top-header")).ChildNodes.FirstOrDefault(s => s.HasClass("inner"));
+                //标题
+                name = inner.ChildNodes.FirstOrDefault(s => s.HasClass("inner-title")).InnerText;
+                //作者
+                author = inner.ChildNodes.FirstOrDefault(s => s.HasClass("inner-right")).ChildNodes.FirstOrDefault(s => s.HasClass("up-info")).InnerText;
             }
             catch
             {
+                OnProgressUpdate(model, OutputLevel.Warning, $"获取标题或作者失败");
+            }
 
+            //时间
+            try
+            {
+                var time = mainNode.ChildNodes.FirstOrDefault(s => s.HasClass("article-container")).ChildNodes.FirstOrDefault(s => s.HasClass("article-container__content")).ChildNodes.FirstOrDefault(s => s.HasClass("title-container")).ChildNodes.FirstOrDefault(s => s.HasClass("article-read-panel")).ChildNodes.FirstOrDefault(s => s.HasClass("article-read-info")).ChildNodes.FirstOrDefault(s => s.HasClass("publish-text")).InnerText;
+
+                model.PublishTime = DateTime.Parse(time);
+            }
+            catch
+            {
+                OnProgressUpdate(model, OutputLevel.Warning, $"获取时间失败");
             }
 
             var converter = new ReverseMarkdown.Converter();
-            model.MainPage = converter.Convert(htmlStr.Replace("data-original=", "src="));
-            model.MainPage = await ProgressImage(model, model.MainPage, RepostArticleType.XiaoHeiHe);
-            model.Title = name;
-            model.OriginalAuthor = ToolHelper.MidStrEx(model.MainPage, "本文作者 @", "**");
-            if (string.IsNullOrWhiteSpace(model.OriginalAuthor) && author != null)
+
+
+            if (string.IsNullOrWhiteSpace(htmlStr))
             {
-                model.OriginalAuthor = author;
+                throw new Exception("无法获取知乎文章内容，请联系管理员");
             }
+
+            model.MainPage = await ProgressImage(model, converter.Convert(htmlStr));
+            model.Title ??= name ?? model.MainPage.Abbreviate(10);
+
+            model.OriginalAuthor = author;
+
             model.Image = image ?? model.MainPage.GetImageLinks().FirstOrDefault();
-  
+
         }
 
-        public async Task<string> ProgressImage(RepostArticleModel model,string text, RepostArticleType type)
+        public async Task<string> ProgressImage(RepostArticleModel model,string text)
         {
-            if (type == RepostArticleType.ZhiHu)
-            {
 
                 var figures = text.Split("</figure>");
 
@@ -301,24 +302,27 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 
                 foreach (var item in figures)
                 {
-                    
-
                     var textTemp = item.Split("<figure");
                     if (textTemp.Length > 1)
                     {
                         //获取图片链接
-                        var image = ToolHelper.MidStrEx(textTemp[1], "data-original=\"", "\">");
-                        if(string.IsNullOrWhiteSpace(image))
+                        var image = ToolHelper.MidStrEx(textTemp[1], "data-original=\"", "\">").Split('@').FirstOrDefault();
+                        if (string.IsNullOrWhiteSpace(image))
                         {
-                            image = ToolHelper.MidStrEx(textTemp[1], "<img src=\"", "\"");
+                            image = ToolHelper.MidStrEx(textTemp[1], "data-src=\"", "\"").Split('@').FirstOrDefault();
                         }
-                        if(string.IsNullOrWhiteSpace(image))
+                        if (string.IsNullOrWhiteSpace(image))
+                        {
+                            image = ToolHelper.MidStrEx(textTemp[1], "<img src=\"", "\"").Split('@').FirstOrDefault();
+                        }
+                        if (string.IsNullOrWhiteSpace(image))
                         {
                             continue;
                         }
 
-                        //获取注释
-                        var figure = textTemp[1].MidStrEx("<figcaption>", "</figcaption>");
+                    //获取注释
+                    var figcaption = textTemp[1].MidStrEx("<figcaption", ">");
+                        var figure = textTemp[1].MidStrEx($"<figcaption{figcaption}>", "</figcaption>");
 
                         OnProgressUpdate(model, OutputLevel.Infor, $"获取图片 {image}");
 
@@ -331,45 +335,26 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                     model.CompleteTaskCount++;
                 }
 
-            }
-            else if (type == RepostArticleType.XiaoHeiHe)
-            {
-
-                var images = text.GetImageLinks();
-                model.TotalTaskCount += images.Count;
-                foreach (var temp in images)
-                {
-                    var image = temp.Replace("/thumb", "");
-                    OnProgressUpdate(model, OutputLevel.Infor, $"获取图片 {image}");
-
-                    var infor = await _imageService.GetImage(image);
-
-                    //替换图片
-                    text = text.Replace(temp, infor);
-
-                    model.CompleteTaskCount++;
-                }
-            }
+            
+           
             return text;
         }
 
 
         private async Task GetArticleContext(RepostArticleModel model)
         {
-            //替换链接
-           var url = model.Url.Replace("https://api.xiaoheihe.cn/maxnews/app/share/detail/", "https://api.xiaoheihe.cn/v3/bbs/app/api/web/share?link_id=");
 
-            if (url.Contains("zhuanlan.zhihu.com"))
+            if (model.Url.Contains("zhuanlan.zhihu.com"))
             {
-                var html = HtmlHelper.GetHtml(url);
+                var html = HtmlHelper.GetHtml(model.Url);
 
                 await ProcZhiHuArticleFromHtmlAsync(model, html);
-
             }
-            else if (url.Contains("api.xiaoheihe.cn"))
+            else if (model.Url.Contains("www.bilibili.com"))
             {
-                var html = HtmlHelper.GetHtml(url);
-                await ProcXiaoHeiHeArticleFromHtmlAsync(model, html);
+                model.Url = model.Url.Split('?').FirstOrDefault();
+                var html = HtmlHelper.GetHtml(model.Url);
+                await ProcBilibiliArticleFromHtmlAsync(model, html);
             }
             else
             {
@@ -390,19 +375,28 @@ namespace CnGalWebSite.PublicToolbox.PostTools
                 {
                     throw new Exception(obj.Error);
                 }
-                Console.WriteLine($"[7] 已提交{model.Main.Type.GetDisplayName()}《{model.Main.Name}》审核[Id:{obj.Error}]");
+                _logger.LogInformation($"[7] 已提交{model.Main.Type.GetDisplayName()}《{model.Main.Name}》审核[Id:{obj.Error}]");
                 return long.Parse(obj.Error);
 
             }
             catch (Exception ex)
             {
-                OutputHelper.PressError(ex, "提交文章审核失败");
+                _logger.LogError(ex, "提交文章审核失败");
                 return 0;
             }
         }
 
         private CreateArticleViewModel GenerateArticle(RepostArticleModel model,IEnumerable<string> games)
         {
+            if(string.IsNullOrWhiteSpace(model.MainPage))
+            {
+                throw new Exception("文章内容不能为空");
+            }
+            if (string.IsNullOrWhiteSpace(model.Title))
+            {
+                throw new Exception("文章标题不能为空");
+            }
+
             var article = new CreateArticleViewModel
             {
                 Name = model.Title,

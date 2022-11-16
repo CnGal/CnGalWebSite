@@ -10,7 +10,9 @@
             <th class="text-left">
                 类型
             </th>
-
+            <th class="text-left">
+               标题
+            </th>
             <th class="text-left">
                 链接
             </th>
@@ -38,6 +40,7 @@
                 <td>@item.Id</td>
 
                 <td>@item.Type.GetDisplayName()</td>
+                <td>@item.Title</td>
                 <td>@item.Url</td>
                 <td>@item.Error</td>
             </tr>

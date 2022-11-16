@@ -263,7 +263,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     catch(Exception ex)
                     {
                         _logger.LogError(ex, "身份识别失败");
-                        return new LoginResult { Code = LoginResultCode.FailedRecaptchaValidation,ErrorDescribe="身份识别失败" };
+                        return new LoginResult { Code = LoginResultCode.FailedRecaptchaValidation,ErrorDescribe="身份识别失败",ErrorInfor=ex.Message };
                     }
 
                     return new LoginResult { Code = LoginResultCode.OK, Token = await _appHelper.GetUserJWTokenAsync(user) };
