@@ -554,7 +554,7 @@ namespace CnGalWebSite.APIServer.Application.News
             //不能重名
             if (await _articleRepository.CountAsync(s => s.Name == article.Name) > 0)
             {
-                throw new Exception("文章名称名称『" + article.Name + "』重复，请尝试使用显示名称");
+                throw new Exception("文章名称『" + article.Name + "』重复，请尝试使用显示名称");
 
             }
 
@@ -938,7 +938,7 @@ namespace CnGalWebSite.APIServer.Application.News
         private int WeekOfYear(DateTime curDay)
         {
 
-            var firstdayofweek = Convert.ToInt32(Convert.ToDateTime(curDay.Year.ToString() + "- " + "1-1 ").DayOfWeek);
+            var firstdayofweek = Convert.ToInt32(DateTime.Parse(curDay.Year.ToString() + "-01-01T00:00:00.000000Z").DayOfWeek);
 
             var days = curDay.DayOfYear;
 
