@@ -30,7 +30,6 @@ namespace CnGalWebSite.DataModel.Model
         public RobotReplyRange Range { get; set; }
 
         public bool IsHidden { get; set; }
-
     }
 
     public enum RobotReplyRange

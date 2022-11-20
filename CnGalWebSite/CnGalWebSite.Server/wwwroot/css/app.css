@@ -1034,6 +1034,11 @@ a img + strong {
     color: var(--main-color) !important;
 }
 
+p img {
+    display: flex;
+    justify-content: center;
+}
+
 /*视频注释*/
 .aspect-ratio + p > strong {
     display: flex;
