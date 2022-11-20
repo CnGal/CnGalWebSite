@@ -1,38 +1,45 @@
-﻿using CnGalWebSite.DataModel.Helper;
-using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ViewModel.Robots;
-using CnGalWebSite.Helper.Extensions;
-using CnGalWebSite.Helper.Helper;
-using Masuda.Net.HelpMessage;
-using MeowMiraiLib.Msg.Sender;
-using MeowMiraiLib.Msg.Type;
-using System.Net.Http.Json;
-using System.Text.Json;
+﻿using MeowMiraiLib.Msg.Type;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
+using CnGalWebSite.RobotClient.DataRepositories;
+using CnGalWebSite.RobotClient.Services.SensitiveWords;
+using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.RobotClient.Extentions;
 using Message = MeowMiraiLib.Msg.Type.Message;
+using CnGalWebSite.Helper.Extensions;
+using CnGalWebSite.RobotClient.Services.ExternalDatas;
+using System.Text.Json;
+using CnGalWebSite.DataModel.ViewModel.Robots;
+using System.Net.Http.Json;
+using CnGalWebSite.DataModel.Helper;
+using Masuda.Net.HelpMessage;
+using CnGalWebSite.RobotClient.DataModels.Messages;
 
-namespace CnGalWebSite.RobotClient
+namespace CnGalWebSite.RobotClient.Services.Messages
 {
-    public class MessageX
+    public class MessageService : IMessageService
     {
-        private readonly Setting _setting;
-        private readonly SensitiveWordX _SensitiveWordX;
-        private readonly IDictionary<string, string> _cache;
+        private readonly IRepository<RobotReply> _robotReplyRepository;
+        private readonly IRepository<RobotFace> _robotFaceRepository;
+        private readonly ISensitiveWordService _sensitiveWordService;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<MessageService> _logger;
+        private readonly IExternalDataService _externalDataService;
         private readonly HttpClient _httpClient;
-        private readonly List<RobotReply> _replies;
-        private readonly List<MessageArg> _messageArgs;
-        private readonly List<RobotFace> _robotFaces;
 
-
-        public MessageX(Setting setting, HttpClient client, List<RobotReply> replies, IDictionary<string, string> cache, List<MessageArg> messageArgs, List<RobotFace> robotFaces, SensitiveWordX SensitiveWordX)
+        public MessageService(IRepository<RobotReply> robotReplyRepository, IRepository<RobotFace> robotFaceRepository, IExternalDataService externalDataService, HttpClient httpClient,
+        ILogger<MessageService> logger,
+        IConfiguration configuration,
+            ISensitiveWordService sensitiveWordService)
         {
-            _setting = setting;
-            _httpClient = client;
-            _replies = replies;
-            _cache = cache;
-            _messageArgs = messageArgs;
-            _robotFaces = robotFaces;
-            _SensitiveWordX = SensitiveWordX;
+            _robotReplyRepository = robotReplyRepository;
+            _sensitiveWordService = sensitiveWordService;
+            _logger = logger;
+            _configuration = configuration;
+            _robotFaceRepository = robotFaceRepository;
+            _externalDataService = externalDataService;
+            _httpClient = httpClient;
         }
 
         /// <summary>
@@ -44,8 +51,8 @@ namespace CnGalWebSite.RobotClient
         public RobotReply GetAutoReply(string message, RobotReplyRange range)
         {
 
-            var now = DateTime.Now.ToCstTime();
-            var replies = _replies.Where(s => s.IsHidden == false && (s.Range == RobotReplyRange.All || s.Range == range) && now.TimeOfDay <= s.BeforeTime.TimeOfDay && now.TimeOfDay >= s.AfterTime.TimeOfDay && Regex.IsMatch(message, s.Key))
+            DateTime now = DateTime.Now.ToCstTime();
+            List<IGrouping<int, RobotReply>> replies = _robotReplyRepository.GetAll().Where(s => s.IsHidden == false && (s.Range == RobotReplyRange.All || s.Range == range) && now.TimeOfDay <= s.BeforeTime.TimeOfDay && now.TimeOfDay >= s.AfterTime.TimeOfDay && Regex.IsMatch(message, s.Key))
                 .GroupBy(s => s.Priority)
                 .OrderByDescending(s => s.Key)
                 .ToList();
@@ -55,19 +62,19 @@ namespace CnGalWebSite.RobotClient
                 return null;
             }
 
-            var index = new Random().Next(0, replies.FirstOrDefault().Count());
-            var reply = replies.FirstOrDefault().ToList()[index];
+            int index = new Random().Next(0, replies.FirstOrDefault().Count());
+            RobotReply reply = replies.FirstOrDefault().ToList()[index];
 
             //检查是否含有变量替换 如果有 则检查输入是否包含敏感词
             if (reply.Value.Contains('$'))
             {
-                var words = _SensitiveWordX.Check(message);
+                List<string> words = _sensitiveWordService.Check(message);
 
                 if (words.Count != 0)
                 {
-                    return new RobotReply
-                    {
-                        Value = _messageArgs.FirstOrDefault(s => s.Name == "SensitiveReply")?.Value ?? "看板娘不知道哦~",
+                    return new RobotReply {
+                        Key = message,
+                        Value = _configuration["SensitiveReply"] ?? $"{ _configuration["RobotName"]}不知道哦~"
                     };
                 }
             }
@@ -85,13 +92,13 @@ namespace CnGalWebSite.RobotClient
         /// <param name="name"></param>
         /// <returns></returns>
         /// <exception cref="ArgError"></exception>
-        public async Task<SendMessageModel> ProcMessageAsync(RobotReplyRange range,string reply, string message, string regex,long qq,string name)
+        public async Task<SendMessageModel> ProcMessageAsync(RobotReplyRange range, string reply, string message, string regex, long qq, string name)
         {
 
-            var args = new List<KeyValuePair<string, string>>();
+            List<KeyValuePair<string, string>> args = new();
             try
             {
-                await ProcMessageArgument(reply, message, qq,name, args);
+                await ProcMessageArgument(reply, message, qq, name, args);
                 ProcMessageReplaceInput(reply, message, regex, args);
                 ProcMessageFace(reply, args);
             }
@@ -101,45 +108,47 @@ namespace CnGalWebSite.RobotClient
             }
             catch (Exception ex)
             {
-                OutputHelper.PressError(ex, "获取变量值失败");
+                _logger.LogError(ex, "获取变量值失败");
                 reply = "呜呜呜~";
             }
 
 
             //检测敏感词
-            var words = _SensitiveWordX.Check(args.Where(s => s.Key == "sender" || (s.Key.Contains('[') && s.Key.Contains(']'))).Select(s => s.Value).ToList());
+            List<string> words = _sensitiveWordService.Check(args.Where(s => s.Key == "sender" || (s.Key.Contains('[') && s.Key.Contains(']'))).Select(s => s.Value).ToList());
 
             if (words.Count != 0)
             {
-                var msg = $"对{name}({qq})的消息回复中包含敏感词\n消息：{message}\n回复：{reply}\n\n参数替换列表：\n";
-                foreach (var item in args)
+                string msg = $"对{name}({qq})的消息回复中包含敏感词\n消息：{message}\n回复：{reply}\n\n参数替换列表：\n";
+                foreach (KeyValuePair<string, string> item in args)
                 {
                     msg += $"{item.Key} -> {item.Value}\n";
 
                 }
                 msg += $"\n触发的敏感词：\n";
-                foreach (var item in words)
+                foreach (string item in words)
                 {
                     msg += $"{item}\n";
                 }
 
-                OutputHelper.Write(OutputLevel.Dager, msg);
+                _logger.LogError(msg);
 
                 throw new ArgError(msg);
             }
 
             //替换参数
-            foreach (var item in args)
+            foreach (KeyValuePair<string, string> item in args)
             {
                 reply = reply.Replace(item.Key, item.Value);
             }
 
-            if(range== RobotReplyRange.Channel)
+            if (range == RobotReplyRange.Channel)
             {
                 return new SendMessageModel
                 {
+                    SendTo=qq,
                     MasudaMessage = ProcMessageToMasuda(reply),
-                    Range = range
+                    Range = range,
+                    Text= reply
                 };
             }
             else
@@ -147,8 +156,10 @@ namespace CnGalWebSite.RobotClient
 
                 return new SendMessageModel
                 {
+                    SendTo = qq,
                     MiraiMessage = ProcMessageToMirai(reply),
-                    Range = range
+                    Range = range,
+                    Text = reply
                 };
             }
         }
@@ -165,19 +176,19 @@ namespace CnGalWebSite.RobotClient
                 return null;
             }
 
-            var messages = new List<Message>();
+            List<Message> messages = new();
 
             while (true)
             {
                 if (vaule.Contains("[image="))
                 {
-                    var imageStr = vaule.MidStrEx("[image=", "]");
+                    string imageStr = vaule.MidStrEx("[image=", "]");
 
                     if (string.IsNullOrWhiteSpace(imageStr) == false)
                     {
                         vaule = vaule.Replace("[image=" + imageStr + "]", "");
                         //修正一部分图片链接缺省协议
-                        if(imageStr.Contains("http")==false)
+                        if (imageStr.Contains("http") == false)
                         {
                             imageStr = "https:" + imageStr;
                         }
@@ -186,7 +197,7 @@ namespace CnGalWebSite.RobotClient
                 }
                 else if (vaule.Contains("[声音="))
                 {
-                    var voiceStr = vaule.MidStrEx("[声音=", "]");
+                    string voiceStr = vaule.MidStrEx("[声音=", "]");
 
                     if (string.IsNullOrWhiteSpace(voiceStr) == false)
                     {
@@ -198,8 +209,8 @@ namespace CnGalWebSite.RobotClient
 
                 else if (vaule.Contains("[@"))
                 {
-                    var idStr = vaule.MidStrEx("[@", "]");
-                    if (long.TryParse(idStr, out var id))
+                    string idStr = vaule.MidStrEx("[@", "]");
+                    if (long.TryParse(idStr, out long id))
                     {
 
                         vaule = vaule.Replace("[@" + idStr + "]", "");
@@ -210,8 +221,6 @@ namespace CnGalWebSite.RobotClient
                 {
                     break;
                 }
-
-
             }
 
 
@@ -220,15 +229,9 @@ namespace CnGalWebSite.RobotClient
                 messages.Add(new Plain(vaule));
             }
 
-            if (string.IsNullOrWhiteSpace(vaule) && messages.Count == 0)
-            {
-                return null;
-            }
-            else
-            {
-                return messages.ToArray();
-            }
+            return string.IsNullOrWhiteSpace(vaule) && messages.Count == 0 ? null : messages.ToArray();
         }
+
         /// <summary>
         /// 将纯文本回复转换成可发送的消息数组
         /// </summary>
@@ -308,7 +311,6 @@ namespace CnGalWebSite.RobotClient
             }
         }
 
-
         /// <summary>
         /// 执行参数替换
         /// </summary>
@@ -325,10 +327,10 @@ namespace CnGalWebSite.RobotClient
 
 
 
-            var splits = Regex.Split(message, regex).Where(s => string.IsNullOrWhiteSpace(s) == false).ToList();
+            List<string> splits = Regex.Split(message, regex).Where(s => string.IsNullOrWhiteSpace(s) == false).ToList();
 
 
-            for (var i = 0; i < splits.Count; i++)
+            for (int i = 0; i < splits.Count; i++)
             {
                 if (reply.Contains($"[{i + 1}]"))
                 {
@@ -350,23 +352,23 @@ namespace CnGalWebSite.RobotClient
         {
             while (true)
             {
-                var argument = reply.MidStrEx("$(", ")");
+                string argument = reply.MidStrEx("$(", ")");
 
                 if (string.IsNullOrWhiteSpace(argument))
                 {
                     break;
                 }
 
-                var value = argument switch
+                string value = argument switch
                 {
                     "time" => DateTime.Now.ToCstTime().ToString("HH:mm"),
                     "qq" => qq.ToString(),
-                    "weather" => _messageArgs.FirstOrDefault(s => s.Name == "weather")?.Value,
+                    "weather" => await _externalDataService.GetWeather(),
                     "sender" => name,
                     "n" => "\n",
                     "r" => "\r",
                     "facelist" => "该功能暂未实装",
-                    _ => await GetArgValue(argument, message,qq)
+                    _ => await GetArgValue(argument, message, qq)
                 };
 
                 reply = reply.Replace("$(" + argument + ")", value);
@@ -387,7 +389,7 @@ namespace CnGalWebSite.RobotClient
                 return;
             }
 
-            foreach (var item in _robotFaces.Where(s => s.IsHidden == false))
+            foreach (RobotFace item in _robotFaceRepository.GetAll().Where(s => s.IsHidden == false))
             {
                 if (reply.Contains($"[{item.Key}]"))
                 {
@@ -395,7 +397,7 @@ namespace CnGalWebSite.RobotClient
                 }
             }
 
-            for (var i = 1; i < 4; i++)
+            for (int i = 1; i < 4; i++)
             {
                 if (reply.Contains($"[{i}]") && args.Any(s => s.Key == $"[{i}]") == false)
                 {
@@ -413,17 +415,11 @@ namespace CnGalWebSite.RobotClient
         /// <returns></returns>
         public async Task<string> GetArgValue(string name, string infor, long qq)
         {
-            return await GetArgValue(name, infor,qq, new Dictionary<string, string>());
+            return await GetArgValue(name, infor, qq, new Dictionary<string, string>());
         }
 
-        public async Task<string> GetArgValue(string name, string infor, long qq, Dictionary<string,string> adds)
+        public async Task<string> GetArgValue(string name, string infor, long qq, Dictionary<string, string> adds)
         {
-            //优先查找本地
-            var argVaule= _messageArgs.FirstOrDefault(s => s.Name == name);
-            if(argVaule!=null)
-            {
-                return argVaule.Value;
-            }
 
             //若本地没有 则请求服务器
             var result = await _httpClient.PostAsJsonAsync<GetArgValueModel>(ToolHelper.WebApiPath + "api/robot/GetArgValue", new GetArgValueModel
@@ -447,27 +443,5 @@ namespace CnGalWebSite.RobotClient
                 return obj.Error;
             }
         }
-    }
-
-
-    public class ArgError : Exception
-    {
-        public string Error { get; set; }
-
-        public ArgError(string error)
-        {
-            Error = error;
-        }
-    }
-
-    public class SendMessageModel
-    {
-        public RobotReplyRange Range { get; set; }
-
-        public long SendTo { get; set; }
-
-        public Message[] MiraiMessage { get; set; } = Array.Empty<Message>();
-
-        public MessageBase[] MasudaMessage { get;set; }
     }
 }

@@ -42,6 +42,10 @@ namespace CnGalWebSite.Server
                     options.JsonSerializerOptions.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
                 });
 
+            //设置Json格式化配置
+            ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+            ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+
             _ = services.AddServerSideBlazor()
                 .AddHubOptions(options =>
                 {
@@ -91,9 +95,6 @@ namespace CnGalWebSite.Server
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            //设置Json格式化配置
-            ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
-            ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

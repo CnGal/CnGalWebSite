@@ -934,7 +934,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                     continue;
                 }
 
-                sb = sb.Replace(item, $"{item}**{infor}**\n");
+                sb = sb.Replace(item, $"{item}**{infor.Trim()}**\n");
             }
 
             return sb;
@@ -959,7 +959,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 }
 
 
-                sb = sb.Replace(item, $"<div class=\"aspect-ratio\"><iframe src=\"https://player.bilibili.com/player.html?{(id[0] == 'B' ? $"bvid={id}" : id[0] == 'a' ? $"aid={id[2..^1]}" : "")}&high_quality=1\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" width=\"100%\" height=\"500px\"></iframe></div>\n\n{(string.IsNullOrWhiteSpace(infor) ? "" : $"**{infor}**\n\n")}");
+                sb = sb.Replace(item, $"<div class=\"aspect-ratio\"><iframe src=\"https://player.bilibili.com/player.html?{(id[0] == 'B' ? $"bvid={id}" : id[0] == 'a' ? $"aid={id[2..^1]}" : "")}&high_quality=1\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" width=\"100%\" height=\"500px\"></iframe></div>\n\n{(string.IsNullOrWhiteSpace(infor) ? "" : $"**{infor.Trim()}**\n\n")}");
 
             }
 
