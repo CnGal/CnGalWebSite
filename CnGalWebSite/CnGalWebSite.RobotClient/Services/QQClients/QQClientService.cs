@@ -38,9 +38,6 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
             _postLogRepository = postLogRepository;
             _logger = logger;
             _eventService = eventService;
-
-            Init();
-
         }
 
         public void InitMasuda()
@@ -48,11 +45,12 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
             if (int.TryParse(_configuration["ChannelAppId"], out int appId) == false)
             {
                 _logger.LogError("初始化频道失败，ChannelAppId无效");
+                return;
             }
             try
             {
-                MasudaClient = new(appId, _configuration[" _setting.ChannelAppKey"], _configuration["_setting.ChannelToken"], BotType.Private);
-
+                MasudaClient = new MasudaBot(appId, _configuration[" _setting.ChannelAppKey"], _configuration["_setting.ChannelToken"], BotType.Private).LogTo(Console.WriteLine);
+             
                 _logger.LogInformation("成功初始化 Masuda 客户端");
             }
             catch (Exception ex)
@@ -61,13 +59,20 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
             }
 
         }
-        public void InitMirai()
+        public async Task InitMirai()
         {
             try
             {
-                MiraiClient = new($"ws://{_configuration["MiraiUrl"]}/all?verifyKey={_configuration["NormalVerifyKey"]}&qq={_configuration["QQ"]}");
-
-                _logger.LogInformation("成功初始化 Mirai 客户端");
+                MiraiClient = new($"ws://{_configuration["MiraiUrl"]}/all?verifyKey={_configuration["NormalVerifyKey"]}&qq={_configuration["QQ"]}",false,false);
+                if(await MiraiClient.ConnectAsync())
+                {
+                    _logger.LogInformation("成功初始化 Mirai 客户端");
+                }
+                else
+                {
+                    _logger.LogError("初始化 Mirai 客户端失败");
+                }
+               
             }
             catch (Exception ex)
             {
@@ -76,14 +81,13 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
 
         }
 
-        public void Init()
+        public async Task Init()
         {
             //初始化QQ群
-            InitMirai();
+           await InitMirai();
 
             if (MiraiClient != null)
             {
-                _ = MiraiClient.ConnectAsync();
 
                 //定时任务计时器
                 t.Start(); //启动计时器
@@ -178,6 +182,7 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
             }
 
             _logger.LogInformation("CnGal资料站 看板娘 v3.3.30");
+
         }
 
         /// <summary>

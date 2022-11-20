@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
@@ -52,7 +53,7 @@ namespace CnGalWebSite.RobotClient.Services.Synchronous
 
             }
             t = new(time*1000);
-
+            
             t.Start(); //启动计时器
             t.Elapsed += async (s, e) =>
             {
@@ -62,6 +63,7 @@ namespace CnGalWebSite.RobotClient.Services.Synchronous
 
         public async Task RefreshAsync()
         {
+            _logger.LogInformation("正在同步数据");
             try
             {
                 var model = await _httpClient.GetFromJsonAsync<List<RobotFace>>(ToolHelper.WebApiPath + "api/robot/getrobotFaces", ToolHelper.options);
@@ -139,6 +141,8 @@ namespace CnGalWebSite.RobotClient.Services.Synchronous
             {
                 _logger.LogError(ex, "无法获取自动回复列表");
             }
+
+            _logger.LogInformation( "同步数据完成");
         }
 
         public void Dispose()

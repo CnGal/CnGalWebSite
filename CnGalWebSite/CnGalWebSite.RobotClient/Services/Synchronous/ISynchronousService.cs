@@ -8,5 +8,6 @@ namespace CnGalWebSite.RobotClient.Services.Synchronous
 {
     public interface ISynchronousService
     {
+        Task RefreshAsync();
     }
 }

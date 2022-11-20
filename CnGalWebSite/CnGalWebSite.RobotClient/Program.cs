@@ -4,14 +4,21 @@ using CnGalWebSite.Helper.Helper;
 using CnGalWebSite.RobotClient;
 using CnGalWebSite.RobotClient.DataRepositories;
 using CnGalWebSite.RobotClient.Extentions;
+using CnGalWebSite.RobotClient.Services.Events;
+using CnGalWebSite.RobotClient.Services.ExternalDatas;
+using CnGalWebSite.RobotClient.Services.Messages;
 using CnGalWebSite.RobotClient.Services.QQClients;
+using CnGalWebSite.RobotClient.Services.SensitiveWords;
 using CnGalWebSite.RobotClient.Services.Synchronous;
+using Masuda.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NetCore.AutoRegisterDi;
+using System.Linq.Dynamic.Core.Tokenizer;
 
-
+MasudaBot asudaBot
+    = new(1, "", "");
 
 //设置Json格式化配置
 ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
@@ -35,20 +42,23 @@ using IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton(sp => new HttpClient());
 
         services.RegisterAssemblyPublicNonGenericClasses()
-              .Where(c => c.Name.EndsWith("Service") || c.Name.EndsWith("Provider"))
-              .AsPublicImplementedInterfaces(ServiceLifetime.Singleton);
+          .Where(c => c.Name.EndsWith("Service") || c.Name.EndsWith("Provider"))
+          .AsPublicImplementedInterfaces(ServiceLifetime.Singleton);
     })
     .Build();
+
+
 
 
 //获取服务提供程序
 using IServiceScope serviceScope = host.Services.CreateScope();
 IServiceProvider provider = serviceScope.ServiceProvider;
 
-var _QQClientService = provider.GetRequiredService<IQQClientService>();
-
-//await Task.Delay(10000);
 var _synchronousService = provider.GetRequiredService<ISynchronousService>();
+await _synchronousService.RefreshAsync();
+
+var _QQClientService = provider.GetRequiredService<IQQClientService>();
+await _QQClientService.Init();
 
 
 await host.RunAsync();
