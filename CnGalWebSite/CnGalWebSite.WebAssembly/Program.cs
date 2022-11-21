@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using CnGalWebSite.DataModel.Application.Examines;
 using CnGalWebSite.DataModel.Application.Helper;
 using CnGalWebSite.DataModel.Helper;
@@ -45,7 +46,8 @@ namespace CnGalWebSite.WebAssembly
             //动态修改标题
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
-            builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddBlazoredLocalStorage()
+                 .AddBlazoredSessionStorage();
 
             builder.Services.AddAuthorizationCore();
             builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();

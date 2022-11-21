@@ -31,7 +31,7 @@
                             <img src="@Model.UserInfor.PhotoPath" alt="@Model.UserInfor.Name" style="width:50px;border-radius:50%;" itemprop="image" />
                             <div style="display: flex; flex-direction: column;" class="ms-4">
 
-                                <RanksViewCard Model="Model.UserInfor.Ranks" NoLeftPandding/>
+                                <RanksViewCard Model="Model.UserInfor.Ranks" NoLeftPandding />
                                 <span style="font-size: large; font-weight: bold; " itemprop="name">
                                     @Model.UserInfor.Name
                                 </span>
@@ -41,65 +41,72 @@
                         <BadgesViewCard Model="Model.UserInfor.Ranks" />
 
                     </div>
-                      
-                      
+
+
 
                 </div>
 
-                <hr/>
+                <hr />
 
             </div>
         }
 
-        <div class="@(HiddenTitle?"":"mt-4")">
+    <div class="@(HiddenTitle?"":"mt-4")">
 
-            @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false && HiddenTitle == false)
-            {
+        @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false && string.IsNullOrWhiteSpace(Model.OriginalLink) == false && HiddenTitle == false)
+        {
 
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
-                    作者：
-                    <strong> @Model.OriginalAuthor</strong>
-                    &nbsp; 原文发表在：
-                    <a href="@Model.OriginalLink" class="info--text fw-bold" style="word-break:break-all;" target="_blank" itemprop="url">@Model.OriginalLink</a>
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+                作者：
+                <strong> @Model.OriginalAuthor</strong>
+                &nbsp; 原文发表在：
+                <a href="@Model.OriginalLink" class="info--text fw-bold" style="word-break:break-all;" target="_blank" itemprop="url">@Model.OriginalLink</a>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-                <div itemprop="author" itemscope itemtype="http://schema.org/Person">
-                    @foreach (var item in Model.OriginalAuthor.Replace("，", ",").Replace("、", ",").Split(','))
-                    {
-                        <meta itemprop="name" content="@item" />
+            <div itemprop="author" itemscope itemtype="http://schema.org/Person">
+                @foreach (var item in Model.OriginalAuthor.Replace("，", ",").Replace("、", ",").Split(','))
+                {
+                    <meta itemprop="name" content="@item" />
 
-                    }
-                </div>
-                <div itemprop="publisher" itemscope itemtype="http://schema.org/Person">
-                    <meta itemprop="url" content="@(NavigationManager.BaseUri+"space/index/"+Model.UserInfor.Id)" />
-                    <meta itemprop="name" content="@Model.UserInfor.Name" />
-                    <meta itemprop="image" content="@Model.UserInfor.PhotoPath" />
-                </div>
-            }
-            else
-            {
-                <div itemprop="author" itemscope itemtype="http://schema.org/Person">
-                    <meta itemprop="url" content="@(NavigationManager.BaseUri+"space/index/"+Model.UserInfor.Id)" />
-                    <meta itemprop="name" content="@Model.UserInfor.Name" />
-                    <meta itemprop="image" content="@Model.UserInfor.PhotoPath" />
-                </div>
-            }
+                }
+            </div>
+            <div itemprop="publisher" itemscope itemtype="http://schema.org/Person">
+                <meta itemprop="url" content="@(NavigationManager.BaseUri+"space/index/"+Model.UserInfor.Id)" />
+                <meta itemprop="name" content="@Model.UserInfor.Name" />
+                <meta itemprop="image" content="@Model.UserInfor.PhotoPath" />
+            </div>
+        }
+        else
+        {
+            <div itemprop="author" itemscope itemtype="http://schema.org/Person">
+                <meta itemprop="url" content="@(NavigationManager.BaseUri+"space/index/"+Model.UserInfor.Id)" />
+                <meta itemprop="name" content="@Model.UserInfor.Name" />
+                <meta itemprop="image" content="@Model.UserInfor.PhotoPath" />
+            </div>
+        }
 
-            @if (Model.MainPageState == EditState.Preview || Model.MainState == EditState.Preview || Model.RelevancesState == EditState.Preview)
-            {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton>
-            }
-            @if(HiddenCatalog==false)
-            {
-<CatalogCard Model="Model" />
-            }
-            
+        @if (Model.MainPageState == EditState.Preview || Model.MainState == EditState.Preview || Model.RelevancesState == EditState.Preview)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton>
+        }
+        @if (HiddenCatalog == false)
+        {
+            <CatalogCard Model="Model" />
+        }
 
-            <MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
+
+        <MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
+        <div style=" display: flex; flex-direction: column; align-items: flex-end;">
             <div>
-                <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Article" Id="Model.Id" />
+                <i class="fa fa-pencil fa-fw font-color"></i>
+                <span class="font-color me-2">最后编辑：@Model.LastEditTime.ToString("yyyy-MM-dd")</span>
             </div>
         </div>
+
+        <div>
+            <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Article" Id="Model.Id" />
+        </div>
+    </div>
     </div>
 
     <meta itemprop="datePublished" content="@Model.CreateTime.ToString("G")" />

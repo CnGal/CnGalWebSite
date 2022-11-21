@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using System;
 using System.Collections.Generic;
@@ -94,7 +95,14 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         /// <summary>
         /// 相关性列表
         /// </summary>
-        public List<RelevancesViewModel> Relevances { get; set; } = new List<RelevancesViewModel>();
+        public List<EntryInforTipViewModel> RelatedEntries { get; set; } = new List<EntryInforTipViewModel>();
+
+        public List<ArticleInforTipViewModel> RelatedArticles { get; set; } = new List<ArticleInforTipViewModel>();
+
+        /// <summary>
+        /// 外部链接
+        /// </summary>
+        public List<RelevancesKeyValueModel> RelatedOutlinks { get; set; } = new List<RelevancesKeyValueModel> { };
 
         public UserInforViewModel UserInfor { get; set; } = new UserInforViewModel();
 

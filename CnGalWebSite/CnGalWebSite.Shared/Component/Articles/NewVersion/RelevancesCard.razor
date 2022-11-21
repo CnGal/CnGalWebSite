@@ -2,54 +2,51 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
-<div style=" display: flex; flex-direction: column; align-items: flex-end;">
-    @if (Model.Relevances.Count != 0)
+
+<div>
+    @if (Model.RelatedEntries.Any())
     {
-        <div class="mb-2" style=" display: flex; align-items: center; flex-wrap: wrap;">
-            <i class="fa fa-tags fa-fw font-color me-2"></i>
-            @foreach (var item in Model.Relevances)
-            {
-                @foreach (var temp in item.Informations)
-                {
-                    @if (temp.Id == 0)
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-codepen" Title="相关词条" Outline Collapable>
+            <div class="mt-3">
+
+
+                <div>
+                    @foreach (var item in Model.RelatedEntries)
                     {
-                        <button class="article-tag article-tag-color-large me-2" @onclick="@(() => OnClickNull(temp.DisplayName))">@temp.DisplayName</button>
-
-                    }
-                    else
-                    {
-
-                        <a class="article-tag article-tag-color-large me-2" href="@(item.Modifier=="词条"?(NavigationManager.BaseUri+"entries/index/"+temp.Id):(NavigationManager.BaseUri+"/articles/index/"+temp.Id))">
-
-                            @temp.DisplayName
-                        </a>
-
+                        <div class="mb-3">
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ShowType />
+                        </div>
                     }
 
+                </div>
+            </div>
 
-                }
-            }
-        </div>
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
+    @if (Model.RelatedArticles.Any())
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-newspaper-o" Title="相关文章" Outline Collapable>
+            <div class="mt-3">
 
+
+                <div>
+                    @foreach (var item in Model.RelatedArticles)
+                    {
+                        <div class="mb-3">
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item" />
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     }
 
-
-    <div>
-        <i class="fa fa-pencil fa-fw font-color"></i>
-        <span class="font-color me-2">最后编辑：@Model.LastEditTime.ToString("yyyy-MM-dd")</span>
-    </div>
 </div>
 
 
 @code {
     [Parameter]
     public ArticleViewModel Model { get; set; } = new ArticleViewModel();
-
-    public async Task OnClickNull(string text)
-    {
-
-        await ToastService.Error("该词条不存在", "你可以亲自创建“" + text + "”哦~");
-
-
-    }
 }

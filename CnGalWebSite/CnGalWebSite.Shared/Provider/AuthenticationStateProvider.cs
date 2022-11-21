@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using System;
 using System.Collections.Generic;
@@ -15,11 +16,13 @@ namespace CnGalWebSite.Shared.Provider
     {
         private readonly HttpClient _httpClient;
         private readonly ILocalStorageService _localStorage;
+        private readonly ISessionStorageService _sessionStorage;
 
-        public ApiAuthenticationStateProvider(HttpClient httpClient, ILocalStorageService localStorage)
+        public ApiAuthenticationStateProvider(HttpClient httpClient, ILocalStorageService localStorage, ISessionStorageService sessionStorage)
         {
             _httpClient = httpClient;
             _localStorage = localStorage;
+            _sessionStorage = sessionStorage;
         }
         /// <summary>
         /// CascadingAuthenticationState组件调用GetAuthenticationStateAsync方法来确定当前用户是否经过验证
@@ -30,7 +33,20 @@ namespace CnGalWebSite.Shared.Provider
             try
             {
                 //检查本地是否有验证令牌
-                var savedToken = await _localStorage.GetItemAsync<string>("authToken");
+                string savedToken;
+                try
+                {
+                    savedToken = await _sessionStorage.GetItemAsync<string>("authToken");
+                    if(string.IsNullOrWhiteSpace(savedToken))
+                    {
+                        savedToken = await _localStorage.GetItemAsync<string>("authToken");
+                    }
+                }
+                catch
+                {
+                    savedToken = await _localStorage.GetItemAsync<string>("authToken");
+                }
+               
                 if (string.IsNullOrWhiteSpace(savedToken))
                 {
                     savedToken = _httpClient.DefaultRequestHeaders.Authorization?.Parameter;

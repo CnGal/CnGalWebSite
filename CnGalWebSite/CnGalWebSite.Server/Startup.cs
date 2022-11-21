@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using CnGalWebSite.DataModel.Application.Examines;
 using CnGalWebSite.DataModel.Application.Helper;
 using CnGalWebSite.DataModel.Helper;
@@ -58,7 +59,8 @@ namespace CnGalWebSite.Server
 
             _ = services.AddScoped(sp => new HttpClient());
 
-            _ = services.AddBlazoredLocalStorage();
+            _ = services.AddBlazoredLocalStorage()
+                .AddBlazoredSessionStorage();
 
             _ = services.AddAuthorizationCore();
             _ = services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();

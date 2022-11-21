@@ -20,7 +20,13 @@ namespace CnGalWebSite.Shared.Service
         /// <param name="loginModel"></param>
         /// <returns></returns>
         Task<LoginResult> Login(LoginModel loginModel);
-        Task<bool> Login(string JwtToken);
+        /// <summary>
+        /// 直接使用令牌登入
+        /// </summary>
+        /// <param name="JwtToken"></param>
+        /// <param name="remember">是否记住</param>
+        /// <returns></returns>
+        Task<bool> Login(string JwtToken,bool remember=true);
 
         /// <summary>
         /// 执行与Login 方法相反的操作。
