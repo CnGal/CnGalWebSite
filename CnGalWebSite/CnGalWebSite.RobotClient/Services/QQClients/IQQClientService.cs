@@ -20,5 +20,7 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
         Task ReplyFromFriendAsync(FriendMessageSender s, MeowMiraiLib.Msg.Type.Message[] e);
 
         Task SendMessage(RobotReplyRange range, long id, string text, Masuda.Net.Models.Message msg = null);
+
+        Task Init();
     }
 }

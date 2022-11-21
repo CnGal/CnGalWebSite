@@ -8,22 +8,10 @@ using CnGalWebSite.DataModel.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Files;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Threading.Tasks;
 using SortOrder = BootstrapBlazor.Components.SortOrder;
-using Microsoft.Extensions.Logging;
-using System.Security.Policy;
-using Microsoft.AspNetCore.Http;
 
 namespace CnGalWebSite.APIServer.Application.Files
 {
@@ -248,14 +236,14 @@ namespace CnGalWebSite.APIServer.Application.Files
                     fileName: "test.png");
                 content.Add(new StringContent(_configuration["TucangCCAPIToken"]), "token");
 
-                var response = await _httpClient.PostAsync("https://tucang.cc/api/v1/upload", content);
+                var response = await _httpClient.PostAsync(_configuration["TucangCCAPIUrl"], content);
 
                 var newUploadResults = await response.Content.ReadAsStringAsync();
                 var result = JObject.Parse(newUploadResults);
 
                 if (result["code"].ToObject<int>() == 200)
                 {
-                    return result["data"]["url"].ToObject<string>().Replace("tucang.cc", _configuration["CustomTucangCCUrl"]) + "?" + url;
+                    return $"{_configuration["CustomTucangCCUrl"]}{result["data"]["url"].ToObject<string>().Split('/').LastOrDefault()}?{url}";
                 }
                 else
                 {
@@ -340,7 +328,7 @@ namespace CnGalWebSite.APIServer.Application.Files
 
             }
 
-            var articles = await _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false&&s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
+            var articles = await _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
                 .OrderBy(s => s.Id)
                .Take(maxCount).ToListAsync();
 
@@ -408,7 +396,7 @@ namespace CnGalWebSite.APIServer.Application.Files
         /// <param name="text"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<string> TransformImagesAsync(string text,string userId)
+        public async Task<string> TransformImagesAsync(string text, string userId)
         {
             var temp = await ToolHelper.TransformImagesAsync(text, _httpClient);
             text = temp.Text;

@@ -40,9 +40,7 @@ namespace CnGalWebSite.APIServer
                 })
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    config.AddJsonFile("BackUp/ServerSetting.json",
-                        optional: true,
-                        reloadOnChange: true);
+                    config.AddUserSecrets<Startup>();
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

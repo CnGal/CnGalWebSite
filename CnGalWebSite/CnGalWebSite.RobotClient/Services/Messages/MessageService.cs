@@ -15,10 +15,12 @@ using System.Net.Http.Json;
 using CnGalWebSite.DataModel.Helper;
 using Masuda.Net.HelpMessage;
 using CnGalWebSite.RobotClient.DataModels.Messages;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace CnGalWebSite.RobotClient.Services.Messages
 {
-    public class MessageService : IMessageService
+    public class MessageService :  IMessageService
     {
         private readonly IRepository<RobotReply> _robotReplyRepository;
         private readonly IRepository<RobotFace> _robotFaceRepository;
