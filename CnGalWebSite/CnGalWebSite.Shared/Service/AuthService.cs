@@ -1,14 +1,12 @@
 ﻿using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.Shared.Provider;
 using Microsoft.AspNetCore.Components.Authorization;
-using System;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace CnGalWebSite.Shared.Service
 {
@@ -17,14 +15,16 @@ namespace CnGalWebSite.Shared.Service
         private readonly HttpClient _httpClient;
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly ILocalStorageService _localStorage;
+        private readonly ISessionStorageService _sessionStorage;
 
-        public AuthService(HttpClient httpClient,
-            AuthenticationStateProvider authenticationStateProvider,
+        public AuthService(HttpClient httpClient, ISessionStorageService sessionStorage,
+        AuthenticationStateProvider authenticationStateProvider,
             ILocalStorageService localStorage)
         {
             _httpClient = httpClient;
             _authenticationStateProvider = authenticationStateProvider;
             _localStorage = localStorage;
+            _sessionStorage = sessionStorage;
         }
         /// <summary>
         /// 提交registerModel给accounts controller并返回RegisterResult给调用者
@@ -63,10 +63,16 @@ namespace CnGalWebSite.Shared.Service
 
                 if (obj.Code == LoginResultCode.OK)
                 {
-                    //记住 则保存令牌到本地
+
                     if (loginModel.RememberMe)
                     {
+                        //记住 则保存令牌到 localStorage
                         await _localStorage.SetItemAsync("authToken", obj.Token);
+                    }
+                    else
+                    {
+                        //不记住 则保存令牌到  sessionStorage
+                        await _sessionStorage.SetItemAsync("authToken", obj.Token);
                     }
 
                     ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(obj.Token);
@@ -89,7 +95,7 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         /// <param name="loginModel"></param>
         /// <returns></returns>
-        public async Task<bool> Login(string JwtToken)
+        public async Task<bool> Login(string JwtToken, bool remember)
         {
             if (string.IsNullOrWhiteSpace(JwtToken))
             {
@@ -97,7 +103,17 @@ namespace CnGalWebSite.Shared.Service
             }
             try
             {
-                await _localStorage.SetItemAsync("authToken", JwtToken);
+                if (remember)
+                {
+                    //记住 则保存令牌到 localStorage
+                    await _localStorage.SetItemAsync("authToken", JwtToken);
+                }
+                else
+                {
+                    //不记住 则保存令牌到  sessionStorage
+                    await _sessionStorage.SetItemAsync("authToken", JwtToken);
+                }
+
                 ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(JwtToken);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JwtToken);
 
@@ -116,8 +132,6 @@ namespace CnGalWebSite.Shared.Service
         /// <returns></returns>
         public async Task<LoginResult> Refresh()
         {
-            //是否记住用户
-            var isRemerber = false;
             try
             {
                 //判断是否登入
@@ -129,16 +143,19 @@ namespace CnGalWebSite.Shared.Service
 
                 //读取本地令牌到Http请求头
                 var savedToken = await _localStorage.GetItemAsync<string>("authToken");
-                if (string.IsNullOrWhiteSpace(savedToken) == false)
+                if (string.IsNullOrWhiteSpace(savedToken))
                 {
-                    isRemerber = true;
-                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", savedToken);
+                    return null;
                 }
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", savedToken);
             }
             catch
             {
                 return null;
             }
+
+            //从本地读取到令牌 尝试刷新
 
             try
             {
@@ -146,12 +163,9 @@ namespace CnGalWebSite.Shared.Service
                 var result = await _httpClient.PostAsJsonAsync<LoginModel>(ToolHelper.WebApiPath + "api/account/RefreshJWToken", new LoginModel());
                 var jsonContent = result.Content.ReadAsStringAsync().Result;
                 var obj = JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
-                if (obj.Code == LoginResultCode.OK&&string.IsNullOrWhiteSpace(obj.Token)==false)
+                if (obj.Code == LoginResultCode.OK && string.IsNullOrWhiteSpace(obj.Token) == false)
                 {
-                    if (isRemerber)
-                    {
-                        await _localStorage.SetItemAsync("authToken", obj.Token);
-                    }
+                    await _localStorage.SetItemAsync("authToken", obj.Token);
 
                     ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(obj.Token);
                     _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", obj.Token);
@@ -183,6 +197,7 @@ namespace CnGalWebSite.Shared.Service
         /// <returns></returns>
         public async Task Logout()
         {
+            await _sessionStorage.RemoveItemAsync("authToken");
             await _localStorage.RemoveItemAsync("authToken");
             ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
             _httpClient.DefaultRequestHeaders.Authorization = null;

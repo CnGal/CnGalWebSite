@@ -64,9 +64,6 @@ namespace CnGalWebSite.APIServer.Controllers
             _articleService = articleService;
         }
 
-
-
-
         [AllowAnonymous]
         [HttpGet("{Id}")]
         public async Task<ActionResult<TagIndexViewModel>> GetTagAsync(int id)

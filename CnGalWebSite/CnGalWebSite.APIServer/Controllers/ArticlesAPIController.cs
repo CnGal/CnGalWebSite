@@ -72,54 +72,6 @@ namespace CnGalWebSite.APIServer.Controllers
             _editRecordService = editRecordService;
         }
 
-        /// <summary>
-        /// 通过Id获取文章的真实数据 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        [AllowAnonymous]
-        public async Task<ActionResult<Article>> GetArticleDataAsync(long id)
-        {
-            //获取当前用户ID
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-
-            var article = await _articleRepository.GetAll().AsNoTracking()
-                .Include(s => s.Entries)
-                .Include(s => s.Outlinks)
-                .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
-                .Include(s => s.Examines).AsSplitQuery().FirstOrDefaultAsync(x => x.Id == id);
-
-            if (article == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                //判断当前是否隐藏
-                if (article.IsHidden == true)
-                {
-                    if (user == null || await _userManager.IsInRoleAsync(user, "Admin") != true)
-                    {
-                        return NotFound();
-                    }
-                    article.IsHidden = true;
-                }
-                else
-                {
-                    article.IsHidden = false;
-
-                }
-                //需要清除环回引用
-                foreach (var item in article.Examines)
-                {
-                    item.Article = null;
-                }
-                return article;
-            }
-
-        }
-
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<ArticleViewModel>> GetArticleViewAsync(long id)
@@ -590,7 +542,6 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
         }
-
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EditArticleMainPageViewModel>> EditArticleMainPageAsync(long Id)

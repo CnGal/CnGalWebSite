@@ -611,64 +611,23 @@ namespace CnGalWebSite.APIServer.Application.Articles
             //读取词条信息
             var relevances = new List<RelevancesViewModel>();
 
-            if (article.Entries.Any(s => s.IsHidden == false))
+            foreach (var item in article.Entries.Where(s => s.IsHidden == false))
             {
-                var temp = new List<RelevancesKeyValueModel>();
-                relevances.Add(new RelevancesViewModel
-                {
-                    Modifier = "词条",
-                    Informations = temp
-                });
-                foreach (var item in article.Entries.Where(s => s.IsHidden == false))
-                {
-                    temp.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.Name ?? item.DisplayName,
-                        DisplayValue = item.BriefIntroduction,
-                        Id =  item.Id,
-                    });
-                }
+                model.RelatedEntries.Add(_appHelper.GetEntryInforTipViewModel(item));
             }
-            if (article.ArticleRelationFromArticleNavigation.Any(s => s.ToArticleNavigation.IsHidden))
+            foreach (var item in article.ArticleRelationFromArticleNavigation.Where(s => s.ToArticleNavigation.IsHidden==false).Select(s=>s.ToArticleNavigation))
             {
-                var temp = new List<RelevancesKeyValueModel>();
-                relevances.Add(new RelevancesViewModel
-                {
-                    Modifier = "文章",
-                    Informations = temp
-                });
-                foreach (var nav in article.ArticleRelationFromArticleNavigation.Where(s => s.ToArticleNavigation.IsHidden == false))
-                {
-                    var item = nav.ToArticleNavigation;
-                    temp.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.Name ?? item.DisplayName,
-                        DisplayValue = item.BriefIntroduction,
-                        Id = item.Id,
-                    });
-                }
+                model.RelatedArticles.Add(_appHelper.GetArticleInforTipViewModel(item));
             }
-            if (article.Outlinks.Count > 0)
+            foreach (var item in article.Outlinks)
             {
-                var temp = new List<RelevancesKeyValueModel>();
-                relevances.Add(new RelevancesViewModel
+                model.RelatedOutlinks.Add(new RelevancesKeyValueModel
                 {
-                    Modifier = "外部链接",
-                    Informations = temp
+                    DisplayName = item.Name,
+                    DisplayValue = item.BriefIntroduction,
+                    Link = item.Link,
                 });
-                foreach (var item in article.Outlinks)
-                {
-
-                    temp.Add(new RelevancesKeyValueModel
-                    {
-                        DisplayName = item.Name,
-                        DisplayValue = item.BriefIntroduction,
-                        Link = item.Link,
-                    });
-                }
             }
-
-            model.Relevances = relevances;
 
             return model;
         }

@@ -70,11 +70,9 @@ else
 
                     <div class="ps-4 pe-4 pt-4">
                         <CnGalWebSite.Shared.Component.Articles.NewVersion.OperationCard Model="Model" Class="mb-4" />
-
-                        <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard Model="Model" />
-
                     </div>
                 </div>
+                <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard Model="Model" />
 
                 <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentArticle" />
 
@@ -191,15 +189,14 @@ else
     {
         var urls = new List<string>();
 
-        var rel = Model.Relevances.FirstOrDefault(s => s.Modifier == "词条");
-        if (rel != null)
+        if (Model.RelatedEntries.Any())
         {
-            urls.AddRange(rel.Informations.Where(s => s.Id != 0).Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
+            urls.AddRange(Model.RelatedEntries.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
         }
-        rel = Model.Relevances.FirstOrDefault(s => s.Modifier == "文章");
-        if (rel != null)
+
+        if (Model.RelatedArticles.Any())
         {
-            urls.AddRange(rel.Informations.Where(s => s.Id != 0).Select(s => NavigationManager.BaseUri + "articles/" + s.Id));
+            urls.AddRange(Model.RelatedEntries.Select(s => NavigationManager.BaseUri + "articles/" + s.Id));
         }
 
         await _structuredDataService.SetStructuredData(urls);
