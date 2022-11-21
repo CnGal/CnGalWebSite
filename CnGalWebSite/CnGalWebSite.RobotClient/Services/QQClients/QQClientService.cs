@@ -49,7 +49,7 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
             }
             try
             {
-                MasudaClient = new MasudaBot(appId, _configuration[" _setting.ChannelAppKey"], _configuration["_setting.ChannelToken"], BotType.Private).LogTo(Console.WriteLine);
+                MasudaClient = new MasudaBot(appId, _configuration["ChannelAppKey"], _configuration["ChannelToken"], BotType.Private).LogTo(Console.WriteLine);
              
                 _logger.LogInformation("成功初始化 Masuda 客户端");
             }

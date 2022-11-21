@@ -32,9 +32,7 @@ using IHost host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureAppConfiguration((hostingContext, config) =>
     {
-        config.AddJsonFile("BackUp/Secrets.json",
-            optional: true,
-            reloadOnChange: true);
+        config.AddUserSecrets<Program>();
     })
     .ConfigureServices((_, services) =>
     {
