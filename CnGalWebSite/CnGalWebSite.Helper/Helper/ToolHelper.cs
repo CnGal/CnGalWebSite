@@ -1,5 +1,5 @@
 ﻿using CnGalWebSite.DataModel.Application.Helper;
-using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -812,13 +812,33 @@ namespace CnGalWebSite.DataModel.Helper
                     {
                         pt.SetValue(data, (PeripheryType)int.Parse(item.Value), null);
                     }
+                    else if (pt.PropertyType == typeof(CopyrightType))
+                    {
+                        pt.SetValue(data, (CopyrightType)int.Parse(item.Value), null);
+                    }
                     else if (pt.PropertyType == typeof(DateTime))
                     {
-                        pt.SetValue(data, DateTime.FromBinary(long.Parse(item.Value)), null);
+                        try
+                        {
+                            pt.SetValue(data, DateTime.Parse(item.Value), null);
+                        }
+                        catch
+                        {
+                            pt.SetValue(data, DateTime.FromBinary(long.Parse(item.Value)), null);
+                        }
+                       
                     }
                     else if (pt.PropertyType == typeof(DateTime?))
                     {
-                        pt.SetValue(data, item.Value != null ? DateTime.FromBinary(long.Parse(item.Value)) : null, null);
+                        try
+                        {
+                            pt.SetValue(data, item.Value != null ? DateTime.Parse(item.Value) : null, null);
+                        }
+                        catch
+                        {
+                            pt.SetValue(data, item.Value != null ? DateTime.FromBinary(long.Parse(item.Value)) : null, null);
+                        }
+                      
                     }
                     else if (pt.PropertyType == typeof(string))
                     {
@@ -832,6 +852,10 @@ namespace CnGalWebSite.DataModel.Helper
                     {
                         pt.SetValue(data, item.Value != null ? int.Parse(item.Value) : 0, null);
                     }
+                    else if (pt.PropertyType == typeof(TimeSpan))
+                    {
+                        pt.SetValue(data, item.Value != null ? TimeSpan.Parse(item.Value) : 0, null);
+                    }
                 }
             }
         }
@@ -842,8 +866,8 @@ namespace CnGalWebSite.DataModel.Helper
 
             var t = currentItem.GetType();
             var pts = t.GetProperties();
-            foreach (var item in pts.Where(s => s.PropertyType == typeof(string) || s.PropertyType == typeof(DateTime) || s.PropertyType == typeof(DateTime?)
-            || s.PropertyType == typeof(EntryType) || s.PropertyType == typeof(ArticleType) || s.PropertyType == typeof(PeripheryType) || s.PropertyType == typeof(bool) || s.PropertyType == typeof(int)))
+            foreach (var item in pts.Where(s => s.PropertyType == typeof(string) || s.PropertyType == typeof(DateTime) || s.PropertyType == typeof(DateTime?) || s.PropertyType == typeof(TimeSpan) 
+            || s.PropertyType == typeof(EntryType) || s.PropertyType == typeof(ArticleType) || s.PropertyType == typeof(PeripheryType) || s.PropertyType == typeof(CopyrightType) || s.PropertyType == typeof(bool) || s.PropertyType == typeof(int)))
             {
                 //特殊字段跳过
                 if (item.Name == "MainPage" || item.Name == "CreateTime" || item.Name == "LastEditTime" || item.Name == "CreateUserId")
@@ -874,7 +898,7 @@ namespace CnGalWebSite.DataModel.Helper
                         model.Add(new ExamineMainAlone
                         {
                             Key = item.Name,
-                            Value = ((DateTime)newValue).ToBinary().ToString()
+                            Value = ((DateTime)newValue).ToString("O")
                         });
                     }
                     if (item.PropertyType == typeof(DateTime?))
@@ -882,7 +906,7 @@ namespace CnGalWebSite.DataModel.Helper
                         model.Add(new ExamineMainAlone
                         {
                             Key = item.Name,
-                            Value = ((DateTime?)newValue)?.ToBinary().ToString()
+                            Value = ((DateTime?)newValue)?.ToString("O")
                         });
                     }
                     else if (item.PropertyType == typeof(ArticleType))
@@ -909,6 +933,14 @@ namespace CnGalWebSite.DataModel.Helper
                             Value = ((int)(PeripheryType)newValue).ToString()
                         });
                     }
+                    else if (item.PropertyType == typeof(CopyrightType))
+                    {
+                        model.Add(new ExamineMainAlone
+                        {
+                            Key = item.Name,
+                            Value = ((int)(CopyrightType)newValue).ToString()
+                        });
+                    }
                     else if (item.PropertyType == typeof(string))
                     {
                         model.Add(new ExamineMainAlone
@@ -926,6 +958,14 @@ namespace CnGalWebSite.DataModel.Helper
                         });
                     }
                     else if (item.PropertyType == typeof(int))
+                    {
+                        model.Add(new ExamineMainAlone
+                        {
+                            Key = item.Name,
+                            Value = newValue.ToString()
+                        });
+                    }
+                    else if (item.PropertyType == typeof(TimeSpan))
                     {
                         model.Add(new ExamineMainAlone
                         {

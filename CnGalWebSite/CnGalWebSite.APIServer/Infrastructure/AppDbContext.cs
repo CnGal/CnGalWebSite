@@ -87,6 +87,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<UserCertification> UserCertifications { get; set; }
         public DbSet<UserMonitor> UserMonitors { get; set; }
         public DbSet<UserReviewEditRecord> UserReviewEditRecords { get; set; }
+        public DbSet<Video> Videos { get; set; }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
@@ -205,6 +206,23 @@ namespace CnGalWebSite.APIServer.Infrastructure
                     .HasForeignKey(d => d.ToEntry)
                     .HasConstraintName("FK_EntryStaff_Entry_To");
             });
+            //设置视频自身多对多关系
+            modelBuilder.Entity<VideoRelation>(entity =>
+            {
+                entity.Property(e => e.VideoRelationId).HasColumnName("VideoRelationId");
+
+                entity.HasOne(d => d.FromVideoNavigation)
+                    .WithMany(p => p.VideoRelationFromVideoNavigation)
+                    .HasForeignKey(d => d.FromVideo)
+                    .HasConstraintName("FK_VideoRelation_Video_From");
+
+                entity.HasOne(d => d.ToVideoNavigation)
+                    .WithMany(p => p.VideoRelationToVideoNavigation)
+                    .HasForeignKey(d => d.ToVideo)
+                    .HasConstraintName("FK_VideoRelation_Video_To");
+            });
+
+
             //角色Id
             const string ADMIN_ID = "a18be9c0-aa65-4af8-bd17-00bd9344e575";
             const string ROLE_ID = ADMIN_ID;
@@ -231,13 +249,13 @@ namespace CnGalWebSite.APIServer.Infrastructure
                 Id = ADMIN_ID,
                 UserName = "Admin",
                 NormalizedUserName = "ADMIN",
-                Email = "1278490989@qq.com",
-                NormalizedEmail = "1278490989@qq.com",
+                Email = "123456789@qq.com",
+                NormalizedEmail = "123456789@qq.com",
                 EmailConfirmed = true,
                 PersonalSignature = "这个人太懒了，什么也没写额(～￣▽￣)～",
                 MainPageContext = "### 这个人太懒了，什么也没写额(～￣▽￣)～",
                 Birthday = null,
-                RegistTime = DateTime.MinValue,
+                RegistTime = DateTime.Now.ToCstTime(),
                 PasswordHash = "AQAAAAEAACcQAAAAEDecloBliZOnB0dNPQmr8qhoodaLmPdrKN10/bvLDrHaAJSxqWOnrEsvBhl5kzrZmQ==",//hasher.HashPassword(null, "CngalAdmin123.."),
                 SecurityStamp = string.Empty
             });

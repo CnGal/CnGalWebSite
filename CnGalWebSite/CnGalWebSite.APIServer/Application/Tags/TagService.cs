@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
+using CnGalWebSite.DataModel.ExamineModel.Tags;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;

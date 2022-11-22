@@ -1,7 +1,8 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.DataModel.Application.Dtos;
-using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Entries;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;

@@ -10,11 +10,21 @@ using CnGalWebSite.APIServer.Application.PlayedGames;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Tags;
 using CnGalWebSite.APIServer.Application.Users;
+using CnGalWebSite.APIServer.Application.Videos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.APIServer.Extentions;
 using CnGalWebSite.DataModel.Application.Dtos;
-using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Articles;
+using CnGalWebSite.DataModel.ExamineModel.Comments;
+using CnGalWebSite.DataModel.ExamineModel.Dismbigs;
+using CnGalWebSite.DataModel.ExamineModel.Entries;
+using CnGalWebSite.DataModel.ExamineModel.Peripheries;
+using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
+using CnGalWebSite.DataModel.ExamineModel.Tags;
+using CnGalWebSite.DataModel.ExamineModel.Users;
+using CnGalWebSite.DataModel.ExamineModel.Videos;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
@@ -51,7 +61,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
-        private readonly IRepository<PlayedGame, string> _playedGameRepository;
+        private readonly IRepository<PlayedGame, long> _playedGameRepository;
+        private readonly IRepository<Video, long> _videoRepository;
         private readonly IEntryService _entryService;
         private readonly IPeripheryService _peripheryService;
         private readonly IArticleService _articleService;
@@ -59,6 +70,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IDisambigService _disambigService;
         private readonly IUserService _userService;
         private readonly IRankService _rankService;
+        private readonly IVideoService _videoService;
         private readonly IPerfectionService _perfectionService;
         private readonly IPlayedGameService _playedGameService;
         private readonly ICommentService _commentService;
@@ -76,11 +88,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Examine>, string, SortOrder, IEnumerable<Examine>>> SortLambdaCacheEntry = new();
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService,
-           IRepository<UserMonitor, long> userMonitorRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository,
+           IRepository<UserMonitor, long> userMonitorRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IVideoService videoService, IRepository<Video, long> videoRepository,
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository, IRepository<Message, long> messageRepository,
         IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger, IRepository<Lottery, long> lotteryRepository,
-        IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<PlayedGame, string> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository)
+        IConfiguration configuration, UserManager<ApplicationUser> userManager, IRepository<PlayedGame, long> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository)
         {
             _examineRepository = examineRepository;
             _appHelper = appHelper;
@@ -111,6 +123,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _userCertificationRepository = userCertificationRepository;
             _userMonitorRepository = userMonitorRepository;
             _userReviewEditRecordRepository = userReviewEditRecordRepository;
+            _videoService = videoService;
+            _videoRepository = videoRepository;
         }
 
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "")
@@ -341,6 +355,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 Operation.EditPlayedGameMain => await GetEditPlayedGameMainExamineView(model, examine),
                 Operation.EstablishAudio => await GetEstablishAudioExamineView(model, examine),
                 Operation.RequestUserCertification => await GetEditUserCertificationMainExamineView(model, examine),
+                Operation.EditVideoMain => await GetEditVideoMainExamineView(model, examine),
+                Operation.EditVideoRelevanes => await GetEditVideoRelevanesExamineView(model, examine),
+                Operation.EditVideoMainPage => await GetEditVideoMainPageExamineView(model, examine),
+                Operation.EditVideoImages => await GetEditVideoImagesExamineView(model, examine),
                 _ => false,
             };
         }
@@ -2658,6 +2676,190 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         #endregion
 
+        #region 视频
+      
+
+        public async Task<bool> GetEditVideoMainExamineView(ExamineViewModel model, Examine examine)
+        {
+            model.Type = ExaminedNormalListModelType.Video;
+            var item = await _videoRepository.FirstOrDefaultAsync(s => s.Id == examine.VideoId);
+            if (item == null)
+            {
+                return false;
+            }
+            model.ObjectId = item.Id;
+            model.ObjectName = item.Name;
+            model.ObjectBriefIntroduction = item.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(item.MainPicture, "app.png");
+
+            var viewBefore = _videoService.GetExamineViewMain(item);
+
+            //添加修改记录 
+            await _videoService.UpdateData(item, examine);
+
+            //序列化数据
+            var viewAfter = _videoService.GetExamineViewMain(item);
+
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+            //判断是否是等待审核状态
+            if (examine.IsPassed != null)
+            {
+                model.BeforeModel = viewAfter;
+                model.AfterModel = viewBefore;
+            }
+            else
+            {
+                model.AfterModel = viewAfter;
+                model.BeforeModel = viewBefore;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> GetEditVideoRelevanesExamineView(ExamineViewModel model, Examine examine)
+        {
+            model.Type = ExaminedNormalListModelType.Video;
+            var item = await _videoRepository.GetAll()
+                .Include(s => s.VideoRelationFromVideoNavigation).ThenInclude(s => s.ToVideoNavigation)
+                .Include(s => s.Entries)
+                  .Include(s => s.Articles)
+                .Include(s => s.Outlinks)
+                .FirstOrDefaultAsync(s => s.Id == examine.VideoId);
+            if (item == null)
+            {
+
+                return false;
+            }
+            model.ObjectId = item.Id;
+            model.ObjectName = item.Name;
+            model.ObjectBriefIntroduction = item.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(item.MainPicture, "app.png");
+
+
+            //序列化相关性列表
+            //先读取词条信息
+            var viewBefore = _videoService.GetExamineViewRelevances(item);
+
+            //添加修改记录 
+            await _videoService.UpdateData(item, examine);
+
+            var viewAfter = _videoService.GetExamineViewRelevances(item);
+
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+
+
+            //判断是否是等待审核状态
+            if (examine.IsPassed != null)
+            {
+                model.BeforeModel = viewAfter;
+                model.AfterModel = viewBefore;
+            }
+            else
+            {
+                model.BeforeModel = viewBefore;
+                model.AfterModel = viewAfter;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> GetEditVideoMainPageExamineView(ExamineViewModel model, Examine examine)
+        {
+            model.Type = ExaminedNormalListModelType.Video;
+            var item = await _videoRepository.FirstOrDefaultAsync(s => s.Id == examine.VideoId);
+            if (item == null)
+            {
+                return false;
+            }
+            model.ObjectId = item.Id;
+            model.ObjectName = item.Name;
+            model.ObjectBriefIntroduction = item.BriefIntroduction;
+            model.Image = _appHelper.GetImagePath(item.MainPicture, "app.png");
+
+
+            var viewBefore = item.MainPage;
+
+            await _videoService.UpdateData(item, examine);
+
+            var viewAfter = item.MainPage;
+
+            //判断是否是等待审核状态
+            if (examine.IsPassed != null)
+            {
+                //序列化数据
+                var htmlDiff = new HtmlDiff.HtmlDiff(viewAfter ?? "", viewBefore ?? "");
+                model.EditOverview = htmlDiff.Build().Replace("\r\n", "<br>");
+                model.BeforeModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(examine.Context)
+                };
+                model.AfterModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(viewAfter)
+                };
+            }
+            else
+            {
+                //序列化数据
+                var htmlDiff = new HtmlDiff.HtmlDiff(viewBefore ?? "", viewAfter ?? "");
+                model.EditOverview = htmlDiff.Build().Replace("\r\n", "<br>");
+                model.BeforeModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(viewBefore)
+                };
+                model.AfterModel = new ExaminePreDataModel
+                {
+                    MainPage = _appHelper.MarkdownToHtml(examine.Context)
+                };
+            }
+
+            return true;
+        }
+
+        public async Task<bool> GetEditVideoImagesExamineView(ExamineViewModel model, Examine examine)
+        {
+            model.Type = ExaminedNormalListModelType.Video;
+            var item = await _videoRepository.GetAll()
+                  .Include(s => s.Pictures)
+                  .FirstOrDefaultAsync(s => s.Id == examine.VideoId);
+            if (item == null)
+            {
+                return false;
+            }
+            model.ObjectId = item.Id;
+            model.ObjectName = item.Name;
+            model.ObjectBriefIntroduction = item.BriefIntroduction;
+       
+                model.Image = _appHelper.GetImagePath(item.MainPicture, "app.png");
+           
+            var viewBefore = _videoService.GetExamineViewImages(item);
+
+            //添加修改记录 
+            await _videoService.UpdateData(item, examine);
+
+            var viewAfter = _videoService.GetExamineViewImages(item);
+
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+
+            //判断是否是等待审核状态
+            if (examine.IsPassed != null)
+            {
+                model.BeforeModel = viewAfter;
+                model.AfterModel = viewBefore;
+            }
+            else
+            {
+                model.BeforeModel = viewBefore;
+                model.AfterModel = viewAfter;
+            }
+            return true;
+        }
+
+        #endregion
+
 
 
         #endregion
@@ -2740,6 +2942,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 case Operation.RequestUserCertification:
                     await ExamineEditUserCertificationMainAsync(entry as UserCertification, examine as UserCertificationMain);
                     break;
+                case Operation.EditVideoMain:
+                    await ExamineEditVideoMainAsync(entry as Video, examine as ExamineMain);
+                    break;
+                case Operation.EditVideoRelevanes:
+                    await ExamineEditVideoRelevancesAsync(entry as Video, examine as VideoRelevances);
+                    break;
+                case Operation.EditVideoMainPage:
+                    await ExamineEditVideoMainPageAsync(entry as Video, examine as string);
+                    break;
+                case Operation.EditVideoImages:
+                    await ExamineEditVideoImagesAsync(entry as Video, examine as VideoImages);
+                    break;
             }
         }
 
@@ -2782,7 +2996,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         //创建审核数据模型
                         var examinedModel = new EntryRelevances();
 
-                        examinedModel.Relevances.Add(new EntryRelevancesAloneModel
+                        examinedModel.Relevances.Add(new EditRecordRelevancesAloneModel
                         {
                             DisplayName = entry.Id.ToString(),
                             DisplayValue = entry.Name,
@@ -2842,7 +3056,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     //创建审核数据模型
                     var examinedModel = new EntryRelevances();
 
-                    examinedModel.Relevances.Add(new EntryRelevancesAloneModel
+                    examinedModel.Relevances.Add(new EditRecordRelevancesAloneModel
                     {
                         DisplayName = entry.Id.ToString(),
                         DisplayValue = entry.Name,
@@ -2874,7 +3088,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     //创建审核数据模型
                     var examinedModel = new ArticleRelevances();
 
-                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
+                    examinedModel.Relevances.Add(new EditRecordRelevancesAloneModel
                     {
                         DisplayName = entry.Id.ToString(),
                         DisplayValue = entry.Name,
@@ -2964,7 +3178,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     //创建审核数据模型
                     var examinedModel = new ArticleRelevances();
 
-                    examinedModel.Relevances.Add(new ArticleRelevancesAloneModel
+                    examinedModel.Relevances.Add(new  EditRecordRelevancesAloneModel
                     {
                         DisplayName = article.Id.ToString(),
                         DisplayValue = article.Name,
@@ -2980,7 +3194,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     }
 
                     await ExamineEditArticleRelevancesAsync(temp, examinedModel);
-                    await UniversalEditArticleExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
+                    await UniversalEditArticleExaminedAsync(temp, admin, true, resulte, Operation.EditArticleRelevanes, "自动反向关联");
                 }
 
 
@@ -2996,7 +3210,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     //创建审核数据模型
                     var examinedModel = new EntryRelevances();
 
-                    examinedModel.Relevances.Add(new EntryRelevancesAloneModel
+                    examinedModel.Relevances.Add(new EditRecordRelevancesAloneModel
                     {
                         DisplayName = article.Id.ToString(),
                         DisplayValue = article.Name,
@@ -3255,6 +3469,137 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         #endregion
 
+        #region 视频
+        public async Task ExamineEditVideoMainAsync(Video item, ExamineMain examine)
+        {
+            _videoService.UpdateMain(item, examine);
+
+            _ = await _videoRepository.UpdateAsync(item);
+        }
+
+        public async Task ExamineEditVideoRelevancesAsync(Video item, VideoRelevances examine)
+        {
+            await _videoService.UpdateRelevances(item, examine);
+            _ = await _videoRepository.UpdateAsync(item);
+
+            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+
+            //反向关联 视频
+            foreach (var infor in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Video))
+            {
+                //查找关联文章
+                var temp = await _videoRepository.GetAll()
+                    .Include(s => s.VideoRelationFromVideoNavigation).ThenInclude(s => s.ToVideoNavigation)
+                    .FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                if (temp != null && temp.VideoRelationFromVideoNavigation.Any(s => s.ToVideo == item.Id) == false)
+                {
+                    //补全审核记录
+                    //创建审核数据模型
+                    var examinedModel = new VideoRelevances();
+
+                    examinedModel.Relevances.Add(new  EditRecordRelevancesAloneModel
+                    {
+                        DisplayName = item.Id.ToString(),
+                        DisplayValue = item.Name,
+                        IsDelete = false,
+                        Type = RelevancesType.Article,
+                    });
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, examinedModel);
+                        resulte = text.ToString();
+                    }
+
+                    await ExamineEditVideoRelevancesAsync(temp, examinedModel);
+                    await UniversalEditVideoExaminedAsync(temp, admin, true, resulte, Operation.EditVideoRelevanes, "自动反向关联");
+                }
+
+
+            }
+            //反向关联 词条
+            foreach (var infor in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Entry))
+            {
+                //查找关联词条
+                var temp = await _entryRepository.GetAll().Include(s => s.Videos).FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                if (temp != null && temp.Videos.Any(s => s.Id == item.Id) == false)
+                {
+                    //补全审核记录
+                    //创建审核数据模型
+                    var examinedModel = new EntryRelevances();
+
+                    examinedModel.Relevances.Add(new EditRecordRelevancesAloneModel
+                    {
+                        DisplayName = item.Id.ToString(),
+                        DisplayValue = item.Name,
+                        IsDelete = false,
+                        Type = RelevancesType.Video,
+                    });
+
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, examinedModel);
+                        resulte = text.ToString();
+                    }
+
+                    await ExamineEstablishRelevancesAsync(temp, examinedModel);
+                    await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
+                }
+            }
+            //反向关联 词条
+            foreach (var infor in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Article))
+            {
+                //查找关联词条
+                var temp = await _articleRepository.GetAll().Include(s => s.Videos).FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                if (temp != null && temp.Videos.Any(s => s.Id == item.Id) == false)
+                {
+                    //补全审核记录
+                    //创建审核数据模型
+                    var examinedModel = new ArticleRelevances();
+
+                    examinedModel.Relevances.Add(new EditRecordRelevancesAloneModel
+                    {
+                        DisplayName = item.Id.ToString(),
+                        DisplayValue = item.Name,
+                        IsDelete = false,
+                        Type = RelevancesType.Video,
+                    });
+
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, examinedModel);
+                        resulte = text.ToString();
+                    }
+
+                    await ExamineEditArticleRelevancesAsync(temp, examinedModel);
+                    await UniversalEditArticleExaminedAsync(temp, admin, true, resulte, Operation.EditArticleRelevanes, "自动反向关联");
+                }
+            }
+        }
+
+        public async Task ExamineEditVideoMainPageAsync(Video item, string examine)
+        {
+            _videoService.UpdateMainPage(item, examine);
+
+            _ = await _videoRepository.UpdateAsync(item);
+        }
+
+
+        public async Task ExamineEditVideoImagesAsync(Video item, VideoImages examine)
+        {
+            //更新数据
+            _videoService.UpdateImages(item, examine);
+            //保存
+            _ = await _videoRepository.UpdateAsync(item);
+
+        }
+        #endregion
+
         #endregion
 
         #region 将审核记录添加到数据库
@@ -3263,7 +3608,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         {
             //序列化审核数据
             var resulte = "";
-            if (operation == Operation.EstablishMainPage|| operation == Operation.EditArticleMainPage||operation== Operation.UserMainPage)
+            if (operation == Operation.EstablishMainPage|| operation == Operation.EditArticleMainPage || operation == Operation.UserMainPage || operation == Operation.EditVideoMainPage)
             {
                 resulte = examineData as string;
             }
@@ -3285,17 +3630,6 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 else
                 {
                     return await UniversalEditExaminedAsync(entry as Entry, user, isAdmin, resulte, operation, note);
-                }
-            }
-            else if (entry is Article)
-            {
-                if (isCreating)
-                {
-                    return await UniversalCreateArticleExaminedAsync(entry as Article, user, isAdmin, resulte, operation, note);
-                }
-                else
-                {
-                    return await UniversalEditArticleExaminedAsync(entry as Article, user, isAdmin, resulte, operation, note);
                 }
             }
             else if (entry is Article)
@@ -3357,6 +3691,17 @@ namespace CnGalWebSite.APIServer.Application.Examines
             else if (entry is UserCertification)
             {
                 return await UniversalEditUserCertificationExaminedAsync( user, isAdmin, resulte, operation, note);
+            }
+            else if (entry is Video)
+            {
+                if (isCreating)
+                {
+                    return await UniversalCreateVideoExaminedAsync(entry as Video, user, isAdmin, resulte, operation, note);
+                }
+                else
+                {
+                    return await UniversalEditVideoExaminedAsync(entry as Video, user, isAdmin, resulte, operation, note);
+                }
             }
             else
             {
@@ -4121,6 +4466,117 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return examine;
         }
 
+        public async Task<Examine> UniversalCreateVideoExaminedAsync(Video video, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        {
+            Examine examine = null;
+            if (isAdmin)
+            {
+                //添加到审核列表
+                examine = new Examine
+                {
+                    Operation = operation,
+                    Context = examineStr,
+                    IsPassed = true,
+                    VideoId = video.Id,
+                    PassedAdminName = user.UserName,
+                    PassedTime = DateTime.Now.ToCstTime(),
+                    ApplyTime = DateTime.Now.ToCstTime(),
+                    ApplicationUserId = user.Id,
+                    Note = note
+                };
+                examine = await _examineRepository.InsertAsync(examine);
+
+            }
+            else
+            {
+                //根据文章Id查找前置审核
+                long? examineId = null;
+                if (operation != Operation.EditPeripheryMain)
+                {
+                    var examine_1 = await GetUserPeripheryActiveExamineAsync(video.Id, user.Id, Operation.EditVideoMain);
+                    if (examine_1 == null)
+                    {
+                        throw new Exception("前置审核不存在");
+                    }
+                    examineId = examine_1.Id;
+                }
+
+                //添加到审核列表
+                examine = new Examine
+                {
+                    Operation = operation,
+                    Context = examineStr,
+                    IsPassed = null,
+                    VideoId = video.Id,
+                    PassedTime = null,
+                    ApplyTime = DateTime.Now.ToCstTime(),
+                    ApplicationUserId = user.Id,
+                    PrepositionExamineId = examineId,
+                    Note = note
+                };
+                examine = await _examineRepository.InsertAsync(examine);
+
+            }
+            //log
+            _logger.LogInformation("{User}({Id})创建视频({EntryId})，当前进行编辑{Operation}操作{Admin}", user.UserName, user.Id, video.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
+            return examine;
+        }
+
+        public async Task<Examine> UniversalEditVideoExaminedAsync(Video video, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        {
+            Examine examine = null;
+            if (isAdmin)
+            {
+                //添加到审核列表
+                examine = new Examine
+                {
+                    Operation = operation,
+                    Context = examineStr,
+                    IsPassed = true,
+                    PassedAdminName = user.UserName,
+                    VideoId = video.Id,
+                    PassedTime = DateTime.Now.ToCstTime(),
+                    ApplyTime = DateTime.Now.ToCstTime(),
+                    ApplicationUserId = user.Id,
+                };
+                examine = await _examineRepository.InsertAsync(examine);
+            }
+            else
+            {
+                //查找是否在之前有审核
+                //获取审核记录
+                examine = await GetUserPeripheryActiveExamineAsync(video.Id, user.Id, operation);
+                if (examine != null)
+                {
+                    examine.Context = examineStr;
+                    examine.ApplyTime = DateTime.Now.ToCstTime();
+                    examine = await _examineRepository.UpdateAsync(examine);
+                }
+                else
+                {
+                    examine = new Examine
+                    {
+                        Operation = operation,
+                        Context = examineStr,
+                        IsPassed = null,
+                        PassedTime = null,
+                        VideoId = video.Id,
+                        ApplyTime = DateTime.Now.ToCstTime(),
+                        ApplicationUserId = user.Id,
+                    };
+                    //添加到审核列表
+                    examine = await _examineRepository.InsertAsync(examine);
+                }
+            }
+
+
+            //log
+            _logger.LogInformation("{User}({Id})对 视频 - {Entry}({Id}) 进行{Operation}操作{Admin}", user.UserName, user.Id, video.Name, video.Id, operation.GetDisplayName(), isAdmin ? "(管理员身份忽略审核)" : "");
+
+            return examine;
+        }
+
 
         #endregion
 
@@ -4375,6 +4831,70 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return tag;
         }
 
+        public async Task<Video> AddNewVideoExaminesAsync(Video model, ApplicationUser user, string note)
+        {
+            var examines = _videoService.ExaminesCompletion(new Video(), model);
+
+            if (examines.Any(s => s.Value == Operation.EditVideoMain) == false)
+            {
+                throw new Exception("无法获取主要信息审核记录，请联系管理员");
+            }
+            var video = new Video();
+
+            video = await _videoRepository.InsertAsync(video);
+            video.CreateUser = user;
+            video.CreateTime = model.CreateTime;
+
+            examines = examines.OrderBy(s => s.Value).ToList();
+            foreach (var item in examines)
+            {
+
+                var resulte = "";
+                if (item.Value == Operation.EditVideoMainPage)
+                {
+                    resulte = item.Key as string;
+                }
+                else
+                {
+                    using TextWriter text = new StringWriter();
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(text, item.Key);
+                    resulte = text.ToString();
+                }
+
+                if (await _userManager.IsInRoleAsync(user, "Editor") == true)
+                {
+                    switch (item.Value)
+                    {
+                        case Operation.EditVideoMain:
+                            await ExamineEditVideoMainAsync(video, item.Key as ExamineMain);
+                            break;
+                        case Operation.EditVideoMainPage:
+                            await ExamineEditVideoMainPageAsync(video, item.Key as string);
+                            break;
+                        case Operation.EditVideoRelevanes:
+                            await ExamineEditVideoRelevancesAsync(video, item.Key as VideoRelevances);
+                            break;
+                        case Operation.EditVideoImages:
+                            await ExamineEditVideoImagesAsync(video, item.Key as VideoImages);
+                            break;
+                        default:
+                            throw new Exception("不支持的类型");
+                    }
+
+                    _ = await UniversalCreateVideoExaminedAsync(video, user, true, resulte, item.Value, note);
+                }
+                else
+                {
+                    _ = await UniversalCreateVideoExaminedAsync(video, user, false, resulte, item.Value, note);
+                }
+            }
+            //更新用户积分
+            await _userService.UpdateUserIntegral(user);
+
+            return video;
+        }
+
 
         #endregion
 
@@ -4417,6 +4937,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task<Examine> GetUserUserCertificationActiveExamineAsync( string userId, Operation operation)
         {
             return await _examineRepository.FirstOrDefaultAsync(s =>s.ApplicationUserId == userId && s.Operation == operation && s.IsPassed == null);
+        }
+
+        public async Task<Examine> GetUserVideoActiveExamineAsync(long videoId, string userId, Operation operation)
+        {
+            return await _examineRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.VideoId == videoId && s.ApplicationUserId == userId && s.Operation == operation && s.IsPassed == null);
         }
 
         #endregion
@@ -4736,6 +5261,23 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 await ExaminesCompletionPeriphery(periphery, examineModel as Periphery);
 
             }
+            //补全视频
+            var videoIds = await _videoRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
+            foreach (var videoId in videoIds)
+            {
+                var video = await _videoRepository.GetAll().AsNoTracking()
+                 .Include(s => s.Outlinks)
+                 .Include(s => s.VideoRelationFromVideoNavigation).ThenInclude(s => s.ToVideoNavigation)
+                 .Include(s => s.Entries)
+                 .Include(s => s.Articles)
+                  .Include(s => s.Pictures)
+                 .FirstOrDefaultAsync(s => s.Id == videoId);
+                //获取通过审核记录叠加的旧模型
+                var examineModel = await GenerateModelFromExamines(video);
+                //应用审核记录
+                await ExaminesCompletionVideo(video, examineModel as Video);
+
+            }
         }
 
         public async Task ExaminesCompletionEntry(Entry newEntry, Entry currentEntry)
@@ -4847,6 +5389,36 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
 
                 await UniversalEditPeripheryExaminedAsync(periphery, admin, true, resulte, item.Value, "补全审核记录");
+            }
+        }
+
+        public async Task ExaminesCompletionVideo(Video newVideo, Video currentVideo)
+        {
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+
+            //将当前模型和新模型对比 获取差异审核 并补全
+            var examines = _videoService.ExaminesCompletion(currentVideo, newVideo);
+            if (examines.Count == 0)
+            {
+                return;
+            }
+            var video = await _videoRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == newVideo.Id);
+            foreach (var item in examines)
+            {
+                var resulte = "";
+                if (item.Value == Operation.EditVideoMainPage)
+                {
+                    resulte = item.Key as string;
+                }
+                else
+                {
+                    using TextWriter text = new StringWriter();
+                    var serializer = new JsonSerializer();
+                    serializer.Serialize(text, item.Key);
+                    resulte = text.ToString();
+                }
+
+                await UniversalEditVideoExaminedAsync(video, admin, true, resulte, item.Value, "补全审核记录");
             }
         }
 

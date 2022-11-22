@@ -1034,7 +1034,7 @@ a img + strong {
     color: var(--main-color) !important;
 }
 
-p img {
+p > img {
     display: flex;
     justify-content: center;
 }

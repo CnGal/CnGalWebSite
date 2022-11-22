@@ -6,6 +6,7 @@ using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Comments;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -41,13 +42,14 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
+        private readonly IRepository<Video, long> _videoRepository;
         private readonly ICommentService _commentService;
         private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
         private readonly IEditRecordService _editRecordService;
 
-        public CommentsAPIController(UserManager<ApplicationUser> userManager, IRepository<ApplicationUser, string> userRepository, ICommentService commentService,
-            IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository, IEditRecordService editRecordService,
+        public CommentsAPIController(UserManager<ApplicationUser> userManager, IRepository<ApplicationUser, string> userRepository, ICommentService commentService, IRepository<Video, long> videoRepository,
+        IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository, IEditRecordService editRecordService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository, IExamineService examineService, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
         {
@@ -64,6 +66,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _examineService = examineService;
             _examineRepository = examineRepository;
             _editRecordService = editRecordService;
+            _videoRepository = videoRepository;
         }
 
         [AllowAnonymous]
@@ -153,6 +156,18 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                 }
             }
+            else if (commentType == CommentType.CommentVideo)
+            {
+                var video = await _videoRepository.FirstOrDefaultAsync(s => s.Id == long.Parse(id));
+                if (video != null)
+                {
+                    //判断是否被关闭
+                    if (video.CanComment == false)
+                    {
+                        return NotFound("评论区被关闭");
+                    }
+                }
+            }
 
             //获取审核预览
             //获取当前用户ID
@@ -192,6 +207,7 @@ namespace CnGalWebSite.APIServer.Controllers
             Entry entry = null;
             Periphery periphery = null;
             Vote vote = null;
+            Video video = null;
             Lottery lottery = null;
             UserSpaceCommentManager userSpace = null;
             Comment replyComment = null;
@@ -257,6 +273,17 @@ namespace CnGalWebSite.APIServer.Controllers
                     if (lottery.CanComment == false)
                     {
                         return new Result { Successful = false, Error = "该抽奖不允许评论" };
+                    }
+                    break;
+                case CommentType.CommentVideo:
+                    video = await _videoRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(model.ObjectId));
+                    if (video == null)
+                    {
+                        return new Result { Successful = false, Error = "无法找到该视频，Id" + model.ObjectId };
+                    }
+                    if (video.CanComment == false)
+                    {
+                        return new Result { Successful = false, Error = "该视频不允许评论" };
                     }
                     break;
                 case CommentType.CommentUser:
@@ -338,6 +365,14 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<Result>> EditLotteryCanCommentAsync(EditLotteryCanCommentModel model)
         {
             await _lotteryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.CanComment, b => model.CanComment).ExecuteAsync();
+            return new Result { Successful = true };
+        }
+
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        public async Task<ActionResult<Result>> EditVideoCanCommentAsync(EditLotteryCanCommentModel model)
+        {
+            await _videoRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.CanComment, b => model.CanComment).ExecuteAsync();
             return new Result { Successful = true };
         }
 

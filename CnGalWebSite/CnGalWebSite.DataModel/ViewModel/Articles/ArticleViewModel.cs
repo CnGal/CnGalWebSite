@@ -12,6 +12,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         /// 名称
         /// </summary>
         public string Name { get; set; }
+        public string DisplayName { get; set; }
         /// <summary>
         /// 简介
         /// </summary>
@@ -105,8 +106,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         public List<RelevancesKeyValueModel> RelatedOutlinks { get; set; } = new List<RelevancesKeyValueModel> { };
 
         public UserInforViewModel UserInfor { get; set; } = new UserInforViewModel();
-
-        public long LastExamineId { get; set; }
 
     }
 }

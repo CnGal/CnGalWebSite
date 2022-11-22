@@ -201,7 +201,6 @@ namespace CnGalWebSite.APIServer.Controllers
             if (user != null)
             {
                 examiningList = await _examineRepository.GetAll().Where(s => s.EntryId == entry.Id && s.ApplicationUserId != user.Id && s.IsPassed == null).Select(s => s.Operation).ToListAsync();
-
             }
             if (user != null)
             {

@@ -4,7 +4,7 @@ using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
-using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Comments;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -36,10 +36,11 @@ namespace CnGalWebSite.APIServer.Application.Comments
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<Vote, long> _voteRepository;
         private readonly IRepository<Lottery, long> _lotteryRepository;
+        private readonly IRepository<Video, long> _videoRepository;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Comment>, string, SortOrder, IEnumerable<Comment>>> SortLambdaCache = new();
 
-        public CommentService(IAppHelper appHelper, IRepository<Comment, long> commentRepository, IRepository<UserSpaceCommentManager, long> userSpaceCommentManagerRepository, IRepository<Article, long> articleRepository,
+        public CommentService(IAppHelper appHelper, IRepository<Comment, long> commentRepository, IRepository<UserSpaceCommentManager, long> userSpaceCommentManagerRepository, IRepository<Article, long> articleRepository, IRepository<Video, long> videoRepository,
         IRankService rankService, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<ApplicationUser, string> userRepository, IRepository<Vote, long> voteRepository, IRepository<Lottery, long> lotteryRepository)
         {
             _commentRepository = commentRepository;
@@ -52,6 +53,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
             _userRepository = userRepository;
             _voteRepository = voteRepository;
             _lotteryRepository = lotteryRepository;
+            _videoRepository = videoRepository;
         }
 
         public async Task<List<CommentViewModel>> GetComments( CommentType type, string Id, string rankName, string ascriptionUserId,IEnumerable<Comment> examineComments)
@@ -87,6 +89,10 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     break;
                 case CommentType.CommentLottery:
                     query = query.Where(s => s.Type == type && s.LotteryId == tempId);
+                    examineComments = examineComments.Where(s => s.ParentCodeNavigation != null || s.LotteryId == tempId);
+                    break;
+                case CommentType.CommentVideo:
+                    query = query.Where(s => s.Type == type && s.VideoId == tempId);
                     examineComments = examineComments.Where(s => s.ParentCodeNavigation != null || s.LotteryId == tempId);
                     break;
                 case CommentType.CommentUser:
@@ -216,6 +222,9 @@ namespace CnGalWebSite.APIServer.Application.Comments
                 case CommentType.CommentLottery:
                     items = items.Where(s => s.LotteryId == tempId);
                     break;
+                case CommentType.CommentVideo:
+                    items = items.Where(s => s.VideoId == tempId);
+                    break;
                 case CommentType.CommentUser:
                     var space = await _userSpaceCommentManagerRepository.FirstOrDefaultAsync(s => s.ApplicationUserId == objectId);
                     if (space == null)
@@ -326,6 +335,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
             Periphery periphery = null;
             Vote vote = null;
             Lottery lottery = null;
+            Video video = null;
             UserSpaceCommentManager userSpace = null;
             Comment replyComment = null;
             ApplicationUser userTemp = null;
@@ -367,6 +377,13 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     break;
                 case CommentType.CommentLottery:
                     lottery = await _lotteryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
+                    if (lottery == null)
+                    {
+                        return;
+                    }
+                    break;
+                case CommentType.CommentVideo:
+                    video = await _videoRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
                     if (lottery == null)
                     {
                         return;
@@ -436,6 +453,10 @@ namespace CnGalWebSite.APIServer.Application.Comments
                 case CommentType.CommentLottery:
                     comment.LotteryId = tempId;
                     comment.Lottery = lottery;
+                    break;
+                case CommentType.CommentVideo:
+                    comment.VideoId = tempId;
+                    comment.Video = video;
                     break;
                 case CommentType.CommentUser:
                     comment.UserSpaceCommentManager = userSpace;

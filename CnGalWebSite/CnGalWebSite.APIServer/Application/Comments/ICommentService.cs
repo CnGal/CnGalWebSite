@@ -1,7 +1,7 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Comments.Dtos;
 using CnGalWebSite.DataModel.Application.Dtos;
-using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Comments;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Coments;

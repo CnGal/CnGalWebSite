@@ -169,7 +169,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
             model.UserInfor = await _userService.GetUserInforViewModel(createUser);
-            model.LastExamineId = article.Examines.Last().Id;
 
             //判断是否有权限编辑
             if (user != null && await _userManager.IsInRoleAsync(user, "Editor") == true)
@@ -205,21 +204,6 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 model.IsThumbsUp = false;
             }
-
-
-
-            //序列化相关性列表
-            //读取当前用户等待审核的信息
-            if (user != null)
-            {
-                examine = examineQuery.Find(s => s.Operation == Operation.EditArticleRelevanes);
-                if (examine != null)
-                {
-                    model.RelevancesState = EditState.Preview;
-                    await _articleService.UpdateArticleData(article, examine);
-                }
-            }
-
 
             var examiningList = new List<Operation>();
             if (user != null)

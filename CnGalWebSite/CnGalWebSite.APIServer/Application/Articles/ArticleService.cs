@@ -3,7 +3,9 @@ using CnGalWebSite.APIServer.Application.Articles.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
-using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Articles;
+using CnGalWebSite.DataModel.ExamineModel.Entries;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
@@ -580,7 +582,8 @@ namespace CnGalWebSite.APIServer.Application.Articles
             var model = new ArticleViewModel
             {
                 Id = article.Id,
-                Name = article.DisplayName ?? article.Name,
+                Name = article.Name ,
+                DisplayName=article.DisplayName,
                 Type = article.Type,
                 MainPage = article.MainPage,
                 PubishTime = article.RealNewsTime ?? article.PubishTime,
@@ -661,7 +664,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             //遍历当前词条数据 打上删除标签
             foreach (var item in currentArticle.ArticleRelationFromArticleNavigation.Select(s => s.ToArticleNavigation))
             {
-                articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                articleRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                 {
                     DisplayName = item.Id.ToString(),
                     DisplayValue = item.Name,
@@ -682,11 +685,11 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 }
                 else
                 {
-                    articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                    articleRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                     {
                         DisplayName = item.ToArticle.ToString(),
                         DisplayValue = item.ToArticleNavigation.Name,
-                        Type = RelevancesType.Entry,
+                        Type = RelevancesType.Article,
                         IsDelete = false
                     });
                 }
@@ -696,7 +699,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             //遍历当前文章数据 打上删除标签
             foreach (var item in currentArticle.Entries)
             {
-                articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                articleRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                 {
                     DisplayName = item.Id.ToString(),
                     DisplayValue = item.Name,
@@ -717,7 +720,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 }
                 else
                 {
-                    articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                    articleRelevances.Relevances.Add(new  EditRecordRelevancesAloneModel
                     {
                         DisplayName = item.Id.ToString(),
                         DisplayValue = item.Name,
@@ -732,7 +735,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             //遍历当前词条外部链接 打上删除标签
             foreach (var item in currentArticle.Outlinks)
             {
-                articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                articleRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                 {
                     DisplayName = item.Name,
                     DisplayValue = item.BriefIntroduction,
@@ -768,7 +771,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 }
                 if (isSame == false)
                 {
-                    articleRelevances.Relevances.Add(new ArticleRelevancesAloneModel
+                    articleRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                     {
                         DisplayName = infor.Name,
                         DisplayValue = infor.BriefIntroduction,
@@ -845,7 +848,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             var examiningList = new List<Operation>();
             if (user != null)
             {
-                examiningList = await _examineRepository.GetAll().Where(s => s.PeripheryId == id && s.ApplicationUserId != user.Id && s.IsPassed == null).Select(s => s.Operation).ToListAsync();
+                examiningList = await _examineRepository.GetAll().Where(s => s.ArticleId == id && s.ApplicationUserId != user.Id && s.IsPassed == null).Select(s => s.Operation).ToListAsync();
 
             }
             if (user != null)

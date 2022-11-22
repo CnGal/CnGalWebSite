@@ -5,7 +5,8 @@ using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
-using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Entries;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
@@ -1684,7 +1685,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //先把 当前词条中的图片 都 打上删除标签
             foreach (var item in currentEntry.Pictures)
             {
-                entryImages.Images.Add(new EntryImage
+                entryImages.Images.Add(new EditRecordImage
                 {
                     Url = item.Url,
                     Note = item.Note,
@@ -1719,7 +1720,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 if (isSame == false)
                 {
-                    entryImages.Images.Add(new EntryImage
+                    entryImages.Images.Add(new EditRecordImage
                     {
                         Url = infor.Url,
                         Modifier = infor.Modifier,
@@ -1745,7 +1746,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //遍历当前词条数据 打上删除标签
             foreach (var item in currentEntry.EntryRelationFromEntryNavigation.Select(s => s.ToEntryNavigation))
             {
-                entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                 {
                     DisplayName = item.Id.ToString(),
                     DisplayValue = item.Name,
@@ -1766,7 +1767,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 else
                 {
-                    entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                    entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                     {
                         DisplayName = item.ToEntry.ToString(),
                         DisplayValue = item.ToEntryNavigation.Name,
@@ -1780,7 +1781,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //遍历当前文章数据 打上删除标签
             foreach (var item in currentEntry.Articles)
             {
-                entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                 {
                     DisplayName = item.Id.ToString(),
                     DisplayValue = item.Name,
@@ -1801,7 +1802,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 else
                 {
-                    entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                    entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                     {
                         DisplayName = item.Id.ToString(),
                         DisplayValue = item.Name,
@@ -1816,7 +1817,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //遍历当前词条外部链接 打上删除标签
             foreach (var item in currentEntry.Outlinks)
             {
-                entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                 {
                     DisplayName = item.Name,
                     DisplayValue = item.BriefIntroduction,
@@ -1853,7 +1854,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 if (isSame == false)
                 {
-                    entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                    entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                     {
                         DisplayName = infor.Name,
                         DisplayValue = infor.BriefIntroduction,
