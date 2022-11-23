@@ -5,7 +5,10 @@
 
 <HomeListCardTip Title="文章" Icon="fa fa-fw  fa-newspaper-o" Url="/articles" APIUrl="api/home/GetHomeArticlesView"  ShowCount />
 
-<HomeListCardTip Title="视频" Icon="fa fa-fw  fa-video-camera" Url="/search/?Types=Video" APIUrl="api/home/GetHomeVideosView" ShowCount />
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+    <HomeListCardTip Title="视频" Icon="fa fa-fw  fa-video-camera" Url="/search/?Types=Video" APIUrl="api/home/GetHomeVideosView" ShowCount />
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+
 
 <HomeListCardTip Title="最近编辑" Icon="fa fa-fw  fa-pencil" Url="/search/?Types=Game&Sort=LastEditTime desc" APIUrl="api/home/GetHomeRecentEditView" ShowCount />
 

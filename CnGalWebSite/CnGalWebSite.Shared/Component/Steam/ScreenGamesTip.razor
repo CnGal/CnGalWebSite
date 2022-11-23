@@ -11,7 +11,10 @@
     </div>
     <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-4">
         <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="ScreenType" ValueChanged="OnScreenTypeChanged" TValue="ScreenSteamType" Class="pt-0" Lable="筛选" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="ScreenType" ValueChanged="OnScreenTypeChanged" TValue="ScreenSteamType" Class="pt-0" Lable="折扣" />
+        </div>
+        <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="PurchasedType" ValueChanged="OnPurchasedTypeChangedChanged" TValue="PurchasedSteamType" Class="pt-0" Lable="库存" />
         </div>
         <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="OrderType" ValueChanged="OnOrderTypeChangedChanged" TValue="SteamSortType" Class="pt-0" Lable="排序" />
@@ -29,6 +32,8 @@
     public SteamSortType OrderType { get; set; }
     [Parameter]
     public SteamDisplayType DisplayType { get; set; }
+    [Parameter]
+    public PurchasedSteamType PurchasedType { get; set; }
 
     [Parameter]
     public EventCallback<ScreenSteamType> ScreenTypeChanged { get; set; }
@@ -36,6 +41,8 @@
     public EventCallback<SteamSortType> OrderTypeChanged { get; set; }
     [Parameter]
     public EventCallback<SteamDisplayType> DisplayTypeChanged { get; set; }
+    [Parameter]
+    public EventCallback<PurchasedSteamType> PurchasedTypeChanged { get; set; }
 
 
     public async Task OnScreenTypeChanged(ScreenSteamType type)
@@ -50,5 +57,10 @@
     public async Task OnDisplayTypeChangedChanged(SteamDisplayType type)
     {
         await DisplayTypeChanged.InvokeAsync(type);
+    }
+
+    public async Task OnPurchasedTypeChangedChanged(PurchasedSteamType type)
+    {
+        await PurchasedTypeChanged.InvokeAsync(type);
     }
 }

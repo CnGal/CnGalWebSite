@@ -56,13 +56,14 @@
             <CnGalWebSite.Shared.Component.Steam.ScreenGamesTip ScreenType="_dataCacheService.DiscountPageCatcheHelper.ScreenType"
                                                                 OrderType="_dataCacheService.DiscountPageCatcheHelper.OrderType"
                                                                 DisplayType="_dataCacheService.DiscountPageCatcheHelper.steamDisplayType"
-                                                                ScreenTypeChanged="ScreenTypeChanged" OrderTypeChanged="OrderTypeChanged" DisplayTypeChanged="DisplayTypeChanged" />
+                                                                 PurchasedType="_dataCacheService.DiscountPageCatcheHelper.PurchasedType"
+                                                                ScreenTypeChanged="ScreenTypeChanged" OrderTypeChanged="OrderTypeChanged" DisplayTypeChanged="DisplayTypeChanged" PurchasedTypeChanged="PurchasedTypeChanged"/>
         </div>
         <div class="row">
             @foreach (var item in _dataCacheService.DiscountPageCatcheHelper.Items.Skip((_dataCacheService.DiscountPageCatcheHelper.CurrentPage - 1) * _dataCacheService.DiscountPageCatcheHelper.MaxCount).Take(_dataCacheService.DiscountPageCatcheHelper.MaxCount))
             {
                 <div class="@("mb-3 "+(_dataCacheService.DiscountPageCatcheHelper.steamDisplayType== SteamDisplayType.LongCard?"col-12":"col-12 col-md-6 col-xxl-4"))">
-                    <CnGalWebSite.Shared.Component.Steam.SteamInforViewTip Model="item" Type="_dataCacheService.DiscountPageCatcheHelper.steamDisplayType" />
+                    <CnGalWebSite.Shared.Component.Steam.SteamInforViewTip Model="item" Type="_dataCacheService.DiscountPageCatcheHelper.steamDisplayType" Purchased="_dataCacheService.DiscountPageCatcheHelper.PurchasedGames.Any(s=>s==item.Id)"/>
                 </div>
             }
 
@@ -89,23 +90,40 @@
     protected override async Task OnInitializedAsync()
     {
 
-        try
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            if(_dataCacheService.DiscountPageCatcheHelper.IsInit==false)
+            try
             {
-                _dataCacheService.DiscountPageCatcheHelper.Init(await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame", ToolHelper.options));
+                if (_dataCacheService.DiscountPageCatcheHelper.IsInit == false)
+                {
+                    _dataCacheService.DiscountPageCatcheHelper.Init(await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame", ToolHelper.options));
+
+                    try
+                    {
+                        _dataCacheService.DiscountPageCatcheHelper.PurchasedGames = await Http.GetFromJsonAsync<List<int>>(ToolHelper.WebApiPath + "api/playedgame/GetUserInSteamGameIds", ToolHelper.options);
+                    }
+                    catch
+                    {
+
+                    }
+
+
+                }
+
+                isReady = true;
+                StateHasChanged();
+
             }
-
-            isReady = true;
-            StateHasChanged();
-
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取Steam折扣游戏列表失败");
+            }
         }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取Steam折扣游戏列表失败");
-        }
-
-
     }
 
     public Task ScreenTypeChanged(ScreenSteamType type)
@@ -131,6 +149,12 @@
     public Task DisplayTypeChanged(SteamDisplayType type)
     {
         _dataCacheService.DiscountPageCatcheHelper.steamDisplayType = type;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+    public Task PurchasedTypeChanged(PurchasedSteamType type)
+    {
+        _dataCacheService.DiscountPageCatcheHelper.PurchasedType = type;
         StateHasChanged();
         return Task.CompletedTask;
     }

@@ -8,6 +8,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
         private List<SteamInforTipViewModel> Model = new List<SteamInforTipViewModel>();
         public List<SteamInforTipViewModel> Items = new List<SteamInforTipViewModel>();
 
+        public List<int> PurchasedGames=new List<int>();
+
         public int TabIndex { get; set; } = 1;
 
         public int MaxCount { get; set; } = 12;
@@ -15,6 +17,17 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
         public int TotalPages => ((Items.Count-1) / MaxCount) + 1;
 
         public int CurrentPage { get; set; } = 1;
+
+        private PurchasedSteamType purchasedType;
+        public PurchasedSteamType PurchasedType
+        {
+            get => purchasedType;
+            set
+            {
+                purchasedType = value;
+                SetItems();
+            }
+        }
 
         private ScreenSteamType screenType;
         public ScreenSteamType ScreenType
@@ -77,6 +90,20 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
                     Items = Model.Where(s => s.CutNow == s.CutLowest && s.CutLowest > 0).ToList();
                     break;
             };
+
+            switch (PurchasedType)
+            {
+                case PurchasedSteamType.All:
+                    Items = Model;
+                    break;
+                case PurchasedSteamType.Purchased:
+                    Items = Model.Where(s => PurchasedGames.Contains(s.Id)).ToList();
+                    break;
+                case PurchasedSteamType.UnPurchased:
+                    Items = Model.Where(s => PurchasedGames.Contains(s.Id)==false).ToList();
+                    break;
+            };
+
 
             switch (OrderType)
             {
