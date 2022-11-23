@@ -1,0 +1,77 @@
+﻿@inject IDataCacheService _dataCacheService
+
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            转载其他平台视频
+        </MCardTitle>
+        <MCardText Class="pb-0">
+            目前只支持B站视频
+        </MCardText>
+        <MStepper Value="_step" Vertical Elevation="0" Style="box-shadow: none;" Height="@("auto")">
+            <MStepperStep Step="1" Complete="_step>1" Color="@_dataCacheService.ThemeSetting.Theme">
+                输入要转载的视频链接
+            </MStepperStep>
+            <MStepperContent Step="1">
+                <InputCard Model="Model" OnFinshInput="OnStart" />
+            </MStepperContent>
+            <MStepperStep Step="2" Complete="_step>2" Color="@_dataCacheService.ThemeSetting.Theme">
+                正在处理视频
+            </MStepperStep>
+            <MStepperContent Step="2">
+                @if (_step == 2)
+                {
+                    <ProcCard Model="Model" @ref="procCard" />
+                }
+            </MStepperContent>
+            <MStepperStep Step="3" Complete="_step>3" Color="@_dataCacheService.ThemeSetting.Theme">
+                视频处理完成
+            </MStepperStep>
+            <MStepperContent Step="3">
+                <ResultCard Model="Model" OnRetry="OnRetry" />
+            </MStepperContent>
+        </MStepper>
+    </MCard>
+</MDialog>
+@code {
+    private int _step = 1;
+    bool Dialog { get; set; }
+
+    public List<RepostVideoModel> Model { get; set; } = new List<RepostVideoModel>();
+    private bool isReady = false;
+
+    ProcCard procCard;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            StateHasChanged();
+        }
+    }
+
+    public async Task OnStart()
+    {
+        _step = 2;
+        StateHasChanged();
+        if (procCard != null)
+        {
+            await procCard.Proc();
+        }
+        _step = 3;
+        StateHasChanged();
+    }
+
+    public async Task OnRetry()
+    {
+        _step = 1;
+        StateHasChanged();
+    }
+
+    public async Task Refresh(bool dialog)
+    {
+        Dialog = dialog;
+
+        StateHasChanged();
+    }
+}

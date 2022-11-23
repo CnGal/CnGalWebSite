@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.ExamineModel.Shared;
+﻿using BootstrapBlazor.Components;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.ExamineModel.Videos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -49,5 +50,7 @@ namespace CnGalWebSite.APIServer.Application.Videos
         ExaminePreDataModel GetExamineViewRelevances(Video item);
 
         ExaminePreDataModel GetExamineViewImages(Video item);
+
+        Task<QueryData<ListVideoAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListVideoAloneModel searchModel);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.Search.Typesense;
+using CnGalWebSite.APIServer.Controllers;
 using CnGalWebSite.APIServer.CustomMiddlewares;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Model;
@@ -27,12 +28,14 @@ namespace CnGalWebSite.APIServer.Application.Typesense
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
+        private readonly IRepository<Video, long> _videoRepository;
         private readonly IRepository<SearchCache, long> _searchCacheRepository;
 
+        private readonly ILogger<TypesenseHelper> _logger;
         private readonly IAppHelper _appHelper;
         private readonly string _collectionName = "SearchCache";
 
-        public TypesenseHelper(ITypesenseProvider typesenseProvider, IRepository<Entry, int> entryRepository, IRepository<SearchCache, long> searchCacheRepository,
+        public TypesenseHelper(ITypesenseProvider typesenseProvider, IRepository<Entry, int> entryRepository, IRepository<SearchCache, long> searchCacheRepository, IRepository<Video, long> videoRepository, ILogger<TypesenseHelper> logger,
         IRepository<Tag, int> tagRepository, IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository, IAppHelper appHelper)
         {
             _typesenseClient = typesenseProvider.GetClient();
@@ -43,6 +46,9 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             _articleRepository = articleRepository;
             _appHelper = appHelper;
             _searchCacheRepository = searchCacheRepository;
+            _videoRepository = videoRepository;
+
+            _logger = logger;
         }
 
         public async Task UpdateDataToSearchService(DateTime LastUpdateTime, bool updateAll = false)
@@ -52,6 +58,9 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             await UpdateArticles(LastUpdateTime, updateAll);
             await UpdatePeripheries(LastUpdateTime, updateAll);
             await UpdateTags(LastUpdateTime, updateAll);
+            await UpdateVideos(LastUpdateTime, updateAll);
+
+            _logger.LogInformation("更新搜索数据完成");
         }
 
         private async Task CreateCollection()
@@ -97,6 +106,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
                 foreach (var item in entries)
                 {
+                    _logger.LogInformation("Entry:{id}", item.Id);
                     var temp = documents.FirstOrDefault(s => s.OriginalId == item.Id);
                     if (temp == null)
                     {
@@ -161,6 +171,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
                 foreach (var item in entries)
                 {
+                    _logger.LogInformation("Article:{id}", item.Id);
                     var temp = documents.FirstOrDefault(s => s.OriginalId == item.Id);
                     if (temp == null)
                     {
@@ -210,6 +221,69 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             }
         }
 
+        private async Task UpdateVideos(DateTime LastUpdateTime, bool updateAll = false)
+        {
+            var entries = await _videoRepository.GetAll().AsNoTracking()
+                .Where(s => (s.LastEditTime > LastUpdateTime || updateAll) && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
+            var documents = new List<SearchCache>();
+            if (entries.Any())
+            {
+                var entryIds = entries.Select(s => s.Id).ToList();
+
+                documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 4 && entryIds.Contains(s.OriginalId)).ToListAsync();
+
+                foreach (var item in entries)
+                {
+                    _logger.LogInformation("Video:{id}", item.Id);
+                    var temp = documents.FirstOrDefault(s => s.OriginalId == item.Id);
+                    if (temp == null)
+                    {
+                        temp = new SearchCache();
+                        temp.Copy(item);
+
+                        temp = await _searchCacheRepository.InsertAsync(temp);
+
+                        temp.Copy(item);
+                        temp = await _searchCacheRepository.UpdateAsync(temp);
+
+                        documents.Add(temp);
+                    }
+                    else
+                    {
+                        temp.Copy(item);
+                        temp = await _searchCacheRepository.UpdateAsync(temp);
+
+                    }
+
+                }
+                var result = await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+                var errors = result.Where(s => s.Success == false);
+                foreach (var item in errors)
+                {
+                    Console.WriteLine(item.Error);
+                }
+            }
+
+            var deleted = await _videoRepository.GetAll().Where(s => s.IsHidden || string.IsNullOrWhiteSpace(s.Name)).Select(s => s.Id).ToListAsync();
+            documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 4 && deleted.Contains(s.OriginalId)).ToListAsync();
+            foreach (var item in documents)
+            {
+                try
+                {
+                    await _typesenseClient.DeleteDocument<SearchCache>(_collectionName, item.Id);
+                }
+                catch
+                {
+
+                }
+            }
+            if (documents.Count != 0)
+            {
+                await _searchCacheRepository.DeleteRangeAsync(s => s.Type == 1 && deleted.Contains(s.OriginalId));
+
+            }
+        }
+
         private async Task UpdatePeripheries(DateTime LastUpdateTime, bool updateAll = false)
         {
             var entries = await _peripheryRepository.GetAll().AsNoTracking()
@@ -226,6 +300,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
                 foreach (var item in entries)
                 {
+                    _logger.LogInformation("Periphery:{id}", item.Id);
                     var temp = documents.FirstOrDefault(s => s.OriginalId == item.Id);
                     if (temp == null)
                     {
@@ -291,6 +366,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                 documents = await _searchCacheRepository.GetAll().Where(s => s.Type == 3 && entryIds.Contains(s.OriginalId)).ToListAsync();
                 foreach (var item in entries)
                 {
+                    _logger.LogInformation("Tag:{id}", item.Id);
                     var temp = documents.FirstOrDefault(s => s.OriginalId == item.Id);
                     if (temp == null)
                     {
@@ -417,6 +493,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                 "文章" => "type:=1",
                 "周边" => "type:=2",
                 "标签" => "type:=3",
+                "视频" => "type:=4",
                 "游戏" => "type:=0 && originalType:=0",
                 "角色" => "type:=0 && originalType:=1",
                 "STAFF" => "type:=0 && originalType:=3",
@@ -478,6 +555,10 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
             var tags = await _tagRepository.GetAll().AsNoTracking().Where(s => tagIds.Contains(s.Id) && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
 
+            var videoIds = model.Hits.Where(s => s.Document.Type == 4).Select(s => s.Document.OriginalId).ToList();
+
+            var videos = await _videoRepository.GetAll().AsNoTracking().Include(s => s.CreateUser).Where(s => videoIds.Contains(s.Id) && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
+
 
 
             var result = new PagedResultDto<SearchAloneModel>
@@ -491,32 +572,64 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             {
                 if (item.Document.Type == 0)
                 {
-                    result.Data.Add(new SearchAloneModel
+                    var temp = entries.FirstOrDefault(s => s.Id == item.Document.OriginalId);
+                    if (temp != null)
                     {
-                        entry = _appHelper.GetEntryInforTipViewModel(entries.FirstOrDefault(s => s.Id == item.Document.OriginalId))
-                    });
+                        result.Data.Add(new SearchAloneModel
+                        {
+                            entry = _appHelper.GetEntryInforTipViewModel(temp)
+                        });
+                    }
+
                 }
                 else if (item.Document.Type == 1)
                 {
-                    result.Data.Add(new SearchAloneModel
+                    var temp = articles.FirstOrDefault(s => s.Id == item.Document.OriginalId);
+                    if (temp != null)
                     {
-                        article = _appHelper.GetArticleInforTipViewModel(articles.FirstOrDefault(s => s.Id == item.Document.OriginalId))
-                    });
+                        result.Data.Add(new SearchAloneModel
+                        {
+                            article = _appHelper.GetArticleInforTipViewModel(temp)
+                        });
+                    }
+
                 }
 
                 else if (item.Document.Type == 2)
                 {
-                    result.Data.Add(new SearchAloneModel
+                    var temp = peripheries.FirstOrDefault(s => s.Id == item.Document.OriginalId);
+                    if (temp != null)
                     {
-                        periphery = _appHelper.GetPeripheryInforTipViewModel(peripheries.FirstOrDefault(s => s.Id == item.Document.OriginalId))
-                    });
+                        result.Data.Add(new SearchAloneModel
+                        {
+                            periphery = _appHelper.GetPeripheryInforTipViewModel(temp)
+                        });
+                    }
+
                 }
                 else if (item.Document.Type == 3)
                 {
-                    result.Data.Add(new SearchAloneModel
+                    var temp = tags.FirstOrDefault(s => s.Id == item.Document.OriginalId);
+                    if (temp != null)
                     {
-                        tag = _appHelper.GetTagInforTipViewModel(tags.FirstOrDefault(s => s.Id == item.Document.OriginalId))
-                    });
+                        result.Data.Add(new SearchAloneModel
+                        {
+                            tag = _appHelper.GetTagInforTipViewModel(temp)
+                        });
+                    }
+
+                }
+                else if (item.Document.Type == 4)
+                {
+                    var temp = videos.FirstOrDefault(s => s.Id == item.Document.OriginalId);
+                    if (temp != null)
+                    {
+                        result.Data.Add(new SearchAloneModel
+                        {
+                            video = _appHelper.GetVideoInforTipViewModel(temp)
+                        });
+                    }
+
                 }
             }
 
@@ -594,7 +707,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
                 foreach (var item in model.Types)
                 {
-                    if (item == SearchType.Entry || item == SearchType.Article || item == SearchType.Periphery || item == SearchType.Tag)
+                    if (item == SearchType.Entry || item == SearchType.Article || item == SearchType.Periphery || item == SearchType.Tag || item == SearchType.Video)
                     {
                         types.AddRange(item.ToTypeList());
                     }

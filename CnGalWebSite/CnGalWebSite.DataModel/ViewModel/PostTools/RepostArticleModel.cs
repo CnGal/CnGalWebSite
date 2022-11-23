@@ -23,7 +23,6 @@ namespace CnGalWebSite.DataModel.ViewModel.PostTools
 
         public DateTime PublishTime { get; set; }
 
-        public DateTime? PostTime { get; set; }
 
         public ArticleType Type { get; set; }
 

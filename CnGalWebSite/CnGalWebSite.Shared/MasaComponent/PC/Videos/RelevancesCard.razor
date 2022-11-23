@@ -7,6 +7,8 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/videos/EditRelevances/" + Model.Id)" ExamineType="Operation.EditVideoRelevanes" OnClickRevoke="OnRevoke" />
 }
 <div>
+    <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="Model.RelatedVideos" />
+
     @if (Model.RelatedEntries.Any())
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-codepen" Title="相关词条" Outline Collapable>
@@ -46,7 +48,7 @@
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     }
 
-    <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="Model.RelatedVideos" />
+
 
 </div>
 

@@ -1,0 +1,79 @@
+﻿<MSimpleTable Class="mb-4">
+    <thead>
+        <tr>
+            <th class="text-left">
+                状态
+            </th>
+            <th class="text-left">
+                Id
+            </th>
+            <th class="text-left">
+                类型
+            </th>
+            <th class="text-left">
+                本人创作
+            </th>
+            <th class="text-left">
+                标题
+            </th>
+            <th class="text-left">
+                链接
+            </th>
+            <th class="text-left">
+                错误
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr @key="item.Url">
+                <td>
+                    @if (item.CompleteTaskCount == item.TotalTaskCount)
+                    {
+                        <MIcon Color="green">mdi-check</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="error">mdi-close</MIcon>
+                    }
+
+
+                </td>
+                <td>@item.Id</td>
+
+                <td>@item.Type</td>
+                <td>
+                    @if (item.IsCreatedByCurrentUser)
+                    {
+                        <MIcon Color="green">mdi-check</MIcon>
+                    }
+                    else
+                    {
+                        <MIcon Color="error">mdi-close</MIcon>
+                    }
+                </td>
+                <td>@item.Title</td>
+                <td>@item.Url</td>
+                <td>@item.Error</td>
+            </tr>
+        }
+    </tbody>
+</MSimpleTable>
+
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="重新开始" Depressed Icon="mdi-refresh" OnClick="OnClickRetry" Class="mb-2" />
+
+
+@code {
+    [Parameter]
+    public List<RepostVideoModel> Model { get; set; }
+    [Parameter]
+    public EventCallback OnRetry { get; set; }
+
+    public async Task OnClickRetry()
+    {
+        Model.RemoveAll(s => s.CompleteTaskCount == s.TotalTaskCount);
+        await OnRetry.InvokeAsync();
+    }
+}

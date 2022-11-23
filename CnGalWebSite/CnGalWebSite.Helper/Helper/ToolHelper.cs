@@ -1,5 +1,4 @@
-﻿using CnGalWebSite.DataModel.Application.Helper;
-using CnGalWebSite.DataModel.ExamineModel.Shared;
+﻿using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -457,7 +456,7 @@ namespace CnGalWebSite.DataModel.Helper
             {
                 return PositionGeneralType.FineArts;
             }
-            else if ((text.Contains("配音") || text.Contains("声优") || text.ToUpper().Contains("CV") || text.ToUpper().Contains("CAST")) &&text.Contains("导演")==false && text.Contains("监督") == false && text.Contains("制作") == false && text.Contains("后期") == false && text.Contains("处理") == false && text.Contains("后制") == false)
+            else if ((text.Contains("配音") || text.Contains("声优") || text.ToUpper().Contains("CV") || text.ToUpper().Contains("CAST")) && text.Contains("导演") == false && text.Contains("监督") == false && text.Contains("制作") == false && text.Contains("后期") == false && text.Contains("处理") == false && text.Contains("后制") == false)
             {
                 return PositionGeneralType.CV;
             }
@@ -493,9 +492,9 @@ namespace CnGalWebSite.DataModel.Helper
             {
                 return false;
             }
-            
+
             var regexDX = new Regex(@"^1(3[0-9]|4[01456879]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[0-35-9])\d{8}$");
-           
+
             if (regexDX.IsMatch(input))
             {
                 return true;
@@ -826,7 +825,7 @@ namespace CnGalWebSite.DataModel.Helper
                         {
                             pt.SetValue(data, DateTime.FromBinary(long.Parse(item.Value)), null);
                         }
-                       
+
                     }
                     else if (pt.PropertyType == typeof(DateTime?))
                     {
@@ -838,7 +837,7 @@ namespace CnGalWebSite.DataModel.Helper
                         {
                             pt.SetValue(data, item.Value != null ? DateTime.FromBinary(long.Parse(item.Value)) : null, null);
                         }
-                      
+
                     }
                     else if (pt.PropertyType == typeof(string))
                     {
@@ -866,7 +865,7 @@ namespace CnGalWebSite.DataModel.Helper
 
             var t = currentItem.GetType();
             var pts = t.GetProperties();
-            foreach (var item in pts.Where(s => s.PropertyType == typeof(string) || s.PropertyType == typeof(DateTime) || s.PropertyType == typeof(DateTime?) || s.PropertyType == typeof(TimeSpan) 
+            foreach (var item in pts.Where(s => s.PropertyType == typeof(string) || s.PropertyType == typeof(DateTime) || s.PropertyType == typeof(DateTime?) || s.PropertyType == typeof(TimeSpan)
             || s.PropertyType == typeof(EntryType) || s.PropertyType == typeof(ArticleType) || s.PropertyType == typeof(PeripheryType) || s.PropertyType == typeof(CopyrightType) || s.PropertyType == typeof(bool) || s.PropertyType == typeof(int)))
             {
                 //特殊字段跳过
@@ -1210,7 +1209,7 @@ namespace CnGalWebSite.DataModel.Helper
 
         }
 
-        public static async Task<TransformImageResult> TransformImagesAsync(string text,HttpClient _httpClient)
+        public static async Task<TransformImageResult> TransformImagesAsync(string text, HttpClient _httpClient)
         {
 
             if (string.IsNullOrWhiteSpace(text))
@@ -1280,28 +1279,125 @@ namespace CnGalWebSite.DataModel.Helper
 
             return cpuUsageTotal * 100;
         }
+
+
+
     }
-        public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions
+    public class QueryPageOptionsHelper : CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions
+    {
+        /// <summary>
+        /// 隐式转换
+        /// </summary>
+        /// <param name="cat"></param>
+        public static implicit operator QueryPageOptionsHelper(BootstrapBlazor.Components.QueryPageOptions cat)
         {
-            /// <summary>
-            /// 隐式转换
-            /// </summary>
-            /// <param name="cat"></param>
-            public static implicit operator QueryPageOptionsHelper(BootstrapBlazor.Components.QueryPageOptions cat)
+            return new QueryPageOptionsHelper
             {
-                return new QueryPageOptionsHelper
-                {
-                    SearchText = cat.SearchText,
-                    SortName = cat.SortName,
-                    SortOrder = (CnGalWebSite.DataModel.ViewModel.Search.SortOrder)cat.SortOrder,
-                    SearchModel = cat.SearchModel,
-                    PageIndex = cat.PageIndex,
-                    StartIndex = cat.StartIndex,
-                    PageItems = cat.PageItems,
-                    IsPage = cat.IsPage,
-                };
+                SearchText = cat.SearchText,
+                SortName = cat.SortName,
+                SortOrder = (CnGalWebSite.DataModel.ViewModel.Search.SortOrder)cat.SortOrder,
+                SearchModel = cat.SearchModel,
+                PageIndex = cat.PageIndex,
+                StartIndex = cat.StartIndex,
+                PageItems = cat.PageItems,
+                IsPage = cat.IsPage,
+            };
+        }
+    }
+
+    public static class IDConvUtil
+    {
+
+        /**
+         * 假定:
+         * avid为数字（例如数据库主键id）,bvid为 可与avid相互转换的 数字字母组成的12位的id.
+         * bvid固定格式：BV1__4_1_7__
+         * 一、通过将avid数字，填充到bvid空位上。实现 avid -> bvid 的编码。
+         * 二、通过将bvid对应位之上的字符，按相反顺序，还原成avid数字。实现 bvid -> avid 的解码。
+         */
+        //table:用来 对应 58进制的字符(58进制每个数字，对应一个字符)
+        static String table = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF";
+
+        //定义bvid（BV1__4_1_7__） 空余位置，(avid转换为bvid时)被填充的顺序
+        static int[] seqArray = new int[] { 11, 10, 3, 8, 4, 6 };
+
+        //默认的基础BVid模板.
+        //char[] defaultBVId = new char[]{'B','V','1',' ',' ','4',' ','1',' ','7',' ',' '};
+
+        // xOr与avid进行异或运算，xAdd与avid进行加或减运算。
+        // 加密时，异或xOr、加xAdd。 解密时，减xAdd、再异或xOr (能还原元数据,相当于啥也没干)
+        static long xOr = 177451812L;
+        static long xAdd = 8728348608L;
+
+        /// <summary>
+        /// 将 aid 转换成 bvid
+        /// </summary>
+        /// <param name="av1"></param>
+        /// <returns></returns>
+        private static String ToBilibiliBvid(this long av1)
+        {
+
+            //将avid 进行异或、加上特定数值（解码时会还原 此部分）
+            long newAvId = (av1 ^ xOr) + xAdd;
+
+            //1.将 newAvId 转换为 6位长度的 58进制数（58进制表示规则由table决定）:
+            //  fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF
+            //2.并将这6位数按照 seqArray {11,10,3,8,4,6} 设定下标的顺序(将6位数翻转:11对应个位,6对应最高位),
+            //  填入 初始bvid模板:BV1__4_1_7__
+            //例：转换完成的 6位58进制为：yK8reg,g是个位,
+            //   所以yK8reg分别对应bvid的下标 y(6)K(4)8(8)r(3)e(10)g(11)
+            //   则填充后 bvid为: BV1rK4y187eg
+
+            char[] defaultBVId = new char[] { 'B', 'V', '1', ' ', ' ', '4', ' ', '1', ' ', '7', ' ', ' ' };
+            for (int i = 0; i < seqArray.Length; i++)
+            {
+
+                //进制转换 i=0时得到的是转换为58进制时，个位的数字。（0~57）
+                //int indexOfTable = (int) (newAvId / ((long) Math.pow(58, i)) % 58);
+                //将58进制的该位数字，转化为字母（按我们预设的规则 table）
+                //char c = table.charAt(indexOfTable);
+                //找到该字符 在bvid中的位置
+                //int indexOfDefaultBVId = seqArray[i];
+                //将字符填充到 bvid模板中。
+                //defaultBVId[indexOfDefaultBVId] = c ;
+
+                //上面可以合并为：
+                defaultBVId[seqArray[i]] = table[(int)(newAvId / ((long)Math.Pow(58, i)) % 58)];
             }
+            return new String(defaultBVId);
         }
 
-    
+        /// <summary>
+        /// 将 bvid 转换成 aid
+        /// </summary>
+        /// <param name="bv"></param>
+        /// <returns></returns>
+        public static long ToBilibiliAid(this string bv)
+        {
+
+            long newAvId = 0L;
+
+            for (int i = 0; i < seqArray.Length; i++)
+            {
+                //从填充位，得到58进制字符
+                //char c = bv.charAt(seqArray[i]);
+                //将字符转换会58进制数字
+                //int indexOfTable = table.indexOf(c);
+                //将数字 根据其位置 i 转换成十进制数字
+                //long num = indexOfTable* (long)Math.pow(58,i);
+                //进制转换公式
+                //newAvId +=num;
+
+                //上面操作合并为：
+                newAvId += table.IndexOf(bv[seqArray[i]]) * (long)Math.Pow(58, i);
+
+            }
+
+            // 还原编码时的操作
+            long avid = (newAvId - xAdd) ^ xOr;
+
+            return avid;
+        }
+
+    }
 }

@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+﻿using BootstrapBlazor.Components;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.ExamineModel.Entries;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
@@ -11,6 +12,7 @@ using CnGalWebSite.DataModel.ViewModel.Videos;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Collections.Concurrent;
 using System.Web;
 
 namespace CnGalWebSite.APIServer.Application.Videos
@@ -27,6 +29,8 @@ namespace CnGalWebSite.APIServer.Application.Videos
         private readonly IAppHelper _appHelper;
         private readonly ILogger<VideoService> _logger;
 
+        private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Video>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Video>>> SortLambdaCacheArticle = new();
+
         public VideoService(IAppHelper appHelper, ILogger<VideoService> logger, IRepository<Video, long> videoRepository, IRepository<Examine, long> examineRepository, IRepository<Entry, int> entryRepository, IRepository<Article, long> articleRepository)
         {
             _appHelper = appHelper;
@@ -36,6 +40,88 @@ namespace CnGalWebSite.APIServer.Application.Videos
             _entryRepository = entryRepository;
             _articleRepository = articleRepository;
         }
+
+        public Task<QueryData<ListVideoAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListVideoAloneModel searchModel)
+        {
+            IEnumerable<Video> items = _videoRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).AsNoTracking();
+            // 处理高级搜索
+            if (!string.IsNullOrWhiteSpace(searchModel.Name))
+            {
+                items = items.Where(item => item.Name?.Contains(searchModel.Name, StringComparison.OrdinalIgnoreCase) ?? false);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.BriefIntroduction))
+            {
+                items = items.Where(item => item.BriefIntroduction?.Contains(searchModel.BriefIntroduction, StringComparison.OrdinalIgnoreCase) ?? false);
+            }
+            if (!string.IsNullOrWhiteSpace(searchModel.OriginalAuthor))
+            {
+                items = items.Where(item => item.OriginalAuthor?.Contains(searchModel.OriginalAuthor, StringComparison.OrdinalIgnoreCase) ?? false);
+            }
+           
+            if (searchModel.Type != null)
+            {
+                items = items.Where(item => item.Type == searchModel.Type);
+            }
+
+            // 处理 Searchable=true 列与 SeachText 模糊搜索
+
+            // 处理 SearchText 模糊搜索
+            if (!string.IsNullOrWhiteSpace(options.SearchText))
+            {
+                items = items.Where(item => (item.Name?.Contains(options.SearchText) ?? false)
+                             || (item.BriefIntroduction?.Contains(options.SearchText) ?? false)
+                             || (item.OriginalAuthor?.Contains(options.SearchText) ?? false));
+            }
+
+
+            // 排序
+            var isSorted = false;
+            if (!string.IsNullOrWhiteSpace(options.SortName))
+            {
+                // 外部未进行排序，内部自动进行排序处理
+                var invoker = SortLambdaCacheArticle.GetOrAdd(typeof(Video), key => LambdaExtensions.GetSortLambda<Video>().Compile());
+                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+                isSorted = true;
+            }
+
+            // 设置记录总数
+            var total = items.Count();
+
+            // 内存分页
+            items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
+
+            //复制数据
+            var resultItems = new List<ListVideoAloneModel>();
+            foreach (var item in items)
+            {
+                resultItems.Add(new ListVideoAloneModel
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    DisplayName = item.DisplayName,
+                    IsHidden = item.IsHidden,
+                    BriefIntroduction = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20),
+                    Priority = item.Priority,
+                    Type = item.Type??"视频",
+                    CreateTime = item.CreateTime,
+                    LastEditTime = item.LastEditTime,
+                    ReaderCount = item.ReaderCount,
+                    OriginalAuthor = item.OriginalAuthor,
+                    PubishTime = item.PubishTime,
+                    CanComment = item.CanComment
+                    //ThumbsUpCount=item.ThumbsUps.Count()
+                });
+            }
+
+            return Task.FromResult(new QueryData<ListVideoAloneModel>()
+            {
+                Items = resultItems,
+                TotalCount = total,
+                IsSorted = isSorted,
+                // IsFiltered = isFiltered
+            });
+        }
+
 
         public async Task<List<long>> GetIdsFromNames(List<string> names)
         {

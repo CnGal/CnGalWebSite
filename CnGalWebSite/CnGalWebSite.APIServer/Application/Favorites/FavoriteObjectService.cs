@@ -113,7 +113,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
             var count = query.Count();
             //根据需求进行排序，然后进行分页逻辑的计算
             //这个特殊方法中当前页数解释为起始位
-            query = query.OrderBy(input.Sorting).Skip(input.CurrentPage).Take(input.MaxResultCount);
+            query = query.OrderBy(input.Sorting).Skip((input.CurrentPage-1)* input.MaxResultCount).Take(input.MaxResultCount);
 
             //将结果转换为List集合 加载到内存中
             List<FavoriteObject> models = null;

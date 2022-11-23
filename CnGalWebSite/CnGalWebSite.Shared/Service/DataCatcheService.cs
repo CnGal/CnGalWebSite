@@ -213,6 +213,10 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public IPageModelCatche<UserArticleListModel> UserArticleListDataCatche { get; set; }
         /// <summary>
+        /// 用户视频列表缓存
+        /// </summary>
+        public IPageModelCatche<UserVideoListModel> UserVideoListDataCatche { get; set; }
+        /// <summary>
         /// 用户编辑记录列表缓存
         /// </summary>
         public IPageModelCatche<PagedResultDto<ExaminedNormalListModel>> UserExaminesDataCatche { get; set; }
@@ -344,6 +348,7 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<List<GameRecordViewModel>> userGameRecordDataCatche,
         IPageModelCatche<List<SteamUserInfor>> userSteamInforDataCatche,
         IPageModelCatche<UserArticleListModel> userArticleListDataCatche,
+        IPageModelCatche<UserVideoListModel> userVideoListDataCatche,
         IPageModelCatche<PagedResultDto<ExaminedNormalListModel>> userExaminesDataCatche,
         IPageModelCatche<FavoriteFoldersViewModel> userFavoriteFoldersDataCatche,
         IPageModelCatche<PagedResultDto<FavoriteObjectAloneViewModel>> userFavoriteObjectsDataCatche,
@@ -371,6 +376,7 @@ namespace CnGalWebSite.Shared.Service
             (UserGameRecordDataCatche = userGameRecordDataCatche).Init(nameof(UserGameRecordDataCatche), ToolHelper.WebApiPath + "api/playedgame/GetUserGameRecords/");
             (UserSteamInforDataCatche = userSteamInforDataCatche).Init(nameof(UserSteamInforDataCatche), ToolHelper.WebApiPath + "api/steam/GetUserSteamInfor/");
             (UserArticleListDataCatche = userArticleListDataCatche).Init(nameof(UserArticleListDataCatche), ToolHelper.WebApiPath + "api/space/GetUserArticles/");
+            (UserVideoListDataCatche = userVideoListDataCatche).Init(nameof(UserVideoListDataCatche), ToolHelper.WebApiPath + "api/space/GetUserVideos/");
             (UserExaminesDataCatche = userExaminesDataCatche).Init(nameof(UserExaminesDataCatche), ToolHelper.WebApiPath + "api/space/GetUserEditRecord");
             (UserFavoriteFoldersDataCatche = userFavoriteFoldersDataCatche).Init(nameof(UserFavoriteFoldersDataCatche), ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/");
             (UserFavoriteObjectsDataCatche = userFavoriteObjectsDataCatche).Init(nameof(UserFavoriteObjectsDataCatche), ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteObjectList");

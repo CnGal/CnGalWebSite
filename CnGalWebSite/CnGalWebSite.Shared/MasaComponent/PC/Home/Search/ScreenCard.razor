@@ -25,6 +25,10 @@
         </div>
         <div class="col-12 col-lg-6">
             <TypeChipsList FixedModel="TagTypes" InputData="Model.Types" Color="@GetColor(5)" OnChanged="OnChanged" />
+            <TypeChipsList FixedModel="VideoTypes" InputData="Model.Types" Color="@GetColor(6)" OnChanged="OnChanged" />
+        </div>
+        <div class="col-12 col-lg-6">
+          
         </div>
     </div>
 </div>
@@ -39,6 +43,7 @@
     List<SearchType> ArticleTypes { get; set; } = SearchInputModel.GetArticleTypes();
     List<SearchType> PeripheryTypes { get; set; } = SearchInputModel.GetPeripheryTypes();
     List<SearchType> TagTypes { get; set; } = SearchInputModel.GetTagTypes();
+    List<SearchType> VideoTypes { get; set; } = SearchInputModel.GetVideoTypes();
     List<SearchTimeModel> Times { get; set; } = SearchInputModel.GetTimes();
 
     public string GetColor(int index)

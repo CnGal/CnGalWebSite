@@ -64,7 +64,7 @@ namespace CnGalWebSite.Shared.AppComponent.Normal.Edits
             Operation.EditVideoMain => "videos/editmain/" + Id,
             Operation.EditVideoMainPage => "videos/editmainpage/" + Id,
             Operation.EditVideoRelevanes => "videos/editrelevances/" + Id,
-            Operation.EditVideoImages => "videos/editrimages/" + Id,
+            Operation.EditVideoImages => "videos/editimages/" + Id,
             _ => "",
         };
         public string Color => State switch

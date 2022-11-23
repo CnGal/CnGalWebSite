@@ -39,7 +39,7 @@
                     <div class="mb-3">
                         @if (item.entry != null)
                         {
-                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.entry" ></CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip>
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.entry"></CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip>
                         }
                         else if (item.article != null)
                         {
@@ -53,7 +53,10 @@
                         {
                             <CnGalWebSite.Shared.Component.Search.NewVersion.TagInforViewTip Model="item.tag"></CnGalWebSite.Shared.Component.Search.NewVersion.TagInforViewTip>
                         }
-
+                        else if (item.video != null)
+                        {
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.VideoInforViewTip Model="item.video"></CnGalWebSite.Shared.Component.Search.NewVersion.VideoInforViewTip>
+                        }
                     </div>
                 }
             }

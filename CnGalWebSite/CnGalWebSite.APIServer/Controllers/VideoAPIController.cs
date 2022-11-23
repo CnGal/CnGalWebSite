@@ -176,6 +176,27 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
             model.UserInfor = await _userService.GetUserInforViewModel(createUser);
+            //添加版权Tag
+            if(model.IsCreatedByCurrentUser)
+            {
+                model.UserInfor.Ranks.Add(new DataModel.ViewModel.Ranks.RankViewModel
+                {
+                    Type = RankType.Rank,
+                    Text = "作者",
+                    CSS = "bg-success",
+
+                });
+            }
+            else
+            {
+                model.UserInfor.Ranks.Add(new DataModel.ViewModel.Ranks.RankViewModel
+                {
+                    Type = RankType.Rank,
+                    Text = "搬运",
+                    CSS = "bg-primary",
+
+                });
+            }
 
             //判断是否有权限编辑
             if (user != null && await _userManager.IsInRoleAsync(user, "Editor") == true)

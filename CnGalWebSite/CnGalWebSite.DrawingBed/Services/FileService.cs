@@ -449,7 +449,7 @@ namespace CnGalWebSite.DrawingBed.Services
 
                 image.Mutate(x => x
                      //.Resize(linshi_x, linshi_y)
-                     .Crop(new Rectangle(0, 0, linshi_x, linshi_y)));
+                     .Crop(new Rectangle((image.Width- linshi_x)/2, (image.Height - linshi_y) / 2, linshi_x, linshi_y)));
                 image.Save(newPath);
                 return newPath;
 

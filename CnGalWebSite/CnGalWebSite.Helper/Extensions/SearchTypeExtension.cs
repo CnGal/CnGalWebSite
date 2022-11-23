@@ -25,10 +25,17 @@ namespace CnGalWebSite.Helper.Extensions
                 SearchType.OtherArticle => (T)Enum.ToObject(typeof(T), 7),
                 SearchType.Fan => (T)Enum.ToObject(typeof(T), 8),
 
-                SearchType.SetorAlbumEtc => (T)Enum.ToObject(typeof(T), 0),
-                SearchType.Ost => (T)Enum.ToObject(typeof(T), 1),
-                SearchType.Set => (T)Enum.ToObject(typeof(T), 2),
-                SearchType.OtherPeriphery => (T)Enum.ToObject(typeof(T), 3),
+                SearchType.OtherPeriphery => (T)Enum.ToObject(typeof(T), 0),
+                SearchType.SetorAlbumEtc => (T)Enum.ToObject(typeof(T), 1),
+                SearchType.Ost => (T)Enum.ToObject(typeof(T), 2),
+                SearchType.Set => (T)Enum.ToObject(typeof(T), 3),
+                SearchType.ActivationCode => (T)Enum.ToObject(typeof(T), 4),
+                SearchType.ColoredPaper => (T)Enum.ToObject(typeof(T), 5),
+                SearchType.Badge => (T)Enum.ToObject(typeof(T), 6),
+                SearchType.Postcard => (T)Enum.ToObject(typeof(T), 7),
+                SearchType.HangPainting => (T)Enum.ToObject(typeof(T), 8),
+                SearchType.Keychain => (T)Enum.ToObject(typeof(T), 9),
+                SearchType.Bookmark => (T)Enum.ToObject(typeof(T), 10),
                 _ => throw new NotImplementedException()
             };
         }
@@ -42,6 +49,7 @@ namespace CnGalWebSite.Helper.Extensions
                 SearchType.Article => Enumerable.Range(6, 9).ToList(),
                 SearchType.Periphery => Enumerable.Range(16, 4).ToList(),
                 SearchType.Tag => Enumerable.Range(20, 1).ToList(),
+                SearchType.Video => Enumerable.Range(21, 1).ToList(),
                 _ => throw new NotImplementedException()
             };
         }
@@ -82,6 +90,13 @@ namespace CnGalWebSite.Helper.Extensions
                 PeripheryType.SetorAlbumEtc => SearchType.SetorAlbumEtc,
                 PeripheryType.Ost => SearchType.Ost,
                 PeripheryType.Set => SearchType.Set,
+                PeripheryType.ActivationCode => SearchType.ActivationCode,
+                PeripheryType.ColoredPaper => SearchType.ColoredPaper,
+                PeripheryType.Badge => SearchType.Badge,
+                PeripheryType.Postcard => SearchType.Postcard,
+                PeripheryType.HangPainting => SearchType.HangPainting,
+                PeripheryType.Keychain => SearchType.Keychain,
+                PeripheryType.Bookmark => SearchType.Bookmark,
                 PeripheryType.None => SearchType.OtherPeriphery,
                 _ => throw new NotImplementedException()
             };

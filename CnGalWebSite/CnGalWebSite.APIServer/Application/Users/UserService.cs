@@ -34,6 +34,7 @@ namespace CnGalWebSite.APIServer.Application.Users
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Entry, long> _entryRepository;
+        private readonly IRepository<Video, long> _videoRepository;
         private readonly IRepository<UserCertification, long> _userCertificationRepository;
         private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
         private readonly IRepository<SignInDay, long> _signInDayRepository;
@@ -48,7 +49,7 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         public UserService(IRepository<ApplicationUser, string> userRepository, IConfiguration configuration, IHttpClientFactory clientFactory, IRepository<ThirdPartyLoginInfor, long> thirdPartyLoginInforRepository, UserManager<ApplicationUser> userManager,
         IRepository<Examine, long> examineRepository, IRepository<UserIntegral, string> userIntegralRepository, IAppHelper appHelper, IRankService rankService, IRepository<Article, long> articleRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
-        IRepository<SignInDay, long> signInDayRepository, IRepository<PlayedGame, long> playedGameRepository, IRepository<Entry, long> entryRepository, IRepository<UserCertification, long> userCertificationRepository)
+        IRepository<SignInDay, long> signInDayRepository, IRepository<PlayedGame, long> playedGameRepository, IRepository<Entry, long> entryRepository, IRepository<UserCertification, long> userCertificationRepository, IRepository<Video, long> videoRepository)
         {
             _userRepository = userRepository;
             _configuration = configuration;
@@ -65,6 +66,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             _playedGameRepository = playedGameRepository;
             _entryRepository = entryRepository;
             _userCertificationRepository = userCertificationRepository;
+            _videoRepository = videoRepository;
         }
 
         public async Task<PagedResultDto<ApplicationUser>> GetPaginatedResult(GetUserInput input)
@@ -756,6 +758,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             model.Integral = user.DisplayIntegral;
             model.EditCount = await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true);
             model.ArticleCount = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false);
+            model.VideoCount = await _videoRepository.CountAsync(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false);
             model.ArticleReadCount = await _articleRepository.GetAll().AsNoTracking().Where(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false).SumAsync(s=>s.ReaderCount);
 
             //计算连续签到天数和今天是否签到

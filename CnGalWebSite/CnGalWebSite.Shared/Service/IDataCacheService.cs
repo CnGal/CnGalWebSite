@@ -121,6 +121,8 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<List<SteamUserInfor>> UserSteamInforDataCatche { get; set; }
 
+        IPageModelCatche<UserVideoListModel> UserVideoListDataCatche { get; set; }
+
         IPageModelCatche<UserArticleListModel> UserArticleListDataCatche { get; set; }
 
         IPageModelCatche<PagedResultDto<ExaminedNormalListModel>> UserExaminesDataCatche { get; set; }
