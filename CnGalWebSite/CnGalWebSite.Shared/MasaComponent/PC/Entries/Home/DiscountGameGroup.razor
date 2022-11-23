@@ -15,7 +15,7 @@
     <ChildContent>
         <MSlideGroup ShowArrows="true">
             <ChildContent>
-                @foreach (var item in _dataCacheService.DiscountPageCatcheHelper.Items.Take(12))
+                @foreach (var item in _dataCacheService.DiscountPageCatcheHelper.Items.Where(s=> _dataCacheService.DiscountPageCatcheHelper.PurchasedGames.Contains( s.Id)==false).Take(12))
                 {
                     <MSlideItem>
                         <MCard Width="350" Class="p-2" Outlined Style="border:0;background-color:transparent"
@@ -39,21 +39,41 @@
     protected override async Task OnInitializedAsync()
     {
 
-        try
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            if (_dataCacheService.DiscountPageCatcheHelper.IsInit == false)
+            try
             {
-                _dataCacheService.DiscountPageCatcheHelper.Init(await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame", ToolHelper.options));
+                if (_dataCacheService.DiscountPageCatcheHelper.IsInit == false)
+                {
+                    _dataCacheService.DiscountPageCatcheHelper.Init(await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame", ToolHelper.options));
+
+                    try
+                    {
+                        _dataCacheService.DiscountPageCatcheHelper.PurchasedGames = await Http.GetFromJsonAsync<List<int>>(ToolHelper.WebApiPath + "api/playedgame/GetUserInSteamGameIds", ToolHelper.options);
+                    }
+                    catch
+                    {
+
+                    }
+
+                }
+
+
+                _dataCacheService.DiscountPageCatcheHelper.Items.Random();
+                StateHasChanged();
             }
-
-
-            _dataCacheService.DiscountPageCatcheHelper.Items.Random();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取词条主页免费游戏列表失败");
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取词条主页免费游戏列表失败");
+            }
         }
     }
+
     public Task OnClickMore()
     {
         NavigationManager.NavigateTo("/discount");

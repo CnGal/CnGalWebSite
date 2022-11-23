@@ -42,6 +42,16 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
         public DateTime LowestTime { get; set; }
     }
 
+    public enum PurchasedSteamType
+    {
+        [Display(Name = "全部")]
+        All,
+        [Display(Name = "已入库")]
+        Purchased,
+        [Display(Name = "未入库")]
+        UnPurchased
+    }
+
     public enum ScreenSteamType
     {
         [Display(Name = "全部")]

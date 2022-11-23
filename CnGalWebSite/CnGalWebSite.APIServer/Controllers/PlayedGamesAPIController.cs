@@ -318,6 +318,25 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
+        /// <summary>
+        ///
+        /// 获取当前用户的所有Steam库中游戏Id
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<List<int>>> GetUserInSteamGameIdsAsync()
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            //获取词条
+            var gameIds = await _playedGameRepository.GetAll().AsNoTracking().Where(s => s.ApplicationUserId == user.Id&&s.IsInSteam&&s.EntryId!=null).Select(s=>s.EntryId.Value).ToListAsync();
+           
+
+            return gameIds;
+        }
+
         [HttpGet]
         public async Task<ActionResult<Result>> RefreshPlayedGameSteamInfor()
         {

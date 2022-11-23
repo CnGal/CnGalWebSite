@@ -11,8 +11,12 @@
                 <div class="p-3 pb-2 h-100" style=" display: flex; flex-direction: column; justify-content: space-between;">
                     <div style="display: flex; width: 100%;">
                         <div style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-                            <header class="text-truncate-3">
-                                <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                            <header class="mb-2" style=" display: flex; align-items: center;">
+                                @if (Purchased)
+                                {
+                                    <div class="article-home-tag ">已入库</div>
+                                }
+                                <h3 class="fw-bold h5 mb-0">@Model.Name</h3>
                             </header>
                             <span class="text-truncate-3">
                                 @Model.BriefIntroduction
@@ -80,7 +84,14 @@
                 <div style="display: flex; width: 100%;">
                     <img style=" height: 67px; " src="@Model.MainImage">
                     <div class="ps-2" style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-                        <span class="text-truncate-1" style="font-size: larger;">@Model.Name</span>
+                        <header style=" display: flex; align-items: center;">
+                            @if (Purchased)
+                            {
+                                <i class="fa fa-fw font-color fa-check-circle"></i>
+                            }
+                            <span class="text-truncate-1" style="font-size: larger;">@Model.Name</span>
+                        </header>
+                       
                         <div style="display: flex; flex-direction: column;">
                             @if (Model.EvaluationCount > 0)
                             {
@@ -121,8 +132,12 @@
                     <div style="display: flex; width: 100%;">
                         <img style="height: 115px;" src="@Model.MainImage">
                         <div class="ps-3" style="width: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-                            <header class="text-truncate-2">
-                                <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                            <header style=" display: flex; align-items: center;">
+                                @if (Purchased)
+                                {
+                                    <div class="article-home-tag">已入库</div>
+                                }
+                                <h3 class="fw-bold h5 mb-0">@Model.Name</h3>
                             </header>
                             <span class="text-truncate-2">
                                 @Model.BriefIntroduction
@@ -189,5 +204,6 @@
     public SteamInforTipViewModel Model { get; set; }
     [Parameter]
     public SteamDisplayType Type { get; set; }
-
+    [Parameter]
+    public bool Purchased{ get; set; }
 }
