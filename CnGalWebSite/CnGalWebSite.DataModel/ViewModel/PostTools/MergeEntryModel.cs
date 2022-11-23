@@ -15,7 +15,7 @@ namespace CnGalWebSite.DataModel.ViewModel.PostTools
 
         public List<BaseEditModel> Examines = new List<BaseEditModel>();
 
-        public DateTime? PostTime { get; set; }
+        
 
         public MergeEntryModel()
         {

@@ -1,0 +1,114 @@
+﻿@inject IArticleService _articleService
+@inject IVideoService _videoService
+@implements IDisposable
+@inject IDataCacheService _dataCacheService
+@inject HttpClient Http
+
+<div>
+    <div>@($"{item.Url} ({index}/{Model.Count})")</div>
+    <MProgressLinear Value="index*100.0/Model.Count" Class="mb-2" Stream BufferValue="0" Color="@_dataCacheService.ThemeSetting.Theme"></MProgressLinear>
+</div>
+<div>
+    <div>@($"{infor} ({item.CompleteTaskCount}/{item.TotalTaskCount})")</div>
+    <MProgressLinear Value="item.CompleteTaskCount*100.0/item.TotalTaskCount" Stream BufferValue="0" Color="@_dataCacheService.ThemeSetting.Theme"></MProgressLinear>
+</div>
+
+@code {
+    [Parameter]
+    public List<RepostVideoModel> Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+    public IEnumerable<string> VideoItems { get; set; }
+    public IEnumerable<string> EntryGameItems { get; set; }
+
+    int index = 0;
+    string infor = "";
+    RepostVideoModel item = new RepostVideoModel();
+
+    private System.Threading.Timer mytimer;
+
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public async void OnProgressUpdate(KeyValuePair<OutputLevel, string> model)
+    {
+
+        try
+        {
+            await InvokeAsync(() =>
+            {
+                infor = model.Value;
+                StateHasChanged();
+            });
+        }
+        catch
+        {
+
+        }
+    }
+
+    public async void Send(object o)
+    {
+        try
+        {
+            await InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+        }
+        catch
+        {
+
+        }
+    }
+
+
+    public async Task Proc()
+    {
+        try
+        {
+            //获取所有词条
+            EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0", ToolHelper.options);
+            VideoItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/videos/GetNames", ToolHelper.options);
+
+            mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 500);
+
+            _videoService.ProgressUpdate += OnProgressUpdate;
+
+            for (index = 0; index < Model.Count; index++)
+            {
+                item = Model[index];
+                await _videoService.ProcVideo(item, VideoItems, EntryGameItems);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取所有词条视频名称失败");
+            return;
+        }
+        finally
+        {
+            mytimer.Dispose();
+            mytimer = null;
+
+            _articleService.ProgressUpdate -= OnProgressUpdate;
+        }
+    }
+
+    #region 释放实例
+    public void Dispose()
+    {
+        if (mytimer != null)
+        {
+            mytimer?.Dispose();
+        }
+        _articleService.ProgressUpdate -= OnProgressUpdate;
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+
+}

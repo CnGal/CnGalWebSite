@@ -42,7 +42,7 @@ namespace CnGalWebSite.DataModel.Model
 
     public enum TimedTaskType
     {
-        [Display(Name = "更新所有游戏Steam信息")]
+        [Display(Name = "更新游戏Steam信息")]
         UpdateGameSteamInfor,
         [Display(Name = "更新所有用户Steam信息")]
         UpdateUserSteamInfor,
@@ -60,7 +60,7 @@ namespace CnGalWebSite.DataModel.Model
         UpdatePerfectionOverview,
         [Display(Name = "更新词条完善度")]
         UpdatePerfection,
-        [Display(Name = "更新Elasticsearch数据缓存")]
+        [Display(Name = "更新搜索服务数据缓存")]
         UpdateDataToElasticsearch,
         [Display(Name = "抓取RSS源动态")]
         UpdateGameNews,

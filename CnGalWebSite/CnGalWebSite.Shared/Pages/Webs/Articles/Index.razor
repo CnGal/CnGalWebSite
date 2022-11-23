@@ -72,7 +72,7 @@ else
                         <CnGalWebSite.Shared.Component.Articles.NewVersion.OperationCard Model="Model" Class="mb-4" />
                     </div>
                 </div>
-                <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard Model="Model" />
+                <CnGalWebSite.Shared.Component.Articles.NewVersion.RelevancesCard Model="Model" OnRevoke="OnRevoke" />
 
                 <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentArticle" />
 
@@ -224,11 +224,9 @@ else
         //上传
         try
         {
-            var result = await Http.PostAsJsonAsync<RevokeExamineModel>
-                (ToolHelper.WebApiPath + "api/articles/RevokeExamine", new RevokeExamineModel { Id = Model.Id });
+            var result = await Http.PostAsJsonAsync<RevokeExamineModel> (ToolHelper.WebApiPath + "api/articles/RevokeExamine", new RevokeExamineModel { Id = Model.Id });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
-            Result obj = JsonSerializer.Deserialize<Result>
-                (jsonContent, ToolHelper.options);
+            Result obj = JsonSerializer.Deserialize<Result>  (jsonContent, ToolHelper.options);
             //判断结果
             if (obj.Successful == false)
             {
@@ -238,9 +236,19 @@ else
             {
                 await ToastService.Success("撤销审核请求成功", "撤销审核请求成功");
                 //修改各部分编辑状态
-                Model.MainPageState = EditState.Normal;
-                Model.MainState = EditState.Normal;
-                Model.RelevancesState = EditState.Normal;
+                switch (operation)
+                {
+                    case Operation.EditArticleMain:
+                        Model.MainState = EditState.Normal;
+                        break;
+                    case Operation.EditArticleMainPage:
+                        Model.MainPageState = EditState.Normal;
+                        break;
+                    case Operation.EditArticleRelevanes:
+                        Model.RelevancesState = EditState.Normal;
+                        break;
+                }
+
                 Id = id;
             }
         }

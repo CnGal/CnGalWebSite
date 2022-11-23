@@ -2,7 +2,8 @@
 using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Articles.Dtos;
 using CnGalWebSite.DataModel.Application.Dtos;
-using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Articles;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -46,6 +47,6 @@ namespace CnGalWebSite.APIServer.Application.Articles
 
         void SetDataFromEditArticleMainPageViewModel(Article newArticle, EditArticleMainPageViewModel model);
 
-        void SetDataFromEditArticleRelevancesViewModel(Article newArticle, EditArticleRelevancesViewModel model, List<Entry> entries, List<Article> articles);
+        void SetDataFromEditArticleRelevancesViewModel(Article newArticle, EditArticleRelevancesViewModel model, List<Entry> entries, List<Article> articles, List<Video> videos);
     }
 }

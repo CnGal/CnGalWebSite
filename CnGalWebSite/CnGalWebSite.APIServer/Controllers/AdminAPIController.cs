@@ -18,6 +18,7 @@ using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.Application.Users;
+using CnGalWebSite.APIServer.Application.Videos;
 using CnGalWebSite.APIServer.Application.Votes;
 using CnGalWebSite.APIServer.Application.WeiXin;
 using CnGalWebSite.APIServer.DataReositories;
@@ -115,9 +116,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ILogger<AdminAPIController> _logger;
         private readonly ISteamInforService _steamInforService;
         private readonly IEditRecordService _editRecordService;
+        private readonly IVideoService _videoService;
 
         public AdminAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository, IRepository<UserFile, int> userFileRepository, IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<EntryStaff, long> entryStaffRepository,
-        IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository,
+        IFileService fileService, IRepository<SignInDay, long> signInDayRepository, IRepository<ErrorCount, long> errorCountRepository, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IVideoService videoService,
         IRepository<ThumbsUp, long> thumbsUpRepository, IRepository<Disambig, int> disambigRepository, IRepository<BackUpArchive, long> backUpArchiveRepository, IRankService rankService, IHistoryDataService historyDataService,
         IRepository<ApplicationUser, string> userRepository, IMessageService messageService, ICommentService commentService, IRepository<Comment, long> commentRepository, IWeiXinService weiXinService, IEditRecordService editRecordService,
         IRepository<Message, long> messageRepository, IErrorCountService errorCountService, IRepository<FavoriteFolder, long> favoriteFolderRepository, IPerfectionService perfectionService, IWebHostEnvironment webHostEnvironment,
@@ -192,6 +194,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _steamInforService = steamInforService;
             _entryStaffRepository = entryStaffRepository;
             _editRecordService = editRecordService;
+            _videoService = videoService;
         }
 
         /// <summary>
@@ -410,6 +413,19 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListArticleAloneModel>>> GetArticleListAsync(ArticlesPagesInfor input)
         {
             var dtos = await _articleService.GetPaginatedResult(input.Options, input.SearchModel);
+
+            return dtos;
+        }
+
+        /// <summary>
+        /// 获取视频列表
+        /// </summary>
+        /// <param name="input">分页信息</param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListVideoAloneModel>>> GetVideoListAsync(VideosPagesInfor input)
+        {
+            var dtos = await _videoService.GetPaginatedResult(input.Options, input.SearchModel);
 
             return dtos;
         }

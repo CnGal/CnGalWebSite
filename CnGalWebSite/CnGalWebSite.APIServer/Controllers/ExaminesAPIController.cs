@@ -2,7 +2,6 @@
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
-using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -23,6 +22,15 @@ using System.Linq.Dynamic.Core;
 using CnGalWebSite.DataModel.ViewModel.EditRecords;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Users;
+using CnGalWebSite.DataModel.ExamineModel.Articles;
+using CnGalWebSite.DataModel.ExamineModel.Comments;
+using CnGalWebSite.DataModel.ExamineModel.Dismbigs;
+using CnGalWebSite.DataModel.ExamineModel.Entries;
+using CnGalWebSite.DataModel.ExamineModel.Peripheries;
+using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
+using CnGalWebSite.DataModel.ExamineModel.Users;
+using CnGalWebSite.DataModel.ExamineModel.Tags;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -45,6 +53,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<UserMonitor, long> _userMonitorsRepository;
         private readonly IRepository<UserReviewEditRecord, long> _userReviewEditRecordRepository;
         private readonly IRepository<UserCertification, long> _userCertificationRepository;
+        private readonly IRepository<Video, long> _videoRepository;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
         private readonly IRankService _rankService;
@@ -52,7 +61,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IUserService _userService;
 
 
-        public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository, IUserService userService,
+        public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository, IUserService userService, IRepository<Video, long> videoRepository,
         IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository,
         UserManager<ApplicationUser> userManager, IExamineService examineService, IRepository<UserMonitor, long> userMonitorsRepository, IEditRecordService editRecordService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository)
@@ -76,6 +85,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _editRecordService = editRecordService;
             _userCertificationRepository = userCertificationRepository;
             _userService = userService;
+            _videoRepository = videoRepository;
         }
 
 
@@ -528,6 +538,26 @@ namespace CnGalWebSite.APIServer.Controllers
                     .Include(s => s.ApplicationUser)
                     .Include(s => s.Tag)
                     .Where(s => s.TagId == tag.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
+            }
+            else if (examine.VideoId != null)
+            {
+                var video = await _videoRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examine.VideoId);
+                if (video == null)
+                {
+                    return NotFound("无法找到审核记录对应的视频");
+                }
+
+                model.ObjectId = video.Id;
+                model.ObjectName = video.DisplayName;
+                model.ObjectBriefIntroduction = video.BriefIntroduction;
+                model.Image = _appHelper.GetImagePath(video.MainPicture, "app.png");
+                model.IsThumbnail = false;
+                model.Type = ExaminedNormalListModelType.Video;
+
+                examines = await _examineRepository.GetAll().AsNoTracking()
+                    .Include(s => s.ApplicationUser)
+                    .Include(s => s.Video)
+                    .Where(s => s.VideoId == video.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
             }
             else
             {

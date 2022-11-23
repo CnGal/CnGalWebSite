@@ -23,6 +23,7 @@ using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.ThematicPages;
 using CnGalWebSite.DataModel.ViewModel.Theme;
+using CnGalWebSite.DataModel.ViewModel.Videos;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.Helper.ViewModel.Articles;
 using CnGalWebSite.Helper.ViewModel.Comments;
@@ -86,6 +87,8 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<ArticleViewModel> ArticleIndexPageCatche { get; set; }
 
+        IPageModelCatche<VideoViewModel> VideoIndexPageCatche { get; set; }
+
         IPageModelCatche<List<HomeNewsAloneViewModel>> HomePageNewsCatche { get; set; }
 
         IPageModelCatche<List<CarouselViewModel>> HomePageCarouselsCatche { get; set; }
@@ -99,6 +102,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<ArticleContrastEditRecordViewModel> ArticleContrastEditRecordViewCatche { get; set; }
 
         IPageModelCatche<PeripheryContrastEditRecordViewModel> PeripheryContrastEditRecordViewCatche { get; set; }
+
+        IPageModelCatche<VideoContrastEditRecordViewModel> VideoContrastEditRecordViewCatche { get; set; }
 
         IPageModelCatche<TagContrastEditRecordViewModel> TagContrastEditRecordViewCatche { get; set; }
 
@@ -115,6 +120,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<List<GameRecordViewModel>> UserGameRecordDataCatche { get; set; }
 
         IPageModelCatche<List<SteamUserInfor>> UserSteamInforDataCatche { get; set; }
+
+        IPageModelCatche<UserVideoListModel> UserVideoListDataCatche { get; set; }
 
         IPageModelCatche<UserArticleListModel> UserArticleListDataCatche { get; set; }
 

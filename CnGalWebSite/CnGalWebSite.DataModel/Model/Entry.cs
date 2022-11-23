@@ -141,6 +141,10 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public ICollection<Article> Articles { get; set; } = new List<Article>();
         /// <summary>
+        /// 关联文章
+        /// </summary>
+        public ICollection<Video> Videos { get; set; } = new List<Video>();
+        /// <summary>
         /// 关联周边
         /// </summary>
         public virtual ICollection<Periphery> RelatedPeripheries { get; set; } = new List<Periphery>();

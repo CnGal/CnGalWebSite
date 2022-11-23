@@ -123,13 +123,18 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 相关性列表
         /// </summary>
+        [Obsolete("关联词条已迁移，请访问 Entries")]
         public ICollection<ArticleRelevance> Relevances { get; set; } = new List<ArticleRelevance>();
 
         public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
         /// <summary>
-        /// 关联文章
+        /// 关联词条
         /// </summary>
         public ICollection<Entry> Entries { get; set; } = new List<Entry>();
+        /// <summary>
+        /// 关联词条
+        /// </summary>
+        public ICollection<Video> Videos { get; set; } = new List<Video>();
         /// <summary>
         /// 关联外部链接
         /// </summary>

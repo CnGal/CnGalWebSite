@@ -65,6 +65,9 @@ namespace CnGalWebSite.DataModel.Model
 
         public long? PlayedGameId { get; set; }
         public PlayedGame PlayedGame { get; set; }
+
+        public long? VideoId { get; set; }
+        public Video Video { get; set; }
         /// <summary>
         /// 前置审核Id
         /// </summary>
@@ -164,5 +167,13 @@ namespace CnGalWebSite.DataModel.Model
         EstablishAudio,
         [Display(Name = "申请用户认证")]
         RequestUserCertification,
+        [Display(Name = "编辑视频主要信息")]
+        EditVideoMain,
+        [Display(Name = "编辑视频图片")]
+        EditVideoImages,
+        [Display(Name = "编辑视频内容")]
+        EditVideoMainPage,
+        [Display(Name = "编辑视频关联词条")]
+        EditVideoRelevanes,
     }
 }

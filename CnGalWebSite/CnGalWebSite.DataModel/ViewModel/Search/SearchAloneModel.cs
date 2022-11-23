@@ -14,5 +14,7 @@
         public TagInforTipViewModel tag { get; set; }
 
         public PeripheryInforTipViewModel periphery { get; set; }
+
+        public VideoInforTipViewModel video { get; set; }
     }
 }

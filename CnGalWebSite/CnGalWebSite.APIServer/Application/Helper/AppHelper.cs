@@ -456,7 +456,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public async Task ArticleReaderNumUpAsync(long articleId)
         {
-            _entryRepository.Clear();
+            _articleRepository.Clear();
             _ = await _articleRepository.GetRangeUpdateTable().Where(s => s.Id == articleId).Set(s => s.ReaderCount, b => b.ReaderCount + 1).ExecuteAsync();
 
         }
@@ -643,6 +643,25 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 CommentCount = item.CommentCount,
                 Link = item.OriginalLink
 
+            };
+        }
+
+        public VideoInforTipViewModel GetVideoInforTipViewModel(Video item)
+        {
+            return new VideoInforTipViewModel
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Type = item.Type ?? "视频",
+                DisplayName =  item.DisplayName,
+                CreateUserName = item.CreateUser?.UserName,
+                CreateUserId = item.CreateUserId,
+                MainImage = GetImagePath(item.MainPicture, "app.png"),
+                BriefIntroduction = item.BriefIntroduction,
+                LastEditTime = item.LastEditTime,
+                ReaderCount = item.ReaderCount,
+                CommentCount = item.CommentCount,
+                PubishTime = item.PubishTime,
             };
         }
 

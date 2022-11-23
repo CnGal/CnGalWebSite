@@ -62,10 +62,11 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.AddMasaBlazor();
 
             //添加工具箱
-            builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-            builder.Services.AddScoped<IEntryService, EntryService>();
-            builder.Services.AddScoped<IArticleService, ArticleService>();
-            builder.Services.AddScoped<IImageService, ImageService>();
+            _ = builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>))
+                .AddScoped<IEntryService, EntryService>()
+                .AddScoped<IArticleService, ArticleService>()
+                .AddScoped<IImageService, ImageService>()
+                .AddScoped<IVideoService, VideoService>();
             //添加预渲染状态记录
             builder.Services.AddScoped<IApplicationStateService, ApplicationStateService>();
 

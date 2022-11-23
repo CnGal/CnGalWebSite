@@ -1,0 +1,39 @@
+﻿
+@if (Model.ImagesState == EditState.Preview)
+{
+    <div class="mb-3">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/videos/EditImages/" + Model.Id)" ExamineType="Operation.EditVideoImages" OnClickRevoke="OnRevoke" />
+    </div>
+}
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="预览图" Icon="fa fa-fw fa-picture-o">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.ImageSlideGroup Model="imagesList" />
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+    [Parameter]
+    public VideoViewModel Model { get; set; }
+
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+
+
+    public List<EditImageAloneModel> imagesList = new List<EditImageAloneModel>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        imagesList.Clear();
+        foreach (var item in Model.Pictures)
+        {
+            foreach (var infor in item.Pictures)
+            {
+                imagesList.Add(new EditImageAloneModel
+                {
+                    Modifier = item.Modifier,
+                    Note = infor.Note,
+                    Image = infor.Url
+                });
+            }
+        }
+
+    }
+}

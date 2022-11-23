@@ -8,5 +8,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Favorites
         public ArticleInforTipViewModel article { get; set; }
 
         public PeripheryInforTipViewModel periphery { get; set; }
+
+        public VideoInforTipViewModel Video { get; set; }
+
+        public TagInforTipViewModel Tag { get; set; }
     }
 }

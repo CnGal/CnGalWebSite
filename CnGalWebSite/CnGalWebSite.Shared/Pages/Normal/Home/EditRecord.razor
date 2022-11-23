@@ -30,7 +30,7 @@
             {
                 <div class="  rounded shadow-sm  bg-opacity pt-3">
 
-                    <div class="row mt-2 ms-2 me-2 ps-0 pe-0" >
+                    <div class="row mt-2 ms-2 me-2 ps-0 pe-0">
                         <div class="col-12 col-md-12 col-lg-5 mt-1 mb-4">
                             <SkeletonAvatar Round="false" />
                         </div>
@@ -82,6 +82,10 @@
                 else if (ExaminesOverview.Type == ExaminedNormalListModelType.Tag)
                 {
                     <TagContrastCard Model="TagContrast.ContrastModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Video)
+                {
+                    <VideoContrastCard Model="VideoContrast.ContrastModel" />
                 }
             }
 
@@ -144,6 +148,10 @@
                 {
                     <TagContrastCard Model="TagContrast.CurrentModel" />
                 }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Video)
+                {
+                    <VideoContrastCard Model="VideoContrast.CurrentModel" />
+                }
             }
 
 
@@ -200,6 +208,7 @@ else
     public ArticleContrastEditRecordViewModel ArticleContrast { get; set; } = new ArticleContrastEditRecordViewModel();
     public PeripheryContrastEditRecordViewModel PeripheryContrast { get; set; } = new PeripheryContrastEditRecordViewModel();
     public TagContrastEditRecordViewModel TagContrast { get; set; } = new TagContrastEditRecordViewModel();
+    public VideoContrastEditRecordViewModel VideoContrast { get; set; } = new VideoContrastEditRecordViewModel();
 
     OverviewCard overviewCard;
 
@@ -212,8 +221,8 @@ else
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-               NavigationManager.LocationChanged += LocationChanged;
-            
+            NavigationManager.LocationChanged += LocationChanged;
+
         }
 
     }
@@ -263,16 +272,16 @@ else
                 await overviewCard.SelecteChanged(ExaminesOverview.Examines[index + 1]);
             }
         }
-   
-            NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + conId + "&CurrentId=" + CurrentId);
-        
-     
+
+        NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + conId + "&CurrentId=" + CurrentId);
+
+
     }
     public async Task CurrentChanged(string curId)
     {
-       
-            NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + ContrastId + "&CurrentId=" + curId);
-      
+
+        NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + ContrastId + "&CurrentId=" + curId);
+
     }
 
     public async Task OnRefreshContrastView(string conId, string curId)
@@ -305,6 +314,12 @@ else
                 ContrastId = TagContrast.ContrastId;
                 CurrentId = TagContrast.CurrentId;
             }
+            else if (ExaminesOverview.Type == ExaminedNormalListModelType.Video)
+            {
+                VideoContrast = await _dataCatcheService.VideoContrastEditRecordViewCatche.GetCache(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId));
+                ContrastId = VideoContrast.ContrastId;
+                CurrentId = VideoContrast.CurrentId;
+            }
             isRefreshing = false;
             StateHasChanged();
         }
@@ -317,9 +332,9 @@ else
 
     public void  Dispose()
     {
-        
+
         NavigationManager.LocationChanged -= LocationChanged;
-        
+
         GC.SuppressFinalize(this);
     }
     #endregion

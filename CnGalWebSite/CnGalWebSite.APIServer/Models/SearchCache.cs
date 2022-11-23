@@ -98,6 +98,22 @@ namespace CnGalWebSite.APIServer.Model
             BriefIntroduction = model.BriefIntroduction ?? "";
             MainPage = "";
         }
+        public void Copy(Video model)
+        {
+            Id = SearchCacheId.ToString();
+            AnotherName = "";
+            DisplayName = model.DisplayName ?? "";
+            LastEditTime = model.LastEditTime.ToBinary();
+            Name = model.Name ?? "";
+            Type = 4;
+            OriginalType = (int)SearchType.Video;
+            OriginalId = model.Id;
+            ReaderCount = model.ReaderCount;
+            BriefIntroduction = model.BriefIntroduction ?? "";
+            MainPage = model.MainPage ?? "";
+            CreateTime = model.CreateTime.ToBinary();
+            PubulishTime = model.PubishTime.ToBinary();
+        }
 
 
     }

@@ -33,6 +33,10 @@
                     <MIcon Left>mdi-script-text</MIcon>
                     发表文章
                 </MButton>
+                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/videos/create"))">
+                    <MIcon Left>mdi-animation-play </MIcon>
+                    发布视频
+                </MButton>
                 <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/tags/createtag"))">
                     <MIcon Left>mdi-tag</MIcon>
                     创建标签
@@ -41,6 +45,7 @@
                     <MIcon Left>mdi-basket</MIcon>
                     创建周边
                 </MButton>
+
                 <AuthorizeView Roles="Admin">
                     <Authorized>
                         <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/lotteries/createlottery"))">

@@ -1,6 +1,6 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Dismbigs;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using Microsoft.EntityFrameworkCore;

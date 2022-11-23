@@ -1,0 +1,34 @@
+﻿@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+
+@if (Model.Any())
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相关视频" Icon="fa fa-fw fa-video-camera" Class="mb-4">
+        <ChildContent>
+            <MSlideGroup ShowArrows="true">
+                <ChildContent>
+                    @foreach (var item in Model)
+                    {
+                        <MSlideItem>
+                            <MCard Width="200" Class="p-2" Outlined Style="border:0;background-color:transparent"
+                                   OnClick="@context.Toggle"
+                                   RefBack="@context.Ref">
+                                <InforCard Model="item" />
+                            </MCard>
+                        </MSlideItem>
+                    }
+                </ChildContent>
+
+            </MSlideGroup>
+        </ChildContent>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+
+
+@code {
+    [Parameter]
+    public List<VideoInforTipViewModel> Model { get; set; }
+
+}

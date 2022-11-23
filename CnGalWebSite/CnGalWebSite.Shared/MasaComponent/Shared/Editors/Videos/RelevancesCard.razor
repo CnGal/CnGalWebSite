@@ -1,0 +1,55 @@
+﻿
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+    关联信息可以帮助我们建立详细的知识图谱，更好地展示相关内容；请确保关联信息存在，也可以先去创建再来关联哦~
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="关联信息" Class="@Class" Collapable>
+    <InputRelevancesListTip AutoCompleteItems="@EntryRoleItems" Model="Model.Roles" Title="角色"></InputRelevancesListTip>
+
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <InputRelevancesListTip AutoCompleteItems="@EntryStaffItems" Model="Model.staffs" Title="STAFF"></InputRelevancesListTip>
+
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <InputRelevancesListTip AutoCompleteItems="@ArticleItems" Model="Model.news" Title="动态"></InputRelevancesListTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <InputRelevancesListTip AutoCompleteItems="@ArticleItems" Model="Model.articles" Title="文章"></InputRelevancesListTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <InputRelevancesListTip AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></InputRelevancesListTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <InputRelevancesListTip AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="组织"></InputRelevancesListTip>
+
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <InputRelevancesListTip AutoCompleteItems="@VideoItems" Model="Model.videos" Title="视频"></InputRelevancesListTip>
+
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <InputOtherLinkListTip Model="Model.others" Title="自定义链接"></InputOtherLinkListTip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <InputRelevanceListTitle Title="外部链接" />
+    <ValidateForm Model="@Model">
+        <div class="row">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.BilibiliId" Label="B站视频Id（bvid/aid）" />
+        </div>
+    </ValidateForm>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+
+@code {
+    [Parameter]
+    public EditVideoRelevancesViewModel Model { get; set; }
+    [Parameter]
+    public List<string> EntryGameItems { get; set; }
+    [Parameter]
+    public List<string> EntryRoleItems { get; set; }
+    [Parameter]
+    public List<string> EntryGroupItems { get; set; }
+    [Parameter]
+    public List<string> EntryStaffItems { get; set; }
+    [Parameter]
+    public List<string> ArticleItems { get; set; }
+    [Parameter]
+    public List<string> VideoItems { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+}

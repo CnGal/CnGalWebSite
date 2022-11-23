@@ -6,95 +6,111 @@
 <div class="row">
     @foreach (var context in Model)
     {
-            @if (_dataCacheService.ThemeSetting.ListDisplayMode == DisplayMode.Image)
+        @if (_dataCacheService.ThemeSetting.ListDisplayMode == DisplayMode.Image)
+        {
+            @if (context.article != null)
             {
-                @if (context.article != null)
+                <div class="col-6 mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = context.article.CommentCount, Image = context.article.MainImage, Name = context.article.DisplayName, ReadCount = context.article.ReaderCount, Url = "/articles/index/" + context.article.Id })" />
+
+                </div>
+
+            }
+            else if (context.entry != null)
+            {
+                @if (context.entry.Type == EntryType.Game || context.entry.Type == EntryType.ProductionGroup)
                 {
                     <div class="col-6 mb-3">
-                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = context.article.CommentCount, Image = context.article.MainImage, Name = context.article.DisplayName, ReadCount = context.article.ReaderCount, Url = "/articles/index/" + context.article.Id })" />
+                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = context.entry.CommentCount, Image = context.entry.MainImage, Name = context.entry.Name, ReadCount = context.entry.ReaderCount, Url = "/entries/index/" + context.entry.Id })" />
 
                     </div>
 
                 }
-                else if (context.entry != null)
-                {
-                    @if (context.entry.Type == EntryType.Game || context.entry.Type == EntryType.ProductionGroup)
-                    {
-                        <div class="col-6 mb-3">
-                            <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = context.entry.CommentCount, Image = context.entry.MainImage, Name = context.entry.Name, ReadCount = context.entry.ReaderCount, Url = "/entries/index/" + context.entry.Id })" />
-
-                        </div>
-
-                    }
-                    else if (context.entry.Type == EntryType.Staff || context.entry.Type == EntryType.Role)
-                    {
-                        <div class="col-6 mb-3">
-                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.StaffOrRoleCard Model="@(new Entries.Normal.Relevances.StaffOrRoleCardModel { Image = context.entry.MainImage, Name = context.entry.Name, InforModel = context.entry.AddInfors.FirstOrDefault(), Description = context.entry.Name, EntryId = context.entry.Id })" />
-                        </div>
-
-                    }
-
-                }
-                else if (context.periphery != null)
+                else if (context.entry.Type == EntryType.Staff || context.entry.Type == EntryType.Role)
                 {
                     <div class="col-6 mb-3">
-                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = context.periphery.CommentCount, Image = context.periphery.MainImage, Name = context.periphery.Name, ReadCount = context.periphery.ReaderCount, Url = "/peripheries/index/" + context.periphery.Id })" />
-
-                    </div>
-
-                }
-                else if (context.tag != null)
-                {
-                    <div class="col-6 mb-3">
-                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = 0, Image = context.tag.MainImage, Name = context.tag.Name, ReadCount = context.tag.ReaderCount, Url = "/tags/index/" + context.tag.Id })" />
-
+                        <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.StaffOrRoleCard Model="@(new Entries.Normal.Relevances.StaffOrRoleCardModel { Image = context.entry.MainImage, Name = context.entry.Name, InforModel = context.entry.AddInfors.FirstOrDefault(), Description = context.entry.Name, EntryId = context.entry.Id })" />
                     </div>
 
                 }
 
             }
-            else
+            else if (context.periphery != null)
             {
-                @if (context.article != null)
+                <div class="col-6 mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = context.periphery.CommentCount, Image = context.periphery.MainImage, Name = context.periphery.Name, ReadCount = context.periphery.ReaderCount, Url = "/peripheries/index/" + context.periphery.Id })" />
+
+                </div>
+
+            }
+            else if (context.tag != null)
+            {
+                <div class="col-6 mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = 0, Image = context.tag.MainImage, Name = context.tag.Name, ReadCount = context.tag.ReaderCount, Url = "/tags/index/" + context.tag.Id })" />
+
+                </div>
+
+            }
+            else if (context.video != null)
+            {
+                <div class="col-6 mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.MainImageCard Model="@(new MainImageCardModel { CommentCount = context.video.CommentCount, Image = context.video.MainImage, Name = context.video.DisplayName, ReadCount = context.video.ReaderCount, Url = "/videos/index/" + context.video.Id })" />
+
+                </div>
+
+            }
+
+        }
+        else
+        {
+            @if (context.article != null)
+            {
+                <div class="col-12 mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ArticleCrad Model="@(new Entries.Normal.Relevances.ArticleCardModel { Description = context.article.BriefIntroduction, Image = context.article.MainImage, ArticleId = context.article.Id, Title = context.article.DisplayName })" />
+                </div>
+
+            }
+            else if (context.entry != null)
+            {
+                @if (context.entry.Type == EntryType.Game || context.entry.Type == EntryType.ProductionGroup)
                 {
                     <div class="col-12 mb-3">
-                        <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.ArticleCrad Model="@(new Entries.Normal.Relevances.ArticleCardModel { Description = context.article.BriefIntroduction, Image = context.article.MainImage, ArticleId = context.article.Id, Title = context.article.DisplayName })" />
+                        <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.GameCard Model="@(new Entries.Normal.Relevances.GameCardModel { Description = context.entry.BriefIntroduction, Image = context.entry.MainImage, EntryId = context.entry.Id, Title = context.entry.Name })" />
                     </div>
-
                 }
-                else if (context.entry != null)
+                else
                 {
-                    @if (context.entry.Type == EntryType.Game || context.entry.Type == EntryType.ProductionGroup)
-                    {
-                        <div class="col-12 mb-3">
-                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.GameCard Model="@(new Entries.Normal.Relevances.GameCardModel { Description = context.entry.BriefIntroduction, Image = context.entry.MainImage, EntryId = context.entry.Id, Title = context.entry.Name })" />
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="col-12 mb-3">
-                            <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.StaffCard Model="@(new Entries.Normal.Relevances.StaffCardModel { Description = context.entry.BriefIntroduction, Image = context.entry.MainImage, EntryId = context.entry.Id, Title = context.entry.Name })" />
-                        </div>
-
-                    }
-                }
-                else if (context.periphery != null)
-                {
-                    <div class="col-6 mb-3">
-                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.ImageTextCard Model="@(new AppComponent.Normal.Cards.ImageTextCardModel {  Image = context.periphery.MainImage,Description=context.periphery.BriefIntroduction, Name = context.periphery.Name,  Url = "/peripheries/index/" + context.periphery.Id })" />
-
-                    </div>
-
-                }
-                else if (context.tag != null)
-                {
-                    <div class="col-6 mb-3">
-                        <CnGalWebSite.Shared.AppComponent.Normal.Cards.ImageTextCard Model="@(new AppComponent.Normal.Cards.ImageTextCardModel { Image = context.tag.MainImage,Description=context.tag.BriefIntroduction, Name = context.tag.Name, Url = "/tags/index/" + context.tag.Id })" />
-
+                    <div class="col-12 mb-3">
+                        <CnGalWebSite.Shared.AppComponent.Pages.Entries.Normal.Relevances.StaffCard Model="@(new Entries.Normal.Relevances.StaffCardModel { Description = context.entry.BriefIntroduction, Image = context.entry.MainImage, EntryId = context.entry.Id, Title = context.entry.Name })" />
                     </div>
 
                 }
             }
+            else if (context.periphery != null)
+            {
+                <div class="col-6 mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.ImageTextCard Model="@(new AppComponent.Normal.Cards.ImageTextCardModel {  Image = context.periphery.MainImage,Description=context.periphery.BriefIntroduction, Name = context.periphery.Name,  Url = "/peripheries/index/" + context.periphery.Id })" />
+
+                </div>
+
+            }
+            else if (context.tag != null)
+            {
+                <div class="col-6 mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.ImageTextCard Model="@(new AppComponent.Normal.Cards.ImageTextCardModel { Image = context.tag.MainImage,Description=context.tag.BriefIntroduction, Name = context.tag.Name, Url = "/tags/index/" + context.tag.Id })" />
+
+                </div>
+
+            }
+            else if (context.video != null)
+            {
+                <div class="col-6 mb-3">
+                    <CnGalWebSite.Shared.AppComponent.Normal.Cards.ImageTextCard Model="@(new AppComponent.Normal.Cards.ImageTextCardModel { Image = context.video.MainImage,Description=context.video.BriefIntroduction, Name = context.video.DisplayName, Url = "/videos/index/" + context.video.Id })" />
+
+                </div>
+
+            }
+        }
 
     }
 </div>

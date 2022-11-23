@@ -10,10 +10,12 @@ using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Users;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
+using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using Markdig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,6 +45,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Message, int> _messageRepository;
         private readonly IRepository<SignInDay, long> _signInDayRepository;
         private readonly IRepository<Article, long> _articleRepository;
+        private readonly IRepository<Video, long> _videoRepository;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IExamineService _examineService;
         private readonly IMessageService _messageService;
@@ -53,7 +56,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<UserCertification, long> _userCertificationRepository;
         private readonly IEditRecordService _editRecordService;
 
-        public SpaceAPIController(IRepository<Message, int> messageRepository, IMessageService messageService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository, IRepository<Entry, int> entryRepository,
+        public SpaceAPIController(IRepository<Message, int> messageRepository, IMessageService messageService, IAppHelper appHelper, IRepository<ApplicationUser, long> userRepository, IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository,
         UserManager<ApplicationUser> userManager, IRepository<SignInDay, long> signInDayRepository, IRepository<Article, long> articleRepository, IUserService userService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Examine, long> examineRepository, IExamineService examineService, IRankService rankService, IRepository<FavoriteObject, long> favoriteObjectRepository, IEditRecordService editRecordService,
         ISteamInforService steamInforService)
@@ -74,6 +77,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _userCertificationRepository = userCertificationRepository;
             _editRecordService = editRecordService;
             _entryRepository = entryRepository;
+            _videoRepository = videoRepository;
         }
 
         /// <summary>
@@ -764,16 +768,41 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true, Error = await _userService.GenerateBindGroupQQCode(user) };
         }
 
+        /// <summary>
+        /// 获取用户发表的文章
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserArticleListModel>> GetUserArticles(string id)
         {
-            var articles = await _articleRepository.GetAll().Include(s=>s.CreateUser).AsNoTracking().Where(s => s.CreateUserId == id&&s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false).ToListAsync();
+            var items = await _articleRepository.GetAll().Include(s=>s.CreateUser).AsNoTracking().Where(s => s.CreateUserId == id&&s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false).ToListAsync();
 
             var model =new UserArticleListModel();
-            foreach (var item in articles.OrderByDescending(s=>s.Id))
+            foreach (var item in items.OrderByDescending(s=>s.Id))
             {
                 model.Items.Add(_appHelper.GetArticleInforTipViewModel(item));
+            }
+
+            return model;
+        }
+
+        /// <summary>
+        /// 获取用户发表的视频
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserVideoListModel>> GetUserVideos(string id)
+        {
+            var items = await _videoRepository.GetAll().Include(s => s.CreateUser).AsNoTracking().Where(s => s.CreateUserId == id && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).ToListAsync();
+
+            var model = new UserVideoListModel();
+            foreach (var item in items.OrderByDescending(s => s.Id))
+            {
+                model.Items.Add(_appHelper.GetVideoInforTipViewModel(item));
             }
 
             return model;

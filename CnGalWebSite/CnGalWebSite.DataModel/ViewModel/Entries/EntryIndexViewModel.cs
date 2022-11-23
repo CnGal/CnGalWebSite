@@ -129,6 +129,12 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// </summary>
         public List<ArticleInforTipViewModel> ArticleRelevances { get; set; } = new List<ArticleInforTipViewModel> { };
 
+
+        /// <summary>
+        /// 相关视频
+        /// </summary>
+        public List<VideoInforTipViewModel> VideoRelevances { get; set; } = new List<VideoInforTipViewModel> { };
+
         /// <summary>
         /// 外部链接
         /// </summary>

@@ -953,7 +953,7 @@
 .app-card-tag {
     background-color:  var(--main-color);
     color: #fff;
-    border-radius: 2px;
+    border-radius: 5px;
     padding-left: 8px;
     padding-right: 8px;
     display: inline-block;
@@ -1034,7 +1034,7 @@ a img + strong {
     color: var(--main-color) !important;
 }
 
-p img {
+p > img {
     display: flex;
     justify-content: center;
 }

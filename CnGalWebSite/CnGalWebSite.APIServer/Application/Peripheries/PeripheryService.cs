@@ -1,7 +1,8 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Peripheries;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
@@ -753,7 +754,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             //先把 当前词条中的图片 都 打上删除标签
             foreach (var item in currentPeriphery.Pictures)
             {
-                peripheryImages.Images.Add(new EntryImage
+                peripheryImages.Images.Add(new DataModel.ExamineModel.Entries.EditRecordImage
                 {
                     Url = item.Url,
                     Note = item.Note,
@@ -786,7 +787,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                 }
                 if (isSame == false)
                 {
-                    peripheryImages.Images.Add(new EntryImage
+                    peripheryImages.Images.Add(new  DataModel.ExamineModel.Entries.EditRecordImage
                     {
                         Url = infor.Url,
                         Modifier = infor.Modifier,

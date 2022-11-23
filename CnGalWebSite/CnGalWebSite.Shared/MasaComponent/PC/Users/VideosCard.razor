@@ -1,0 +1,54 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject HttpClient Http
+
+
+@if (Model.TotalPages == 0)
+{
+    <NotFoundTip IsNeedLayput="true" />
+}
+else
+{
+    @foreach (var item in Model.Items.Skip((Model.CurrentPage - 1) * Model.MaxCount).Take(Model.MaxCount))
+    {
+        <div class="mb-3">
+            <CnGalWebSite.Shared.Component.Search.NewVersion.VideoInforViewTip Model="item" />
+
+        </div>
+    }
+
+    @if (Model.TotalPages > 1)
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="Model.CurrentPage" Length="@Model.TotalPages" ValueChanged="OnPageClick" />
+    }
+}
+
+@code {
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+
+    [Parameter]
+    public string Id { get; set; }
+
+    public UserVideoListModel Model { get; set; } = new UserVideoListModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Model = await _dataCacheService.UserVideoListDataCatche.GetCache(Id);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取用户发表视频列表失败");
+        }
+    }
+
+    private Task OnPageClick(int pageIndex)
+    {
+        Model.CurrentPage = pageIndex;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

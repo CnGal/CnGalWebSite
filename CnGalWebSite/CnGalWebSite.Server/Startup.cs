@@ -80,7 +80,8 @@ namespace CnGalWebSite.Server
             _ = services.AddScoped(typeof(IRepository<>), typeof(Repository<>))
                 .AddScoped<IEntryService, EntryService>()
                 .AddScoped<IArticleService, ArticleService>()
-                .AddScoped<IImageService, ImageService>();
+                .AddScoped<IImageService, ImageService>()
+             .AddScoped<IVideoService, VideoService>();
             //services.AddScoped<IEventBase, EventBase>();
 
             //添加预渲染状态记录

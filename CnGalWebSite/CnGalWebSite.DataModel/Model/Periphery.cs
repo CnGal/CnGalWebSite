@@ -220,7 +220,7 @@ namespace CnGalWebSite.DataModel.Model
         Postcard,
         [Display(Name = "挂画")]
         HangPainting,
-        [Display(Name = "钥匙扣")]
+        [Display(Name = "挂件")]
         Keychain,
         [Display(Name = "书签")]
         Bookmark,

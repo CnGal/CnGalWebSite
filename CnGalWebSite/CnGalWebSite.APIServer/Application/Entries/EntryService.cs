@@ -5,7 +5,8 @@ using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
-using CnGalWebSite.DataModel.ExamineModel;
+using CnGalWebSite.DataModel.ExamineModel.Entries;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
@@ -40,11 +41,12 @@ namespace CnGalWebSite.APIServer.Application.Entries
         private readonly IAppHelper _appHelper;
         private readonly IArticleService _articleService;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
+        private readonly IRepository<Video, long> _videoRepository;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Entry>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Entry>>> SortLambdaCacheEntry = new();
 
         public EntryService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IRepository<Article, int> articleRepository, IRepository<PlayedGame, long> playedGameRepository,
-        IRepository<Examine, long> examineRepository, IArticleService articleService)
+        IRepository<Examine, long> examineRepository, IArticleService articleService, IRepository<Video, long> videoRepository)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
@@ -53,7 +55,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             _articleRepository = articleRepository;
             _articleService = articleService;
             _playedGameRepository = playedGameRepository;
-
+            _videoRepository = videoRepository;
         }
 
         public async Task<PagedResultDto<Entry>> GetPaginatedResult(GetEntryInput input)
@@ -587,6 +589,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             UpdateEntryDataOutlinks(entry, examine);
             await UpdateEntryDataRelatedEntriesAsync(entry, examine);
             await UpdateEntryDataRelatedArticles(entry, examine);
+            await UpdateEntryDataRelatedVideos(entry, examine);
         }
 
 
@@ -723,6 +726,48 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     if (article != null)
                     {
                         relevances.Add(article);
+                    }
+
+                }
+            }
+
+            //更新最后编辑时间
+            entry.LastEditTime = DateTime.Now.ToCstTime();
+        }
+
+        public async Task UpdateEntryDataRelatedVideos(Entry entry, EntryRelevances examine)
+        {
+            //序列化相关性列表
+            //先读取词条信息
+            var relevances = entry.Videos;
+
+            foreach (var item in examine.Relevances.Where(s => s.Type == RelevancesType.Video))
+            {
+                var isAdd = false;
+
+                //遍历信息列表寻找关键词
+                foreach (var infor in relevances)
+                {
+
+                    if (infor.Id.ToString() == item.DisplayName)
+                    {
+                        //查看是否为删除操作
+                        if (item.IsDelete == true)
+                        {
+                            relevances.Remove(infor);
+
+                        }
+                        isAdd = true;
+                        break;
+                    }
+                }
+                if (isAdd == false && item.IsDelete == false)
+                {
+                    //没有找到关键词 则新建关键词
+                    var video = await _videoRepository.FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                    if (video != null)
+                    {
+                        relevances.Add(video);
                     }
 
                 }
@@ -1396,6 +1441,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             var relevanceArticle = new List<ArticleInforTipViewModel>();
             var relevanceOther = new List<RelevancesKeyValueModel>();
 
+            //文章
             foreach (var item in entry.Articles.Where(s => s.IsHidden == false))
             {
                 if (item.Type == ArticleType.News)
@@ -1408,6 +1454,15 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
                 }
             }
+            //视频
+            foreach (var item in entry.Videos.Where(s => s.IsHidden == false))
+            {
+              
+                    model.VideoRelevances.Add(_appHelper.GetVideoInforTipViewModel(item));
+
+                
+            }
+            //词条
             foreach (var nav in entry.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.IsHidden == false))
             {
                 var item = nav.ToEntryNavigation;
@@ -1684,7 +1739,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //先把 当前词条中的图片 都 打上删除标签
             foreach (var item in currentEntry.Pictures)
             {
-                entryImages.Images.Add(new EntryImage
+                entryImages.Images.Add(new EditRecordImage
                 {
                     Url = item.Url,
                     Note = item.Note,
@@ -1719,7 +1774,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 if (isSame == false)
                 {
-                    entryImages.Images.Add(new EntryImage
+                    entryImages.Images.Add(new EditRecordImage
                     {
                         Url = infor.Url,
                         Modifier = infor.Modifier,
@@ -1745,7 +1800,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //遍历当前词条数据 打上删除标签
             foreach (var item in currentEntry.EntryRelationFromEntryNavigation.Select(s => s.ToEntryNavigation))
             {
-                entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                 {
                     DisplayName = item.Id.ToString(),
                     DisplayValue = item.Name,
@@ -1766,7 +1821,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 else
                 {
-                    entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                    entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                     {
                         DisplayName = item.ToEntry.ToString(),
                         DisplayValue = item.ToEntryNavigation.Name,
@@ -1780,7 +1835,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //遍历当前文章数据 打上删除标签
             foreach (var item in currentEntry.Articles)
             {
-                entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                 {
                     DisplayName = item.Id.ToString(),
                     DisplayValue = item.Name,
@@ -1801,11 +1856,46 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 else
                 {
-                    entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                    entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                     {
                         DisplayName = item.Id.ToString(),
                         DisplayValue = item.Name,
                         Type = RelevancesType.Article,
+                        IsDelete = false
+                    });
+                }
+            }
+
+            //处理关联视频
+            //遍历当前数据 打上删除标签
+            foreach (var item in currentEntry.Videos)
+            {
+                entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
+                {
+                    DisplayName = item.Id.ToString(),
+                    DisplayValue = item.Name,
+                    Type = RelevancesType.Video,
+                    IsDelete = true,
+                });
+            }
+
+            //再遍历视图 对应修改
+
+            //添加新建项目
+            foreach (var item in newEntry.Videos)
+            {
+                var temp = entryRelevances.Relevances.FirstOrDefault(s => s.Type == RelevancesType.Video && s.DisplayName == item.Id.ToString());
+                if (temp != null)
+                {
+                    entryRelevances.Relevances.Remove(temp);
+                }
+                else
+                {
+                    entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
+                    {
+                        DisplayName = item.Id.ToString(),
+                        DisplayValue = item.Name,
+                        Type = RelevancesType.Video,
                         IsDelete = false
                     });
                 }
@@ -1816,7 +1906,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //遍历当前词条外部链接 打上删除标签
             foreach (var item in currentEntry.Outlinks)
             {
-                entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                 {
                     DisplayName = item.Name,
                     DisplayValue = item.BriefIntroduction,
@@ -1853,7 +1943,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 if (isSame == false)
                 {
-                    entryRelevances.Relevances.Add(new EntryRelevancesAloneModel
+                    entryRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
                     {
                         DisplayName = infor.Name,
                         DisplayValue = infor.BriefIntroduction,
@@ -2442,6 +2532,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             var groups = new List<RelevancesModel>();
             var games = new List<RelevancesModel>();
             var news = new List<RelevancesModel>();
+            var videos = new List<RelevancesModel>();
             var others = new List<RelevancesModel>();
             foreach (var nav in entry.EntryRelationFromEntryNavigation)
             {
@@ -2491,6 +2582,15 @@ namespace CnGalWebSite.APIServer.Application.Entries
                         });
                         break;
                 }
+            }
+            foreach (var item in entry.Videos)
+            {
+              
+                        videos.Add(new RelevancesModel
+                        {
+                            DisplayName = item.Name
+                        });
+                     
             }
             foreach (var item in entry.Outlinks)
             {
@@ -2824,7 +2924,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
         }
 
-        public void SetDataFromEditRelevancesViewModel(Entry newEntry, EditRelevancesViewModel model, List<Entry> entries, List<Article> articles)
+        public void SetDataFromEditRelevancesViewModel(Entry newEntry, EditRelevancesViewModel model, List<Entry> entries, List<Article> articles, List<Video> videos)
         {
             //加载在关联信息中的网站
             if (string.IsNullOrWhiteSpace(model.MoegirlName) == false)
@@ -2904,6 +3004,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             newEntry.Outlinks.Clear();
             newEntry.Articles = articles;
+            newEntry.Videos = videos;
             newEntry.EntryRelationFromEntryNavigation = entries.Select(s => new EntryRelation
             {
                 ToEntry = s.Id,

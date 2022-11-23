@@ -157,9 +157,9 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
         {
             var entryIds = await _entryRepository.GetAll().AsNoTracking()
                 .Where(s => s.Type == EntryType.Game && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden != true)
-                .Select(s => s.Id).ToListAsync();
+                .Select(s => s.Id).ToArrayAsync();
 
-            var index = new Random().Next(0, entryIds.Count - 1);
+            var index = new Random().Next(0, entryIds.Length - 1);
             return await GetEntryInfor(entryIds[index], plainText, showLink);
         }
 

@@ -17,7 +17,7 @@
         <div class="mb-3">
             @if (item.entry != null)
             {
-                <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.entry"  />
+                <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.entry" />
 
             }
             else if (item.article != null)
@@ -27,6 +27,14 @@
             else if (item.periphery != null)
             {
                 <CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip Model="item.periphery" />
+            }
+            else if (item.Video != null)
+            {
+                <CnGalWebSite.Shared.Component.Search.NewVersion.VideoInforViewTip Model="item.Video" />
+            }
+            else if (item.Tag != null)
+            {
+                <CnGalWebSite.Shared.Component.Search.NewVersion.TagInforViewTip Model="item.Tag" />
             }
         </div>
 

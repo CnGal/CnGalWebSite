@@ -6,12 +6,18 @@
             <div class="col-12 col-xl-8 pt-3">
                 <div style=" height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
-                        @if (Model.IsDefault)
-                        {
-                            <div class="article-home-tag me-2">默认</div>
-                        }
-                        <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
-                        <div class="article-home-text mt-1 mb-1">
+                        <div class="text-truncate-2 mb-1" style=" display: flex; align-items: center;">
+                            @if (Model.IsDefault)
+                            {
+                                <div class="article-home-tag">默认</div>
+                            }
+
+                            <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
+                        </div>
+
+
+
+                        <div  class="text-truncate-2">
                             @Model.BriefIntroduction
                         </div>
                     </div>

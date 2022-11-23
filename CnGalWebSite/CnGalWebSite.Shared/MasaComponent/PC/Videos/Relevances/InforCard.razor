@@ -1,0 +1,29 @@
+﻿@inject IDataCacheService _dataCacheService
+
+
+<a href="@("/videos/index/" + Model.Id)" class="a-font-color h-100">
+    <div class="rounded shadow-sm  bg-opacity h-100" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <div>
+                <img loading="lazy" class="img-fluid" src="@Model.MainImage" alt="@Model.Name">
+            </div>
+            <div class="p-2">
+                <header class="text-truncate-1">
+                    <span class="app-card-tag">@Model.Type</span>
+                    <span class="fw-bold" style=" display: inline;">@Model.DisplayName</span>
+                </header>
+                <div class="text-truncate-2" style="color: gray">
+                    @Model.BriefIntroduction
+                </div>
+            </div>
+        </div>
+    </div>
+</a>
+
+
+
+@code {
+    [Parameter]
+    public VideoInforTipViewModel Model { get; set; }
+ 
+}

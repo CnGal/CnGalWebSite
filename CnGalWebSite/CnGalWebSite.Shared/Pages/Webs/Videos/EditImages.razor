@@ -1,0 +1,113 @@
+﻿@inject HttpClient Http
+@inject ToastService? ToastService
+@inject NavigationManager NavigationManager
+
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@("编辑 " + Model.Name)"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+
+}
+
+<AutoSaveTip TItem="EditVideoImagesViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
+
+<div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.EditSummaryTip Type="ExaminedNormalListModelType.Video" Class="mb-3" />
+
+    @if (isReady == false)
+    {
+        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-4">
+
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+            <div class="mt-2">
+            </div>
+            <SkeletonParagraph />
+        </div>
+    }
+    else
+    {
+
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw fa-video-camera" Outline>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Videos.ImagesCard Model="Model" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    public EditVideoImagesViewModel Model { get; set; } = new EditVideoImagesViewModel();
+    bool isReady = false;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    AutoSaveTip<EditVideoImagesViewModel> autoSave { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            try
+            {
+                //获取词条信息
+                Model = await Http.GetFromJsonAsync<EditVideoImagesViewModel>(ToolHelper.WebApiPath + "api/videos/editimages/" + Id, ToolHelper.options);
+
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取编辑视频相册失败");
+            }
+
+        }
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            var result = await Http.PostAsJsonAsync<EditVideoImagesViewModel>(ToolHelper.WebApiPath + "api/videos/editimages", Model);
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("保存视频图片失败", obj.Error);
+            }
+            else
+            {
+              await  autoSave.Clean();
+
+                await ToastService.Success("保存成功", "保存视频图片成功，等待审核通过");
+                NavigationManager.NavigateTo( "/videos/index/" + Model.Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "保存视频图片失败");
+        }
+    }
+
+    private Task DataLoaded(EditVideoImagesViewModel model)
+    {
+        isReady = false;
+        StateHasChanged();
+        Model = model;
+        isReady = true;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+}

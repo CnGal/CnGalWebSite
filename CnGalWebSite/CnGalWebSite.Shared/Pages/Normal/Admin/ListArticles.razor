@@ -3,103 +3,50 @@
 
 @inject HttpClient Http
 @inject ToastService? ToastService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JS
-@implements IAsyncDisposable
 
 
 <TitleTip Title="文章版块"></TitleTip>
 
 
-<div class="">
-    <div class="" style="padding-right: 0;padding-left: 0;">
-        <div class="  rounded shadow-sm  bg-opacity p-3">
-            <h3 class="fw-bold text-center">文章版块</h3>
-            <p class="text-center" style="color: gray;margin-top:20px">
-                <i class="fa fa-gamepad fa-fw "></i>
-                <span class="article-infor-text">@(InforModel.News + "篇动态")</span>&nbsp;&nbsp;&nbsp;
+<div class=" rounded shadow-sm -lg p-4 bg-opacity">
+    <Table TItem="ListArticleAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelArticle" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="340" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableToolbarTemplate>
+            <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Success" Icon="fa fa-pencil" Text="编辑" OnClickCallback="OnEditModel" IsAsync="true" />
+            <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Primary" Icon="fa fa-arrow-up" Text="增权重" OnClickCallback="OnPriorityUpClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Success" Icon="fa fa-arrow-down" Text="降权重" OnClickCallback="OnPriorityDownClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Success" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Primary" Icon="fa fa-comments" Text="开启评论" OnClickCallback="OnCanCommentClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Success" Icon="fa fa-comments-o" Text="关闭评论" OnClickCallback="OnCanNotCommentClick" IsAsync="true" />
+        </TableToolbarTemplate>
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" DefaultSortOrder="SortOrder.Desc" />
+            <TableColumn @bind-Field="@context.Type" Sortable="true" Searchable="true" Width="80" />
+            <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
+            <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" TextWrap="true" Width="400" />
+            <TableColumn @bind-Field="@context.CreateTime" Sortable="true" Width="120" FormatString="yyyy-MM-dd" />
+            <TableColumn @bind-Field="@context.LastEditTime" Sortable="true" Width="120" FormatString="yyyy-MM-dd" />
+            <TableColumn @bind-Field="@context.ReaderCount" Sortable="true" Width="80" />
+            <TableColumn @bind-Field="@context.OriginalAuthor" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
+            <TableColumn @bind-Field="@context.OriginalLink" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
+            <TableColumn @bind-Field="@context.PubishTime" Sortable="true" Width="120" FormatString="yyyy-MM-dd" />
 
-                <i class="fa fa-users fa-fw "></i>
-                <span class="article-infor-text">@(InforModel.Notices + "个公告")</span>
-                @if (IsSmallScreen)
-                {
-                    <br /> }
-                else
-                {
-                    <span>&nbsp; &nbsp; &nbsp;</span>}
-                <i class="fa fa-star fa-fw "></i>
-                <span class="article-infor-text">@(InforModel.Strategies + "篇攻略")</span>&nbsp;&nbsp;&nbsp;
+            <TableColumn @bind-Field="@context.Priority" Sortable="true" Width="120" />
+            <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+            <TableColumn @bind-Field="@context.CanComment" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
 
-                <i class="fa fa-object-group fa-fw "></i>
-                <span class="article-infor-text">@(InforModel.Toughts + "篇感想")</span>
-                @if (IsSmallScreen)
-                {
-                    <br /> }
-                else
-                {
-                    <span>&nbsp; &nbsp; &nbsp;</span>}
-                <i class="fa fa-unlink fa-fw "></i>
-                <span class="article-infor-text">@(InforModel.Interviews + "篇采访")</span>&nbsp;&nbsp;&nbsp;
-
-                <i class="fa fa-unlink fa-fw "></i>
-                <span class="article-infor-text">@(InforModel.Hiddens + "篇隐藏文章")</span>
-                @if (IsSmallScreen)
-                {
-                    <br /> }
-                else
-                {
-                    <span>&nbsp; &nbsp; &nbsp;</span>}
-                <i class="fa fa-codepen fa-fw "></i>
-                <span class="article-infor-text">@("总计"+InforModel.All + "篇文章")</span>
-
-            </p>
-        </div>
-
-        <div class="mt-3" style="padding-right: 0;padding-left: 0;">
-            <div class=" rounded shadow-sm -lg p-4 bg-opacity">
-                <Table TItem="ListArticleAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelArticle" ShowSearch="true" @ref="TableRows"
-                       ShowExtendButtons="true" ExtendButtonColumnWidth="340" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-                        ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-                    <TableToolbarTemplate>
-                        <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Success" Icon="fa fa-pencil" Text="编辑" OnClickCallback="OnEditModel" IsAsync="true" />
-                        <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Primary" Icon="fa fa-arrow-up" Text="增权重" OnClickCallback="OnPriorityUpClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Success" Icon="fa fa-arrow-down" Text="降权重" OnClickCallback="OnPriorityDownClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Primary" Icon="fa fa-map-signs" Text="显示" OnClickCallback="OnUnHiddenClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Success" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Primary" Icon="fa fa-comments" Text="开启评论" OnClickCallback="OnCanCommentClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListArticleAloneModel" Color="Color.Success" Icon="fa fa-comments-o" Text="关闭评论" OnClickCallback="OnCanNotCommentClick" IsAsync="true" />
-                    </TableToolbarTemplate>
-                    <TableColumns>
-                        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60"  DefaultSortOrder="SortOrder.Desc"/>
-                        <TableColumn @bind-Field="@context.Type" Sortable="true" Searchable="true" Width="80" />
-                        <TableColumn @bind-Field="@context.Name" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
-                        <TableColumn @bind-Field="@context.BriefIntroduction" Searchable="true" TextWrap="true" Width="400" />
-                        <TableColumn @bind-Field="@context.CreateTime" Sortable="true" Width="120" FormatString="yyyy-MM-dd" />
-                        <TableColumn @bind-Field="@context.LastEditTime" Sortable="true" Width="120" FormatString="yyyy-MM-dd" />
-                        <TableColumn @bind-Field="@context.ReaderCount" Sortable="true" Width="80" />
-                        <TableColumn @bind-Field="@context.OriginalAuthor" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
-                        <TableColumn @bind-Field="@context.OriginalLink" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
-                        <TableColumn @bind-Field="@context.PubishTime" Sortable="true" Width="120" FormatString="yyyy-MM-dd" />
-
-                        <TableColumn @bind-Field="@context.Priority" Sortable="true" Width="120" />
-                        <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
-                        <TableColumn @bind-Field="@context.CanComment" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
-
-                    </TableColumns>
-                    <RowButtonTemplate>
-                        <TableCellButton AutoSelectedRowWhenClick="false"   Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClick ="@(() => OnRowLookClick( context.Id , context.Name))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClick ="@(() => OnRowEditPriorityClick(new long[] { context.Id }, 1 , true))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClick ="@(() => OnRowEditPriorityClick(new long[] { context.Id }, - 1 , true))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-unlink" Text="切换显示" IsAsync="true" OnClick ="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, !context.IsHidden, true))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-comments-o" Text="开关评论" IsAsync="true" OnClick ="@(() => OnRowEditCanCommentClick(new long[] { context.Id }, !context.CanComment, true))" />
-                    </RowButtonTemplate>
-                </Table>
-            </div>
-        </div>
-
-    </div>
-
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClick="@(() => OnRowLookClick( context.Id , context.Name))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClick="@(() => OnRowEditPriorityClick(new long[] { context.Id }, 1 , true))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClick="@(() => OnRowEditPriorityClick(new long[] { context.Id }, - 1 , true))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-unlink" Text="切换显示" IsAsync="true" OnClick="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, !context.IsHidden, true))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-comments-o" Text="开关评论" IsAsync="true" OnClick="@(() => OnRowEditCanCommentClick(new long[] { context.Id }, !context.CanComment, true))" />
+        </RowButtonTemplate>
+    </Table>
 </div>
 
 @code {
@@ -108,8 +55,6 @@
     private Table<ListArticleAloneModel>? TableRows { get; set; }
     private List<ListArticleAloneModel> SelectedRows { get; set; } = new();
 
-
-    public GetArticleCountModel InforModel { get; set; } = new GetArticleCountModel();
     public PagedResultDto<Article> pagedResultDto = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<Article> { Data = new List<Article>(), CurrentPage = 1, TotalCount = 0 };
 
     public ListArticlesViewModel ListModel { get; set; } = new ListArticlesViewModel { Articles = new List<ListArticleAloneModel>() };
@@ -120,82 +65,9 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    #region 获取屏幕大小
-
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime? JSRuntime { get; set; }
-
-
-
-    public bool IsSmallScreen { get; set; }
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; }
-
-
-    private JSInterop<ListArticles>? Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            Interop = new JSInterop<ListArticles>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
-        }
-    }
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 768))
-        {
-            IsSmallScreen = width < 768;
-
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 768 && width < 2000))
-        {
-            IsNormalScreen = width >= 768 && width < 2000;
-
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 2000))
-        {
-            IsLargeScreen = width >= 2000;
-
-            StateHasChanged();
-        }
-    }
-    #endregion
-
 
     protected override async Task OnInitializedAsync()
     {
-#if DEBUG
-        //Thread.Sleep(10000);
-#endif
-        try
-        {
-            InforModel = await Http.GetFromJsonAsync<GetArticleCountModel>(ToolHelper.WebApiPath + "api/articles/getarticlecount", ToolHelper.options);
-
-        }
-        catch(Exception ex)
-        {
-
-            ErrorHandler.ProcessError(ex, "无法获取文章数据");
-        }
 
     }
 
@@ -235,7 +107,7 @@
 
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "修改文章权重失败");
         }
@@ -295,7 +167,7 @@
                 }
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, tempString + "文章失败");
         }
@@ -330,7 +202,7 @@
 
     public Task OnRowLookClick(long id, string name)
     {
-        NavigationManager.NavigateTo(Provider,"/articles/index/" + id, name, "fa fa-newspaper-o");
+        NavigationManager.NavigateTo( "/articles/index/" + id);
         return Task.CompletedTask;
     }
 
@@ -360,7 +232,7 @@
                 }
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, tempString + "失败");
         }
@@ -456,28 +328,10 @@
                 await TableRows.QueryAsync();
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, "保存文章数据失败");
         }
     }
-
-
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
-    {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }
 

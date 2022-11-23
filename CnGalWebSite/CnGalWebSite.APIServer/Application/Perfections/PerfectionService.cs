@@ -472,7 +472,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                     CheckEntryMainImage(entry)
                 };
                 //检查Staff
-                results.AddRange(await CheckEntryStaff(entry));
+                results.AddRange( CheckEntryStaff(entry));
                 //检查steamId
                 results.Add(CheckEntrySteamId(entry));
                 //检查制作组
@@ -975,7 +975,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
             }
         }
 
-        public async Task<List<PerfectionCheck>> CheckEntryStaff(Entry entry)
+        public List<PerfectionCheck> CheckEntryStaff(Entry entry)
         {
             var results = new List<PerfectionCheck>();
             //获取所有staff

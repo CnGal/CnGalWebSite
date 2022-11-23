@@ -127,10 +127,6 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         Task<object> GenerateModelFromExamines(List<Examine> examines);
 
-        Task ExaminesCompletionEntry(Entry newEntry, Entry currentEntry);
-
-        Task ExaminesCompletionArticle(Article newArticle, Article currentArticle);
-
         Task ReplaceEditEntryStaffExamineContext();
 
         Task ReplaceEntryStaff();
@@ -160,5 +156,9 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="operation"></param>
         /// <returns></returns>
         Task ApplyEditRecordToObject(object entry, object examine, Operation operation);
+
+        Task<Video> AddNewVideoExaminesAsync(Video model, ApplicationUser user, string note);
+
+        Task<Examine> GetUserVideoActiveExamineAsync(long videoId, string userId, Operation operation);
     }
 }

@@ -17,8 +17,8 @@
         if(id.Contains("http"))
         {
             id = System.Web.HttpUtility.UrlDecode(id);
-            var temp = id.Split('/');
-            Id = temp.Last().Replace("@","");
+            var temp = id.Split('?').FirstOrDefault()?.Split('/');
+            Id = temp?.LastOrDefault(s=>string.IsNullOrWhiteSpace(s)==false).Replace("@","");
 
         }
         else

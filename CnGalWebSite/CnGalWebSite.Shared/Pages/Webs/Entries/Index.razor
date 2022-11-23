@@ -159,6 +159,7 @@ else
                                 </div>
                             </MTabItem>
                             <MTabItem Value="2">
+                                <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="EntryView.VideoRelevances"/>
                                 <EntryRelevancesNormalListViewTip Model="EntryView" OnRevoke="OnRevoke"></EntryRelevancesNormalListViewTip>
                                 <PeripheryOverViewTip EntryId="EntryView.Id" IsEdit="EntryView.IsEdit" IsGameView="EntryView.Type == EntryType.Game" />
                             </MTabItem>
@@ -197,7 +198,7 @@ else
 
                             </div>
                         }
-
+                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="EntryView.VideoRelevances" />
                         @if (EntryView.Type == EntryType.Game && EntryView.IsScored)
                         {
                             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
@@ -508,7 +509,7 @@ else
                         break;
                 }
                 _dataCatcheService.EntryIndexPageCatche.Clean(Id);
-                Refresh();
+                await Refresh();
             }
         }
         catch (Exception ex)

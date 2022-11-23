@@ -112,6 +112,13 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
                  SearchType.SetorAlbumEtc,
                  SearchType.Ost,
                  SearchType.Set,
+                 SearchType.ActivationCode,
+                 SearchType.ColoredPaper,
+                 SearchType.Badge,
+                 SearchType.Postcard,
+                 SearchType.HangPainting,
+                 SearchType.Keychain,
+                 SearchType.Bookmark,
                  SearchType.OtherPeriphery,
             };
         }
@@ -123,6 +130,15 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
                  SearchType.Tag
             };
         }
+
+        public static List<SearchType> GetVideoTypes()
+        {
+            return new List<SearchType>
+            {
+                 SearchType.Video
+            };
+        }
+
 
         public static List<SearchTimeModel> GetTimes()
         {
@@ -329,6 +345,23 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
         [Display(Name = "标签")]
         Tag,
 
+        [Display(Name = "视频")]
+        Video,
+
+        [Display(Name = "激活码")]
+        ActivationCode,
+        [Display(Name = "色纸")]
+        ColoredPaper,
+        [Display(Name = "徽章")]
+        Badge,
+        [Display(Name = "明信片")]
+        Postcard,
+        [Display(Name = "挂画")]
+        HangPainting,
+        [Display(Name = "挂件")]
+        Keychain,
+        [Display(Name = "书签")]
+        Bookmark,
     }
 
 }

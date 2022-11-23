@@ -41,6 +41,9 @@ namespace CnGalWebSite.DataModel.Model
         public long? LotteryId { get; set; }
         public Lottery Lottery { get; set; }
 
+        public long? VideoId { get; set; }
+        public Video Video { get; set; }
+
         public long? UserSpaceCommentManagerId { get; set; }
         public UserSpaceCommentManager UserSpaceCommentManager { get; set; }
 
@@ -72,5 +75,7 @@ namespace CnGalWebSite.DataModel.Model
         CommentVote,
         [Display(Name = "评论抽奖")]
         CommentLottery,
+        [Display(Name = "评论视频")]
+        CommentVideo,
     }
 }

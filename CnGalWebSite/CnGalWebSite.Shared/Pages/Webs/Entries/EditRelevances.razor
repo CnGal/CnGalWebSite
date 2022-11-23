@@ -47,21 +47,22 @@ else
         }
 
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-codepen" Outline>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.RelevancesCard Model="Model" EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" ArticleItems="ArticleItems" Class="mb-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Entries.RelevancesCard Model="Model" EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" VideoItems="VideoItems" ArticleItems="ArticleItems" Class="mb-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     }
 </div>
 
 @code {
-        [Parameter]
-        public string Id { get; set; }
+    [Parameter]
+    public string Id { get; set; }
     public EditRelevancesViewModel Model { get; set; } = new EditRelevancesViewModel();
     private List<string> EntryGameItems { get; set; } = new List<string>();
     private List<string> EntryRoleItems { get; set; } = new List<string>();
     private List<string> EntryGroupItems { get; set; } = new List<string>();
     private List<string> EntryStaffItems { get; set; } = new List<string>();
     private List<string> ArticleItems { get; set; } = new List<string>();
+    private List<string> VideoItems { get; set; } = new List<string>();
 
     bool isReady = false;
 
@@ -85,6 +86,8 @@ else
                 EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3", ToolHelper.options);
                 //获取所有文章
                 ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles", ToolHelper.options);
+                //获取所有视频
+                VideoItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/videos/GetNames", ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
 

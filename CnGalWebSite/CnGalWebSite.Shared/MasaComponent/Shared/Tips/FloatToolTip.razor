@@ -18,6 +18,7 @@
             {
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-script-text" Tooltip="转载文章" OnClick="OnRepostArticles" />
             }
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-animation-play" Tooltip="转载视频" OnClick="OnRepostVideos" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial>
 
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-transfer-up" Tooltip="回到顶部" OnClick="OnClickFly" />
@@ -27,14 +28,14 @@
 </div>
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard @ref="mergeEntriesCard" />
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard @ref="repostArticlesCard" />
-
+<CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard @ref="repostVideosCard" />
 
 
 @code {
     private bool fab;
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard mergeEntriesCard;
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard repostArticlesCard;
-
+    CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard repostVideosCard;
 
     public Task OnClickFly()
     {
@@ -87,6 +88,17 @@
             await repostArticlesCard.Refresh(true);
         }
     }
+    public async Task OnRepostVideos()
+    {
+        if (Login() == false)
+        {
+            return;
+        }
+        if (repostVideosCard != null)
+        {
+            await repostVideosCard.Refresh(true);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -97,7 +109,7 @@
 
     public async void RefreshRequsted(object sender, EventArgs args)
     {
-     await  InvokeAsync( StateHasChanged);
+        await  InvokeAsync( StateHasChanged);
     }
     #region 释放实例
 

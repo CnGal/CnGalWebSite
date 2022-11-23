@@ -200,11 +200,12 @@
 
                 editStates.Add(Operation.EstablishMain, model.State.MainState);
                 editStates.Add(Operation.EstablishAddInfor, model.State.InforState);
-                editStates.Add(Operation.EstablishMainPage, model.State.MainPageState);
+
                 editStates.Add(Operation.EstablishImages, model.State.ImagesState);
-                editStates.Add(Operation.EstablishRelevances, model.State.RelevancesState);
-                editStates.Add(Operation.EstablishTags, model.State.TagState);
                 editStates.Add(Operation.EstablishAudio, model.State.AudioState);
+                editStates.Add(Operation.EstablishTags, model.State.TagState);
+                editStates.Add(Operation.EstablishRelevances, model.State.RelevancesState);
+                editStates.Add(Operation.EstablishMainPage, model.State.MainPageState);
 
             }
             else if (Type == ExaminedNormalListModelType.Article)
@@ -239,6 +240,19 @@
                 editStates.Add(Operation.EditTagMain, model.State.MainState);
                 editStates.Add(Operation.EditTagChildEntries, model.State.ChildEntriesState);
                 editStates.Add(Operation.EditTagChildTags, model.State.ChildTagsState);
+
+            }
+            else if (Type == ExaminedNormalListModelType.Video)
+            {
+                var model = await Http.GetFromJsonAsync<EditVideoInforBindModel>(ToolHelper.WebApiPath + "api/videos/GetEditInforBindModel/" + Id, ToolHelper.options);
+
+                Examines = model.Examines;
+
+                editStates.Add(Operation.EditVideoMain, model.State.MainState);
+                editStates.Add(Operation.EditVideoImages, model.State.ImagesState);
+                editStates.Add(Operation.EditVideoRelevanes, model.State.RelevancesState);
+                editStates.Add(Operation.EditVideoMainPage, model.State.MainPageState);
+
 
             }
 

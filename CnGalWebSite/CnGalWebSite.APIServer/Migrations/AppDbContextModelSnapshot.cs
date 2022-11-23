@@ -34,6 +34,21 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.ToTable("ArticleEntry");
                 });
 
+            modelBuilder.Entity("ArticleVideo", b =>
+                {
+                    b.Property<long>("ArticlesId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("VideosId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ArticlesId", "VideosId");
+
+                    b.HasIndex("VideosId");
+
+                    b.ToTable("ArticleVideo");
+                });
+
             modelBuilder.Entity("ArticleVote", b =>
                 {
                     b.Property<long>("ArticlesId")
@@ -240,27 +255,27 @@ namespace CnGalWebSite.APIServer.Migrations
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
                             AccessFailedCount = 0,
                             CanComment = true,
-                            ConcurrencyStamp = "074e891d-c841-471e-9e3f-5246fd9191e7",
+                            ConcurrencyStamp = "4f625bd7-ee93-4548-86b3-85b6d204f2c2",
                             ContributionValue = 0,
                             DisplayContributionValue = 0,
                             DisplayIntegral = 0,
-                            Email = "1278490989@qq.com",
+                            Email = "123456789@qq.com",
                             EmailConfirmed = true,
                             GroupQQ = 0L,
                             Integral = 0,
                             IsPassedVerification = false,
                             IsShowFavotites = false,
                             IsShowGameRecord = false,
-                            LastOnlineTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LastOnlineTime = new DateTime(1, 1, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
                             LockoutEnabled = false,
                             MainPageContext = "### 这个人太懒了，什么也没写额(～￣▽￣)～",
-                            NormalizedEmail = "1278490989@qq.com",
+                            NormalizedEmail = "123456789@qq.com",
                             NormalizedUserName = "ADMIN",
                             OnlineTime = 0L,
                             PasswordHash = "AQAAAAEAACcQAAAAEDecloBliZOnB0dNPQmr8qhoodaLmPdrKN10/bvLDrHaAJSxqWOnrEsvBhl5kzrZmQ==",
                             PersonalSignature = "这个人太懒了，什么也没写额(～￣▽￣)～",
                             PhoneNumberConfirmed = false,
-                            RegistTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            RegistTime = new DateTime(2022, 11, 23, 13, 54, 33, 845, DateTimeKind.Utc).AddTicks(162),
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
@@ -583,6 +598,9 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<long?>("UserSpaceCommentManagerId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("VideoId")
+                        .HasColumnType("bigint");
+
                     b.Property<long?>("VoteId")
                         .HasColumnType("bigint");
 
@@ -601,6 +619,8 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("PeripheryId");
 
                     b.HasIndex("UserSpaceCommentManagerId");
+
+                    b.HasIndex("VideoId");
 
                     b.HasIndex("VoteId");
 
@@ -782,11 +802,16 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<string>("Url")
                         .HasColumnType("longtext");
 
+                    b.Property<long?>("VideoId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EntryId");
 
                     b.HasIndex("PeripheryId");
+
+                    b.HasIndex("VideoId");
 
                     b.ToTable("EntryPicture");
                 });
@@ -965,6 +990,9 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<int>("Version")
                         .HasColumnType("int");
 
+                    b.Property<long?>("VideoId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
@@ -982,6 +1010,8 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("PlayedGameId");
 
                     b.HasIndex("TagId");
+
+                    b.HasIndex("VideoId");
 
                     b.ToTable("Examines");
                 });
@@ -1041,8 +1071,14 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<long?>("PeripheryId")
                         .HasColumnType("bigint");
 
+                    b.Property<int?>("TagId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
+
+                    b.Property<long?>("VideoId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -1053,6 +1089,10 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasIndex("FavoriteFolderId");
 
                     b.HasIndex("PeripheryId");
+
+                    b.HasIndex("TagId");
+
+                    b.HasIndex("VideoId");
 
                     b.ToTable("FavoriteObjects");
                 });
@@ -1518,11 +1558,16 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("longtext");
 
+                    b.Property<long?>("VideoId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ArticleId");
 
                     b.HasIndex("EntryId");
+
+                    b.HasIndex("VideoId");
 
                     b.ToTable("Outlink");
                 });
@@ -2209,7 +2254,7 @@ namespace CnGalWebSite.APIServer.Migrations
                         {
                             Id = 1,
                             IsHidden = false,
-                            LastEditTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LastEditTime = new DateTime(1, 1, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "游戏",
                             Priority = 0,
                             ReaderCount = 0
@@ -2218,7 +2263,7 @@ namespace CnGalWebSite.APIServer.Migrations
                         {
                             Id = 2,
                             IsHidden = false,
-                            LastEditTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LastEditTime = new DateTime(1, 1, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "角色",
                             Priority = 0,
                             ReaderCount = 0
@@ -2227,7 +2272,7 @@ namespace CnGalWebSite.APIServer.Migrations
                         {
                             Id = 3,
                             IsHidden = false,
-                            LastEditTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LastEditTime = new DateTime(1, 1, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "STAFF",
                             Priority = 0,
                             ReaderCount = 0
@@ -2236,7 +2281,7 @@ namespace CnGalWebSite.APIServer.Migrations
                         {
                             Id = 4,
                             IsHidden = false,
-                            LastEditTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LastEditTime = new DateTime(1, 1, 1, 8, 0, 0, 0, DateTimeKind.Unspecified),
                             Name = "制作组",
                             Priority = 0,
                             ReaderCount = 0
@@ -2498,6 +2543,108 @@ namespace CnGalWebSite.APIServer.Migrations
                         .IsUnique();
 
                     b.ToTable("UserSpaceCommentManagers");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.Video", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BackgroundPicture")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BriefIntroduction")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("CanComment")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("CommentCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Copyright")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CreateUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("longtext");
+
+                    b.Property<TimeSpan>("Duration")
+                        .HasColumnType("time(6)");
+
+                    b.Property<bool>("IsCreatedByCurrentUser")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsInteractive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("LastEditTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("MainPage")
+                        .HasMaxLength(10000000)
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("MainPicture")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("OriginalAuthor")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PubishTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("ReaderCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SmallBackgroundPicture")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreateUserId");
+
+                    b.ToTable("Videos");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.VideoRelation", b =>
+                {
+                    b.Property<long>("VideoRelationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("VideoRelationId");
+
+                    b.Property<long?>("FromVideo")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ToVideo")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("VideoRelationId");
+
+                    b.HasIndex("FromVideo");
+
+                    b.HasIndex("ToVideo");
+
+                    b.ToTable("VideoRelation");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Vote", b =>
@@ -3152,6 +3299,21 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.ToTable("EntryTag");
                 });
 
+            modelBuilder.Entity("EntryVideo", b =>
+                {
+                    b.Property<int>("EntriesId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("VideosId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("EntriesId", "VideosId");
+
+                    b.HasIndex("VideosId");
+
+                    b.ToTable("EntryVideo");
+                });
+
             modelBuilder.Entity("EntryVote", b =>
                 {
                     b.Property<int>("EntriesId")
@@ -3196,28 +3358,24 @@ namespace CnGalWebSite.APIServer.Migrations
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e575",
-                            ConcurrencyStamp = "df9c6cd5-1faf-49eb-a0f3-b816c62cfc36",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e576",
-                            ConcurrencyStamp = "b8ea63a8-dbd7-4534-85dd-b27b559f279c",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e577",
-                            ConcurrencyStamp = "6d965bdb-4478-47fb-a53d-7b1f160afacc",
                             Name = "SuperAdmin",
                             NormalizedName = "SUPERADMIN"
                         },
                         new
                         {
                             Id = "a18be9c0-aa65-4af8-bd17-00bd9344e578",
-                            ConcurrencyStamp = "32af696d-f7f4-43e0-9831-65fd7b9d00ac",
                             Name = "Editor",
                             NormalizedName = "EDITOR"
                         });
@@ -3392,6 +3550,21 @@ namespace CnGalWebSite.APIServer.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ArticleVideo", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.Article", null)
+                        .WithMany()
+                        .HasForeignKey("ArticlesId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Video", null)
+                        .WithMany()
+                        .HasForeignKey("VideosId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ArticleVote", b =>
                 {
                     b.HasOne("CnGalWebSite.DataModel.Model.Article", null)
@@ -3529,6 +3702,11 @@ namespace CnGalWebSite.APIServer.Migrations
                         .HasForeignKey("UserSpaceCommentManagerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("CnGalWebSite.DataModel.Model.Video", "Video")
+                        .WithMany()
+                        .HasForeignKey("VideoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CnGalWebSite.DataModel.Model.Vote", "Vote")
                         .WithMany()
                         .HasForeignKey("VoteId")
@@ -3547,6 +3725,8 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Navigation("Periphery");
 
                     b.Navigation("UserSpaceCommentManager");
+
+                    b.Navigation("Video");
 
                     b.Navigation("Vote");
                 });
@@ -3579,6 +3759,11 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasOne("CnGalWebSite.DataModel.Model.Periphery", null)
                         .WithMany("Pictures")
                         .HasForeignKey("PeripheryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Video", null)
+                        .WithMany("Pictures")
+                        .HasForeignKey("VideoId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
@@ -3666,6 +3851,11 @@ namespace CnGalWebSite.APIServer.Migrations
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("CnGalWebSite.DataModel.Model.Video", "Video")
+                        .WithMany("Examines")
+                        .HasForeignKey("VideoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Article");
@@ -3681,6 +3871,8 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Navigation("PlayedGame");
 
                     b.Navigation("Tag");
+
+                    b.Navigation("Video");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.FavoriteFolder", b =>
@@ -3716,6 +3908,16 @@ namespace CnGalWebSite.APIServer.Migrations
                         .HasForeignKey("PeripheryId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("CnGalWebSite.DataModel.Model.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Video", "Video")
+                        .WithMany()
+                        .HasForeignKey("VideoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Article");
 
                     b.Navigation("Entry");
@@ -3723,6 +3925,10 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Navigation("FavoriteFolder");
 
                     b.Navigation("Periphery");
+
+                    b.Navigation("Tag");
+
+                    b.Navigation("Video");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.GameNews", b =>
@@ -3836,6 +4042,11 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasOne("CnGalWebSite.DataModel.Model.Entry", null)
                         .WithMany("Outlinks")
                         .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Video", null)
+                        .WithMany("Outlinks")
+                        .HasForeignKey("VideoId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
@@ -4096,6 +4307,33 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.Video", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.ApplicationUser", "CreateUser")
+                        .WithMany()
+                        .HasForeignKey("CreateUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreateUser");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.VideoRelation", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.Video", "FromVideoNavigation")
+                        .WithMany("VideoRelationFromVideoNavigation")
+                        .HasForeignKey("FromVideo")
+                        .HasConstraintName("FK_VideoRelation_Video_From");
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Video", "ToVideoNavigation")
+                        .WithMany("VideoRelationToVideoNavigation")
+                        .HasForeignKey("ToVideo")
+                        .HasConstraintName("FK_VideoRelation_Video_To");
+
+                    b.Navigation("FromVideoNavigation");
+
+                    b.Navigation("ToVideoNavigation");
+                });
+
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.VoteOption", b =>
                 {
                     b.HasOne("CnGalWebSite.DataModel.Model.Article", "Article")
@@ -4208,6 +4446,21 @@ namespace CnGalWebSite.APIServer.Migrations
                     b.HasOne("CnGalWebSite.DataModel.Model.Tag", null)
                         .WithMany()
                         .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EntryVideo", b =>
+                {
+                    b.HasOne("CnGalWebSite.DataModel.Model.Entry", null)
+                        .WithMany()
+                        .HasForeignKey("EntriesId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CnGalWebSite.DataModel.Model.Video", null)
+                        .WithMany()
+                        .HasForeignKey("VideosId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -4490,6 +4743,19 @@ namespace CnGalWebSite.APIServer.Migrations
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.UserSpaceCommentManager", b =>
                 {
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("CnGalWebSite.DataModel.Model.Video", b =>
+                {
+                    b.Navigation("Examines");
+
+                    b.Navigation("Outlinks");
+
+                    b.Navigation("Pictures");
+
+                    b.Navigation("VideoRelationFromVideoNavigation");
+
+                    b.Navigation("VideoRelationToVideoNavigation");
                 });
 
             modelBuilder.Entity("CnGalWebSite.DataModel.Model.Vote", b =>

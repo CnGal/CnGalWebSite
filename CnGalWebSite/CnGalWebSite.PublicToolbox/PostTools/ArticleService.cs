@@ -68,7 +68,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             }
             if (articles.Any(s => s == model.Title))
             {
-                OnProgressUpdate(model, OutputLevel.Dager, $"与现有文章《{model.Title}》重名，请手动上传");
+                OnProgressUpdate(model, OutputLevel.Dager, $"与现有文章《{model.Title}》重名，请自定义标题");
                 return;
             }
 

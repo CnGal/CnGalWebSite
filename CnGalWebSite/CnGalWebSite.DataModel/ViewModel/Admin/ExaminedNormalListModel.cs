@@ -54,7 +54,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         [Display(Name = "游玩记录")]
         PlayedGame,
         [Display(Name = "用户认证")]
-        UserCertification
+        UserCertification,
+        [Display(Name = "视频")]
+        Video
     }
 
     public enum ExaminedNormalListPassType

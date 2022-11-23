@@ -187,6 +187,12 @@ namespace CnGalWebSite.APIServer.Application.Helper
         /// <returns></returns>
         ArticleInforTipViewModel GetArticleInforTipViewModel(Article item);
         /// <summary>
+        /// 获取为卡片展示优化的视频数据模型
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        VideoInforTipViewModel GetVideoInforTipViewModel(Video item);
+        /// <summary>
         /// 获取为卡片展示优化的词条数据模型
         /// </summary>
         /// <param name="entry">词条</param>
