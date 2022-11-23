@@ -30,17 +30,20 @@ namespace CnGalWebSite.APIServer.Application.Articles
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Entry, int> _entryRepository;
+        private readonly IRepository<Video, int> _videoRepository;
         private readonly IAppHelper _appHelper;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Article>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Article>>> SortLambdaCacheArticle = new();
 
 
-        public ArticleService(IAppHelper appHelper, IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository)
+        public ArticleService(IAppHelper appHelper, IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, IRepository<Examine, long> examineRepository, IRepository<Video, int> videoRepository)
         {
             _articleRepository = articleRepository;
             _appHelper = appHelper;
             _entryRepository = entryRepository;
             _examineRepository = examineRepository;
+            _videoRepository = videoRepository;
+
         }
 
         public async Task<PagedResultDto<Article>> GetPaginatedResult(GetArticleInput input)
@@ -340,6 +343,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             UpdateArticleDataOutlinks(article, examine);
             await UpdateArticleDataRelatedArticlesAsync(article, examine);
             await UpdateArticleDataRelatedEntries(article, examine);
+            await UpdateArticleDataRelatedVideos(article, examine);
         }
 
         public void UpdateArticleDataOutlinks(Article article, ArticleRelevances examine)
@@ -472,7 +476,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 {
                     //没有找到关键词 则新建关键词
                     var entry = await _entryRepository.FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
-                    if (article != null)
+                    if (entry != null)
                     {
                         relevances.Add(entry);
                     }
@@ -484,7 +488,46 @@ namespace CnGalWebSite.APIServer.Application.Articles
             article.LastEditTime = DateTime.Now.ToCstTime();
         }
 
+        public async Task UpdateArticleDataRelatedVideos(Article article, ArticleRelevances examine)
+        {
+            //序列化相关性列表
+            //先读取词条信息
+            var relevances = article.Videos;
 
+            foreach (var item in examine.Relevances.Where(s => s.Type == RelevancesType.Video))
+            {
+                var isAdd = false;
+
+                //遍历信息列表寻找关键词
+                foreach (var infor in relevances)
+                {
+
+                    if (infor.Id.ToString() == item.DisplayName)
+                    {
+                        //查看是否为删除操作
+                        if (item.IsDelete == true)
+                        {
+                            relevances.Remove(infor);
+                        }
+                        isAdd = true;
+                        break;
+                    }
+                }
+                if (isAdd == false && item.IsDelete == false)
+                {
+                    //没有找到关键词 则新建关键词
+                    var video = await _videoRepository.FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                    if (video != null)
+                    {
+                        relevances.Add(video);
+                    }
+
+                }
+            }
+
+            //更新最后编辑时间
+            article.LastEditTime = DateTime.Now.ToCstTime();
+        }
 
         public void UpdateArticleDataMainPage(Article article, string examine)
         {
@@ -618,6 +661,10 @@ namespace CnGalWebSite.APIServer.Application.Articles
             {
                 model.RelatedEntries.Add(_appHelper.GetEntryInforTipViewModel(item));
             }
+            foreach (var item in article.Videos.Where(s => s.IsHidden == false))
+            {
+                model.RelatedVideos.Add(_appHelper.GetVideoInforTipViewModel(item));
+            }
             foreach (var item in article.ArticleRelationFromArticleNavigation.Where(s => s.ToArticleNavigation.IsHidden==false).Select(s=>s.ToArticleNavigation))
             {
                 model.RelatedArticles.Add(_appHelper.GetArticleInforTipViewModel(item));
@@ -659,9 +706,9 @@ namespace CnGalWebSite.APIServer.Application.Articles
             //创建审核数据模型
             var articleRelevances = new ArticleRelevances();
 
-            //处理关联词条
+            //处理关联文章
 
-            //遍历当前词条数据 打上删除标签
+            //遍历当前数据 打上删除标签
             foreach (var item in currentArticle.ArticleRelationFromArticleNavigation.Select(s => s.ToArticleNavigation))
             {
                 articleRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
@@ -695,8 +742,8 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 }
             }
 
-            //处理关联文章
-            //遍历当前文章数据 打上删除标签
+            //处理关联词条
+            //遍历当前数据 打上删除标签
             foreach (var item in currentArticle.Entries)
             {
                 articleRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
@@ -729,10 +776,44 @@ namespace CnGalWebSite.APIServer.Application.Articles
                     });
                 }
             }
+            //处理关联视频
+            //遍历当前数据 打上删除标签
+            foreach (var item in currentArticle.Videos)
+            {
+                articleRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
+                {
+                    DisplayName = item.Id.ToString(),
+                    DisplayValue = item.Name,
+                    Type = RelevancesType.Video,
+                    IsDelete = true,
+                });
+            }
+
+            //再遍历视图 对应修改
+
+            //添加新建项目
+            foreach (var item in newArticle.Videos)
+            {
+                var temp = articleRelevances.Relevances.FirstOrDefault(s => s.Type == RelevancesType.Video && s.DisplayName == item.Id.ToString());
+                if (temp != null)
+                {
+                    articleRelevances.Relevances.Remove(temp);
+                }
+                else
+                {
+                    articleRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
+                    {
+                        DisplayName = item.Id.ToString(),
+                        DisplayValue = item.Name,
+                        Type = RelevancesType.Video,
+                        IsDelete = false
+                    });
+                }
+            }
 
             //处理外部链接
 
-            //遍历当前词条外部链接 打上删除标签
+            //遍历当前外部链接 打上删除标签
             foreach (var item in currentArticle.Outlinks)
             {
                 articleRelevances.Relevances.Add(new EditRecordRelevancesAloneModel
@@ -914,10 +995,11 @@ namespace CnGalWebSite.APIServer.Application.Articles
         {
             newArticle.MainPage = model.Context;
         }
-        public void SetDataFromEditArticleRelevancesViewModel(Article newArticle, EditArticleRelevancesViewModel model, List<Entry> entries, List<Article> articles)
+        public void SetDataFromEditArticleRelevancesViewModel(Article newArticle, EditArticleRelevancesViewModel model, List<Entry> entries, List<Article> articles, List<Video> videos)
         {
             newArticle.Outlinks.Clear();
             newArticle.Entries = entries;
+            newArticle.Videos = videos;
             newArticle.ArticleRelationFromArticleNavigation = articles.Select(s => new ArticleRelation
             {
                 ToArticle = s.Id,

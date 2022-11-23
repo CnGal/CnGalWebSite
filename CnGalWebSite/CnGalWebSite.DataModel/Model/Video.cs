@@ -79,20 +79,11 @@ namespace CnGalWebSite.DataModel.Model
         /// 阅读数
         /// </summary>
         public int ReaderCount { get; set; }
-        /// <summary>
-        /// 点赞数
-        /// </summary>
-        public int ThumbsUpCount { get; set; }
+
         /// <summary>
         /// 评论数
         /// </summary>
         public int CommentCount { get; set; }
-
-
-        /// <summary>
-        /// 点赞列表
-        /// </summary>
-        public List<ThumbsUp> ThumbsUps { get; set; }
 
         /// <summary>
         /// 是否隐藏
@@ -102,7 +93,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 是否可以评论
         /// </summary>
-        public bool? CanComment { get; set; } = true;
+        public bool CanComment { get; set; } = true;
 
         /// <summary>
         /// 原作者名称

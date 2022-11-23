@@ -100,6 +100,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
 
         public List<ArticleInforTipViewModel> RelatedArticles { get; set; } = new List<ArticleInforTipViewModel>();
 
+        public List<VideoInforTipViewModel> RelatedVideos { get; set; } = new List<VideoInforTipViewModel>();
+
         /// <summary>
         /// 外部链接
         /// </summary>

@@ -108,6 +108,16 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
         /// <summary>
+        /// 获取最近发布的视频
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<List<MainImageCardModel>>> GetHomeVideosViewAsync()
+        {
+            return await _homeService.GetHomeVideosViewAsync();
+
+        }
+        /// <summary>
         /// 获取最近发布的动态
         /// </summary>
         /// <returns></returns>

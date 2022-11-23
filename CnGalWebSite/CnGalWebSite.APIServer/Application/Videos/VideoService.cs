@@ -8,6 +8,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Videos;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Web;
@@ -393,21 +394,25 @@ namespace CnGalWebSite.APIServer.Application.Videos
                 Id = video.Id,
                 Name = video.Name,
                 DisplayName = video.DisplayName,
-                Type = video.Type,
+                Type = video.Type ?? "视频",
                 MainPage = video.MainPage,
                 PubishTime = video.PubishTime,
                 OriginalAuthor = video.OriginalAuthor,
                 CreateTime = video.CreateTime,
-                ThumbsUpCount = video.ThumbsUpCount,
                 ReaderCount = video.ReaderCount,
                 LastEditTime = video.LastEditTime,
-                CanComment = video.CanComment ?? true,
+                CanComment = video.CanComment,
                 BriefIntroduction = video.BriefIntroduction,
                 IsHidden = video.IsHidden,
+                Duration = video.Duration,
+                CommentCount = video.CommentCount,
+                Copyright = video.Copyright,
+                IsCreatedByCurrentUser = video.IsCreatedByCurrentUser,
+                IsInteractive = video.IsInteractive,
             };
 
             //初始化图片
-            model.MainPicture = _appHelper.GetImagePath(video.MainPicture, "");
+            model.MainPicture = _appHelper.GetImagePath(video.MainPicture, "app.png");
             model.BackgroundPicture = _appHelper.GetImagePath(video.BackgroundPicture, "");
             model.SmallBackgroundPicture = _appHelper.GetImagePath(video.SmallBackgroundPicture, "");
 
@@ -927,6 +932,16 @@ namespace CnGalWebSite.APIServer.Application.Videos
         /// <param name="videos"></param>
         public void SetDataFromEditRelevances(Video item, EditVideoRelevancesViewModel model, List<Entry> entries, List<Article> articles, List<Video> videos)
         {
+            //加载在关联信息中的网站
+            if (string.IsNullOrWhiteSpace(model.BilibiliId) == false)
+            {
+                model.others.Add(new RelevancesModel
+                {
+                    DisplayName = "bilibili",
+                    Link = "https://www.bilibili.com/video/" + HttpUtility.UrlDecode(model.BilibiliId)
+                });
+            }
+
             item.Outlinks.Clear();
             item.Entries = entries;
             item.Articles = articles;
@@ -1224,6 +1239,26 @@ namespace CnGalWebSite.APIServer.Application.Videos
             {
                 DisplayName = "类型",
                 DisplayValue = item.Type,
+            });
+            texts.Add(new KeyValueModel
+            {
+                DisplayName = "版权",
+                DisplayValue = item.Copyright.GetDisplayName(),
+            });
+            texts.Add(new KeyValueModel
+            {
+                DisplayName = "互动视频",
+                DisplayValue = item.IsInteractive?"是":"否",
+            });
+            texts.Add(new KeyValueModel
+            {
+                DisplayName = "本人创作",
+                DisplayValue = item.IsCreatedByCurrentUser ? "是" : "否",
+            });
+            texts.Add(new KeyValueModel
+            {
+                DisplayName = "时长",
+                DisplayValue = item.Duration.ToString()
             });
 
 

@@ -87,10 +87,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Videos
         /// </summary>
         public int ReaderCount { get; set; }
         /// <summary>
-        /// 点赞数
-        /// </summary>
-        public int ThumbsUpCount { get; set; }
-        /// <summary>
         /// 评论数
         /// </summary>
         public int CommentCount { get; set; }
@@ -104,7 +100,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Videos
         /// <summary>
         /// 是否可以评论
         /// </summary>
-        public bool? CanComment { get; set; } = true;
+        public bool CanComment { get; set; } = true;
 
         /// <summary>
         /// 原作者名称
@@ -119,16 +115,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Videos
         /// 是否处于编辑状态
         /// </summary>
         public bool IsEdit { get; set; }
-        /// <summary>
-        /// 是否已经点赞
-        /// </summary>
-        public bool IsThumbsUp { get; set; }
 
         /// <summary>
         /// 主页
         /// </summary>
         public string MainPage { get; set; }
-
 
         public EditState MainState { get; set; }
         public EditState MainPageState { get; set; }

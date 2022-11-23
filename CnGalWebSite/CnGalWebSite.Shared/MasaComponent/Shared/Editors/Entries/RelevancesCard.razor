@@ -21,6 +21,10 @@
     <InputRelevancesListTip AutoCompleteItems="@EntryGameItems" Model="Model.Games" Title="游戏"></InputRelevancesListTip>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <InputRelevancesListTip AutoCompleteItems="@EntryGroupItems" Model="Model.Groups" Title="组织"></InputRelevancesListTip>
+
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
+    <InputRelevancesListTip AutoCompleteItems="@VideoItems" Model="Model.videos" Title="视频"></InputRelevancesListTip>
+
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
     <InputOtherLinkListTip Model="Model.others" Title="自定义链接"></InputOtherLinkListTip>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
@@ -37,7 +41,7 @@
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Cards.InputIdCard @bind-Id="Model.BaiDuName" Label="百度百科条目名称" />
         </div>
     </ValidateForm>
-  
+
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 
@@ -54,6 +58,8 @@
     public List<string> EntryStaffItems { get; set; }
     [Parameter]
     public List<string> ArticleItems { get; set; }
+    [Parameter]
+    public List<string> VideoItems { get; set; }
     [Parameter]
     public string Class { get; set; }
 

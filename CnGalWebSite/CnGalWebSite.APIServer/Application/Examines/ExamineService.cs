@@ -371,6 +371,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                           .Include(s => s.Tag)
                           .Include(s => s.Article)
                           .Include(s => s.Periphery)
+                          .Include(s => s.Video)
                           .Select(n => new
                           {
                               n.Id,
@@ -384,11 +385,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                               n.DisambigId,
                               n.PeripheryId,
                               n.PlayedGameId,
+                              n.VideoId,
                               TagName = n.Tag == null ? "" : n.Tag.Name,
                               EntryName = n.Entry == null ? "" : n.Entry.Name,
                               ArticleName = n.Article == null ? "" : n.Article.Name,
                               DisambigName = n.Disambig == null ? "" : n.Disambig.Name,
                               PeripheryName = n.Periphery == null ? "" : n.Periphery.Name,
+                              VideoName = n.Video == null ? "" : n.Video.Name,
                               UserId = n.ApplicationUserId,
                               n.ApplicationUser.UserName,
                               n.Operation,
@@ -409,9 +412,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     IsPassed = item.IsPassed,
                     UserImage = _appHelper.GetImagePath(item.PhotoPath, "user.png"),
                     Ranks = isShowRanks ? (await _rankService.GetUserRanks(item.UserId)).Where(s => s.Name != "编辑者").ToList() : new List<DataModel.ViewModel.Ranks.RankViewModel>(),
-                    RelatedId = item.EntryId != null ? item.EntryId.ToString() : item.ArticleId != null ? item.ArticleId.ToString() : item.TagId != null ? item.TagId.ToString() : item.CommentId != null ? item.CommentId.ToString() : item.DisambigId != null ? item.DisambigId.ToString() : item.PeripheryId != null ? item.PeripheryId.ToString() : item.PlayedGameId != null ? item.PlayedGameId.ToString() : item.UserId,
-                    Type = item.EntryId != null ? ExaminedNormalListModelType.Entry : item.ArticleId != null ? ExaminedNormalListModelType.Article : item.TagId != null ? ExaminedNormalListModelType.Tag : item.CommentId != null ? ExaminedNormalListModelType.Comment : item.DisambigId != null ? ExaminedNormalListModelType.Disambig : item.PeripheryId != null ? ExaminedNormalListModelType.Periphery : item.PlayedGameId != null ? ExaminedNormalListModelType.PlayedGame : ExaminedNormalListModelType.User,
-                    RelatedName = item.EntryId != null ? item.EntryName : item.ArticleId != null ? item.ArticleName : item.TagId != null ? item.TagName : item.DisambigId != null ? item.DisambigName : item.PeripheryId != null ? item.PeripheryName : item.CommentId != null ? "" : item.PlayedGameId != null ? "" : item.UserName
+                    RelatedId = item.EntryId != null ? item.EntryId.ToString() : item.ArticleId != null ? item.ArticleId.ToString() : item.TagId != null ? item.TagId.ToString() : item.CommentId != null ? item.CommentId.ToString() : item.DisambigId != null ? item.DisambigId.ToString() : item.PeripheryId != null ? item.PeripheryId.ToString() : item.PlayedGameId != null ? item.PlayedGameId.ToString() : item.VideoId != null ? item.VideoId.ToString() : item.UserId,
+                    Type = item.EntryId != null ? ExaminedNormalListModelType.Entry : item.ArticleId != null ? ExaminedNormalListModelType.Article : item.TagId != null ? ExaminedNormalListModelType.Tag : item.CommentId != null ? ExaminedNormalListModelType.Comment : item.DisambigId != null ? ExaminedNormalListModelType.Disambig : item.PeripheryId != null ? ExaminedNormalListModelType.Periphery : item.PlayedGameId != null ? ExaminedNormalListModelType.PlayedGame : item.VideoId != null ? ExaminedNormalListModelType.Video : ExaminedNormalListModelType.User,
+                    RelatedName = item.EntryId != null ? item.EntryName : item.ArticleId != null ? item.ArticleName : item.TagId != null ? item.TagName : item.DisambigId != null ? item.DisambigName : item.PeripheryId != null ? item.PeripheryName : item.CommentId != null ? "" : item.PlayedGameId != null ? "" : item.VideoId != null ? item.VideoName : item.UserName
                 };
                 result.Add(tempModel);
             }
@@ -914,6 +917,15 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             }
 
+            foreach (var item in entry.Videos)
+            {
+                model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
+                {
+                    video = _appHelper.GetVideoInforTipViewModel(item)
+                });
+
+            }
+
             foreach (var item in entry.EntryRelationFromEntryNavigation)
             {
                 model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
@@ -1339,6 +1351,15 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
                 {
                     entry = _appHelper.GetEntryInforTipViewModel(item)
+                });
+
+            }
+
+            foreach (var item in article.Videos)
+            {
+                model.Relevances.Add(new DataModel.ViewModel.Search.SearchAloneModel
+                {
+                    video = _appHelper.GetVideoInforTipViewModel(item)
                 });
 
             }
@@ -3110,6 +3131,39 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
 
             }
+            //反向关联 视频
+            foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Video))
+            {
+                //查找关联词条
+                var temp = await _videoRepository.GetAll().Include(s => s.Entries).FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                if (temp != null && temp.Entries.Any(s => s.Id == entry.Id) == false)
+                {
+                    //补全审核记录
+                    //创建审核数据模型
+                    var examinedModel = new VideoRelevances();
+
+                    examinedModel.Relevances.Add(new EditRecordRelevancesAloneModel
+                    {
+                        DisplayName = entry.Id.ToString(),
+                        DisplayValue = entry.Name,
+                        IsDelete = false,
+                        Type = RelevancesType.Entry,
+                    });
+
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, examinedModel);
+                        resulte = text.ToString();
+                    }
+
+                    await ExamineEditVideoRelevancesAsync(temp, examinedModel);
+                    await UniversalEditVideoExaminedAsync(temp, admin, true, resulte, Operation.EditVideoRelevanes, "自动反向关联");
+                }
+
+
+            }
 
         }
 
@@ -3228,6 +3282,39 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
                     await ExamineEstablishRelevancesAsync(temp, examinedModel);
                     await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
+                }
+
+
+            }
+            //反向关联 视频
+            foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Video))
+            {
+                //查找关联词条
+                var temp = await _videoRepository.GetAll().Include(s => s.Articles).FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                if (temp != null && temp.Articles.Any(s => s.Id == article.Id) == false)
+                {
+                    //补全审核记录
+                    //创建审核数据模型
+                    var examinedModel = new VideoRelevances();
+
+                    examinedModel.Relevances.Add(new EditRecordRelevancesAloneModel
+                    {
+                        DisplayName = article.Id.ToString(),
+                        DisplayValue = article.Name,
+                        IsDelete = false,
+                        Type = RelevancesType.Article,
+                    });
+
+                    var resulte = "";
+                    using (TextWriter text = new StringWriter())
+                    {
+                        var serializer = new JsonSerializer();
+                        serializer.Serialize(text, examinedModel);
+                        resulte = text.ToString();
+                    }
+
+                    await ExamineEditVideoRelevancesAsync(temp, examinedModel);
+                    await UniversalEditVideoExaminedAsync(temp, admin, true, resulte, Operation.EditVideoRelevanes, "自动反向关联");
                 }
 
 
@@ -3490,7 +3577,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 //查找关联文章
                 var temp = await _videoRepository.GetAll()
                     .Include(s => s.VideoRelationFromVideoNavigation).ThenInclude(s => s.ToVideoNavigation)
-                    .FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                    .FirstOrDefaultAsync(s => s.Id.ToString() == infor.DisplayName);
                 if (temp != null && temp.VideoRelationFromVideoNavigation.Any(s => s.ToVideo == item.Id) == false)
                 {
                     //补全审核记录
@@ -3502,7 +3589,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         DisplayName = item.Id.ToString(),
                         DisplayValue = item.Name,
                         IsDelete = false,
-                        Type = RelevancesType.Article,
+                        Type = RelevancesType.Video,
                     });
                     var resulte = "";
                     using (TextWriter text = new StringWriter())
@@ -3522,7 +3609,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             foreach (var infor in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Entry))
             {
                 //查找关联词条
-                var temp = await _entryRepository.GetAll().Include(s => s.Videos).FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                var temp = await _entryRepository.GetAll().Include(s => s.Videos).FirstOrDefaultAsync(s => s.Id.ToString() == infor.DisplayName);
                 if (temp != null && temp.Videos.Any(s => s.Id == item.Id) == false)
                 {
                     //补全审核记录
@@ -3553,7 +3640,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             foreach (var infor in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Article))
             {
                 //查找关联词条
-                var temp = await _articleRepository.GetAll().Include(s => s.Videos).FirstOrDefaultAsync(s => s.Id.ToString() == item.DisplayName);
+                var temp = await _articleRepository.GetAll().Include(s => s.Videos).FirstOrDefaultAsync(s => s.Id.ToString() == infor.DisplayName);
                 if (temp != null && temp.Videos.Any(s => s.Id == item.Id) == false)
                 {
                     //补全审核记录
@@ -5206,7 +5293,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
                  .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Information).ThenInclude(s => s.Additional)
                  .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                  .Include(s => s.EntryStaffFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                 .Include(s => s.Articles).ThenInclude(s => s.CreateUser)
+                 .Include(s => s.Articles)
+                 .Include(s => s.Videos)
                  .Include(s => s.Information).ThenInclude(s => s.Additional).Include(s => s.Tags).Include(s => s.Pictures)
                  .FirstOrDefaultAsync(s => s.Id == entryId);
                 //获取通过审核记录叠加的旧模型
@@ -5223,6 +5311,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                  .Include(s => s.Outlinks)
                  .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
                  .Include(s => s.Entries)
+                 .Include(s => s.Videos)
                  .FirstOrDefaultAsync(s => s.Id == articleId);
                 //获取通过审核记录叠加的旧模型
                 var examineModel = await GenerateModelFromExamines(article);

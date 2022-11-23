@@ -11,6 +11,7 @@ namespace CnGalWebSite.DataModel.ViewModel
         public List<RelevancesModel> Games { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> articles { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> news { get; set; } = new List<RelevancesModel>();
+        public List<RelevancesModel> videos { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> others { get; set; } = new List<RelevancesModel>();
 
         [Display(Name = "2DFan条目Id")]

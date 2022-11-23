@@ -119,9 +119,13 @@ namespace CnGalWebSite.APIServer.Application.Favorites
             List<FavoriteObject> models = null;
             if (count != 0)
             {
-                models = await query.AsNoTracking().Include(s => s.Entry).ThenInclude(s => s.Information).Include(s => s.Entry)
-                    .ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                    .Include(s => s.Article).ThenInclude(s => s.CreateUser).Include(s => s.Periphery).ToListAsync();
+                models = await query.AsNoTracking()
+                    .Include(s => s.Entry).ThenInclude(s => s.Information)
+                    .Include(s => s.Video).ThenInclude(s => s.CreateUser)
+                    .Include(s => s.Tag)
+                    .Include(s=>s.Entry).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                    .Include(s => s.Article).ThenInclude(s => s.CreateUser)
+                    .Include(s => s.Periphery).ToListAsync();
             }
             else
             {
@@ -152,7 +156,20 @@ namespace CnGalWebSite.APIServer.Application.Favorites
                         periphery = _appHelper.GetPeripheryInforTipViewModel(item.Periphery)
                     });
                 }
-
+                else if (item.Type == FavoriteObjectType.Video)
+                {
+                    dtos.Add(new FavoriteObjectAloneViewModel
+                    {
+                        Video = _appHelper.GetVideoInforTipViewModel(item.Video)
+                    });
+                }
+                else if (item.Type == FavoriteObjectType.Tag)
+                {
+                    dtos.Add(new FavoriteObjectAloneViewModel
+                    {
+                        Tag = _appHelper.GetTagInforTipViewModel(item.Tag)
+                    });
+                }
             }
 
             var dtos_ = new PagedResultDto<FavoriteObjectAloneViewModel>

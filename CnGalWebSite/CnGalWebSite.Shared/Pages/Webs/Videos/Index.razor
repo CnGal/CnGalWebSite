@@ -1,0 +1,369 @@
+﻿@inject HttpClient Http
+@inject ToastService ToastService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject IDataCacheService _dataCatcheService
+@inject IStructuredDataService _structuredDataService
+@inject DialogService DialogService
+
+@implements IDisposable
+
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+{
+    <TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+}
+else
+{
+    <TitleTip></TitleTip>
+}
+
+@if (_dataCatcheService.ThemeSetting.IsTransparent)
+{
+    @if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
+    }
+    @if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) == false)
+    {
+        <div id="web_bg" style="background-image: url(@Model.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
+    }
+}
+
+@if (isNotFound)
+{
+    int temp = 0;
+    <NotFoundEntry IsNeedLayput="true" EntryName="@(int.TryParse(Id,out temp)?"":ToolHelper.Base64DecodeName(Id))"></NotFoundEntry>
+}
+else
+{
+    @if (_dataCatcheService.EntryIndexPageCatche.Check(Id) || isReady)
+    {
+        <div class="row" itemscope itemtype="http://schema.org/Movie">
+            <div class="col-12 mb-4">
+                @if (Model.IsHidden == true)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
+                        当前视频处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+                }
+
+                <div>
+                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainCard Model="Model" OnRevoke="OnRevoke" OnPreEdit="OnPreEdit" />
+                </div>
+            </div>
+            @if (_dataCatcheService.IsApp)
+            {
+                <div class="col-12 col-lg-4 ">
+
+                    <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Model="Model.UserInfor" Small/>
+
+                    <div class="mb-4">
+                        <CnGalWebSite.Shared.MasaComponent.PC.Videos.BasicInforCard Model="Model" OnRevoke="OnRevoke" />
+                    </div>
+
+                </div>
+                <div class="col-12 col-lg-8">
+                    @if (Model.Pictures.Count != 0)
+                    {
+                        <div class="mb-4">
+                            <CnGalWebSite.Shared.MasaComponent.PC.Videos.ImagesCard Model="Model" OnRevoke="OnRevoke" />
+                        </div>
+                    }
+
+                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainPageCard Model="Model" OnRevoke="OnRevoke" />
+                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.RelevancesCard Model="Model" OnRevoke="OnRevoke" />
+                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.OutlinksCard Model="Model" OnRevoke="OnRevoke" />
+                    @if (Model.CanComment)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentVideo" />
+                    }
+
+
+                </div>
+            }
+            else
+            {
+        <div class="col-12 col-lg-8  order-2 order-lg-1 ">
+
+            @if (Model.Pictures.Count != 0)
+            {
+                <div class="mb-4">
+                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.ImagesCard Model="Model" OnRevoke="OnRevoke" />
+                </div>
+            }
+            <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainPageCard Model="Model" OnRevoke="OnRevoke" />
+
+
+            <CnGalWebSite.Shared.MasaComponent.PC.Videos.RelevancesCard Model="Model" OnRevoke="OnRevoke" />
+            @if (Model.CanComment)
+            {
+                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentVideo" />
+            }
+        </div>
+                <div class="col-12 col-lg-4 order-1 order-lg-2">
+                    <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Model="Model.UserInfor" />
+
+                    <div class="mb-4">
+                        <CnGalWebSite.Shared.MasaComponent.PC.Videos.BasicInforCard Model="Model" OnRevoke="OnRevoke" />
+                    </div>
+                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.OutlinksCard Model="Model" OnRevoke="OnRevoke" />
+                </div>
+            }
+
+        </div>
+    }
+    else
+    {
+        <div class="  rounded shadow-sm  bg-opacity pt-3">
+
+            <div class="row mt-2 ms-2 me-2">
+                <div class="col-12 col-md-12 col-lg-5 mt-1 mb-4">
+                    <SkeletonAvatar Round="false" />
+                </div>
+
+                <div class="col-12 col-md-12 col-lg-6 mt-1 mb-2">
+                    <SkeletonParagraph />
+                </div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3">
+                <SkeletonParagraph />
+
+            </div>
+        </div>
+
+
+        <div class=" mt-3">
+            <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                <SkeletonParagraph />
+            </div>
+        </div>
+        <div class="mt-3">
+            <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+            </div>
+        </div>
+    }
+
+}
+@if (isFirstLoad == false)
+{
+    <MSnackbar Timeout="-1" @bind-Value="isLoading" Text
+               Color="@_dataCatcheService.ThemeSetting.Theme" Style="min-width:180px;"
+               Elevation="24">
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <MProgressCircular Size="@("20px")" Width="2" Class="me-4" Indeterminate Color="@_dataCatcheService.ThemeSetting.Theme">
+            </MProgressCircular>
+            正在跳转......
+        </div>
+
+    </MSnackbar>
+}
+
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+    bool isReady = false;
+    bool isLoading = false;
+    bool isNotFound = false;
+    bool isFirstLoad = true;
+    public string CurrentUserRank { get; set; }
+
+    public VideoViewModel Model { get; set; } = new VideoViewModel();
+
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+
+    public bool IsAdmin { get; set; } = false;
+    public bool CanDeleted { get; set; }
+    string LastLookName = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            NavigationManager.LocationChanged += LocationChanged;
+            isFirstLoad = false;
+        }
+        //记录数据
+        if (Model.Name != LastLookName && string.IsNullOrWhiteSpace(Model.Name) == false)
+        {
+            LastLookName = Model.Name;
+
+            try
+            {
+                await JS.InvokeAsync<string>("trackEvent", "视频", "浏览", Model.Name, "1", "look");
+            }
+            catch (Exception exc)
+            {
+
+            }
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await Refresh();
+    }
+    public async Task Refresh()
+    {
+        try
+        {
+            isNotFound = false;
+            //获取词条信息
+            Model = await _dataCatcheService.VideoIndexPageCatche.GetCache(Id);
+            //判断如果名称为空则返回主页
+            if (string.IsNullOrWhiteSpace(Model.Name))
+            {
+                NavigationManager.NavigateTo("/videos/home");
+            }
+
+            var userState = await authenticationStateTask;
+            var user = userState.User;
+            if (user.Identity.Name == Model.UserInfor.Name)
+            {
+                Model.Authority = true;
+                CanDeleted = true;
+            }
+            if (user.IsInRole("Editor"))
+            {
+                Model.Authority = true;
+            }
+
+            //生成轮播结构数据
+            await GenerateCarouselStructuredDataJson();
+
+            isReady = true;
+            StateHasChanged();
+
+        }
+        catch (Exception exc)
+        {
+            isNotFound = true;
+            isReady = true;
+            StateHasChanged();
+        }
+    }
+
+    public async Task GenerateCarouselStructuredDataJson()
+    {
+        var urls = new List<string>();
+        urls.AddRange(Model.RelatedEntries.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
+        urls.AddRange(Model.RelatedArticles.Select(s => NavigationManager.BaseUri + "articles/" + s.Id));
+        urls.AddRange(Model.RelatedVideos.Select(s => NavigationManager.BaseUri + "videos/" + s.Id));
+        await _structuredDataService.SetStructuredData(urls);
+    }
+
+
+    [Inject]
+    [NotNull]
+    private SwalService? SwalService { get; set; }
+    private async Task OnRevoke(Operation operation)
+    {
+        //确认
+        var op = new SwalOption()
+        {
+            Title = "确认撤销编辑",
+            Content = "撤销编辑后会删除数据，无法恢复，请谨慎操作",
+
+            Category = SwalCategory.Warning,
+        };
+        var ret = await SwalService.ShowModal(op);
+        if (ret == false)
+        {
+            return;
+        }
+        //上传
+        try
+        {
+            var result = await Http.PostAsJsonAsync<RevokeExamineModel>(ToolHelper.WebApiPath + "api/entries/RevokeExamine", new RevokeExamineModel { Id = Model.Id, ExamineType = operation });
+            string jsonContent = result.Content.ReadAsStringAsync().Result;
+            Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
+            //判断结果
+            if (obj.Successful == false)
+            {
+                await ToastService.Error("撤销审核请求失败", obj.Error);
+            }
+            else
+            {
+                await ToastService.Success("撤销审核请求成功", "撤销审核请求成功");
+                //修改各部分编辑状态
+                switch (operation)
+                {
+                    case Operation.EditVideoMain:
+                        Model.MainState = EditState.Normal;
+                        break;
+                    case Operation.EditVideoMainPage:
+                        Model.MainPageState = EditState.Normal;
+                        break;
+                    case Operation.EditVideoRelevanes:
+                        Model.RelevancesState = EditState.Normal;
+                        break;
+                    case Operation.EditVideoImages:
+                        Model.ImagesState = EditState.Normal;
+                        break;
+
+                }
+                _dataCatcheService.EntryIndexPageCatche.Clean(Id);
+                Refresh();
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "撤销审核请求失败");
+        }
+    }
+
+    public Task OnPreEdit(bool value)
+    {
+        Model.IsEdit = value;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (Id != Model.Id.ToString())
+        {
+            if (_dataCatcheService.VideoIndexPageCatche.Check(Id) == false)
+            {
+                isLoading = true;
+                StateHasChanged();
+                await Refresh();
+                isLoading = false;
+                StateHasChanged();
+            }
+            else
+            {
+                await Refresh();
+            }
+
+        }
+    }
+
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        NavigationManager.LocationChanged -= LocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

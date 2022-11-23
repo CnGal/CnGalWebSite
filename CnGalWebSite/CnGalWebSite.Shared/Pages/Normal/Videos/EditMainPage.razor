@@ -1,0 +1,22 @@
+﻿@page "/videos/editmainpage/{id}"
+@attribute [Authorize]
+
+@inject IDataCacheService _dataCacheService
+
+<MakeSureInWASMTip></MakeSureInWASMTip>
+@if (ToolHelper.IsSSR == false)
+{
+    <CnGalWebSite.Shared.Pages.Webs.Videos.EditMainPage Id="@Id" />
+
+}
+
+
+@code{
+    [Parameter]
+    public string Id { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        //清空当前缓存
+        _dataCacheService.VideoIndexPageCatche.Clean(Id);
+    }
+}

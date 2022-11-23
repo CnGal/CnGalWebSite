@@ -70,7 +70,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         void SetDataFromEditImagesViewModel(Entry newEntry, EditImagesViewModel model);
 
-        void SetDataFromEditRelevancesViewModel(Entry newEntry, EditRelevancesViewModel model, List<Entry> entries, List<Article> articles);
+        void SetDataFromEditRelevancesViewModel(Entry newEntry, EditRelevancesViewModel model, List<Entry> entries, List<Article> articles, List<Video> videos);
 
         void SetDataFromEditMainPageViewModel(Entry newEntry, EditMainPageViewModel model);
 

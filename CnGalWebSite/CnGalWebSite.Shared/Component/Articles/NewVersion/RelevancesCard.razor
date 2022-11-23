@@ -2,8 +2,12 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
-
+@if (Model.RelevancesState == EditState.Preview)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/articles/EditRelevances/" + Model.Id)" ExamineType="Operation.EditArticleRelevanes" OnClickRevoke="OnRevoke" />
+}
 <div>
+    <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="Model.RelatedVideos" />
     @if (Model.RelatedEntries.Any())
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-codepen" Title="相关词条" Outline Collapable>
@@ -48,5 +52,8 @@
 
 @code {
     [Parameter]
-    public ArticleViewModel Model { get; set; } = new ArticleViewModel();
+    public ArticleViewModel Model { get; set; }
+
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
 }

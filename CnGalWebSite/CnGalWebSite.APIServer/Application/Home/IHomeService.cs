@@ -51,5 +51,7 @@ namespace CnGalWebSite.APIServer.Application.Home
         /// <returns></returns>
         Task<List<HomeNewsAloneViewModel>> GetHomeNewsViewAsync();
 
+        Task<List<MainImageCardModel>> GetHomeVideosViewAsync();
+
     }
 }

@@ -652,15 +652,14 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 Id = item.Id,
                 Name = item.Name,
-                Type = item.Type,
+                Type = item.Type ?? "视频",
                 DisplayName =  item.DisplayName,
                 CreateUserName = item.CreateUser?.UserName,
                 CreateUserId = item.CreateUserId,
-                MainImage = GetImagePath(item.MainPicture, "certificate.png"),
+                MainImage = GetImagePath(item.MainPicture, "app.png"),
                 BriefIntroduction = item.BriefIntroduction,
                 LastEditTime = item.LastEditTime,
                 ReaderCount = item.ReaderCount,
-                ThumbsUpCount = item.ThumbsUpCount,
                 CommentCount = item.CommentCount,
                 PubishTime = item.PubishTime,
             };

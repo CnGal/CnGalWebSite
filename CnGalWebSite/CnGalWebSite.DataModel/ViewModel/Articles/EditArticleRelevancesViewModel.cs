@@ -11,7 +11,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         public List<RelevancesModel> Groups { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> Games { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> Articles { get; set; } = new List<RelevancesModel>();
-
+        public List<RelevancesModel> Videos { get; set; } = new List<RelevancesModel>();
         public List<RelevancesModel> Others { get; set; } = new List<RelevancesModel>();
     }
 }

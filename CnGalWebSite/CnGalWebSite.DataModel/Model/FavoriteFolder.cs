@@ -44,6 +44,12 @@ namespace CnGalWebSite.DataModel.Model
 
         public long? ArticleId { get; set; }
         public Article Article { get; set; }
+
+        public int? TagId { get; set; }
+        public Tag Tag { get; set; }
+
+        public long? VideoId { get; set; }
+        public Video Video { get; set; }
     }
 
     public enum FavoriteObjectType
@@ -54,6 +60,9 @@ namespace CnGalWebSite.DataModel.Model
         Article,
         [Display(Name = "周边")]
         Periphery,
-
+        [Display(Name = "视频")]
+        Video,
+        [Display(Name = "标签")]
+        Tag,
     }
 }

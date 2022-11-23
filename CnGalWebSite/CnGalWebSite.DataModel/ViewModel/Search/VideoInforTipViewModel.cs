@@ -29,8 +29,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Search
 
         public int ReaderCount { get; set; }
 
-        public int ThumbsUpCount { get; set; }
-
         public int CommentCount { get; set; }
     }
 }

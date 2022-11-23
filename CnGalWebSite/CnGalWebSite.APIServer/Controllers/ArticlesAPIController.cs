@@ -3,6 +3,7 @@ using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Users;
+using CnGalWebSite.APIServer.Application.Videos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.Application.Dtos;
@@ -43,15 +44,17 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<ThumbsUp, long> _thumbsUpRepository;
         private readonly IRepository<Comment, long> _commentUpRepository;
         private readonly IRepository<Examine, long> _examineRepository;
+        private readonly IRepository<Video, long> _videoRepository;
         private readonly IArticleService _articleService;
         private readonly IEntryService _entryService;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
         private readonly IUserService _userService;
+        private readonly IVideoService _videoService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IEditRecordService _editRecordService;
 
-        public ArticlesAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IUserService userService,
+        public ArticlesAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IUserService userService, IVideoService videoService, IRepository<Video, long> videoRepository,
         IExamineService examineService, IEntryService entryService, IRepository<ApplicationUser, string> userRepository, IWebHostEnvironment webHostEnvironment, IEditRecordService editRecordService,
         UserManager<ApplicationUser> userManager, IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository,
         IRepository<Entry, int> entryRepository)
@@ -70,6 +73,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _userRepository = userRepository;
             _webHostEnvironment = webHostEnvironment;
             _editRecordService = editRecordService;
+            _videoRepository = videoRepository;
+            _videoService = videoService;
         }
 
         [AllowAnonymous]
@@ -83,6 +88,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.CreateUser).Include(s => s.ThumbsUps)
                 .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
                 .Include(s => s.Entries)
+                .Include(s => s.Videos).ThenInclude(s=>s.CreateUser)
                 .Include(s => s.Outlinks)
                 .Include(s => s.Examines).ThenInclude(s => s.ApplicationUser)
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -338,8 +344,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.Relevances.Groups.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
                 model.Relevances.Games.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
                 model.Relevances.Articles.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.Relevances.Videos.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
                 model.Relevances.Others.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
-
 
                 //预处理 建立词条关联信息
                 //判断关联是否存在
@@ -349,6 +355,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 var articleIds = new List<long>();
                 var articleNames = new List<string>();
 
+                var videoIds = new List<long>();
+                var videoNames = new List<string>();
+
                 entryNames.AddRange(model.Relevances.Games.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
                 entryNames.AddRange(model.Relevances.Groups.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
                 entryNames.AddRange(model.Relevances.Staffs.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
@@ -356,11 +365,14 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 //建立文章关联信息
                 articleNames.AddRange(model.Relevances.Articles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                //视频
+                videoNames.AddRange(model.Relevances.Videos.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
 
                 try
                 {
                     entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
                     articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
+                    videoIds = await _videoService.GetIdsFromNames(videoNames);
                 }
                 catch (Exception ex)
                 {
@@ -368,7 +380,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
                 var articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
-
+                var videos = await _videoRepository.GetAll().Where(s => videoIds.Contains(s.Id)).ToListAsync();
 
                 var newArticle = new Article
                 {
@@ -377,7 +389,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 _articleService.SetDataFromEditArticleMainViewModel(newArticle, model.Main);
                 _articleService.SetDataFromEditArticleMainPageViewModel(newArticle, model.MainPage);
-                _articleService.SetDataFromEditArticleRelevancesViewModel(newArticle, model.Relevances, entries, articles);
+                _articleService.SetDataFromEditArticleRelevancesViewModel(newArticle, model.Relevances, entries, articles,videos);
 
                 var article = new Article();
                 //获取审核记录
@@ -649,6 +661,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var article = await _articleRepository.GetAll().AsNoTracking()
                 .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
                 .Include(s => s.Entries)
+                .Include(s => s.Videos)
                 .Include(s => s.Outlinks)
                 .FirstOrDefaultAsync(s => s.Id == Id);
             if (article == null)
@@ -685,6 +698,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var groups = new List<RelevancesModel>();
             var games = new List<RelevancesModel>();
             var news = new List<RelevancesModel>();
+            var videos = new List<RelevancesModel>();
             var others = new List<RelevancesModel>();
 
             foreach (var nav in article.ArticleRelationFromArticleNavigation)
@@ -696,6 +710,13 @@ namespace CnGalWebSite.APIServer.Controllers
                     DisplayName = item.Name
                 });
 
+            }
+            foreach (var item in article.Videos)
+            {
+                        videos.Add(new RelevancesModel
+                        {
+                            DisplayName = item.Name
+                        });
             }
             foreach (var item in article.Entries)
             {
@@ -743,6 +764,7 @@ namespace CnGalWebSite.APIServer.Controllers
             model.Groups = groups;
             model.Games = games;
             model.Others = others;
+            model.Videos = videos;
 
             return model;
         }
@@ -775,6 +797,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.Games.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
                 model.Articles.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
                 model.Others.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
+                model.Videos.RemoveAll(s => string.IsNullOrWhiteSpace(s.DisplayName));
 
 
                 //预处理 建立词条关联信息
@@ -785,6 +808,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 var articleIds = new List<long>();
                 var articleNames = new List<string>();
 
+                var videoIds = new List<long>();
+                var videoNames = new List<string>();
+
                 entryNames.AddRange(model.Games.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
                 entryNames.AddRange(model.Groups.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
                 entryNames.AddRange(model.Staffs.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
@@ -792,11 +818,14 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 //建立文章关联信息
                 articleNames.AddRange(model.Articles.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
+                //视频
+                videoNames.AddRange(model.Videos.Where(s => string.IsNullOrWhiteSpace(s.DisplayName) == false).Select(s => s.DisplayName));
 
                 try
                 {
                     entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
                     articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
+                    videoIds = await _videoService.GetIdsFromNames(videoNames);
                 }
                 catch (Exception ex)
                 {
@@ -807,11 +836,13 @@ namespace CnGalWebSite.APIServer.Controllers
                 var currentArticle = await _articleRepository.GetAll()
                     .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
                     .Include(s => s.Entries)
+                    .Include(s => s.Videos)
                     .Include(s => s.Outlinks)
                     .FirstOrDefaultAsync(s => s.Id == model.Id);
                 var newArticle = await _articleRepository.GetAll().AsNoTracking()
                     .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
                     .Include(s => s.Entries)
+                    .Include(s => s.Videos)
                     .Include(s => s.Outlinks)
                     .FirstOrDefaultAsync(s => s.Id == model.Id);
 
@@ -824,8 +855,9 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 var entries = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).ToListAsync();
                 var articles = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).ToListAsync();
+                var videos = await _videoRepository.GetAll().Where(s => videoIds.Contains(s.Id)).ToListAsync();
 
-                _articleService.SetDataFromEditArticleRelevancesViewModel(newArticle, model, entries, articles);
+                _articleService.SetDataFromEditArticleRelevancesViewModel(newArticle, model, entries, articles,videos);
 
                 var examines = _articleService.ExaminesCompletion(currentArticle, newArticle);
 

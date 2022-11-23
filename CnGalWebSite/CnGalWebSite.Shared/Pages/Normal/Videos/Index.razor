@@ -1,0 +1,11 @@
+﻿@page "/videos/index/{Id}"
+
+@inject IDataCacheService _dataCacheService
+
+
+<CnGalWebSite.Shared.Pages.Webs.Videos.Index Id="@Id" />
+
+@code{
+    [Parameter]
+    public string Id { get; set; }
+}

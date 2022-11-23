@@ -30,11 +30,13 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<FavoriteFolder, long> _favoriteFolderRepository;
         private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
+        private readonly IRepository<Video, long> _videoRepository;
+        private readonly IRepository<Tag, long> _tagRepository;
         private readonly IAppHelper _appHelper;
         private readonly IFavoriteFolderService _favoriteFolderService;
         private readonly IFavoriteObjectService _favoriteObjectService;
 
-        public FavoriteFolderAPIController(IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<Periphery, long> peripheryRepository,
+        public FavoriteFolderAPIController(IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Video, long> videoRepository, IRepository<Tag, long> tagRepository,
         IRepository<ApplicationUser, string> userRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
         UserManager<ApplicationUser> userManager, IFavoriteObjectService favoriteObjectService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService)
@@ -49,6 +51,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _favoriteFolderService = favoriteFolderService;
             _favoriteObjectService = favoriteObjectService;
             _peripheryRepository = peripheryRepository;
+            _videoRepository = videoRepository;
+            _tagRepository = tagRepository;
         }
 
         [HttpPost]
@@ -99,7 +103,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         continue;
                     }
 
-                    var item = await _articleRepository.FirstOrDefaultAsync(s => s.Id == model.ObjectId);
+                    var item = await _articleRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == model.ObjectId);
                     if (item == null)
                     {
                         return new Result { Successful = false, Error = "无法找到该文章" };
@@ -109,7 +113,6 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         FavoriteFolder = temp,
                         FavoriteFolderId = temp.Id,
-                        Article = item,
                         ArticleId = item.Id,
                         Type = FavoriteObjectType.Article,
                         CreateTime = DateTime.Now.ToCstTime()
@@ -126,7 +129,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         continue;
                     }
 
-                    var item = await _entryRepository.FirstOrDefaultAsync(s => s.Id == model.ObjectId);
+                    var item = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == model.ObjectId);
                     if (item == null)
                     {
                         return new Result { Successful = false, Error = "无法找到该词条" };
@@ -136,7 +139,6 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         FavoriteFolder = temp,
                         FavoriteFolderId = temp.Id,
-                        Entry = item,
                         EntryId = item.Id,
                         Type = FavoriteObjectType.Entry,
                         CreateTime = DateTime.Now.ToCstTime()
@@ -154,7 +156,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         continue;
                     }
 
-                    var item = await _peripheryRepository.FirstOrDefaultAsync(s => s.Id == model.ObjectId);
+                    var item = await _peripheryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == model.ObjectId);
                     if (item == null)
                     {
                         return new Result { Successful = false, Error = "无法找到该周边" };
@@ -164,9 +166,62 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         FavoriteFolder = temp,
                         FavoriteFolderId = temp.Id,
-                        Periphery = item,
                         PeripheryId = item.Id,
                         Type = FavoriteObjectType.Periphery,
+                        CreateTime = DateTime.Now.ToCstTime()
+                    });
+                }
+
+            }
+            else if (model.Type == FavoriteObjectType.Video)
+            {
+                foreach (var temp in favoriteFolders)
+                {
+                    //查找是否已经添加
+                    if (await _favoriteObjectRepository.GetAll().AnyAsync(s => s.FavoriteFolderId == temp.Id && s.VideoId == model.ObjectId))
+                    {
+                        continue;
+                    }
+
+                    var item = await _videoRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == model.ObjectId);
+                    if (item == null)
+                    {
+                        return new Result { Successful = false, Error = "无法找到该视频" };
+
+                    }
+                    await _favoriteObjectRepository.InsertAsync(new FavoriteObject
+                    {
+                        FavoriteFolder = temp,
+                        FavoriteFolderId = temp.Id,
+                        VideoId = item.Id,
+                        Type = FavoriteObjectType.Video,
+                        CreateTime = DateTime.Now.ToCstTime()
+                    });
+                }
+
+            }
+            else if (model.Type == FavoriteObjectType.Tag)
+            {
+                foreach (var temp in favoriteFolders)
+                {
+                    //查找是否已经添加
+                    if (await _favoriteObjectRepository.GetAll().AnyAsync(s => s.FavoriteFolderId == temp.Id && s.TagId == model.ObjectId))
+                    {
+                        continue;
+                    }
+
+                    var item = await _tagRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == model.ObjectId);
+                    if (item == null)
+                    {
+                        return new Result { Successful = false, Error = "无法找到该标签" };
+
+                    }
+                    await _favoriteObjectRepository.InsertAsync(new FavoriteObject
+                    {
+                        FavoriteFolder = temp,
+                        FavoriteFolderId = temp.Id,
+                        TagId = item.Id,
+                        Type = FavoriteObjectType.Tag,
                         CreateTime = DateTime.Now.ToCstTime()
                     });
                 }
@@ -203,6 +258,14 @@ namespace CnGalWebSite.APIServer.Controllers
             else if (model.Type == FavoriteObjectType.Periphery)
             {
                 await _favoriteObjectRepository.DeleteRangeAsync(s => s.PeripheryId == model.ObjectId && s.Type == FavoriteObjectType.Periphery && favoriteFolderIds.Contains(s.FavoriteFolderId));
+            }
+            else if (model.Type == FavoriteObjectType.Video)
+            {
+                await _favoriteObjectRepository.DeleteRangeAsync(s => s.VideoId == model.ObjectId && s.Type == FavoriteObjectType.Video && favoriteFolderIds.Contains(s.FavoriteFolderId));
+            }
+            else if (model.Type == FavoriteObjectType.Tag)
+            {
+                await _favoriteObjectRepository.DeleteRangeAsync(s => s.TagId == model.ObjectId && s.Type == FavoriteObjectType.Tag && favoriteFolderIds.Contains(s.FavoriteFolderId));
             }
             //更新数目
             await _appHelper.UpdateFavoritesCountAsync(favoriteFolderIds);
@@ -474,6 +537,20 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new IsObjectInUserFavoriteFolderResult
                 {
                     Result = await _favoriteObjectRepository.GetAll().AnyAsync(s => favoriteFolderIds.Contains(s.FavoriteFolderId) && s.PeripheryId == id)
+                };
+            }
+            else if (type == FavoriteObjectType.Video)
+            {
+                return new IsObjectInUserFavoriteFolderResult
+                {
+                    Result = await _favoriteObjectRepository.GetAll().AnyAsync(s => favoriteFolderIds.Contains(s.FavoriteFolderId) && s.VideoId == id)
+                };
+            }
+            else if (type == FavoriteObjectType.Tag)
+            {
+                return new IsObjectInUserFavoriteFolderResult
+                {
+                    Result = await _favoriteObjectRepository.GetAll().AnyAsync(s => favoriteFolderIds.Contains(s.FavoriteFolderId) && s.TagId == id)
                 };
             }
 

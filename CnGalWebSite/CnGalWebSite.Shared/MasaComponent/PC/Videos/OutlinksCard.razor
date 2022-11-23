@@ -1,0 +1,34 @@
+﻿@if (Model.RelevancesState == EditState.Preview)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/videos/EditRelevances/" + Model.Id)" ExamineType="Operation.EditVideoRelevanes" OnClickRevoke="OnRevoke" />
+}
+
+@if (Model.RelatedOutlinks.Any())
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="外部链接" Outline Collapable>
+            <div class="mb-3">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning">
+                    以下为外部链接，与本站没有任何从属关系，本站亦不对其安全性负责
+                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+            </div>
+            <div class="row">
+
+                @foreach (var item in Model.RelatedOutlinks)
+                {
+                    <div class="mb-3 col-12">
+                        <RelevanceOtherTip Model="item" />
+                    </div>
+                }
+            </div>
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
+}
+
+@code {
+    [Parameter]
+    public VideoViewModel Model { get; set; }
+
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+}

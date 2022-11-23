@@ -11,10 +11,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Videos
     public class EditVideoMainViewModel : BaseEditModel
     {
         [Display(Name = "显示名称")]
-        [Required(ErrorMessage = "请填写显示名称")]
         public string DisplayName { get; set; }
         [Display(Name = "简介")]
-        [Required(ErrorMessage = "请填写简介")]
         public string BriefIntroduction { get; set; }
 
         [Display(Name = "主图")]
@@ -35,10 +33,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Videos
         [Display(Name = "时长")]
         public TimeSpan Duration { get; set; }
        
-        [Display(Name = "是否为互动视频")]
+        [Display(Name = "互动视频")]
         public bool IsInteractive { get; set; }
      
-        [Display(Name = "是否为用户本人创作")]
+        [Display(Name = "本人创作")]
         public bool IsCreatedByCurrentUser { get; set; }
 
         [Display(Name = "原作者")]
@@ -52,10 +50,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Videos
             if (string.IsNullOrWhiteSpace(Name))
             {
                 return new Result { Error = "请填写唯一名称" };
-            }
-            if (string.IsNullOrWhiteSpace(BriefIntroduction))
-            {
-                return new Result { Error = "请填写简介" };
             }
             if (string.IsNullOrWhiteSpace(DisplayName))
             {

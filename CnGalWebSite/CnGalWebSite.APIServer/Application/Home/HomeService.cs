@@ -22,11 +22,12 @@ namespace CnGalWebSite.APIServer.Application.Home
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Carousel, int> _carouselRepository;
         private readonly IRepository<FriendLink, int> _friendLinkRepository;
+        private readonly IRepository<Video, int> _videoRepository;
         private readonly IAppHelper _appHelper;
         private readonly IArticleService _articleService;
 
-        public HomeService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Article, long> articleRepository,
-            IArticleService articleService,
+        public HomeService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Article, long> articleRepository, IRepository<Video, int> videoRepository,
+        IArticleService articleService,
         IRepository<Carousel, int> carouselRepository, IRepository<FriendLink, int> friendLinkRepository)
         {
             _entryRepository = entryRepository;
@@ -35,6 +36,7 @@ namespace CnGalWebSite.APIServer.Application.Home
             _carouselRepository = carouselRepository;
             _friendLinkRepository = friendLinkRepository;
             _articleService = articleService;
+            _videoRepository = videoRepository;
         }
 
         public async Task<List<MainImageCardModel>> GetHomeNewestGameViewAsync()
@@ -200,6 +202,32 @@ namespace CnGalWebSite.APIServer.Application.Home
                         CommentCount = item.CommentCount,
                         ReadCount = item.ReaderCount,
                         //DisPlayValue = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20)
+                    });
+                }
+            }
+            return model;
+
+        }
+
+        public async Task<List<MainImageCardModel>> GetHomeVideosViewAsync()
+        {
+            var model = new List<MainImageCardModel>();
+
+            //获取近期发布的视频
+            var article_result2 = await _videoRepository.GetAll().Where(s => s.IsHidden != true).AsNoTracking().OrderByDescending(s => s.PubishTime).ThenByDescending(s => s.Id)
+                .Where(s => s.Name != null && s.Name != "").Take(12).ToListAsync();
+            if (article_result2 != null)
+            {
+                foreach (var item in article_result2)
+                {
+                    model.Add(new MainImageCardModel
+                    {
+                        Id = item.Id,
+                        Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
+                        Name = item.DisplayName,
+                        Url = "videos/index/" + item.Id,
+                        CommentCount = item.CommentCount,
+                        ReadCount = item.ReaderCount,
                     });
                 }
             }

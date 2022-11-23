@@ -38,7 +38,7 @@
     else
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@($"编辑 {Model.Name}（Id:{Model.Id}）")" Icon="fa fa-fw  fa-newspaper-o" Outline>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.RelevancesCard Model="Model" Class="mb-4" EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" ArticleItems="ArticleItems"/>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Articles.RelevancesCard Model="Model" Class="mb-4" EntryGameItems="EntryGameItems" EntryRoleItems="EntryRoleItems" EntryGroupItems="EntryGroupItems" EntryStaffItems="EntryStaffItems" VideoItems="VideoItems" ArticleItems="ArticleItems"/>
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     }
@@ -63,7 +63,7 @@
     private List<string> EntryGroupItems { get; set; } = new List<string>();
     private List<string> EntryStaffItems { get; set; } = new List<string>();
     private List<string> ArticleItems { get; set; } = new List<string>();
-
+    private List<string> VideoItems { get; set; } = new List<string>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -80,6 +80,8 @@
                 EntryStaffItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/3", ToolHelper.options);
                 //获取所有文章
                 ArticleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/articles/GetAllArticles", ToolHelper.options);
+                //获取所有视频 
+                VideoItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/videos/GetNames", ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }

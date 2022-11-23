@@ -1,0 +1,60 @@
+﻿@inject ToastService ToastService
+@inject IServiceProvider Provider
+@inject NavigationManager NavigationManager
+
+@if (Model.RelevancesState == EditState.Preview)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/videos/EditRelevances/" + Model.Id)" ExamineType="Operation.EditVideoRelevanes" OnClickRevoke="OnRevoke" />
+}
+<div>
+    @if (Model.RelatedEntries.Any())
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-codepen" Title="相关词条" Outline Collapable>
+            <div class="mt-3">
+
+
+                <div>
+                    @foreach (var item in Model.RelatedEntries)
+                    {
+                        <div class="mb-3">
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ShowType />
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
+    @if (Model.RelatedArticles.Any())
+    {
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-newspaper-o" Title="相关文章" Outline Collapable>
+            <div class="mt-3">
+
+
+                <div>
+                    @foreach (var item in Model.RelatedArticles)
+                    {
+                        <div class="mb-3">
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item" />
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+    }
+
+    <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="Model.RelatedVideos" />
+
+</div>
+
+
+@code {
+    [Parameter]
+    public VideoViewModel Model { get; set; }
+
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+}

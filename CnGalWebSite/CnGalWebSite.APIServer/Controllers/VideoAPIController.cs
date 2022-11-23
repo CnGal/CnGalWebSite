@@ -12,12 +12,12 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Videos;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -64,19 +64,19 @@ namespace CnGalWebSite.APIServer.Controllers
             _webHostEnvironment = webHostEnvironment;
             _editRecordService = editRecordService;
             _videoRepository = videoRepository;
-            _videoRepository = videoRepository;
+            _videoService = videoService;
             _logger = logger;
         }
 
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<ActionResult<VideoViewModel>> GetVideoViewAsync(long id)
+        public async Task<ActionResult<VideoViewModel>> GetViewAsync(long id)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //通过Id获取文章
             var video = await _videoRepository.GetAll().AsNoTracking()
-                .Include(s => s.CreateUser).Include(s => s.ThumbsUps)
+                .Include(s => s.CreateUser)
                 .Include(s => s.VideoRelationFromVideoNavigation).ThenInclude(s => s.ToVideoNavigation)
                 .Include(s => s.Entries)
                   .Include(s => s.Articles)
@@ -193,25 +193,6 @@ namespace CnGalWebSite.APIServer.Controllers
                     model.Authority = false;
                 }
             }
-
-            //判断是否已经点赞
-            if (user != null && video.ThumbsUps != null)
-            {
-
-                if (video.ThumbsUps.Find(s => s.ApplicationUserId == user.Id) == null)
-                {
-                    model.IsThumbsUp = false;
-                }
-                else
-                {
-                    model.IsThumbsUp = true;
-                }
-            }
-            else
-            {
-                model.IsThumbsUp = false;
-            }
-
 
             var examiningList = new List<Operation>();
             if (user != null)
@@ -548,7 +529,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
                 articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
-                videoIds = await _videoService.GetIdsFromNames(articleNames);
+                videoIds = await _videoService.GetIdsFromNames(videoNames);
             }
             catch (Exception ex)
             {
@@ -646,7 +627,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Result>> CreateVideoAsync(CreateVideoViewModel model)
+        public async Task<ActionResult<Result>> CreateAsync(CreateVideoViewModel model)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -719,7 +700,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
                 articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
-                videoIds = await _videoService.GetIdsFromNames(articleNames);
+                videoIds = await _videoService.GetIdsFromNames(videoNames);
             }
             catch (Exception ex)
             {
@@ -757,7 +738,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        public async Task<ActionResult<Result>> HiddenVideoAsync(HiddenArticleModel model)
+        public async Task<ActionResult<Result>> HideAsync(HiddenArticleModel model)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -775,7 +756,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        public async Task<ActionResult<Result>> EditEntryPriorityAsync(EditArticlePriorityViewModel model)
+        public async Task<ActionResult<Result>> EditPriorityAsync(EditArticlePriorityViewModel model)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -838,6 +819,86 @@ namespace CnGalWebSite.APIServer.Controllers
             };
 
             return model;
+        }
+
+        /// <summary>
+        /// 获取编辑信息汇总
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<EditVideoInforBindModel>> GetEditInforBindModelAsync(long id)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            var periphery = await _videoRepository.FirstOrDefaultAsync(s => s.Id == id);
+            if (periphery == null)
+            {
+                return NotFound("无法找到该视频");
+            }
+            var model = new EditVideoInforBindModel
+            {
+                Id = id,
+                Name = periphery.Name
+            };
+
+            //获取编辑记录
+            model.Examines = await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => s.VideoId == id && (s.IsPassed == true || (user != null && s.IsPassed == null && s.ApplicationUserId == user.Id))), true);
+            model.Examines = model.Examines.OrderByDescending(s => s.ApplyTime).ToList();
+            //获取编辑状态
+            model.State = await _videoService.GetEditState(user, id);
+
+            return model;
+        }
+
+        /// <summary>
+        /// 获取输入提示 所有视频名称
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<string>>> GetNamesAsync()
+        {
+            return await _videoRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Name).ToArrayAsync();
+        }
+
+        /// <summary>
+        /// 获取输入提示 所有视频类型
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<string>>> GetTypesAsync()
+        {
+            return (await _videoRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false && string.IsNullOrWhiteSpace(s.Type) == false).Select(s => s.Type).ToListAsync()).Purge();
+        }
+
+        /// <summary>
+        /// 撤销编辑
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<Result>> RevokeExamine(RevokeExamineModel model)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            //查找审核
+            var examine = await _examineRepository.FirstOrDefaultAsync(s => s.VideoId == model.Id && s.ApplicationUserId == user.Id && s.Operation == model.ExamineType && s.IsPassed == null);
+            if (examine != null)
+            {
+                await _examineRepository.DeleteAsync(examine);
+                //删除以此审核为前置审核的
+                await _examineRepository.DeleteAsync(s => s.PrepositionExamineId == examine.Id);
+                return new Result { Successful = true };
+            }
+            else
+            {
+                return new Result { Successful = false, Error = "找不到目标审核记录" };
+            }
+
         }
     }
 }

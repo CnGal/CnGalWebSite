@@ -1,21 +1,41 @@
-﻿<div class=" rounded shadow-sm  bg-opacity mb-3">
-    <div>
-        <img src="@Model.BackgroundImage"  alt="@Model.Name" class="w-100">
-        <div style="display: flex; margin-top: -40px; justify-content: center;">
-            <img src="@Model.PhotoPath" style="width:80px; border-radius: 50%;" alt="@Model.Name">
+﻿@if (Small)
+{
+    <div class=" rounded shadow-sm  bg-opacity mb-3 ps-3 pe-3 pt-2 pb-2">
+        <a href="@("/space/index/"+Model.Id)" style=" display: flex; flex-direction: row; align-items: center;" class="a-font-color" itemprop="url">
+            <img src="@Model.PhotoPath" alt="@Model.Name" style="width:50px;border-radius:50%;" itemprop="image" />
+            <div style="display: flex; flex-direction: column;" class="ms-4">
+                <RanksViewCard Model="Model.Ranks" ForceDisplayBadge NoLeftPandding />
+                <span style="font-size: large; font-weight: bold; " itemprop="name">
+                    @Model.Name
+                </span>
+            </div>
+        </a>
+    </div>
+}
+else
+{
+    <div class=" rounded shadow-sm  bg-opacity mb-3">
+        <a  href="@("/space/index/"+Model.Id)"  class="a-font-color">
+            <img src="@Model.BackgroundImage" alt="@Model.Name" class="w-100">
+            <div style="display: flex; margin-top: -40px; justify-content: center;">
+                <img src="@Model.PhotoPath" style="width:80px; border-radius: 50%;" alt="@Model.Name">
+            </div>
+        </a>
+        <div class="p-3" style=" display: flex; flex-direction: column; align-items: center;">
+            <h1 class="h4 text-center fw-bold mb-1" style=" word-break: break-all;">@Model.Name</h1>
+            <RanksViewCard Model="Model.Ranks" ForceDisplayBadge Center />
+
+            <span class="text-center mt-1">@Model.PersonalSignature</span>
         </div>
     </div>
-    <div class="p-3" style=" display: flex; flex-direction: column; align-items: center;">
-        <h1 class="h4 text-center fw-bold mb-1" style=" word-break: break-all;">@Model.Name</h1>
-        <RanksViewCard Model="Model.Ranks" ForceDisplayBadge Center/>
 
-        <span class="text-center mt-1">@Model.PersonalSignature</span>
-    </div>
-</div>
+}
 
 
 
 @code {
     [Parameter]
     public UserInforViewModel Model { get; set; }
+    [Parameter]
+    public bool Small { get; set; }
 }

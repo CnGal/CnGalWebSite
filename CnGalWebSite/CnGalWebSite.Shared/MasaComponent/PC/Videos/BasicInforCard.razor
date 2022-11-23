@@ -1,0 +1,58 @@
+﻿@if (Model.MainState == EditState.Preview)
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/videos/EditMain/" + Model.Id)" ExamineType="Operation.EditVideoMain" OnClickRevoke="OnRevoke" />
+}
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="fa fa-fw fa-info-circle">
+    <div class="row">
+
+        <div class="col-12 ">
+            <i class="fa fa-fw  fa-tags font-color "></i>&nbsp;&nbsp;@Model.Type
+        </div>
+        @if (Model.IsInteractive)
+        {
+            <div class="col-12 ">
+                <i class="fa fa-fw  fa-paperclip font-color "></i>&nbsp;&nbsp;互动视频
+            </div>
+        }
+
+        <div class="col-12 ">
+            <i class="fa fa-fw font-color fa-copyright"></i>&nbsp;&nbsp;@Model.Copyright.GetDisplayName()
+        </div>
+
+        @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false)
+        {
+            <div class="col-12 ">
+                <i class="fa  fa-fw font-color fa-user"></i>&nbsp;&nbsp;原作者：@Model.OriginalAuthor
+            </div>
+        }
+        @if (Model.Duration.TotalSeconds != 0)
+        {
+            <div class="col-12 ">
+                <i class="fa fa-fw font-color fa-clock-o"></i>&nbsp;&nbsp;时长：@Model.Duration
+            </div>
+        }
+        <div class="col-12 ">
+            <i class="fa  fa-fw font-color fa-eye"></i>&nbsp;&nbsp;浏览次数：@Model.ReaderCount
+        </div>
+
+        <div class="col-12">
+            <i class="fa  fa-fw font-color fa-calendar-check-o"></i>&nbsp;&nbsp;发布时间：@Model.PubishTime.ToString("G")
+        </div>
+
+
+
+
+
+    </div>
+
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+
+@code {
+
+    [Parameter]
+    public EventCallback<Operation> OnRevoke { get; set; }
+    [Parameter]
+    public VideoViewModel Model { get; set; }
+
+}
