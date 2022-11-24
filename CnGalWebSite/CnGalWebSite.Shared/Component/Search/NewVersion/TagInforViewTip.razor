@@ -27,21 +27,21 @@
 else
 {
     <div class="shadow-sm rounded  bg-opacity ps-3 pe-3">
-        <div class="mb-2" style="display:flex;">
+        <div class="pb-3" style="display:flex;">
             <a href="@("/tags/index/" + Model.Id)" class="pt-3">
                 <img loading="lazy" style=" width: 250px; " src="@Model.MainImage" alt="@Model.Name">
             </a>
             <div class="pt-3 ps-3">
-                    <a href="@("/tags/index/" + Model.Id)" class="a-font-color text-truncate-2 mb-1" style=" display: flex; align-items: center;">
-                        <div class="article-home-tag">标签</div>
-                        <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
-                    </a>
+                <a href="@("/tags/index/" + Model.Id)" class="a-font-color text-truncate-2 mb-1" style=" display: flex; align-items: center;">
+                    <div class="article-home-tag">标签</div>
+                    <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
+                </a>
 
-                    <a href="@("/tags/index/" + Model.Id)" class="text-truncate-3 a-font-color">
-                        @Model.BriefIntroduction
-                    </a>
-                </div>
+                <a href="@("/tags/index/" + Model.Id)" class="text-truncate-3 a-font-color">
+                    @Model.BriefIntroduction
+                </a>
             </div>
+        </div>
     </div>
 
 }
