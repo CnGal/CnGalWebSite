@@ -5,7 +5,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
 {
     public class DiscountPageHelper
     {
-        private List<SteamInforTipViewModel> Model = new List<SteamInforTipViewModel>();
+        public List<SteamInforTipViewModel> Model = new List<SteamInforTipViewModel>();
         public List<SteamInforTipViewModel> Items = new List<SteamInforTipViewModel>();
 
         public List<int> PurchasedGames=new List<int>();
@@ -94,13 +94,13 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
             switch (PurchasedType)
             {
                 case PurchasedSteamType.All:
-                    Items = Model;
+                    //Items = Items;
                     break;
                 case PurchasedSteamType.Purchased:
-                    Items = Model.Where(s => PurchasedGames.Contains(s.Id)).ToList();
+                    Items = Items.Where(s => PurchasedGames.Contains(s.Id)).ToList();
                     break;
                 case PurchasedSteamType.UnPurchased:
-                    Items = Model.Where(s => PurchasedGames.Contains(s.Id)==false).ToList();
+                    Items = Items.Where(s => PurchasedGames.Contains(s.Id)==false).ToList();
                     break;
             };
 

@@ -67,7 +67,11 @@
                             name = "space";
 
                         }
+                        else if (examine.Type == ExaminedNormalListModelType.Video)
+                        {
+                            name = "videos";
 
+                        }
 
 
                         @if (examine.Type is ExaminedNormalListModelType.Comment or ExaminedNormalListModelType.PlayedGame)

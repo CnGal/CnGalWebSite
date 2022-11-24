@@ -1,9 +1,5 @@
 ﻿@inject HttpClient Http
-@inject ExamineService _examineService
-@inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
-@inject IAppHelper _appHelper
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
 <TitleTip Title="发表文章"></TitleTip>
@@ -96,7 +92,7 @@
         try
         {
 
-            var result = await Http.PostAsJsonAsync<CreateArticleViewModel>(ToolHelper.WebApiPath + "api/articles/createarticle", Model);
+            var result = await Http.PostAsJsonAsync<CreateArticleViewModel>(ToolHelper.WebApiPath + "api/articles/create", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
@@ -109,7 +105,7 @@
                 await autoSave.Clean();
 
                 await ToastService.Success("创建文章成功", "创建文章成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/articles/index/" + obj.Error, Model.Name, "fa fa-newspaper-o");
+                NavigationManager.NavigateTo("/articles/index/" + obj.Error);
             }
         }
         catch (Exception ex)

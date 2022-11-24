@@ -104,21 +104,29 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
 
-            //获取审核信息
-            Model = await Http.GetFromJsonAsync<ExamineViewModel>(ToolHelper.WebApiPath + "api/examines/GetExamineView/" + Id, ToolHelper.options);
-         
-            isReady = true;
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "获取审核信息失败");
-        }
     }
 
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+
+                //获取审核信息
+                Model = await Http.GetFromJsonAsync<ExamineViewModel>(ToolHelper.WebApiPath + "api/examines/GetExamineView/" + Id, ToolHelper.options);
+
+                isReady = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取审核信息失败");
+            }
+        }
+    }
 
     private async Task ExaminePrepositionExamine()
     {

@@ -5,7 +5,7 @@
 
 <TitleTip Title="动态汇总"></TitleTip>
 
-<MTabs @bind-Value="@_dataCacheService.NewsSummaryCache.TabIndex" IconsAndText Grow CenterActive Class="shadow-sm bg-opacity rounded"
+<MTabs @bind-Value="@_dataCacheService.NewsSummaryCache.TabIndex" IconsAndText Grow CenterActive Class="shadow-sm bg-opacity rounded mb-4"
        Color="@_dataCacheService.ThemeSetting.Theme">
 
     <MTab Value="1" OnClick="@(() => OnCondited("本周"))">
@@ -22,7 +22,7 @@
     </MTab>
 
 </MTabs>
-<div class="mt-2">
+<div>
     @if (isReady)
     {
         <div>

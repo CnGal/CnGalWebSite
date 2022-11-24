@@ -15,7 +15,7 @@
     <ChildContent>
         <MSlideGroup ShowArrows="true">
             <ChildContent>
-                @foreach (var item in _dataCacheService.DiscountPageCatcheHelper.Items.Where(s=> _dataCacheService.DiscountPageCatcheHelper.PurchasedGames.Contains( s.Id)==false).Take(12))
+                @foreach (var item in _dataCacheService.DiscountPageCatcheHelper.Model.Take(12))
                 {
                     <MSlideItem>
                         <MCard Width="350" Class="p-2" Outlined Style="border:0;background-color:transparent"
@@ -38,8 +38,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-
-
+        _dataCacheService.DiscountPageCatcheHelper.Model.Random();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -63,9 +62,8 @@
 
                 }
 
-
-                _dataCacheService.DiscountPageCatcheHelper.Items.Random();
                 StateHasChanged();
+
             }
             catch (Exception ex)
             {

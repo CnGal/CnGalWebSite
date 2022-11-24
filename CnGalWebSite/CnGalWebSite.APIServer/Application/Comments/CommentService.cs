@@ -93,7 +93,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     break;
                 case CommentType.CommentVideo:
                     query = query.Where(s => s.Type == type && s.VideoId == tempId);
-                    examineComments = examineComments.Where(s => s.ParentCodeNavigation != null || s.LotteryId == tempId);
+                    examineComments = examineComments.Where(s => s.ParentCodeNavigation != null || s.VideoId == tempId);
                     break;
                 case CommentType.CommentUser:
                     //
@@ -384,7 +384,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     break;
                 case CommentType.CommentVideo:
                     video = await _videoRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == long.Parse(examine.ObjectId));
-                    if (lottery == null)
+                    if (video == null)
                     {
                         return;
                     }
@@ -415,6 +415,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
                         .Include(s => s.UserSpaceCommentManager)//.ThenInclude(s=>s.ApplicationUser)
                         .Include(s=>s.Lottery)
                         .Include(s=>s.Vote)
+                        .Include(s => s.Video)
                         .Include(s=>s.Periphery)
                         .FirstOrDefaultAsync(s => s.Id == tempId);
                     if (replyComment == null)

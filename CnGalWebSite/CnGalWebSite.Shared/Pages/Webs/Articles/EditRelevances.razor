@@ -1,9 +1,5 @@
 ﻿@inject HttpClient Http
-@inject ExamineService _examineService
-@inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
-@inject IAppHelper _appHelper
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -72,7 +68,7 @@
             try
             {
                 //获取文章信息
-                Model = await Http.GetFromJsonAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlerelevances/" + Id, ToolHelper.options);
+                Model = await Http.GetFromJsonAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editrelevances/" + Id, ToolHelper.options);
                 //获取所有词条
                 EntryGameItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/0", ToolHelper.options);
                 EntryRoleItems = await Http.GetFromJsonAsync<List<string>>(ToolHelper.WebApiPath + "api/entries/GetAllEntries/1", ToolHelper.options);
@@ -96,7 +92,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlerelevances", Model);
+            var result = await Http.PostAsJsonAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editrelevances", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
@@ -110,7 +106,7 @@
                 autoSave.Clean();
 
                 await ToastService.Success("编辑文章关联信息成功", "编辑文章关联信息成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/articles/index/" + Model.Id, Model.Name, "fa fa-newspaper-o");
+                NavigationManager.NavigateTo( "/articles/index/" + Model.Id);
             }
         }
         catch (Exception ex)

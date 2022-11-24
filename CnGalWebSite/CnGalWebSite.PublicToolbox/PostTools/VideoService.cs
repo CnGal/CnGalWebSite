@@ -117,7 +117,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             model.Main.MainPicture = data["data"]["View"]["pic"].ToString();
             model.Main.Name = model.Main.DisplayName = data["data"]["View"]["title"].ToString().Replace("\n","");
             model.Main.PubishTime =ToolHelper.GetDateTimeFrom1970Ticks(data["data"]["View"]["pubdate"].ToObject<long>());
-            model.MainPage.Context = model.Main.BriefIntroduction = data["data"]["View"]["desc"].ToString() ?? "";
+            model.MainPage.Context = model.Main.BriefIntroduction = (data["data"]["View"]["desc"].ToString() ?? "").Replace(model.Main.Name,"");
             model.Main.Duration = new TimeSpan(0, 0, data["data"]["View"]["duration"].ToObject<int>());
             model.Main.IsInteractive = data["data"]["View"]["rights"]["is_stein_gate"].ToObject<bool>();
             model.Main.IsCreatedByCurrentUser = item.IsCreatedByCurrentUser;

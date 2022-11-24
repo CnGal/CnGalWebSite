@@ -1,9 +1,5 @@
 ﻿@inject HttpClient Http
-@inject ExamineService _examineService
-@inject ILocalStorageService _localStorage
 @inject ToastService? ToastService
-@inject IAppHelper _appHelper
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
 @if (string.IsNullOrWhiteSpace(Model.Name) == false)
@@ -65,7 +61,7 @@
             try
             {
                 //获取文章信息
-                Model = await Http.GetFromJsonAsync<EditArticleMainViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlemain/" + Id, ToolHelper.options);
+                Model = await Http.GetFromJsonAsync<EditArticleMainViewModel>(ToolHelper.WebApiPath + "api/articles/editmain/" + Id, ToolHelper.options);
 
                 isReady = true;
                 StateHasChanged();
@@ -81,7 +77,7 @@
     {
         try
         {
-            var result = await Http.PostAsJsonAsync<EditArticleMainViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlemain", Model);
+            var result = await Http.PostAsJsonAsync<EditArticleMainViewModel>(ToolHelper.WebApiPath + "api/articles/editmain", Model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
@@ -95,7 +91,7 @@
                 await autoSave.Clean();
 
                 await ToastService.Success("编辑文章主要信息成功", "编辑文章主要信息成功，等待审核通过");
-                NavigationManager.NavigateTo(Provider, "/articles/index/" + Model.Id, Model.Name, "fa fa-newspaper-o");
+                NavigationManager.NavigateTo( "/articles/index/" + Model.Id);
             }
         }
         catch (Exception ex)

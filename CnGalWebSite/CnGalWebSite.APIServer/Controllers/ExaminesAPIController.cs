@@ -31,6 +31,7 @@ using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
 using CnGalWebSite.DataModel.ExamineModel.Users;
 using CnGalWebSite.DataModel.ExamineModel.Tags;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
+using CnGalWebSite.DataModel.ExamineModel.Videos;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -227,6 +228,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     entry = await _entryRepository.GetAll()
                         .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
                         .Include(s => s.Outlinks)
+                        .Include(s => s.Articles)
+                        .Include(s => s.Videos)
                         .FirstOrDefaultAsync(s => s.Id == examine.EntryId);
                     break;
                 case Operation.EstablishTags:
@@ -243,6 +246,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 case Operation.EditArticleRelevanes:
                     entry = await _articleRepository.GetAll()
                             .Include(s => s.ArticleRelationFromArticleNavigation).ThenInclude(s => s.ToArticleNavigation)
+                            .Include(s => s.Entries)
+                            .Include(s => s.Videos)
                             .FirstOrDefaultAsync(s => s.Id == examine.ArticleId);
                     break;
                 case Operation.EditArticleMainPage:
@@ -295,6 +300,26 @@ namespace CnGalWebSite.APIServer.Controllers
                         .Include(s => s.ApplicationUser)
                         .FirstOrDefaultAsync(s => s.ApplicationUserId == examine.ApplicationUserId);
                     break;
+                case Operation.EditVideoMain:
+
+                    entry = await _videoRepository.FirstOrDefaultAsync(s => s.Id == examine.VideoId);
+
+                    break;
+                case Operation.EditVideoRelevanes:
+                    entry = await _videoRepository.GetAll()
+                            .Include(s => s.VideoRelationFromVideoNavigation).ThenInclude(s => s.ToVideoNavigation)
+                            .Include(s=>s.Entries)
+                            .Include(s=>s.Articles)
+                            .FirstOrDefaultAsync(s => s.Id == examine.VideoId);
+                    break;
+                case Operation.EditVideoMainPage:
+                    entry = await _videoRepository.FirstOrDefaultAsync(s => s.Id == examine.VideoId);
+                    break;
+                case Operation.EditVideoImages:
+                    entry = await _videoRepository.GetAll()
+                       .Include(s => s.Pictures)
+                       .FirstOrDefaultAsync(s => s.Id == examine.VideoId);
+                    break;
                 default:
                     return new Result { Successful = false, Error = "未知的操作" };
             }
@@ -322,7 +347,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     return new Result { Successful = false, Error = "审核内容为空" };
                 }
-                if (examine.Operation == Operation.UserMainPage || examine.Operation == Operation.EditArticleMainPage || examine.Operation == Operation.EstablishMainPage)
+                if (examine.Operation == Operation.UserMainPage || examine.Operation == Operation.EditArticleMainPage || examine.Operation == Operation.EstablishMainPage || examine.Operation == Operation.EditVideoMainPage)
                 {
                     examineData = examine.Context;
                 }
@@ -353,6 +378,9 @@ namespace CnGalWebSite.APIServer.Controllers
                         Operation.EditPeripheryRelatedPeripheries => typeof(PeripheryRelatedPeripheries),
                         Operation.EditPlayedGameMain => typeof(PlayedGameMain),
                         Operation.RequestUserCertification => typeof(UserCertificationMain),
+                        Operation.EditVideoMain => typeof(ExamineMain),
+                        Operation.EditVideoRelevanes => typeof(VideoRelevances),
+                        Operation.EditVideoImages => typeof(VideoImages),
                         _ => throw new NotImplementedException("未知的操作")
                     });
                 }

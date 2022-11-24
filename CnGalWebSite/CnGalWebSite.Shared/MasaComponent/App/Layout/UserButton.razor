@@ -45,7 +45,7 @@
                 内容中心
             </MButton>
 
-            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSpace">
+            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("space/index/" + _dataCacheService.UserInfor.Id))">
                 <MIcon Left>mdi-star</MIcon>
                 个人空间
             </MButton>
@@ -57,7 +57,7 @@
                 <MIcon Left>mdi-comment-text-multiple  </MIcon>
                 消息通知
             </MButton>
-            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/home/editlist"))">
+            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickCreate">
                 <MIcon Left>mdi-plus  </MIcon>
                 创建投稿
             </MButton>
@@ -80,6 +80,8 @@
             <MIcon Left>mdi-information-outline</MIcon>
             关于我们
         </MButton>
+
+        <CreateObjectCard @ref="createObjectCard"/>
     }
 
 
@@ -104,6 +106,8 @@
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+
+    CreateObjectCard createObjectCard;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -154,15 +158,15 @@
     private async Task OnClickUrl(string url)
     {
         NavigationManager.NavigateTo(url);
-
-
-
         await OnClosed.InvokeAsync();
     }
 
-    private async Task OnClickSpace()
+    private async Task OnClickCreate()
     {
-        NavigationManager.NavigateTo("space/index/" + _dataCacheService.UserInfor.Id);
+        if(createObjectCard!=null)
+        {
+           await createObjectCard.Refresh(true);
+        }
         await OnClosed.InvokeAsync();
     }
 }
