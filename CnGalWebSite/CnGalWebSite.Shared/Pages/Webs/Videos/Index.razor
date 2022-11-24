@@ -290,7 +290,7 @@ else
         //上传
         try
         {
-            var result = await Http.PostAsJsonAsync<RevokeExamineModel>(ToolHelper.WebApiPath + "api/entries/RevokeExamine", new RevokeExamineModel { Id = Model.Id, ExamineType = operation });
+            var result = await Http.PostAsJsonAsync<RevokeExamineModel>(ToolHelper.WebApiPath + "api/videos/RevokeExamine", new RevokeExamineModel { Id = Model.Id, ExamineType = operation });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果

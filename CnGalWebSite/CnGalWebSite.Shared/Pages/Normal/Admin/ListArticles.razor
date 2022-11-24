@@ -90,7 +90,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<EditArticlePriorityViewModel>(ToolHelper.WebApiPath + "api/articles/EditArticlePriority", new EditArticlePriorityViewModel { Ids = ids, PlusPriority = plusPriority });
+            var result = await Http.PostAsJsonAsync<EditArticlePriorityViewModel>(ToolHelper.WebApiPath + "api/articles/EditPriority", new EditArticlePriorityViewModel { Ids = ids, PlusPriority = plusPriority });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             if (obj.Successful == false)
@@ -148,7 +148,7 @@
         //调用API
         try
         {
-            var result = await Http.PostAsJsonAsync<HiddenArticleModel>(ToolHelper.WebApiPath + "api/articles/HiddenArticle", new HiddenArticleModel { Ids = ids, IsHidden = isHidden });
+            var result = await Http.PostAsJsonAsync<HiddenArticleModel>(ToolHelper.WebApiPath + "api/articles/Hide", new HiddenArticleModel { Ids = ids, IsHidden = isHidden });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
 

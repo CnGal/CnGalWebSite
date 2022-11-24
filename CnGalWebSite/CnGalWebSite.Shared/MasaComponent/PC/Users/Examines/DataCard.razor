@@ -5,10 +5,17 @@
         @if (Model.DisplayMode == UserPendingDataDisplayMode.Main)
         {
             <img src="@Model.MainPicture" alt="@Model.Name" class="w-100">
-            <div class="m-2  text-truncate-2">
-                <span class="comment-tag bg-main">@Model.Type.GetDisplayName()</span>
-                @Model.Name
+            <div class="p-2">
+                <div class="mb-1  text-truncate-2">
+                    <span class="comment-tag bg-main">@Model.Type.GetDisplayName()</span>
+                    <span class="fw-bold">  @Model.Name</span>
+
+                </div>
+                <div class="text-truncate-2" style="color: gray">
+                    @Model.BriefIntroduction
+                </div>
             </div>
+
 
 
 
@@ -19,6 +26,9 @@
                 <img src="@Model.Thumbnail" alt="@Model.Name" style="border-radius: 50%; height: 100px; width: 100px;">
                 <div class="mt-2 text-truncate-2">
                     @Model.Name
+                </div>
+                <div class="text-truncate-2" style="color: gray">
+                    @Model.BriefIntroduction
                 </div>
             </div>
         }
@@ -49,6 +59,7 @@
             ExaminedNormalListModelType.Article => $"/articles/index/{Model.Id}",
             ExaminedNormalListModelType.Periphery => $"/peripheries/index/{Model.Id}",
             ExaminedNormalListModelType.Tag => $"/tags/index/{Model.Id}",
+            ExaminedNormalListModelType.Video => $"/videos/index/{Model.Id}",
             ExaminedNormalListModelType.PlayedGame => Model.Link,
             ExaminedNormalListModelType.Comment => Model.Link,
             _ => ""

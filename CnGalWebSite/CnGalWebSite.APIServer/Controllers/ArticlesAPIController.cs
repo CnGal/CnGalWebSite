@@ -314,7 +314,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Result>> CreateArticleAsync(CreateArticleViewModel model)
+        public async Task<ActionResult<Result>> CreateAsync(CreateArticleViewModel model)
         {
             try
             {
@@ -412,7 +412,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<EditArticleMainViewModel>> EditArticleMainAsync(long Id)
+        public async Task<ActionResult<EditArticleMainViewModel>> EditMainAsync(long Id)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -467,7 +467,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Result>> EditArticleMainAsync(EditArticleMainViewModel model)
+        public async Task<ActionResult<Result>> EditMainAsync(EditArticleMainViewModel model)
         {
             try
             {
@@ -540,7 +540,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<EditArticleMainPageViewModel>> EditArticleMainPageAsync(long Id)
+        public async Task<ActionResult<EditArticleMainPageViewModel>> EditMainPageAsync(long Id)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -583,7 +583,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Result>> EditArticleMainPageAsync(EditArticleMainPageViewModel model)
+        public async Task<ActionResult<Result>> EditMainPageAsync(EditArticleMainPageViewModel model)
         {
             try
             {
@@ -652,7 +652,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<EditArticleRelevancesViewModel>> EditArticleRelevancesAsync(long Id)
+        public async Task<ActionResult<EditArticleRelevancesViewModel>> EditRelevancesAsync(long Id)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -770,7 +770,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Result>> EditArticleRelevancesAsync(EditArticleRelevancesViewModel model)
+        public async Task<ActionResult<Result>> EditRelevancesAsync(EditArticleRelevancesViewModel model)
         {
             try
             {
@@ -883,14 +883,14 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        public async Task<ActionResult<Result>> HiddenArticleAsync(HiddenArticleModel model)
+        public async Task<ActionResult<Result>> HideAsync(HiddenArticleModel model)
         {
             await _articleRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
             return new Result { Successful = true };
         }
 
         [HttpPost]
-        public async Task<ActionResult<Result>> ThumbsUpArticleAsync(ThumbsUpArticleModel model)
+        public async Task<ActionResult<Result>> ThumbsUpAsync(ThumbsUpArticleModel model)
         {
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //通过Id获取文章
@@ -943,7 +943,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        public async Task<ActionResult<Result>> EditArticlePriorityAsync(EditArticlePriorityViewModel model)
+        public async Task<ActionResult<Result>> EditPriorityAsync(EditArticlePriorityViewModel model)
         {
             await _articleRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.Priority, b => b.Priority + model.PlusPriority).ExecuteAsync();
 
