@@ -36,11 +36,6 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        _dataCacheService.DiscountPageCatcheHelper.Model.Random();
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -61,6 +56,7 @@
                     }
 
                 }
+                _dataCacheService.DiscountPageCatcheHelper.Model.Random();
 
                 StateHasChanged();
 

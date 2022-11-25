@@ -129,6 +129,7 @@
     public Task ScreenTypeChanged(ScreenSteamType type)
     {
         _dataCacheService.DiscountPageCatcheHelper.ScreenType = type;
+        _dataCacheService.DiscountPageCatcheHelper.CurrentPage = 1;
         StateHasChanged();
         return Task.CompletedTask;
     }
@@ -155,6 +156,7 @@
     public Task PurchasedTypeChanged(PurchasedSteamType type)
     {
         _dataCacheService.DiscountPageCatcheHelper.PurchasedType = type;
+        _dataCacheService.DiscountPageCatcheHelper.CurrentPage = 1;
         StateHasChanged();
         return Task.CompletedTask;
     }
