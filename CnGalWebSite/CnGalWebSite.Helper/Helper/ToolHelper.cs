@@ -819,11 +819,11 @@ namespace CnGalWebSite.DataModel.Helper
                     {
                         try
                         {
-                            pt.SetValue(data, DateTime.Parse(item.Value), null);
+                            pt.SetValue(data, DateTime.Parse(item.Value).ToUniversalTime(), null);
                         }
                         catch
                         {
-                            pt.SetValue(data, DateTime.FromBinary(long.Parse(item.Value)), null);
+                            pt.SetValue(data, DateTime.FromBinary(long.Parse(item.Value)).ToUniversalTime(), null);
                         }
 
                     }
@@ -831,11 +831,11 @@ namespace CnGalWebSite.DataModel.Helper
                     {
                         try
                         {
-                            pt.SetValue(data, item.Value != null ? DateTime.Parse(item.Value) : null, null);
+                            pt.SetValue(data, item.Value != null ? DateTime.Parse(item.Value).ToUniversalTime() : null, null);
                         }
                         catch
                         {
-                            pt.SetValue(data, item.Value != null ? DateTime.FromBinary(long.Parse(item.Value)) : null, null);
+                            pt.SetValue(data, item.Value != null ? DateTime.FromBinary(long.Parse(item.Value)).ToUniversalTime() : null, null);
                         }
 
                     }

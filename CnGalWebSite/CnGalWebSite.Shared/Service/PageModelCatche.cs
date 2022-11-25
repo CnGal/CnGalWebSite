@@ -74,7 +74,7 @@ namespace CnGalWebSite.Shared.Service
                 }
                 else
                 {
-                    temp = await _httpClient.GetFromJsonAsync<TModel>(_baseUrl + apiUrl);
+                    temp = await _httpClient.GetFromJsonAsync<TModel>(_baseUrl + apiUrl, ToolHelper.options);
                 }
 
                 return temp;
