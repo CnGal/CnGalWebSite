@@ -96,6 +96,13 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             OnProgressUpdate(model, OutputLevel.Infor, $"提交审核");
 
             model.Id = await SubmitArticle(article);
+            if (model.Id == 0)
+            {
+                _logger.LogError("提交文章审核失败 {Link}", model.Url);
+                OnProgressUpdate(model, OutputLevel.Dager, "提交文章审核失败");
+                return;
+            }
+
             model.PostTime = DateTime.Now.ToCstTime();
             await _outlinkArticleRepository.SaveAsync();
 
@@ -367,7 +374,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             try
             {
 
-                var result = await _httpClient.PostAsJsonAsync<CreateArticleViewModel>(ToolHelper.WebApiPath + "api/articles/createarticle", model);
+                var result = await _httpClient.PostAsJsonAsync<CreateArticleViewModel>(ToolHelper.WebApiPath + "api/articles/create", model);
                 var jsonContent = result.Content.ReadAsStringAsync().Result;
                 var obj = System.Text.Json.JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
                 //判断结果
