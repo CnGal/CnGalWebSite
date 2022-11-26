@@ -759,7 +759,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             model.EditCount = await _examineRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.IsPassed == true);
             model.ArticleCount = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false);
             model.VideoCount = await _videoRepository.CountAsync(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false);
-            model.ArticleReadCount = await _articleRepository.GetAll().AsNoTracking().Where(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false).SumAsync(s=>s.ReaderCount);
+            model.ArticleReadCount = await _articleRepository.GetAll().AsNoTracking().Where(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false).SumAsync(s=>s.ReaderCount) + await _videoRepository.GetAll().Where(s => s.CreateUserId == user.Id && string.IsNullOrWhiteSpace(s.Name) == false && s.IsHidden == false).SumAsync(s => s.ReaderCount);
 
             //计算连续签到天数和今天是否签到
             model.IsSignIn = false;
@@ -830,6 +830,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             var commentLimited = 5;
             var articleIntegral = entryIntegral;
             var playedGameIntegral = entryIntegral;
+            var videoIntegral = articleIntegral;
 
             try
             {
@@ -849,15 +850,17 @@ namespace CnGalWebSite.APIServer.Application.Users
 
 
                 //发表文章
-                var integral_2 = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id) * articleIntegral;
+                var integral_2 = await _articleRepository.CountAsync(s => s.CreateUserId == user.Id&&s.IsHidden==false&&string.IsNullOrWhiteSpace(s.Name)==false) * articleIntegral;
                 //签到
                 var integral_3 = await _signInDayRepository.CountAsync(s => s.ApplicationUserId == user.Id) * signInDaysIntegral;
 
                 var integral_4 = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.Integral).Select(s => s.Count).SumAsync();
                 //游玩记录
                 var integral_5 = await _playedGameRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.ShowPublicly && string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength) * playedGameIntegral;
+                //发表文章
+                var integral_6 = await _videoRepository.CountAsync(s => s.CreateUserId == user.Id && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false) * videoIntegral;
 
-                user.DisplayIntegral = integral_1 + integral_2 + integral_3 + integral_4 + integral_5;
+                user.DisplayIntegral = integral_1 + integral_2 + integral_3 + integral_4 + integral_5+integral_6;
 
 
                 //计算贡献值

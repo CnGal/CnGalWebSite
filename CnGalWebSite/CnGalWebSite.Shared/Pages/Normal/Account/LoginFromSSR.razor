@@ -68,26 +68,30 @@
     {
         if(firstRender)
         {
-            try
+            if(string.IsNullOrWhiteSpace(Code)==false)
             {
-                var result = await Http.PostAsJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = Code });
-                string jsonContent = result.Content.ReadAsStringAsync().Result;
-                LoginResult obj = JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
-                //判断结果
-                if (obj.Code == LoginResultCode.OK)
+                try
                 {
-                    if (await AuthService.Login(obj.Token) == false)
+                    var result = await Http.PostAsJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/LoginByOneTimeCode", new OneTimeCodeModel { Code = Code });
+                    string jsonContent = result.Content.ReadAsStringAsync().Result;
+                    LoginResult obj = JsonSerializer.Deserialize<LoginResult>(jsonContent, ToolHelper.options);
+                    //判断结果
+                    if (obj.Code == LoginResultCode.OK)
                     {
-                        ErrorHandler.ProcessError(new Exception(), "获取令牌成功，但是尝试登入失败");
-                    }
-                    else
-                    {
+                        if (await AuthService.Login(obj.Token) == false)
+                        {
+                            ErrorHandler.ProcessError(new Exception(), "获取令牌成功，但是尝试登入失败");
+                        }
+                        else
+                        {
 
+                        }
                     }
                 }
-            }
-            catch (Exception exc)
-            {
+                catch (Exception exc)
+                {
+
+                }
 
             }
 
