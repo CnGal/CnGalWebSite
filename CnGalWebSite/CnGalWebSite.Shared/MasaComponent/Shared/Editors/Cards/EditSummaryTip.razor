@@ -4,34 +4,34 @@
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     @if (Type == ExaminedNormalListModelType.Entry)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success">
-            在@(Creating?"创建": "编辑")词条前请先<TabLink Text="词条规范" Url="/articles/index/2" Icon="fa fa-newspaper-o" class="success--text fw-bold">阅读《词条编辑规范》</TabLink>，我们不会审核通过不符合规范的词条
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error">
+            在@(Creating?"创建": "编辑")词条前请先<TabLink Text="词条规范" Url="/articles/index/2" Icon="fa fa-newspaper-o" class="error--text fw-bold">阅读《词条编辑规范》</TabLink>，我们不会审核通过不符合规范的词条
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     }
     else if (Type == ExaminedNormalListModelType.Article)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success">
-            在@(Creating?"发表": "编辑")文章前请先<TabLink Text="文章规范" Url="/articles/index/3" Icon="fa fa-newspaper-o" class="success--text fw-bold">阅读《文章发表规范》</TabLink>，我们不会审核通过不符合规范的文章
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error">
+            在@(Creating?"发表": "编辑")文章前请先<TabLink Text="文章规范" Url="/articles/index/3" Icon="fa fa-newspaper-o" class="error--text fw-bold">阅读《文章发表规范》</TabLink>，我们不会审核通过不符合规范的文章
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
     }
     else if (Type == ExaminedNormalListModelType.Periphery)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success">
-            在@(Creating?"创建": "编辑")周边前请先<TabLink Text="周边规范" Url="/articles/index/253" Icon="fa fa-newspaper-o" class="success--text fw-bold">阅读《周边编辑规范》</TabLink>，我们不会审核通过不符合规范的周边
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error">
+            在@(Creating?"创建": "编辑")周边前请先<TabLink Text="周边规范" Url="/articles/index/253" Icon="fa fa-newspaper-o" class="error--text fw-bold">阅读《周边编辑规范》</TabLink>，我们不会审核通过不符合规范的周边
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
     }
     else if (Type == ExaminedNormalListModelType.Tag)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success">
-            在@(Creating?"创建": "编辑")标签前请先<TabLink Text="标签规范" Url="/articles/index/254" Icon="fa fa-newspaper-o" class="success--text fw-bold">阅读《标签编辑规范》</TabLink>，我们不会审核通过不符合规范的标签
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error">
+            在@(Creating?"创建": "编辑")标签前请先<TabLink Text="标签规范" Url="/articles/index/254" Icon="fa fa-newspaper-o" class="error--text fw-bold">阅读《标签编辑规范》</TabLink>，我们不会审核通过不符合规范的标签
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     }
     else if (Type == ExaminedNormalListModelType.Video)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Success">
-            在@(Creating?"发布": "编辑")视频前请先<TabLink Text="视频规范" Url="/articles/index/254" Icon="fa fa-newspaper-o" class="success--text fw-bold">阅读《视频编辑规范》</TabLink>，我们不会审核通过不符合规范的视频
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Error">
+            在@(Creating?"发布": "编辑")视频前请先<TabLink Text="视频规范" Url="/articles/index/254" Icon="fa fa-newspaper-o" class="error--text fw-bold">阅读《视频编辑规范》</TabLink>，我们不会审核通过不符合规范的视频
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
     }
 
