@@ -27,7 +27,7 @@
 </div>
 
 @code {
-    string typeString = "文章作者";
+    string typeString = "作者";
     bool isProgressing = false;
 
     public int Value { get; set; } = 0;
@@ -46,7 +46,7 @@
         try
         {
             //尝试解析Json数据
-            List<UpdateArticleAuthorModel> entryList = null;
+            List<UpdateAuthorModel> entryList = null;
             using (System.IO.Stream stream = file.File.OpenReadStream(file.File.Size))
             {
                 Memory<byte> bytes = new byte[stream.Length];
@@ -71,7 +71,7 @@
                     using (System.IO.TextReader str = new System.IO.StringReader(jsonStr))
                     {
                         Newtonsoft.Json.JsonSerializer serializer = new Newtonsoft.Json.JsonSerializer();
-                        entryList = (List<UpdateArticleAuthorModel>)serializer.Deserialize(str, typeof(List<UpdateArticleAuthorModel>));
+                        entryList = (List<UpdateAuthorModel>)serializer.Deserialize(str, typeof(List<UpdateAuthorModel>));
                     }
                 }
                 catch
@@ -144,12 +144,12 @@
 
     }
 
-    public async Task<bool> OnImportData(UpdateArticleAuthorModel model)
+    public async Task<bool> OnImportData(UpdateAuthorModel model)
     {
         //上传
         try
         {
-            var result = await Http.PostAsJsonAsync<UpdateArticleAuthorModel>(ToolHelper.WebApiPath + "api/batch/UpdateArticleAuthor", model);
+            var result = await Http.PostAsJsonAsync<UpdateAuthorModel>(ToolHelper.WebApiPath + "api/batch/UpdateAuthor", model);
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果

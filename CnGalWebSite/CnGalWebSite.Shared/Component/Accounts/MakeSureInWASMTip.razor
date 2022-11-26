@@ -55,17 +55,20 @@
                      await SwalService.Show(op);
                  }*/
                 //获取一次性代码
+                var code = "";
 
                 try
                 {
                     var Model = await Http.GetFromJsonAsync<OneTimeCodeModel>(ToolHelper.WebApiPath + "api/account/GetOneTimeCode", ToolHelper.options);
-                    NavigationManager.NavigateTo("https://app.cngal.org/account/loginfromssr?Code=" + Model.Code + "&ReturnUrl=" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
+                    code = Model.Code;
+
                 }
                 catch (Exception ex)
                 {
-                    ErrorHandler.ProcessError(ex, "尝试跳转APP模式失败");
+                    // ErrorHandler.ProcessError(ex, "尝试跳转APP模式失败");
                 }
                 //跳转
+                NavigationManager.NavigateTo("https://app.cngal.org/account/loginfromssr?Code=" + code + "&ReturnUrl=" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
             }
 
         }

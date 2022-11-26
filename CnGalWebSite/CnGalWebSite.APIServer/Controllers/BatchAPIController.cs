@@ -29,6 +29,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Carousel, int> _carouselRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<HistoryUser, int> _historyUserRepository;
+        private readonly IRepository<Video, long> _videoRepository;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
         private readonly IUserService _userService;
@@ -36,7 +37,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         public BatchAPIController(IRepository<HistoryUser, int> historyUserRepository, IExamineService examineService, IRepository<Periphery, long> peripheryRepository,
         UserManager<ApplicationUser> userManager, IRepository<FriendLink, int> friendLinkRepository, IRepository<Carousel, int> carouselRepositor, IUserService userService,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository)
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -48,6 +49,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _examineService = examineService;
             _peripheryRepository = peripheryRepository;
             _userService = userService;
+            _videoRepository = videoRepository;
         }
 
         [HttpPost]
@@ -101,24 +103,40 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Result>> UpdateArticleAuthorAsync(UpdateArticleAuthorModel model)
+        public async Task<ActionResult<Result>> UpdateAuthorAsync(UpdateAuthorModel model)
         {
-            //查找文章和用户
-            var article = await _articleRepository.FirstOrDefaultAsync(s => s.Id == model.ArticleId);
-            if (article == null)
-            {
-                return new Result { Successful = false, Error = "文章『Id：" + model.ArticleId + "』不存在" };
-            }
             var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
             {
-                return new Result { Successful = false, Error = "用户『Id：" + model.ArticleId + "』不存在" };
+                return new Result { Successful = false, Error = "用户『Id：" + model.UserId + "』不存在" };
             }
 
-            //修改文章作者
-            article.CreateUser = user;
-            article.CreateUserId = user.Id;
-            await _articleRepository.UpdateAsync(article);
+            foreach (var item in model.ArticleIds)
+            {
+                var article = await _articleRepository.FirstOrDefaultAsync(s => s.Id == item);
+                if (article == null)
+                {
+                    return new Result { Successful = false, Error = "文章『Id：" + item + "』不存在" };
+                }
+                //修改文章作者
+                article.CreateUserId = user.Id;
+                await _articleRepository.UpdateAsync(article);
+            }
+
+            foreach (var item in model.VideoIds)
+            {
+                var video = await _videoRepository.FirstOrDefaultAsync(s => s.Id == item);
+                if (video == null)
+                {
+                    return new Result { Successful = false, Error = "视频『Id：" + item + "』不存在" };
+                }
+                //修改文章作者
+                video.CreateUserId = user.Id;
+                await _videoRepository.UpdateAsync(video);
+            }
+
+
+
             //更新用户积分
             await _userService.UpdateUserIntegral(user);
             return new Result { Successful = true };

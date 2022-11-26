@@ -1,8 +1,10 @@
 ﻿namespace CnGalWebSite.DataModel.ViewModel.Batch
 {
-    public class UpdateArticleAuthorModel
+    public class UpdateAuthorModel
     {
-        public long ArticleId { get; set; }
+        public long[] ArticleIds { get; set; }
+
+        public long[] VideoIds { get; set; }
 
         public string UserId { get; set; }
     }

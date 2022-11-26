@@ -1490,10 +1490,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 }
                 else if (item.Type == EntryType.Game)
                 {
-                    if (entry.Type == EntryType.Staff)
+                    if (entry.Type == EntryType.Staff||entry.Type == EntryType.ProductionGroup)
                     {
-
-                        //获取角色词条
                         var staffGame = _appHelper.GetEntryInforTipViewModel(item);
                         staffGame.AddInfors.Clear();
                         //查找担任过的职位
