@@ -27,10 +27,11 @@
         {
             var url = Type switch
             {
-                ExaminedNormalListModelType.Article => "api/articles/HiddenArticle",
+                ExaminedNormalListModelType.Article => "api/articles/Hide",
                 ExaminedNormalListModelType.Entry => "api/entries/HiddenEntry",
                 ExaminedNormalListModelType.Periphery => "api/peripheries/HiddenPeriphery",
-                ExaminedNormalListModelType.Tag => "api/tags/HiddenTag"
+                ExaminedNormalListModelType.Tag => "api/tags/HiddenTag",
+                ExaminedNormalListModelType.Video => "api/videos/Hide"
             };
 
 

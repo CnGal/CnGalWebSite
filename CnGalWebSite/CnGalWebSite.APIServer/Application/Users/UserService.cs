@@ -682,7 +682,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             //拉取审核数据
             var examines = await _examineRepository.GetAll().AsNoTracking()
                 .Where(s => s.ApplicationUserId == user.Id)
-                .Select(n => new { n.IsPassed, n.Operation, n.Context, n.EntryId, n.ArticleId, n.TagId, n.ApplyTime, n.Id })
+                .Select(n => new { n.IsPassed, n.Operation, n.ApplyTime, n.Id })
                 .ToListAsync();
 
             model.EditCount = examines.Count;

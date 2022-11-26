@@ -65,7 +65,7 @@
         if (begin.DayOfWeek != DayOfWeek.Monday)
         {
             DateTime begin_ = begin.AddDays(-(int)begin.DayOfWeek + 1);
-            for (DateTime temp = begin_; temp < begin; temp = temp.AddDays(1))
+            for (DateTime temp = begin_; temp.Date < begin.Date; temp = temp.AddDays(1))
             {
                 AfterTreatmentDate.Add(new KeyValuePair<DateTime, int>(temp, -1));
             }
@@ -73,7 +73,7 @@
         if (end.DayOfWeek != DayOfWeek.Sunday)
         {
             DateTime end_ = end.AddDays((7 - (int)end.DayOfWeek));
-            for (DateTime temp = end.AddDays(1); temp <= end_; temp = temp.AddDays(1))
+            for (DateTime temp = end.AddDays(1); temp.Date <= end_.Date; temp = temp.AddDays(1))
             {
                 AfterTreatmentDate.Add(new KeyValuePair<DateTime, int>(temp, -1));
             }
@@ -81,7 +81,7 @@
 
         for (DateTime i = begin; i <= end; i = i.AddDays(1))
         {
-            KeyValuePair<DateTime, int> temp = BeforeTreatmentDate.FirstOrDefault(s => s.Key == i);
+            KeyValuePair<DateTime, int> temp = BeforeTreatmentDate.FirstOrDefault(s => s.Key.Date == i.Date);
             if (temp.Key == default(KeyValuePair<DateTime, int>).Key)
             {
                 AfterTreatmentDate.Add(new KeyValuePair<DateTime, int>(i, 0));
