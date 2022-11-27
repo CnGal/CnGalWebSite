@@ -24,5 +24,10 @@ namespace CnGalWebSite.DataModel.ExamineModel.Articles
         public ArticleType Type { get; set; }
 
         public string NewsType { get; set; }
+
+        /// <summary>
+        /// 是否为用户本人创作
+        /// </summary>
+        public bool IsCreatedByCurrentUser { get; set; }
     }
 }

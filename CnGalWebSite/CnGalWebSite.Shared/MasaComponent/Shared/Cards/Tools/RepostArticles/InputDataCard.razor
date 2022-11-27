@@ -10,16 +10,19 @@
     </div>
     <div class="row mb-4">
         <div class="col-12 col-sm-3">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="model.Type" TValue="ArticleType" Lable="类型" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="InputModel.Type" TValue="ArticleType" Lable="类型" />
         </div>
         <div class="col-12 col-sm-9">
-            <MTextField Label="标题（可不填，将自动获取）" @bind-Value="@model.Title" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
+            <MTextField Label="标题（可不填，将自动获取）" @bind-Value="@InputModel.Title" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
         </div>
         <div class="col-12  mb-4">
-            <MTextField Label="链接" @bind-Value="@model.Url" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
+            <MTextField Label="链接" @bind-Value="@InputModel.Url" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
+        </div>
+        <div class="col-12 col-sm-6 mb-4">
+            <MCheckbox @bind-Value="InputModel.IsCreatedByCurrentUser" Label="本人创作" Color="@_dataCacheService.ThemeSetting.Theme" />
         </div>
         <div class="col-12 mb-2">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="OnAdd" Icon="mdi-plus" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="@(async ()=> {await OnAdd(InputModel);InputModel = new RepostArticleModel(); })" Icon="mdi-plus" />
         </div>
     </div>
     <MSimpleTable Class="mb-4">
@@ -56,6 +59,7 @@
 
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="下一步" Depressed Icon="mdi-arrow-down-bold-outline" OnClick="OnClickFinshInput" Class="mb-2" />
 </div>
+<ImportCard @ref="importCard" OnImported="OnImported" />
 
 
 @code {
@@ -67,7 +71,11 @@
 
     public EventCallback OnFinshInput { get; set; }
     List<KeyValuePair<string, ArticleType>> items = new List<KeyValuePair<string, ArticleType>>();
-    RepostArticleModel model = new RepostArticleModel();
+
+    RepostArticleModel InputModel = new RepostArticleModel();
+
+    ImportCard importCard;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -80,12 +88,32 @@
 
     public Task ValueChanged(ArticleType type)
     {
-        model.Type = type;
+        InputModel.Type = type;
         return Task.CompletedTask;
     }
 
-    public async Task OnAdd()
+    public async Task OnImported(List<string> items)
     {
+        foreach (var item in items)
+        {
+            var model = new RepostArticleModel
+            {
+                Url = item,
+                Type=InputModel.Type,
+                IsCreatedByCurrentUser = InputModel.IsCreatedByCurrentUser
+            };
+            await OnAdd(model);
+        }
+    }
+    public async Task OnImport()
+    {
+        await importCard.Refresh(true);
+    }
+
+    public async Task OnAdd(RepostArticleModel model)
+    {
+        model.UserName = _dataCacheService.UserInfor.Name;
+
         if (string.IsNullOrWhiteSpace(model.Url))
         {
             await PopupService.ToastAsync("先填写文章链接哦", AlertTypes.Error);
@@ -101,9 +129,8 @@
             await PopupService.ToastAsync("文章链接添加一次就够了哦", AlertTypes.Error);
             return;
         }
-        model.UserName = _dataCacheService.UserInfor.Name;
+
         Model.Add(model);
-        model = new RepostArticleModel();
     }
 
     public Task OnDelete(RepostArticleModel model)

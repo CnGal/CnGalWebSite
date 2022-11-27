@@ -11,9 +11,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
         _dataCacheService.RefreshRequsted += RefreshRequsted;
-
     }
 
     public async void RefreshRequsted(object sender, EventArgs args)

@@ -21,7 +21,7 @@
             <MCheckbox @bind-Value="InputModel.IsCreatedByCurrentUser" Label="本人创作" Color="@_dataCacheService.ThemeSetting.Theme" />
         </div>
         <div class="col-12 mb-2">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="@(()=> { OnAdd(InputModel);InputModel = new RepostVideoModel(); })" Icon="mdi-plus" Class="me-4" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="@(async ()=> {await OnAdd(InputModel);InputModel = new RepostVideoModel(); })" Icon="mdi-plus" Class="me-4" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="批量导入" OnClick="OnImport" Icon="mdi-database-import" />
         </div>
     </div>

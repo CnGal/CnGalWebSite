@@ -1,0 +1,64 @@
+﻿@inject IDataCacheService _dataCacheService
+@implements IDisposable
+@inject NavigationManager NavigationManager
+
+<MTooltip Top Color="white">
+    <ActivatorContent>
+        <img @attributes="@context.Attrs" src="@Model.MainImage" alt="@Model.Name" style="height:40px;aspect-ratio:1;border-radius:50%;" @onclick="@(()=>OnClick())" />
+    </ActivatorContent>
+    <ChildContent>
+        <div style=" display: flex; flex-direction: column; align-items: center; width:230px;color:black;">
+            <img src="@Model.MainImage" alt="@Model.Name" style="border-radius: 50%; height: 100px; width: 100px;" class="mb-2">
+
+
+            <div class="text-truncate-2 fw-bold">
+                @Model.Name
+            </div>
+            @if (string.IsNullOrWhiteSpace(Model.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName) == false)
+            {
+                <div class=" text-center" style="color:gray;">
+                    @($"《{Model.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName}》")
+                </div>
+            }
+            <div class="text-truncate-3 text-center">
+                @Model.BriefIntroduction
+            </div>
+        </div>
+    </ChildContent>
+</MTooltip>
+
+@code {
+    [Parameter]
+    public EntryInforTipViewModel Model { get; set; }
+
+    [Parameter]
+    public string Image { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+        _dataCacheService.RefreshRequsted += RefreshRequsted;
+    }
+
+    public void OnClick()
+    {
+        NavigationManager.NavigateTo($"/entries/index/{Model.Id}");
+    }
+
+    public async void RefreshRequsted(object sender, EventArgs args)
+    {
+        await InvokeAsync(StateHasChanged);
+
+    }
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

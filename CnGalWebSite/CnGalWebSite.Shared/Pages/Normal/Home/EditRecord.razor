@@ -221,6 +221,7 @@ else
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
+            NavigationManager.LocationChanged -= LocationChanged;
             NavigationManager.LocationChanged += LocationChanged;
 
         }

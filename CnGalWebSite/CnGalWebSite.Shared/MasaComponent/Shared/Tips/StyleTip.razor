@@ -88,6 +88,7 @@ else
 @code {
     public bool isDark = false;
     public bool isTransparent = true;
+    public bool isExpand = false;
 
     public string colorMain;
     public string colorHover;
@@ -301,7 +302,7 @@ else
 
         ProcColor(_dataCacheService.ThemeSetting.Theme);
 
-        if (theme != _dataCacheService.ThemeSetting.Theme || isDark != _dataCacheService.ThemeSetting.IsDark || isTransparent != _dataCacheService.ThemeSetting.IsTransparent)
+        if (theme != _dataCacheService.ThemeSetting.Theme || isDark != _dataCacheService.ThemeSetting.IsDark || isTransparent != _dataCacheService.ThemeSetting.IsTransparent || isExpand != _dataCacheService.ThemeSetting.IsExtendEntireScreen)
         {
             await _dataCacheService.ThemeChanged.InvokeAsync(colorMain);
             await _dataCacheService.RefreshApp.InvokeAsync();
@@ -309,6 +310,7 @@ else
             theme = _dataCacheService.ThemeSetting.Theme;
             isDark = _dataCacheService.ThemeSetting.IsDark;
             isTransparent = _dataCacheService.ThemeSetting.IsTransparent;
+            isExpand = _dataCacheService.ThemeSetting.IsExtendEntireScreen;
         }
 
         StateHasChanged();

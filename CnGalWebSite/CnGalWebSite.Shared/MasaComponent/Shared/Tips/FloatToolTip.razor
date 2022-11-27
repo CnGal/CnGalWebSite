@@ -4,8 +4,11 @@
 
 
 <div style="position: fixed; z-index: 4; bottom: 125px; right: 50px; " class="@(_dataCacheService.IsApp?"d-none":"")">
-    <div>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial Icon="mdi-link" Direction="top" Text="社区交流" Class="mb-4">
+    <div style=" display: flex; flex-direction: column;">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.Brithdays.BrithdayButton Class="mb-4" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalogButton @ref="masaCatalogButton" Class="mb-4" />
+
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSpeedDial Icon="mdi-link" Direction="left" Text="社区交流" Class="mb-4">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaImageToolTip Icon="mdi-wechat" Image="https://image.cngal.org/images/2022/06/02/76142d8159b0.jpg" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-sina-weibo" Tooltip="微博" OnClick="@(()=>OnNav("https://weibo.com/cngalorg?sudaref=www.cngal.org"))" />
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton XSmall Fab Icon="mdi-qqchat" Tooltip="QQ" OnClick="@(()=>OnNav("https://jq.qq.com/?_wv=1027&k=mG6qNvyg"))" />
@@ -30,12 +33,12 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard @ref="repostArticlesCard" />
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard @ref="repostVideosCard" />
 
-
 @code {
     private bool fab;
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.MergeEntries.MainCard mergeEntriesCard;
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostArticles.MainCard repostArticlesCard;
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard repostVideosCard;
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalogButton masaCatalogButton;
 
     public Task OnClickFly()
     {
@@ -88,6 +91,7 @@
             await repostArticlesCard.Refresh(true);
         }
     }
+
     public async Task OnRepostVideos()
     {
         if (Login() == false)
@@ -100,16 +104,42 @@
         }
     }
 
+    public async Task DisplayArticleCatalogButton(ArticleViewModel model)
+    {
+        if (masaCatalogButton != null)
+        {
+            await masaCatalogButton.Refresh(model.MainPage, $"/articles/index/{model.Id}");
+        }
+
+        StateHasChanged();
+    }
+
     protected override async Task OnInitializedAsync()
     {
-
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
         _dataCacheService.RefreshRequsted += RefreshRequsted;
 
+        NavigationManager.LocationChanged -= LocationChanged;
+        NavigationManager.LocationChanged += LocationChanged;
+
+    }
+
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (NavigationManager.Uri.Contains("articles/index") == false)
+        {
+
+            if (masaCatalogButton != null)
+            {
+                await masaCatalogButton.Refresh(null, null);
+            }
+            StateHasChanged();
+        }
     }
 
     public async void RefreshRequsted(object sender, EventArgs args)
     {
-        await  InvokeAsync( StateHasChanged);
+        await InvokeAsync(StateHasChanged);
     }
     #region 释放实例
 
@@ -117,7 +147,7 @@
     {
 
         _dataCacheService.RefreshRequsted -= RefreshRequsted;
-
+        NavigationManager.LocationChanged -= LocationChanged;
         GC.SuppressFinalize(this);
     }
     #endregion

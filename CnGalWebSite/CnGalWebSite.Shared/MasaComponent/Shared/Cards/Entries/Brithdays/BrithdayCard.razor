@@ -1,0 +1,66 @@
+﻿
+@if (Model == null || Model.Any() == false)
+{
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="mb-2" style=" font-size: xxx-large;">🎂</div>
+        <div>好像今天没人过生日~</div>
+        <div>前往 <a href="/entries/brithdaycalendar">生日日历</a> 提前准备吧~</div>
+    </div>
+
+}
+else
+{
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="@((Model.Count<=2||(Model.Count%2!=0&&Model.IndexOf(item)==Model.Count-1))?"col-12":"col-6")">
+            <a href="@($"/entries/index/{item.Id}")" class="a-font-color">
+                <div class="pb-4" style=" display: flex; flex-direction: column; align-items: center; ">
+                    <img src="@item.MainImage" alt="@item.Name" style="border-radius: 50%; height: 100px; width: 100px;" class="mb-2">
+                    <div class="text-truncate-2 fw-bold">
+                        @item.Name
+                    </div>
+                    @if (string.IsNullOrWhiteSpace(item.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName) == false)
+                    {
+                        <div class=" text-center" style="color:gray;">
+                            @($"《{item.AddInfors.FirstOrDefault(s => s.Modifier == "登场游戏")?.Contents?.FirstOrDefault()?.DisplayName}》")
+                        </div>
+                    }
+                    <div class="text-truncate-3 text-center">
+                        @item.BriefIntroduction
+                    </div>
+                </div>
+            </a>
+        </div>
+    }
+</div>
+  
+
+    <div style=" font-size: large; font-weight: bold; text-align: center; ">🎂 生日快乐</div>
+    <div class="mb-2" style="color: gray;text-align: center;">@Text</div>
+    <a style="display: flex; justify-content: center; " href="/entries/brithdaycalendar">前往生日日历</a>
+
+}
+
+@code {
+    [Parameter]
+    public List<EntryInforTipViewModel> Model { get; set; }
+
+    public string Text = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var sb = new System.Text.StringBuilder(DateTime.Now.ToCstTime().ToString("M月d日"));
+        sb.Append("是");
+        foreach (var item in Model)
+        {
+            sb.Append(item.Name);
+            if (Model.IndexOf(item) != Model.Count - 1)
+            {
+                sb.Append("、");
+            }
+        }
+        sb.Append("的生日哦~");
+        Text = sb.ToString();
+    }
+}

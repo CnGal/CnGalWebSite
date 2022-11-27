@@ -3,11 +3,9 @@
 
 @implements IDisposable
 
-@if (CatalogItems != null && CatalogItems.Any()&&_dataCacheService.IsApp==false)
+@if (CatalogItems != null && CatalogItems.Any())
 {
-    <div class="rounded shadow-sm  bg-opacity">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-list" Title="目录" Collapable IsCollapsed="_dataCacheService.ThemeSetting.IsHiddeArticleCatalog" IsCollapsedChanged="IsCollapsedChanged" Outline OutlineHead Class="p-3">
-            <div class="overflow-x-auto p-3 pt-0" style="max-height: calc(100vh - 180px)">
+            <div class="overflow-x-auto pe-3" style="max-height: 500px">
                 <MTreeview OpenAll
                            Color="@_dataCacheService.ThemeSetting.Theme"
                            Items="CatalogItems"
@@ -19,14 +17,7 @@
                            ItemText="u => u.Text"
                            OnActiveUpdate="OnActiveUpdate">
                 </MTreeview>
-
-
-
-
-            </div>
-
-        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-    </div>
+            </div> 
 }
 
 
@@ -36,14 +27,25 @@
     public string Model { get; set; }
     [Parameter]
     public string Url { get; set; }
+    [Parameter]
+    public EventCallback OnNav { get; set; }
 
     List<ArticleCatalogModel> CatalogItems = new List<ArticleCatalogModel>();
 
+
     protected override async Task OnInitializedAsync()
     {
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
         _dataCacheService.RefreshRequsted += RefreshRequsted;
+        await Refresh();
 
+    }
+
+    public Task Refresh()
+    {
         CatalogItems = ArticleCatalogModel.GetCatalog(Model);
+
+        return Task.CompletedTask;
     }
 
     public async Task OnActiveUpdate(List<ArticleCatalogModel> model)
@@ -53,7 +55,7 @@
             return;
         }
         await JS.InvokeAsync<string>("navigateTo", $"{Url}#{model.FirstOrDefault().Href}");
-
+        await OnNav.InvokeAsync();
     }
 
     public async Task IsCollapsedChanged(bool value)

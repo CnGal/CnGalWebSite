@@ -1,0 +1,90 @@
+﻿@page "/entries/brithdaycalendar"
+
+@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@inject HttpClient Http
+
+<div class=" rounded shadow-sm  bg-opacity p-4">
+    <div class="font-color mb-4 h5 fw-bold" style=" text-align: center; ">🎂 角色生日日历</div>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Calendars.MasaCalendar Month="Date" MonthChanged="MonthChanged">
+        <div style=" display: flex; flex-direction: column;" class="h-100">
+            <div class="p-2">
+                @context.Day.ToString()
+            </div>
+            <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-content: flex-end; " class="p-1 h-100">
+                @foreach (var item in Model.Where(s => s.Brithday.Day == context.Day && s.Brithday.Month == context.Month))
+                {
+                    <div class="p-1">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Cards.Entries.Brithdays.RoleButton Model="item.Infor" />
+                    </div>
+                }
+            </div>
+        </div>
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.Calendars.MasaCalendar>
+</div>
+
+
+@code {
+    DateTime Date = DateTime.Now.ToCstTime();
+    List<RoleBrithdayViewModel> Model = new List<RoleBrithdayViewModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int Year { get; set; }
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int Day { get; set; }
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int Month { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.LocationChanged -= LocationChanged;
+        NavigationManager.LocationChanged += LocationChanged;
+
+        LocationChanged(null, null);
+    }
+
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if (NavigationManager.Uri.Contains("/entries/brithdaycalendar"))
+        {
+            if(Day!=0&&Month!=0 &&Year!= 0)
+            {
+                Date = new DateTime(Year, Month, Day, 0, 0, 0, DateTimeKind.Local);
+
+            }
+            else
+            {
+                Date = DateTime.Now.ToCstTime();
+            }
+            try
+            {
+                Model = await _dataCacheService.RoleBrithdaysDataCatche.GetCache($"?month={Date.Month}");
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取角色生日失败");
+            }
+        }
+
+    }
+
+
+    public Task MonthChanged(DateTime month)
+    {
+        if(Date.Date==month.Date)
+        {
+            return Task.CompletedTask;
+        }
+        NavigationManager.NavigateTo($"/entries/brithdaycalendar?Year={month.Year}&Month={month.Month}&Day={month.Day}");
+        return Task.CompletedTask;
+
+    }
+
+}

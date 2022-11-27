@@ -1,0 +1,69 @@
+﻿@inject IDataCacheService _dataCacheService
+@implements IDisposable
+
+
+@if (_dataCacheService.ThemeSetting.IsExtendEntireScreen)
+{
+    @if (string.IsNullOrWhiteSpace(Styles) == false || string.IsNullOrWhiteSpace(Class) == false)
+    {
+        @ChildContent
+    }
+    else
+    {
+        <div class="p-4">
+            @ChildContent
+        </div>
+    }
+
+}
+else
+{
+    @if (string.IsNullOrWhiteSpace(Styles) == false || string.IsNullOrWhiteSpace(Class) == false)
+    {
+        <div style=" display: flex; flex-direction: column; align-items: center; align-content: center; ">
+
+            <div style="@Styles" class="@Class">
+                @ChildContent
+            </div>
+        </div>
+    }
+    else
+    {
+        <MContainer>
+            @ChildContent
+        </MContainer>
+    }
+
+}
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public string Styles { get; set; }
+    [Parameter]
+    public string Class { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+        _dataCacheService.RefreshRequsted += RefreshRequsted;
+    }
+
+    public async void RefreshRequsted(object sender, EventArgs args)
+    {
+        await InvokeAsync(StateHasChanged);
+
+    }
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+
+}

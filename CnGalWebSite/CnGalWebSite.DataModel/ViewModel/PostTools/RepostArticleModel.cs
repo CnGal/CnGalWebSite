@@ -28,6 +28,8 @@ namespace CnGalWebSite.DataModel.ViewModel.PostTools
 
         public string UserName { get; set; }
 
+        public bool IsCreatedByCurrentUser { get; set; }
+
         public RepostArticleModel()
         {
             TotalTaskCount = 4;

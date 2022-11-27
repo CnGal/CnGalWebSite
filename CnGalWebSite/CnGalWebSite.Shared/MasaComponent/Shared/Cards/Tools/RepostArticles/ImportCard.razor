@@ -1,0 +1,43 @@
+﻿@inject IDataCacheService _dataCacheService
+
+<MDialog @bind-Value="Dialog"
+         Width="600">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            导入文章链接
+        </MCardTitle>
+        <MCardText Class="pb-0" Style=" white-space: pre-line!important; ">一行仅输入一个链接，可以批量导入多个链接</MCardText>
+        <MCardText Class="pb-0">
+            <MTextarea Rows="5" Color="green"
+                       @bind-Value="Text">
+            </MTextarea>
+        </MCardText>
+        <MCardActions>
+            <MSpacer></MSpacer>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="导入" IsAsync="true" OnClick="OnImport" Icon="mdi-database-import " Color="green" TextStyle />
+        </MCardActions>
+    </MCard>
+
+</MDialog>
+@code {
+    bool Dialog { get; set; }
+
+    string Text { get; set; }
+
+    [Parameter]
+    public EventCallback<List<string>> OnImported { get; set; }
+
+    public async Task OnImport()
+    {
+        await OnImported.InvokeAsync(ToolHelper.GetTextListFromString(Text));
+        Dialog = false;
+        StateHasChanged();
+    }
+
+    public async Task Refresh(bool dialog)
+    {
+        Dialog = dialog;
+
+        StateHasChanged();
+    }
+}

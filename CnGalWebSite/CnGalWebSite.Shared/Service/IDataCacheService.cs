@@ -133,6 +133,8 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<List<EntryInforTipViewModel>> PublishGameTimesDataCatche { get; set; }
 
+        IPageModelCatche<List<RoleBrithdayViewModel>> RoleBrithdaysDataCatche { get; set; }
+
         IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
 
         IPageModelCatche<List<MainImageCardModel>> HomeListCardsCache { get; set; }

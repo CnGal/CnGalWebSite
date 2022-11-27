@@ -2,6 +2,7 @@
 using CnGalWebSite.APIServer.Model;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.Models;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Tables;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -88,6 +89,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
         public DbSet<UserMonitor> UserMonitors { get; set; }
         public DbSet<UserReviewEditRecord> UserReviewEditRecords { get; set; }
         public DbSet<Video> Videos { get; set; }
+        public DbSet<RoleBirthday> RoleBirthdays { get; set; }
 
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
         {
@@ -134,6 +136,9 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<Vote>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Lottery>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Disambig>().HasIndex(g => g.Name).IsUnique();
+
+            //限定外键唯一
+            modelBuilder.Entity<RoleBirthday>().HasIndex(g => g.RoleId).IsUnique();
             modelBuilder.Entity<GameScoreTableModel>().HasIndex(g => g.GameId).IsUnique();
             modelBuilder.Entity<SteamInfor>().HasIndex(g => g.SteamId).IsUnique();
             modelBuilder.Entity<SteamInforTableModel>().HasIndex(g => g.SteamId).IsUnique();

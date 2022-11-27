@@ -426,7 +426,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             };
 
             var entries = games.ToList();
-            entries.RemoveAll(s => s == "幻觉" || s == "画师" || s == "她");
+            entries.RemoveAll(s => s == "幻觉" || s == "画师" || s == "她" || s == "人间");
 
             //查找关联词条
             foreach (var item in entries)

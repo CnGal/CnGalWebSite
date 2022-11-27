@@ -28,7 +28,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         [Display(Name = "动态类别")]
         public string NewsType { get; set; }
 
-
+        [Display(Name = "本人创作")]
+        public bool IsCreatedByCurrentUser { get; set; }
         [Display(Name = "原作者")]
         public string OriginalAuthor { get; set; }
         [Display(Name = "原文链接")]

@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.DataModel.ViewModel.Anniversaries;
+using System;
 
 namespace CnGalWebSite.DataModel.ViewModel.Theme
 {
@@ -18,6 +19,11 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         public bool IsTransparent { get; set; } = true;
 
         /// <summary>
+        /// 是否扩展到整个屏幕显示
+        /// </summary>
+        public bool IsExtendEntireScreen { get; set; }
+
+        /// <summary>
         /// 是否隐藏文章目录
         /// </summary>
         public bool IsHiddeArticleCatalog { get; set; }
@@ -29,6 +35,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         public DisplayMode ListDisplayMode { get; set; }
 
         public AnniversariesSetting AnniversariesSetting { get; set; } = new AnniversariesSetting();
+
+        public DateTime LastDisplayBrithdayTime { get; set; }
     }
 
     public enum DisplayMode
