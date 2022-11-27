@@ -1,22 +1,23 @@
 ﻿<div>
     <div class=" mb-3 ">
-        <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainCard Model="Model" HiddenButton ForceSmall/>
+        <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainCard Model="Model" HiddenButton ForceSmall />
     </div>
-      
-        <div class="mb-3">
-            <CnGalWebSite.Shared.MasaComponent.PC.Videos.BasicInforCard Model="Model" />
-        </div>
-        @if (Model.Pictures.Count != 0)
-        {
-            <div class="mb-3">
-                <CnGalWebSite.Shared.MasaComponent.PC.Videos.ImagesCard Model="Model" />
-            </div>
-        }
 
-        <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainPageCard Model="Model" />
-        <CnGalWebSite.Shared.MasaComponent.PC.Videos.RelevancesCard Model="Model" />
-        <CnGalWebSite.Shared.MasaComponent.PC.Videos.OutlinksCard Model="Model" />
+    <div class="mb-3">
+        <CnGalWebSite.Shared.MasaComponent.PC.Videos.BasicInforCard Model="Model" />
     </div>
+    @if (Model.Pictures.Count != 0)
+    {
+        <div class="mb-3">
+            <CnGalWebSite.Shared.MasaComponent.PC.Videos.ImagesCard Model="Model" />
+        </div>
+    }
+
+    <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainPageCard Model="Model" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="Model.RelatedVideos" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Videos.RelevancesCard Model="Model" />
+    <CnGalWebSite.Shared.MasaComponent.PC.Videos.OutlinksCard Model="Model" />
+</div>
 
     @code {
         [Parameter]

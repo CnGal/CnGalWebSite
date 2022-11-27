@@ -5658,6 +5658,13 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 return exammines.Any() ? await GenerateModelFromExamines(exammines) : throw new Exception("未找到该周边");
 
             }
+            else if (model is Video)
+            {
+                var video = model as Video;
+                var exammines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.VideoId == video.Id && s.IsPassed == true).OrderBy(s => s.Id).ToListAsync();
+                return exammines.Any() ? await GenerateModelFromExamines(exammines) : throw new Exception("未找到该视频");
+
+            }
             else
             {
                 throw new Exception("不支持的类型");
@@ -5701,6 +5708,15 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     await _peripheryService.UpdatePeripheryDataAsync(periphery, item);
                 }
                 return periphery;
+            }
+            else if (examines.FirstOrDefault().VideoId != null)
+            {
+                var video = new Video();
+                foreach (var item in examines)
+                {
+                    await _videoService.UpdateData(video, item);
+                }
+                return video;
             }
             else
             {
