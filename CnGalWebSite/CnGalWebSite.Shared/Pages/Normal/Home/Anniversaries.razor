@@ -53,6 +53,7 @@
     {
         if (firstRender)
         {
+            NavigationManager.LocationChanged -= LocationChanged;
             NavigationManager.LocationChanged += LocationChanged;
         }
     }
@@ -60,7 +61,7 @@
     protected override async Task OnInitializedAsync()
     {
 
-            LocationChanged(null, null);
+        LocationChanged(null, null);
 
     }
 

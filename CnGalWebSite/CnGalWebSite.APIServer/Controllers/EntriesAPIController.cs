@@ -1364,6 +1364,12 @@ namespace CnGalWebSite.APIServer.Controllers
             return await _entryRepository.GetAll().AsNoTracking().Where(s => s.Name == name_).Select(s => s.Id).FirstOrDefaultAsync();
         }
 
+        /// <summary>
+        /// 获取每月发布的游戏
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<List<EntryInforTipViewModel>>> GetPublishGamesByTime([FromQuery]int year, [FromQuery]int month)
@@ -1382,6 +1388,17 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             return model;
+        }
+
+        /// <summary>
+        /// 获取每月角色生日
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<RoleBrithdayViewModel>>> GetRoleBrithdaysByTime([FromQuery] int month)
+        {
+            return await _entryService.GetBirthdayRoles(month);
         }
     }
 }

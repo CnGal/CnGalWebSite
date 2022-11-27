@@ -990,6 +990,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
             newArticle.DisplayName = model.DisplayName;
             newArticle.NewsType = model.NewsType;
             newArticle.SmallBackgroundPicture = model.SmallBackgroundPicture;
+            newArticle.IsCreatedByCurrentUser=model.IsCreatedByCurrentUser;
         }
         public void SetDataFromEditArticleMainPageViewModel(Article newArticle, EditArticleMainPageViewModel model)
         {

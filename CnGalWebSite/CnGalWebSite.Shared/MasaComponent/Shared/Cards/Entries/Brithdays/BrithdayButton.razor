@@ -1,0 +1,108 @@
+﻿@inject NavigationManager NavigationManager
+@inject IDataCacheService _dataCacheService
+@inject HttpClient Http
+
+@implements IDisposable
+
+@if (Model != null)
+{
+    <MMenu OffsetY @bind-Value="menu" Top>
+        <ActivatorContent Context="m">
+            <MTooltip Bottom>
+                <ActivatorContent Context="c">
+                    @{
+                        var attrs = new Dictionary<string, object>();
+                        m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                        c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
+                    }
+                    <MButton Fab Small Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs" Dark>
+                        <MIcon>mdi-cake-variant </MIcon>
+                    </MButton>
+                </ActivatorContent>
+                <ChildContent>
+                    <span>生日</span>
+                </ChildContent>
+            </MTooltip>
+        </ActivatorContent>
+
+        <ChildContent>
+            <div class="bg-theme p-3" style="@(Model.Count>2?"width:460px;":"width:230px;")">
+                <div class="w-100">
+                    <BrithdayCard Model="Model" />
+                </div>
+            </div>
+        </ChildContent>
+    </MMenu>
+}
+
+@code {
+
+    [Parameter]
+    public string Class { get; set; }
+
+    private bool menu { get; set; }
+
+    List<EntryInforTipViewModel> Model;
+
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalog masaCatalog;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+        _dataCacheService.RefreshRequsted += RefreshRequsted;
+
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+
+            try
+            {
+                var url = $"?month={DateTime.Now.ToCstTime().Month}";
+
+                Model = (await _dataCacheService.RoleBrithdaysDataCatche.GetCache(url)).Where(s => s.Brithday.Day == DateTime.Now.ToCstTime().Day).Select(s => s.Infor).ToList();
+
+
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorHandler.ProcessError(ex, "获取角色生日失败");
+            }
+        }
+
+        await Task.Delay(500);
+
+        if ( _dataCacheService.ThemeSetting.LastDisplayBrithdayTime.Date != DateTime.Now.ToCstTime().Date)
+        {
+            menu = true;
+            _dataCacheService.ThemeSetting.LastDisplayBrithdayTime = DateTime.Now.ToCstTime();
+
+
+            await _dataCacheService.SavaTheme.InvokeAsync();
+            StateHasChanged();
+
+        }
+    }
+    public async void RefreshRequsted(object sender, EventArgs args)
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
+}

@@ -77,5 +77,11 @@ namespace CnGalWebSite.APIServer.Application.Entries
         void SetDataFromEditTagsViewModel(Entry newEntry, EditEntryTagViewModel model, List<Tag> tags);
 
         void SetDataFromEditAudioViewModel(Entry newEntry, EditAudioViewModel model);
+
+
+        Task UpdateRoleBrithday();
+
+        Task<List<RoleBrithdayViewModel>> GetBirthdayRoles(int month);
+
     }
 }

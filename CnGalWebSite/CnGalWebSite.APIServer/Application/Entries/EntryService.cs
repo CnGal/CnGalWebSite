@@ -3,6 +3,7 @@ using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Controllers;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.ExamineModel.Entries;
@@ -28,6 +29,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using Tag = CnGalWebSite.DataModel.Model.Tag;
 
 namespace CnGalWebSite.APIServer.Application.Entries
@@ -42,11 +44,13 @@ namespace CnGalWebSite.APIServer.Application.Entries
         private readonly IArticleService _articleService;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IRepository<Video, long> _videoRepository;
+        private readonly IRepository<RoleBirthday, long> _roleBirthdayRepository;
+        private readonly ILogger<EntryService> _logger;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Entry>, string, BootstrapBlazor.Components.SortOrder, IEnumerable<Entry>>> SortLambdaCacheEntry = new();
 
         public EntryService(IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<DataModel.Model.Tag, int> tagRepository, IRepository<Article, int> articleRepository, IRepository<PlayedGame, long> playedGameRepository,
-        IRepository<Examine, long> examineRepository, IArticleService articleService, IRepository<Video, long> videoRepository)
+        IRepository<Examine, long> examineRepository, IArticleService articleService, IRepository<Video, long> videoRepository, IRepository<RoleBirthday, long> roleBirthdayRepository, ILogger<EntryService> logger)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
@@ -56,6 +60,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
             _articleService = articleService;
             _playedGameRepository = playedGameRepository;
             _videoRepository = videoRepository;
+            _roleBirthdayRepository=roleBirthdayRepository;
+            _logger = logger;
         }
 
         public async Task<PagedResultDto<Entry>> GetPaginatedResult(GetEntryInput input)
@@ -1112,7 +1118,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     {
                         cvs.Append("、");
                     }
-                    cvs.Append(String.IsNullOrWhiteSpace(item.CustomName) ? (item.ToEntryNavigation?.Name ?? item.Name) : item.CustomName);
+                    cvs.Append(string.IsNullOrWhiteSpace(item.CustomName) ? (item.ToEntryNavigation?.Name ?? item.Name) : item.CustomName);
                 }
                 if (cvs.Length > 0)
                 {
@@ -3088,6 +3094,89 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
             }
         }
+
+        /// <summary>
+        /// 更新角色生日到缓存
+        /// </summary>
+        /// <returns></returns>
+        public async Task UpdateRoleBrithday()
+        {
+            var roles = await _entryRepository.GetAll().AsNoTracking()
+               .Include(s => s.Information)
+               .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+               .Where(s => s.Type == EntryType.Role && s.Information.Any(s => s.DisplayName == "生日"&&string.IsNullOrWhiteSpace(s.DisplayValue)==false))
+               .Select(s => new
+               {
+                   s.Id,
+                   s.Name,
+                   Brithday = s.Information.FirstOrDefault(s => s.DisplayName == "生日").DisplayValue
+               })
+               .ToListAsync();
+
+            foreach(var item in roles)
+            {
+                DateTime day;
+                try
+                {
+                    var temp = item.Brithday.Replace("日", "").Split("月");
+                    day = new DateTime(2020, int.Parse(temp[0]), int.Parse(temp[1]), 0, 0, 0, DateTimeKind.Utc);
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogError(ex,"更新角色 - {name}({id}) 生日时，转换日期（{day}）失败", item.Name, item.Id, item.Brithday);
+                    continue;
+                }
+               
+                var brithday = await _roleBirthdayRepository.GetAll().FirstOrDefaultAsync(s => s.RoleId == item.Id);
+                if(brithday==null)
+                {
+                    brithday = new RoleBirthday
+                    {
+                        RoleId = item.Id,
+                        Birthday = day
+                    };
+
+                  
+                    await _roleBirthdayRepository.InsertAsync(brithday);
+                    _logger.LogError("添加角色 - {name}({id}) 生日：{brithday}", item.Name, item.Id, item.Brithday);
+                }
+                else if(brithday.Birthday != day)
+                {
+                    brithday.Birthday = day;
+                    await _roleBirthdayRepository.UpdateAsync(brithday);
+                    _logger.LogError("更新角色 - {name}({id}) 生日：{brithday}", item.Name, item.Id, item.Brithday);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// 获取今天生日的角色
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<RoleBrithdayViewModel>> GetBirthdayRoles(int month)
+        {
+            List<RoleBrithdayViewModel> model = new List<RoleBrithdayViewModel>();
+            var date = DateTime.UtcNow;
+
+            var roles = await _roleBirthdayRepository.GetAll().AsNoTracking()
+                .Include(s => s.Role).ThenInclude(s=>s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
+                .Where(s=>s.Birthday.Date.Month==month)
+                .ToListAsync();
+
+            foreach (var role in roles)
+            {
+                model.Add(new RoleBrithdayViewModel
+                {
+                    Brithday = role.Birthday,
+                    Infor = _appHelper.GetEntryInforTipViewModel(role.Role)
+                });
+                 
+            }
+
+            return model;
+        }
+
 
 
     }

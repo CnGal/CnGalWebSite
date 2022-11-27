@@ -89,17 +89,13 @@
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/articles/editarticle/" + Model.Id)" OnClickRevoke="OnRevoke"></CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton>
         }
-        @if (HiddenCatalog == false)
-        {
-            <CatalogCard Model="Model" />
-        }
 
 
         <MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
         <div style=" display: flex; flex-direction: column; align-items: flex-end;">
             <div>
                 <i class="fa fa-pencil fa-fw font-color"></i>
-                <span class="font-color me-2">最后编辑：@Model.LastEditTime.ToString("yyyy-MM-dd HH:mm")</span>
+                <span class="font-color me-2">最后编辑：@Model.LastEditTime.ToString("G")</span>
             </div>
         </div>
 

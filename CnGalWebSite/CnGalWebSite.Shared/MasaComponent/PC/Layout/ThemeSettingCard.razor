@@ -46,6 +46,15 @@
         <MCardText Class="pb-0">
             <MSwitch Value="_show" ValueChanged="BackgroundValueChanged" Label="@(_show?"显示背景图":"隐藏背景图")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
         </MCardText>
+        <MCardTitle Class="text-h6">
+            扩展显示范围
+        </MCardTitle>
+        <MCardText>
+            选中后将把显示范围扩大到整个页面，也就是两边不再留白
+        </MCardText>
+        <MCardText Class="pb-0">
+            <MSwitch Value="_expand" ValueChanged="ExpandValueChanged" Label="@(_expand?"扩展显示范围":"限制显示范围")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
+        </MCardText>
         <MCardActions>
             <MSpacer></MSpacer>
             <MButton Color="green darken-1"
@@ -61,6 +70,7 @@
 
     StringNumber colorString = "pink lighten-2";
     bool _show = false;
+    bool _expand= false;
     bool Dialog { get; set; }
 
     [CascadingParameter]
@@ -128,6 +138,16 @@
     {
         _show = show;
         _dataCacheService.ThemeSetting.IsTransparent = show;
+
+        if (CnGalRootTip != null)
+        {
+            await CnGalRootTip.SaveTheme();
+        }
+    }
+    public async Task ExpandValueChanged(bool expand)
+    {
+        _expand = expand;
+        _dataCacheService.ThemeSetting.IsExtendEntireScreen = expand;
 
         if (CnGalRootTip != null)
         {

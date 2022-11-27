@@ -282,12 +282,12 @@ namespace CnGalWebSite.DataModel.Helper
             }
             return null;
         }
+
         /// <summary>
         /// 批量导入抽奖奖项
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-
         public static List<string> GetTextListFromString(string text)
         {
             var result = new List<string>();

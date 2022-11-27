@@ -461,6 +461,7 @@ namespace CnGalWebSite.APIServer.Controllers
             model.DisplayName = article.DisplayName;
 
             model.SmallBackgroundPicture = article.SmallBackgroundPicture;
+            model.IsCreatedByCurrentUser = article.IsCreatedByCurrentUser;
 
 
             return model;

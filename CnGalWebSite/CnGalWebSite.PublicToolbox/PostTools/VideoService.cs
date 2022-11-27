@@ -169,7 +169,7 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 
             //查找关联词条
             var entries = games.ToList();
-            entries.RemoveAll(s => s == "幻觉" || s == "画师" || s == "她");
+            entries.RemoveAll(s => s == "幻觉" || s == "画师" || s == "她" || s == "人间");
 
             foreach (var infor in entries)
             {

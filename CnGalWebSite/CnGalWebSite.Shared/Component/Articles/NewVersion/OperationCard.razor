@@ -7,10 +7,10 @@
             <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ShareButton Title="@(Model.Type.GetDisplayName()+" - "+Model.Name)" Class="ms-4" Text="@($"【{Model.Type.GetDisplayName()}】《{Model.Name}》\n{Model.BriefIntroduction}")" />
         }
 
-                @if (Model.Authority)
-                {
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Article" Id="Model.Id" @bind-IsHidden="@Model.IsHidden" @bind-IsEdit="@Model.IsEdit" Class="ms-4" />
-                }
+        @if (Model.Authority)
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Article" Id="Model.Id" @bind-IsHidden="@Model.IsHidden" @bind-IsEdit="@Model.IsEdit" Class="ms-4" />
+        }
 
     </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>

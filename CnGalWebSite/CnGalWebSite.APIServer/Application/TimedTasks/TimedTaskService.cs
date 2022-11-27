@@ -1,5 +1,6 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.BackUpArchives;
+using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.News;
@@ -35,12 +36,13 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
         private readonly IExamineService _examineService;
         private readonly ILotteryService _lotteryService;
         private readonly IFileService _fileService;
+        private readonly IEntryService _entryService;
         private readonly ILogger<TimedTaskService> _logger;
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<TimedTask>, string, SortOrder, IEnumerable<TimedTask>>> SortLambdaCacheApplicationUser = new();
 
         public TimedTaskService(IRepository<TimedTask, int> timedTaskRepository, ISteamInforService steamInforService, IBackUpArchiveService backUpArchiveService, ITableService tableService, ILogger<TimedTaskService> logger,
-        IPerfectionService perfectionService, ISearchHelper searchHelper, INewsService newsService, IExamineService examineService, ILotteryService lotteryService, IFileService fileService)
+        IPerfectionService perfectionService, ISearchHelper searchHelper, INewsService newsService, IExamineService examineService, ILotteryService lotteryService, IFileService fileService, IEntryService entryService)
         {
             _timedTaskRepository = timedTaskRepository;
             _steamInforService = steamInforService;
@@ -53,6 +55,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
             _lotteryService = lotteryService;
             _fileService = fileService;
             _logger = logger;
+            _entryService = entryService;
         }
 
         public Task<QueryData<ListTimedTaskAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListTimedTaskAloneModel searchModel)
@@ -220,6 +223,9 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                         }
 
                         await _fileService.TransferAllMainImages(maxNum);
+                        break;
+                    case TimedTaskType.UpdateRoleBrithdays:
+                        await _entryService.UpdateRoleBrithday();
                         break;
                 }
                 //记录执行时间

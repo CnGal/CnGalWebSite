@@ -66,7 +66,10 @@ namespace CnGalWebSite.DataModel.Model
         /// </summary>
         public ApplicationUser CreateUser { get; set; }
         public string CreateUserId { get; set; }
-
+        /// <summary>
+        /// 是否为用户本人创作
+        /// </summary>
+        public bool IsCreatedByCurrentUser { get; set; } = false;
         /// <summary>
         /// 阅读数
         /// </summary>

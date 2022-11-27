@@ -4,28 +4,28 @@
 <ErrorHandler>
     <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" />
     <ImagesLargeViewTip />
-    <FloatToolTip @ref="floatToolTip" />
+    <FloatToolTip @ref="FloatTool" />
     <UserLicenseAgreementTip />
     <audio id="bgMusic"></audio>
-        <CascadingValue Value=this IsFixed="true">
-            @ChildContent
-        </CascadingValue>
+    <CascadingValue Value=this IsFixed="true">
+        @ChildContent
+    </CascadingValue>
 </ErrorHandler>
 
 
 
-    @code {
-        [Parameter]
-        public RenderFragment ChildContent { get; set; }
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
 
-        CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip styleTip;
-        FloatToolTip floatToolTip;
+    CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip styleTip;
+    public FloatToolTip FloatTool { get; set; }
 
-        public async Task SaveTheme()
+    public async Task SaveTheme()
+    {
+        if (styleTip != null)
         {
-            if (styleTip != null)
-            {
-                await styleTip.SaveTheme();
-            }
+            await styleTip.SaveTheme();
         }
     }
+}

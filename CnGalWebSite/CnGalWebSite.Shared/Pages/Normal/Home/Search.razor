@@ -116,6 +116,7 @@
     {
         if (firstRender)
         {
+            NavigationManager.LocationChanged -= LocationChanged;
             NavigationManager.LocationChanged += LocationChanged;
             LocationChanged(null, null);
         }
@@ -197,7 +198,7 @@
     {
         if (e.Code == "Enter" || e.Code == "NumpadEnter")
         {
-           await OnSearchString();
+            await OnSearchString();
         }
     }
 

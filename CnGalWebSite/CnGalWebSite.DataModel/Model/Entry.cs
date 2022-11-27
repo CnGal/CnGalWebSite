@@ -373,6 +373,16 @@ namespace CnGalWebSite.DataModel.Model
         public string Thumbnail { get; set; }
     }
 
+    public class RoleBirthday
+    {
+        public long Id { get; set; }
+
+        public DateTime Birthday { get;set;}
+
+        public Entry Role { get; set; }
+        public int RoleId { get; set; }
+    }
+
     public enum GamePlatformType
     {
         [Display(Name = "Windows")]

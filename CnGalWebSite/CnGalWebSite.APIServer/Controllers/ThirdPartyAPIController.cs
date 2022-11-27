@@ -56,7 +56,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<string>> GetBilibiliVideoInfor([FromQuery]string id)
         {
-            return await _httpClient.GetStringAsync($"http://api.bilibili.com/x/web-interface/view/detail?{(id[0] == 'B' || id[0] == 'b' ? $"bvid=" : "aid=")}{id}");
+            return await _httpClient.GetStringAsync($"http://api.bilibili.com/x/web-interface/view/detail?{(id[0] == 'B' || id[0] == 'b' ? $"bvid={id}" : $"aid={id.Replace("av","")}")}");
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<string>>> GetBilibiliVideoImageImposition([FromQuery] string id)
         {
-            var json = await _httpClient.GetStringAsync($"http://api.bilibili.com/pvideo?aid={(id[0] == 'B' || id[0] == 'b' ? id.ToBilibiliAid() : id)}");
+            var json = await _httpClient.GetStringAsync($"http://api.bilibili.com/pvideo?aid={(id[0] == 'B' || id[0] == 'b' ? id.ToBilibiliAid() : id.Replace("av", ""))}");
             var result = JObject.Parse(json);
 
             if (result["code"].ToObject<int>()==0)

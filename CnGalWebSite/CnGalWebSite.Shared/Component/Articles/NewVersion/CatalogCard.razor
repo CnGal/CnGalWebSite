@@ -1,9 +1,23 @@
-﻿
-<div style=" box-sizing: border-box; min-width: 0px; padding-bottom: 20px; position: sticky; margin-left: -280px; top: 88px; width: 250px; z-index: 1; float: left; ">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalog Model="@Model.MainPage" Url="@($"/articles/index/{Model.Id}")"/>
-</div>
+﻿@inject IDataCacheService _dataCacheService
+
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            目录
+        </MCardTitle>
+        <MCardText Class="pb-0">
+            点击标题可快速跳转到对应位置，未加载的图片可能会影响定位准确性
+        </MCardText>
+        <MCardText>
+        </MCardText>
+    </MCard>
+</MDialog>
 
 @code {
-    [Parameter]
     public ArticleViewModel Model { get; set; } = new ArticleViewModel();
+
+    bool Dialog { get; set; }
+
+
 }

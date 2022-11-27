@@ -49,6 +49,7 @@ namespace CnGalWebSite.Shared
             _dataCacheService.RefreshApp = EventCallback.Factory.Create(this, async () => await OnRefresh());
             _dataCacheService.OpenNewPage = EventCallback.Factory.Create(this, (string s) => OpenNewPage(s));
             _dataCacheService.ThemeChanged = EventCallback.Factory.Create(this, (string s) => ThemeChanged(s));
+            _dataCacheService.SavaTheme = EventCallback.Factory.Create(this, async () =>await cngalRootTip?.SaveTheme());
             _dataCacheService.ShareLink = EventCallback.Factory.Create(this, (ShareLinkModel s) => ShareLink(s));
             _dataCacheService.Quit = EventCallback.Factory.Create(this, () => Quit());
 

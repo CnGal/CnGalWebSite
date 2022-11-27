@@ -6,6 +6,7 @@
                     Color="@_dataCacheService.ThemeSetting.Theme">
         @foreach (var item in items)
         {
+            <MBorder Value="@(selectedItem == item.Text)" Offset="false" Width="4" Color="@_dataCacheService.ThemeSetting.Theme">
                 <MListItem Value="@item.Text">
                     <MListItemIcon>
                         <MIcon>@item.Icon</MIcon>
@@ -14,8 +15,9 @@
                         <MListItemTitle>@item.Text</MListItemTitle>
                     </MListItemContent>
                 </MListItem>
-        }
-    </MListItemGroup>
+                </MBorder>
+                }
+        </MListItemGroup>
 </MList>
 
 @code {
