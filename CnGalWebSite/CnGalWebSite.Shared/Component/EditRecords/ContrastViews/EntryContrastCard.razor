@@ -49,7 +49,7 @@
     @if (Model.Audio.Any())
     {
         <div class="mb-3">
-            <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="Model"/>
+            <CnGalWebSite.Shared.Component.Entries.NewVersion.AudioCard Model="Model" />
         </div>
     }
     @if (Model.NewsOfEntry.Count > 0)
@@ -59,6 +59,7 @@
         </div>
 
     }
+    <CnGalWebSite.Shared.MasaComponent.PC.Videos.Relevances.GroupCard Model="Model.VideoRelevances" />
     @if (Model.ArticleRelevances.Count != 0 || Model.EntryRelevances.Count != 0 || Model.OtherRelevances.Count != 0 || Model.StaffGames.Count != 0 || Model.Roles.Count != 0)
     {
         <div>
