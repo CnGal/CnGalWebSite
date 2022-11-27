@@ -80,7 +80,7 @@
 
         await Task.Delay(500);
 
-        if ( _dataCacheService.ThemeSetting.LastDisplayBrithdayTime.Date != DateTime.Now.ToCstTime().Date)
+        if ( _dataCacheService.ThemeSetting.LastDisplayBrithdayTime.Date != DateTime.Now.ToCstTime().Date&&Model.Any())
         {
             menu = true;
             _dataCacheService.ThemeSetting.LastDisplayBrithdayTime = DateTime.Now.ToCstTime();

@@ -58,10 +58,10 @@
 
         }
 
-        <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" StopPropagation OnClick="OnClickSetting">
-            <MIcon Left>mdi-cog</MIcon>
-            主题设置
-        </MButton>
+    <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" StopPropagation OnClick="OnClickSetting">
+        <MIcon Left>mdi-cog</MIcon>
+        <span style="background: linear-gradient(to right,purple,red); -webkit-background-clip: text; color: transparent;">主题设置</span>
+    </MButton>
 
 
         <MButton Text Block Color="@(_dataCacheService.ThemeSetting.Theme)" OnClick="@(()=>OnNav("/account/logout"))">
