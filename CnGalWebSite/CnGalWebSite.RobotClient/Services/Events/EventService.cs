@@ -22,6 +22,7 @@ namespace CnGalWebSite.RobotClient.Services.Events
             _robotEventRepository = robotEventRepository;
             _eventExecuteInforRepository = eventExecuteInforRepository;
         }
+
         /// <summary>
         /// 获取当前时间点定时事件
         /// </summary>
