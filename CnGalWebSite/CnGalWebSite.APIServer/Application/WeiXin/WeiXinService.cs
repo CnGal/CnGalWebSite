@@ -1,13 +1,16 @@
 ﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Nest;
 using Senparc.Weixin.MP.CommonAPIs;
 using Senparc.Weixin.MP.Entities.Menu;
 using System;
@@ -25,12 +28,15 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
         private readonly IConfiguration _configuration;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
+        private readonly IRepository<RoleBirthday, long> _roleBirthdayRepository;
         private readonly IArticleService _articleService;
+        private readonly IEntryService _entryService;
         private readonly IAppHelper _appHelper;
         private readonly ISearchHelper _searchHelper;
         private readonly ISteamInforService _steamService;
 
-        public WeiXinService(IConfiguration configuration, IRepository<Entry, int> entryRepository, IRepository<Article, long> articleRepository, IArticleService articleService, IAppHelper appHelper, ISteamInforService steamService, ISearchHelper searchHelper)
+        public WeiXinService(IConfiguration configuration, IRepository<Entry, int> entryRepository, IRepository<Article, long> articleRepository, IArticleService articleService, IAppHelper appHelper, ISteamInforService steamService, ISearchHelper searchHelper, IEntryService entryService,
+            IRepository<RoleBirthday, long> roleBirthdayRepository)
         {
             _configuration = configuration;
             _entryRepository = entryRepository;
@@ -39,6 +45,8 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             _appHelper = appHelper;
             _steamService = steamService;
             _searchHelper = searchHelper;
+            _entryService = entryService;
+            _roleBirthdayRepository = roleBirthdayRepository;
         }
 
         public void CreateMenu()
@@ -527,6 +535,31 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
             {
                 return null;
             }
+        }
+
+        public async Task<string> GetRoleBirthdays(bool plainText = false)
+        {
+            var now = DateTime.Now.ToCstTime();
+            var roles = await _roleBirthdayRepository.GetAll().AsNoTracking()
+              .Where(s => s.Birthday.Date.Month == now.Month && s.Birthday.Date.Day == now.Day)
+              .Select(s=>s.RoleId)
+              .ToListAsync();
+
+            if (roles.Any()==false)
+            {
+                return null;
+            }
+
+            var sb = new StringBuilder();
+            foreach(var item in  roles)
+            {
+                sb.AppendLine(await GetEntryInfor(item, plainText,true));
+                sb.AppendLine();
+            }
+
+            sb.Append($"🎂 今天是她{(roles.Count > 1 ? "们" : "")}的生日哦~~~");
+
+            return sb.ToString();
         }
     }
 }

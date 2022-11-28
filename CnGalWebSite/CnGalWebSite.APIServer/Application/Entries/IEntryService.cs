@@ -81,7 +81,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         Task UpdateRoleBrithday();
 
-        Task<List<RoleBrithdayViewModel>> GetBirthdayRoles(int month);
+        Task<List<RoleBrithdayViewModel>> GetBirthdayRoles(int month, int day = 0);
 
     }
 }

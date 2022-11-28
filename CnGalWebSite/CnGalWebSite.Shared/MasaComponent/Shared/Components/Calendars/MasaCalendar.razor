@@ -35,9 +35,9 @@
         <div style="width: 14.28%; display: flex; align-items: center; justify-content: center;">五</div>
         <div style="width: 14.28%;  display: flex; align-items: center; justify-content: center;">六</div>
     </div>
-    @for (var k = 0; k < 5; k++)
+    @for (var k = 0; k < 6; k++)
     {
-        <div style="@(("display:flex;border-bottom :thin solid rgba(0,0,0,.12);")+"min-height: 100px;")">
+        <div style="@(($"display:flex;border-bottom :thin solid rgba(0,0,0,.{(k==4?"20":"12")});")+"min-height: 100px;")">
             @for (int i = 0; i < 7; i++)
             {
                 var date = Begin.AddDays(k * 7 + i);
@@ -73,7 +73,7 @@
         var temp = Month.AddDays(-Month.Day + 1);
 
         Begin = temp.AddDays(-(int)temp.DayOfWeek );
-        End = Begin.AddDays(35);
+        End = Begin.AddDays(42);
 
         StateHasChanged();
 
