@@ -180,55 +180,64 @@ namespace CnGalWebSite.RobotClient.Services.Messages
 
             List<Message> messages = new();
 
-            while (true)
+            while(true)
             {
-                if (vaule.Contains("[image="))
+                var item = vaule.MidStrEx("[", "]");
+                if(string.IsNullOrWhiteSpace(item))
                 {
-                    string imageStr = vaule.MidStrEx("[image=", "]");
-
-                    if (string.IsNullOrWhiteSpace(imageStr) == false)
-                    {
-                        vaule = vaule.Replace("[image=" + imageStr + "]", "");
-                        //修正一部分图片链接缺省协议
-                        if (imageStr.Contains("http") == false)
-                        {
-                            imageStr = "https:" + imageStr;
-                        }
-                        messages.Add(new Image(url: imageStr.Replace("http://image.cngal.org/", "https://image.cngal.org/")));
-                    }
-                }
-                else if (vaule.Contains("[声音="))
-                {
-                    string voiceStr = vaule.MidStrEx("[声音=", "]");
-
-                    if (string.IsNullOrWhiteSpace(voiceStr) == false)
-                    {
-                        vaule = vaule.Replace("[声音=" + voiceStr + "]", "");
-                        messages.Add(new Voice(url: voiceStr.Replace("http://res.cngal.org/", "https://res.cngal.org/")));
-
-                    }
-                }
-
-                else if (vaule.Contains("[@"))
-                {
-                    string idStr = vaule.MidStrEx("[@", "]");
-                    if (long.TryParse(idStr, out long id))
-                    {
-
-                        vaule = vaule.Replace("[@" + idStr + "]", "");
-                        messages.Add(new At(id, idStr));
-                    }
+                    messages.Add(new Plain(vaule));
+                    break;
                 }
                 else
                 {
-                    break;
+                    var infor = "";
+                    //尝试获取命令前方的字符串
+                    if (vaule.StartsWith($"[{item}]")==false)
+                    {
+                        infor =  vaule.Split($"[{item}]").FirstOrDefault();
+                        messages.Add(new Plain(infor));
+                    }
+                    //删除命令及前方字符串
+                    vaule = vaule.Replace($"{infor}[{item}]", "");
+                  
+                    if (item.StartsWith("image="))
+                    {
+                        string imageStr = item.Replace("image=","");
+
+                        if (string.IsNullOrWhiteSpace(imageStr) == false)
+                        {
+                            //修正一部分图片链接缺省协议
+                            if (imageStr.Contains("http") == false)
+                            {
+                                imageStr = "https:" + imageStr;
+                            }
+                            messages.Add(new Image(url: imageStr.Replace("http://image.cngal.org/", "https://image.cngal.org/")));
+                        }
+                    }
+                    else if (item.StartsWith("声音="))
+                    {
+                        string voiceStr = item.Replace("声音=","");
+
+                        if (string.IsNullOrWhiteSpace(voiceStr) == false)
+                        {
+                            messages.Add(new Voice(url: voiceStr.Replace("http://res.cngal.org/", "https://res.cngal.org/")));
+
+                        }
+                    }
+
+                    else if (item.StartsWith("@"))
+                    {
+                        string idStr = item.Replace("@", "");
+                        if (long.TryParse(idStr, out long id))
+                        {
+                            messages.Add(new At(id, idStr));
+                        }
+                    }
+                    else
+                    {
+                        messages.Add(new Plain($"[{item}]"));
+                    }
                 }
-            }
-
-
-            if (string.IsNullOrWhiteSpace(vaule) == false)
-            {
-                messages.Add(new Plain(vaule));
             }
 
             return string.IsNullOrWhiteSpace(vaule) && messages.Count == 0 ? null : messages.ToArray();

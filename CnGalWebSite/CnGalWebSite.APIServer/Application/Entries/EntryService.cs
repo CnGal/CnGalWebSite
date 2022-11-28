@@ -3154,14 +3154,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
         /// 获取今天生日的角色
         /// </summary>
         /// <returns></returns>
-        public async Task<List<RoleBrithdayViewModel>> GetBirthdayRoles(int month)
+        public async Task<List<RoleBrithdayViewModel>> GetBirthdayRoles(int month, int day=0)
         {
             List<RoleBrithdayViewModel> model = new List<RoleBrithdayViewModel>();
             var date = DateTime.UtcNow;
 
             var roles = await _roleBirthdayRepository.GetAll().AsNoTracking()
                 .Include(s => s.Role).ThenInclude(s=>s.EntryRelationFromEntryNavigation).ThenInclude(s=>s.ToEntryNavigation)
-                .Where(s=>s.Birthday.Date.Month==month)
+                .Where(s=>s.Birthday.Date.Month==month&&(day==0||s.Birthday.Date.Day==day))
                 .ToListAsync();
 
             foreach (var role in roles)

@@ -24,5 +24,7 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
         Task<string> GetArticleInfor(int id, bool plainText = false, bool showLink = false);
 
         string GetAboutUsage();
+
+        Task<string> GetRoleBirthdays(bool plainText = false);
     }
 }
