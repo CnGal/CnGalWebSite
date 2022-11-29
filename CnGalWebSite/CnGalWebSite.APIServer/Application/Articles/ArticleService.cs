@@ -578,6 +578,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 Link = article.OriginalLink ?? ("/articles/index/" + article.Id),
                 HappenedTime = article.RealNewsTime ?? article.PubishTime,
                 NewsType = article.NewsType ?? "动态",
+                ArticleId = article.Id
             };
 
             var infor1 = article.Entries.FirstOrDefault(s => s.Type == EntryType.ProductionGroup);

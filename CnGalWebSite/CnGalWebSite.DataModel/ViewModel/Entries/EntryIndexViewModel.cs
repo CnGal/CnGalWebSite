@@ -221,6 +221,11 @@ namespace CnGalWebSite.DataModel.ViewModel
         public string UserId { get; set; }
 
         public DateTime HappenedTime { get; set; }
+
+        /// <summary>
+        /// 文章Id
+        /// </summary>
+        public long ArticleId { get; set; }
     }
 
     public class StaffInforModel

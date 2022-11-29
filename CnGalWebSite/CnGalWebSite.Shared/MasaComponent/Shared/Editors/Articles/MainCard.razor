@@ -36,7 +36,7 @@
                     <DateTimePicker TValue="DateTime" Value="@Model.PubishTime" ValueChanged="OnPubishTimeChanged" ViewMode="DatePickerViewMode .DateTime" DisplayText="发布时间" ShowLabel="true" />
                 </div>
                 <div class="form-group col-12  col-sm-6">
-                    <Checkbox TValue="bool" @bind-Value="Model.IsCreatedByCurrentUser" ShowAfterLabel></Checkbox>
+                    <Checkbox TValue="bool" @bind-Value="Model.IsCreatedByCurrentUser" ShowAfterLabel ShowLabel="false" DisplayText="本人创作"></Checkbox>
                 </div>
                 <div class="form-group col-12">
                     <BootstrapInput @bind-Value="Model.OriginalLink" />

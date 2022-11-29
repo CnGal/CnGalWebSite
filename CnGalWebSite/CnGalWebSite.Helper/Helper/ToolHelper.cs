@@ -873,7 +873,7 @@ namespace CnGalWebSite.DataModel.Helper
                 {
                     continue;
                 }
-                if (item.PropertyType == typeof(bool) && item.Name != "IsReprint" && item.Name != "IsAvailableItem")
+                if (item.PropertyType == typeof(bool) && item.Name != "IsReprint" && item.Name != "IsAvailableItem" && item.Name != "IsCreatedByCurrentUser")
                 {
                     continue;
                 }
