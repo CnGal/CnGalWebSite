@@ -13,6 +13,7 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.Helper.Helper;
 using Microsoft.Extensions.Logging;
 using System.Security.Policy;
+using CnGalWebSite.DataModel.ViewModel.Videos;
 
 namespace CnGalWebSite.PublicToolbox.PostTools
 {
@@ -214,16 +215,30 @@ namespace CnGalWebSite.PublicToolbox.PostTools
 
 
             //获取从词条关联的各个文章
-            //获取从词条关联的各个游戏
             var reArticleIds = subEntry.ArticleRelevances.Select(x => x.Id).ToList();
-            reArticleIds.AddRange(subEntry.ArticleRelevances.Select(x => x.Id));
+            reArticleIds.AddRange(subEntry.NewsOfEntry.Select(x => x.ArticleId));
 
             //替换关联信息
             foreach (var item in reArticleIds)
             {
-                var examineModel = await _httpClient.GetFromJsonAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editarticlerelevances/" + item);
+                var examineModel = await _httpClient.GetFromJsonAsync<EditArticleRelevancesViewModel>(ToolHelper.WebApiPath + "api/articles/editrelevances/" + item);
                 ReplaceEntryName(examineModel.Games, model.SubName, model.HostName);
                 ReplaceEntryName(examineModel.Staffs, model.SubName, model.HostName);
+                ReplaceEntryName(examineModel.Roles, model.SubName, model.HostName);
+                ReplaceEntryName(examineModel.Groups, model.SubName, model.HostName);
+
+                model.Examines.Add(examineModel);
+            }
+
+            //获取从词条关联的各个视频
+            var reVideoIds = subEntry.VideoRelevances.Select(x => x.Id).ToList();
+
+            //替换关联信息
+            foreach (var item in reVideoIds)
+            {
+                var examineModel = await _httpClient.GetFromJsonAsync<EditVideoRelevancesViewModel>(ToolHelper.WebApiPath + "api/videos/editrelevances/" + item);
+                ReplaceEntryName(examineModel.Games, model.SubName, model.HostName);
+                ReplaceEntryName(examineModel.staffs, model.SubName, model.HostName);
                 ReplaceEntryName(examineModel.Roles, model.SubName, model.HostName);
                 ReplaceEntryName(examineModel.Groups, model.SubName, model.HostName);
 
@@ -293,9 +308,10 @@ namespace CnGalWebSite.PublicToolbox.PostTools
             {
                 var result = item.GetType().Name switch
                 {
-                    "EditArticleRelevancesViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/articles/editarticlerelevances", item as EditArticleRelevancesViewModel),
+                    "EditArticleRelevancesViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/articles/editrelevances", item as EditArticleRelevancesViewModel),
                     "EditAddInforViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/EditAddInfor", item as EditAddInforViewModel),
                     "EditRelevancesViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/entries/editrelevances", item as EditRelevancesViewModel),
+                    "EditVideoRelevancesViewModel" => await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/videos/editrelevances", item as EditVideoRelevancesViewModel),
                     _ => null
                 };
 
