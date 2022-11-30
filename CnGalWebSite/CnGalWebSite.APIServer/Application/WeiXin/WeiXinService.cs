@@ -541,24 +541,38 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
         {
             var now = DateTime.Now.ToCstTime();
             var roles = await _roleBirthdayRepository.GetAll().AsNoTracking()
-              .Where(s => s.Birthday.Date.Month == now.Month && s.Birthday.Date.Day == now.Day)
-              .Select(s=>s.RoleId)
-              .ToListAsync();
+                .Include(s => s.Role)
+                .Where(s => s.Birthday.Date.Month == now.Month && s.Birthday.Date.Day == now.Day)
+                .Select(s => new
+                {
+                    s.RoleId,
+                    s.Role.DisplayName
+                })
+                .ToListAsync();
 
-            if (roles.Any()==false)
+            if (roles.Any() == false)
             {
                 return null;
             }
 
             var sb = new StringBuilder();
-            foreach(var item in  roles)
+
+            foreach (var item in roles)
             {
-                sb.AppendLine(await GetEntryInfor(item, plainText,true));
+                sb.AppendLine(await GetEntryInfor(item.RoleId, plainText, true));
                 sb.AppendLine();
             }
 
-            sb.Append($"🎂 今天是她{(roles.Count > 1 ? "们" : "")}的生日哦~~~");
-
+            sb.Append($"🎂 今天是");
+            foreach (var item in roles)
+            {
+                sb.Append(item.DisplayName);
+                if (roles.IndexOf(item) != roles.Count - 1)
+                {
+                    sb.Append("、");
+                }
+            }
+            sb.Append($"的生日哦~~~");
             return sb.ToString();
         }
     }
