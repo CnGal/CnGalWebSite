@@ -740,7 +740,10 @@ namespace CnGalWebSite.APIServer.Controllers
             _videoService.SetDataFromEditRelevances(newVideo, model.Relevances, entries, articles, vidoes);
             _videoService.SetDataFromEditImages(newVideo, model.Images);
 
-            var video = new Video();
+            var video = new Video
+            {
+                CreateTime = DateTime.Now.ToCstTime()
+            };
             //获取审核记录
             try
             {
