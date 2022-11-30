@@ -1088,7 +1088,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
 
             foreach(var item in model.Ids)
             {
@@ -1102,7 +1102,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> HideEntryOutlinkAsync(HiddenEntryModel model)
         {
-            await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHideOutlink, b => model.IsHidden).ExecuteAsync();
+            await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHideOutlink, b => model.IsHidden));
             return new Result { Successful = true };
         }
 
@@ -1115,11 +1115,11 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断是否为特殊词条
             if (model.Operation == EditEntryPriorityOperation.ClearAllGame)
             {
-                await _entryRepository.GetRangeUpdateTable().Where(s => s.Type == EntryType.Game).Set(s => s.Priority, b => 0).ExecuteAsync();
+                await _entryRepository.GetAll().Where(s => s.Type == EntryType.Game).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => 0));
             }
             else if (model.Operation == EditEntryPriorityOperation.None)
             {
-                await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.Priority, b => b.Priority + model.PlusPriority).ExecuteAsync();
+                await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
             }
 
 

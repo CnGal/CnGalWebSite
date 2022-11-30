@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Zack.EFCore.Batch.Internal;
 
 namespace CnGalWebSite.APIServer.DataReositories
 {
@@ -25,8 +24,6 @@ namespace CnGalWebSite.APIServer.DataReositories
         /// 通过泛型，从数据库上下文中获取领域模型
         /// </summary>
         public virtual DbSet<Tentity> Table => _dbContext.Set<Tentity>();
-        public virtual BatchUpdateBuilder<Tentity> RangeUpdate => _dbContext.BatchUpdate<Tentity>();
-        public virtual BatchUpdateBuilder<Tentity> RangeDelete => _dbContext.BatchUpdate<Tentity>();
 
         public RepositoryBase(AppDbContext dbContext)
         {
@@ -36,11 +33,6 @@ namespace CnGalWebSite.APIServer.DataReositories
         public IQueryable<Tentity> GetAll()
         {
             return Table.AsQueryable();
-        }
-
-        public BatchUpdateBuilder<Tentity> GetRangeUpdateTable()
-        {
-            return RangeUpdate;
         }
 
         public List<Tentity> GetAllList()
@@ -142,11 +134,6 @@ namespace CnGalWebSite.APIServer.DataReositories
             {
                 await DeleteAsync(entity);
             }
-        }
-
-        public async Task DeleteRangeAsync(Expression<Func<Tentity, bool>> predicate)
-        {
-            await _dbContext.DeleteRangeAsync(predicate);
         }
 
         public int Count()

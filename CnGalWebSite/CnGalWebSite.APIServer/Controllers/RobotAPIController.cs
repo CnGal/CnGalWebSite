@@ -611,7 +611,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotEventAsync(HiddenRobotModel model)
         {
-            await _robotEventRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _robotEventRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
 
             return new Result { Successful = true };
         }
@@ -620,7 +620,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotGroupAsync(HiddenRobotModel model)
         {
-            await _robotGroupRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _robotGroupRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
 
             return new Result { Successful = true };
         }
@@ -629,7 +629,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotReplyAsync(HiddenRobotModel model)
         {
-            await _robotReplyRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _robotReplyRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
 
             return new Result { Successful = true };
         }
@@ -638,7 +638,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenRobotFaceAsync(HiddenRobotModel model)
         {
-            await _robotFaceRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _robotFaceRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
 
             return new Result { Successful = true };
         }

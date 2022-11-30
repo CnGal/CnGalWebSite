@@ -136,6 +136,7 @@ namespace CnGalWebSite.APIServer.Infrastructure
             modelBuilder.Entity<Vote>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Lottery>().HasIndex(g => g.Name).IsUnique();
             modelBuilder.Entity<Disambig>().HasIndex(g => g.Name).IsUnique();
+            modelBuilder.Entity<Video>().HasIndex(g => g.Name).IsUnique();
 
             //限定外键唯一
             modelBuilder.Entity<RoleBirthday>().HasIndex(g => g.RoleId).IsUnique();

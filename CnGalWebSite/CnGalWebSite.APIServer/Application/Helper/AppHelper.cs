@@ -457,14 +457,14 @@ namespace CnGalWebSite.APIServer.Application.Helper
         public async Task ArticleReaderNumUpAsync(long articleId)
         {
             _articleRepository.Clear();
-            _ = await _articleRepository.GetRangeUpdateTable().Where(s => s.Id == articleId).Set(s => s.ReaderCount, b => b.ReaderCount + 1).ExecuteAsync();
+            _ = await _articleRepository.GetAll().Where(s => s.Id == articleId).ExecuteUpdateAsync(s => s.SetProperty(a=>a.ReaderCount, b => b.ReaderCount + 1));
 
         }
 
         public async Task EntryReaderNumUpAsync(int entryId)
         {
             _entryRepository.Clear();
-            _ = await _entryRepository.GetRangeUpdateTable().Where(s => s.Id == entryId).Set(s => s.ReaderCount, b => b.ReaderCount + 1).ExecuteAsync();
+            _ = await _entryRepository.GetAll().Where(s => s.Id == entryId).ExecuteUpdateAsync(s => s.SetProperty(s => s.ReaderCount, b => b.ReaderCount + 1));
         }
 
         public async Task UpdateFavoritesCountAsync(long[] favoriteFolderIds)
@@ -472,7 +472,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
             foreach (var item in favoriteFolderIds)
             {
                 var count = await _favoriteFolderRepository.GetAll().Include(s => s.FavoriteObjects).Where(s => s.Id == item).Select(s => s.FavoriteObjects.Count).FirstOrDefaultAsync();
-                _ = await _favoriteFolderRepository.GetRangeUpdateTable().Where(s => s.Id == item).Set(s => s.Count, b => count).ExecuteAsync();
+                _ = await _favoriteFolderRepository.GetAll().Where(s => s.Id == item).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Count, b => count));
             }
         }
 
@@ -1195,8 +1195,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
         public async Task DeleteAllBackupInfor()
         {
-            await _backUpArchiveDetailRepository.DeleteRangeAsync(s => true);
-            await _backUpArchiveRepository.DeleteRangeAsync(s => true);
+            await _backUpArchiveDetailRepository.GetAll().Where(s => true).ExecuteDeleteAsync();
+            await _backUpArchiveRepository.GetAll().Where(s => true).ExecuteDeleteAsync();
         }
 
         public async Task<string> CheckStringCompliance(string text, string ip)

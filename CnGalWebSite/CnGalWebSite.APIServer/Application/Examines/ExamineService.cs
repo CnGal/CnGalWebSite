@@ -3619,23 +3619,27 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 case CommentType.CommentArticle:
                     tempCount = await _commentRepository.CountAsync(s => s.ArticleId == comment.ArticleId);
-                    _ = await _articleRepository.GetRangeUpdateTable().Where(s => s.Id == comment.ArticleId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    _ = await _articleRepository.GetAll().Where(s => s.Id == comment.ArticleId).ExecuteUpdateAsync(s => s.SetProperty(a => a.CommentCount, b => tempCount));
                     break;
                 case CommentType.CommentEntries:
                     tempCount = await _commentRepository.CountAsync(s => s.EntryId == comment.EntryId);
-                    _ = await _entryRepository.GetRangeUpdateTable().Where(s => s.Id == comment.EntryId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    _ = await _entryRepository.GetAll().Where(s => s.Id == comment.EntryId).ExecuteUpdateAsync(s => s.SetProperty(a => a.CommentCount, b => tempCount));
                     break;
                 case CommentType.CommentPeriphery:
                     tempCount = await _commentRepository.CountAsync(s => s.PeripheryId == comment.PeripheryId);
-                    _ = await _peripheryRepository.GetRangeUpdateTable().Where(s => s.Id == comment.PeripheryId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    _ = await _peripheryRepository.GetAll().Where(s => s.Id == comment.PeripheryId).ExecuteUpdateAsync(s => s.SetProperty(a => a.CommentCount, b => tempCount));
                     break;
                 case CommentType.CommentVote:
                     tempCount = await _commentRepository.CountAsync(s => s.VoteId == comment.VoteId);
-                    _ = await _voteRepository.GetRangeUpdateTable().Where(s => s.Id == comment.VoteId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    _ = await _voteRepository.GetAll().Where(s => s.Id == comment.VoteId).ExecuteUpdateAsync(s => s.SetProperty(a => a.CommentCount, b => tempCount));
                     break;
                 case CommentType.CommentLottery:
                     tempCount = await _commentRepository.CountAsync(s => s.LotteryId == comment.LotteryId);
-                    _ = await _lotteryRepository.GetRangeUpdateTable().Where(s => s.Id == comment.LotteryId).Set(s => s.CommentCount, b => tempCount).ExecuteAsync();
+                    _ = await _lotteryRepository.GetAll().Where(s => s.Id == comment.LotteryId).ExecuteUpdateAsync(s => s.SetProperty(a => a.CommentCount, b => tempCount));
+                    break;
+                case CommentType.CommentVideo:
+                    tempCount = await _commentRepository.CountAsync(s => s.VideoId == comment.VideoId);
+                    _ = await _videoRepository.GetAll().Where(s => s.Id == comment.LotteryId).ExecuteUpdateAsync(s => s.SetProperty(a => a.CommentCount, b => tempCount));
                     break;
             }
         }

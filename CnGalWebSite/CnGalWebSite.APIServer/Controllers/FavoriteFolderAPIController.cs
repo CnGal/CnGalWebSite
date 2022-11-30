@@ -249,23 +249,23 @@ namespace CnGalWebSite.APIServer.Controllers
 
             if (model.Type == FavoriteObjectType.Entry)
             {
-                await _favoriteObjectRepository.DeleteRangeAsync(s => s.EntryId == model.ObjectId && s.Type == FavoriteObjectType.Entry && favoriteFolderIds.Contains(s.FavoriteFolderId));
+                await _favoriteObjectRepository.GetAll().Where(s => s.EntryId == model.ObjectId && s.Type == FavoriteObjectType.Entry && favoriteFolderIds.Contains(s.FavoriteFolderId)).ExecuteDeleteAsync();
             }
             else if (model.Type == FavoriteObjectType.Article)
             {
-                await _favoriteObjectRepository.DeleteRangeAsync(s => s.ArticleId == model.ObjectId && s.Type == FavoriteObjectType.Article && favoriteFolderIds.Contains(s.FavoriteFolderId));
+                await _favoriteObjectRepository.GetAll().Where(s => s.ArticleId == model.ObjectId && s.Type == FavoriteObjectType.Article && favoriteFolderIds.Contains(s.FavoriteFolderId)).ExecuteDeleteAsync();
             }
             else if (model.Type == FavoriteObjectType.Periphery)
             {
-                await _favoriteObjectRepository.DeleteRangeAsync(s => s.PeripheryId == model.ObjectId && s.Type == FavoriteObjectType.Periphery && favoriteFolderIds.Contains(s.FavoriteFolderId));
+                await _favoriteObjectRepository.GetAll().Where(s => s.PeripheryId == model.ObjectId && s.Type == FavoriteObjectType.Periphery && favoriteFolderIds.Contains(s.FavoriteFolderId)).ExecuteDeleteAsync();
             }
             else if (model.Type == FavoriteObjectType.Video)
             {
-                await _favoriteObjectRepository.DeleteRangeAsync(s => s.VideoId == model.ObjectId && s.Type == FavoriteObjectType.Video && favoriteFolderIds.Contains(s.FavoriteFolderId));
+                await _favoriteObjectRepository.GetAll().Where(s => s.VideoId == model.ObjectId && s.Type == FavoriteObjectType.Video && favoriteFolderIds.Contains(s.FavoriteFolderId)).ExecuteDeleteAsync();
             }
             else if (model.Type == FavoriteObjectType.Tag)
             {
-                await _favoriteObjectRepository.DeleteRangeAsync(s => s.TagId == model.ObjectId && s.Type == FavoriteObjectType.Tag && favoriteFolderIds.Contains(s.FavoriteFolderId));
+                await _favoriteObjectRepository.GetAll().Where(s => s.TagId == model.ObjectId && s.Type == FavoriteObjectType.Tag && favoriteFolderIds.Contains(s.FavoriteFolderId)).ExecuteDeleteAsync();
             }
             //更新数目
             await _appHelper.UpdateFavoritesCountAsync(favoriteFolderIds);
@@ -387,7 +387,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "访问被拒绝" };
             }
 
-            await _favoriteObjectRepository.DeleteRangeAsync(s => s.FavoriteFolderId == model.FavorieFolderId && model.Ids.Contains(s.Id));
+            await _favoriteObjectRepository.GetAll().Where(s => s.FavoriteFolderId == model.FavorieFolderId && model.Ids.Contains(s.Id)).ExecuteDeleteAsync();
 
             //更新数目
             await _appHelper.UpdateFavoritesCountAsync(new long[] { model.FavorieFolderId });
@@ -402,7 +402,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
             var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
-            await _favoriteFolderRepository.DeleteRangeAsync(s => (isAdmin || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id));
+            await _favoriteFolderRepository.GetAll().Where(s => (isAdmin || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).ExecuteDeleteAsync();
 
             return new Result { Successful = true };
 
@@ -421,7 +421,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "访问被拒绝" };
             }
 
-            await _favoriteFolderRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsDefault, b => model.IsDefault).ExecuteAsync();
+            await _favoriteFolderRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsDefault, b => model.IsDefault));
 
             return new Result { Successful = true };
         }
@@ -644,8 +644,8 @@ namespace CnGalWebSite.APIServer.Controllers
             //清除选定目标的关联收藏夹
             var entries = model.ObjectIds.Where(s => s.Key == FavoriteObjectType.Entry).Select(s => s.Value);
             var articles = model.ObjectIds.Where(s => s.Key == FavoriteObjectType.Article).Select(s => s.Value);
-            await _favoriteObjectRepository.DeleteRangeAsync(s => folderIds.Contains(s.FavoriteFolderId) && s.Type == FavoriteObjectType.Entry && entries.Contains((long)s.EntryId));
-            await _favoriteObjectRepository.DeleteRangeAsync(s => folderIds.Contains(s.FavoriteFolderId) && s.Type == FavoriteObjectType.Article && articles.Contains((long)s.ArticleId));
+            await _favoriteObjectRepository.GetAll().Where(s => folderIds.Contains(s.FavoriteFolderId) && s.Type == FavoriteObjectType.Entry && entries.Contains((long)s.EntryId)).ExecuteDeleteAsync();
+            await _favoriteObjectRepository.GetAll().Where(s => folderIds.Contains(s.FavoriteFolderId) && s.Type == FavoriteObjectType.Article && articles.Contains((long)s.ArticleId)).ExecuteDeleteAsync();
 
             //添加到新收藏夹
             foreach (var item in model.FolderIds)

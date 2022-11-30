@@ -339,7 +339,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             {
                 try
                 {
-                    var jsonContent = await _httpClient.GetStringAsync("https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + item);
+                    var jsonContent = await _httpClient.GetStringAsync(_configuration["SteamAPIUrl"]+"IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + item+ "&skip_unvetted_apps=0");
                     var obj = JObject.Parse(jsonContent);
                     var temp = obj["response"].ToObject<UserSteamResponseJson>();
                     steamGames.games.AddRange(temp.games);
@@ -422,7 +422,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             var steamUser = new SteamUserInforJson();
             try
             {
-                var jsonContent = await _httpClient.GetStringAsync("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=" + _configuration["SteamAPIToken"] + "&steamids=" + SteamId);
+                var jsonContent = await _httpClient.GetStringAsync(_configuration["SteamAPIUrl"]+"ISteamUser/GetPlayerSummaries/v2/?key=" + _configuration["SteamAPIToken"] + "&steamids=" + SteamId);
                 var obj = JObject.Parse(jsonContent);
                 steamUser = obj.ToObject<SteamUserInforJson>();
             }

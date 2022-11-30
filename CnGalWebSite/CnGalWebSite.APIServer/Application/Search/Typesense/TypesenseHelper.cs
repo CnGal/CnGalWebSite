@@ -153,7 +153,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             }
             if (documents.Count != 0)
             {
-                await _searchCacheRepository.DeleteRangeAsync(s => s.Type == 0 && deleted.Contains(s.OriginalId));
+                await _searchCacheRepository.GetAll().Where(s => s.Type == 0 && deleted.Contains(s.OriginalId)).ExecuteDeleteAsync();
 
             }
         }
@@ -216,7 +216,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             }
             if (documents.Count != 0)
             {
-                await _searchCacheRepository.DeleteRangeAsync(s => s.Type == 1 && deleted.Contains(s.OriginalId));
+                await _searchCacheRepository.GetAll().Where(s => s.Type == 1 && deleted.Contains(s.OriginalId)).ExecuteDeleteAsync();
 
             }
         }
@@ -279,7 +279,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             }
             if (documents.Count != 0)
             {
-                await _searchCacheRepository.DeleteRangeAsync(s => s.Type == 1 && deleted.Contains(s.OriginalId));
+                await _searchCacheRepository.GetAll().Where(s => s.Type == 1 && deleted.Contains(s.OriginalId)).ExecuteDeleteAsync();
 
             }
         }
@@ -346,7 +346,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             }
             if (documents.Count != 0)
             {
-                await _searchCacheRepository.DeleteRangeAsync(s => s.Type == 2 && deleted.Contains(s.OriginalId));
+                await _searchCacheRepository.GetAll().Where(s => s.Type == 2 && deleted.Contains(s.OriginalId)).ExecuteDeleteAsync();
 
             }
         }
@@ -413,7 +413,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             }
             if (documents.Count != 0)
             {
-                await _searchCacheRepository.DeleteRangeAsync(s => s.Type == 3 && deleted.Contains(s.OriginalId));
+                await _searchCacheRepository.GetAll().Where(s => s.Type == 3 && deleted.Contains(s.OriginalId)).ExecuteDeleteAsync();
 
             }
         }
@@ -423,7 +423,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             try
             {
                 await _typesenseClient.DeleteCollection(_collectionName);
-                //await _searchCacheRepository.DeleteRangeAsync(s => true);
+                //await _searchCacheRepository.GetAll().Where(s => true).ExecuteDeleteAsync();
             }
             catch
             {

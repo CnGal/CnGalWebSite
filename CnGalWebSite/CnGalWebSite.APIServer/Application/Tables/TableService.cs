@@ -152,7 +152,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 //删除不存在的项目
                 var currentIds = Infors.Select(s => s.RealId);
 
-                await _basicInforTableModelRepository.DeleteRangeAsync(s => currentIds.Contains(s.RealId) == false);
+                await _basicInforTableModelRepository.GetAll().Where(s => currentIds.Contains(s.RealId) == false).ExecuteDeleteAsync();
                 //添加不存在的项目
                 var oldIds = await _basicInforTableModelRepository.GetAll().Select(s => s.RealId).ToListAsync();
 
@@ -252,7 +252,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             //删除不存在的项目
             var currentIds = Infors.Select(s => s.RealId);
 
-            await _groupInforTableModelRepository.DeleteRangeAsync(s => currentIds.Contains(s.RealId) == false);
+            await _groupInforTableModelRepository.GetAll().Where(s => currentIds.Contains(s.RealId) == false).ExecuteDeleteAsync();
             //添加不存在的项目
             var oldIds = await _groupInforTableModelRepository.GetAll().Select(s => s.RealId).ToListAsync();
 
@@ -324,7 +324,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             //删除不存在的项目
             var currentIds = Infors.Select(s => s.RealId);
 
-            await _staffInforTableModelRepository.DeleteRangeAsync(s => currentIds.Contains(s.RealId) == false);
+            await _staffInforTableModelRepository.GetAll().Where(s => currentIds.Contains(s.RealId) == false).ExecuteDeleteAsync();
             //添加不存在的项目
             var oldIds = await _staffInforTableModelRepository.GetAll().Select(s => s.RealId).ToListAsync();
 
@@ -402,7 +402,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             //删除不存在的项目
             var currentIds = Infors.Select(s => s.RealId);
 
-            await _makerInforTableModelRepository.DeleteRangeAsync(s => currentIds.Contains(s.RealId) == false);
+            await _makerInforTableModelRepository.GetAll().Where(s => currentIds.Contains(s.RealId) == false).ExecuteDeleteAsync();
             //添加不存在的项目
             var oldIds = await _makerInforTableModelRepository.GetAll().Select(s => s.RealId).ToListAsync();
 
@@ -550,7 +550,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             //删除不存在的项目
             var currentIds = Infors.Select(s => s.RealId);
 
-            await _roleInforTableModelRepository.DeleteRangeAsync(s => currentIds.Contains(s.RealId) == false);
+            await _roleInforTableModelRepository.GetAll().Where(s => currentIds.Contains(s.RealId) == false).ExecuteDeleteAsync();
             //添加不存在的项目
             var oldIds = await _roleInforTableModelRepository.GetAll().Select(s => s.RealId).ToListAsync();
 
@@ -623,7 +623,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             //删除不存在的项目
             var currentIds = steamList.Select(s => s.SteamId);
 
-            await _steamInforTableModelRepository.DeleteRangeAsync(s => currentIds.Contains(s.SteamId) == false);
+            await _steamInforTableModelRepository.GetAll().Where(s => currentIds.Contains(s.SteamId) == false).ExecuteDeleteAsync();
             //添加不存在的项目
             var oldIds = await _steamInforTableModelRepository.GetAll().Select(s => s.SteamId).ToListAsync();
 

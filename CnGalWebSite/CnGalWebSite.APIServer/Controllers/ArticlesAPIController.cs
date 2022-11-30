@@ -886,7 +886,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> HideAsync(HiddenArticleModel model)
         {
-            await _articleRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _articleRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
             return new Result { Successful = true };
         }
 
@@ -937,7 +937,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             //计算点赞总数
             var tempCount = await _thumbsUpRepository.CountAsync(s => s.ArticleId == article.Id);
-            await _articleRepository.GetRangeUpdateTable().Where(s => s.Id == article.Id).Set(s => s.ThumbsUpCount, b => tempCount).ExecuteAsync();
+            await _articleRepository.GetAll().Where(s => s.Id == article.Id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.ThumbsUpCount, b => tempCount));
 
             return new Result { Successful = true };
         }
@@ -946,7 +946,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> EditPriorityAsync(EditArticlePriorityViewModel model)
         {
-            await _articleRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.Priority, b => b.Priority + model.PlusPriority).ExecuteAsync();
+            await _articleRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
 
             return new Result { Successful = true };
         }
@@ -1006,7 +1006,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //查找审核
 
-            await _examineRepository.DeleteRangeAsync(s => s.ArticleId == model.Id && s.ApplicationUserId == user.Id && s.IsPassed == null);
+            await _examineRepository.GetAll().Where(s => s.ArticleId == model.Id && s.ApplicationUserId == user.Id && s.IsPassed == null).ExecuteDeleteAsync();
             return new Result { Successful = true };
 
 

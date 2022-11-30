@@ -654,7 +654,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             else
             {
-                await _userMonitorsRepository.DeleteRangeAsync(s => s.ApplicationUserId == user.Id && (s.EntryId == null || model.Ids.Contains(s.EntryId.Value)));
+                await _userMonitorsRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && (s.EntryId == null || model.Ids.Contains(s.EntryId.Value))).ExecuteDeleteAsync();
             }
 
             return new Result { Successful = true };
@@ -697,10 +697,9 @@ namespace CnGalWebSite.APIServer.Controllers
             //}
 
             //修改旧项目
-            _ = await _userReviewEditRecordRepository.GetRangeUpdateTable()
+            _ = await _userReviewEditRecordRepository.GetAll()
                 .Where(s => s.ApplicationUserId == user.Id && s.ExamineId != null && model.ExamineIds.Contains(s.ExamineId.Value))
-                .Set(s => s.State, b => model.State)
-                .ExecuteAsync();
+                .ExecuteUpdateAsync(s => s.SetProperty(s => s.State, b => model.State));
 
 
             return new Result { Successful = true };

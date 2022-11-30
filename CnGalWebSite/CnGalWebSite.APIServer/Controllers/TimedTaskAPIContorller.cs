@@ -5,6 +5,7 @@ using CnGalWebSite.DataModel.ViewModel.TimedTasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -156,7 +157,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> PauseTimedTaskAsync(PauseTimedTaskModel model)
         {
-            await _timedTaskRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsPause, b => model.IsPause).ExecuteAsync();
+            await _timedTaskRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsPause, b => model.IsPause));
 
             return new Result { Successful = true };
         }
@@ -165,7 +166,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<Result>> DeleteTimedTaskAsync(DeleteTimedTaskModel model)
         {
 
-            await _timedTaskRepository.DeleteRangeAsync(s => model.Ids.Contains(s.Id));
+            await _timedTaskRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteDeleteAsync();
             return new Result { Successful = true };
         }
 

@@ -224,7 +224,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //增加阅读人数
-            await _lotteryRepository.GetRangeUpdateTable().Where(s => s.Id == id).Set(s => s.ReaderCount, b => b.ReaderCount + 1).ExecuteAsync();
+            await _lotteryRepository.GetAll().Where(s => s.Id == id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.ReaderCount, b => b.ReaderCount + 1));
 
             return model;
 
@@ -741,7 +741,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenLotteryAsync(HiddenLotteryModel model)
         {
-            await _lotteryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _lotteryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
             return new Result { Successful = true };
         }
 
@@ -749,7 +749,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> EndLotteryAsync(EndLotteryModel model)
         {
-            await _lotteryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsEnd, b => model.IsEnd).ExecuteAsync();
+            await _lotteryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsEnd, b => model.IsEnd));
             return new Result { Successful = true };
         }
 
@@ -757,7 +757,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> EditLotteryPriorityAsync(EditLotteryPriorityViewModel model)
         {
-            await _lotteryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.Priority, b => b.Priority + model.PlusPriority).ExecuteAsync();
+            await _lotteryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
 
             return new Result { Successful = true };
         }
@@ -882,7 +882,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> HiddenLotteryUserAsync(HiddenLotteryModel model)
         {
-            await _lotteryUserRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _lotteryUserRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
             return new Result { Successful = true };
         }
 

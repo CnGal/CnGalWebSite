@@ -63,7 +63,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<Result>> HiddenRankAsync(HiddenRankModel model)
         {
 
-            await _rankRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _rankRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
 
             return new Result { Successful = true };
         }
@@ -124,7 +124,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Result>> RemoveUserRankAsync(RemoveUserRankModel model)
         {
-            await _rankUserRepository.DeleteRangeAsync(s => model.RankIds.Contains(s.RankId) && model.UserIds.Contains(s.ApplicationUserId));
+            await _rankUserRepository.GetAll().Where(s => model.RankIds.Contains(s.RankId) && model.UserIds.Contains(s.ApplicationUserId)).ExecuteDeleteAsync();
 
             return new Result { Successful = true };
         }
@@ -151,7 +151,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> EditRankPriorityAsync(EditRankPriorityViewModel model)
         {
-            await _rankRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.Priority, b => b.Priority + model.PlusPriority).ExecuteAsync();
+            await _rankRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
 
             return new Result { Successful = true };
         }
@@ -160,7 +160,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> HiddenUserRankAsync(HiddenUserRankModel model)
         {
-            await _rankUserRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _rankUserRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
             return new Result { Successful = true };
         }
 

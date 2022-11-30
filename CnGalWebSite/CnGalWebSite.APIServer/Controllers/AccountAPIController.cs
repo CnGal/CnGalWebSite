@@ -437,7 +437,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 //更新最后修改密码日期
                 var now= DateTime.Now.ToCstTime();
-                await _userRepository.GetRangeUpdateTable().Where(s => s.Id==user.Id).Set(s => s.LastChangePasswordTime, b => now).ExecuteAsync();
+                await _userRepository.GetAll().Where(s => s.Id==user.Id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.LastChangePasswordTime, b => now));
 
                 return new Result { Successful = true };
             }
@@ -664,7 +664,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     await _appHelper.RemoveErrorCount(user.Email);
                     //更新最后修改密码日期
                     var now = DateTime.Now.ToCstTime();
-                    await _userRepository.GetRangeUpdateTable().Where(s => s.Id == user.Id).Set(s => s.LastChangePasswordTime, b => now).ExecuteAsync();
+                    await _userRepository.GetAll().Where(s => s.Id == user.Id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.LastChangePasswordTime, b => now));
 
                     return new Result { Successful = true };
                 }

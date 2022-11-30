@@ -1,16 +1,17 @@
-﻿@page "/entries/brithdaycalendar"
+﻿@page "/entries/birthdaycalendar"
+@page "/birthday"
 
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject HttpClient Http
 
 
-<TitleTip Title="角色生日日历" Description="可以在这里按月份查看所有角色的生日"/>
+<TitleTip Title="角色生日日历" Description="可以在这里按月份查看所有角色的生日" />
 <div class=" rounded shadow-sm  bg-opacity p-4">
     <div class="font-color mb-4 h5 fw-bold" style=" text-align: center; ">🎂 角色生日日历</div>
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.Calendars.MasaCalendar Month="Date" MonthChanged="MonthChanged">
         <div style=" display: flex; flex-direction: column;" class="h-100">
-            <div class="p-2">
+            <div class="@((context.Date==DateTime.Now.ToCstTime().Date?"fw-bold ":"")+" p-2")">
                 @context.Day.ToString()
             </div>
             <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-content: flex-end; " class="p-1 h-100">
@@ -53,7 +54,7 @@
 
     public async void LocationChanged(object sender, LocationChangedEventArgs args)
     {
-        if (NavigationManager.Uri.Contains("/entries/brithdaycalendar"))
+        if (NavigationManager.Uri.Contains("/birthday"))
         {
             if (Day != 0 && Month != 0 && Year != 0)
             {
@@ -87,7 +88,7 @@
         {
             return Task.CompletedTask;
         }
-        NavigationManager.NavigateTo($"/entries/brithdaycalendar?Year={month.Year}&Month={month.Month}&Day={month.Day}");
+        NavigationManager.NavigateTo($"/birthday?Year={month.Year}&Month={month.Month}&Day={month.Day}");
         return Task.CompletedTask;
 
     }

@@ -415,8 +415,8 @@ namespace CnGalWebSite.APIServer.Application.Perfections
         public async Task UpdateAllEntryPerfectionsAsync()
         {
             //删除不符合条件词条的完善度检查
-            await _perfectionCheckRepository.DeleteRangeAsync(s => s.Perfection.Entry.Type != EntryType.Game || string.IsNullOrWhiteSpace(s.Perfection.Entry.Name) || s.Perfection.Entry.IsHidden == true);
-            await _perfectionRepository.DeleteRangeAsync(s => s.Entry.Type != EntryType.Game || string.IsNullOrWhiteSpace(s.Entry.Name) || s.Entry.IsHidden == true);
+            await _perfectionCheckRepository.GetAll().Where(s => s.Perfection.Entry.Type != EntryType.Game || string.IsNullOrWhiteSpace(s.Perfection.Entry.Name) || s.Perfection.Entry.IsHidden == true).ExecuteDeleteAsync();
+            await _perfectionRepository.GetAll().Where(s => s.Entry.Type != EntryType.Game || string.IsNullOrWhiteSpace(s.Entry.Name) || s.Entry.IsHidden == true).ExecuteDeleteAsync();
 
             var entries = await _entryRepository.GetAll().AsNoTracking().Where(s => s.Type == EntryType.Game && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
             foreach (var item in entries)
@@ -547,7 +547,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                     grade = results.Select(s => s.Grade).ToArray().Sum();
 
                 }
-                await _perfectionRepository.GetRangeUpdateTable().Where(s => s.Id == perfection.Id).Set(s => s.Grade, b => grade).ExecuteAsync();
+                await _perfectionRepository.GetAll().Where(s => s.Id == perfection.Id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Grade, b => grade));
 
 
             }
@@ -1119,10 +1119,9 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 //遍历更新数据
                 foreach (var item in counnts)
                 {
-                    await _perfectionCheckRepository.GetRangeUpdateTable()
+                    await _perfectionCheckRepository.GetAll()
                         .Where(s => s.Infor == item.Key)
-                        .Set(s => s.Count, b => item.Count)
-                        .ExecuteAsync();
+                        .ExecuteUpdateAsync(s => s.SetProperty(s => s.Count, b => item.Count));
                 }
 
                 //计算每个词条完善度总分超过全站的百分比
@@ -1134,7 +1133,7 @@ namespace CnGalWebSite.APIServer.Application.Perfections
                 foreach (var item in grades)
                 {
                     var temp = 100 * (double)grades.Count(s => s.Grade < item.Grade) / count;
-                    await _perfectionRepository.GetRangeUpdateTable().Where(s => s.Id == item.Id).Set(s => s.VictoryPercentage, b => temp).ExecuteAsync();
+                    await _perfectionRepository.GetAll().Where(s => s.Id == item.Id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.VictoryPercentage, b => temp));
 
                 }
 
@@ -1150,10 +1149,9 @@ namespace CnGalWebSite.APIServer.Application.Perfections
 
                 foreach (var item in checkCounts)
                 {
-                    await _perfectionCheckRepository.GetRangeUpdateTable()
+                    await _perfectionCheckRepository.GetAll()
                         .Where(s => s.CheckType == item.Key)
-                        .Set(s => s.VictoryPercentage, b => 100 * (double)item.Count / count)
-                        .ExecuteAsync();
+                        .ExecuteUpdateAsync(s => s.SetProperty(s => s.VictoryPercentage, b => 100 * (double)item.Count / count));
                 }
 
             }

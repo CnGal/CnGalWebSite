@@ -207,7 +207,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 game = await _playedGameRepository.UpdateAsync(game);
 
                 //删除待审核记录
-                await _examineRepository.DeleteRangeAsync(s => s.PlayedGameId == game.Id && s.ApplicationUserId == user.Id && s.IsPassed == null && s.Operation == Operation.EditPlayedGameMain);
+                await _examineRepository.GetAll().Where(s => s.PlayedGameId == game.Id && s.ApplicationUserId == user.Id && s.IsPassed == null && s.Operation == Operation.EditPlayedGameMain).ExecuteDeleteAsync();
 
 
                 return new Result { Successful = true };
@@ -238,7 +238,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            await _playedGameRepository.GetRangeUpdateTable().Where(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.EntryId)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.EntryId)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
             return new Result { Successful = true };
         }
         /// <summary>
@@ -252,7 +252,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            await _playedGameRepository.GetRangeUpdateTable().Where(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.EntryId)).Set(s => s.ShowPublicly, b => model.IsHidden).ExecuteAsync();
+            await _playedGameRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && model.Ids.Contains(s.EntryId)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.ShowPublicly, b => model.IsHidden));
             return new Result { Successful = true };
         }
 
