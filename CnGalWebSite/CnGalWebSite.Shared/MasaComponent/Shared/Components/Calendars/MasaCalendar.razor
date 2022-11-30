@@ -4,11 +4,11 @@
 
 
 <div style="display: flex; flex-direction: column;">
-    <div class="ps-4 pe-4 pb-2" style=" display: flex; justify-content: space-between; align-items: center; ">
+    <div class="ps-4 pe-4 pb-2" style=" display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
         <div class="h5 fw-bold mb-0 font-color">
             @Month.ToString("yyyy年M月")
         </div>
-        <div style="display:flex;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: flex-end;">
             <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>ValueChanged(0))" Class="me-4">
                 上一年
             </MButton>
@@ -37,7 +37,7 @@
     </div>
     @for (var k = 0; k < 6; k++)
     {
-        <div style="@(($"display:flex;border-bottom :thin solid rgba(0,0,0,.{(k==4?"20":"12")});")+"min-height: 100px;")">
+        <div style="@(($"display:flex;border-bottom :thin solid rgba(0,0,0,.{(k==4?"20":"12")});"))">
             @for (int i = 0; i < 7; i++)
             {
                 var date = Begin.AddDays(k * 7 + i);

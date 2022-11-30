@@ -28,14 +28,34 @@
         <div class="ps-4 pt-4 pe-4 col">
             <h1 class="fw-bold h3">@Model.Name</h1>
             <div>
-                <span itemprop="description">
-                    @Model.BriefIntroduction
-                </span>
+                @if (ForceSmall)
+                {
+                    <div>
+                        <span itemprop="description">
+                            @Model.BriefIntroduction
+                        </span>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-md-none-co ">
+                        <span itemprop="description">
+                            @Model.BriefIntroduction
+                        </span>
+                    </div>
+
+                    <div class="d-md-flex d-none">
+                        <span class="text-truncate-4">
+                            @Model.BriefIntroduction
+                        </span>
+                    </div>
+                }
+
                 @if (HiddenButton == false)
                 {
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
                         <div class="mt-2" style="@("display: flex; "+(ForceSmall||_dataCacheService.IsApp?"justify-content: center;":"justify-content: flex-end;"))">
-                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Video"/>
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.FavoriteButton Id="Model.Id" Type="FavoriteObjectType.Video" />
                             @if (Model.Authority)
                             {
                                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.EditButton Type="ExaminedNormalListModelType.Video" Id="Model.Id" @bind-IsHidden="@Model.IsHidden" @bind-IsEdit="@Model.IsEdit" Class="ms-4" />

@@ -4,7 +4,7 @@
 
 <MTooltip Top Color="white">
     <ActivatorContent>
-        <img @attributes="@context.Attrs" src="@Model.MainImage" alt="@Model.Name" style="height:40px;aspect-ratio:1;border-radius:50%;" @onclick="@(()=>OnClick())" />
+        <img @attributes="@context.Attrs" src="@Model.MainImage" alt="@Model.Name" style="@((_dataCacheService.IsApp?"height:30px;":"height:40px;")+"aspect-ratio:1;border-radius:50%;") " @onclick="@(()=>OnClick())" />
     </ActivatorContent>
     <ChildContent>
         <div style=" display: flex; flex-direction: column; align-items: center; width:230px;color:black;">

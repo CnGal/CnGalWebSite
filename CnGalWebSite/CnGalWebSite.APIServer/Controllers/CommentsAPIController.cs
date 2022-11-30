@@ -340,7 +340,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> EditArticleCanCommentAsync(EditArticleCanCommentModel model)
         {
-            await _articleRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.CanComment, b => model.CanComment).ExecuteAsync();
+            await _articleRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
             return new Result { Successful = true };
         }
 
@@ -348,7 +348,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> EditPeripheryCanCommentAsync(EditPeripheryCanCommentModel model)
         {
-            await _peripheryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.CanComment, b => model.CanComment).ExecuteAsync();
+            await _peripheryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
             return new Result { Successful = true };
         }
 
@@ -356,7 +356,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> EditVoteCanCommentAsync(EditVoteCanCommentModel model)
         {
-            await _voteRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.CanComment, b => model.CanComment).ExecuteAsync();
+            await _voteRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
             return new Result { Successful = true };
         }
 
@@ -364,7 +364,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> EditLotteryCanCommentAsync(EditLotteryCanCommentModel model)
         {
-            await _lotteryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.CanComment, b => model.CanComment).ExecuteAsync();
+            await _lotteryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
             return new Result { Successful = true };
         }
 
@@ -372,7 +372,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> EditVideoCanCommentAsync(EditLotteryCanCommentModel model)
         {
-            await _videoRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.CanComment, b => model.CanComment).ExecuteAsync();
+            await _videoRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
             return new Result { Successful = true };
         }
 
@@ -380,7 +380,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> EditEntryCanCommentAsync(EditEntryCanCommentModel model)
         {
-            await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.CanComment, b => model.CanComment).ExecuteAsync();
+            await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
 
             return new Result { Successful = true };
         }
@@ -389,7 +389,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> EditSpaceCanCommentAsync(EditSpaceCanComment model)
         {
-            await _userRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.CanComment, b => model.CanComment).ExecuteAsync();
+            await _userRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.CanComment, b => model.CanComment));
 
 
             return new Result { Successful = true };
@@ -400,7 +400,7 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<Result>> HiddenCommentAsync(HiddenCommentModel model)
         {
 
-            await _commentRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _commentRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
 
             return new Result { Successful = true };
         }
@@ -448,7 +448,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 if (await _appHelper.IsUserHavePermissionForCommmentAsync(item, user))
                 {
-                    await _commentRepository.GetRangeUpdateTable().Where(s => s.Id == item).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+                    await _commentRepository.GetAll().Where(s => s.Id == item).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
                 }
                 else
                 {
@@ -470,7 +470,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> EditCommentPriorityAsync(EditCommentPriorityViewModel model)
         {
-            await _commentRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.Priority, b => b.Priority + model.PlusPriority).ExecuteAsync();
+            await _commentRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
 
             return new Result { Successful = true };
         }

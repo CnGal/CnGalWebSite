@@ -59,7 +59,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             if (model.IsIgnore == true)
             {
-                await _gameNewsRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.State, b => GameNewsState.Ignore).ExecuteAsync();
+                await _gameNewsRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.State, b => GameNewsState.Ignore));
                 return new Result { Successful = true };
 
             }

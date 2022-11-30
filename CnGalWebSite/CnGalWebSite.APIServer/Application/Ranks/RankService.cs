@@ -419,7 +419,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             }
 
             //应用修改项
-            _ = await _rankUserRepository.GetRangeUpdateTable().Where(s => ids.Contains(s.Id)).Set(s => s.IsHidden, b => !b.IsHidden).ExecuteAsync();
+            _ = await _rankUserRepository.GetAll().Where(s => ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => !b.IsHidden));
         }
     }
 }

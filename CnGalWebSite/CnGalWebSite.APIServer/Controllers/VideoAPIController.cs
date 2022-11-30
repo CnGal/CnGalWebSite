@@ -274,7 +274,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             //增加阅读次数
             _videoRepository.Clear();
-            _ = await _videoRepository.GetRangeUpdateTable().Where(s => s.Id == video.Id).Set(s => s.ReaderCount, b => b.ReaderCount + 1).ExecuteAsync();
+            _ = await _videoRepository.GetAll().Where(s => s.Id == video.Id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.ReaderCount, b => b.ReaderCount + 1));
 
             return model;
         }
@@ -764,7 +764,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            await _videoRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _videoRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
 
             foreach (var item in model.Ids)
             {
@@ -781,7 +781,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            await _entryRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.Priority, b => b.Priority + model.PlusPriority).ExecuteAsync();
+            await _entryRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.Priority, b => b.Priority + model.PlusPriority));
             foreach (var item in model.Ids)
             {
                 _logger.LogInformation("管理员 - {name}({id}) 修改视频 - Id:{entryId} 优先级为：{PlusPriority}", user.UserName, user.Id,item, model.PlusPriority);

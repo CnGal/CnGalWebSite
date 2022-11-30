@@ -193,7 +193,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //增加阅读人数
-            await _tagRepository.GetRangeUpdateTable().Where(s => s.Id == tag.Id).Set(s => s.ReaderCount, b => b.ReaderCount + 1).ExecuteAsync();
+            await _tagRepository.GetAll().Where(s => s.Id == tag.Id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.ReaderCount, b => b.ReaderCount + 1));
 
             return model;
 
@@ -729,7 +729,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> HiddenTagAsync(HiddenTagModel model)
         {
-            await _tagRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsHidden, b => model.IsHidden).ExecuteAsync();
+            await _tagRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
 
             return new Result { Successful = true };
         }

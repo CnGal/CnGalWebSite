@@ -527,7 +527,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
-            await _messageRepository.GetRangeUpdateTable().Where(s => s.ApplicationUserId == user.Id).Set(s => s.IsReaded, b => true).ExecuteAsync();
+            await _messageRepository.GetAll().Where(s => s.ApplicationUserId == user.Id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsReaded, b => true));
 
             return new Result { Successful = true };
         }
@@ -536,7 +536,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> EditMessageIsReadedAsync(EditMessageIsReadedModel model)
         {
-            await _messageRepository.GetRangeUpdateTable().Where(s => model.Ids.Contains(s.Id)).Set(s => s.IsReaded, b => model.IsReaded).ExecuteAsync();
+            await _messageRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsReaded, b => model.IsReaded));
 
             return new Result { Successful = true };
         }
@@ -545,7 +545,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         public async Task<ActionResult<Result>> DeleteMessagesAsync(DeleteMessagesModel model)
         {
-            await _messageRepository.DeleteRangeAsync(s => model.Ids.Contains(s.Id));
+            await _messageRepository.GetAll().Where(s => model.Ids.Contains(s.Id)).ExecuteDeleteAsync();
 
             return new Result { Successful = true };
         }
@@ -557,7 +557,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
             var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
-            await _messageRepository.GetRangeUpdateTable().Where(s => (true || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).Set(s => s.IsReaded, b => model.IsReaded).ExecuteAsync();
+            await _messageRepository.GetAll().Where(s => (true || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsReaded, b => model.IsReaded));
 
             return new Result { Successful = true };
         }
@@ -584,7 +584,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
             var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
-            await _messageRepository.DeleteRangeAsync(s => (isAdmin || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id));
+            await _messageRepository.GetAll().Where(s => (isAdmin || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).ExecuteDeleteAsync();
 
             return new Result { Successful = true };
         }

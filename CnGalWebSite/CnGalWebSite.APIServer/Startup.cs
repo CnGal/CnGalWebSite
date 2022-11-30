@@ -63,7 +63,7 @@ namespace CnGalWebSite.APIServer
                     {
                         //全局配置查询拆分模式
                         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-                    }).UseBatchEF_MySQLPomelo());
+                    }));
             // services.AddMvc(async => async.EnableEndpointRouting = false);
             //不使用终结点路由
             services.AddControllersWithViews(a => a.EnableEndpointRouting = false)

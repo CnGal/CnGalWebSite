@@ -25,7 +25,7 @@
         <MIcon Left>mdi-home</MIcon>
         主页
     </MButton>
-    @if (Admin==false)
+    @if (Admin == false)
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDivider />
@@ -70,6 +70,10 @@
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
 
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="@(()=>OnClickUrl("/birthday"))">
+            <MIcon Left>mdi-cake-variant</MIcon>
+            生日日历
+        </MButton>
         <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" Left OnClick="OnClickSetting">
             <MIcon Left>mdi-cog</MIcon>
             主题设置
@@ -81,7 +85,7 @@
             关于我们
         </MButton>
 
-        <CreateObjectCard @ref="createObjectCard"/>
+        <CreateObjectCard @ref="createObjectCard" />
     }
 
 
@@ -163,9 +167,9 @@
 
     private async Task OnClickCreate()
     {
-        if(createObjectCard!=null)
+        if (createObjectCard != null)
         {
-           await createObjectCard.Refresh(true);
+            await createObjectCard.Refresh(true);
         }
         await OnClosed.InvokeAsync();
     }

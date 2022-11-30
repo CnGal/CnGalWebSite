@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Zack.EFCore.Batch.Internal;
 
 namespace CnGalWebSite.APIServer.DataReositories
 {
@@ -108,11 +107,7 @@ namespace CnGalWebSite.APIServer.DataReositories
         /// <param name="entity">实体</param>
         /// <returns>被更新的实体</returns>
         Task<TEntity> UpdateAsync(TEntity entity);
-        /// <summary>
-        /// 批量更新数据
-        /// </summary>
-        /// <returns>进行批量更新操作的对象</returns>
-        BatchUpdateBuilder<TEntity> GetRangeUpdateTable();
+ 
         #endregion
 
         #region 删除
@@ -144,12 +139,6 @@ namespace CnGalWebSite.APIServer.DataReositories
         /// </summary>
         /// <param name="predicarte">筛选实体的条件</param>
         Task DeleteAsync(Expression<Func<TEntity, bool>> predicarte);
-        /// <summary>
-        /// 批量删除
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        Task DeleteRangeAsync(Expression<Func<TEntity, bool>> predicate);
 
         #endregion
 
