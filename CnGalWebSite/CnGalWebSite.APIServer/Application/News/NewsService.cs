@@ -593,13 +593,9 @@ namespace CnGalWebSite.APIServer.Application.News
         /// <returns></returns>
         public async Task AddWeiboUserInfor(string entryName, long weiboId)
         {
-            var user = await _rssHelper.GetWeiboUserInfor(weiboId);
+            var user = await _weiboUserInforRepository.GetAll().FirstOrDefaultAsync(s => s.WeiboId == weiboId);
+            user ??= await _rssHelper.GetWeiboUserInfor(weiboId);
 
-
-            if (await _weiboUserInforRepository.GetAll().AnyAsync(s => s.WeiboName == user.WeiboName))
-            {
-                return;
-            }
 
             var entry = await _entryRepository.GetAll().Include(s => s.Information).FirstOrDefaultAsync(s => s.Name == entryName);
 
@@ -631,7 +627,15 @@ namespace CnGalWebSite.APIServer.Application.News
 
             user.EntryId = entry.Id;
 
-            await _weiboUserInforRepository.InsertAsync(user);
+            if (user.Id == 0)
+            {
+                await _weiboUserInforRepository.InsertAsync(user);
+            }
+            else
+            {
+                await _weiboUserInforRepository.UpdateAsync(user);
+            }
+
 
             await _entryRepository.UpdateAsync(entry);
         }
