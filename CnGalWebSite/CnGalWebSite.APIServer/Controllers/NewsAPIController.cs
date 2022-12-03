@@ -144,7 +144,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var author = await _weiboUserInforRepository.GetAll().AsNoTracking().Include(s => s.Entry).FirstOrDefaultAsync(s => s.WeiboName == gameNews.Author);
 
             //查看是否修正了作者信息
-            if (author == null && string.IsNullOrWhiteSpace(model.AuthorEntryName) == false && string.IsNullOrWhiteSpace(model.WeiboId) == false)
+            if (string.IsNullOrWhiteSpace(model.AuthorEntryName) == false && string.IsNullOrWhiteSpace(model.WeiboId) == false&&( model.AuthorEntryName != author?.Entry?.Name  || model.WeiboId != author.WeiboId.ToString()))
             {
                 try
                 {
