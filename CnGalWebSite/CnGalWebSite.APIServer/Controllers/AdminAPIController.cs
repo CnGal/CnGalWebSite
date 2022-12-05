@@ -878,7 +878,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                //await _weeklyNewsRepository.GetAll().ExecuteUpdateAsync(s=>s.SetProperty(s => s.CreateTime, b => b.CreateTime.AddHours(8)));
+                await _articleRepository.GetAll().Where(s=>string.IsNullOrWhiteSpace(s.DisplayName)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.DisplayName, b => b.Name));
                 return new Result { Successful = true };
             }
             catch (Exception ex)

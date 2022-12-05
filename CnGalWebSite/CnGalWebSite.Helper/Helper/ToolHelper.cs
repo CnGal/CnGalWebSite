@@ -158,7 +158,6 @@ namespace CnGalWebSite.DataModel.Helper
             return Encoding.UTF8.GetString(bytes);
         }
 
-
         /// <summary>
         /// 计算文件的 MD5 值
         /// </summary>

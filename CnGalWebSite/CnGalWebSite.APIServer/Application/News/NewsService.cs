@@ -534,6 +534,7 @@ namespace CnGalWebSite.APIServer.Application.News
             var article = new Article
             {
                 Name = weeklyNews.Title,
+                DisplayName= weeklyNews.Title,
                 MainPage = mainPage,
                 BriefIntroduction = weeklyNews.BriefIntroduction,
                 MainPicture = weeklyNews.MainPicture,
