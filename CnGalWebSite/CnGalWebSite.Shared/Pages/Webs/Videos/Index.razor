@@ -8,9 +8,9 @@
 
 @implements IDisposable
 
-@if (string.IsNullOrWhiteSpace(Model.Name) == false)
+@if (string.IsNullOrWhiteSpace(Model.DisplayName) == false)
 {
-    <TitleTip Title="@(Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+    <TitleTip Title="@(Model.DisplayName)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
 }
 else
 {

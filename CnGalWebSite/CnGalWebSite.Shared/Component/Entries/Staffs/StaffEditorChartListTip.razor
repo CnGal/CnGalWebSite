@@ -5,35 +5,35 @@
 @inject IPopupService PopupService
 @inject DialogService DialogService
 
-    <style>
-        .table-wrapper {
-            min-height: 400px;
-        }
-    </style>
-    <Table TItem="StaffModel" @ref="StaffsTable"
-           IsPagination="true" PageItemsSource="@PageItemsSource"
-           IsStriped="true" IsBordered="true" IsMultipleSelect="true" ShowSearch="true"
-           ShowToolbar="true" ShowExtendButtons="true" ShowSkeleton="true" IsExcel
-           OnQueryAsync="@OnQueryAsync" EditMode="EditMode.InCell" ShowToastAfterSaveOrDeleteModel="false"
-           OnAddAsync="@OnAddAsync" OnSaveAsync="@OnSaveAsync" OnDeleteAsync="@OnDeleteAsync">
-        <TableToolbarTemplate>
-            <TableToolbarButton TItem="StaffModel" Color="Color.Warning" Icon="fa fa-upload" Text="批量导入" OnClickCallback="OnImportClick" />
-        </TableToolbarTemplate>
+<style>
+    .table-wrapper {
+        min-height: 400px;
+    }
+</style>
+<Table TItem="StaffModel" @ref="StaffsTable"
+       IsPagination="true" PageItemsSource="@PageItemsSource"
+       IsStriped="true" IsBordered="true" IsMultipleSelect="true" ShowSearch="true"
+       ShowToolbar="true" ShowExtendButtons="true" ShowSkeleton="true" IsExcel
+       OnQueryAsync="@OnQueryAsync" EditMode="EditMode.InCell" ShowToastAfterSaveOrDeleteModel="false"
+       OnAddAsync="@OnAddAsync" OnSaveAsync="@OnSaveAsync" OnDeleteAsync="@OnDeleteAsync">
+    <TableToolbarTemplate>
+        <TableToolbarButton TItem="StaffModel" Color="Color.Warning" Icon="fa fa-upload" Text="批量导入" OnClickCallback="OnImportClick" />
+    </TableToolbarTemplate>
 
-        <TableColumns>
-            <TableColumn @bind-Field="@context.Modifier" Filterable="true" Sortable="true" />
-            <TableColumn @bind-Field="@context.PositionOfficial" Filterable="true" Sortable="true" DefaultSort="true" />
-            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" />
-            <TableColumn @bind-Field="@context.PositionGeneral" Sortable="true" />
-            <TableColumn @bind-Field="@context.SubordinateOrganization" Filterable="true" Sortable="true" Searchable="true" />
-            <TableColumn @bind-Field="@context.CustomName" Filterable="true" Sortable="true" Searchable="true" />
-        </TableColumns>
-    </Table>
+    <TableColumns>
+        <TableColumn @bind-Field="@context.Modifier" Filterable="true" Sortable="true" />
+        <TableColumn @bind-Field="@context.PositionOfficial" Filterable="true" Sortable="true" DefaultSort="true" />
+        <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" />
+        <TableColumn @bind-Field="@context.PositionGeneral" Sortable="true" />
+        <TableColumn @bind-Field="@context.SubordinateOrganization" Filterable="true" Sortable="true" Searchable="true" />
+        <TableColumn @bind-Field="@context.CustomName" Filterable="true" Sortable="true" Searchable="true" />
+    </TableColumns>
+</Table>
 
 
 @code{
-        [Parameter]
-        public List<StaffModel> Staffs { get; set; }
+    [Parameter]
+    public List<StaffModel> Staffs { get; set; }
 
     private IEnumerable<int> PageItemsSource => new int[] { 10, 20, 40, 80, 200, 1000 };
 
