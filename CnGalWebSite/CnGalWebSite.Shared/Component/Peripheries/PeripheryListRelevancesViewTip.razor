@@ -1,44 +1,39 @@
 ﻿
 <div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa-codepen" Title="相关词条">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-codepen" Title="相关词条" Collapable Outline>
         <div class="mt-3">
-
-
             <div>
-                @foreach (var item in Entries)
+                @foreach (var item in Model.Entries)
                 {
                     <div class="mb-3">
-                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" />
+                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item"  BigCardStyle/>
                     </div>
                 }
 
             </div>
         </div>
-     
+
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
-    @if (IsEdit == true || (Peripheries.Count > 0 && Type != PeripheryType.Set))
+    @if ((Model.Peripheries.Count > 0 && Model.Type != PeripheryType.Set))
     {
-<div class="mt-3">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa-shopping-basket" Title="相关周边">
         <div class="mt-3">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-shopping-basket" Title="相关周边" Collapable Outline>
+                <div class="mt-3">
 
-            @if (Type != PeripheryType.Set)
-            {
-                @foreach (var item in Peripheries)
-                {
-                    <div class="mb-3">
-                        <CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip Model="item" />
-                    </div>
-                }
-            }
+                    @if (Model.Type != PeripheryType.Set)
+                    {
+                        @foreach (var item in Model.Peripheries)
+                        {
+                            <div class="mb-3">
+                                <CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip Model="item" />
+                            </div>
+                        }
+                    }
+                </div>
+
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
         </div>
-     
-    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-</div>
-      
-
-
     }
 
 
@@ -46,21 +41,6 @@
 
 @code {
     [Parameter]
-    public List<EntryInforTipViewModel> Entries { get; set; } = new List<EntryInforTipViewModel>();
-    [Parameter]
-    public List<PeripheryInforTipViewModel> Peripheries { get; set; } = new List<PeripheryInforTipViewModel>();
-
-    [Parameter]
-    public bool IsEdit { get; set; }
-    [Parameter]
-    public EditState RelatedEntriesState { get; set; }
-    [Parameter]
-    public EditState RelatedPeripheriesState { get; set; }
-    [Parameter]
-    public EventCallback<Operation> OnClickRevoke { get; set; }
-    [Parameter]
-    public long Id { get; set; }
-    [Parameter]
-    public PeripheryType Type { get; set; }
+    public PeripheryViewModel Model { get; set; }
 
 }

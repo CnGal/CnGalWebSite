@@ -38,7 +38,7 @@
 
 
 
-                    <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  ? "text-truncate-1" : "text-truncate-2"))">
+                    <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-1" : "text-truncate-2"))">
                         @Model.BriefIntroduction
                     </a>
                     @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && ShowAddInfors)
@@ -74,12 +74,12 @@ else
     <div class="shadow-sm rounded  bg-opacity ps-3 pe-3 pb-3 h-100">
         @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
         {
-            <div style="display:flex;">
+            <div style="@((BigCardStyle?"flex-direction: column;":"")+"display:flex;")">
                 <a href="@("/entries/index/" + Model.Id)" class="a-font-color pt-3 pb-3">
-                    <img loading="lazy" style=" width: 250px; " src="@Model.MainImage" alt="@Model.Name">
+                    <img loading="lazy" style="@(BigCardStyle?" width:100%;":" width: 250px;") " src="@Model.MainImage" alt="@Model.Name">
                 </a>
 
-                <div class="pt-3 ps-3" style=" width: 100%;">
+                <div class="@(BigCardStyle?"pb-2":"pt-3 ps-3")" style=" width: 100%;">
                     <a href="@("/entries/index/" + Model.Id)" class="a-font-color text-truncate-1 mb-2" style="display: flex; align-items: center;">
                         @if (ShowType)
                         {
@@ -89,7 +89,7 @@ else
                         <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
                     </a>
 
-                    <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  ? "text-truncate-2" : "text-truncate-4"))">
+                    <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-2" : "text-truncate-4"))">
 
                         @Model.BriefIntroduction
 
@@ -140,7 +140,7 @@ else
                         <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" Class="ms-2" />
                     </div>
 
-                    <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  ? "text-truncate-2" : "text-truncate-4"))">
+                    <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-2" : "text-truncate-4"))">
                         @Model.BriefIntroduction
                     </a>
 
@@ -221,6 +221,11 @@ else
     public bool ShowType { get; set; } = true;
     [Parameter]
     public bool ShowAddInfors { get; set; } = true;
+    /// <summary>
+    /// 强制大卡片样式
+    /// </summary>
+    [Parameter]
+    public bool BigCardStyle { get; set; }
     [Parameter]
     public bool ForcedShowPublishTime { get; set; }
 }

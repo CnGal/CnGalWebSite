@@ -55,7 +55,7 @@ else
             {
                 <div class="col-12 col-lg-4 ">
 
-                    <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Model="Model.UserInfor" Small/>
+                    <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Model="Model.UserInfor" Small />
 
                     <div class="mb-4">
                         <CnGalWebSite.Shared.MasaComponent.PC.Videos.BasicInforCard Model="Model" OnRevoke="OnRevoke" />
@@ -83,23 +83,23 @@ else
             }
             else
             {
-        <div class="col-12 col-lg-8  order-2 order-lg-1 ">
+                <div class="col-12 col-lg-8  order-2 order-lg-1 ">
 
-            @if (Model.Pictures.Count != 0)
-            {
-                <div class="mb-4">
-                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.ImagesCard Model="Model" OnRevoke="OnRevoke" />
+                    @if (Model.Pictures.Count != 0)
+                    {
+                        <div class="mb-4">
+                            <CnGalWebSite.Shared.MasaComponent.PC.Videos.ImagesCard Model="Model" OnRevoke="OnRevoke" />
+                        </div>
+                    }
+                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainPageCard Model="Model" OnRevoke="OnRevoke" />
+
+
+                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.RelevancesCard Model="Model" OnRevoke="OnRevoke" />
+                    @if (Model.CanComment)
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentVideo" />
+                    }
                 </div>
-            }
-            <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainPageCard Model="Model" OnRevoke="OnRevoke" />
-
-
-            <CnGalWebSite.Shared.MasaComponent.PC.Videos.RelevancesCard Model="Model" OnRevoke="OnRevoke" />
-            @if (Model.CanComment)
-            {
-                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentVideo" />
-            }
-        </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2">
                     <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Model="Model.UserInfor" />
 

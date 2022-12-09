@@ -12,9 +12,6 @@
     public long Id { get; set; }
 
     [Parameter]
-    public bool IsCollected { get; set; }
-
-    [Parameter]
     public EventCallback<bool> CollectionChanged { get; set; }
 
     [Parameter]
@@ -25,6 +22,42 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    bool IsCollected;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var user = await authenticationStateTask;
+
+            if (user.User.Identity.IsAuthenticated)
+            {
+                await GetUserIsCollected();
+
+            }
+        }
+    }
+
+
+    public async Task GetUserIsCollected()
+    {
+        try
+        {
+            var result = await Http.GetFromJsonAsync<CheckPeripheryIsCollectedModel>(ToolHelper.WebApiPath + "api/peripheries/CheckPeripheryIsCollected/" + Id);
+
+            if (result != null)
+            {
+                IsCollected = result.IsCollected;
+                await CollectionChanged.InvokeAsync(IsCollected);
+                StateHasChanged();
+            }
+
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
 
     private async Task OnClickStar()
     {

@@ -3,18 +3,17 @@ namespace CnGalWebSite.DataModel.ViewModel.Peripheries
 {
     public class GameOverviewPeripheriesModel
     {
-        public int EntryId { get; set; }
+        public string ObjectId { get; set; }
 
-        public long PeripheryId { get; set; }
-
-
-        public string UserId { get; set; }
+        public bool IsThumbnail { get; set; }
 
         public string Image { get; set; }
 
         public string Name { get; set; }
 
-        public PeripheryOverviewHeadType Type { get; set; }
+        public string BriefIntroduction { get; set; }
+
+        public PeripheryOverviewType Type { get; set; }
 
 
         public List<PeripheryOverviewModel> Peripheries { get; set; } = new List<PeripheryOverviewModel>();
@@ -33,10 +32,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Peripheries
         public int CollectedCount { get; set; }
     }
 
-    public enum PeripheryOverviewHeadType
+    public enum PeripheryOverviewType
     {
-        GameOrGroup,
-        RoleOrStaff,
+        Entry,
         User,
         Periphery
     }

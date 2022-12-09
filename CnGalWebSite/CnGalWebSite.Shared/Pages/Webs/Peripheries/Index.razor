@@ -32,67 +32,89 @@ else
 
 @if (isNotFound == true)
 {
-    int temp = 0;
     <NotFoundPeriphery IsNeedLayput="true"></NotFoundPeriphery>
 }
 else
 {
-    <div>
-        @if (isReady == false)
-        {
-            <div style="padding-right: 0;padding-left: 0;">
-                <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
-                    <SkeletonParagraph />
-                    <hr class="m-2" />
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
-                    <div class="mt-2">
-                    </div>
-                    <SkeletonParagraph />
+    @if (isReady == false)
+    {
+        <div>
+            <div class="  rounded shadow-sm  ps-4 pe-4 pt-3 pb-3 bg-opacity rounded">
+                <SkeletonParagraph />
+                <hr class="m-2" />
+                <SkeletonParagraph />
+                <div class="mt-2">
                 </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
+                <div class="mt-2">
+                </div>
+                <SkeletonParagraph />
             </div>
-        }
-        else
-        {
-            @if (Model.IsHidden == true)
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12 mb-4">
+                @if (Model.IsHidden == true)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
+                        当前周边处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+                    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+
+                }
+                <PeripheryMainInforTip Model="Model" OnRevoke="OnRevoke" OnPreEdit="OnPreEdit" CollectionChanged="CollectionChanged"/>
+            </div>
+
+
+            @if (_dataCatcheService.IsApp)
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning" Class="mb-3">
-                    当前周边处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-                </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+                <div class="col-12 col-lg-4 ">
+
+                    <PeripheryBasicInforTip Model="Model" OnRevoke="OnRevoke" />
+                </div>
+                <div class="col-12 col-lg-8">
+                    @if (Model.Pictures.Count != 0)
+                    {
+                        <div class="mb-3">
+                            <PeripheryImagesViewTip Model="Model" OnRevoke="OnRevoke" />
+                        </div>
+                    }
+                    <PeripheryListOverviewsTip Model="Model" @ref="appPeripheryOverViewTip" OnRevoke="OnRevoke" />
+                    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentPeriphery" />
+                </div>
             }
-
-            <div class="  rounded shadow-sm  bg-opacity mb-3">
-                <PeripheryMainInforTip Model="Model" />
-                <div>
-                    <CnGalWebSite.Shared.Component.Votes.Relevances.ListRelatedVotesInforCard Type="VoteOptionType.Periphery" Id="Model.Id" />
-                </div>
-                <div class="mt-4 pb-4">
-                    <PeripheryOperationTip Model="Model" CollectionChanged="CollectionChanged"></PeripheryOperationTip>
-                </div>
-
-            </div>
-            <div class="rounded shadow-sm bg-opacity mb-3">
-                <PeripheryBasicInforTip Model="Model" OnRevoke="OnRevoke" />
-            </div>
-
-            @if (Model.Pictures.Count != 0)
+            else
             {
-                <div class="mb-3">
-                    <PeripheryImagesViewTip Model="Model" OnRevoke="OnRevoke" />
+
+                <div class="col-12 col-lg-8  order-2 order-lg-1">
+                    @if (Model.Pictures.Count != 0)
+                    {
+                        <div class="mb-3">
+                            <PeripheryImagesViewTip Model="Model" OnRevoke="OnRevoke" />
+                        </div>
+                    }
+
+                    <PeripheryListOverviewsTip Model="Model" @ref="peripheryOverViewTip" OnRevoke="OnRevoke" />
+
+
+                    <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentPeriphery" />
+
+                </div>
+
+                <div class="col-12 col-lg-4 order-1 order-lg-2">
+
+                    <PeripheryBasicInforTip Model="Model" OnRevoke="OnRevoke" />
+                    <PeripheryListRelevancesViewTip Model="Model"/>
                 </div>
             }
-            <div class="">
-                <PeripheryListOverviewsTip Model="Model" @ref="peripheryOverViewTip" OnRevoke="OnRevoke" />
-            </div>
+        </div>
 
-                <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentPeriphery" />
-        }
-    </div>
+
+    }
 }
 
 
@@ -129,6 +151,8 @@ else
     public bool IsUserFavorited { get; set; }
     public FavoriteFoldersViewModel UserFavoriteInfor { get; set; }
     private PeripheryListOverviewsTip peripheryOverViewTip;
+    private PeripheryListOverviewsTip appPeripheryOverViewTip;
+
     public bool IsAdmin { get; set; } = false;
     string LastLookName = "";
     bool isFrist = true;
@@ -163,6 +187,14 @@ else
         }
 
     }
+
+    public Task OnPreEdit(bool value)
+    {
+        Model.IsEdit = value;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -200,8 +232,14 @@ else
 
     public async Task CollectionChanged(bool isCollected)
     {
-        Model.IsCollected = isCollected;
-        peripheryOverViewTip.CollectionChanged(isCollected, Model.Id);
+        if (peripheryOverViewTip != null)
+        {
+            await peripheryOverViewTip.CollectionChanged(isCollected, Model.Id);
+        }
+        if (appPeripheryOverViewTip != null)
+        {
+            await appPeripheryOverViewTip.CollectionChanged(isCollected, Model.Id);
+        }
     }
 
     [Inject]
@@ -247,6 +285,9 @@ else
                         break;
                     case Operation.EditPeripheryRelatedEntries:
                         Model.RelatedEntriesState = EditState.Normal;
+                        break;
+                    case Operation.EditPeripheryRelatedPeripheries:
+                        Model.RelatedPeripheriesState = EditState.Normal;
                         break;
                 }
                 Id = id;

@@ -15,8 +15,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Peripheries
 
         public bool IsEdit { get; set; }
 
-        public bool IsCollected { get; set; }
-
         public EditState ImagesState { get; set; }
 
         public EditState MainState { get; set; }
