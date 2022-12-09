@@ -438,8 +438,11 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             {
                 model.Image = _appHelper.GetImagePath(user?.PhotoPath, "user.png");
                 model.Name = user?.UserName ?? "登入后记录周边收集进度";
-                model.UserId = user?.Id;
-                model.Type = PeripheryOverviewHeadType.User;
+                model.ObjectId = user?.Id;
+                model.IsThumbnail = true;
+                model.Type = PeripheryOverviewType.User;
+                model.BriefIntroduction = user?.PersonalSignature;
+
             }
 
             //获取词条信息
@@ -447,9 +450,12 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             {
                 model.Image = _appHelper.GetImagePath((entry.Type == EntryType.Game || entry.Type == EntryType.ProductionGroup) ? entry.MainPicture : entry.Thumbnail, (entry.Type == EntryType.Game || entry.Type == EntryType.ProductionGroup) ? "app.png" : "user.png");
                 model.Name = entry.DisplayName ?? entry.Name;
-                model.Type = (entry.Type == EntryType.Game || entry.Type == EntryType.ProductionGroup) ? PeripheryOverviewHeadType.GameOrGroup : PeripheryOverviewHeadType.RoleOrStaff;
+                model.Type = PeripheryOverviewType.Entry;
+                model.IsThumbnail = entry.Type == EntryType.Role || entry.Type == EntryType.Staff;
+                model.ObjectId = entry.Id.ToString();
+                model.BriefIntroduction = entry.BriefIntroduction;
             }
-            model.EntryId = entry.Id;
+          
 
             return model;
         }
@@ -487,8 +493,10 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             {
                 model.Image = _appHelper.GetImagePath(user?.PhotoPath, "user.png");
                 model.Name = user?.UserName ?? "登入后记录周边收集进度";
-                model.UserId = user?.Id;
-                model.Type = PeripheryOverviewHeadType.User;
+                model.ObjectId = user?.Id;
+                model.Type = PeripheryOverviewType.User;
+                model.BriefIntroduction = user?.PersonalSignature;
+                model.IsThumbnail = true;
             }
 
             //获取主周边信息信息
@@ -496,9 +504,11 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             {
                 model.Image = _appHelper.GetImagePath(periphery.MainPicture, "app.png");
                 model.Name = periphery.DisplayName ?? periphery.Name;
-                model.Type = PeripheryOverviewHeadType.Periphery;
+                model.Type = PeripheryOverviewType.Periphery;
+                model.BriefIntroduction = periphery.BriefIntroduction;
+                model.ObjectId = periphery.Id.ToString();
             }
-            model.PeripheryId = periphery.Id;
+           
 
             return model;
         }

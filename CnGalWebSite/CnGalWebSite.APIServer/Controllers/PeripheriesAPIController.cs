@@ -128,14 +128,6 @@ namespace CnGalWebSite.APIServer.Controllers
             //建立视图模型
             var model = _peripheryService.GetPeripheryViewModel(periphery);
 
-            //判断该周边是否被收集
-            if (user != null)
-            {
-                model.IsCollected = await _userOwnedPeripheryRepository.GetAll().AnyAsync(s => s.PeripheryId == model.Id && s.ApplicationUserId == user.Id);
-            }
-
-
-
 
             if (user != null)
             {
@@ -1073,6 +1065,23 @@ namespace CnGalWebSite.APIServer.Controllers
                 ContrastModel = result[0],
                 CurrentModel = result[1],
             };
+
+            return model;
+        }
+
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<CheckPeripheryIsCollectedModel>> CheckPeripheryIsCollected(long id)
+        {
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+
+            var model = new CheckPeripheryIsCollectedModel();
+
+            //判断该周边是否被收集
+            if (user != null)
+            {
+                model.IsCollected = await _userOwnedPeripheryRepository.GetAll().AnyAsync(s => s.PeripheryId == id && s.ApplicationUserId == user.Id);
+            }
 
             return model;
         }

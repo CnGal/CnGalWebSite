@@ -1,6 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject ToastService? ToastService
+@inject IDataCacheService _dataCatcheService
 
 
 @if (isReady)
@@ -8,80 +9,59 @@
 
     @if (Model.Peripheries.Count != 0)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边" Icon="fa fa-fw fa-shopping-basket" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="周边" Icon="fa fa-fw fa-shopping-basket" Outline OnlyShowContext="OnlyShowContext">
 
-            <div class="@(Outline ? "":" rounded shadow-sm  bg-opacity p-3 " +Class)">
-                @if (Model.Type == PeripheryOverviewHeadType.GameOrGroup || Model.Type == PeripheryOverviewHeadType.RoleOrStaff)
-                {
-                    <TabLink style="display: flex; align-items: center;" class="pb-3 a-font-color" Url="@("/entries/index/"+Model.EntryId+"/20")" Icon="fa fa-codepen" Text="@Model.Name">
-                        @if (Model.Type == PeripheryOverviewHeadType.GameOrGroup)
+            <div class="@(Outline ? "":" rounded shadow-sm  bg-opacity " +Class)">
+                <a class="a-font-color" href="@Url">
+                    <div class="row m-0">
+                        @if (Model.IsThumbnail)
                         {
-                            <img src="@Model.Image" alt="@Model.Name" style="width: 100px; height: auto;" />
+                            <div class="col-auto  ps-3 pt-3 pe-0" style=" display: flex; align-items: center;">
+                                <img src="@Model.Image" alt="@Model.Name" style="aspect-ratio: 1/1; height: 75px; border-radius: 50%;" />
+                            </div>
                         }
                         else
                         {
-                            <img src="@Model.Image" alt="@Model.Name" style="width:50px;height:50px;border-radius:50%;" />
-
+                            <div class="d-md-flex d-none col-auto  ps-3 pt-3 pe-0">
+                                <img src="@Model.Image" alt="@Model.Name" style="aspect-ratio: 460/215; height: 75px;" />
+                            </div>
+                            <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;">
+                                <img src="@Model.Image" alt="@Model.Name" style="aspect-ratio: 460/215; width: 100%;" />
+                            </div>
                         }
-                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; flex-direction: column; min-height: 45px; " class="w-100 ms-3">
-                            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-                                <div style="display: flex; flex-direction: column; justify-content: flex-end; font-size: large; ">@Model.Name</div>
-                                <div>@("收集进度 "+Model.Peripheries.Count(s=>s.IsCollected==true)+"/" + Model.Peripheries.Count)</div>
-                            </div>
-                            <div>
-                                <Progress Value="@((int)((double)Model.Peripheries.Count(s=>s.IsCollected==true)*100/Model.Peripheries.Count))" Color="Color.Success" IsShowValue="true" Height="10"></Progress>
+                        <div class="ps-3 pt-3 pe-4 col">
+                            <div style=" display: flex; flex-wrap: wrap; flex-direction: column; justify-content: center;" class="w-100 h-100">
+                                <div style="display: flex; align-items: flex-end; justify-content: flex-start; flex-wrap: wrap;" class="mb-2">
+                                    <div class="h5 fw-bold m-0 me-2">@Model.Name</div>
+
+                                    <div style="color: gray;">@("收集进度 "+Model.Peripheries.Count(s=>s.IsCollected==true)+"/" + Model.Peripheries.Count)</div>
+                                </div>
+                                <div class=" text-truncate-2">@Model.BriefIntroduction</div>
+
                             </div>
                         </div>
-                    </TabLink>
-                }
-                else if (Model.Type == PeripheryOverviewHeadType.Periphery)
-                {
-                    <TabLink style="display: flex; align-items: center;" class="pb-3 a-font-color" Url="@("/peripheries/index/"+Model.PeripheryId)" Icon="fa fa-shopping-basket" Text="@Model.Name">
-                        <img src="@Model.Image" alt="@Model.Name" style="width: 100px; height: auto;" />
-
-
-                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; flex-direction: column; min-height: 45px; " class="w-100 ms-3">
-                            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-                                <div style="display: flex; flex-direction: column; justify-content: flex-end; font-size: large; ">@Model.Name</div>
-                                <div>@("收集进度 "+Model.Peripheries.Count(s=>s.IsCollected==true)+"/" + Model.Peripheries.Count)</div>
-                            </div>
-                            <div>
-                                <Progress Value="@((int)((double)Model.Peripheries.Count(s=>s.IsCollected==true)*100/Model.Peripheries.Count))" Color="Color.Success" IsShowValue="true" Height="10"></Progress>
-                            </div>
-                        </div>
-                    </TabLink>
-                }
-                else if (Model.Type == PeripheryOverviewHeadType.User)
-                {
-                    <TabLink style=" display: flex; align-items: center;" class="pb-3 a-font-color" Url="@(string.IsNullOrWhiteSpace(Model.UserId)?("/account/login/"+ToolHelper.Base64EncodeUrl(NavigationManager.Uri)):( "/space/index/"+Model.UserId+"/11"))" Icon="fa fa-star-o" Text="@Model.Name">
-                        <img src="@Model.Image" alt="@Model.Name" style="width:50px;height:50px;border-radius:50%;" />
-                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; flex-direction: column;min-height:45px; " class="w-100 ms-3">
-                            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-                                <div style="display: flex; flex-direction: column; justify-content: flex-end; font-size: large; ">@Model.Name</div>
-                                <div>@("收集进度 "+Model.Peripheries.Count(s=>s.IsCollected==true)+"/" + Model.Peripheries.Count)</div>
-                            </div>
-                            <div>
-                                <Progress Value="@((int)((double)Model.Peripheries.Count(s=>s.IsCollected==true)*100/Model.Peripheries.Count))" Color="Color.Success" IsShowValue="true" Height="10"></Progress>
-                            </div>
-                        </div>
-                    </TabLink>
-                }
-
-                @if (Model.Peripheries.Count != 0)
-                {
-                    <div style=" display: flex; flex-direction: row; overflow-x: auto; flex-wrap: nowrap; ">
+                    </div>
+                </a>
+                <div class="ms-3 me-3 mb-1 mt-1 pt-2">
+                    <MProgressLinear Value="@((int)((double)Model.Peripheries.Count(s=>s.IsCollected==true)*100/Model.Peripheries.Count))" BufferValue="0" Stream Color="@_dataCatcheService.ThemeSetting.Theme"/>
+                </div>
+                <MSlideGroup ShowArrows="true" Class="ms-2 me-2 pb-2">
+                    <ChildContent>
                         @foreach (var item in Model.Peripheries)
                         {
-                            <div class="h-100 me-2" style="width: 170px;">
-                                <PeripheryOverviewAloneTip Model="item" />
-                            </div>
+                            <MSlideItem>
+                                <MCard Width="150" Class="p-2" Outlined Style="border:0;background-color:transparent"
+                                       OnClick="@context.Toggle"
+                                       RefBack="@context.Ref">
+                                    <PeripheryOverviewAloneTip Model="item" />
+                                </MCard>
+                            </MSlideItem>
                         }
-                    </div>
-                }
+                    </ChildContent>
 
+                </MSlideGroup>
             </div>
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-
     }
     else
     {
@@ -105,8 +85,6 @@
         }
     }
 
-
-
 }
 
 @code {
@@ -120,6 +98,8 @@
     public bool IsGameView { get; set; }
     [Parameter]
     public string Class { get; set; }
+    [Parameter]
+    public bool OnlyShowContext { get; set; }
 
     bool isReady = false;
     [CascadingParameter]
@@ -127,6 +107,8 @@
 
     [Parameter]
     public GameOverviewPeripheriesModel Model { get; set; }
+
+    string Url;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -141,11 +123,23 @@
             {
                 ErrorHandler.ProcessError(ex, "获取词条相关周边集合概览失败");
             }
-
         }
         else
         {
             isReady = true;
+        }
+
+        if (Model.Type == PeripheryOverviewType.Entry)
+        {
+            Url = "/entries/index/" + Model.ObjectId;
+        }
+        else if (Model.Type == PeripheryOverviewType.Periphery)
+        {
+            Url = "/peripheries/index/" + Model.ObjectId;
+        }
+        else if (Model.Type == PeripheryOverviewType.User)
+        {
+            Url = string.IsNullOrWhiteSpace(Model.ObjectId) ? ("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri)) : ("/space/index/" + Model.ObjectId + "/11");
         }
     }
 
