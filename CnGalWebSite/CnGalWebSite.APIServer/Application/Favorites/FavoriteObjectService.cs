@@ -34,54 +34,68 @@ namespace CnGalWebSite.APIServer.Application.Favorites
 
         public async Task<QueryData<ListFavoriteObjectAloneModel>> GetPaginatedResult(CnGalWebSite.DataModel.ViewModel.Search.QueryPageOptions options, ListFavoriteObjectAloneModel searchModel, long favoriteFolderId = 0)
         {
-            IEnumerable<FavoriteObject> items;
+            IQueryable<FavoriteObject> items;
 
             //是否限定用户
             if (favoriteFolderId != 0)
             {
-                items = _favoriteObjectRepository.GetAll().AsNoTracking().Where(s => s.FavoriteFolderId == favoriteFolderId);
+                items = _favoriteObjectRepository.GetAll().AsNoTracking()
+                    .Include(s=>s.Entry)
+                    .Include(s=>s.Article)
+                    .Include(s=>s.Periphery)
+                    .Include(s=>s.Video)
+                    .Include(s=>s.Tag)
+                    .Where(s => s.FavoriteFolderId == favoriteFolderId);
             }
             else
             {
-                items = _favoriteObjectRepository.GetAll().AsNoTracking();
+                items = _favoriteObjectRepository.GetAll().AsNoTracking()
+                    .Include(s => s.Entry)
+                    .Include(s => s.Article)
+                    .Include(s => s.Periphery)
+                    .Include(s => s.Video)
+                    .Include(s => s.Tag);
             }
-
-
 
             // 排序
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
-                // 外部未进行排序，内部自动进行排序处理
-                var invoker = SortLambdaCache.GetOrAdd(typeof(FavoriteObject), key => LambdaExtensions.GetSortLambda<FavoriteObject>().Compile());
-                items = invoker(items, options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }
-
             // 设置记录总数
             var total = items.Count();
 
             // 内存分页
-            items = items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToList();
-
-            //获取名称
-            var entryIds = items.Where(s => s.Type == FavoriteObjectType.Entry).Select(s => s.EntryId).ToList();
-            var articleIds = items.Where(s => s.Type == FavoriteObjectType.Article).Select(s => s.ArticleId).ToList();
-
-            var entry_ = await _entryRepository.GetAll().Where(s => entryIds.Contains(s.Id)).Select(s => new KeyValuePair<long, string>(s.Id, s.DisplayName)).ToListAsync();
-            var article_ = await _articleRepository.GetAll().Where(s => articleIds.Contains(s.Id)).Select(s => new KeyValuePair<long, string>(s.Id, s.DisplayName)).ToListAsync();
-
+            var itemsReal = await items.Skip((options.PageIndex - 1) * options.PageItems).Take(options.PageItems).ToListAsync();
 
             //复制数据
             var resultItems = new List<ListFavoriteObjectAloneModel>();
-            foreach (var item in items)
+            foreach (var item in itemsReal)
             {
                 resultItems.Add(new ListFavoriteObjectAloneModel
                 {
                     Id = item.Id,
-                    Name = item.Type == FavoriteObjectType.Entry ? entry_.FirstOrDefault(s => s.Key == item.EntryId).Value : article_.FirstOrDefault(s => s.Key == item.ArticleId).Value,
+                    Name = item.Type switch
+                    {
+                        FavoriteObjectType.Entry=>item.Entry.DisplayName,
+                        FavoriteObjectType.Article => item.Article.DisplayName,
+                        FavoriteObjectType.Periphery => item.Periphery.DisplayName,
+                        FavoriteObjectType.Video => item.Video.DisplayName,
+                        FavoriteObjectType.Tag => item.Tag.Name,
+                        _=>null
+                    },
                     Type = item.Type,
-                    ObjectId = (long)(item.Type == FavoriteObjectType.Entry ? item.EntryId : item.ArticleId),
+                    ObjectId = item.Type switch
+                    {
+                        FavoriteObjectType.Entry => item.Entry.Id,
+                        FavoriteObjectType.Article => item.Article.Id,
+                        FavoriteObjectType.Periphery => item.Periphery.Id,
+                        FavoriteObjectType.Video => item.Video.Id,
+                        FavoriteObjectType.Tag => item.Tag.Id,
+                        _ => 0
+                    },
                     CreateTime = item.CreateTime
                 });
             }

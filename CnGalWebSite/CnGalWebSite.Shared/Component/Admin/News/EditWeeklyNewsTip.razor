@@ -2,7 +2,6 @@
 @inject DialogService DialogService
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
-@inject IServiceProvider Provider
 @inject IDataCacheService _dataCacheService
 
 
@@ -226,7 +225,7 @@
     private async Task OnLook()
     {
         Dialog = false;
-        NavigationManager.NavigateTo(Provider, "/articles/index/" + Model.ArticleId, Model.Title, "fa fa-newspaper-o");
+        NavigationManager.NavigateTo("/articles/index/" + Model.ArticleId);
 
     }
     public async Task OnReset()

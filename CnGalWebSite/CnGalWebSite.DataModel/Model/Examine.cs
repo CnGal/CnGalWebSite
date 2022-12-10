@@ -68,6 +68,9 @@ namespace CnGalWebSite.DataModel.Model
 
         public long? VideoId { get; set; }
         public Video Video { get; set; }
+
+        public long? FavoriteFolderId { get; set; }
+        public FavoriteFolder FavoriteFolder { get; set; }
         /// <summary>
         /// 前置审核Id
         /// </summary>
@@ -175,5 +178,7 @@ namespace CnGalWebSite.DataModel.Model
         EditVideoMainPage,
         [Display(Name = "编辑视频关联词条")]
         EditVideoRelevanes,
+        [Display(Name = "编辑收藏夹")]
+        EditFavoriteFolderMain,
     }
 }

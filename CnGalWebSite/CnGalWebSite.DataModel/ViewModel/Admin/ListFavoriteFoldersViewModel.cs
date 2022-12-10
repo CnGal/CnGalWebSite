@@ -30,8 +30,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         [Display(Name = "收藏数")]
         public long Count { get; set; }
 
-        [Display(Name = "是否默认")]
+        [Display(Name = "默认")]
         public bool IsDefault { get; set; }
+        [Display(Name = "公开")]
+        public bool ShowPublicly { get; set; }
+        [Display(Name = "隐藏")]
+        public bool IsHidden { get; set; }
     }
 
     public class FavoriteFoldersPagesInfor

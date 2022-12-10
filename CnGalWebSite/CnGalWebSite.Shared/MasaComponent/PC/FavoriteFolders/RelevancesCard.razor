@@ -1,0 +1,98 @@
+﻿
+@if (Model.Objects.Any(s => s.entry != null))
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-codepen" Title="相关词条" Outline Collapable>
+        <div class="mt-3">
+            <div>
+                @foreach (var item in Model.Objects.Where(s => s.entry != null).Select(s => s.entry))
+                {
+                    <div class="mb-3">
+                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ShowType />
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+@if (Model.Objects.Any(s => s.article != null))
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-newspaper-o" Title="相关文章" Outline Collapable>
+        <div class="mt-3">
+
+
+            <div>
+                @foreach (var item in Model.Objects.Where(s => s.article != null).Select(s => s.article))
+                {
+                    <div class="mb-3">
+                        <CnGalWebSite.Shared.Component.Search.NewVersion.ArticleInforViewTip Model="item" />
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+@if (Model.Objects.Any(s => s.Tag != null))
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-tags" Title="相关标签" Outline Collapable>
+        <div class="mt-3">
+
+
+            <div>
+                @foreach (var item in Model.Objects.Where(s => s.Tag != null).Select(s => s.Tag))
+                {
+                    <div class="mb-3">
+                        <CnGalWebSite.Shared.Component.Search.NewVersion.TagInforViewTip Model="item" />
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+@if (Model.Objects.Any(s => s.periphery != null))
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-shopping-basket" Title="相关周边" Outline Collapable>
+        <div class="mt-3">
+
+
+            <div>
+                @foreach (var item in Model.Objects.Where(s => s.periphery != null).Select(s => s.periphery))
+                {
+                    <div class="mb-3">
+                        <CnGalWebSite.Shared.Component.Search.NewVersion.PeripheryInforViewTip Model="item" />
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+@if (Model.Objects.Any(s => s.Video != null))
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw  fa-video-camera" Title="相关视频" Outline Collapable>
+        <div class="mt-3">
+
+
+            <div>
+                @foreach (var item in Model.Objects.Where(s => s.Video != null).Select(s => s.Video))
+                {
+                    <div class="mb-3">
+                        <CnGalWebSite.Shared.Component.Search.NewVersion.VideoInforViewTip Model="item" />
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+@code {
+    [Parameter]
+    public FavoriteFolderViewModel Model { get; set; }
+}

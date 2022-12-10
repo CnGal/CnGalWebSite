@@ -4,7 +4,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Favorites
 {
     public class FavoriteFoldersViewModel
     {
-        public List<FavoriteFolderAloneModel> Favorites { get; set; }
+        public List<FavoriteFolderAloneModel> Favorites { get; set; }=new List<FavoriteFolderAloneModel>();
     }
     public class FavoriteFolderAloneModel
     {
@@ -13,6 +13,16 @@ namespace CnGalWebSite.DataModel.ViewModel.Favorites
         public string Name { get; set; }
 
         public bool IsDefault { get; set; }
+        /// <summary>
+        /// 是否向他人公开
+        /// </summary>
+        public bool ShowPublicly { get; set; }
+
+        /// <summary>
+        /// 是否隐藏
+        /// </summary>
+        public bool IsHidden { get; set; }
+
 
         public string MainImage { get; set; }
 

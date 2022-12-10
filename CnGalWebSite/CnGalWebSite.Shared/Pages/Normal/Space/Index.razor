@@ -1,5 +1,4 @@
-﻿@page "/space/index/{Id}/{DefaultIndex}"
-@page "/space/index/{Id}"
+﻿@page "/space/index/{Id}"
 
 @inject IDataCacheService _dataCacheService
 
@@ -8,7 +7,5 @@
 @code{
     [Parameter]
     public string Id { get; set; }
-    [Parameter]
-    public string DefaultIndex { get; set; }
 }
 

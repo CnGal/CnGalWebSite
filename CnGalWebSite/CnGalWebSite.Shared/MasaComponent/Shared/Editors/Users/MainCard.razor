@@ -25,13 +25,13 @@
             <div class="col-12">
                 <MCardText Class="p-0">展示的头衔</MCardText>
                 <div style="display:flex;">
+                    @foreach (var item in Model.Ranks)
+                    {
+                        <MCheckbox @bind-Value="item.IsShow" Label="@item.Name" Color="@_dataCacheService.ThemeSetting.Theme" Class="me-4 mt-2" />
 
+                    }
                 </div>
-                @foreach (var item in Model.Ranks)
-                {
-                    <MCheckbox @bind-Value="item.IsShow" Label="@item.Name" Color="@_dataCacheService.ThemeSetting.Theme" Class="me-2" />
-
-                }
+            
             </div>
 
         </div>

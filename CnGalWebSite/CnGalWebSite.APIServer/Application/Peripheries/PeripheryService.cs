@@ -54,13 +54,9 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             {
                 items = items.Where(item => item.BriefIntroduction?.Contains(searchModel.BriefIntroduction, StringComparison.OrdinalIgnoreCase) ?? false);
             }
-            if (!string.IsNullOrWhiteSpace(searchModel.Author))
+            if (!string.IsNullOrWhiteSpace(searchModel.Category))
             {
-                items = items.Where(item => item.Author?.Contains(searchModel.Author, StringComparison.OrdinalIgnoreCase) ?? false);
-            }
-            if (!string.IsNullOrWhiteSpace(searchModel.Material))
-            {
-                items = items.Where(item => item.Material?.Contains(searchModel.Material, StringComparison.OrdinalIgnoreCase) ?? false);
+                items = items.Where(item => item.Category?.Contains(searchModel.Category, StringComparison.OrdinalIgnoreCase) ?? false);
             }
 
 
@@ -104,10 +100,10 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                     LastEditTime = item.LastEditTime,
                     ReaderCount = item.ReaderCount,
                     CanComment = item.CanComment ?? true,
-                    Author = item.Author,
+                    Type = item.Type,
                     CollectedCount = item.CollectedCount,
                     CommentCount = item.CommentCount,
-                    Material = item.Material,
+                    Category = item.Category,
                 });
             }
 

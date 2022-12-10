@@ -55,9 +55,12 @@ else
 
             <i class="fa fa-thumbs-o-up fa-fw d-none d-sm-inline"></i>
             <span class="article-home-infor-text d-none d-sm-inline">@(Model.ThumbsUpCount)人点赞&nbsp;&nbsp;&nbsp;</span>
+            @if (string.IsNullOrWhiteSpace(Model.CreateUserName) == false)
+            {
+                <i class="fa fa-user fa-fw"></i>
+                <span class="article-home-infor-text">@Model.CreateUserName&nbsp;&nbsp;&nbsp;</span>
+            }
 
-            <i class="fa fa-user fa-fw"></i>
-            <span class="article-home-infor-text">@Model.CreateUserName&nbsp;&nbsp;&nbsp;</span>
         </a>
     </div>
 

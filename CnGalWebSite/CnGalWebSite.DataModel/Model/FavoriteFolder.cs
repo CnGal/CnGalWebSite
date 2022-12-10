@@ -16,6 +16,22 @@ namespace CnGalWebSite.DataModel.Model
         public string BriefIntroduction { get; set; }
 
         public DateTime CreateTime { get; set; }
+        /// <summary>
+        /// 最后编辑时间
+        /// </summary>
+        public DateTime LastEditTime { get; set; }
+        /// <summary>
+        /// 是否向他人公开
+        /// </summary>
+        public bool ShowPublicly { get; set; }
+        /// <summary>
+        /// 阅读数
+        /// </summary>
+        public int ReaderCount { get; set; }
+        /// <summary>
+        /// 是否隐藏
+        /// </summary>
+        public bool IsHidden { get; set; }
 
         public string ApplicationUserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
@@ -23,6 +39,11 @@ namespace CnGalWebSite.DataModel.Model
         public long Count { get; set; }
 
         public ICollection<FavoriteObject> FavoriteObjects { get; set; }
+
+        /// <summary>
+        /// 审核记录 也是编辑记录
+        /// </summary>
+        public ICollection<Examine> Examines { get; set; } = new List<Examine>();
     }
 
     public class FavoriteObject

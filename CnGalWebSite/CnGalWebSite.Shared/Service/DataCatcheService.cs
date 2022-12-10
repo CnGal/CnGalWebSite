@@ -147,6 +147,10 @@ namespace CnGalWebSite.Shared.Service
         /// 视频主页数据缓存
         /// </summary>
         public IPageModelCatche<VideoViewModel> VideoIndexPageCatche { get; set; }
+        /// <summary>
+        /// 目录主页数据缓存
+        /// </summary>
+        public IPageModelCatche<FavoriteFolderViewModel> FavoriteFolderIndexPageCatche { get; set; }
 
         /// <summary>
         /// 标签主页数据缓存
@@ -360,7 +364,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<List<EntryInforTipViewModel>> publishGameTimesDataCatche,
         IPageModelCatche<List<MainImageCardModel>> homeListCardsCache,
         IPageModelCatche<VideoViewModel> videoIndexPageCatche,
-        IPageModelCatche<List<RoleBrithdayViewModel>> roleBrithdaysDataCatche  )
+        IPageModelCatche<List<RoleBrithdayViewModel>> roleBrithdaysDataCatche,
+        IPageModelCatche<FavoriteFolderViewModel> favoriteFolderIndexPageCatche)
         {
             (EntryIndexPageCatche = entryIndexPageCatche).Init(nameof(EntryIndexPageCatche), ToolHelper.WebApiPath + "api/entries/GetEntryView/");
             (ArticleIndexPageCatche = articleIndexPageCatche).Init(nameof(ArticleIndexPageCatche), ToolHelper.WebApiPath + "api/articles/GetArticleView/");
@@ -368,6 +373,7 @@ namespace CnGalWebSite.Shared.Service
             (VoteIndexPageCatche = voteIndexPageCatche).Init(nameof(VoteIndexPageCatche), ToolHelper.WebApiPath + "api/votes/GetVoteView/");
             (LotteryIndexPageCatche = lotteryIndexPageCatche).Init(nameof(LotteryIndexPageCatche), ToolHelper.WebApiPath + "api/lotteries/GetLotteryView/");
             (VideoIndexPageCatche = videoIndexPageCatche).Init(nameof(VideoIndexPageCatche), ToolHelper.WebApiPath + "api/videos/GetView/");
+            (FavoriteFolderIndexPageCatche = favoriteFolderIndexPageCatche).Init(nameof(FavoriteFolderIndexPageCatche), ToolHelper.WebApiPath + "api/Favorites/GetView/");
             (TagIndexPageCatche = tagIndexPageCatche).Init(nameof(TagIndexPageCatche), ToolHelper.WebApiPath + "api/tags/gettag/");
             (ExaminesOverviewCatche = examinesOverviewCatche).Init(nameof(ExaminesOverviewCatche), ToolHelper.WebApiPath + "api/examines/GetExaminesOverview/");
             (EntryContrastEditRecordViewCatche = entryContrastEditRecordViewCatche).Init(nameof(EntryContrastEditRecordViewCatche), ToolHelper.WebApiPath + "api/entries/GetContrastEditRecordViews/");

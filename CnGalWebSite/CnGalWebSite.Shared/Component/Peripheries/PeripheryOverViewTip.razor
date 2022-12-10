@@ -139,7 +139,7 @@
         }
         else if (Model.Type == PeripheryOverviewType.User)
         {
-            Url = string.IsNullOrWhiteSpace(Model.ObjectId) ? ("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri)) : ("/space/index/" + Model.ObjectId + "/11");
+            Url = string.IsNullOrWhiteSpace(Model.ObjectId) ? ("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri)) : ("/space/index/" + Model.ObjectId + "?TabIndex=11");
         }
     }
 

@@ -12,8 +12,6 @@ namespace CnGalWebSite.APIServer.Application.Search
 
         Task DeleteDataOfSearchService();
 
-        Task<PagedResultDto<SearchAloneModel>> QueryAsync(int page, int limit, string text, string screeningConditions, string sort, QueryType type);
-
         Task<PagedResultDto<SearchAloneModel>> QueryAsync(SearchInputModel model);
 
     }

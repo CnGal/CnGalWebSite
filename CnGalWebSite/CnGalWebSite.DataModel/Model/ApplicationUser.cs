@@ -84,6 +84,7 @@ namespace CnGalWebSite.DataModel.Model
         /// <summary>
         /// 是否公开收藏夹
         /// </summary>
+        [Obsolete("用户主页展示设置为公开的所有收藏夹，不受此项限制")]
         public bool IsShowFavotites { get; set; }
         /// <summary>
         /// 是否公开游玩记录

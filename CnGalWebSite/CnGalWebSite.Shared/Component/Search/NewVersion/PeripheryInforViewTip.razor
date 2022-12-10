@@ -32,7 +32,7 @@ else
 
         <div class="pt-3 ps-3" style=" width: 100%;">
             <a href="@("/peripheries/index/" + Model.Id)" class="a-font-color text-truncate-1 mb-2"  style=" display: flex; align-items: center;">
-                <div class="article-home-tag">周边</div>
+                <div class="article-home-tag">@(Model.Type== PeripheryType.None?(string.IsNullOrWhiteSpace(Model.Category) ?"周边":Model.Category) :Model.Type.GetDisplayName())</div>
                 <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
             </a>
 

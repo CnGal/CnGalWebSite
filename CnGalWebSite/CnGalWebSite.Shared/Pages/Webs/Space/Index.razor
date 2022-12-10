@@ -74,7 +74,7 @@ else
                             }
                             @if (Model.IsCurrentUser || Model.IsShowFavorites)
                             {
-                                <MTab Value="5">
+                                <MTab Value="11">
                                     收藏夹<MIcon>mdi-heart-multiple </MIcon>
                                 </MTab>
                             }
@@ -171,7 +171,7 @@ else
 
                             @if (Model.IsCurrentUser || Model.IsShowFavorites)
                             {
-                                <MTabItem Value="5">
+                                <MTabItem Value="11">
                                     <FavoriteFoldersViewTip UserId="@Model.Id" IsCurrentUser="Model.IsCurrentUser"></FavoriteFoldersViewTip>
                                 </MTabItem>
                             }
@@ -241,7 +241,7 @@ else
         }
     }
 
-    public StringNumber TabIndex { get; set; } = 1;
+    public StringNumber TabIndex { get; set; } = 0;
 
     public string CurrentUserRank { get; set; }
     public int currentPage { get; set; } = 1;
@@ -293,7 +293,8 @@ else
 
         try
         {
-            TabIndex = _dataCacheService.SpaceViewCache.TabIndex;
+                TabIndex = _dataCacheService.SpaceViewCache.TabIndex;
+            
 
             isReady = false;
             isNotFound = false;

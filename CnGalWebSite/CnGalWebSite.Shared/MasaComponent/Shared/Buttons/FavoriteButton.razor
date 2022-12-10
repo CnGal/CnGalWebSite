@@ -130,7 +130,7 @@
             {
                 [nameof(ChooseFavoriteFolderTip.UserFavoriteInfor)] = UserFavoriteInfor,
                 [nameof(ChooseFavoriteFolderTip.ObjectId)] = Id,
-                [nameof(ChooseFavoriteFolderTip.Type)] = FavoriteObjectType.Entry,
+                [nameof(ChooseFavoriteFolderTip.Type)] =Type,
                 [nameof(ChooseFavoriteFolderTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
                 [nameof(ChooseFavoriteFolderTip.OnFavorite)] = EventCallback.Factory.Create(this, async () => { IsUserFavorited = true; StateHasChanged(); })
             }).Render();

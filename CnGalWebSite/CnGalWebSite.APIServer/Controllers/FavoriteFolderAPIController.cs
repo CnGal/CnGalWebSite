@@ -1,10 +1,16 @@
-﻿using CnGalWebSite.APIServer.Application.Favorites;
+﻿using CnGalWebSite.APIServer.Application.Examines;
+using CnGalWebSite.APIServer.Application.Favorites;
 using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Application.Dtos;
+using CnGalWebSite.DataModel.ExamineModel.FavoriteFolders;
+using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -31,14 +37,18 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<Video, long> _videoRepository;
+        private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Tag, long> _tagRepository;
         private readonly IAppHelper _appHelper;
         private readonly IFavoriteFolderService _favoriteFolderService;
         private readonly IFavoriteObjectService _favoriteObjectService;
+        private readonly IEditRecordService _editRecordService;
+        private readonly IUserService _userService;
+
 
         public FavoriteFolderAPIController(IRepository<FavoriteFolder, long> favoriteFolderRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Video, long> videoRepository, IRepository<Tag, long> tagRepository,
-        IRepository<ApplicationUser, string> userRepository, IRepository<FavoriteObject, long> favoriteObjectRepository,
-        UserManager<ApplicationUser> userManager, IFavoriteObjectService favoriteObjectService,
+        IRepository<ApplicationUser, string> userRepository, IRepository<FavoriteObject, long> favoriteObjectRepository, IRepository<Examine, long> examineRepository,
+        UserManager<ApplicationUser> userManager, IFavoriteObjectService favoriteObjectService, IEditRecordService editRecordService, IUserService userService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFavoriteFolderService favoriteFolderService)
         {
             _userManager = userManager;
@@ -53,8 +63,148 @@ namespace CnGalWebSite.APIServer.Controllers
             _peripheryRepository = peripheryRepository;
             _videoRepository = videoRepository;
             _tagRepository = tagRepository;
+            _examineRepository = examineRepository;
+            _editRecordService= editRecordService;
+            _userService = userService;
         }
 
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<FavoriteFolderViewModel>> GetView(long id)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            //通过Id获取文章
+            var folder = await _favoriteFolderRepository.GetAll().AsNoTracking()
+                .Include(s => s.ApplicationUser)
+                .Include(s => s.FavoriteObjects).ThenInclude(s => s.Video).ThenInclude(s=>s.CreateUser)
+                .Include(s => s.FavoriteObjects).ThenInclude(s => s.Article).ThenInclude(s => s.CreateUser)
+                .Include(s => s.FavoriteObjects).ThenInclude(s => s.Entry).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
+                .Include(s => s.FavoriteObjects).ThenInclude(s => s.Periphery)
+                .Include(s => s.FavoriteObjects).ThenInclude(s => s.Tag)
+                .Include(s => s.Examines).ThenInclude(s => s.ApplicationUser)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (folder == null)
+            {
+                return NotFound();
+            }
+
+
+            //判断当前是否隐藏
+            if ((folder.ShowPublicly == false) && user?.Id != folder.ApplicationUserId)
+            {
+                if (user == null || await _userManager.IsInRoleAsync(user, "Admin") != true)
+                {
+                    return NotFound();
+                }
+            }
+
+            List<Examine> examineQuery = null;
+
+
+            //读取审核信息
+            if (user != null)
+            {
+                examineQuery = await _examineRepository.GetAll().AsNoTracking()
+                               .Where(s => s.FavoriteFolderId == folder.Id && s.ApplicationUserId == user.Id && s.IsPassed == null
+                               && (s.Operation == Operation.EditFavoriteFolderMain ))
+                               .Select(s => new Examine
+                               {
+                                   Operation = s.Operation,
+                                   Context = s.Context
+                               })
+                               .ToListAsync();
+            }
+
+            //读取当前登入用户审核信息 获取待审核的内容
+            Examine examine = null;
+            if (user != null)
+            {
+                examine = examineQuery.FirstOrDefault(s => s.Operation == Operation.EditFavoriteFolderMain);
+                if (examine != null)
+                {
+                     _favoriteFolderService.UpdateData(folder, examine);
+                }
+            }
+
+            //建立视图模型
+            var model = _favoriteFolderService.GetViewModel(folder);
+
+            if (user != null)
+            {
+                if (examineQuery.Any(s => s.Operation == Operation.EditFavoriteFolderMain))
+                {
+                    model.MainState = EditState.Preview;
+                }
+             
+            }
+
+            //复制数据
+            var createUser = folder.ApplicationUser;
+            if (createUser == null)
+            {
+                folder.ApplicationUser = createUser = folder.Examines.First(s => s.IsPassed == true).ApplicationUser;
+            }
+
+
+            model.UserInfor = await _userService.GetUserInforViewModel(createUser);
+          
+
+            //判断是否有权限编辑
+            if (user != null && await _userManager.IsInRoleAsync(user, "Admin") == true)
+            {
+                model.Authority = true;
+            }
+            else
+            {
+                if (user != null && user.Id == folder.ApplicationUser.Id)
+                {
+                    model.Authority = true;
+                }
+                else
+                {
+                    model.Authority = false;
+                }
+            }
+
+            var examiningList = new List<Operation>();
+            if (user != null)
+            {
+                examiningList = await _examineRepository.GetAll().Where(s => s.FavoriteFolderId == folder.Id && s.ApplicationUserId != user.Id && s.IsPassed == null).Select(s => s.Operation).ToListAsync();
+
+            }
+
+            //获取各部分状态
+            if (user != null)
+            {
+                if (model.MainState != EditState.Preview)
+                {
+                    if (examiningList.Any(s => s == Operation.EditFavoriteFolderMain))
+                    {
+                        model.MainState = EditState.Locked;
+                    }
+                    else
+                    {
+                        model.MainState = EditState.Normal;
+                    }
+                }
+               
+            }
+
+
+            //增加阅读次数
+            _favoriteFolderRepository.Clear();
+            _ = await _favoriteFolderRepository.GetAll().Where(s => s.Id == folder.Id).ExecuteUpdateAsync(s => s.SetProperty(s => s.ReaderCount, b => b.ReaderCount + 1));
+
+            return model;
+        }
+
+        /// <summary>
+        /// 创建收藏夹
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<Result>> CreateFavoriteFolderAsync(CreateFavoriteFolderViewModel model)
         {
@@ -66,20 +216,57 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "已经存在名称为“" + model.Name + "”的收藏夹" };
             }
 
-
-            await _favoriteFolderRepository.InsertAsync(new FavoriteFolder
+            if (model.ShowPublicly)
             {
-                Name = model.Name,
-                IsDefault = model.IsDefault,
-                BriefIntroduction = model.BriefIntroduction,
-                ApplicationUser = user,
-                ApplicationUserId = user.Id,
-                CreateTime = DateTime.Now.ToCstTime()
-            });
+                var folder = await _favoriteFolderRepository.InsertAsync(new FavoriteFolder
+                {
+                    CreateTime = DateTime.Now.ToCstTime(),
+                    LastEditTime = DateTime.Now.ToCstTime(),
+                    ApplicationUserId = user.Id,
+                });
+
+                var favoriteFolderMain = new FavoriteFolderMain
+                {
+                    BriefIntroduction = model.BriefIntroduction,
+                    ShowPublicly = model.ShowPublicly,
+                    MainImage = model.MainImage,
+                    Name = model.Name,
+                };
+
+                //保存并尝试应用审核记录
+                await _editRecordService.SaveAndApplyEditRecord(folder, user, favoriteFolderMain, Operation.EditFavoriteFolderMain, "");
+
+                folder.IsDefault = model.IsDefault;
+                folder.IsHidden = model.IsHidden;
+
+                await _favoriteFolderRepository.UpdateAsync(folder);
+            }
+            else
+            {
+                await _favoriteFolderRepository.InsertAsync(new FavoriteFolder
+                {
+                    Name = model.Name,
+                    IsDefault = model.IsDefault,
+                    BriefIntroduction = model.BriefIntroduction,
+                    ApplicationUserId = user.Id,
+                    CreateTime = DateTime.Now.ToCstTime(),
+                    LastEditTime = DateTime.Now.ToCstTime(),
+                    IsHidden = model.IsHidden,
+                    ShowPublicly = model.ShowPublicly,
+                    MainImage = model.MainImage,
+
+                });
+
+            }
 
             return new Result { Successful = true };
         }
 
+        /// <summary>
+        /// 添加对象到收藏夹
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<Result>> AddFavoriteObjectAsync(AddFavoriteObjectViewModel model)
         {
@@ -272,7 +459,11 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-
+        /// <summary>
+        /// 获取用户收藏夹列表
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         private async Task<FavoriteFoldersViewModel> GetUserFavoriteFolders(string userId)
         {
             var model = new FavoriteFoldersViewModel
@@ -294,25 +485,6 @@ namespace CnGalWebSite.APIServer.Controllers
                 return null;
             }
 
-            //判断是否有权限获取
-            if (isAdmin == false)
-            {
-                if (currentUser == null)
-                {
-                    if (user.IsShowFavotites == false)
-                    {
-                        return null;
-                    }
-                }
-                else
-                {
-                    if (currentUser.Id != userId && user.IsShowFavotites == false)
-                    {
-                        return null;
-                    }
-                }
-            }
-
             //如果没有收藏夹则创建默认收藏夹
             if (user.FavoriteFolders.Count == 0)
             {
@@ -330,7 +502,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
 
-            foreach (var item in user.FavoriteFolders)
+            foreach (var item in user.FavoriteFolders.Where(s => s.IsHidden == false && (currentUser.Id == userId || s.ShowPublicly)))
             {
                 model.Favorites.Add(new FavoriteFolderAloneModel
                 {
@@ -347,6 +519,11 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
+        /// <summary>
+        /// 获取用户收藏夹列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<FavoriteFoldersViewModel>> GetUserFavoriteFoldersAsync(string id)
@@ -354,6 +531,11 @@ namespace CnGalWebSite.APIServer.Controllers
             return await GetUserFavoriteFolders(id);
         }
 
+        /// <summary>
+        /// 通过单个收藏夹Id获取所有收藏夹列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<FavoriteFoldersViewModel>> GetUserFavoriteInforFromFolderIdAsync(string id)
@@ -395,6 +577,11 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
+        /// <summary>
+        /// 删除收藏夹
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<Result>> UserDeleteFavoriteFolderAsync(DeleteFavoriteFoldersModel model)
         {
@@ -408,6 +595,11 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
+        /// <summary>
+        /// 设置默认收藏夹
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<Result>> UserSetFavoriteFolderDefaultAsync(SetDefaultFavoriteFolderModel model)
         {
@@ -426,6 +618,12 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
+
+        /// <summary>
+        /// 获取收藏夹列表
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListFavoriteFolderAloneModel>>> GetFavoriteFolderListAsync(FavoriteFoldersPagesInfor input)
         {
@@ -445,6 +643,11 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
+        /// <summary>
+        /// 获取收藏对象列表
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListFavoriteObjectAloneModel>>> GetFavoriteObjectListAsync(FavoriteObjectsPagesInfor input)
         {
@@ -463,6 +666,13 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
+        /// <summary>
+        /// 获取用户收藏对象列表
+        /// </summary>
+        /// <param name="maxResultCount"></param>
+        /// <param name="currentPage"></param>
+        /// <param name="folderId"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
         public async Task<PagedResultDto<FavoriteObjectAloneViewModel>> GetUserFavoriteObjectListAsync( [FromQuery] int maxResultCount, [FromQuery] int currentPage, [FromQuery] long folderId)
@@ -509,6 +719,12 @@ namespace CnGalWebSite.APIServer.Controllers
             }, folderId);
         }
 
+        /// <summary>
+        /// 判断是否被收藏
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         [HttpGet("{id}/{type}")]
         public async Task<ActionResult<IsObjectInUserFavoriteFolderResult>> IsObjectInUserFavoriteFolderAsync(long id, FavoriteObjectType type)
         {
@@ -557,6 +773,11 @@ namespace CnGalWebSite.APIServer.Controllers
             return NotFound();
         }
 
+        /// <summary>
+        /// 编辑收藏夹
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<EditFavoriteFolderViewModel>> EditFavoriteFolderAsync(long id)
         {
@@ -576,17 +797,33 @@ namespace CnGalWebSite.APIServer.Controllers
                 return NotFound();
             }
 
+            //获取审核记录
+            var examines = await _examineRepository.GetAllListAsync(s => s.FavoriteFolderId ==id && s.ApplicationUserId == user.Id
+              && (s.Operation == Operation.EditFavoriteFolderMain) && s.IsPassed == null);
+
+            var examine = examines.FirstOrDefault(s => s.Operation == Operation.EditFavoriteFolderMain);
+            if (examine != null)
+            {
+                _favoriteFolderService.UpdateData(folder, examine);
+            }
+
             EditFavoriteFolderViewModel model = new();
             model.Name = folder.Name;
             model.Id = folder.Id;
             model.BriefIntroduction = folder.BriefIntroduction;
             model.IsDefault = folder.IsDefault;
-            model.MainImage = folder.MainImage;
-            model.MainImagePath = _appHelper.GetImagePath(folder.MainImage, "app.png");
+            model.IsHidden=folder.IsHidden;
+            model.ShowPublicly=folder.ShowPublicly;
+            model.MainImage = _appHelper.GetImagePath(folder.MainImage, "app.png");
 
             return model;
         }
 
+        /// <summary>
+        /// 编辑收藏夹
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<Result>> EditFavoriteFolderAsync(EditFavoriteFolderViewModel model)
         {
@@ -606,17 +843,45 @@ namespace CnGalWebSite.APIServer.Controllers
                 return NotFound();
             }
 
-            folder.Name = model.Name;
-            folder.Id = model.Id;
-            folder.BriefIntroduction = model.BriefIntroduction;
-            folder.IsDefault = model.IsDefault;
-            folder.MainImage = model.MainImage;
 
+            if (model.Name != folder.Name || model.BriefIntroduction != folder.BriefIntroduction || model.ShowPublicly != folder.ShowPublicly || model.MainImage != folder.MainImage)
+            {
+                if (model.ShowPublicly)
+                {
+                    var favoriteFolderMain = new FavoriteFolderMain
+                    {
+                        BriefIntroduction = model.BriefIntroduction,
+                        ShowPublicly = model.ShowPublicly,
+                        MainImage = model.MainImage,
+                        Name = model.Name,
+                    };
+
+                    //保存并尝试应用审核记录
+                    await _editRecordService.SaveAndApplyEditRecord(folder, user, favoriteFolderMain, Operation.EditFavoriteFolderMain, "");
+                }
+            }
+            else
+            {
+                folder.Name = model.Name;
+                folder.BriefIntroduction = model.BriefIntroduction;
+                folder.MainImage = model.MainImage;
+                folder.ShowPublicly = model.ShowPublicly;
+            }
+
+            folder.LastEditTime = DateTime.Now.ToCstTime();
+            folder.IsDefault = model.IsDefault;         
+            folder.IsHidden = model.IsHidden;
+          
             await _favoriteFolderRepository.UpdateAsync(folder);
 
             return new Result { Successful = true };
         }
 
+        /// <summary>
+        /// 移动收藏对象
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<Result>> MoveFavoriteObjectsAsync(MoveFavoriteObjectsModel model)
         {
@@ -644,8 +909,14 @@ namespace CnGalWebSite.APIServer.Controllers
             //清除选定目标的关联收藏夹
             var entries = model.ObjectIds.Where(s => s.Key == FavoriteObjectType.Entry).Select(s => s.Value);
             var articles = model.ObjectIds.Where(s => s.Key == FavoriteObjectType.Article).Select(s => s.Value);
+            var tags = model.ObjectIds.Where(s => s.Key == FavoriteObjectType.Tag).Select(s => s.Value);
+            var peripheries = model.ObjectIds.Where(s => s.Key == FavoriteObjectType.Periphery).Select(s => s.Value);
+            var videos = model.ObjectIds.Where(s => s.Key == FavoriteObjectType.Video).Select(s => s.Value);
             await _favoriteObjectRepository.GetAll().Where(s => folderIds.Contains(s.FavoriteFolderId) && s.Type == FavoriteObjectType.Entry && entries.Contains((long)s.EntryId)).ExecuteDeleteAsync();
             await _favoriteObjectRepository.GetAll().Where(s => folderIds.Contains(s.FavoriteFolderId) && s.Type == FavoriteObjectType.Article && articles.Contains((long)s.ArticleId)).ExecuteDeleteAsync();
+            await _favoriteObjectRepository.GetAll().Where(s => folderIds.Contains(s.FavoriteFolderId) && s.Type == FavoriteObjectType.Periphery && peripheries.Contains((long)s.PeripheryId)).ExecuteDeleteAsync();
+            await _favoriteObjectRepository.GetAll().Where(s => folderIds.Contains(s.FavoriteFolderId) && s.Type == FavoriteObjectType.Tag && tags.Contains((long)s.TagId)).ExecuteDeleteAsync();
+            await _favoriteObjectRepository.GetAll().Where(s => folderIds.Contains(s.FavoriteFolderId) && s.Type == FavoriteObjectType.Video && articles.Contains((long)s.VideoId)).ExecuteDeleteAsync();
 
             //添加到新收藏夹
             foreach (var item in model.FolderIds)
@@ -657,6 +928,9 @@ namespace CnGalWebSite.APIServer.Controllers
                         Type = infor.Key,
                         ArticleId = infor.Key == FavoriteObjectType.Article ? infor.Value : null,
                         EntryId = (infor.Key == FavoriteObjectType.Entry ? (int)infor.Value : null),
+                        PeripheryId = infor.Key == FavoriteObjectType.Periphery ? infor.Value : null,
+                        VideoId = infor.Key == FavoriteObjectType.Video ? infor.Value : null,
+                        TagId = infor.Key == FavoriteObjectType.Tag ? (int)infor.Value : null,
                         CreateTime = DateTime.Now.ToCstTime(),
                         FavoriteFolderId = item
                     });
@@ -668,6 +942,33 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return new Result { Successful = true };
         }
+
+        /// <summary>
+        /// 撤销编辑
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<Result>> RevokeExamine(RevokeExamineModel model)
+        {
+            //获取当前用户ID
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            //查找审核
+            var examine = await _examineRepository.FirstOrDefaultAsync(s => s.FavoriteFolderId == model.Id && s.ApplicationUserId == user.Id && s.Operation == model.ExamineType && s.IsPassed == null);
+            if (examine != null)
+            {
+                await _examineRepository.DeleteAsync(examine);
+                //删除以此审核为前置审核的
+                await _examineRepository.DeleteAsync(s => s.PrepositionExamineId == examine.Id);
+                return new Result { Successful = true };
+            }
+            else
+            {
+                return new Result { Successful = false, Error = "找不到目标审核记录" };
+            }
+
+        }
+
 
     }
 }
