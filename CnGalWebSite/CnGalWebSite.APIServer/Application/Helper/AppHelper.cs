@@ -828,7 +828,9 @@ namespace CnGalWebSite.APIServer.Application.Helper
                 LastEditTime = periphery.LastEditTime,
                 ReaderCount = periphery.ReaderCount,
                 CommentCount = periphery.CommentCount,
-                AddInfors = new List<EntryInforTipAddInforModel>()
+                AddInfors = new List<EntryInforTipAddInforModel>(),
+                Type = periphery.Type,
+                Category = periphery.Category
             };
 
             //处理附加信息

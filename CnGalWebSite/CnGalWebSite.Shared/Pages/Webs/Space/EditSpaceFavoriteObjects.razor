@@ -1,90 +1,53 @@
 ﻿
 @inject HttpClient Http
 @inject ToastService? ToastService
-
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
-<TitleTip Title="管理收藏夹"></TitleTip>
+<TitleTip Title="编辑收藏夹"></TitleTip>
 
 <AutoSaveTip TItem="EditFavoriteFolderViewModel" Item="Model" DataLoaded="DataLoaded" @ref="autoSave" />
 
 @if (isReady == false)
 {
     <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4">
-        <h3 class="text-truncate mb-4 fw-bold">管理收藏夹</h3>
-        <h5 class=" mb-4 fw-bold">当前收藏夹：</h5>
-        <hr>
-
-        <div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
-            <div class="mt-2">
-            </div>
-            <SkeletonParagraph />
+        <SkeletonParagraph />
+        <div class="mt-2">
         </div>
+        <SkeletonParagraph />
+        <div class="mt-2">
+        </div>
+        <SkeletonParagraph />
+        <div class="mt-2">
+        </div>
+        <SkeletonParagraph />
+        <div class="mt-2">
+        </div>
+        <SkeletonParagraph />
     </div>
 }
 else
 {
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑收藏夹" Icon="fa fa-fw  fa-folder-open" Outline>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Users.FolderMainCard Model="Model" Class="mb-4" />
 
-    <ValidateForm Model="@Model" ValidateAllProperties="true" class="form-group mb-4">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+            下方的编辑会实时生效
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
-        <div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-4 pb-4 mb-3">
-            <h3 class="text-truncate mb-4 fw-bold">编辑收藏夹基本信息</h3>
-            <h5 class="mb-4 fw-bold">当前收藏夹：@(ToolHelper.Base64DecodeName(Name))</h5>
-            <hr />
+        <EditFavoriteObjectesTip Id="@FolderId"></EditFavoriteObjectesTip>
 
-            <div class="row">
-                <div class=" col-6 col-md-4 col-lg-3 mt-2">
-                    <ImageCropperButton @bind-ImagePath="@Model.MainImage" EntryType_="EntryType.Game" IsMainImage="true"
-                                        Text="上传缩略图" IsMustCropper="true"></ImageCropperButton>
-                </div>
-            </div>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.SubmitButton OnSubmit="OnSubmit" Model="Model" Class="mb-4" />
 
-            <div class="row  mt-4">
-                <div class="form-group col-12  col-sm-6">
-                    <BootstrapInput @bind-Value="Model.Name" />
-                </div>
-                <div class="form-group col-12 col-sm-6">
-                    <Switch @bind-Value="Model.IsDefault" />
-                </div>
-                <div class="form-group col-12">
-                    <BootstrapInput @bind-Value="Model.BriefIntroduction" />
-                </div>
-            </div>
-
-
-
-        </div>
-    </ValidateForm>
-
-
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 }
-<div class="">
-    <EditFavoriteObjectesTip Id="@Id" Title="管理收藏的词条和文章" OnClickUrl="OnClickUrl"></EditFavoriteObjectesTip>
-</div>
-<div class="  rounded shadow-sm  bg-opacity rounded ps-4 pe-4 pt-3 pb-3 mb-4">
-    <div>
-        <Button style="width: 100px" @onclick="@(() => OnSubmit())" IsAsync="true" Color="Color.Success" IsOutline="true" Icon="fa fa-check" Text="完成"></Button>
-    </div>
-</div>
+
 
 @code {
     [Parameter]
-    public string Id { get; set; }
+    public string UserId { get; set; }
     [Parameter]
-    public string Name { get; set; }
-    [Parameter]
-    public string ReturnUrl { get; set; }
+    public long FolderId { get; set; }
+
     public EditFavoriteFolderViewModel Model { get; set; } = new EditFavoriteFolderViewModel();
     bool isReady = false;
 
@@ -102,8 +65,7 @@ else
         {
             try
             {
-                //获取词条信息
-                Model = await Http.GetFromJsonAsync<EditFavoriteFolderViewModel>(ToolHelper.WebApiPath + "api/favorites/EditFavoriteFolder/" + Id, ToolHelper.options);
+                Model = await Http.GetFromJsonAsync<EditFavoriteFolderViewModel>(ToolHelper.WebApiPath + "api/favorites/EditFavoriteFolder/" + FolderId, ToolHelper.options);
                 isReady = true;
                 StateHasChanged();
             }
@@ -138,29 +100,21 @@ else
             }
             else
             {
-                autoSave.Clean();
+                await autoSave.Clean();
 
                 await ToastService.Success("保存收藏夹基本信息成功", "保存收藏夹基本信息成功");
 
-                //获取用户收藏夹相关信息 只需要获取一次
-                var userState = await authenticationStateTask;
-                var user = userState.User;
-                string userId = string.Empty;
-                foreach (var item in user.Claims)
+                if (string.IsNullOrWhiteSpace(UserId))
                 {
-                    if (item.Type == "userid")
-                    {
-                        userId = item.Value;
-                    }
-                }
-                if (string.IsNullOrWhiteSpace(ReturnUrl) == false)
-                {
-                    NavigationManager.NavigateTo(Provider, ToolHelper.Base64DecodeUrl(ReturnUrl), "管理收藏夹", "fa fa-folder-open");
+                    NavigationManager.NavigateTo("/favoritefolders/index/" + FolderId);
+
                 }
                 else
                 {
-                    NavigationManager.NavigateTo(Provider, "/space/index/" + userId, user.Identity.Name, "fa fa-star-o");
+                    NavigationManager.NavigateTo("/space/EditSpaceFavoriteFolders/" + UserId);
                 }
+
+
             }
         }
         catch (Exception ex)
@@ -168,19 +122,6 @@ else
             ErrorHandler.ProcessError(ex, "保存收藏夹基本信息失败");
         }
     }
-
-    public async void OnClickUrl(NavigateModel model)
-    {
-        try
-        {
-            NavigationManager.NavigateTo(Provider, model.Url, model.Title, model.Icon);
-        }
-        catch
-        {
-            await ToastService.Error("导航失败", "请尝试刷新页面");
-        }
-    }
-
     private Task DataLoaded(EditFavoriteFolderViewModel model)
     {
         isReady = false;

@@ -74,7 +74,7 @@
                         }
 
 
-                        @if (examine.Type is ExaminedNormalListModelType.Comment or ExaminedNormalListModelType.PlayedGame)
+                        @if (examine.Type is ExaminedNormalListModelType.Comment or ExaminedNormalListModelType.PlayedGame or ExaminedNormalListModelType.FavoriteFolder)
                         {
                             <span>
                                 @($"序号『{ examine.Id.ToString("00000")}』")

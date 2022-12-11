@@ -11,6 +11,17 @@ namespace CnGalWebSite.DataModel.ViewModel.Favorites
         [Display(Name = "是否为默认收藏夹")]
         public bool IsDefault { get; set; }
 
-        //public string MainImage { get; set; }
+        public string MainImage { get; set; }
+
+        /// <summary>
+        /// 是否向他人公开
+        /// </summary>
+        public bool ShowPublicly { get; set; } = true;
+
+        /// <summary>
+        /// 是否隐藏
+        /// </summary>
+        public bool IsHidden { get; set; }
+
     }
 }

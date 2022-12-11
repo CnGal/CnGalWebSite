@@ -1,72 +1,81 @@
 ﻿@inject ToastService ToastService
-
+@inject IDataCacheService _dataCacheService
 @inject HttpClient Http
-    <style>
-        .modal-footer {
-            display: none;
-        }
-    </style>
 
-<div>
-    @if (isReady)
-    {
-        <CheckboxList TValue="IEnumerable<long>" @bind-Value="@Value1" Items="@Items1" ShowLabel="true" DisplayText="选择要保存到的收藏夹" IsVertical="true" ></CheckboxList>
 
-    }
+<MDialog @bind-Value="Dialog"
+         Width="500">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            选择收藏
+        </MCardTitle>
+        <MCardText>
+            在下方选择收藏到的位置，可以选中多个
+        </MCardText>
+        <MCardText Class="pb-0">
+            <div style="display:flex;">
+                @foreach (var item in UserFavoriteInfor.Favorites)
+                {
+                    <MCheckbox Value="SelectedItemIds.Contains( item.Id)" ValueChanged="@((e) => { if (e) SelectedItemIds.Add(item.Id); else SelectedItemIds.RemoveAll(s => s == item.Id); })"
+                               Label="@item.Name" Class="m-0 me-4"
+                               HideDetails="true"
+                               Color="@_dataCacheService.ThemeSetting.Theme" />
+                }
 
-    <div class="mt-3" style="display: flex; justify-content: space-between;">
-        <Button Color="Color.Danger" Icon="fa fa-close" @onclick="@(()=>OnClickClose.InvokeAsync())" IsAsync="true" Text="放弃"></Button>
-        <Button Color="Color.Success" Icon="fa fa-check" class="me-1" @onclick="OnFavorited" IsAsync="true" Text="收藏"></Button>
-    </div>
-</div>
+            </div>
+
+        </MCardText>
+
+
+        <MCardActions>
+            <MSpacer></MSpacer>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="收藏" IsAsync="true" OnClick="OnClickFavorited" Icon="mdi-heart" Color="green" TextStyle />
+        </MCardActions>
+    </MCard>
+</MDialog>
 
 @code {
+
     [Parameter]
-    public EventCallback OnClickClose { get; set; }
-    [Parameter]
-    public EventCallback OnFavorite { get; set; }
+    public EventCallback OnFavorited { get; set; }
     [Parameter]
     public long ObjectId { get; set; }
     [Parameter]
     public FavoriteObjectType Type { get; set; }
-    [Parameter]
-    public FavoriteFoldersViewModel UserFavoriteInfor { get; set; }
 
-    [NotNull]
-    private List<SelectedItem>? Items1 { get; set; } = new List<SelectedItem>();
+
+    public FavoriteFoldersViewModel UserFavoriteInfor { get; set; } = new FavoriteFoldersViewModel();
+
+
+    List<long> SelectedItemIds = new List<long>();
+    bool Dialog { get; set; }
+
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    public string Text { get; set; }
-    private IEnumerable<long> Value1 { get; set; }
-    bool isReady = false;
-
-    protected override async Task OnInitializedAsync()
+    public Task Refresh( FavoriteFoldersViewModel userFavoriteInfor)
     {
-        //序列化收藏夹
-        foreach(var item in UserFavoriteInfor.Favorites)
+        if (SelectedItemIds.Any())
         {
-            Items1.Add(new SelectedItem
-            {
-                Text = item.Name,
-                Value = item.Id.ToString()
-            });
+            SelectedItemIds.Clear();
         }
-        isReady = true;
+        UserFavoriteInfor = userFavoriteInfor;
+        Dialog = true;
         StateHasChanged();
+        return Task.CompletedTask;
     }
 
-
-    public async Task OnFavorited()
+    public async Task OnClickFavorited()
     {
-        if(Value1==null||Value1.Any()==false)
+        if (SelectedItemIds == null || SelectedItemIds.Any() == false)
         {
             await ToastService.Error("请选择要保存到的收藏夹", "请选择要保存到的收藏夹");
             return;
         }
         try
         {
-            var result = await Http.PostAsJsonAsync<AddFavoriteObjectViewModel>(ToolHelper.WebApiPath + "api/favorites/AddFavoriteObject", new AddFavoriteObjectViewModel { FavoriteFolderIds = Value1?.ToArray()??new long[] { }, ObjectId = ObjectId, Type = Type });
+            var result = await Http.PostAsJsonAsync<AddFavoriteObjectViewModel>(ToolHelper.WebApiPath + "api/favorites/AddFavoriteObject", new AddFavoriteObjectViewModel { FavoriteFolderIds = SelectedItemIds?.ToArray() ?? new long[] { }, ObjectId = ObjectId, Type = Type });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
@@ -77,8 +86,9 @@
             }
             else
             {
-               
-                await OnFavorite.InvokeAsync();
+                Dialog = false;
+                StateHasChanged();
+                await OnFavorited.InvokeAsync();
             }
         }
         catch (Exception ex)
@@ -86,6 +96,5 @@
             ErrorHandler.ProcessError(ex, "收藏失败");
             return;
         }
-        await OnClickClose.InvokeAsync();
     }
 }

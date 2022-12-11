@@ -82,6 +82,8 @@ else
     public void OnReturn()
     {
         _dataCacheService.SpaceViewCache.ViewOnFavoriteFolderId = 0;
+        _dataCacheService.SpaceViewCache.TabIndex = 11;
+        NavigationManager.NavigateTo("/space/index/" + UserId);
         StateHasChanged();
     }
     public Task OnManage()

@@ -3,6 +3,7 @@ using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Disambigs;
 using CnGalWebSite.APIServer.Application.Entries;
+using CnGalWebSite.APIServer.Application.Favorites;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.Application.Peripheries;
@@ -19,6 +20,7 @@ using CnGalWebSite.DataModel.ExamineModel.Articles;
 using CnGalWebSite.DataModel.ExamineModel.Comments;
 using CnGalWebSite.DataModel.ExamineModel.Dismbigs;
 using CnGalWebSite.DataModel.ExamineModel.Entries;
+using CnGalWebSite.DataModel.ExamineModel.FavoriteFolders;
 using CnGalWebSite.DataModel.ExamineModel.Peripheries;
 using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
@@ -63,6 +65,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IRepository<Video, long> _videoRepository;
+        private readonly IRepository<FavoriteFolder, long> _favoriteFolderRepository;
         private readonly IEntryService _entryService;
         private readonly IPeripheryService _peripheryService;
         private readonly IArticleService _articleService;
@@ -73,6 +76,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IVideoService _videoService;
         private readonly IPerfectionService _perfectionService;
         private readonly IPlayedGameService _playedGameService;
+        private readonly IFavoriteFolderService _favoriteFolderService;
         private readonly ICommentService _commentService;
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -87,8 +91,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<Examine>, string, SortOrder, IEnumerable<Examine>>> SortLambdaCacheEntry = new();
 
-        public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService,
-           IRepository<UserMonitor, long> userMonitorRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IVideoService videoService, IRepository<Video, long> videoRepository,
+        public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService, IRepository<FavoriteFolder, long> favoriteFolderRepository,
+        IRepository<UserMonitor, long> userMonitorRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IVideoService videoService, IRepository<Video, long> videoRepository, IFavoriteFolderService favoriteFolderService,
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository, IRepository<Message, long> messageRepository,
         IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger, IRepository<Lottery, long> lotteryRepository,
@@ -125,6 +129,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _userReviewEditRecordRepository = userReviewEditRecordRepository;
             _videoService = videoService;
             _videoRepository = videoRepository;
+            _favoriteFolderRepository = favoriteFolderRepository;
+            _favoriteFolderService = favoriteFolderService;
         }
 
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "")
@@ -359,6 +365,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 Operation.EditVideoRelevanes => await GetEditVideoRelevanesExamineView(model, examine),
                 Operation.EditVideoMainPage => await GetEditVideoMainPageExamineView(model, examine),
                 Operation.EditVideoImages => await GetEditVideoImagesExamineView(model, examine),
+                Operation.EditFavoriteFolderMain => await GetEditFavoriteFolderMainExamineView(model, examine),
                 _ => false,
             };
         }
@@ -385,6 +392,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                               n.DisambigId,
                               n.PeripheryId,
                               n.PlayedGameId,
+                              n.FavoriteFolderId,
                               n.VideoId,
                               TagName = n.Tag == null ? "" : n.Tag.Name,
                               EntryName = n.Entry == null ? "" : n.Entry.Name,
@@ -392,6 +400,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                               DisambigName = n.Disambig == null ? "" : n.Disambig.Name,
                               PeripheryName = n.Periphery == null ? "" : n.Periphery.Name,
                               VideoName = n.Video == null ? "" : n.Video.Name,
+                              FavoriteFolderName = n.FavoriteFolder == null ? "" : n.FavoriteFolder.Name,
                               UserId = n.ApplicationUserId,
                               n.ApplicationUser.UserName,
                               n.Operation,
@@ -412,9 +421,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     IsPassed = item.IsPassed,
                     UserImage = _appHelper.GetImagePath(item.PhotoPath, "user.png"),
                     Ranks = isShowRanks ? (await _rankService.GetUserRanks(item.UserId)).Where(s => s.Name != "编辑者").ToList() : new List<DataModel.ViewModel.Ranks.RankViewModel>(),
-                    RelatedId = item.EntryId != null ? item.EntryId.ToString() : item.ArticleId != null ? item.ArticleId.ToString() : item.TagId != null ? item.TagId.ToString() : item.CommentId != null ? item.CommentId.ToString() : item.DisambigId != null ? item.DisambigId.ToString() : item.PeripheryId != null ? item.PeripheryId.ToString() : item.PlayedGameId != null ? item.PlayedGameId.ToString() : item.VideoId != null ? item.VideoId.ToString() : item.UserId,
-                    Type = item.EntryId != null ? ExaminedNormalListModelType.Entry : item.ArticleId != null ? ExaminedNormalListModelType.Article : item.TagId != null ? ExaminedNormalListModelType.Tag : item.CommentId != null ? ExaminedNormalListModelType.Comment : item.DisambigId != null ? ExaminedNormalListModelType.Disambig : item.PeripheryId != null ? ExaminedNormalListModelType.Periphery : item.PlayedGameId != null ? ExaminedNormalListModelType.PlayedGame : item.VideoId != null ? ExaminedNormalListModelType.Video : ExaminedNormalListModelType.User,
-                    RelatedName = item.EntryId != null ? item.EntryName : item.ArticleId != null ? item.ArticleName : item.TagId != null ? item.TagName : item.DisambigId != null ? item.DisambigName : item.PeripheryId != null ? item.PeripheryName : item.CommentId != null ? "" : item.PlayedGameId != null ? "" : item.VideoId != null ? item.VideoName : item.UserName
+                    RelatedId = item.EntryId != null ? item.EntryId.ToString() : item.ArticleId != null ? item.ArticleId.ToString() : item.TagId != null ? item.TagId.ToString() : item.CommentId != null ? item.CommentId.ToString() : item.DisambigId != null ? item.DisambigId.ToString() : item.PeripheryId != null ? item.PeripheryId.ToString() : item.PlayedGameId != null ? item.PlayedGameId.ToString() : item.VideoId != null ? item.VideoId.ToString() : item.FavoriteFolderId != null ? item.FavoriteFolderId.ToString() : item.UserId,
+                    Type = item.EntryId != null ? ExaminedNormalListModelType.Entry : item.ArticleId != null ? ExaminedNormalListModelType.Article : item.TagId != null ? ExaminedNormalListModelType.Tag : item.CommentId != null ? ExaminedNormalListModelType.Comment : item.DisambigId != null ? ExaminedNormalListModelType.Disambig : item.PeripheryId != null ? ExaminedNormalListModelType.Periphery : item.PlayedGameId != null ? ExaminedNormalListModelType.PlayedGame : item.VideoId != null ? ExaminedNormalListModelType.Video : item.FavoriteFolderId != null ? ExaminedNormalListModelType.FavoriteFolder : ExaminedNormalListModelType.User,
+                    RelatedName = item.EntryId != null ? item.EntryName : item.ArticleId != null ? item.ArticleName : item.TagId != null ? item.TagName : item.DisambigId != null ? item.DisambigName : item.PeripheryId != null ? item.PeripheryName : item.CommentId != null ? "" : item.PlayedGameId != null ? "" : item.VideoId != null ? item.VideoName : item.FavoriteFolderId != null ? item.FavoriteFolderName : item.UserName
                 };
                 result.Add(tempModel);
             }
@@ -438,7 +447,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var peripheries = new List<Periphery>();
             var comments = new List<Comment>();
             var playedgames = new List<PlayedGame>();
-
+            var favoriteFolders = new List<FavoriteFolder>();
 
             foreach (var item in examines)
             {
@@ -512,9 +521,19 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     }
                   
 
-                    _playedGameService.UpdatePlayedGameData(infor, item);
+                    _playedGameService.UpdatePlayedGameData(infor, item);                
+                }
+                else if (item.Operation == Operation.EditFavoriteFolderMain)
+                {
+                    var infor = favoriteFolders.FirstOrDefault(s => s.Id == item.FavoriteFolderId);
+                    if (infor == null)
+                    {
+                        infor = await _favoriteFolderRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == item.FavoriteFolderId.Value);
+                        favoriteFolders.Add(infor);
+                    }
 
-                 
+
+                    _favoriteFolderService.UpdateData(infor, item);
                 }
                 else if (item.Operation == Operation.PubulishComment)
                 {
@@ -619,6 +638,21 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     Type = ExaminedNormalListModelType.PlayedGame
                 });
             }
+
+            foreach (var infor in favoriteFolders)
+            {
+                model.Add(new UserPendingDataModel
+                {
+                    Id = infor.Id.ToString(),
+                    BriefIntroduction = infor.BriefIntroduction,
+                    Link = "/favoritefolders/index/" + infor.Id,
+                    DisplayMode = UserPendingDataDisplayMode.Main,
+                    MainPicture = _appHelper.GetImagePath(infor.MainImage, "app.png"),
+                    Name =infor.Name,
+                    Type = ExaminedNormalListModelType.FavoriteFolder
+                });
+            }
+
 
             foreach (var infor in comments)
             {
@@ -2992,6 +3026,71 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         #endregion
 
+        #region 收藏夹
+
+        public async Task<bool> GetEditFavoriteFolderMainExamineView(ExamineViewModel model, Examine examine)
+        {
+            model.Type = ExaminedNormalListModelType.FavoriteFolder;
+            var item = await _favoriteFolderRepository.GetAll().AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == examine.FavoriteFolderId);
+
+            if (item == null)
+            {
+                return false;
+            }
+            model.ObjectId = item.Id;
+            model.Image = _appHelper.GetImagePath(item.MainImage, "app.png");
+
+            //序列化数据
+            FavoriteFolderMain favoriteFolderMain = null;
+            using (TextReader str = new StringReader(examine.Context))
+            {
+                var serializer = new JsonSerializer();
+                favoriteFolderMain = (FavoriteFolderMain)serializer.Deserialize(str, typeof(FavoriteFolderMain));
+            }
+
+            //json格式化
+            model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
+
+            var informationsModel = new InformationsModel
+            {
+                Modifier = "主要信息"
+            };
+
+            if(string.IsNullOrWhiteSpace(favoriteFolderMain.MainImage)==false)
+            {
+                model.AfterModel.Pictures.Add(new PicturesAloneViewModel
+                {
+                    Url = favoriteFolderMain.MainImage
+                });
+            }
+            if(string.IsNullOrWhiteSpace(favoriteFolderMain.Name)==false)
+            {
+                informationsModel.Informations.Add(new KeyValueModel
+                {
+                    DisplayName = "名称",
+                    DisplayValue = favoriteFolderMain.Name
+                });
+            }
+            if (string.IsNullOrWhiteSpace(favoriteFolderMain.BriefIntroduction) == false)
+            {
+                informationsModel.Informations.Add(new KeyValueModel
+                {
+                    DisplayName = "简介",
+                    DisplayValue = favoriteFolderMain.BriefIntroduction
+                });
+            }
+
+            model.AfterModel.Texts.Add(informationsModel);
+
+            if (examine.IsPassed == true)
+            {
+                model.BeforeModel = model.AfterModel;
+            }
+            return true;
+        }
+
+        #endregion
 
 
         #endregion
@@ -3070,6 +3169,9 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     break;
                 case Operation.EditPlayedGameMain:
                     await ExamineEditPlayedGameMainAsync(entry as PlayedGame, examine as PlayedGameMain);
+                    break;
+                case Operation.EditFavoriteFolderMain:
+                    await ExamineEditFavoriteFolderMainAsync(entry as FavoriteFolder, examine as FavoriteFolderMain);
                     break;
                 case Operation.RequestUserCertification:
                     await ExamineEditUserCertificationMainAsync(entry as UserCertification, examine as UserCertificationMain);
@@ -3802,6 +3904,19 @@ namespace CnGalWebSite.APIServer.Application.Examines
         }
         #endregion
 
+        #region 收藏夹
+
+        public async Task ExamineEditFavoriteFolderMainAsync(FavoriteFolder favoriteFolder, FavoriteFolderMain examine)
+        {
+            //更新数据
+            _favoriteFolderService.UpdateMain(favoriteFolder, examine);
+            //保存
+            _ = await _favoriteFolderRepository.UpdateAsync(favoriteFolder);
+        }
+
+
+        #endregion
+
         #endregion
 
         #region 将审核记录添加到数据库
@@ -3889,6 +4004,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
             else if (entry is PlayedGame)
             {
                 return await UniversalEditPlayedGameExaminedAsync(entry as PlayedGame, user, isAdmin, resulte, operation, note);
+            }
+            else if (entry is FavoriteFolder)
+            {
+                return await UniversalEditFavoriteFolderExaminedAsync(entry as FavoriteFolder, user, isAdmin, resulte, operation, note);
             }
             else if (entry is UserCertification)
             {
@@ -4779,6 +4898,59 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return examine;
         }
 
+        public async Task<Examine> UniversalEditFavoriteFolderExaminedAsync(FavoriteFolder favoriteFolder, ApplicationUser user, bool isAdmin, string examineStr, Operation operation, string note)
+        {
+            Examine examine = null;
+            if (isAdmin)
+            {
+                //添加到审核列表
+                examine = new Examine
+                {
+                    Operation = operation,
+                    Context = examineStr,
+                    IsPassed = true,
+                    PassedAdminName = user.UserName,
+                    FavoriteFolderId = favoriteFolder.Id,
+                    PassedTime = DateTime.Now.ToCstTime(),
+                    ApplyTime = DateTime.Now.ToCstTime(),
+                    ApplicationUserId = user.Id,
+                    Note = note
+                };
+                examine = await _examineRepository.InsertAsync(examine);
+            }
+            else
+            {
+                //查找是否在之前有审核
+                //获取审核记录
+                examine = await GetUserFavoriteFolderActiveExamineAsync(favoriteFolder.Id, user.Id, operation);
+                if (examine != null)
+                {
+                    examine.Context = examineStr;
+                    examine.ApplyTime = DateTime.Now.ToCstTime();
+                    examine = await _examineRepository.UpdateAsync(examine);
+                }
+                else
+                {
+                    examine = new Examine
+                    {
+                        Operation = operation,
+                        Context = examineStr,
+                        IsPassed = null,
+                        PassedTime = null,
+                        FavoriteFolderId = favoriteFolder.Id,
+                        ApplyTime = DateTime.Now.ToCstTime(),
+                        ApplicationUserId = user.Id,
+                        Note = note
+                    };
+                    //添加到审核列表
+                    examine = await _examineRepository.InsertAsync(examine);
+                }
+            }
+            //log
+            _logger.LogInformation("{User}({Id})编辑收藏夹({EntryId}) {Admin}", user.UserName, user.Id, favoriteFolder.Id, isAdmin ? "(管理员身份忽略审核)" : "");
+
+            return examine;
+        }
 
         #endregion
 
@@ -5144,6 +5316,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task<Examine> GetUserVideoActiveExamineAsync(long videoId, string userId, Operation operation)
         {
             return await _examineRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.VideoId == videoId && s.ApplicationUserId == userId && s.Operation == operation && s.IsPassed == null);
+        }
+
+        public async Task<Examine> GetUserFavoriteFolderActiveExamineAsync(long peripheryId, string userId, Operation operation)
+        {
+            return await _examineRepository.FirstOrDefaultAsync(s => s.FavoriteFolderId == peripheryId && s.ApplicationUserId == userId && s.Operation == operation && s.IsPassed == null);
         }
 
         #endregion

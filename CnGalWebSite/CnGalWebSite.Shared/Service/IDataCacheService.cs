@@ -95,6 +95,8 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<VoteViewModel> VoteIndexPageCatche { get; set; }
 
+        IPageModelCatche<FavoriteFolderViewModel> FavoriteFolderIndexPageCatche { get; set; }
+
         IPageModelCatche<ExaminesOverviewViewModel> ExaminesOverviewCatche { get; set; }
 
         IPageModelCatche<EntryContrastEditRecordViewModel> EntryContrastEditRecordViewCatche { get; set; }

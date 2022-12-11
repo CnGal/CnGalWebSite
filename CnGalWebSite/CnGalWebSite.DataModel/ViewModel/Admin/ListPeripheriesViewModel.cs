@@ -1,4 +1,5 @@
 ﻿
+using CnGalWebSite.DataModel.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -23,10 +24,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         public string Name { get; set; }
         [Display(Name = "简介")]
         public string BriefIntroduction { get; set; }
-        [Display(Name = "作者")]
-        public string Author { get; set; }
-        [Display(Name = "材质")]
-        public string Material { get; set; }
+        [Display(Name = "类型")]
+        public PeripheryType Type { get; set; }
+        [Display(Name = "类别")]
+        public string Category { get; set; }
         [Display(Name = "优先级")]
         public int Priority { get; set; }
 

@@ -224,5 +224,9 @@ namespace CnGalWebSite.DataModel.Model
         Keychain,
         [Display(Name = "书签")]
         Bookmark,
+        [Display(Name = "海报")]
+        Posters,
+        [Display(Name = "光盘")]
+        CD,
     }
 }

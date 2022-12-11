@@ -1,18 +1,24 @@
-﻿@page "/space/EditSpaceFavoriteObjects/{Id}/{Name}/{ReturnUrl}"
-@page "/space/EditSpaceFavoriteObjects/{Id}/{Name}"
+﻿@page "/space/EditSpaceFavoriteObjects"
+
 @attribute [Authorize]
 
 @inject IDataCacheService _dataCacheService
 
 
 
-<CnGalWebSite.Shared.Pages.Webs.Space.EditSpaceFavoriteObjects Id="@Id" Name="@Name" ReturnUrl="@ReturnUrl"></CnGalWebSite.Shared.Pages.Webs.Space.EditSpaceFavoriteObjects>
+<CnGalWebSite.Shared.Pages.Webs.Space.EditSpaceFavoriteObjects UserId="@UserId" FolderId="@FolderId" />
 
 @code{
+    [SupplyParameterFromQuery]
     [Parameter]
-    public string Id { get; set; }
+    public string UserId { get; set; }
+    [SupplyParameterFromQuery]
     [Parameter]
-    public string Name { get; set; }
-    [Parameter]
-    public string ReturnUrl { get; set; }
+    public long FolderId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //清空当前缓存
+        _dataCacheService.FavoriteFolderIndexPageCatche.Clean(FolderId.ToString());
+    }
 }

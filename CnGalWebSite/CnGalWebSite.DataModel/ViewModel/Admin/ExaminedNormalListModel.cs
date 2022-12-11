@@ -56,7 +56,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         [Display(Name = "用户认证")]
         UserCertification,
         [Display(Name = "视频")]
-        Video
+        Video,
+        [Display(Name = "收藏夹")]
+        FavoriteFolder
     }
 
     public enum ExaminedNormalListPassType

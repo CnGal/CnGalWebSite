@@ -2,57 +2,35 @@
 
 @attribute [Authorize(Roles = "Admin")]
 
-@inject IAuthService AuthService
 @inject HttpClient Http
 @inject ToastService? ToastService
-@inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 
-<TitleTip Title="收藏夹板块版块"></TitleTip>
+<TitleTip Title="收藏夹板块"></TitleTip>
 
-<div class="">
-   
-    <div class="mb-4" style="padding-right: 0;padding-left: 0;">
-        <div class="  rounded shadow-sm  bg-opacity p-3">
-            <h3 class="fw-bold text-center">收藏夹板块版块</h3>
-            <p class="text-center" style="color: gray;margin-top:20px">
-                <i class="fa fa-spin fa-spinner fa-fw "></i>
-                <span class="article-infor-text">@(InforModel.Defaults + "个默认收藏夹")</span>&nbsp;&nbsp;&nbsp;
+<div class=" rounded shadow-sm p-4 bg-opacity">
+    <Table TItem="ListFavoriteFolderAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="120" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" DefaultSortOrder="SortOrder.Desc" />
+            <TableColumn @bind-Field="@context.Name" Searchable="true" Sortable="true" Width="100" />
+            <TableColumn @bind-Field="@context.BriefIntroduction" Sortable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.UserId" Sortable="true" Width="300" TextWrap="true" />
+            <TableColumn @bind-Field="@context.Count" Sortable Searchable="true" TextWrap="true" Width="80" />
+            <TableColumn @bind-Field="@context.CreateTime" Sortable TextWrap="true" Width="140" FormatString="yyyy-MM-dd HH:mm" />
 
-                <i class="fa fa-list-alt fa-fw "></i>
-                <span class="article-infor-text">@("总计"+InforModel.All + "个收藏夹")</span>
-
-            </p>
-        </div>
-        <div class=" rounded shadow-sm p-4 bg-opacity mt-3">
-            <Table TItem="ListFavoriteFolderAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
-                   ShowExtendButtons="true" ExtendButtonColumnWidth="180" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-                    ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-                <TableToolbarTemplate>
-                    <TableToolbarButton TItem="ListFavoriteFolderAloneModel" Color="Color.Success" Icon="fa fa-plus" Text="添加" OnClickCallback="AddFavoriteFolder" IsAsync="true" />
-                    <TableToolbarButton TItem="ListFavoriteFolderAloneModel" Color="Color.Info" Icon="fa fa-link" Text="设置默认" OnClickCallback="OnDefaultClick" IsAsync="true" />
-                    <TableToolbarButton TItem="ListFavoriteFolderAloneModel" Color="Color.Primary" Icon="fa fa-unlink" Text="取消默认" OnClickCallback="OnUnDefaultClick" IsAsync="true" />
-                    <TableToolbarButton TItem="ListFavoriteFolderAloneModel" Color="Color.Danger" Icon="fa fa-trash" Text="删除" OnClickCallback="OnDeleteClick" IsAsync="true" />
-                </TableToolbarTemplate>
-                <TableColumns>
-                    <TableColumn @bind-Field="@context.Id" Searchable="true" Sortable="true" Width="100" />
-                    <TableColumn @bind-Field="@context.Name" Searchable="true" Sortable="true" Width="100" />
-                    <TableColumn @bind-Field="@context.BriefIntroduction" Sortable="true" Width="200" TextWrap="true" />
-                    <TableColumn @bind-Field="@context.UserId" Sortable="true" Width="250" TextWrap="true" />
-                    <TableColumn @bind-Field="@context.Count" Searchable="true" TextWrap="true" Width="120" />
-                    <TableColumn @bind-Field="@context.CreateTime" TextWrap="true" Width="100" FormatString="yyyy-MM-dd" />
-
-                    <TableColumn @bind-Field="@context.IsDefault" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
-                </TableColumns>
-                <RowButtonTemplate>
-                    <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="管理" IsAsync="true" OnClickWithoutRender="@(() => OnRowManageClick(context.Id,context.Name))" />
-                    <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-exchange" Text="切换默认" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsDefaultClick(new long[] { context.Id }, !context.IsDefault, true))" />
-                    <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-trash" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new long[] { context.Id } ,true))" />
-                </RowButtonTemplate>
-            </Table>
-        </div>
-    </div>
+            <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="80" />
+            <TableColumn @bind-Field="@context.ShowPublicly" Sortable="true" ComponentType="@typeof(Switch)" Width="80" />
+            <TableColumn @bind-Field="@context.IsDefault" Sortable="true" ComponentType="@typeof(Switch)" Width="80" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => OnRowManageClick(context.Id,context.UserId))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick(context.Id))" />
+        </RowButtonTemplate>
+    </Table>
 </div>
+
 @code {
 
     [NotNull]
@@ -70,15 +48,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            InforModel = await Http.GetFromJsonAsync<ListFavoriteFoldersInforViewModel>(ToolHelper.WebApiPath + "api/admin/ListFavoriteFolders", ToolHelper.options);
 
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取取收藏夹数据");
-        }
     }
 
 
@@ -97,174 +67,16 @@
         }
     }
 
-    private async Task OnRowManageClick(long id, string name)
+    private  Task OnRowManageClick(long folderId, string userId)
     {
-        try
-        {
-            NavigationManager.NavigateTo(Provider,"/space/EditSpaceFavoriteObjects/" + id + "/" + ToolHelper.Base64EncodeName(name)+"/"+ToolHelper.Base64EncodeUrl(NavigationManager.Uri), "管理收藏夹", "fa fa-folder-open");
-        }
-        catch
-        {
-            await ToastService.Error("导航失败", "请尝试刷新页面");
-        }
+        NavigationManager.NavigateTo("/space/EditSpaceFavoriteObjects?UserId=" + userId + "&FolderId=" + folderId);
+        return Task.CompletedTask;
     }
 
-
-    private async Task OnRowEditIsDefaultClick(long[] ids, bool isDefault, bool showMessage)
+    private  Task OnRowLookClick(long folderId)
     {
-        string tempString = isDefault == true ? "默认" : "取消默认";
-        //调用API
-        try
-        {
-            var result = await Http.PostAsJsonAsync<SetDefaultFavoriteFolderModel>(ToolHelper.WebApiPath + "api/favorites/UserSetFavoriteFolderDefault", new SetDefaultFavoriteFolderModel { Ids = ids, IsDefault = isDefault });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-
-
-
-            if (obj.Successful == false)
-            {
-                await ToastService.Error(tempString + "收藏夹失败", obj.Error);
-            }
-            else
-            {
-                if (showMessage)
-                {
-                    await ToastService.Success(tempString + "收藏夹成功", tempString + "收藏夹成功");
-                    await TableRows.QueryAsync();
-                }
-            }
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, tempString + "收藏夹失败");
-        }
+        NavigationManager.NavigateTo("/favoritefolders/index/" + folderId);
+        return Task.CompletedTask;
     }
 
-    private async Task OnDefaultClick(IEnumerable<ListFavoriteFolderAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有修改收藏夹状态", "请选中收藏夹");
-            return;
-        }
-
-        await OnRowEditIsDefaultClick(items.Select(s => s.Id).ToArray(), true, false);
-
-        await ToastService.Success("设置默认收藏夹成功", "设置默认收藏夹成功");
-        await TableRows.QueryAsync();
-    }
-    private async Task OnUnDefaultClick(IEnumerable<ListFavoriteFolderAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有修改收藏夹状态", "请选中收藏夹");
-            return;
-        }
-
-        await OnRowEditIsDefaultClick(items.Select(s => s.Id).ToArray(), false, false);
-
-        await ToastService.Success("取消默认收藏夹成功", "取消默认收藏夹成功");
-        await TableRows.QueryAsync();
-    }
-
-    private async Task OnRowDeleteClick(long[] ids, bool showMessage)
-    {
-        //调用API
-        try
-        {
-            var result = await Http.PostAsJsonAsync<DeleteFavoriteFoldersModel>(ToolHelper.WebApiPath + "api/favorites/UserDeleteFavoriteFolder", new DeleteFavoriteFoldersModel { Ids = ids });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("删除收藏夹失败", obj.Error);
-            }
-            else
-            {
-                if (showMessage)
-                {
-                    await ToastService.Success("删除收藏夹成功", "删除收藏夹成功");
-                    await TableRows.QueryAsync();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "删除收藏夹失败");
-        }
-    }
-
-    private async Task OnDeleteClick(IEnumerable<ListFavoriteFolderAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有删除收藏夹", "请选中收藏夹");
-            return;
-        }
-
-        await OnRowDeleteClick(items.Select(s => s.Id).ToArray(), false);
-
-        await ToastService.Success("删除收藏夹成功", "删除收藏夹成功");
-        await TableRows.QueryAsync();
-    }
-
-
-    [Inject]
-    [NotNull]
-    private DialogService? DialogService { get; set; }
-    public async Task AddFavoriteFolder(IEnumerable<ListFavoriteFolderAloneModel> e)
-    {
-        CreateFavoriteFolderViewModel model = new CreateFavoriteFolderViewModel();
-
-        var items = Utility.GenerateEditorItems<CreateFavoriteFolderViewModel>();
-
-        var option = new EditDialogOption<CreateFavoriteFolderViewModel>()
-        {
-            Title = "创建收藏夹",
-            Model = model,
-            Items = items,
-            OnCloseAsync = () =>
-            {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
-            OnEditAsync = async context =>
-            {
-                try
-                {
-                    var result = await Http.PostAsJsonAsync<CreateFavoriteFolderViewModel>(ToolHelper.WebApiPath + "api/favorites/CreateFavoriteFolder", (CreateFavoriteFolderViewModel)context.Model);
-                    string jsonContent = result.Content.ReadAsStringAsync().Result;
-                    var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-
-
-
-                    if (obj.Successful == false)
-                    {
-                        await ToastService.Error("创建收藏夹失败", obj.Error);
-                        return false;
-                    }
-                    else
-                    {
-
-                        await ToastService.Success("创建收藏夹成功", "创建收藏夹成功");
-                        await TableRows.QueryAsync();
-                        return true;
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    ErrorHandler.ProcessError(ex, "创建收藏夹失败");
-                    return false;
-                }
-
-
-
-            }
-        };
-
-        await DialogService.ShowEditDialog(option);
-    }
 }

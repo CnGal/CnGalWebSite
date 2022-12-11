@@ -36,6 +36,8 @@ namespace CnGalWebSite.Helper.Extensions
                 SearchType.HangPainting => (T)Enum.ToObject(typeof(T), 8),
                 SearchType.Keychain => (T)Enum.ToObject(typeof(T), 9),
                 SearchType.Bookmark => (T)Enum.ToObject(typeof(T), 10),
+                SearchType.Posters => (T)Enum.ToObject(typeof(T), 11),
+                SearchType.CD => (T)Enum.ToObject(typeof(T), 12),
                 _ => throw new NotImplementedException()
             };
         }
@@ -98,6 +100,8 @@ namespace CnGalWebSite.Helper.Extensions
                 PeripheryType.Keychain => SearchType.Keychain,
                 PeripheryType.Bookmark => SearchType.Bookmark,
                 PeripheryType.None => SearchType.OtherPeriphery,
+                PeripheryType.Posters => SearchType.Posters,
+                PeripheryType.CD => SearchType.CD,
                 _ => throw new NotImplementedException()
             };
         }

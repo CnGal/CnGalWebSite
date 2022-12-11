@@ -146,7 +146,6 @@ namespace CnGalWebSite.APIServer.Application.Users
             var isSorted = false;
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
-
                 items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
                 isSorted = true;
             }

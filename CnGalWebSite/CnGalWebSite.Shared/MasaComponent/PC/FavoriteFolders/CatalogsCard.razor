@@ -1,0 +1,81 @@
+﻿@inject IDataCacheService _dataCacheService
+@inject HttpClient Http
+
+@if (Model.Any())
+{
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-list" Title="相关目录" Outline Collapable>
+        @foreach (var item in Model)
+        {
+            <div class="mb-3">
+                @if (_dataCacheService.IsApp)
+                {
+                <a href="@("/favoritefolders/index/" + item.Id)" class="a-font-color">
+                    <div class="div-shadow rounded  bg-opacity h-100">
+                        <div style="display: flex; align-items: center;">
+                            <div>
+                                <img loading="lazy" style=" width: 160px; " src="@item.MainImage" alt="@item.Name">
+                            </div>
+                            <div class="me-2 ms-2">
+                                <header class="text-truncate-1">
+                                    <span class="fw-bold" style=" display: inline;">@item.Name</span>
+                                </header>
+                                <span class="text-truncate-2">
+                                    @item.BriefIntroduction
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                }
+                else
+                {
+                <a href="@("/favoritefolders/index/" + item.Id)" class="a-font-color">
+                    <div class="div-shadow rounded  bg-opacity h-100">
+                        <div style="display: flex; align-items: center;">
+                            <div>
+                                <img loading="lazy" style=" width: 160px; " src="@item.MainImage" alt="@item.Name">
+                            </div>
+                            <div class="me-2 ms-3">
+                                <header class="text-truncate-1">
+                                    <span class="h5 fw-bold" style=" display: inline;">@item.Name</span>
+                                </header>
+                                <span class="text-truncate-2">
+                                    @item.BriefIntroduction
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                }
+
+            </div>
+          
+        }
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+}
+
+@code {
+    [Parameter]
+    public FavoriteObjectType Type { get; set; }
+    [Parameter]
+    public long Id { get; set; }
+
+    public List<FavoriteFolderAloneModel> Model = new List<FavoriteFolderAloneModel>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            Model = await Http.GetFromJsonAsync<List<FavoriteFolderAloneModel>>($"{ToolHelper.WebApiPath}api/favorites/GetRelateFavoriteFolders?type={(int)Type}&id={Id}", ToolHelper.options);
+
+            StateHasChanged();
+        }
+        catch (Exception exc)
+        {
+
+            StateHasChanged();
+        }
+
+    }
+}

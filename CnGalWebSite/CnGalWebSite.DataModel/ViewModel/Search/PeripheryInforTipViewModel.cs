@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CnGalWebSite.DataModel.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CnGalWebSite.DataModel.ViewModel.Search
@@ -19,6 +20,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Search
         public int ReaderCount { get; set; }
         [Display(Name = "评论数")]
         public int CommentCount { get; set; }
+
+        public PeripheryType Type { get; set; }
+
+        public string Category { get; set; }
 
         public List<EntryInforTipAddInforModel> AddInfors { get; set; } = new List<EntryInforTipAddInforModel>() { };
     }

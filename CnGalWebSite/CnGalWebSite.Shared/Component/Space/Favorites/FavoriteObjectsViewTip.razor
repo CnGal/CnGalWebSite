@@ -99,7 +99,7 @@
 
     public Task OnManage()
     {
-        NavigationManager.NavigateTo("/space/EditSpaceFavoriteObjects/" + Id + "/" + ToolHelper.Base64EncodeName(Title));
+        NavigationManager.NavigateTo("/space/EditSpaceFavoriteObjects/" + Id );
         return Task.CompletedTask;
     }
 }

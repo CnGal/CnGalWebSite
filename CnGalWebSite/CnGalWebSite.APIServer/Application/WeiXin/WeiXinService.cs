@@ -129,7 +129,12 @@ namespace CnGalWebSite.APIServer.Application.WeiXin
 
         public async Task<string> GetSearchResults(string text)
         {
-            var result = await _searchHelper.QueryAsync(1, 6, text, "全部", null, QueryType.Page);
+            var result = await _searchHelper.QueryAsync(new DataModel.Application.Search.Dtos.SearchInputModel
+            {
+                MaxResultCount=6,
+                FilterText=text,
+            });
+
             var sb = new StringBuilder();
 
             if (result.TotalCount == 0)

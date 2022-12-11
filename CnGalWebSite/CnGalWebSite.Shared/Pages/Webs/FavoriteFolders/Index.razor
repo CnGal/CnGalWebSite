@@ -8,25 +8,13 @@
 
 @implements IDisposable
 
-@if (string.IsNullOrWhiteSpace(Model.DisplayName) == false)
+@if (string.IsNullOrWhiteSpace(Model.Name) == false)
 {
-    <TitleTip Title="@(Model.DisplayName)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
+    <TitleTip Title="@("目录 - "+Model.Name)" Description="@Model.BriefIntroduction" Image="@Model.MainPicture"></TitleTip>
 }
 else
 {
     <TitleTip></TitleTip>
-}
-
-@if (_dataCatcheService.ThemeSetting.IsTransparent)
-{
-    @if (string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) == false)
-    {
-        <div id="web_bg" style="background-image: url(@Model.SmallBackgroundPicture)" class="d-none  bg-d-lg-block bgimage-ison "></div>
-    }
-    @if (string.IsNullOrWhiteSpace(Model.BackgroundPicture) == false)
-    {
-        <div id="web_bg" style="background-image: url(@Model.BackgroundPicture)" class=" d-none d-sm-block bgimage-ison"></div>
-    }
 }
 
 @if (isNotFound)
@@ -48,7 +36,7 @@ else
                 }
 
                 <div>
-                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainCard Model="Model" OnRevoke="OnRevoke" OnPreEdit="OnPreEdit" />
+                    <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.MainCard Model="Model" OnRevoke="OnRevoke" OnPreEdit="OnPreEdit" />
                 </div>
             </div>
             @if (_dataCatcheService.IsApp)
@@ -58,59 +46,27 @@ else
                     <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Model="Model.UserInfor" Small />
 
                     <div class="mb-4">
-                        <CnGalWebSite.Shared.MasaComponent.PC.Videos.BasicInforCard Model="Model" OnRevoke="OnRevoke" />
+                        <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.BasicInforCard Model="Model" OnRevoke="OnRevoke" />
                     </div>
 
                 </div>
                 <div class="col-12 col-lg-8">
-                    @if (Model.Pictures.Count != 0)
-                    {
-                        <div class="mb-4">
-                            <CnGalWebSite.Shared.MasaComponent.PC.Videos.ImagesCard Model="Model" OnRevoke="OnRevoke" />
-                        </div>
-                    }
 
-                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainPageCard Model="Model" OnRevoke="OnRevoke" />
-                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.RelevancesCard Model="Model" OnRevoke="OnRevoke" />
-
-                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.OutlinksCard Model="Model" OnRevoke="OnRevoke" />
-                    <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.CatalogsCard Type="FavoriteObjectType.Video" Id="Model.Id" />
-                    @if (Model.CanComment)
-                    {
-                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentVideo" />
-                    }
-
-
+                    <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.RelevancesCard Model="Model" />
                 </div>
             }
             else
             {
                 <div class="col-12 col-lg-8  order-2 order-lg-1 ">
 
-                    @if (Model.Pictures.Count != 0)
-                    {
-                        <div class="mb-4">
-                            <CnGalWebSite.Shared.MasaComponent.PC.Videos.ImagesCard Model="Model" OnRevoke="OnRevoke" />
-                        </div>
-                    }
-                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainPageCard Model="Model" OnRevoke="OnRevoke" />
-
-
-                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.RelevancesCard Model="Model" OnRevoke="OnRevoke" />
-                    @if (Model.CanComment)
-                    {
-                        <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentVideo" />
-                    }
+                    <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.RelevancesCard Model="Model" />
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2">
                     <CnGalWebSite.Shared.MasaComponent.PC.Users.MainInforCard Model="Model.UserInfor" />
 
                     <div class="mb-4">
-                        <CnGalWebSite.Shared.MasaComponent.PC.Videos.BasicInforCard Model="Model" OnRevoke="OnRevoke" />
+                        <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.BasicInforCard Model="Model" OnRevoke="OnRevoke" />
                     </div>
-
-                    <CnGalWebSite.Shared.MasaComponent.PC.Videos.OutlinksCard Model="Model" OnRevoke="OnRevoke" />
-                    <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.CatalogsCard Type="FavoriteObjectType.Video" Id="Model.Id" />
                 </div>
             }
 
@@ -183,7 +139,7 @@ else
     bool isFirstLoad = true;
     public string CurrentUserRank { get; set; }
 
-    public VideoViewModel Model { get; set; } = new VideoViewModel();
+    public FavoriteFolderViewModel Model { get; set; } = new FavoriteFolderViewModel();
 
 
     [CascadingParameter]
@@ -212,7 +168,7 @@ else
 
             try
             {
-                await JS.InvokeAsync<string>("trackEvent", "视频", "浏览", Model.Name, "1", "look");
+                await JS.InvokeAsync<string>("trackEvent", "目录", "浏览", Model.Name, "1", "look");
             }
             catch (Exception exc)
             {
@@ -230,11 +186,11 @@ else
         {
             isNotFound = false;
             //获取词条信息
-            Model = await _dataCatcheService.VideoIndexPageCatche.GetCache(Id);
+            Model = await _dataCatcheService.FavoriteFolderIndexPageCatche.GetCache(Id);
             //判断如果名称为空则返回主页
             if (string.IsNullOrWhiteSpace(Model.Name))
             {
-                NavigationManager.NavigateTo("/videos/home");
+                NavigationManager.NavigateTo("/");
             }
 
             var userState = await authenticationStateTask;
@@ -267,9 +223,9 @@ else
     public async Task GenerateCarouselStructuredDataJson()
     {
         var urls = new List<string>();
-        urls.AddRange(Model.RelatedEntries.Select(s => NavigationManager.BaseUri + "entries/" + s.Id));
-        urls.AddRange(Model.RelatedArticles.Select(s => NavigationManager.BaseUri + "articles/" + s.Id));
-        urls.AddRange(Model.RelatedVideos.Select(s => NavigationManager.BaseUri + "videos/" + s.Id));
+        urls.AddRange(Model.Objects.Where(s => s.entry != null).Select(s => NavigationManager.BaseUri + "entries/" + s.entry.Id));
+        urls.AddRange(Model.Objects.Where(s => s.article != null).Select(s => NavigationManager.BaseUri + "articles/" + s.article.Id));
+        urls.AddRange(Model.Objects.Where(s => s.Video != null).Select(s => NavigationManager.BaseUri + "videos/" + s.Video.Id));
         await _structuredDataService.SetStructuredData(urls);
     }
 
@@ -295,7 +251,7 @@ else
         //上传
         try
         {
-            var result = await Http.PostAsJsonAsync<RevokeExamineModel>(ToolHelper.WebApiPath + "api/videos/RevokeExamine", new RevokeExamineModel { Id = Model.Id, ExamineType = operation });
+            var result = await Http.PostAsJsonAsync<RevokeExamineModel>(ToolHelper.WebApiPath + "api/favorites/RevokeExamine", new RevokeExamineModel { Id = Model.Id, ExamineType = operation });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             Result obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
             //判断结果
@@ -309,21 +265,12 @@ else
                 //修改各部分编辑状态
                 switch (operation)
                 {
-                    case Operation.EditVideoMain:
+                    case Operation.EditFavoriteFolderMain:
                         Model.MainState = EditState.Normal;
-                        break;
-                    case Operation.EditVideoMainPage:
-                        Model.MainPageState = EditState.Normal;
-                        break;
-                    case Operation.EditVideoRelevanes:
-                        Model.RelevancesState = EditState.Normal;
-                        break;
-                    case Operation.EditVideoImages:
-                        Model.ImagesState = EditState.Normal;
                         break;
 
                 }
-                _dataCatcheService.VideoContrastEditRecordViewCatche.Clean(Id);
+                _dataCatcheService.FavoriteFolderIndexPageCatche.Clean(Id);
                 Refresh();
             }
         }
@@ -345,7 +292,7 @@ else
     {
         if (Id != Model.Id.ToString())
         {
-            if (_dataCatcheService.VideoIndexPageCatche.Check(Id) == false)
+            if (_dataCatcheService.FavoriteFolderIndexPageCatche.Check(Id) == false)
             {
                 isLoading = true;
                 StateHasChanged();
