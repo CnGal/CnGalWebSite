@@ -6,7 +6,7 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="@(IsUserFavorited?"mdi-heart":"mdi-heart-outline")" Tooltip="@(IsUserFavorited?"已收藏":"收藏")" Class="@Class" OnClick="OnClickStar" />
 
-
+<ChooseFavoriteFolderTip @ref="chooseFavoriteFolderTip" ObjectId="Id" Type="Type" OnFavorited="@(() => {  IsUserFavorited = true; StateHasChanged();})"/>
 
 @code {
     [Parameter]
@@ -24,6 +24,8 @@
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+
+    ChooseFavoriteFolderTip chooseFavoriteFolderTip;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -119,22 +121,10 @@
         var favoriteFolderIds = UserFavoriteInfor.Favorites.Where(s => s.IsDefault == true).Select(s => s.Id).ToArray();
         if (favoriteFolderIds.Length == 0)
         {
-            //没有默认收藏夹 进入选择收藏夹界面
-
-            var option = new DialogOption()
+            if(chooseFavoriteFolderTip!=null)
             {
-                Title = "选择收藏夹",
-                ShowCloseButton = false
-            };
-            option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<ChooseFavoriteFolderTip>(new Dictionary<string, object>
-            {
-                [nameof(ChooseFavoriteFolderTip.UserFavoriteInfor)] = UserFavoriteInfor,
-                [nameof(ChooseFavoriteFolderTip.ObjectId)] = Id,
-                [nameof(ChooseFavoriteFolderTip.Type)] =Type,
-                [nameof(ChooseFavoriteFolderTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
-                [nameof(ChooseFavoriteFolderTip.OnFavorite)] = EventCallback.Factory.Create(this, async () => { IsUserFavorited = true; StateHasChanged(); })
-            }).Render();
-            await DialogService.Show(option);
+               await chooseFavoriteFolderTip.Refresh(UserFavoriteInfor);
+            }
         }
         else
         {

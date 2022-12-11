@@ -72,7 +72,9 @@ else
 
                     <CnGalWebSite.Shared.MasaComponent.PC.Videos.MainPageCard Model="Model" OnRevoke="OnRevoke" />
                     <CnGalWebSite.Shared.MasaComponent.PC.Videos.RelevancesCard Model="Model" OnRevoke="OnRevoke" />
+
                     <CnGalWebSite.Shared.MasaComponent.PC.Videos.OutlinksCard Model="Model" OnRevoke="OnRevoke" />
+                    <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.CatalogsCard Type="FavoriteObjectType.Video" Id="Model.Id" />
                     @if (Model.CanComment)
                     {
                         <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="CanDeleted" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentVideo" />
@@ -106,7 +108,9 @@ else
                     <div class="mb-4">
                         <CnGalWebSite.Shared.MasaComponent.PC.Videos.BasicInforCard Model="Model" OnRevoke="OnRevoke" />
                     </div>
+
                     <CnGalWebSite.Shared.MasaComponent.PC.Videos.OutlinksCard Model="Model" OnRevoke="OnRevoke" />
+                    <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.CatalogsCard Type="FavoriteObjectType.Video" Id="Model.Id" />
                 </div>
             }
 

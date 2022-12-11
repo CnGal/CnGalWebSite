@@ -223,6 +223,10 @@ namespace CnGalWebSite.APIServer.Controllers
                     CreateTime = DateTime.Now.ToCstTime(),
                     LastEditTime = DateTime.Now.ToCstTime(),
                     ApplicationUserId = user.Id,
+                    BriefIntroduction = model.BriefIntroduction,
+                    ShowPublicly = false,
+                    MainImage = model.MainImage,
+                    Name = model.Name,
                 });
 
                 var favoriteFolderMain = new FavoriteFolderMain
@@ -675,7 +679,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
-        public async Task<PagedResultDto<FavoriteObjectAloneViewModel>> GetUserFavoriteObjectListAsync( [FromQuery] int maxResultCount, [FromQuery] int currentPage, [FromQuery] long folderId)
+        public async Task<PagedResultDto<FavoriteObjectAloneViewModel>> GetUserFavoriteObjectListAsync([FromQuery] int maxResultCount, [FromQuery] int currentPage, [FromQuery] long folderId)
         {
             var currentUser = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             var favoriteFolder = await _favoriteFolderRepository.GetAll().Include(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == folderId);
@@ -694,21 +698,11 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //判断是否有权限访问
-            if (isAdmin == false)
+            if (favoriteFolder.ShowPublicly == false)
             {
-                if (currentUser == null)
+                if (isAdmin == false && user.Id != currentUser.Id)
                 {
-                    if (user.IsShowFavotites == false)
-                    {
-                        return new PagedResultDto<FavoriteObjectAloneViewModel>() { Data = new List<FavoriteObjectAloneViewModel>() };
-                    }
-                }
-                else
-                {
-                    if (currentUser.Id != user.Id && user.IsShowFavotites == false)
-                    {
-                        return new PagedResultDto<FavoriteObjectAloneViewModel>() { Data = new List<FavoriteObjectAloneViewModel>() };
-                    }
+                    return new PagedResultDto<FavoriteObjectAloneViewModel>() { Data = new List<FavoriteObjectAloneViewModel>() };
                 }
             }
 
@@ -814,7 +808,7 @@ namespace CnGalWebSite.APIServer.Controllers
             model.IsDefault = folder.IsDefault;
             model.IsHidden=folder.IsHidden;
             model.ShowPublicly=folder.ShowPublicly;
-            model.MainImage = _appHelper.GetImagePath(folder.MainImage, "app.png");
+            model.MainImage = folder.MainImage;
 
             return model;
         }
@@ -969,6 +963,50 @@ namespace CnGalWebSite.APIServer.Controllers
 
         }
 
+        /// <summary>
+        /// 获取词条文章标签周边视频的相关收藏夹
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult<List<FavoriteFolderAloneModel>>> GetRelateFavoriteFolders([FromQuery] FavoriteObjectType type, [FromQuery] long id)
+        {
+            var folders = type switch
+            {
+                FavoriteObjectType.Entry => await _favoriteFolderRepository.GetAll().AsNoTracking().Where(s =>s.ShowPublicly&& s.FavoriteObjects.Any(s => s.EntryId == id)).ToListAsync(),
+                FavoriteObjectType.Article => await _favoriteFolderRepository.GetAll().AsNoTracking().Where(s => s.ShowPublicly && s.FavoriteObjects.Any(s => s.ArticleId == id)).ToListAsync(),
+                FavoriteObjectType.Tag => await _favoriteFolderRepository.GetAll().AsNoTracking().Where(s => s.ShowPublicly && s.FavoriteObjects.Any(s => s.TagId == id)).ToListAsync(),
+                FavoriteObjectType.Periphery => await _favoriteFolderRepository.GetAll().AsNoTracking().Where(s => s.ShowPublicly && s.FavoriteObjects.Any(s => s.PeripheryId == id)).ToListAsync(),
+                FavoriteObjectType.Video => await _favoriteFolderRepository.GetAll().AsNoTracking().Where(s => s.ShowPublicly && s.FavoriteObjects.Any(s => s.VideoId == id)).ToListAsync(),
+                _ => null
+            } ;
 
+            if (folders == null|| folders.Any()==false)
+            {
+                return new List<FavoriteFolderAloneModel>();
+            }
+
+            var model =new List<FavoriteFolderAloneModel>();
+
+            foreach(var item in folders)
+            {
+                model.Add(new FavoriteFolderAloneModel
+                {
+                    Id = item.Id,
+                    ShowPublicly = item.ShowPublicly,
+                    BriefIntroduction = item.BriefIntroduction,
+                    Count = item.Count,
+                    CreateTime = item.CreateTime,
+                    IsDefault = item.IsDefault,
+                    IsHidden = item.IsHidden,
+                    MainImage = _appHelper.GetImagePath(item.MainImage,"app.png"),
+                    Name = item.Name,
+                });
+            }
+
+            return  model;
+
+        }
     }
 }

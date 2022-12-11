@@ -3,13 +3,19 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+    创建或编辑 <strong>公开</strong> 的收藏夹后，我们需要进行审核
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Info" Class="mb-3">
+    审核通过前，修改的内容仅在  <strong>编辑收藏夹</strong> 页面展示
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑收藏夹列表" Icon="fa fa-fw fa-folder-open" Class="mb-4" Outline>
     <div class=" rounded shadow-sm  p-4 bg-opacity">
         <Table TItem="ListFavoriteFolderAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
                ShowExtendButtons="true" ExtendButtonColumnWidth="120" IsStriped=true
                ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
             <TableToolbarTemplate>
-                <TableToolbarButton TItem="ListFavoriteFolderAloneModel" Color="Color.Success" Icon="fa fa-fw fa-plus" Text="新建" OnClickCallback="AddFavoriteFolder" IsAsync="true" />
+                <TableToolbarButton TItem="ListFavoriteFolderAloneModel" Color="Color.Success" Icon="fa fa-fw fa-plus" Text="创建收藏夹" OnClickCallback="AddFavoriteFolder" IsAsync="true" />
             </TableToolbarTemplate>
             <TableColumns>
                 <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" Fixed="true" Width="60" DefaultSortOrder="SortOrder.Desc" />
@@ -74,7 +80,7 @@
         return Task.CompletedTask;
     }
 
-    private Task OnRowLookClick(long id,string name)
+    private Task OnRowLookClick(long id, string name)
     {
         NavigationManager.NavigateTo($"/favoritefolders/index/{id}");
         return Task.CompletedTask;

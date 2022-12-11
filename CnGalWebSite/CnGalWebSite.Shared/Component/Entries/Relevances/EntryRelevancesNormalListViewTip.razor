@@ -62,7 +62,7 @@
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
         }
-        var publisherWorks = Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.Publisher)&& s.Contents.Any(s=>ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.ProductionGroup)==false));
+        var publisherWorks = Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.Publisher) && s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.ProductionGroup) == false));
 
         @if (publisherWorks.Any())
         {
@@ -80,7 +80,7 @@
 
         }
 
-        var participationWorks = Model.StaffGames.Where(s => s.AddInfors == null || s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) != PositionGeneralType.CV && ToolHelper.GetGeneralType(s.DisplayName) != PositionGeneralType.SpecialThanks) && s.Contents.Any(s=>ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.ProductionGroup || ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.Publisher)==false));
+        var participationWorks = Model.StaffGames.Where(s => s.AddInfors == null || s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) != PositionGeneralType.CV && ToolHelper.GetGeneralType(s.DisplayName) != PositionGeneralType.SpecialThanks) && s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.ProductionGroup || ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.Publisher) == false));
         @if (participationWorks.Any())
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-paper-plane-o" Title="@("参与作品"+(participationWorks.Count()>4?$" ({participationWorks.Count()})":""))" Outline Collapable>
@@ -127,6 +127,20 @@
                 </div>
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
         }
+        @if (Model.EntryRelevances.Any(s => s.Type == EntryType.ProductionGroup))
+        {
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-object-group" Title="@("相关组织"+(Model.EntryRelevances.Count(s => s.Type == EntryType.ProductionGroup)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.ProductionGroup)})":""))" Outline Collapable>
+                <div class="row">
+                    @foreach (var item in Model.EntryRelevances.Where(s => s.Type == EntryType.ProductionGroup))
+                    {
+                        <div class="mb-3 col-12">
+                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" IsEdit="Model.IsEdit" ShowType="false" />
+                        </div>
+                    }
+
+                </div>
+            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
+        }
         @if (Model.EntryRelevances.Any(s => s.Type == EntryType.Staff))
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-star" Title="@("相关STAFF"+(Model.EntryRelevances.Count(s => s.Type == EntryType.Staff)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.Staff)})":""))" Outline Collapable>
@@ -155,20 +169,7 @@
                 </div>
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
         }
-        @if (Model.EntryRelevances.Any(s => s.Type == EntryType.ProductionGroup))
-        {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-object-group" Title="@("相关组织"+(Model.EntryRelevances.Count(s => s.Type == EntryType.ProductionGroup)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.ProductionGroup)})":""))" Outline Collapable>
-                <div class="row">
-                    @foreach (var item in Model.EntryRelevances.Where(s => s.Type == EntryType.ProductionGroup))
-                    {
-                        <div class="mb-3 col-12">
-                            <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" IsEdit="Model.IsEdit" ShowType="false" />
-                        </div>
-                    }
 
-                </div>
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
-        }
         @if (Model.ArticleRelevances.Count > 0)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-newspaper-o" Title="相关文章" Outline Collapable>
@@ -187,6 +188,7 @@
     }
     @if (RightDisplay == false)
     {
+
         @if (Model.OtherRelevances.Count > 0 && Model.IsHideOutlink == false)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
@@ -208,8 +210,8 @@
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
-
         }
+        <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.CatalogsCard Type="FavoriteObjectType.Entry" Id="Model.Id" />
     }
 
 </div>

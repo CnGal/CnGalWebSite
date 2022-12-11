@@ -65,7 +65,6 @@ else
         {
             try
             {
-                //获取词条信息
                 Model = await Http.GetFromJsonAsync<EditFavoriteFolderViewModel>(ToolHelper.WebApiPath + "api/favorites/EditFavoriteFolder/" + FolderId, ToolHelper.options);
                 isReady = true;
                 StateHasChanged();

@@ -57,6 +57,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Favorites
 
         public bool IsHidden { get; set; }
 
+        public int TabIndex { get; set; }
 
         public EditState MainState { get; set; }
     }

@@ -32,6 +32,7 @@ using CnGalWebSite.DataModel.ExamineModel.Users;
 using CnGalWebSite.DataModel.ExamineModel.Tags;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.ExamineModel.Videos;
+using CnGalWebSite.DataModel.ExamineModel.FavoriteFolders;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -55,6 +56,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<UserReviewEditRecord, long> _userReviewEditRecordRepository;
         private readonly IRepository<UserCertification, long> _userCertificationRepository;
         private readonly IRepository<Video, long> _videoRepository;
+        private readonly IRepository<FavoriteFolder, long> _favoriteFolderRepository;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
         private readonly IRankService _rankService;
@@ -63,7 +65,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
         public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository, IUserService userService, IRepository<Video, long> videoRepository,
-        IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository,
+        IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository,
         UserManager<ApplicationUser> userManager, IExamineService examineService, IRepository<UserMonitor, long> userMonitorsRepository, IEditRecordService editRecordService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository)
         {
@@ -87,6 +89,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _userCertificationRepository = userCertificationRepository;
             _userService = userService;
             _videoRepository = videoRepository;
+            _favoriteFolderRepository = favoriteFolderRepository;
         }
 
 
@@ -294,6 +297,10 @@ namespace CnGalWebSite.APIServer.Controllers
                     entry = await _playedGameRepository.GetAll()
                             .FirstOrDefaultAsync(s => s.Id == examine.PlayedGameId);
                     break;
+                case Operation.EditFavoriteFolderMain:
+                    entry = await _favoriteFolderRepository.GetAll()
+                            .FirstOrDefaultAsync(s => s.Id == examine.FavoriteFolderId);
+                    break;
                 case Operation.RequestUserCertification:
                     entry = await _userCertificationRepository.GetAll()
                         .Include(s => s.Entry)
@@ -377,6 +384,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         Operation.EditPeripheryRelatedEntries => typeof(PeripheryRelatedEntries),
                         Operation.EditPeripheryRelatedPeripheries => typeof(PeripheryRelatedPeripheries),
                         Operation.EditPlayedGameMain => typeof(PlayedGameMain),
+                        Operation.EditFavoriteFolderMain => typeof(FavoriteFolderMain),
                         Operation.RequestUserCertification => typeof(UserCertificationMain),
                         Operation.EditVideoMain => typeof(ExamineMain),
                         Operation.EditVideoRelevanes => typeof(VideoRelevances),

@@ -83,7 +83,9 @@ else
                             <PeripheryImagesViewTip Model="Model" OnRevoke="OnRevoke" />
                         </div>
                     }
+                    <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.CatalogsCard Type="FavoriteObjectType.Periphery" Id="Model.Id" />
                     <PeripheryListOverviewsTip Model="Model" @ref="appPeripheryOverViewTip" OnRevoke="OnRevoke" />
+                    
                     <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentPeriphery" />
                 </div>
             }
@@ -108,7 +110,8 @@ else
                 <div class="col-12 col-lg-4 order-1 order-lg-2">
 
                     <PeripheryBasicInforTip Model="Model" OnRevoke="OnRevoke" />
-                    <PeripheryListRelevancesViewTip Model="Model"/>
+                    <PeripheryListRelevancesViewTip Model="Model" />
+                    <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.CatalogsCard Type="FavoriteObjectType.Periphery" Id="Model.Id" />
                 </div>
             }
         </div>

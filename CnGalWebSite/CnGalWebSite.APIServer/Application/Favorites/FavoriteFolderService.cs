@@ -152,7 +152,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
                 Name = folder.Name,
                 BriefIntroduction=folder.BriefIntroduction,
                 CreateTime = folder.CreateTime,
-                IsHidden = folder.ShowPublicly,
+                IsHidden = !folder.ShowPublicly,
                 MainPicture=_appHelper.GetImagePath(folder.MainImage,"app.png"),
                 ReaderCount=folder.ReaderCount,
                 LastEditTime = folder.LastEditTime,             

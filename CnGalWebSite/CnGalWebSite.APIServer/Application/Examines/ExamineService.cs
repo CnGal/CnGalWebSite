@@ -3032,7 +3032,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         {
             model.Type = ExaminedNormalListModelType.FavoriteFolder;
             var item = await _favoriteFolderRepository.GetAll().AsNoTracking()
-                .FirstOrDefaultAsync(s => s.Id == examine.PlayedGameId);
+                .FirstOrDefaultAsync(s => s.Id == examine.FavoriteFolderId);
 
             if (item == null)
             {
