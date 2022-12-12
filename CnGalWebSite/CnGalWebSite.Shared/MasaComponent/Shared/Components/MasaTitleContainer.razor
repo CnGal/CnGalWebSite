@@ -12,10 +12,24 @@ else
         <div class="@( (OutlineHead?"":"rounded shadow-sm  bg-opacity p-2 ") + Class + (IsCollapsed ? " mb-3" : ""))">
             <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
                 <h2 class="@("m-0 " + (string.IsNullOrWhiteSpace(TextColor)?"font-color":TextColor))" style="font-size: inherit;">
-                    <i class="@Icon"></i> &nbsp;&nbsp;@Title
+                    @if (Icon.Contains("mdi"))
+                    {
+                        <MIcon Color="@(ButtonColor??_dataCacheService.ThemeSetting.Theme)" Class="me-4">@Icon</MIcon>@Title
+                    }
+                    else
+                    {
+                        <span>  <i class="@Icon"></i> &nbsp; &nbsp;@Title</span>
+                    }
                 </h2>
                 <div>
                     @ButtonContent
+                    @if (ShowMoreButton)
+                    {
+                        <MButton XSmall Text Block Color="@(ButtonColor??_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickMore">
+                            <MIcon Left>@IconType.SeeDetails.ToIconString()</MIcon>
+                            查看详情
+                        </MButton>
+                    }
                     @if (Collapable)
                     {
                         <MasaButton Color="@ButtonColor" Fab XSmall Icon="@(IsCollapsed?"fa fa-chevron-right":"fa fa-chevron-down")" Tooltip="@(IsCollapsed?"展开":"折叠")" OnClick="@(() => OnCollapseChanged(!IsCollapsed))" />
@@ -42,11 +56,25 @@ else
     {
         <div class="@( (OutlineHead?"":"rounded shadow-sm  bg-opacity p-3 ") + Class + (IsCollapsed ? " mb-3" : ""))">
             <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
-                <h2 class="@("fw-bold h5 m-0 " + (string.IsNullOrWhiteSpace(TextColor)?"font-color":TextColor))">
-                    <i class="@Icon"></i> &nbsp;&nbsp;@Title
+                <h2 class="@("fw-bold h5 m-0 " + (string.IsNullOrWhiteSpace(TextColor)?"font-color":TextColor))" style="display:flex;">
+                    @if (Icon.Contains("mdi"))
+                    {
+                        <MIcon Color="@(ButtonColor??_dataCacheService.ThemeSetting.Theme)" Class="me-4">@Icon</MIcon>@Title
+                    }
+                    else
+                    {
+                        <span>  <i class="@Icon"></i> &nbsp; &nbsp;@Title</span>
+                    }
                 </h2>
                 <div>
                     @ButtonContent
+                    @if (ShowMoreButton)
+                    {
+                        <MButton  Text Block Color="@(ButtonColor??_dataCacheService.ThemeSetting.Theme)" OnClick="OnClickMore">
+                            <MIcon Left>@IconType.SeeDetails.ToIconString()</MIcon>
+                            查看详情
+                        </MButton>
+                    }
                     @if (Collapable)
                     {
                         <MasaButton Color="@ButtonColor" Fab XSmall Icon="@(IsCollapsed?"fa fa-chevron-right":"fa fa-chevron-down")" Tooltip="@(IsCollapsed?"展开":"折叠")" OnClick="@(() => OnCollapseChanged(!IsCollapsed))" />
@@ -98,9 +126,13 @@ else
     [Parameter]
     public bool IsCollapsed { get; set; }
     [Parameter]
+    public bool ShowMoreButton { get; set; }
+    [Parameter]
     public bool Small { get; set; }
     [Parameter]
     public EventCallback<bool> IsCollapsedChanged { get; set; }
+    [Parameter]
+    public EventCallback OnClickMore { get; set; }
 
     private async Task OnCollapseChanged(bool state)
     {

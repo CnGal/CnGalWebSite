@@ -1,27 +1,32 @@
-﻿
+﻿@inject IDataCacheService _dataCacheService
+
 @if (ShowCount)
 {
-
     <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color">
-        <img loading="lazy" src="@Image" class="card-img-top" alt="@Name" style="aspect-ratio: 460/215;" />
-        <span class="home-card-name-text pt-2">@Name</span>
-        @if (ShowCount)
-        {
-            <div style="color:gray">
-                <i class="fa fa-eye fa-fw " style=" width: 50%; text-align: start;">&nbsp;@ReadCount</i>
-                <i class="fa fa-comments-o fa-fw ">&nbsp;@CommentCount</i>
+        <div style="display: flex; flex-direction: column; justify-content: space-between; " class="h-100">
+            <div>
+                <img loading="lazy" src="@Image" class="card-img-top" alt="@Name" style="aspect-ratio: 460/215;" />
+                <span class="home-card-name-text pt-2">@Name</span>
             </div>
-        }
+            @if (ShowCount)
+            {
+                <div style="color: gray; display: flex; justify-content: space-between;">
+                    <span class="d-flex">
+                        <MIcon XSmall Class="me-2" Color="grey">@IconType.Read.ToIconString()</MIcon>@ReadCount
+                    </span>
+                    <span class="d-flex">
+                        <MIcon XSmall Class="me-2" Color="grey">@IconType.Comment.ToIconString()</MIcon>@CommentCount
+                    </span>
+                </div>
+            }
+        </div>
     </a>
-
 }
 else
 {
     <a href="@Url" target="@(Outlink?"_blank":null)" class="a-font-color" itemprop="url">
         <img loading="lazy" src="@Image" class="card-img-top" alt="@Name" itemprop="image" style="aspect-ratio:460/215;" />
-
         <span class="home-card-name-text pt-2" itemprop="name">@Name</span>
-
     </a>
 }
 

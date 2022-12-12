@@ -12,7 +12,7 @@
     {
         @if (Model.Roles.Count > 0)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-child" Title="登场角色" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Role.ToIconString()" Title="登场角色" Outline Collapable>
                 <div class="row">
                     @foreach (var item in Model.Roles)
                     {
@@ -31,7 +31,7 @@
         var castWorks = Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.CV)));
         @if (castWorks.Any())
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-microphone" Title="@("配音作品"+(castWorks.Count()>4?$" ({castWorks.Count()})":""))" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Dub.ToIconString()" Title="@("配音作品"+(castWorks.Count()>4?$" ({castWorks.Count()})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in castWorks)
                     {
@@ -49,7 +49,7 @@
 
         @if (productionGroupWorks.Any())
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-magic" Title="@("制作作品"+(productionGroupWorks.Count()>4?$" ({productionGroupWorks.Count()})":""))" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Make.ToIconString()" Title="@("制作作品"+(productionGroupWorks.Count()>4?$" ({productionGroupWorks.Count()})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in productionGroupWorks)
                     {
@@ -66,7 +66,7 @@
 
         @if (publisherWorks.Any())
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-map-signs" Title="@("发行作品"+(publisherWorks.Count()>4?$" ({publisherWorks.Count()})":""))" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Publisher.ToIconString()" Title="@("发行作品"+(publisherWorks.Count()>4?$" ({publisherWorks.Count()})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in publisherWorks)
                     {
@@ -83,7 +83,7 @@
         var participationWorks = Model.StaffGames.Where(s => s.AddInfors == null || s.AddInfors.Any(s => s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) != PositionGeneralType.CV && ToolHelper.GetGeneralType(s.DisplayName) != PositionGeneralType.SpecialThanks) && s.Contents.Any(s => ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.ProductionGroup || ToolHelper.GetGeneralType(s.DisplayName) == PositionGeneralType.Publisher) == false));
         @if (participationWorks.Any())
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-paper-plane-o" Title="@("参与作品"+(participationWorks.Count()>4?$" ({participationWorks.Count()})":""))" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Participate.ToIconString()" Title="@("参与作品"+(participationWorks.Count()>4?$" ({participationWorks.Count()})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in participationWorks)
                     {
@@ -100,7 +100,7 @@
 
         @if (appreciatedParticWorks.Any())
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-star-o" Title="@("特别感谢"+(appreciatedParticWorks.Count()>4?$" ({appreciatedParticWorks.Count()})":""))" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.SpecialThanks.ToIconString()" Title="@("特别感谢"+(appreciatedParticWorks.Count()>4?$" ({appreciatedParticWorks.Count()})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in appreciatedParticWorks)
                     {
@@ -115,7 +115,7 @@
         }
         @if (Model.EntryRelevances.Any(s => s.Type == EntryType.Game))
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-gamepad" Title="@("相关游戏"+(Model.EntryRelevances.Count(s => s.Type == EntryType.Game)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.Game)})":""))" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Game.ToIconString()" Title="@("相关游戏"+(Model.EntryRelevances.Count(s => s.Type == EntryType.Game)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.Game)})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in Model.EntryRelevances.Where(s => s.Type == EntryType.Game))
                     {
@@ -129,7 +129,7 @@
         }
         @if (Model.EntryRelevances.Any(s => s.Type == EntryType.ProductionGroup))
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-object-group" Title="@("相关组织"+(Model.EntryRelevances.Count(s => s.Type == EntryType.ProductionGroup)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.ProductionGroup)})":""))" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Group.ToIconString()" Title="@("相关组织"+(Model.EntryRelevances.Count(s => s.Type == EntryType.ProductionGroup)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.ProductionGroup)})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in Model.EntryRelevances.Where(s => s.Type == EntryType.ProductionGroup))
                     {
@@ -143,7 +143,7 @@
         }
         @if (Model.EntryRelevances.Any(s => s.Type == EntryType.Staff))
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-star" Title="@("相关STAFF"+(Model.EntryRelevances.Count(s => s.Type == EntryType.Staff)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.Staff)})":""))" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Staff.ToIconString()" Title="@("相关STAFF"+(Model.EntryRelevances.Count(s => s.Type == EntryType.Staff)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.Staff)})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in Model.EntryRelevances.Where(s => s.Type == EntryType.Staff))
                     {
@@ -157,7 +157,7 @@
         }
         @if (Model.EntryRelevances.Any(s => s.Type == EntryType.Role))
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-group" Title="@("相关角色"+(Model.EntryRelevances.Count(s => s.Type == EntryType.Role)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.Role)})":""))" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Role.ToIconString()" Title="@("相关角色"+(Model.EntryRelevances.Count(s => s.Type == EntryType.Role)>4?$" ({Model.EntryRelevances.Count(s => s.Type == EntryType.Role)})":""))" Outline Collapable>
                 <div class="row">
                     @foreach (var item in Model.EntryRelevances.Where(s => s.Type == EntryType.Role))
                     {
@@ -172,7 +172,7 @@
 
         @if (Model.ArticleRelevances.Count > 0)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-newspaper-o" Title="相关文章" Outline Collapable>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Article.ToIconString()" Title="相关文章" Outline Collapable>
                 <div class="row">
                     @foreach (var item in Model.ArticleRelevances)
                     {
@@ -192,7 +192,7 @@
         @if (Model.OtherRelevances.Count > 0 && Model.IsHideOutlink == false)
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="外部链接" Outline Collapable>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Link.ToIconString()" Title="外部链接" Outline Collapable>
                     <div class="mb-3">
                         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert Type="AlertTypes.Warning">
                             以下为外部链接，与本站没有任何从属关系，本站亦不对其安全性负责

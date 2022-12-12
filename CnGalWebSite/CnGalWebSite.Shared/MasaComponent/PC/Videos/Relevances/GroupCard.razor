@@ -5,7 +5,7 @@
 @if (Model.Any())
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相关视频" Icon="fa fa-fw fa-video-camera" Class="mb-4">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相关视频" Icon="@IconType.Video.ToIconString()" Class="mb-4">
             <ChildContent>
                 <MSlideGroup ShowArrows="true">
                     <ChildContent>

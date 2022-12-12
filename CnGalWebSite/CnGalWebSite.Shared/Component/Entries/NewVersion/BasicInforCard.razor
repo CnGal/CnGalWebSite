@@ -16,7 +16,7 @@
 
 @if (Model.Information.Any(s => s.Modifier == "基本信息" && s.Informations.Any(s => s.DisplayName != "官网")))
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="fa fa-fw fa-info-circle" Class="mb-4">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="@IconType.Infor.ToIconString()" Class="mb-4">
         <div class="ms-1">
             <div class="row">
                 @foreach (var item in Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations)
@@ -172,7 +172,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
     @if (Model.IsHideOutlink == false && (Model.Information.Any(s => s.Modifier == "相关网站") || (Model.Information.Any(s => s.Modifier == "基本信息") && Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))))
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相关网站" Icon="fa fa-fw fa-link" Class="mb-4">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相关网站" Icon="@IconType.Link.ToIconString()" Class="mb-4">
             <div class="ms-1">
                 <div class="row">
                     @if (Model.Information.Any(s => s.Modifier == "相关网站"))

@@ -10,7 +10,7 @@
 
 @if (Model.Tags.Count > 0)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="标签" Icon="fa fa-fw fa-tags">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="标签" Icon="@IconType.Tags.ToIconString()">
         <div>
             @foreach (var item in Model.Tags)
             {

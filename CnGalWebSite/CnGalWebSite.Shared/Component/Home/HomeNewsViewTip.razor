@@ -4,7 +4,7 @@
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="fa fa-fw fa-newspaper-o" Class="mb-4">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="@IconType.News.ToIconString()" Class="mb-4">
     <ButtonContent>
             <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
                 <MIcon Left>mdi-share-all-outline  </MIcon>

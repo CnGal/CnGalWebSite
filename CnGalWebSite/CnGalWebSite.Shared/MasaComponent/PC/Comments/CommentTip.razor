@@ -3,7 +3,7 @@
 @inject NavigationManager NavigationManager
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="fa fa-fw fa-sticky-note-o" Outline>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="留言板" Icon="@IconType.Comment.ToIconString()" Outline>
         @if (CanComment)
         {
             <CommentListView Model="Model" CanDeleted="CanDeleted" OnRefrsh="Refresh" @ref="commentListView"></CommentListView>
@@ -14,7 +14,7 @@
                 </Authorized>
                 <NotAuthorized>
                     <div style="display: flex; justify-content: center;" class="rounded shadow-sm  bg-opacity p-3 ">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后发表评论" OnClick="OnLoginClick" Icon="mdi-login" />
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="登入后发表评论" OnClick="OnLoginClick" Icon="@IconType.Login.ToIconString()" />
                     </div>
                 </NotAuthorized>
             </AuthorizeView>

@@ -4,7 +4,7 @@
 
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/peripheries/EditImages/" + Model.Id)" ExamineType="Operation.EditPeripheryImages" OnClickRevoke="OnRevoke"/>
 }
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相册" Icon="fa fa-fw fa-picture-o">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="相册" Icon="@IconType.PhotoAlbum.ToIconString()">
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.ImageSlideGroup Model="imagesList" />
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
