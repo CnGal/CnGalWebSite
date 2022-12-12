@@ -27,12 +27,7 @@
         opacity: 0.5;
     }
 </style>
-<div class="rounded shadow-sm bg-opacity rounded h-100 pt-3 pb-3">
-    <div class="mb-2 ps-3 pe-3" style="display: flex; justify-content: space-between; align-items: flex-end; ">
-        <div>
-            <h2 class="fw-bold pb-2 m-0 font-color h5"><i class="fa fa-pencil"></i>&nbsp;&nbsp;编辑记录</h2>
-        </div>
-    </div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑记录" Icon="@IconType.EditRecord.ToIconString()" Class="h-100">
     <Scroll Height="600px">
         <div>
             <div class="row ps-3 pe-3">
@@ -47,9 +42,8 @@
                 }
             </div>
         </div>
-      
     </Scroll>
-</div>
+</CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {
     [Parameter]

@@ -13,7 +13,7 @@
                     c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                 }
                 <MButton Icon Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs" Dark="@_dataCacheService.ThemeSetting.IsDark">
-                    <MIcon>mdi-plus</MIcon>
+                    <MIcon>@IconType.Create.ToIconString()</MIcon>
                 </MButton>
             </ActivatorContent>
             <ChildContent>
@@ -26,34 +26,34 @@
         <div class="bg-theme p-3" style="width:200px;">
             <div class="w-100">
                 <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/entries/establishentry"))">
-                    <MIcon Left>mdi-archive</MIcon>
+                    <MIcon Left>@IconType.Entry.ToIconString()</MIcon>
                     创建词条
                 </MButton>
                 <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/articles/createarticle"))">
-                    <MIcon Left>mdi-script-text</MIcon>
+                    <MIcon Left>@IconType.Article.ToIconString()</MIcon>
                     发表文章
                 </MButton>
                 <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/videos/create"))">
-                    <MIcon Left>mdi-animation-play </MIcon>
+                    <MIcon Left>@IconType.Video.ToIconString()</MIcon>
                     发布视频
                 </MButton>
                 <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/tags/createtag"))">
-                    <MIcon Left>mdi-tag</MIcon>
+                    <MIcon Left>@IconType.Tag.ToIconString()</MIcon>
                     创建标签
                 </MButton>
                 <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/peripheries/createperiphery"))">
-                    <MIcon Left>mdi-basket</MIcon>
+                    <MIcon Left>@IconType.Periphery.ToIconString()</MIcon>
                     创建周边
                 </MButton>
 
                 <AuthorizeView Roles="Admin">
                     <Authorized>
                         <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/lotteries/createlottery"))">
-                            <MIcon Left>mdi-wallet-giftcard </MIcon>
+                            <MIcon Left>@IconType.Lottery.ToIconString()</MIcon>
                             创建抽奖
                         </MButton>
                         <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/votes/createvote"))">
-                            <MIcon Left>mdi-vote</MIcon>
+                            <MIcon Left>@IconType.Vote.ToIconString()</MIcon>
                             发起投票
                         </MButton>
                     </Authorized>

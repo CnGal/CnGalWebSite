@@ -1,6 +1,6 @@
 ﻿
 <div>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-codepen" Title="相关词条" Collapable Outline>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Entry.ToIconString()" Title="相关词条" Collapable Outline>
         <div class="mt-3">
             <div>
                 @foreach (var item in Model.Entries)
@@ -18,7 +18,7 @@
     @if ((Model.Peripheries.Count > 0 && Model.Type != PeripheryType.Set))
     {
         <div class="mt-3">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-shopping-basket" Title="相关周边" Collapable Outline>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="@IconType.Periphery.ToIconString()" Title="相关周边" Collapable Outline>
                 <div class="mt-3">
 
                     @if (Model.Type != PeripheryType.Set)

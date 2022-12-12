@@ -7,7 +7,7 @@
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/entries/EditRelevances/" + Model.Id)" ExamineType="Operation.EstablishRelevances" OnClickRevoke="OnRevoke" />
 }
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="动态" Icon="fa fa-fw fa-newspaper-o">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="动态" Icon="@IconType.News.ToIconString()">
     <Scroll style="max-height:500px">
         <MTimeline Dense="_dataCacheService.IsApp||Model.NewsOfEntry.Count<3" Class="ms-2 me-2">
             @foreach (var item in Model.NewsOfEntry.OrderByDescending(s => s.HappenedTime))

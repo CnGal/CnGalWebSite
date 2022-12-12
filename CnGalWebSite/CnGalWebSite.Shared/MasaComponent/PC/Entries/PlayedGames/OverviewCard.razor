@@ -6,14 +6,7 @@
 {
     @if (Large)
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="fa fa-fw fa-star" Class="@Class">
-
-            <ButtonContent>
-                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
-                    <MIcon Left>mdi-share-all-outline  </MIcon>
-                    查看详情
-                </MButton>
-            </ButtonContent>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="@IconType.GameRecord.ToIconString()" Class="@Class" ShowMoreButton OnClickMore="OnClickMore">
             <ChildContent>
                 <UserScoreGroup Model="Model" OnEdit="OnClickEditGameRecored" ShowBlankAction ShowChart MaxCount="10" />
             </ChildContent>
@@ -22,14 +15,7 @@
     }
     else
     {
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="fa fa-fw fa-star" Class="@Class">
-
-            <ButtonContent>
-                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
-                    <MIcon Left>mdi-share-all-outline  </MIcon>
-                    查看详情
-                </MButton>
-            </ButtonContent>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="@IconType.GameRecord.ToIconString()" Class="@Class" ShowMoreButton OnClickMore="OnClickMore">
             <ChildContent>
                 <TotalScoreCard Model="Model" Outline />
                 <div>

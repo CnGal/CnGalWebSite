@@ -37,6 +37,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         public AnniversariesSetting AnniversariesSetting { get; set; } = new AnniversariesSetting();
 
         public DateTime LastDisplayBrithdayTime { get; set; }
+
+        public string FontFamily { get; set; } = "Helvetica,Tahoma,Arial,PingFang SC,Hiragino Sans GB,Heiti SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif";
     }
 
     public enum DisplayMode

@@ -1,7 +1,7 @@
 ﻿@inject HttpClient Http
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="Steam信息" Icon="fa fa-fw fa-steam" >
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="Steam信息" Icon="@IconType.Steam.ToIconString()" >
     <div class="row" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
         @if (IsReady)
         {

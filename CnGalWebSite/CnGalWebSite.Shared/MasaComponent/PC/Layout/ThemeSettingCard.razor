@@ -55,6 +55,12 @@
         <MCardText Class="pb-0">
             <MSwitch Value="_expand" ValueChanged="ExpandValueChanged" Label="@(_expand?"扩展显示范围":"限制显示范围")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
         </MCardText>
+        <MCardTitle Class="text-h6">
+            字体
+        </MCardTitle>
+        <MCardText Class="pb-0">
+            <MTextField Label="自定义渲染的字体，具体参见更新日志" Value="@_dataCacheService.ThemeSetting.FontFamily" ValueChanged="FontFamilyValueChanged" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
+        </MCardText>
         <MCardActions>
             <MSpacer></MSpacer>
             <MButton Color="green darken-1"
@@ -148,6 +154,16 @@
     {
         _expand = expand;
         _dataCacheService.ThemeSetting.IsExtendEntireScreen = expand;
+
+        if (CnGalRootTip != null)
+        {
+            await CnGalRootTip.SaveTheme();
+        }
+    }
+
+    public async Task FontFamilyValueChanged(string value)
+    {
+        _dataCacheService.ThemeSetting.FontFamily = value;
 
         if (CnGalRootTip != null)
         {
