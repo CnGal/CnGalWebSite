@@ -113,8 +113,8 @@
 
             if (_days > 999)
             {
-                Model.BeforeTime = DateTime.MaxValue;
-                Model.AfterTime = DateTime.MinValue;
+                Model.BeforeTime = DateTime.Now.Date.AddDays(1);
+                Model.AfterTime =new DateTime(100,10,10);
             }
             else
             {
@@ -123,7 +123,7 @@
             }
 
 
-            Model = await _dataCacheService.LineChartDataCatche.GetCache(BaseUrl + $"?Type={Type}&AfterTime={Model.AfterTime.ToBinary()}&BeforeTime={Model.BeforeTime.ToBinary()}");
+            Model = await _dataCacheService.LineChartDataCatche.GetCache(BaseUrl + $"?Type={Type}&AfterTime={new DateTimeOffset(Model.AfterTime).ToUnixTimeMilliseconds()}&BeforeTime={new DateTimeOffset(Model.BeforeTime).ToUnixTimeMilliseconds()}");
 
             if (Stacked)
             {

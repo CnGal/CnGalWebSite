@@ -43,7 +43,7 @@ namespace CnGalWebSite.DataModel.Helper
 
         public static readonly JsonSerializerOptions options = new()
         {
-            PropertyNameCaseInsensitive = true,
+            PropertyNameCaseInsensitive = true, 
         };
 
         public const int MaxEditorCount = 200;

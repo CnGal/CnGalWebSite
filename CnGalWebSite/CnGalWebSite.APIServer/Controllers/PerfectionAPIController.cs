@@ -8,6 +8,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Perfections;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -82,7 +83,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private const int MaxCountLineDay = 60;
 
         /// <summary>
-        /// 获取编辑概览图表
+        /// 获取 编辑概览、完善度 图表
         /// </summary>
         /// <returns></returns>
         [AllowAnonymous]
@@ -91,8 +92,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             if (type == LineChartType.Edit || type == LineChartType.PerfectionLevel || type == LineChartType.StatisticalData)
             {
-                var after = DateTime.FromBinary(afterTime);
-                var before = DateTime.FromBinary(beforeTime);
+                var after = afterTime.ToString().TransTime();
+                var before = beforeTime.ToString().TransTime();
 
                 return await _chartService.GetLineChartAsync(type, after, before);
             }
