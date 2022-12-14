@@ -61,14 +61,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            InforModel = await Http.GetFromJsonAsync<ListUsersInforViewModel>(ToolHelper.WebApiPath + "api/admin/listusers", ToolHelper.options);
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取用户数据");
-        }
 
     }
 

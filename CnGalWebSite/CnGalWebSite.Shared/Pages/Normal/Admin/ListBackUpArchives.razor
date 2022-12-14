@@ -11,55 +11,34 @@
 <TitleTip Title="互联网档案馆备份版块"></TitleTip>
 
 
-<div class="">
-    <div class="" style="padding-right: 0;padding-left: 0;">
-        <div class="  rounded shadow-sm  bg-opacity p-3">
-            <h3 class="fw-bold text-center">互联网档案馆备份版块</h3>
-            <p class="text-center" style="color: gray;margin-top:20px">
-                <i class="fa fa-close fa-fw "></i>
-                <span class="article-infor-text">@(""+InforModel.IsLastFail + "个备份失败")</span>&nbsp;&nbsp;&nbsp;
+<div class=" rounded shadow-sm -lg p-4 bg-opacity">
+    <Table TItem="ListBackUpArchiveAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true IsAutoRefresh="@IsAutoRefresh"
+           ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableToolbarTemplate>
+            <TableToolbarButton TItem="ListBackUpArchiveAloneModel" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" OnClickCallback="OnRunClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListBackUpArchiveAloneModel" Color="Color.Primary" Icon="fa fa-spin fa-spinner fa-fw" Text="切换自动刷新" OnClickCallback="ClickIsAutoRefresh" />
+        </TableToolbarTemplate>
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
+            <TableColumn @bind-Field="@context.LastBackUpTime" Sortable="true" Width="200" TextWrap="true" />
+            <TableColumn @bind-Field="@context.LastTimeUsed" Sortable="true" Width="100" TextWrap="true" FormatString="0.0" />
+            <TableColumn @bind-Field="@context.IsLastFail" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
+            <TableColumn @bind-Field="@context.EntryId" Searchable="true" Sortable="true" Width="150" />
 
-
-                <i class="fa fa-chrome fa-fw "></i>
-                <span class="article-infor-text">@("总计"+InforModel.All + "个备份")</span>
-
-            </p>
-        </div>
-
-        <div class="mt-3" style="padding-right: 0;padding-left: 0;">
-            <div class=" rounded shadow-sm -lg p-4 bg-opacity">
-                <Table TItem="ListBackUpArchiveAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
-                       ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true IsAutoRefresh="@IsAutoRefresh"
-                        ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-                    <TableToolbarTemplate>
-                        <TableToolbarButton TItem="ListBackUpArchiveAloneModel" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" OnClickCallback="OnRunClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListBackUpArchiveAloneModel" Color="Color.Primary" Icon="fa fa-spin fa-spinner fa-fw" Text="切换自动刷新" OnClickCallback="ClickIsAutoRefresh" />
-                    </TableToolbarTemplate>
-                    <TableColumns>
-                        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-                        <TableColumn @bind-Field="@context.LastBackUpTime" Sortable="true" Width="200" TextWrap="true" />
-                        <TableColumn @bind-Field="@context.LastTimeUsed" Sortable="true" Width="100" TextWrap="true" FormatString="0.0" />
-                        <TableColumn @bind-Field="@context.IsLastFail" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
-                        <TableColumn @bind-Field="@context.EntryId" Searchable="true" Sortable="true" Width="150" />
-
-                        <TableColumn @bind-Field="@context.ArticleId" Searchable="true" Sortable="true" Width="150" />
-                    </TableColumns>
-                    <RowButtonTemplate>
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" IsAsync="true" OnClickWithoutRender="@(() => OnRowRunClick( new long[] { context.Id } ,true))" />
-                    </RowButtonTemplate>
-                </Table>
-            </div>
-        </div>
-
-    </div>
-
+            <TableColumn @bind-Field="@context.ArticleId" Searchable="true" Sortable="true" Width="150" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-paper-plane" Text="执行" IsAsync="true" OnClickWithoutRender="@(() => OnRowRunClick( new long[] { context.Id } ,true))" />
+        </RowButtonTemplate>
+    </Table>
 </div>
+
 @code {
     [NotNull]
     private Table<ListBackUpArchiveAloneModel>? TableRows { get; set; }
     private List<ListBackUpArchiveAloneModel> SelectedRows { get; set; } = new();
 
-    public ListBackUpArchivesInforViewModel InforModel { get; set; } = new ListBackUpArchivesInforViewModel();
     public ListBackUpArchivesViewModel ListModel { get; set; } = new ListBackUpArchivesViewModel { BackUpArchives = new List<ListBackUpArchiveAloneModel>() };
 
     private ListBackUpArchiveAloneModel searchModel { get; set; } = new ListBackUpArchiveAloneModel();
@@ -71,14 +50,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            InforModel = await Http.GetFromJsonAsync<ListBackUpArchivesInforViewModel>(ToolHelper.WebApiPath + "api/BackUpArchives/listBackUpArchives", ToolHelper.options);
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取互联网档案馆备份信息数据");
-        }
 
     }
 

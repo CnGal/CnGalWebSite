@@ -6,79 +6,48 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
-@implements IAsyncDisposable
 
 
 <TitleTip Title="消息版块"></TitleTip>
 
-<div class="">
-    <div class="" style="padding-right: 0;padding-left: 0;">
-        <div class="  rounded shadow-sm  bg-opacity p-3">
-            <h3 class="fw-bold text-center">消息版块</h3>
-            <p class="text-center" style="color: gray;margin-top:20px">
-                <i class="fa fa-commenting fa-fw "></i>
-                <span class="article-infor-text">@(InforModel.ReadedCount + "条已读消息")</span>&nbsp;&nbsp;&nbsp;
+<div class=" rounded shadow-sm -lg p-4 bg-opacity">
+    <Table TItem="ListMessageAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="200" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
+           ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
+        <TableToolbarTemplate>
+            <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Success" Icon="fa fa-database" Text="已读" OnClickCallback="OnReadedClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Primary" Icon="fa fa-pencil-square-o" Text="未读" OnClickCallback="OnNotReadedClick" IsAsync="true" />
+            <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Danger" Icon="fa fa-close" Text="删除" OnClickCallback="OnDeleteClick" IsAsync="true" />
 
-                <i class="fa fa-commenting-o fa-fw "></i>
-                <span class="article-infor-text">@(InforModel.NotReadedCount + "条未读消息")</span>
-                @if (IsSmallScreen)
-                {
-                    <br />
-                }
-                else
-                {
-                    <span>&nbsp; &nbsp; &nbsp;</span>
-                }
-                <i class="fa fa-star fa-fw "></i>
-                <span class="article-infor-text">@("总计"+InforModel.All + "条消息")</span>
+        </TableToolbarTemplate>
+        <TableColumns>
+            <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
+            <TableColumn @bind-Field="@context.Type" Searchable="true" Sortable="true" Width="100" />
+            <TableColumn @bind-Field="@context.Title" Sortable="true" Searchable="true" Width="200" />
+            <TableColumn @bind-Field="@context.Text" Searchable="true" TextWrap="true" Width="300" />
 
-            </p>
-        </div>
-
-        <div class="mt-3" style="padding-right: 0;padding-left: 0;">
-            <div class=" rounded shadow-sm -lg p-4 bg-opacity">
-                <Table TItem="ListMessageAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@SearchModelUser" ShowSearch="true" @ref="TableRows"
-                       ShowExtendButtons="true" ExtendButtonColumnWidth="200" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
-                        ShowToolbar="true" ShowDefaultButtons="false" FixedExtendButtonsColumn="true">
-                    <TableToolbarTemplate>
-                        <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Success" Icon="fa fa-database" Text="已读" OnClickCallback="OnReadedClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Primary" Icon="fa fa-pencil-square-o" Text="未读" OnClickCallback="OnNotReadedClick" IsAsync="true" />
-                        <TableToolbarButton TItem="ListMessageAloneModel" Color="Color.Danger" Icon="fa fa-close" Text="删除" OnClickCallback="OnDeleteClick" IsAsync="true" />
-
-                    </TableToolbarTemplate>
-                    <TableColumns>
-                        <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
-                        <TableColumn @bind-Field="@context.Type" Searchable="true" Sortable="true" Width="100" />
-                        <TableColumn @bind-Field="@context.Title" Sortable="true" Searchable="true" Width="200" />
-                        <TableColumn @bind-Field="@context.Text" Searchable="true" TextWrap="true" Width="300" />
-
-                        <TableColumn @bind-Field="@context.PostTime" Sortable="true" TextWrap="true" Width="120" />
-                        <TableColumn @bind-Field="@context.ApplicationUserId" Sortable="true" Searchable="true" TextWrap="true" Width="160" />
-                        <TableColumn @bind-Field="@context.Rank" Sortable="true" Searchable="true" TextWrap="true" Width="100" />
-                        <TableColumn @bind-Field="@context.Link" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
-                        <TableColumn @bind-Field="@context.AdditionalInfor" Sortable="true" Searchable="true" Width="130" TextWrap="true" />
-                        <TableColumn @bind-Field="@context.LinkTitle" Sortable="true" Searchable="true" TextWrap="true" Width="160" />
-                        <TableColumn @bind-Field="@context.Image" Sortable="true" Searchable="true" TextWrap="true" Width="160" />
-                        <TableColumn @bind-Field="@context.IsReaded" Sortable="true" Searchable="true" ComponentType="@typeof(Switch)" Width="110" />
-                    </TableColumns>
-                    <RowButtonTemplate>
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookLink( context.Link , context.LinkTitle))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-comments-o" Text="切换状态" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsReadedClick(new long[] { context.Id }, !context.IsReaded, true))" />
-                        <TableCellButton AutoSelectedRowWhenClick="false"  Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-close" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new long[] { context.Id },true))" />
-                    </RowButtonTemplate>
-                </Table>
-            </div>
-        </div>
-
-    </div>
-
+            <TableColumn @bind-Field="@context.PostTime" Sortable="true" TextWrap="true" Width="120" />
+            <TableColumn @bind-Field="@context.ApplicationUserId" Sortable="true" Searchable="true" TextWrap="true" Width="160" />
+            <TableColumn @bind-Field="@context.Rank" Sortable="true" Searchable="true" TextWrap="true" Width="100" />
+            <TableColumn @bind-Field="@context.Link" Sortable="true" Searchable="true" TextWrap="true" Width="200" />
+            <TableColumn @bind-Field="@context.AdditionalInfor" Sortable="true" Searchable="true" Width="130" TextWrap="true" />
+            <TableColumn @bind-Field="@context.LinkTitle" Sortable="true" Searchable="true" TextWrap="true" Width="160" />
+            <TableColumn @bind-Field="@context.Image" Sortable="true" Searchable="true" TextWrap="true" Width="160" />
+            <TableColumn @bind-Field="@context.IsReaded" Sortable="true" Searchable="true" ComponentType="@typeof(Switch)" Width="110" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookLink( context.Link , context.LinkTitle))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-comments-o" Text="切换状态" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsReadedClick(new long[] { context.Id }, !context.IsReaded, true))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-close" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new long[] { context.Id },true))" />
+        </RowButtonTemplate>
+    </Table>
 </div>
+
 @code {
     [NotNull]
     private Table<ListMessageAloneModel>? TableRows { get; set; }
     private List<ListMessageAloneModel> SelectedRows { get; set; } = new();
 
-    public ListMessagesInforViewModel InforModel { get; set; } = new ListMessagesInforViewModel();
     public ListMessagesViewModel ListModel { get; set; } = new ListMessagesViewModel { Messages = new List<ListMessageAloneModel>() };
 
     private ListMessageAloneModel SearchModelUser { get; set; } = new ListMessageAloneModel();
@@ -88,80 +57,10 @@
     public ErrorHandler ErrorHandler { get; set; }
 
 
-    #region 获取屏幕大小
-
-    /// <summary>
-    /// 获得/设置 IJSRuntime 实例
-    /// </summary>
-    [Inject]
-    [System.Diagnostics.CodeAnalysis.NotNull]
-    public IJSRuntime? JSRuntime { get; set; }
-
-
-
-    public bool IsSmallScreen { get; set; }
-    public bool IsNormalScreen { get; set; }
-    public bool IsLargeScreen { get; set; }
-
-
-    private JSInterop<ListMessages>? Interop { get; set; }
-    /// <summary>
-    /// OnAfterRenderAsync 方法
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            Interop = new JSInterop<ListMessages>(JSRuntime);
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", nameof(SetCollapsed));
-        }
-    }
-
-    /// <summary>
-    /// 设置侧边栏收缩方法 客户端监控 window.onresize 事件回调此方法
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public void SetCollapsed(int width)
-    {
-        if (IsSmallScreen != (width < 768))
-        {
-            IsSmallScreen = width < 768;
-
-            StateHasChanged();
-        }
-        if (IsNormalScreen != (width >= 768 && width < 2000))
-        {
-            IsNormalScreen = width >= 768 && width < 2000;
-
-            StateHasChanged();
-        }
-        if (IsLargeScreen != (width >= 2000))
-        {
-            IsLargeScreen = width >= 2000;
-
-            StateHasChanged();
-        }
-    }
-    #endregion
 
 
     protected override async Task OnInitializedAsync()
     {
-#if DEBUG
-        //Thread.Sleep(10000);
-#endif
-        try
-        {
-            InforModel = await Http.GetFromJsonAsync<ListMessagesInforViewModel>(ToolHelper.WebApiPath + "api/admin/listmessages", ToolHelper.options);
-        }
-        catch(Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "无法获取消息数据");
-        }
 
     }
 
@@ -184,7 +83,7 @@
     {
         if (string.IsNullOrWhiteSpace(link) == false)
         {
-            NavigationManager.NavigateTo(Provider,link, name, "fa fa-star-o");
+            NavigationManager.NavigateTo(Provider, link, name, "fa fa-star-o");
         }
 
         return Task.CompletedTask;
@@ -215,7 +114,7 @@
                 }
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorHandler.ProcessError(ex, tempString + "失败");
         }
@@ -293,20 +192,4 @@
         await ToastService.Success("删除消息成功", "删除消息成功");
         await TableRows.QueryAsync();
     }
-    #region 释放实例
-    private async ValueTask DisposeAsyncCore()
-    {
-        if (Interop != null)
-        {
-            await Interop.InvokeVoidAsync(this, null, "bb_layout", "dispose");
-            Interop.Dispose();
-            Interop = null;
-        }
-    }
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore();
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

@@ -3,7 +3,7 @@
 @inject IDataCacheService _dataCacheService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="CnGal每周速报" Icon="fa fa-fw fa-newspaper-o">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="CnGal每周速报" Icon="@IconType.News.ToIconString()">
     <ButtonContent>
         <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
             <MIcon Left>mdi-share-all-outline  </MIcon>

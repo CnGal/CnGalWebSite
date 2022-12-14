@@ -4,7 +4,7 @@
 
 @foreach (var item in _dataCacheService.RandomTagsCatche.Take(1))
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@item.Name" Icon="fa fa-fw fa-hashtag">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@item.Name" Icon="@IconType.Tag.ToIconString()">
         <ButtonContent>
             <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClickMore("/tags/index/"+item.Id))">
                 <MIcon Left>mdi-share-all-outline  </MIcon>

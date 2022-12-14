@@ -174,32 +174,32 @@ else
         @if (Model.Type == EntryType.Game)
         {
             <a href="@("/entries/index/" + Model.Id)" class="a-font-color">
-                <span style="color: gray;" class="pb-3">
+                <span style="color: gray;" class="d-flex">
 
-                    <i class="fa fa-calendar fa-fw"></i>&nbsp;
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" Color="grey" />
                     @if (Model.PublishTime == null)
                     {
-                        <span class="article-home-infor-text">未知&nbsp;&nbsp;&nbsp;</span>
+                        <span class="me-4">未知</span>
                     }
                     else
                     {
                         @if (Model.PublishTime.Value > DateTime.Now.ToCstTime() && ForcedShowPublishTime == false)
                         {
-                            <span class="article-home-infor-text">未发售&nbsp;&nbsp;&nbsp;</span>
+                            <span class="me-4">未发售</span>
                         }
                         else
                         {
-                            <span class="article-home-infor-text">@((Model.Type== EntryType.Game?Model.PublishTime.Value: Model.LastEditTime).ToString("yyyy-MM-dd"))&nbsp;&nbsp;&nbsp;</span>
+                            <span class="me-4">@((Model.Type== EntryType.Game?Model.PublishTime.Value: Model.LastEditTime).ToString("yyyy-MM-dd"))</span>
 
                         }
                     }
 
 
-                    <i class="fa fa-commenting-o fa-fw"></i>
-                    <span class="article-home-infor-text">@(Model.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Comment" Color="grey" />
+                    <span class="me-4">@(Model.CommentCount)条评论</span>
 
-                    <i class="fa fa-eye fa-fw d-none d-sm-inline"></i>
-                    <span class="article-home-infor-text d-none d-sm-inline">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" Color="grey" />
+                    <span class="me-4">@(Model.ReaderCount)次阅读</span>
                 </span>
 
             </a>

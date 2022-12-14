@@ -4,17 +4,17 @@
     <div style="display: flex; flex-direction: column; word-break: break-all; " class="ps-3 pe-3 pt-2 pb-2">
         @if (string.IsNullOrWhiteSpace(Model.Link))
         {
-            <span>
-                <i class="fa fa-gift fa-fw font-color"></i>
-                <span >
-                    @($"{Model.Name} {Model.Count}件") 
+            <span class="d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
+                <span>
+                    @($"{Model.Name} {Model.Count}件")
                 </span>
             </span>
         }
         else
         {
-            <span>
-                <i class="fa fa-gift fa-fw font-color"></i>
+            <span class="d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
                 <a href="@Model.Link" target="@(Model.Link.ToLower().Contains("cngal")?"":"_blank")">
                     @($"{Model.Name} {Model.Count}件")
                 </a>
@@ -23,8 +23,8 @@
 
         @if (string.IsNullOrWhiteSpace(Model.Sponsor) == false)
         {
-            <span>
-                <i class="fa fa-building-o fa-fw font-color"></i>
+            <span class="d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Sponsor" />
                 <span>
                     赞助商：@Model.Sponsor
                 </span>
