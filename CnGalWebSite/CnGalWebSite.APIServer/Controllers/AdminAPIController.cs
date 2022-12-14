@@ -32,6 +32,7 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Tables;
+using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -788,8 +789,8 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<LineChartModel>> GetLineChartAsync([FromQuery] LineChartType type, [FromQuery] long afterTime, [FromQuery] long beforeTime)
         {
-            var after = DateTime.FromBinary(afterTime);
-            var before = DateTime.FromBinary(beforeTime);
+            var after = afterTime.ToString().TransTime();
+            var before = beforeTime.ToString().TransTime();
 
             return await _chartService.GetLineChartAsync(type, after, before);
         }

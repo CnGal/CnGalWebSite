@@ -14,7 +14,7 @@ else
                 <h2 class="@("m-0 " + (string.IsNullOrWhiteSpace(TextColor)?"font-color":TextColor))" style="font-size: inherit;">
                     @if (Icon.Contains("mdi"))
                     {
-                        <MIcon Color="@(ButtonColor??_dataCacheService.ThemeSetting.Theme)" Class="me-4">@Icon</MIcon>@Title
+                        <MIcon XSmall Color="@(ButtonColor??_dataCacheService.ThemeSetting.Theme)" Class="me-4">@Icon</MIcon>@Title
                     }
                     else
                     {

@@ -115,18 +115,9 @@ namespace CnGalWebSite.Helper.Extensions
         /// </summary>
         /// <param name=""></param>
         /// <returns></returns>
-        public static DateTime  TransTime(this string str)
+        public static DateTime TransTime(this string str)
         {
-            DateTime nowTime;
-            if (str.Length == 13)
-            {
-                nowTime = new DateTime(1970, 1, 1, 8, 0, 0).AddMilliseconds(long.Parse( str));
-            }
-            else
-            {
-                nowTime = new DateTime(1970, 1, 1, 8, 0, 0).AddSeconds(long.Parse(str));
-            }
-            return nowTime;
+            return  new DateTime(1970, 1, 1, 8, 0, 0).AddMilliseconds(long.Parse(str));
         }
       
     }
