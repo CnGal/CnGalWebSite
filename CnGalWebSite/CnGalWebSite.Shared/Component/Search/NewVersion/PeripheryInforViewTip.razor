@@ -62,15 +62,15 @@ else
 
     </div>
     <a href="@("/peripheries/index/" + Model.Id)" class="a-font-color">
-        <span style="color: gray;" class="pb-3">
-            <i class="fa fa-calendar fa-fw"></i>
-            <span class="article-home-infor-text">@Model.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+        <span style="color: gray;" class="d-flex">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" Color="grey" />
+            <span class="me-4">@Model.LastEditTime.ToString("yyyy-MM-dd")</span>
 
-            <i class="fa fa-commenting-o fa-fw"></i>
-            <span class="article-home-infor-text">@(Model.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Comment" Color="grey" />
+            <span class="me-4">@(Model.CommentCount)条评论</span>
 
-            <i class="fa fa-eye fa-fw"></i>
-            <span class="article-home-infor-text">@(Model.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" Color="grey" />
+            <span>@(Model.ReaderCount)次阅读</span>
         </span>
     </a>
 </div>

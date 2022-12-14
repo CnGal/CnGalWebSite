@@ -38,21 +38,21 @@
 
     }
     <div class="row">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-star" Text="@("贡献值："+Model.ContributionValue)" Class="col-12" /> <br />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Type="IconType.Count" Text="@("贡献值："+Model.ContributionValue)" Class="col-12" /> 
 
         @if (Model.Birthday != null)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-birthday-cake" Text="@("生日："+Model.Birthday.Value.ToString("M月d日") )" Class="col-12" /> <br />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Type="IconType.Birthday" Text="@("生日："+Model.Birthday.Value.ToString("M月d日") )" Class="col-12" /> 
 
         }
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-hourglass-2" Text="@("在线时间："+ Model.OnlineTime.ToString("0.0")+"小时")" Class="col-12" /> <br />
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-bullhorn" Text="@("注册时间："+Model.RegisteTime.ToString("yyyy-MM-dd HH:mm"))" Class="col-12" /> <br />
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-calendar-check-o" Text="@("最后访问："+Model.LastOnlineTime.ToString("yyyy-MM-dd HH:mm"))" Class="col-12" /> <br />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Type="IconType.Duration" Text="@("在线时间："+ Model.OnlineTime.ToString("0.0")+"小时")" Class="col-12" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Type="IconType.DeterminedTime" Text="@("注册时间："+Model.RegisteTime.ToString("yyyy-MM-dd HH:mm"))" Class="col-12" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Type="IconType.IndeterminateTime" Text="@("最后访问："+Model.LastOnlineTime.ToString("yyyy-MM-dd HH:mm"))" Class="col-12" /> 
         @if (Model.LastEditTime != null)
         {
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-pencil" Text="@("上次编辑时间："+Model.LastEditTime.Value.ToString("yyyy-MM-dd HH:mm"))" Class="col-12" /> <br />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Type="IconType.EditTime" Text="@("上次编辑时间："+Model.LastEditTime.Value.ToString("yyyy-MM-dd HH:mm"))" Class="col-12" />
         }
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Icon="fa fa-fw fa-id-card-o" Text="@("UID："+Model.Id)" Class="col-12" /> <br />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.IconText Type="IconType.Identity" Text="@("UID："+Model.Id)" Class="col-12" /> 
     </div>
 
 </div>

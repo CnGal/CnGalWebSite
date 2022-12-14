@@ -4,7 +4,7 @@
 
 @if (Items.Count > 0)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(Items[Index.ToInt32()].Name+" 角色预览")" Icon="fa fa-fw fa-users">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(Items[Index.ToInt32()].Name+" 角色预览")" Icon="@IconType.Role.ToIconString()">
         <ButtonContent>
             <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
                 <MIcon Left>mdi-share-all-outline  </MIcon>

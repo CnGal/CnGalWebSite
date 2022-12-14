@@ -2,7 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="随机评价" Icon="fa fa-fw fa-random" Class="mb-4">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="随机评价" Icon="@IconType.GameRecord.ToIconString()" Class="mb-4">
 
     <ButtonContent>
         <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">

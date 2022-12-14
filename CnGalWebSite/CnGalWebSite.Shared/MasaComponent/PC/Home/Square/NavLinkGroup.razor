@@ -4,7 +4,7 @@
 
 <div class="row">
     <div class="col-12 col-md-6 mb-4">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="CnGal资料站" Icon="fa fa-fw fa-anchor" Class="h-100">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="CnGal资料站" Icon="@IconType.Home.ToIconString()" Class="h-100">
 
             <div class="w-100">
                 <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/about"))">
@@ -27,7 +27,7 @@
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     </div>
     <div class="col-12 col-md-6 mb-4">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="标签" Icon="fa fa-fw fa-tags" Class="h-100">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="标签" Icon="@IconType.Tags.ToIconString()" Class="h-100">
 
             <div class="w-100">
                 <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>OnClick("/tags/index/1"))">

@@ -4,7 +4,7 @@
 @inject IJSRuntime JS
 
 <div class="rounded shadow-sm bg-opacity  p-4 pt-3 h-100" style=" display: flex; flex-direction: column; ">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="fa fa-fw fa-newspaper-o" Class="mb-2" Outline OutlineHead>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="@IconType.News.ToIconString()" Class="mb-2" Outline OutlineHead>
         <ButtonContent>
             <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
                 <MIcon Left>mdi-share-all-outline  </MIcon>

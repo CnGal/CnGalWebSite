@@ -20,7 +20,7 @@
 @if (Model.Type == PlayedGameType.WantToPlay)
 {
     <MChip Label TextColor="white" XSmall Color="@(IsDark?_dataCacheService.ThemeSetting.Theme:"green")" Class="mb-2 me-2">
-        <MIcon Left XSmall>mdi-book </MIcon>
+        <MIcon Left XSmall>@IconType.WantToPlay.ToIconString() </MIcon>
         想玩
     </MChip>
 
@@ -28,21 +28,21 @@
 else if (Model.Type == PlayedGameType.Playing)
 {
     <MChip Label TextColor="white" XSmall Color="@(IsDark?_dataCacheService.ThemeSetting.Theme:"indigo")" Class="mb-2 me-2">
-        <MIcon Left XSmall>mdi-google-controller </MIcon>
+        <MIcon Left XSmall>@IconType.Playing.ToIconString()</MIcon>
         正在玩
     </MChip>
 }
 else if (Model.Type == PlayedGameType.Played)
 {
     <MChip Label TextColor="white" XSmall Color="@(IsDark?_dataCacheService.ThemeSetting.Theme:"cyan")" Class="mb-2 me-2">
-        <MIcon Left XSmall>mdi-play-box-multiple</MIcon>
+        <MIcon Left XSmall>@IconType.Played.ToIconString()</MIcon>
         已玩
     </MChip>
 }
 else if (Model.Type == PlayedGameType.Uninterested)
 {
     <MChip Label TextColor="white" XSmall Color="@(IsDark?_dataCacheService.ThemeSetting.Theme:"teal")" Class="mb-2 me-2">
-        <MIcon Left XSmall>mdi-thumb-down</MIcon>
+        <MIcon Left XSmall>@IconType.Uninterested.ToIconString()</MIcon>
         不感兴趣
     </MChip>
 
@@ -50,7 +50,7 @@ else if (Model.Type == PlayedGameType.Uninterested)
 else if (Model.Type == PlayedGameType.UnPlayed)
 {
     <MChip Label TextColor="white" XSmall Color="@(IsDark?_dataCacheService.ThemeSetting.Theme:"blue")" Class="mb-2 me-2">
-        <MIcon Left XSmall>mdi-pin-off</MIcon>
+        <MIcon Left XSmall>@IconType.UnPlayed.ToIconString()</MIcon>
         未玩
     </MChip>
 }

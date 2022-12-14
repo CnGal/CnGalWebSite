@@ -6,39 +6,39 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="基础信息" Icon="@IconType.Infor.ToIconString()">
     <div class="row">
 
-        <div class="col-12 ">
-            <i class="fa fa-fw  fa-tags font-color "></i>&nbsp;&nbsp;@Model.Type
+        <div class="col-12 d-flex">
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Tag" />@Model.Type
         </div>
         @if (Model.IsInteractive)
         {
             <div class="col-12 ">
-                <i class="fa fa-fw  fa-paperclip font-color "></i>&nbsp;&nbsp;互动视频
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Category" />互动视频
             </div>
         }
 
-        <div class="col-12 ">
-            <i class="fa fa-fw font-color fa-copyright"></i>&nbsp;&nbsp;@Model.Copyright.GetDisplayName()
-        </div>
-        <div class="col-12 ">
-            <i class="fa  fa-fw font-color fa-eye"></i>&nbsp;&nbsp;浏览数：@Model.ReaderCount
-        </div>
+    <div class="col-12 ">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Copyright" />@Model.Copyright.GetDisplayName()
+    </div>
+    <div class="col-12 ">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" />浏览数：@Model.ReaderCount
+    </div>
         @if (Model.Duration.TotalSeconds != 0)
         {
             <div class="col-12 ">
-                <i class="fa fa-fw font-color fa-clock-o"></i>&nbsp;&nbsp;时长：@Model.Duration
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Duration" />时长：@Model.Duration
             </div>
         }
 
         @if (string.IsNullOrWhiteSpace(Model.OriginalAuthor) == false)
         {
             <div class="col-12 ">
-                <i class="fa  fa-fw font-color fa-user"></i>&nbsp;&nbsp;原作者：@Model.OriginalAuthor
+              <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.User" />原作者：@Model.OriginalAuthor
             </div>
         }
 
 
         <div class="col-12">
-            <i class="fa  fa-fw font-color fa-calendar-check-o"></i>&nbsp;&nbsp;发布时间：@Model.PubishTime.ToString("G")
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" />发布时间：@Model.PubishTime.ToString("G")
         </div>
 
 

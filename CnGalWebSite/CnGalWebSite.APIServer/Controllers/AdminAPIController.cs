@@ -198,20 +198,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         /// <summary>
-        /// 获取用户列表概览信息
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<ListUsersInforViewModel>> ListUsersAsync()
-        {
-            var model = new ListUsersInforViewModel
-            {
-                UserCount = await _userManager.Users.CountAsync()
-            };
-            return model;
-        }
-
-        /// <summary>
         /// 获取用户列表
         /// </summary>
         /// <param name="input">分页信息</param>
@@ -351,25 +337,6 @@ namespace CnGalWebSite.APIServer.Controllers
                 : (ActionResult<Result>)new Result { Successful = false, Error = result.Errors.ToList()[0].Description };
         }
 
-        /// <summary>
-        /// 获取词条列表概览 
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<ListEntriesInforViewModel>> ListEntriesAsync()
-        {
-            var model = new ListEntriesInforViewModel
-            {
-                All = await _entryRepository.CountAsync(),
-                Games = await _entryRepository.CountAsync(x => x.Type == EntryType.Game),
-                Staffs = await _entryRepository.CountAsync(x => x.Type == EntryType.Staff),
-                Roles = await _entryRepository.CountAsync(x => x.Type == EntryType.Role),
-                Groups = await _entryRepository.CountAsync(x => x.Type == EntryType.ProductionGroup),
-                Hiddens = await _entryRepository.CountAsync(x => x.IsHidden == true)
-            };
-
-            return model;
-        }
 
         /// <summary>
         /// 获取词条列表
@@ -384,25 +351,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-        /// <summary>
-        /// 获取文章列表概览
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult<GetArticleCountModel>> ListArticlesAsync()
-        {
-            var model = new GetArticleCountModel
-            {
-                All = await _articleRepository.CountAsync(),
-                Toughts = await _articleRepository.CountAsync(x => x.Type == ArticleType.Tought),
-                Interviews = await _articleRepository.CountAsync(x => x.Type == ArticleType.Interview),
-                Strategies = await _articleRepository.CountAsync(x => x.Type == ArticleType.Strategy),
-                News = await _articleRepository.CountAsync(x => x.Type == ArticleType.News),
-                Hiddens = await _articleRepository.CountAsync(x => x.IsHidden == true)
-            };
-
-            return model;
-        }
 
         /// <summary>
         /// 获取文章列表
@@ -431,22 +379,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<ActionResult<ListCommentsInforViewModel>> ListCommentsAsync()
-        {
-            var model = new ListCommentsInforViewModel
-            {
-                All = await _commentRepository.LongCountAsync(),
-                EntryComments = await _commentRepository.LongCountAsync(s => s.Type == CommentType.CommentEntries),
-                ArticleComments = await _commentRepository.LongCountAsync(s => s.Type == CommentType.CommentArticle),
-                SpaceComments = await _commentRepository.LongCountAsync(s => s.Type == CommentType.CommentUser),
-                ParentComments = await _commentRepository.LongCountAsync(s => s.Type != CommentType.ReplyComment),
-                ChildComments = await _commentRepository.LongCountAsync(s => s.Type == CommentType.ReplyComment),
-                Hiddens = await _commentRepository.CountAsync(x => x.IsHidden == true)
-            };
-
-            return model;
-        }
 
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListCommentAloneModel>>> GetCommentListAsync(CommentsPagesInfor input)
@@ -454,19 +386,6 @@ namespace CnGalWebSite.APIServer.Controllers
             var dtos = await _commentService.GetPaginatedResult(input.Options, input.SearchModel);
 
             return dtos;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<ListMessagesInforViewModel>> ListMessagesAsync()
-        {
-            var model = new ListMessagesInforViewModel
-            {
-                All = await _messageRepository.LongCountAsync(),
-                ReadedCount = await _messageRepository.LongCountAsync(s => s.IsReaded == true),
-                NotReadedCount = await _messageRepository.LongCountAsync(s => s.IsReaded == false)
-            };
-
-            return model;
         }
 
         [HttpPost]
@@ -477,16 +396,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<ListFilesInforViewModel>> ListFilesAsync()
-        {
-            var model = new ListFilesInforViewModel
-            {
-                All = await _userFileRepository.CountAsync()
-            };
-
-            return model;
-        }
 
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListFileAloneModel>>> GetFileListAsync(FilesPagesInfor input)
@@ -494,17 +403,6 @@ namespace CnGalWebSite.APIServer.Controllers
             var dtos = await _fileService.GetPaginatedResult(input.Options, input.SearchModel);
 
             return dtos;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<ListErrorCountsInforViewModel>> ListErrorCountsAsync()
-        {
-            var model = new ListErrorCountsInforViewModel
-            {
-                All = await _errorCountRepository.LongCountAsync()
-            };
-
-            return model;
         }
 
         [HttpPost]
@@ -515,36 +413,12 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<ListFavoriteFoldersInforViewModel>> ListFavoriteFoldersAsync()
-        {
-            var model = new ListFavoriteFoldersInforViewModel
-            {
-                All = await _favoriteFolderRepository.LongCountAsync(),
-                Defaults = await _favoriteFolderRepository.LongCountAsync(s => s.IsDefault == true)
-            };
-
-            return model;
-        }
-
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListFavoriteFolderAloneModel>>> GetFavoriteFolderListAsync(FavoriteFoldersPagesInfor input)
         {
             var dtos = await _favoriteFolderService.GetPaginatedResult(input.Options, input.SearchModel, null);
 
             return dtos;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<ListRanksInforViewModel>> ListRanksAsync()
-        {
-            var model = new ListRanksInforViewModel
-            {
-                All = await _rankRepository.LongCountAsync(),
-                Hiddens = await _rankRepository.LongCountAsync(s => s.IsHidden == true)
-            };
-
-            return model;
         }
 
         [HttpPost]
@@ -555,18 +429,6 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<ListPeripheriesInforViewModel>> ListPeripheriesAsync()
-        {
-            var model = new ListPeripheriesInforViewModel
-            {
-                All = await _peripheryRepository.LongCountAsync(),
-                Hiddens = await _peripheryRepository.LongCountAsync(s => s.IsHidden == true)
-            };
-
-            return model;
-        }
-
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListPeripheryAloneModel>>> GetPeripheryListAsync(PeripheriesPagesInfor input)
         {
@@ -575,36 +437,12 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<ListVotesInforViewModel>> ListVotesAsync()
-        {
-            var model = new ListVotesInforViewModel
-            {
-                All = await _voteRepository.LongCountAsync(),
-                Hiddens = await _voteRepository.LongCountAsync(s => s.IsHidden == true)
-            };
-
-            return model;
-        }
-
         [HttpPost]
         public async Task<ActionResult<BootstrapBlazor.Components.QueryData<ListVoteAloneModel>>> GetVoteListAsync(VotesPagesInfor input)
         {
             var dtos = await _voteService.GetPaginatedResult(input.Options, input.SearchModel);
 
             return dtos;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<ListLotteriesInforViewModel>> ListLotteriesAsync()
-        {
-            var model = new ListLotteriesInforViewModel
-            {
-                All = await _lotteryRepository.LongCountAsync(),
-                Hiddens = await _lotteryRepository.LongCountAsync(s => s.IsHidden == true)
-            };
-
-            return model;
         }
 
         [HttpPost]

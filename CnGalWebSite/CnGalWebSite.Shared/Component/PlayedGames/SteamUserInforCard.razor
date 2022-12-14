@@ -9,33 +9,38 @@
                     @item.Name
                 </div>
                 <div class="m-0" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
-                    <span>
-                        <i class="fa fa-history fa-fw font-color"></i>
-                        <span>@("总时长："+(GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" 小时")&nbsp;&nbsp;&nbsp;</span>
+                    <span  class="me-4 d-flex">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Duration" />
+                        <span>@("总时长："+(GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" 小时")</span>
                     </span>
-                    <span>
-                        <i class="fa fa-codepen fa-fw font-color"></i>
-                        <span>@("总计："+GameRecords.Count)&nbsp;&nbsp;&nbsp;</span>
+                    <span  class="me-4 d-flex">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
+                        <span>@("总计："+GameRecords.Count)</span>
 
                     </span>
-                    <span>
-                        <i class="fa fa-car fa-fw font-color"></i>
-                        <span>@("想玩："+GameRecords.Count(s=>s.Type== PlayedGameType.WantToPlay))&nbsp;&nbsp;&nbsp;</span>
+                    <span  class="me-4 d-flex">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.WantToPlay" />
+                        <span>@("想玩："+GameRecords.Count(s=>s.Type== PlayedGameType.WantToPlay))</span>
 
                     </span>
-                    <span>
-                        <i class="fa fa-dashboard fa-fw font-color"></i>
-                        <span>@("正在玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Playing))&nbsp;&nbsp;&nbsp;</span>
+                    <span  class="me-4 d-flex">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Playing" />
+                        <span>@("正在玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Playing))</span>
 
                     </span>
-                    <span>
-                        <i class="fa fa-gamepad fa-fw font-color"></i>
-                        <span>@("已玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Played))&nbsp;&nbsp;&nbsp;</span>
+                    <span  class="me-4 d-flex">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Played" />
+                        <span>@("已玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Played))</span>
 
                     </span>
-                    <span>
-                        <i class="fa fa-thumbs-o-down fa-fw font-color"></i>
-                        <span>@("不感兴趣："+GameRecords.Count(s=>s.Type== PlayedGameType.Uninterested))&nbsp;&nbsp;&nbsp;</span>
+                    <span  class="me-4 d-flex">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.UnPlayed" />
+                        <span>@("未玩："+GameRecords.Count(s=>s.Type== PlayedGameType.UnPlayed))</span>
+
+                    </span>
+                    <span  class="d-flex">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Uninterested" />
+                        <span>@("不感兴趣："+GameRecords.Count(s=>s.Type== PlayedGameType.Uninterested))</span>
 
                     </span>
                 </div>
@@ -69,33 +74,38 @@ else
 
     <div class="shadow-sm rounded bg-opacity h-100 p-2 mb-3" style="display:flex;">
         <div class="m-0" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
-            <span>
-                <i class="fa fa-history fa-fw font-color"></i>
-                <span>@("总时长："+(GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" 小时")&nbsp;&nbsp;&nbsp;</span>
+            <span class="me-4 d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Duration" />
+                <span>@("总时长："+(GameRecords.Sum(s=>s.PlayDuration)/60.0).ToString("0.0")+" 小时")</span>
             </span>
-            <span>
-                <i class="fa fa-codepen fa-fw font-color"></i>
-                <span>@("总计："+GameRecords.Count)&nbsp;&nbsp;&nbsp;</span>
+            <span class="me-4 d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" />
+                <span>@("总计："+GameRecords.Count)</span>
 
             </span>
-            <span>
-                <i class="fa fa-car fa-fw font-color"></i>
-                <span>@("想玩："+GameRecords.Count(s=>s.Type== PlayedGameType.WantToPlay))&nbsp;&nbsp;&nbsp;</span>
+            <span class="me-4 d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.WantToPlay" />
+                <span>@("想玩："+GameRecords.Count(s=>s.Type== PlayedGameType.WantToPlay))</span>
 
             </span>
-            <span>
-                <i class="fa fa-dashboard fa-fw font-color"></i>
-                <span>@("正在玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Playing))&nbsp;&nbsp;&nbsp;</span>
+            <span class="me-4 d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Playing" />
+                <span>@("正在玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Playing))</span>
 
             </span>
-            <span>
-                <i class="fa fa-gamepad fa-fw font-color"></i>
-                <span>@("已玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Played))&nbsp;&nbsp;&nbsp;</span>
+            <span class="me-4 d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Played" />
+                <span>@("已玩："+GameRecords.Count(s=>s.Type== PlayedGameType.Played))</span>
 
             </span>
-            <span>
-                <i class="fa fa-thumbs-o-down fa-fw font-color"></i>
-                <span>@("不感兴趣："+GameRecords.Count(s=>s.Type== PlayedGameType.Uninterested))&nbsp;&nbsp;&nbsp;</span>
+            <span class="me-4 d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.UnPlayed" />
+                <span>@("未玩："+GameRecords.Count(s=>s.Type== PlayedGameType.UnPlayed))</span>
+
+            </span>
+            <span class="d-flex">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Uninterested" />
+                <span>@("不感兴趣："+GameRecords.Count(s=>s.Type== PlayedGameType.Uninterested))</span>
 
             </span>
         </div>

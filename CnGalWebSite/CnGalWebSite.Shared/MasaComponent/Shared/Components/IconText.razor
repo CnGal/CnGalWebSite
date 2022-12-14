@@ -1,23 +1,23 @@
 ﻿@if (string.IsNullOrWhiteSpace(Url))
 {
-    <span class="@Class">
-        <i class="@("font-color "+Icon)"></i>&nbsp; &nbsp;@Text
+    <span class="@(Class+" d-flex")">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Type" />@Text
     </span>
 }
 else
 {
-    <span class="col-12" style=" word-break: break-all;">
-        <i class="@("font-color "+Icon)"></i>&nbsp; &nbsp;@Text<a href="@Url" target="_blank">@Url</a>
+    <span class="col-12 d-flex" style=" word-break: break-all;">
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Type" />@Text<a href="@Url" target="_blank">@Url</a>
     </span>
 }
 
 @code {
     [Parameter]
-    public string Text { get; set; }
+    public IconType Type { get; set; }
     [Parameter]
     public string Url { get; set; }
     [Parameter]
-    public string Icon { get; set; }
+    public string Text { get; set; }
     [Parameter]
     public string Class { get; set; }
 }

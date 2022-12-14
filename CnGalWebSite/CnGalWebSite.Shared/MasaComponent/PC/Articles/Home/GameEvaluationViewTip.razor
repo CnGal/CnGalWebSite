@@ -1,7 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(Model.Name+" 游戏评测")" Icon="fa fa-fw fa-star">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@(Model.Name+" 游戏评测")" Icon="@IconType.Article.ToIconString()">
     <ButtonContent>
         <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
             <MIcon Left>mdi-share-all-outline  </MIcon>

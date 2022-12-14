@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace CnGalWebSite.DataModel.ViewModel.Others
 {
     public enum IconType
     {
+        [Display(Name="词条")]
         Entry,
         Article,
         Tag,
@@ -27,10 +30,13 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Dub,
         Make,
         Publisher,
+        [Display(Name = "参与")]
         Participate,
+        [Display(Name = "特别感谢")]
         SpecialThanks,
         Infor,
         Image,
+        [Display(Name = "相册")]
         PhotoAlbum,
         GameRecord,
         Audio,
@@ -48,7 +54,67 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Gift,
         User,
         Users,
-        Read
+        Read,
+        DeterminedTime,
+        IndeterminateTime,
+        EditTime,
+        Engine,
+        QQ,
+        GenderMale,
+        GenderFemale,
+        [Display(Name = "其他性别")]
+        GenderNonBinary,
+        Secret,
+        [Display(Name = "身材")]
+        Stature,
+        Data,
+        Birthday,
+        Hair,
+        Clothes,
+        [Display(Name = "瞳")]
+        Pupil,
+        [Display(Name = "性格")]
+        Nature,
+        Identity,
+        [Display(Name = "血")]
+        Blood,
+        HumanHeight,
+        Interest,
+        Age,
+        Name,
+        AnotherName,
+        RealName,
+        Youtube,
+        Weibo,
+        Twitter,
+        Facebook,
+        ThumbsUp,
+        Price,
+        Chart,
+        Discount,
+        Free,
+        OutOfDate,
+        Takedown,
+        [Display(Name = "类型")]
+        Category,
+        Brand,
+        Size,
+        Material,
+        Count,
+        Update,
+        [Display(Name = "装饰品")]
+        Ornament,
+        Duration,
+        Copyright,
+        Sponsor,
+        State,
+        Filter,
+        WantToPlay,
+        Playing,
+        Played,
+        Uninterested,
+        UnPlayed,
+        Random
     }
 
     public static class IconTypeHelper
@@ -57,6 +123,106 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Random:
+                    return "mdi-cube-send ";
+                case IconType.WantToPlay:
+                    return "mdi-book ";
+                case IconType.Playing:
+                    return "mdi-google-controller";
+                case IconType.Played:
+                    return "mdi-play-box-multiple";
+                case IconType.Uninterested:
+                    return "mdi-thumb-down";
+                case IconType.UnPlayed:
+                    return "mdi-pin-off";
+                case IconType.Filter:
+                    return "mdi-filter ";
+                case IconType.State:
+                    return "mdi-sign-real-estate ";
+                case IconType.Sponsor:
+                    return "mdi-store-outline ";
+                case IconType.Duration:
+                    return "mdi-timer-outline";
+                case IconType.Copyright:
+                    return "mdi-copyright ";
+                case IconType.Ornament:
+                    return "mdi-ornament ";
+                case IconType.Update:
+                    return "mdi-update";
+                case IconType.Count:
+                    return "mdi-counter";
+                case IconType.Material:
+                    return "mdi-palette-swatch ";
+                case IconType.Brand:
+                    return "mdi-tag-heart ";
+                case IconType.Size:
+                    return "mdi-move-resize";
+                case IconType.Category:
+                    return "mdi-shape ";
+                case IconType.Takedown:
+                    return "mdi-download-off";
+                case IconType.OutOfDate:
+                    return "mdi-database-off ";
+                case IconType.Free:
+                    return "mdi-cloud";
+                case IconType.Discount:
+                    return "mdi-brightness-percent";
+                case IconType.Chart:
+                    return "mdi-chart-bar";
+                case IconType.Price:
+                    return "mdi-currency-usd";
+                case IconType.ThumbsUp:
+                    return "mdi-thumb-up ";
+                case IconType.Facebook:
+                    return "mdi-facebook";
+                case IconType.Twitter:
+                    return "mdi-twitter ";
+                case IconType.Youtube:
+                    return "mdi-youtube ";
+                case IconType.Weibo:
+                    return "mdi-sina-weibo ";
+                case IconType.RealName:
+                    return "mdi-card-account-details-star ";
+                case IconType.Name:
+                    return "mdi-card-account-details ";
+                case IconType.AnotherName:
+                    return "mdi-card-account-details-outline ";
+                case IconType.Age:
+                    return "mdi-forest ";
+                case IconType.Interest:
+                    return "mdi-heart-multiple ";
+                case IconType.HumanHeight:
+                    return "mdi-human-male-height-variant ";
+                case IconType.Blood:
+                    return "mdi-water ";
+                case IconType.Identity:
+                    return "mdi-account-outline ";
+                case IconType.Nature:
+                    return "mdi-nature-people ";
+                case IconType.Pupil:
+                    return "mdi-eye ";
+                case IconType.Clothes:
+                    return "mdi-hanger ";
+                case IconType.Hair:
+                    return "mdi-face-man-profile ";
+                case IconType.Birthday:
+                    return "mdi-cake-variant ";
+                case IconType.Stature:
+                    return "mdi-human-handsup ";
+                case IconType.Data:
+                    return "mdi-database ";
+                case IconType.Secret:
+                    return "mdi-lock";
+                case IconType.GenderNonBinary:
+                    return "mdi-gender-non-binary ";
+                case IconType.GenderMale:
+                    return "mdi-gender-male ";
+                case IconType.GenderFemale:
+                    return "mdi-gender-female ";
+                case IconType.QQ:
+                    return "mdi-qqchat";
+                case IconType.Engine:
+                    return "mdi-engine-outline ";
                 case IconType.Entry:
                     return "mdi-archive";
                 case IconType.Article:
@@ -143,6 +309,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
                     return "mdi-account-multiple  ";
                 case IconType.Read:
                     return "mdi-eye";
+                case IconType.DeterminedTime:
+                    return "mdi-clock-outline ";
+                case IconType.EditTime:
+                    return "mdi-clock-edit-outline ";
+                case IconType.IndeterminateTime:
+                    return "mdi-clock";
                 default:
                     return "";
             }

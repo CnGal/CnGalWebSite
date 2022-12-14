@@ -3,7 +3,7 @@
 @inject IDataCacheService _dataCacheService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="投票" Icon="fa fa-fw fa-dropbox" Class="h-100">
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="投票" Icon="@IconType.Vote.ToIconString()" Class="h-100">
     <ButtonContent>
         <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
             <MIcon Left>mdi-share-all-outline  </MIcon>

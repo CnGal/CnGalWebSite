@@ -765,7 +765,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var value = model.Name switch
                 {
                     "recommend" => await _weiXinService.GetRandom(true, true),
-                    "birthday" => await _weiXinService.GetRoleBirthdays( true),
+                    "birthday" => await _weiXinService.GetRoleBirthdays( true)??"",
                     "BirthdayWithDefault" => await _weiXinService.GetRoleBirthdays(true)??"好像今天没人过生日~~~",
                     "NewestEditGames" => await _weiXinService.GetNewestEditGames(true),
                     "NewestUnPublishGames" => await _weiXinService.GetNewestUnPublishGames(true),

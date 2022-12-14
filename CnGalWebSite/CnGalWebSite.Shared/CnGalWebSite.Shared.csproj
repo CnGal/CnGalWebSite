@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -74,7 +74,6 @@
   
   <ItemGroup>
     <Folder Include="AppComponent\Pages\Entries\" />
-    <Folder Include="AppComponent\Pages\Users\" />
     <Folder Include="Pages\Apps\Entries\" />
     <Folder Include="Pages\Apps\Peripheries\" />
     <Folder Include="Pages\Apps\Space\" />

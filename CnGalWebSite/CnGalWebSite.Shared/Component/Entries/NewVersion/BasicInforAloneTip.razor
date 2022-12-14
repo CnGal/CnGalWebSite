@@ -3,8 +3,11 @@
 
 @if (string.IsNullOrWhiteSpace(Url))
 {
-    <span class="@Class">
-        <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;
+    <span class="@(Class+" d-flex")">
+
+        <MIcon Small Color="@_dataCacheService.ThemeSetting.Theme" Class="me-2">@Icon</MIcon>
+
+
         @if (string.IsNullOrWhiteSpace(Title) == false)
         {
             <span>
@@ -23,8 +26,12 @@ else
 {
     @if (ToolHelper.IsMaui)
     {
-        <span class="@Class" style=" word-break: break-all;">
-            <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text
+        <span class="@(Class+" d-flex")" style=" word-break: break-all;">
+
+            <MIcon Small Color="@_dataCacheService.ThemeSetting.Theme" Class="me-2">@Icon</MIcon>
+
+
+            @Text
 
             <a class="font-color" @onclick="OnClick" itemprop="@ItemProp">@Url</a>
 
@@ -33,8 +40,12 @@ else
     }
     else
     {
-        <span class="@Class" style=" word-break: break-all;">
-            <i class="@("fa fa-fw font-color "+Icon)"></i>&nbsp; &nbsp;@Text
+        <span class="@(Class+" d-flex")" style=" word-break: break-all;">
+
+            <MIcon Small Color="@_dataCacheService.ThemeSetting.Theme" Class="me-2">@Icon</MIcon>
+
+
+            @Text
 
 
             <a href="@Url" target="_blank" itemprop="@ItemProp">@Url</a>

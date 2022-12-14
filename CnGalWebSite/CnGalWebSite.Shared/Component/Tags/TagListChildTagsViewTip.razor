@@ -4,7 +4,7 @@
         <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.RevokeButton Url="@("/tags/EditChildTags/" + Model.Id)" ExamineType="Operation.EditTagChildTags" OnClickRevoke="OnClickRevoke"/>
 
 }
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="子标签" Icon="fa fa-fw fa-tags" Collapable>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="子标签" Icon="@IconType.Tags.ToIconString()" Collapable>
     <div class="row">
         @foreach (var item in Model.ChildrenTags)
         {
