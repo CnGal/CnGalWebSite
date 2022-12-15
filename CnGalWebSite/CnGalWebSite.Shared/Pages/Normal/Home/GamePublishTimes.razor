@@ -6,6 +6,7 @@
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
+
 <TitleTip Title="游戏发售时间汇总" Description="可以查看每月发售游戏列表"></TitleTip>
 
 <style>
@@ -58,34 +59,87 @@
         <div class=" rounded shadow-sm ps-4 pe-4 mb-4 bg-opacity">
             <div style="display: flex;flex-direction: column;align-items: center;align-content: center;" class="pt-4">
                 <div class="h4 fw-bold font-color">游戏发售时间汇总</div>
+                <div>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="切换模式" Icon="@IconType.Switch.ToIconString()" TextStyle OnClick="OnSwitch" />
+                </div>
             </div>
             <div style="display: flex; align-items: center; justify-content: center;">
-                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="上个月" Icon="mdi-arrow-left-thick" TextStyle OnClick="OnClickLeft"/>
-                <div style="max-width:160px" class="ps-4 pe-4">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMonthPick Date="Date" DateChanged="DateChanged" />
+                @if (Type == PublishGamesDisplayType.CardList)
+                {
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="上个月" Icon="mdi-arrow-left-thick" TextStyle OnClick="OnClickLeft" />
+                    <div style="max-width:160px" class="ps-4 pe-4">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaMonthPick Date="Date" DateChanged="DateChanged" />
 
-                </div>
-                <div style="max-width:100px;">
-                    <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickRight">
-                        下个月
-                        <MIcon Right>mdi-arrow-right-thick</MIcon>
-                    </MButton>
-                </div>
+                    </div>
+                    <div style="max-width:100px;">
+                        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickRight">
+                            下个月
+                            <MIcon Right>mdi-arrow-right-thick</MIcon>
+                        </MButton>
+                    </div>
+                }
+                else
+                {
+                    <div style="max-width: 180px">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker ShowTime="false" Value="After" ValueChanged="AfterChanged" />
+
+                    </div>
+                    <span class="ms-4 me-4">  ~  </span>
+                    <div style="max-width: 180px">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaDatePicker ShowTime="false" Value="Before" ValueChanged="BeforeChanged" />
+
+                    </div>
+                }
+
 
             </div>
         </div>
-        <div class="row">
-            @foreach (var item in Model.OrderBy(s=>s.PublishTime))
+        @if (Type == PublishGamesDisplayType.CardList)
+        {
+            <div class="row">
+                @foreach (var item in CardModel.OrderBy(s => s.PublishTime))
+                {
+                    <div class="mb-4">
+                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ForcedShowPublishTime ShowType="false" />
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            if (TimelineModel.Any())
             {
-                <div class="mb-4">
-                    <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item" ForcedShowPublishTime ShowType="false"/>
+                var i = 0;
+
+                <div class="rounded shadow-sm bg-opacity p-3">
+                    <MTimeline Dense="_dataCacheService.IsApp||TimelineModel.Count<3">
+
+                        @foreach (var item in TimelineModel.OrderByDescending(s => s.Infor.PublishTime))
+                        {
+                            <MTimelineItem Large Color="@GetColor(i)">
+                                <OppositeContent>
+                                    <span>@(string.IsNullOrWhiteSpace(item.PublishTimeNote) ? item.Infor.PublishTime.Value.ToString("yyyy年M月d日") : item.PublishTimeNote)</span>
+                                </OppositeContent>
+                                <ChildContent>
+                                    <MCard Class="elevation-2" @onclick="@(() => ViewAt(item.Infor.Id))">
+                                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.Infor" Outline ShowDetailNumber="(_dataCacheService.IsApp||TimelineModel.Count<3)" BigCardStyle="@_dataCacheService.IsApp" AllowNav="false" />
+                                    </MCard>
+                                </ChildContent>
+                            </MTimelineItem>
+
+
+                            i = (i + 1) % 11;
+
+                        }
+                    </MTimeline>
                 </div>
+
             }
 
+        }
 
-        </div>
 
-        @if (Model.Count == 0)
+        @if (isFirst == false && ((Type == PublishGamesDisplayType.CardList && CardModel.Any() == false) || (Type == PublishGamesDisplayType.Timeline && TimelineModel.Any() == false)))
         {
             <NotFoundTip IsNeedLayput="true" />
         }
@@ -104,28 +158,74 @@
     [Parameter]
     public int Month { get; set; }
 
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public long BeforeTime { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public long AfterTime { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int type { get; set; }
+
+    public PublishGamesDisplayType Type { get; set; }
+
     DateOnly Date = DateOnly.FromDateTime(DateTime.Now);
 
-    List<EntryInforTipViewModel> Model = new List<EntryInforTipViewModel>();
+    DateTime Before = DateTime.Now.AddDays(1);
+
+    DateTime After = DateTime.Now.AddMonths(-1);
+
+    bool isFirst = true;
+
+    List<EntryInforTipViewModel> CardModel = new List<EntryInforTipViewModel>();
+    List<PublishGamesTimelineModel> TimelineModel = new List<PublishGamesTimelineModel>();
 
     bool isReady = false;
+
+    public string GetColor(int index)
+    {
+        return index switch { 0 => "red", 1 => "pink", 2 => "purple", 3 => "deep-purple", 4 => "indigo", 5 => "blue", 6 => "cyan", 7 => "teal", 8 => "green", 9 => "yellow", 10 => "orange", _ => "black" };
+    }
 
     protected override async Task OnParametersSetAsync()
     {
 
         try
         {
-            if (Year == 0 || Month == 0 || Month > 12)
+            isFirst = true;
+            Type = (PublishGamesDisplayType)type;
+
+            if (Type == PublishGamesDisplayType.CardList)
             {
-                await DateChanged(DateOnly.FromDateTime(DateTime.Now));
+                if (Year == 0 || Month == 0 || Month > 12)
+                {
+                    Date = DateOnly.FromDateTime(DateTime.Now);
+                }
+                else
+                {
+                    Date = new DateOnly(Year, Month, 1);
+                }
+
+                CardModel = await _dataCacheService.PublishGameTimesDataCatche.GetCache($"?year={Year}&month={Month}");
 
             }
             else
             {
-                Date = new DateOnly(Year, Month, 1);
-            }
-            Model = await _dataCacheService.PublishGameTimesDataCatche.GetCache($"?year={Year}&month={Month}");
+                if (AfterTime != 0)
+                {
+                    After = AfterTime.ToString().TransTime();
+                }
+                if (BeforeTime != 0)
+                {
+                    Before = BeforeTime.ToString().TransTime();
+                }
 
+                TimelineModel = await _dataCacheService.PublishGamesTimelineDataCatche.GetCache($"?beforeTime={BeforeTime}&aftertime={AfterTime}");
+            }
+            isFirst = false;
             isReady = true;
 
         }
@@ -147,24 +247,74 @@
         DateChanged(Date.AddMonths(-1));
         return Task.CompletedTask;
     }
+
     public Task OnClickRight()
     {
         DateChanged(Date.AddMonths(1));
         return Task.CompletedTask;
     }
 
-    public Task DateChanged(DateOnly date)
+    public async Task DateChanged(DateOnly date)
+    {
+        Date = date;
+        await Refresh();
+    }
+
+    public async Task BeforeChanged(DateTime date)
+    {
+        Before = date;
+        await Refresh();
+    }
+
+    public async Task AfterChanged(DateTime date)
+    {
+        After = date;
+        await Refresh();
+    }
+
+    public async Task OnSwitch()
+    {
+        if (Type == PublishGamesDisplayType.CardList)
+        {
+            Type = PublishGamesDisplayType.Timeline;
+        }
+        else
+        {
+            Type = PublishGamesDisplayType.CardList;
+        }
+        isFirst = false;
+        await Refresh();
+    }
+
+    public Task ViewAt(int id)
+    {
+        NavigationManager.NavigateTo("/entries/index/" + id);
+        return Task.CompletedTask;
+    }
+
+    public Task Refresh()
     {
         try
         {
-            Date = date;
-            Year = date.Year;
-            Month = date.Month;
-            NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object>
+            if (Type == PublishGamesDisplayType.CardList)
             {
-                ["year"] = date.Year,
-                ["month"] = date.Month
-            }));
+                NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object>
+                {
+                    ["year"] = Date.Year,
+                    ["month"] = Date.Month,
+                    ["type"] = (int)Type,
+                }));
+            }
+            else
+            {
+                NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object>
+                {
+                    ["beforeTime"] = Before.ToUnixTimeMilliseconds(),
+                    ["afterTime"] = After.ToUnixTimeMilliseconds(),
+                    ["type"] = (int)Type,
+                }));
+            }
+
 
         }
         catch

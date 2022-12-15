@@ -53,6 +53,11 @@ namespace CnGalWebSite.Helper.Extensions
             }
         }
 
+        public static long ToUnixTimeMilliseconds(this DateTime time)
+        {
+            return new DateTimeOffset(time).ToUnixTimeMilliseconds();
+        }
+
        
     }
 }

@@ -1375,6 +1375,15 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<List<EntryInforTipViewModel>>> GetPublishGamesByTime([FromQuery]int year, [FromQuery]int month)
         {
             DateTime time = DateTime.Now.ToCstTime();
+
+            if(month==0)
+            {
+                month = time.Month;
+            }
+            if (year == 0)
+            {
+                year = time.Year;
+            }
             var games = await _entryRepository.GetAll().AsNoTracking()
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Where(s => s.PubulishTime != null && s.PubulishTime.Value.Year == year && s.PubulishTime.Value.Month == month)
@@ -1399,6 +1408,55 @@ namespace CnGalWebSite.APIServer.Controllers
         public async Task<ActionResult<List<RoleBrithdayViewModel>>> GetRoleBrithdaysByTime([FromQuery] int month)
         {
             return await _entryService.GetBirthdayRoles(month);
+        }
+
+        /// <summary>
+        /// 获取 发布游戏时间轴
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="afterTime"></param>
+        /// <param name="beforeTime"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<List<PublishGamesTimelineModel>>> GetPublishGamesTimeline([FromQuery] int groupId, [FromQuery] long afterTime, [FromQuery] long beforeTime)
+        {
+            DateTime after = DateTime.MinValue;
+            DateTime before = DateTime.MaxValue;
+
+            if (afterTime!=0)
+            {
+                after = afterTime.ToString().TransTime();       
+            }
+            if(beforeTime!=0)
+            {
+                before = beforeTime.ToString().TransTime();
+            }
+
+            DateTime time = DateTime.Now.ToCstTime();
+            var games = await _entryRepository.GetAll().AsNoTracking()
+                .Include(s=>s.Information)
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                .Where(s=>groupId==0||s.EntryStaffFromEntryNavigation.Any(s=>s.PositionGeneral== PositionGeneralType.ProductionGroup&&s.ToEntry==groupId))
+                .Where(s => s.PubulishTime != null && s.PubulishTime.Value.Date> after && s.PubulishTime.Value.Date< before)
+                .Where(s => s.Information.Where(s => s.DisplayName == "发行时间备注").Any(s => string.IsNullOrWhiteSpace(s.DisplayValue) == false) == false || s.PubulishTime < time)
+                .ToListAsync();
+
+            var model = new List<PublishGamesTimelineModel>();
+            foreach (var item in games)
+            {
+                var entry= _appHelper.GetEntryInforTipViewModel(item);
+
+                var note = item.Information.FirstOrDefault(s => s.DisplayName == "发行时间备注")?.DisplayValue;
+
+                model.Add(new PublishGamesTimelineModel
+                {
+                    Infor = entry,
+                    PublishTimeNote = note,
+                });
+            }
+
+            return model;
         }
     }
 }

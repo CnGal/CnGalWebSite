@@ -1,0 +1,91 @@
+﻿@inject ToastService ToastService
+@inject HttpClient Http
+@inject IDataCacheService _dataCacheService
+@inject NavigationManager NavigationManager
+
+<MDialog @bind-Value="Dialog"
+         Width="800">
+    <MCard>
+        <MCardTitle Class="text-h5">
+            时间轴
+        </MCardTitle>
+        <MCardText>
+            @Name 制作的游戏
+        </MCardText>
+       
+        <MCardText>
+            @if (TimelineModel.Any())
+            {
+                var i = 0;
+
+                    <MTimeline Dense="_dataCacheService.IsApp||TimelineModel.Count<3">
+
+                        @foreach (var item in TimelineModel.OrderByDescending(s => s.Infor.PublishTime))
+                        {
+                            <MTimelineItem Large Color="@GetColor(i)">
+                                <OppositeContent>
+                                    <span>@(string.IsNullOrWhiteSpace(item.PublishTimeNote) ? item.Infor.PublishTime.Value.ToString("yyyy年M月d日") : item.PublishTimeNote)</span>
+                                </OppositeContent>
+                                <ChildContent>
+                                    <MCard Class="elevation-2" @onclick="@(() => NavigationManager.NavigateTo("entries/index/"+item.Infor.Id))">
+                                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.Infor" Outline ShowDetailNumber="(_dataCacheService.IsApp||TimelineModel.Count<3)" BigCardStyle="@(_dataCacheService.IsApp||TimelineModel.Count>=3)" AllowNav="false" />
+                                    </MCard>
+                                </ChildContent>
+                            </MTimelineItem>
+
+
+                            i = (i + 1) % 11;
+
+                        }
+                    </MTimeline>
+
+            }
+            else
+            {
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard />
+            }
+        </MCardText>
+    </MCard>
+</MDialog>
+@code {
+    [Parameter]
+    public EventCallback OnRefreshTable { get; set; }
+
+    List<PublishGamesTimelineModel> TimelineModel = new List<PublishGamesTimelineModel>();
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    bool Dialog { get; set; }
+
+    string Name;
+
+    public string GetColor(int index)
+    {
+        return index switch { 0 => "red", 1 => "pink", 2 => "purple", 3 => "deep-purple", 4 => "indigo", 5 => "blue", 6 => "cyan", 7 => "teal", 8 => "green", 9 => "yellow", 10 => "orange", _ => "black" };
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+
+    public async Task Refresh(string name,int id)
+    {
+        Name = name;
+        Dialog = true;
+        try
+        {
+            TimelineModel = await _dataCacheService.PublishGamesTimelineDataCatche.GetCache($"?groupId={id}&beforeTime={new DateTime(2030,1,1).ToUnixTimeMilliseconds()}&aftertime={new DateTime(1990, 1, 1).ToUnixTimeMilliseconds()}");
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.ProcessError(ex, "获取游戏发售时间列表失败");
+        }
+
+
+        StateHasChanged();
+    }
+}

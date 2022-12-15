@@ -123,7 +123,7 @@
             }
 
 
-            Model = await _dataCacheService.LineChartDataCatche.GetCache(BaseUrl + $"?Type={Type}&AfterTime={new DateTimeOffset(Model.AfterTime).ToUnixTimeMilliseconds()}&BeforeTime={new DateTimeOffset(Model.BeforeTime).ToUnixTimeMilliseconds()}");
+            Model = await _dataCacheService.LineChartDataCatche.GetCache(BaseUrl + $"?Type={Type}&AfterTime={Model.AfterTime.ToUnixTimeMilliseconds()}&BeforeTime={Model.BeforeTime.ToUnixTimeMilliseconds()}");
 
             if (Stacked)
             {

@@ -1,15 +1,15 @@
 ﻿@inject IDataCacheService _dataCatcheService
 
-@if (_dataCatcheService.IsApp)
+@if (_dataCatcheService.IsApp&&BigCardStyle==false)
 {
     <div class="shadow-sm rounded  bg-opacity h-100">
         @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
         {
             <div style="display: flex; align-items: center;">
-                <a href="@("/entries/index/" + Model.Id)" class="a-font-color">
+                <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color">
                     <img loading="lazy" style=" width: 160px; " src="@Model.MainImage" alt="@Model.Name">
                 </a>
-                <a href="@("/entries/index/" + Model.Id)" class="a-font-color ms-2 me-2 w-100">
+                <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color ms-2 me-2 w-100">
                     <span class="text-truncate-1">
                         <span class="fw-bold" style=" display: inline;">@Model.Name</span>
                     </span>
@@ -24,13 +24,13 @@
         {
             <div style="display: flex; align-items: center;">
 
-                <a href="@("/entries/index/" + Model.Id)" class="a-font-color p-2">
+                <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color p-2">
                     <img loading="lazy" src="@Model.MainImage" style="border-radius: 50%;width: 80px;" alt="@Model.Name" />
                 </a>
 
                 <div class="ms-2 me-2 w-100">
                     <div style=" display: flex; align-items: center;">
-                        <a href="@("/entries/index/" + Model.Id)" class="a-font-color text-truncate-1">
+                        <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color text-truncate-1">
                             <span class="fw-bold" style=" display: inline;">@Model.Name</span>
                         </a>
                         <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" Class="ms-2" />
@@ -38,7 +38,7 @@
 
 
 
-                    <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-1" : "text-truncate-2"))">
+                    <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-1" : "text-truncate-2"))">
                         @Model.BriefIntroduction
                     </a>
                     @if (Model.AddInfors != null && Model.AddInfors.Count > 0 && ShowAddInfors)
@@ -71,16 +71,16 @@
 else
 {
 
-    <div class="shadow-sm rounded  bg-opacity ps-3 pe-3 pb-3 h-100">
+    <div class="@(Outline?"ps-3 pe-3 h-100":"shadow-sm rounded  bg-opacity ps-3 pe-3 h-100")">
         @if (Model.Type == EntryType.Game || Model.Type == EntryType.ProductionGroup)
         {
             <div style="@((BigCardStyle?"flex-direction: column;":"")+"display:flex;")">
-                <a href="@("/entries/index/" + Model.Id)" class="a-font-color pt-3 pb-3">
+                <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color pt-3 pb-3">
                     <img loading="lazy" style="@(BigCardStyle?" width:100%;":" width: 250px;") " src="@Model.MainImage" alt="@Model.Name">
                 </a>
 
                 <div class="@(BigCardStyle?"pb-2":"pt-3 ps-3")" style=" width: 100%;">
-                    <a href="@("/entries/index/" + Model.Id)" class="a-font-color text-truncate-1 mb-2" style="display: flex; align-items: center;">
+                    <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color text-truncate-1 mb-2" style="display: flex; align-items: center;">
                         @if (ShowType)
                         {
                             <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
@@ -89,7 +89,7 @@ else
                         <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@Model.Name</h3>
                     </a>
 
-                    <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-2" : "text-truncate-4"))">
+                    <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-2" : "text-truncate-4"))">
 
                         @Model.BriefIntroduction
 
@@ -123,13 +123,13 @@ else
         else
         {
             <div style="display:flex;">
-                <a href="@("/entries/index/" + Model.Id)" class="a-font-color pt-3 p-0 ps-2">
+                <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color pt-3 p-0 ps-2">
                     <img src="@Model.MainImage" style="border-radius: 50%;width: 116px;" alt="@Model.Name" />
                 </a>
 
                 <div class="pt-3 ps-3" style=" width: 100%;">
                     <div style=" display: flex; align-items: center;" class="mb-2">
-                        <a href="@("/entries/index/" + Model.Id)" class="a-font-color text-truncate-2" style="display: flex; align-items: center;">
+                        <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color text-truncate-2" style="display: flex; align-items: center;">
                             @if (ShowType)
                             {
                                 <div class="article-home-tag">@Model.Type.GetDisplayName()</div>
@@ -140,7 +140,7 @@ else
                         <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.AudioButton Url="@Model.Audio.FirstOrDefault()?.Url" Class="ms-2" />
                     </div>
 
-                    <a href="@("/entries/index/" + Model.Id)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-2" : "text-truncate-4"))">
+                    <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="@("a-font-color "+(Model.AddInfors != null && Model.AddInfors.Count > 0  && ShowAddInfors ? "text-truncate-2" : "text-truncate-4"))">
                         @Model.BriefIntroduction
                     </a>
 
@@ -171,10 +171,10 @@ else
                 </div>
             </div>
         }
-        @if (Model.Type == EntryType.Game)
+        @if (Model.Type == EntryType.Game&& ShowDetailNumber)
         {
-            <a href="@("/entries/index/" + Model.Id)" class="a-font-color">
-                <span style="color: gray;" class="d-flex">
+            <a href="@(AllowNav?("/entries/index/" + Model.Id):null)" class="a-font-color">
+                <span style="color: gray;" class="d-flex pb-3">
 
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" Color="grey" />
                     @if (Model.PublishTime == null)
@@ -220,7 +220,13 @@ else
     [Parameter]
     public bool ShowType { get; set; } = true;
     [Parameter]
+    public bool Outline { get; set; }
+    [Parameter]
     public bool ShowAddInfors { get; set; } = true;
+    [Parameter]
+    public bool ShowDetailNumber { get; set; } = true;
+    [Parameter]
+    public bool AllowNav { get; set; } = true;
     /// <summary>
     /// 强制大卡片样式
     /// </summary>

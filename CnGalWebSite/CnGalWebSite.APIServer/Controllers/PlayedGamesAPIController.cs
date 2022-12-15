@@ -499,8 +499,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.ApplicationUser)
                 .Include(s => s.Entry).ThenInclude(s => s.Tags)
                 .OrderBy(x => EF.Functions.Random())
-                .Where(s => s.ShowPublicly && s.MusicSocre != 0 && s.PaintSocre != 0 && s.CVSocre != 0 && s.SystemSocre != 0 && s.ScriptSocre != 0 && s.TotalSocre != 0 && s.CVSocre != 0 && string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength)
-                .Take(50)
+                .Where(s => s.ShowPublicly && s.MusicSocre != 0 && s.PaintSocre != 0 && s.SystemSocre != 0 && s.ScriptSocre != 0 && s.TotalSocre != 0 && string.IsNullOrWhiteSpace(s.PlayImpressions) == false && s.PlayImpressions.Length > ToolHelper.MinValidPlayImpressionsLength)
+                .Take(30)
                 .ToListAsync();
             var model = new List<PlayedGameUserScoreRandomModel>();
             foreach (var item in games)
