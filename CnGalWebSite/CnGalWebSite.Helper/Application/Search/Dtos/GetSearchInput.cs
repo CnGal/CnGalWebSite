@@ -292,7 +292,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
 
         public override string ToString()
         {
-            return $"{new DateTimeOffset(AfterTime).ToUnixTimeMilliseconds()}-{new DateTimeOffset(BeforeTime).ToUnixTimeMilliseconds()}";
+            return $"{AfterTime.ToUnixTimeMilliseconds()}-{BeforeTime.ToUnixTimeMilliseconds()}";
         }
 
     }

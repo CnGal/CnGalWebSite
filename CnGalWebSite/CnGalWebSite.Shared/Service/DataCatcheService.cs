@@ -237,6 +237,10 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public IPageModelCatche<List<EntryInforTipViewModel>> PublishGameTimesDataCatche { get; set; }
         /// <summary>
+        /// 游戏发售时间轴缓存
+        /// </summary>
+        public IPageModelCatche<List<PublishGamesTimelineModel>> PublishGamesTimelineDataCatche { get; set; }
+        /// <summary>
         /// 角色生日列表缓存
         /// </summary>
         public IPageModelCatche<List<RoleBrithdayViewModel>> RoleBrithdaysDataCatche { get; set; }
@@ -365,7 +369,8 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<List<MainImageCardModel>> homeListCardsCache,
         IPageModelCatche<VideoViewModel> videoIndexPageCatche,
         IPageModelCatche<List<RoleBrithdayViewModel>> roleBrithdaysDataCatche,
-        IPageModelCatche<FavoriteFolderViewModel> favoriteFolderIndexPageCatche)
+        IPageModelCatche<FavoriteFolderViewModel> favoriteFolderIndexPageCatche,
+         IPageModelCatche<List<PublishGamesTimelineModel>> publishGamesTimelineDataCatche)
         {
             (EntryIndexPageCatche = entryIndexPageCatche).Init(nameof(EntryIndexPageCatche), ToolHelper.WebApiPath + "api/entries/GetEntryView/");
             (ArticleIndexPageCatche = articleIndexPageCatche).Init(nameof(ArticleIndexPageCatche), ToolHelper.WebApiPath + "api/articles/GetArticleView/");
@@ -392,6 +397,7 @@ namespace CnGalWebSite.Shared.Service
             (UserFavoriteFoldersDataCatche = userFavoriteFoldersDataCatche).Init(nameof(UserFavoriteFoldersDataCatche), ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteFolders/");
             (UserFavoriteObjectsDataCatche = userFavoriteObjectsDataCatche).Init(nameof(UserFavoriteObjectsDataCatche), ToolHelper.WebApiPath + "api/favorites/GetUserFavoriteObjectList");
             (PublishGameTimesDataCatche = publishGameTimesDataCatche).Init(nameof(PublishGameTimesDataCatche), ToolHelper.WebApiPath + "api/entries/GetPublishGamesByTime");
+            (PublishGamesTimelineDataCatche = publishGamesTimelineDataCatche).Init(nameof(PublishGamesTimelineDataCatche), ToolHelper.WebApiPath + "api/entries/GetPublishGamesTimeline");
             (RoleBrithdaysDataCatche = roleBrithdaysDataCatche).Init(nameof(RoleBrithdaysDataCatche), ToolHelper.WebApiPath + "api/entries/GetRoleBrithdaysByTime");
             (HomeListCardsCache = homeListCardsCache).Init(nameof(HomeListCardsCache), ToolHelper.WebApiPath);
 

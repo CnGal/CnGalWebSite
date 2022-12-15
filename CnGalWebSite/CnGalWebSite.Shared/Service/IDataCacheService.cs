@@ -141,6 +141,8 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<List<MainImageCardModel>> HomeListCardsCache { get; set; }
 
+        IPageModelCatche<List<PublishGamesTimelineModel>> PublishGamesTimelineDataCatche { get; set; }
+
         UserPendingDataCacheModel UserPendingDataCatche { get; set; }
 
         List<DocumentViewModel> DocumentsCatche { get; set; }

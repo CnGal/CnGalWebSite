@@ -114,7 +114,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Played,
         Uninterested,
         UnPlayed,
-        Random
+        Random,
+        Switch,
+        Timeline
     }
 
     public static class IconTypeHelper
@@ -123,6 +125,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Timeline:
+                    return "mdi-timeline-text-outline ";
+                case IconType.Switch:
+                    return "mdi-swap-horizontal";
                 case IconType.Random:
                     return "mdi-cube-send ";
                 case IconType.WantToPlay:
