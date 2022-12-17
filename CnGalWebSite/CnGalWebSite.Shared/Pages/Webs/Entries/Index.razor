@@ -341,6 +341,8 @@ else
     </MSnackbar>
 }
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.Entry" EventType="TrackEventType.View" ObjectId="@EntryView.Id.ToString()"
+                                                                ObjectName="@EntryView.Name"/>
 
 @code {
 
@@ -386,25 +388,13 @@ else
             NavigationManager.LocationChanged += LocationChanged;
             isFirstLoad = false;
         }
-        //记录数据
-        if (EntryView.Name != LastLookName && string.IsNullOrWhiteSpace(EntryView.Name) == false)
-        {
-            LastLookName = EntryView.Name;
-
-            try
-            {
-                await JS.InvokeAsync<string>("trackEvent", "词条", "浏览", EntryView.Name, "1", "look");
-            }
-            catch (Exception exc)
-            {
-
-            }
-        }
     }
+
     protected override async Task OnInitializedAsync()
     {
         await Refresh();
     }
+
     public async Task Refresh()
     {
         try

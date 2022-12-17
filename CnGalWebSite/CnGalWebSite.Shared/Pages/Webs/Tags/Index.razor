@@ -65,7 +65,7 @@ else
             @if (Model.ChildrenEntries.Count != 0 || Model.IsEdit)
             {
                 <div class="">
-                    <TagListChildEntriesViewTip Model="Model"  OnClickRevoke="OnRevoke" />
+                    <TagListChildEntriesViewTip Model="Model" OnClickRevoke="OnRevoke" />
                 </div>
             }
 
@@ -73,6 +73,8 @@ else
 
     }
 </div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.Tag" EventType="TrackEventType.View" ObjectId="@Model.Id.ToString()"
+                                                                ObjectName="@Model.Name" />
 
 @code {
     private string id = "";
@@ -111,21 +113,6 @@ else
         if (firstRender)
         {
             isFirst = false;
-        }
-
-
-        //记录数据
-        if (Model.Name != LastLookName && string.IsNullOrWhiteSpace(Model.Name) == false)
-        {
-            LastLookName = Model.Name;
-            try
-            {
-                await JS.InvokeAsync<string>("trackEvent", "标签", "浏览", Model.Name, "1", "look");
-            }
-            catch (Exception exc)
-            {
-
-            }
         }
 
     }
@@ -169,7 +156,7 @@ else
         {
             Title = "确认撤销编辑",
             Content = "撤销编辑后会删除数据，无法恢复，请谨慎操作",
-            
+
             Category = SwalCategory.Warning,
         };
         var ret = await SwalService.ShowModal(op);

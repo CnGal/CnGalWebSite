@@ -214,6 +214,8 @@ else
 
 }
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.User" EventType="TrackEventType.View" ObjectId="@Model.Id"
+                                                                ObjectName="@Model.BasicInfor.Name" />
 
 @code {
 
@@ -269,20 +271,6 @@ else
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
 
-        //记录数据
-        if (LastLookName != Model.BasicInfor.Name && string.IsNullOrWhiteSpace(Model.BasicInfor.Name) == false)
-        {
-            LastLookName = Model.BasicInfor.Name;
-            try
-            {
-                await JS.InvokeAsync<string>("trackEvent", "用户主页", "浏览", Model.BasicInfor.Name, "1", "look");
-            }
-            catch (Exception exc)
-            {
-
-            }
-        }
-
         if (firstRender)
         {
             isFirstLoad = false;
@@ -293,8 +281,8 @@ else
 
         try
         {
-                TabIndex = _dataCacheService.SpaceViewCache.TabIndex;
-            
+            TabIndex = _dataCacheService.SpaceViewCache.TabIndex;
+
 
             isReady = false;
             isNotFound = false;
@@ -303,7 +291,7 @@ else
             var user = userState.User;
 
             //获取用户基本信息
-            Model =await _dataCacheService.PersonalSpaceDataCatche.GetCache(Id);
+            Model = await _dataCacheService.PersonalSpaceDataCatche.GetCache(Id);
 
             if (_applicationStateService.InPreRendered)
             {

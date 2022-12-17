@@ -127,6 +127,8 @@ else
     </MSnackbar>
 }
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.FavoriteFolder" EventType="TrackEventType.View" ObjectId="@Model.Id.ToString()"
+                                                                ObjectName="@Model.Name" />
 
 @code {
 
@@ -160,20 +162,6 @@ else
             NavigationManager.LocationChanged -= LocationChanged;
             NavigationManager.LocationChanged += LocationChanged;
             isFirstLoad = false;
-        }
-        //记录数据
-        if (Model.Name != LastLookName && string.IsNullOrWhiteSpace(Model.Name) == false)
-        {
-            LastLookName = Model.Name;
-
-            try
-            {
-                await JS.InvokeAsync<string>("trackEvent", "目录", "浏览", Model.Name, "1", "look");
-            }
-            catch (Exception exc)
-            {
-
-            }
         }
     }
     protected override async Task OnInitializedAsync()

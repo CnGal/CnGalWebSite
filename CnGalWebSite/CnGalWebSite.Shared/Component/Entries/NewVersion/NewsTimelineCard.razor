@@ -15,7 +15,7 @@
                 <MTimelineItem Large>
                     <IconContent>
                         <MAvatar Class="pointer" @onclick="@(()=>OnClickImage(item))" Color="white">
-                            <img src="@item.Image"  alt="@item.GroupName"/>
+                            <img src="@item.Image" alt="@item.GroupName" />
                         </MAvatar>
                     </IconContent>
                     <OppositeContent>
@@ -38,11 +38,15 @@
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
+
 @code {
     [Parameter]
     public EntryIndexViewModel Model { get; set; }
     [Parameter]
     public EventCallback<Operation> OnRevoke { get; set; }
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
+
 
     public Task OnClickImage(NewsModel item)
     {
@@ -72,13 +76,9 @@
         }
         else
         {
-            try
+            if (trackEven != null)
             {
-                await JS.InvokeAsync<string>("trackEvent", "动态", "点击", item.Title, "1", "click");
-            }
-            catch (Exception exc)
-            {
-
+                await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.News, item.ArticleId.ToString(), item.BriefIntroduction);
             }
 
             await _dataCacheService.OpenNewPage.InvokeAsync(item.Link);

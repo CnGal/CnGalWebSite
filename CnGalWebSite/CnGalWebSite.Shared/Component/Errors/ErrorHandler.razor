@@ -56,15 +56,15 @@
         var time = (DateTime.Now.ToCstTime() - LastErrorTime).TotalSeconds;
         if (time > 2 && string.IsNullOrWhiteSpace(message) == false)
         {
-            //向友盟发送日志
-            try
-            {
-                await JS.InvokeAsync<string>("trackEvent", "抛出异常", message, ex.Message, "1", "look");
-            }
-            catch (Exception exc)
-            {
+            ////向友盟发送日志
+            //try
+            //{
+            //    await JS.InvokeAsync<string>("trackEvent", "抛出异常", message, ex.Message, "1", "look");
+            //}
+            //catch (Exception exc)
+            //{
 
-            }
+            //}
 
             if (string.IsNullOrWhiteSpace(resolvent))
             {

@@ -73,13 +73,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Folder Include="AppComponent\Pages\Entries\" />
-    <Folder Include="Pages\Apps\Entries\" />
-    <Folder Include="Pages\Apps\Peripheries\" />
-    <Folder Include="Pages\Apps\Space\" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <Content Include="..\CnGalWebSite.Server\wwwroot\scripts\check.min.js" Link="wwwroot\js\check.min.js" />
   </ItemGroup>
   

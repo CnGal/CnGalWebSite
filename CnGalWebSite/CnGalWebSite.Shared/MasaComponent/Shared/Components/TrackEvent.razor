@@ -1,0 +1,47 @@
+﻿@inject IJSRuntime JS
+@inject IDataCacheService _dataCacheService
+
+@code {
+    [Parameter]
+    public string ObjectName { get; set; }
+    [Parameter]
+    public string ObjectId { get; set; }
+    [Parameter]
+    public string Note { get; set; }
+    [Parameter]
+    public TrackEventDataType DataType { get; set; }
+    [Parameter]
+    public TrackEventType EventType { get; set; }
+
+    string objectName;
+    string objectId;
+    string note;
+    TrackEventDataType dataType;
+    TrackEventType eventType;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrWhiteSpace(ObjectName)==false&&(objectName != ObjectName || objectId != ObjectId || note != Note || dataType != DataType || eventType != EventType))
+        {
+            objectName = ObjectName;
+            objectId = ObjectId;
+            note = Note;
+            dataType = DataType;
+            eventType = EventType;
+
+            SendTrackEvent(eventType, dataType, objectId, objectName, note);
+        }
+    }
+
+    public async Task SendTrackEvent(TrackEventType eventType, TrackEventDataType dataType, string objectId, string objectName,string note =null)
+    {
+        try
+        {
+            await JS.InvokeAsync<string>("trackEvent", eventType.GetDisplayName(), dataType.GetDisplayName(), objectName, objectId, _dataCacheService.UserInfor.Id, note);
+        }
+        catch (Exception exc)
+        {
+
+        }
+    }
+}

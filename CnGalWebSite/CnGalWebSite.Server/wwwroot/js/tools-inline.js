@@ -38,9 +38,14 @@ function highlightAllCode() {
     hljs.highlightAll();
 }
 
-function trackEvent(categotry, action, lable, value, nodeid) {
-    //_czc.push(['_trackEvent', categotry, action, lable, value, nodeid]);
-    umami.trackEvent(lable,categotry  + ' ' + action);
+function trackEvent(event_name, type,objectName,objectId, userId,note) {
+    umami.trackEvent(event_name, {
+        type:type,
+        objectName: objectName,
+        objectId: objectId,
+        userId: userId,
+        note: note
+    });
 }
 
 function initVditorContext(objRef, domRef) {

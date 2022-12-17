@@ -2,11 +2,12 @@
 @inject IJSRuntime JS
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip @ref="backgroundImageTip"/>
+<CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip @ref="backgroundImageTip" />
 
 <CascadingValue Value=this IsFixed="true">
     @ChildContent
 </CascadingValue>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
 
 @code {
     [Parameter]
@@ -15,6 +16,7 @@
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     CnGalWebSite.Shared.MasaComponent.Shared.Tips.BackgroundImageTip backgroundImageTip;
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
 
     string UserId = "";
     string UserName = "";
@@ -25,7 +27,7 @@
 
         if (user.User.Identity.IsAuthenticated && UserName != user.User.Identity.Name)
         {
- 
+
             UserName = user.User.Identity.Name;
 
             foreach (var item in user.User.Claims)
@@ -36,26 +38,12 @@
                 }
             }
 
-
-            //设置用户身份
-            try
-            {
-                await JS.InvokeAsync<string>("setCustomVar", "登录状态", string.IsNullOrWhiteSpace(UserId) ? "未登入" : "已登入");
-            }
-            catch (Exception)
-            {
-
-            }
             //记录数据
             if (string.IsNullOrWhiteSpace(UserName) == false && string.IsNullOrWhiteSpace(UserId) == false)
             {
-                try
+                if (trackEven != null)
                 {
-                    await JS.InvokeAsync<string>("trackEvent", "用户", "登入", UserId, "1", "login");
-                }
-                catch (Exception)
-                {
-
+                    await trackEven.SendTrackEvent(TrackEventType.Login, TrackEventDataType.User, UserId, UserName);
                 }
 
             }

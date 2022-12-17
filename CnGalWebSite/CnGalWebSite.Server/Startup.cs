@@ -53,28 +53,23 @@ namespace CnGalWebSite.Server
                     options.MaximumReceiveMessageSize = int.MaxValue;
                 });
             //本地化
-            services.AddLocalization();
-
-            _ = services.AddBootstrapBlazor();
-
-            _ = services.AddScoped(sp => new HttpClient());
-
-            _ = services.AddBlazoredLocalStorage()
-                .AddBlazoredSessionStorage();
-
-            _ = services.AddAuthorizationCore();
-            _ = services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
-            _ = services.AddScoped<IAuthService, AuthService>();
-            _ = services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
-            _ = services.AddScoped<IDataCacheService, DataCatcheService>();
-
-            _ = services.AddScoped<IAppHelper, AppHelper>();
-            _ = services.AddScoped(x => new ExamineService());
-            _ = services.AddScoped(x => new ImagesLargeViewService());
-            _ = services.AddMasaBlazor();
+            services.AddLocalization()
+                .AddBootstrapBlazor()
+                .AddScoped(sp => new HttpClient())
+                .AddBlazoredLocalStorage()
+                .AddBlazoredSessionStorage()
+                .AddAuthorizationCore()
+                .AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>()
+                .AddScoped<IAuthService, AuthService>()
+                .AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>))
+                .AddScoped<IDataCacheService, DataCatcheService>()
+                .AddScoped<IAppHelper, AppHelper>()
+                .AddScoped(x => new ExamineService())
+                .AddScoped(x => new ImagesLargeViewService())
+                .AddMasaBlazor();
 
             //添加状态检查
-            _ = services.AddHealthChecks();
+             _ = services.AddHealthChecks();
 
             //添加工具箱
             _ = services.AddScoped(typeof(IRepository<>), typeof(Repository<>))

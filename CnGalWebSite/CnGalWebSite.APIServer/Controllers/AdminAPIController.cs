@@ -717,7 +717,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                await _articleRepository.GetAll().Where(s=>string.IsNullOrWhiteSpace(s.DisplayName)).ExecuteUpdateAsync(s=>s.SetProperty(s => s.DisplayName, b => b.Name));
+                var str= await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/12/16/banner.jpg");
                 return new Result { Successful = true };
             }
             catch (Exception ex)
