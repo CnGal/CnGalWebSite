@@ -39,6 +39,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
         public DateTime LastDisplayBrithdayTime { get; set; }
 
         public string FontFamily { get; set; } = "Helvetica,Tahoma,Arial,PingFang SC,Hiragino Sans GB,Heiti SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif";
+
+        public bool ShowDetailedErrorInfor { get; set; }
+
+        public bool AllowAutoSave { get; set; } = true;
     }
 
     public enum DisplayMode

@@ -58,6 +58,7 @@
 
     public Task OnClickMore()
     {
+        throw new Exception("123");
         NavigationManager.NavigateTo(Url);
         return Task.CompletedTask;
     }

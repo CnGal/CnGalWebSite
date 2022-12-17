@@ -78,7 +78,7 @@
         {
             if (trackEven != null)
             {
-                await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.News, item.ArticleId.ToString(), item.BriefIntroduction);
+                await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.News, item.ArticleId.ToString(), item.Title);
             }
 
             await _dataCacheService.OpenNewPage.InvokeAsync(item.Link);
