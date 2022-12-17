@@ -6,19 +6,19 @@
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="@IconType.News.ToIconString()" Class="mb-4">
     <ButtonContent>
-            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
-                <MIcon Left>mdi-share-all-outline  </MIcon>
-                查看更多
-            </MButton>
+        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
+            <MIcon Left>mdi-share-all-outline  </MIcon>
+            查看更多
+        </MButton>
 
     </ButtonContent>
     <ChildContent>
-        <div class="row" >
+        <div class="row">
 
             @foreach (var item in Items.Take(6))
             {
                 <div class="mb-3 col-12 col-lg-6 pointer d-flex">
-                    <HomeNewsAloneTip Model="item" OnClickNews="OnClickNews"/>
+                    <HomeNewsAloneTip Model="item" OnClickNews="OnClickNews" />
                 </div>
             }
         </div>
@@ -26,12 +26,15 @@
 
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
+
 @code {
 
     public List<HomeNewsAloneViewModel> Items { get; set; } = new List<HomeNewsAloneViewModel>();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
 
 
     protected override async Task OnInitializedAsync()
@@ -51,14 +54,9 @@
 
     public async Task OnClickNews(HomeNewsAloneViewModel model)
     {
-
-        try
+        if (trackEven != null)
         {
-            await JS.InvokeAsync<string>("trackEvent", "动态", "点击", model.Text, "1", "click");
-        }
-        catch (Exception exc)
-        {
-
+            await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.News, model.ArticleId.ToString(), model.Text);
         }
     }
 

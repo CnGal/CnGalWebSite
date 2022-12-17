@@ -10,16 +10,16 @@
     <div class="  rounded shadow-sm  bg-opacity pt-4 pb-3 mb-3">
         <div>
             <h2 class="h4 font-color fw-bold text-center">CnGal资料站数据汇总</h2>
-            <div class="text-center" style="color: gray;">
-                <i class="fa fa-codepen fa-fw "></i>
-                <span class="article-infor-text">@(Model.EntriesCount + "个词条")</span>&nbsp;&nbsp;&nbsp;
+            <div class="d-flex" style="color: gray; justify-content: center;">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Entry" Color="grey" />
+                <span class="me-4">@(Model.EntriesCount + "个词条")</span>
 
-                <i class="fa fa-newspaper-o fa-fw "></i>
-                <span class="article-infor-text">@(Model.ArticlesCount + "篇文章")</span>&nbsp;&nbsp;&nbsp;
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Article" Color="grey" />
+                <span class="me-4">@(Model.ArticlesCount + "篇文章")</span>
 
                 <br class="d-flex d-md-none " />
-                <i class="fa fa-pencil fa-fw "></i>
-                <span class="article-infor-text">@(Model.LastEditTime?.ToString("yyyy-MM-dd HH:mm"))</span>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.EditTime" Color="grey" />
+                <span>@(Model.LastEditTime?.ToString("yyyy-MM-dd HH:mm"))</span>
             </div>
         </div>
     </div>

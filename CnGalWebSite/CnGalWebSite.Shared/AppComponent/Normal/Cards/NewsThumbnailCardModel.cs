@@ -21,5 +21,7 @@ namespace CnGalWebSite.Shared.AppComponent.Normal.Cards
 
         public bool IsOutLink { get; set; }
 
+        public long ArticleId { get;set; }
+
     }
 }

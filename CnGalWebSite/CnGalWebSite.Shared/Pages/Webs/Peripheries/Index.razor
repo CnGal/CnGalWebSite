@@ -66,7 +66,7 @@ else
                     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
                 }
-                <PeripheryMainInforTip Model="Model" OnRevoke="OnRevoke" OnPreEdit="OnPreEdit" CollectionChanged="CollectionChanged"/>
+                <PeripheryMainInforTip Model="Model" OnRevoke="OnRevoke" OnPreEdit="OnPreEdit" CollectionChanged="CollectionChanged" />
             </div>
 
 
@@ -85,7 +85,7 @@ else
                     }
                     <CnGalWebSite.Shared.MasaComponent.PC.FavoriteFolders.CatalogsCard Type="FavoriteObjectType.Periphery" Id="Model.Id" />
                     <PeripheryListOverviewsTip Model="Model" @ref="appPeripheryOverViewTip" OnRevoke="OnRevoke" />
-                    
+
                     <CnGalWebSite.Shared.MasaComponent.PC.Comments.CommentTip CanComment="Model.CanComment" CanDeleted="IsAdmin" ObjectId="@Model.Id.ToString()" Type="CommentType.CommentPeriphery" />
                 </div>
             }
@@ -120,6 +120,8 @@ else
     }
 }
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.Periphery" EventType="TrackEventType.View" ObjectId="@Model.Id.ToString()"
+                                                                ObjectName="@Model.Name" />
 
 
 @code {
@@ -170,19 +172,6 @@ else
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        //记录数据
-        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name) == false)
-        {
-            LastLookName = Model.Name;
-            try
-            {
-                await JS.InvokeAsync<string>("trackEvent", "周边", "浏览", Model.Name, "1", "look");
-            }
-            catch (Exception exc)
-            {
-
-            }
-        }
         if (firstRender)
         {
 

@@ -4,6 +4,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
 {
     public class CarouselViewModel
     {
+        public int Id { get; set; }
+
         public string Image { get; set; }
 
         public string Link { get; set; }

@@ -24,6 +24,7 @@
 
 <HomeViewTip></HomeViewTip>
 
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
 
 
 
@@ -36,6 +37,7 @@
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
 
 
     #region 新建标签页
@@ -92,13 +94,9 @@
 
     private async Task OnClick(CarouselViewModel model)
     {
-        try
+        if (trackEven != null)
         {
-            await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", model.Note ?? model.Link, "1", "click");
-        }
-        catch (Exception exc)
-        {
-
+            await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.Carousel, model.Id.ToString(), model.Note);
         }
     }
 }

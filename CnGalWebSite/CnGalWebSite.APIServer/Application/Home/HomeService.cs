@@ -283,6 +283,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                     Note = item.Note,
                     Priority = item.Priority,
                     Type = item.Type,
+                    Id = item.Id,
                 });
             }
 

@@ -51,6 +51,7 @@
                         Title = item.Title,
                         Type = item.Type,
                         Url =item.Link??( "/articles/index/" + item.ArticleId),
+                        ArticleId=item.ArticleId,
                         IsOutLink=!string.IsNullOrWhiteSpace(item.Link)
                     });
                 }

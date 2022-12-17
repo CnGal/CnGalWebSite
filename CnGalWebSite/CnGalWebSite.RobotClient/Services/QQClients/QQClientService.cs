@@ -93,40 +93,56 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
                 t.Start(); //启动计时器
                 t.Elapsed += async (s, e) =>
                 {
-                    var message = _eventService.GetCurrentTimeEvent();
-                    if (string.IsNullOrWhiteSpace(message) == false)
+                    try
                     {
-                        var result = await _messageService.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null);
-
-                        if (result != null)
+                        var message = _eventService.GetCurrentTimeEvent();
+                        if (string.IsNullOrWhiteSpace(message) == false)
                         {
-                            foreach (var item in _robotGroupRepository.GetAll().Where(s => s.IsHidden == false && s.ForceMatch == false))
+                            var result = await _messageService.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null);
+
+                            if (result != null)
                             {
-                                result.SendTo = item.GroupId;
-                                await SendMessage(result);
+                                foreach (var item in _robotGroupRepository.GetAll().Where(s => s.IsHidden == false && s.ForceMatch == false))
+                                {
+                                    result.SendTo = item.GroupId;
+                                    await SendMessage(result);
+                                }
                             }
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "定时任务异常");
+                    }
+
                 };
 
                 //随机任务计时器
                 t2.Start(); //启动计时器
                 t2.Elapsed += async (s, e) =>
                 {
-                    var message = _eventService.GetProbabilityEvents();
-                    if (string.IsNullOrWhiteSpace(message) == false)
+                    try
                     {
-                        var result = await _messageService.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null);
-
-                        if (result != null)
+                        var message = _eventService.GetProbabilityEvents();
+                        if (string.IsNullOrWhiteSpace(message) == false)
                         {
-                            foreach (var item in _robotGroupRepository.GetAll().Where(s => s.IsHidden == false && s.ForceMatch == false))
+                            var result = await _messageService.ProcMessageAsync(RobotReplyRange.Group, message, "", null, 0, null);
+
+                            if (result != null)
                             {
-                                result.SendTo = item.GroupId;
-                                await SendMessage(result);
+                                foreach (var item in _robotGroupRepository.GetAll().Where(s => s.IsHidden == false && s.ForceMatch == false))
+                                {
+                                    result.SendTo = item.GroupId;
+                                    await SendMessage(result);
+                                }
                             }
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "随机任务异常");
+                    }
+
                 };
 
                 //好友消息事件

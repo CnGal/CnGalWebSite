@@ -19,20 +19,18 @@
         </div>
     </div>
 </div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven"/>
 
 @code {
     [Parameter]
     public NewsThumbnailCardModel Model { get; set; }
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
 
     public async Task OnClickNews()
     {
-        try
+        if(trackEven!=null)
         {
-            await JS.InvokeAsync<string>("trackEvent", "动态", "点击", Model.Text, "1", "click");
-        }
-        catch (Exception exc)
-        {
-
+            await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.News, Model.ArticleId.ToString(), Model.Text);
         }
 
         if (Model.IsOutLink)

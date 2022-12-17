@@ -24,38 +24,36 @@
         }
     </div>
 </div>
-       
-
-        @code {
-            [Parameter]
-            public List<HomeNewsAloneViewModel> Model { get; set; } = new List<HomeNewsAloneViewModel>();
-            [Parameter]
-            public int MaxCount { get; set; } = 6;
-            [CascadingParameter]
-            public ErrorHandler ErrorHandler { get; set; }
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
 
 
-            protected override async Task OnInitializedAsync()
-            {
+@code {
+    [Parameter]
+    public List<HomeNewsAloneViewModel> Model { get; set; } = new List<HomeNewsAloneViewModel>();
+    [Parameter]
+    public int MaxCount { get; set; } = 6;
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
 
-            }
 
-            public async Task OnClickNews(HomeNewsAloneViewModel model)
-            {
-                try
-                {
-                    await JS.InvokeAsync<string>("trackEvent", "动态", "点击", model.Text, "1", "click");
-                }
-                catch (Exception exc)
-                {
+    protected override async Task OnInitializedAsync()
+    {
 
-                }
-            }
+    }
 
-            public Task OnClickMore()
-            {
-                NavigationManager.NavigateTo("/articles/news");
-                return Task.CompletedTask;
-            }
-
+    public async Task OnClickNews(HomeNewsAloneViewModel model)
+    {
+        if (trackEven != null)
+        {
+            await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.News, model.ArticleId.ToString(), model.Text);
         }
+    }
+
+    public Task OnClickMore()
+    {
+        NavigationManager.NavigateTo("/articles/news");
+        return Task.CompletedTask;
+    }
+
+}

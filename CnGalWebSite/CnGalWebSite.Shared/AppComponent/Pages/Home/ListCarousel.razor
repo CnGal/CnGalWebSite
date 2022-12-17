@@ -5,9 +5,10 @@
 @inject NavigationManager NavigationManager
 
 <div class="mb-3 rounded shadow-sm">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaCarousel Model="Images" OnClick="OnClick" HideDelimiters/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaCarousel Model="Images" OnClick="OnClick" HideDelimiters />
 
 </div>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
 
 @code {
     private List<CarouselViewModel> Images = new List<CarouselViewModel>();
@@ -16,6 +17,7 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
 
 
     protected override async Task OnInitializedAsync()
@@ -47,13 +49,9 @@
 
     private async Task OnClick(CarouselViewModel model)
     {
-        try
+        if (trackEven != null)
         {
-            await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", model.Note ?? model.Link, "1", "click");
-        }
-        catch (Exception exc)
-        {
-
+            await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.Carousel, model.Id.ToString(), model.Note);
         }
     }
 

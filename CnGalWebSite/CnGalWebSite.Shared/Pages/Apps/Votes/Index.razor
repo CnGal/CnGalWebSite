@@ -66,6 +66,8 @@ else
     <CnGalWebSite.Shared.AppComponent.Pages.Votes.VoteFooter @ref="voteFooter" Image="@Model.MainPicture" RelyCallBack="RefreshComment"
                                                              VoteId="@Model.Id" ArticleName="@Model.Name" BriefIntroduction="@Model.BriefIntroduction" />
 }
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent DataType="TrackEventDataType.Vote" EventType="TrackEventType.View" ObjectId="@Model.Id.ToString()"
+                                                                ObjectName="@Model.Name" />
 
 @code {
     private string id = "";
@@ -141,7 +143,6 @@ else
     async Task OnReLoad()
     {
         await OnInitializedAsync();
-        await OnAfterRenderAsync_();
     }
 
     public async Task RefreshComment()
@@ -153,23 +154,6 @@ else
         }
     }
 
-    async Task OnAfterRenderAsync_()
-    {
-
-        //记录数据
-        if (LastLookName != Model.Name && string.IsNullOrWhiteSpace(Model.Name) == false)
-        {
-            LastLookName = Model.Name;
-            try
-            {
-                await JS.InvokeAsync<string>("trackEvent", "投票", "浏览", Model.Name, "1", "look");
-            }
-            catch (Exception exc)
-            {
-
-            }
-        }
-    }
 
     protected override async Task OnInitializedAsync()
     {

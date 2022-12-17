@@ -1,13 +1,17 @@
 ﻿@inject IJSRuntime JS
 
 <div class="rounded shadow-sm">
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaCarousel Model="Images" OnClick="OnClick" AspectRatio="4/3D"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaCarousel Model="Images" OnClick="OnClick" AspectRatio="4/3D" />
 </div>
+
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
+
 @code {
     [Parameter]
     public List<CarouselViewModel> Model { get; set; } = new List<CarouselViewModel>();
 
     private List<CarouselViewModel> Images = new List<CarouselViewModel>();
+    CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
 
     protected override async Task OnInitializedAsync()
     {
@@ -28,13 +32,9 @@
 
     private async Task OnClick(CarouselViewModel model)
     {
-        try
+        if (trackEven != null)
         {
-            await JS.InvokeAsync<string>("trackEvent", "轮播图", "点击", model.Note ?? model.Link, "1", "click");
-        }
-        catch (Exception exc)
-        {
-
+            await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.Carousel, model.Id.ToString(), model.Note);
         }
     }
 }
