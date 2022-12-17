@@ -2,58 +2,67 @@
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
 
+<AuthorizeView>
+    <Authorized>
+        @if (_dataCacheService.IsApp)
+        {
+            <MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:_dataCacheService.ThemeSetting.Theme)" Dark Dense>
+                <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
 
-@if (_dataCacheService.IsApp)
-{
-    <MAppBar App Color="@(_dataCacheService.ThemeSetting.IsDark?null:_dataCacheService.ThemeSetting.Theme)" Dark Dense>
-        <MAppBarNavIcon @onclick="@(()=>SetDrawer())"></MAppBarNavIcon>
+                <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard @ref="homeTitleCard" />
+                <MSpacer></MSpacer>
 
-        <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard @ref="homeTitleCard" />
-        <MSpacer></MSpacer>
+                <MButton Icon OnClick="OnClickSearch">
+                    <MIcon>mdi-magnify</MIcon>
+                </MButton>
+            </MAppBar>
+            <CnGalWebSite.Shared.MasaComponent.App.Admin.NavMenu @ref="navButton" OnRefresh="OnRefreshLayout" />
 
-        <MButton Icon OnClick="OnClickSearch">
-            <MIcon>mdi-magnify</MIcon>
-        </MButton>
-    </MAppBar>
-    <CnGalWebSite.Shared.MasaComponent.App.Admin.NavMenu @ref="navButton" OnRefresh="OnRefreshLayout" />
+        }
+        <MMain>
 
-}
-<MMain>
+            <CascadingValue Value="this" IsFixed="true">
+                <CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
+                    @if (_dataCacheService.IsApp == false)
+                    {
+                        <div style=" min-height: 100vh; top: 0px; max-height: calc(100% - 0px);width: 300px; position: fixed; min-width: 300px;" class="me-4 rounded shadow-sm  bg-opacity ">
+                            <div style="display: flex; justify-content: center; " class="mt-6 mb-6">
+                                <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip OnClick="OnRefreshLayout" Admin />
+                            </div>
+                            <CnGalWebSite.Shared.MasaComponent.PC.Admin.LeftMenu Style="overflow-y: auto; height: calc(100vh - 85px);background-color:transparent" Class="scroll" />
+                        </div>
+                        <div style=" margin-left: 317px; margin-bottom: 17px;">
+                            <div style=" position: fixed; right: 0; z-index: 3; left: 317px;top:0">
+                                <CnGalWebSite.Shared.MasaComponent.PC.Admin.TopBar @ref="topBar" />
+                            </div>
+                            <div style="margin-top: 85px;" class="me-4">
+                                <ErrorHandler>
+                                    @Body
+                                </ErrorHandler>
 
-    <CascadingValue Value="this" IsFixed="true">
-        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
-            @if (_dataCacheService.IsApp == false)
-            {
-                <div style=" min-height: 100vh; top: 0px; max-height: calc(100% - 0px);width: 300px; position: fixed; min-width: 300px;" class="me-4 rounded shadow-sm  bg-opacity ">
-                    <div style="display: flex; justify-content: center; " class="mt-6 mb-6">
-                        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.LogoTip OnClick="OnRefreshLayout" Admin />
-                    </div>
-                    <CnGalWebSite.Shared.MasaComponent.PC.Admin.LeftMenu Style="overflow-y: auto; height: calc(100vh - 85px);background-color:transparent" Class="scroll" />
-                </div>
-                <div style=" margin-left: 317px; margin-bottom: 17px;">
-                    <div style=" position: fixed; right: 0; z-index: 3; left: 317px;top:0">
-                        <CnGalWebSite.Shared.MasaComponent.PC.Admin.TopBar @ref="topBar" />
-                    </div>
-                    <div style="margin-top: 85px;" class="me-4">
-                        @Body
-
-                    </div>
-                </div>
-            }
-            else
-            {
-                <MContainer>
-                    @Body
-                </MContainer>
-            }
-
-
-        </CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
-    </CascadingValue>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
+                            <ErrorHandler>
+                                @Body
+                            </ErrorHandler>
+                        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
+                    }
 
 
-</MMain>
-
+                </CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
+            </CascadingValue>
+        </MMain>
+    </Authorized>
+    <NotAuthorized>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
+            <NotFoundError  />
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
+    </NotAuthorized>
+</AuthorizeView>
 @code {
 
     CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard homeTitleCard;

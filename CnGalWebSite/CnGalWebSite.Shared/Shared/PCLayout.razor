@@ -21,7 +21,7 @@
     </MTabs>
     <MSpacer></MSpacer>
 
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="搜索" Icon="mdi-magnify" Class="mr-6" OnClick="@(()=>OnNavClick("/search"))"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="搜索" Icon="mdi-magnify" Class="mr-6" OnClick="@(()=>OnNavClick("/search"))" />
     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
         <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
 
@@ -29,18 +29,21 @@
 </MAppBar>
 
 <MMain>
-    
-        <CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer >
-                @Body
-            </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
-           
-</CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
 
-   
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
+            <ErrorHandler>
+                @Body
+            </ErrorHandler>
+           
+        </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaContainer>
+
+    </CnGalWebSite.Shared.MasaComponent.Shared.Tips.ContentRootTip>
+
+
 </MMain>
 
-<MFooter App Padless Absolute Class="shadow-sm  bg-opacity">
+<MFooter App Padless Absolute Class="shadow-sm  bg-opacity" Height="186">
     <CnGalWebSite.Shared.MasaComponent.Shared.Tips.MainFooterTip />
 </MFooter>
 

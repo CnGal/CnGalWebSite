@@ -61,6 +61,24 @@
         <MCardText Class="pb-0">
             <MTextField Label="自定义渲染的字体，具体参见更新日志" Value="@_dataCacheService.ThemeSetting.FontFamily" ValueChanged="FontFamilyValueChanged" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
         </MCardText>
+        <MCardTitle Class="text-h6">
+            自动保存编辑
+        </MCardTitle>
+        <MCardText>
+            在编辑页面时间隔10秒自动保存一次数据
+        </MCardText>
+        <MCardText Class="pb-0">
+            <MSwitch Value="@_dataCacheService.ThemeSetting.AllowAutoSave" ValueChanged="AllowAutoSaveValueChanged" Label="@(_dataCacheService.ThemeSetting.AllowAutoSave?"自动保存":"不自动保存")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
+        </MCardText>
+        <MCardTitle Class="text-h6">
+            显示错误详情
+        </MCardTitle>
+        <MCardText>
+            展示网站发生错误时的详细信息
+        </MCardText>
+        <MCardText Class="pb-0">
+            <MSwitch Value="@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" ValueChanged="ShowDetailedErrorInforValueChanged" Label="@(@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor?"显示":"不显示")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
+        </MCardText>
         <MCardActions>
             <MSpacer></MSpacer>
             <MButton Color="green darken-1"
@@ -164,6 +182,26 @@
     public async Task FontFamilyValueChanged(string value)
     {
         _dataCacheService.ThemeSetting.FontFamily = value;
+
+        if (CnGalRootTip != null)
+        {
+            await CnGalRootTip.SaveTheme();
+        }
+    }
+
+    public async Task AllowAutoSaveValueChanged(bool value)
+    {
+        _dataCacheService.ThemeSetting.AllowAutoSave = value;
+
+        if (CnGalRootTip != null)
+        {
+            await CnGalRootTip.SaveTheme();
+        }
+    }
+
+    public async Task ShowDetailedErrorInforValueChanged(bool value)
+    {
+        _dataCacheService.ThemeSetting.ShowDetailedErrorInfor = value;
 
         if (CnGalRootTip != null)
         {
