@@ -144,6 +144,9 @@ PWA 应用：https://app.cngal.org/
   - 允许用户评论
 - 标签
   - 拥有层级关系
+- 视频
+  - 收录简介、预览图、链接
+  - 允许关联其他词条、文章、视频
 - 用户
   - 完整的账户管理
   - 允许创建收藏夹，并收藏词条、文章、周边
@@ -159,6 +162,14 @@ PWA 应用：https://app.cngal.org/
   - 允许执行定时任务
   - 自动备份页面到互联网档案馆
   - 用户权限管理
+- 看板娘
+  - 问答
+  - 定时任务、随机任务
+  - 查询数据
+- 投稿工具
+  - 合并词条
+  - 转载文章
+  - 转载视频
 - 其他
   - 数据汇总页面
   - 编辑指引与词条完善度检查
@@ -169,6 +180,8 @@ PWA 应用：https://app.cngal.org/
 <span id="nav-6"></span>
 
 ## 架构
+
+### 网站
 
 后端：ASP .Net Core Web API
 
@@ -181,6 +194,15 @@ UI 库：Masa Blzor, BlazorBootstrap
 ORM：Entity Framework Core 7.0
 
 SDK：.Net 7.0
+
+### 看板娘
+
+QQ机器人框架使用 [Mirai](https://github.com/mamoe/mirai) 和 [Mirai-API-HTTP](https://github.com/project-mirai/mirai-api-http) 插件
+并在 [.Net](https://github.com/microsoft/dotnet) 平台上通过 [MeowMiraiLib](https://github.com/DavidSciMeow/MeowMiraiLib) 第三方库开发
+
+QQ频道使用官方API，在 [.Net](https://github.com/microsoft/dotnet) 平台上通过 [Masuda.Net](https://github.com/ssccinng/Masuda.Net) 第三方库开发
+
+### 文件结构
 
 <!-- 在这里填写你的项目架构图或描述，你可以放置项目目录描述 -->
 
@@ -214,6 +236,8 @@ SDK：.Net 7.0
 如果你想要开发第三方客户端，请参阅 [API 使用流程](/Docs/AboutCode/APIInstructions/Summary.md)
 
 [点我](/Docs/AboutCode/BasicTutorial/HowToRun.md) 查看如何搭建运行环境并运行项目
+
+或者查看 [看板娘的自我介绍](/Docs/Kanban/Summany.md)
 
 在参与项目之前，可以查看 [代码文档](/Docs/AboutCode/Summary.md) 了解代码结构，并阅读我们的 [代码规范]()
 
