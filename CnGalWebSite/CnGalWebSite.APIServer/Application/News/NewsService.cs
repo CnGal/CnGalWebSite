@@ -692,7 +692,8 @@ namespace CnGalWebSite.APIServer.Application.News
             model.AppendLine("## 正文");
             foreach (var item in weeklyNews.News)
             {
-                model.Append($"### {item.Author} - {item.Title}\n\n{item.BriefIntroduction}\n\n[原文链接 - {item.PublishTime:yyyy/M/d HH:mm}]({item.Link})\n\n");
+                //以UTC时间处理 但是发布后需要以 UTC+8:00 展示
+                model.Append($"### {item.Author} - {item.Title}\n\n{item.BriefIntroduction}\n\n[原文链接 - {item.PublishTime.AddHours(8):yyyy/M/d HH:mm}]({item.Link})\n\n");
                 if (string.IsNullOrWhiteSpace(item.MainPicture) == false)
                 {
                     model.Append($"![{item.Title}]({item.MainPicture})\n\n");

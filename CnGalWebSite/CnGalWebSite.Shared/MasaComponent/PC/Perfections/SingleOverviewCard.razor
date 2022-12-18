@@ -14,14 +14,20 @@
                 <div class="@("comment-tag me-2 bg-"+color)">@Model.Level.GetDisplayName()</div>
                 <div class="comment-username me-2">@("超过全站 "+Model.VictoryPercentage.ToString("0.0")+"% 的词条")</div>
             </div>
-            <span class="mt-2 text-center" style="color:gray;">
-                <i class="fa fa-history fa-fw"></i>
-                <span>@(Model.LastEditTime.ToTimeFromNowString()+ "编辑")</span>
-                <i class="fa fa-list fa-fw ms-3"></i>
-                <span>@(Model.DefectCount+ "个项目待完善")</span><br />
-                <i class="fa fa-bar-chart fa-fw ms-3"></i>
-                <span>@("总计"+Model.EditCount + "次编辑")</span>
-            </span>
+            <div class="mt-2" style=" color: gray; display: flex; flex-wrap: wrap; justify-content: center;">
+                <div>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.EditTime" Color="grey" />
+                    <span class="me-4">@(Model.LastEditTime.ToTimeFromNowString()+ "编辑")</span>
+                </div>
+                <div>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Count" Color="grey" />
+                    <span class="me-4">@(Model.DefectCount+ "个项目待完善")</span><br />
+                </div>
+                <div>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Chart" Color="grey" />
+                    <span class="me-4">@("总计"+Model.EditCount + "次编辑")</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>

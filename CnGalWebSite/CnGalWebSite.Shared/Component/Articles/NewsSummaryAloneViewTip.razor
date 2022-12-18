@@ -21,13 +21,13 @@
                     @if (string.IsNullOrWhiteSpace(Model.Outlink) == false)
                     {
                         <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickWeibo" Class="me-3">
-                            <MIcon Left>mdi-share-all-outline</MIcon>
+                            <MIcon Left>@IconType.Weibo.ToIconString()</MIcon>
                             访问微博主页
                         </MButton>
                     }
 
                     <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMainPage">
-                        <MIcon Left>mdi-share-all-outline</MIcon>
+                        <MIcon Left>@IconType.Entry.ToIconString()</MIcon>
                         @(Model.GroupId>0?"查看词条":"查看个人空间")
                     </MButton>
 
@@ -52,26 +52,30 @@
                             <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@item.Name</h3>
                         </a>
                         <a href="@("/articles/index/" + item.Id)" class="text-truncate-3 a-font-color">
-                            @Model.BriefIntroduction
+                            @item.BriefIntroduction
                         </a>
                     </div>
                 </div>
 
                 <a href="@("/articles/index/" + item.Id)" style="color: gray;">
-                    <i class="fa fa-calendar fa-fw"></i>
-                    <span class="article-home-infor-text">@item.LastEditTime.ToString("yyyy-MM-dd")&nbsp;&nbsp;&nbsp;</span>
+                    <div class="d-flex">
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.DeterminedTime" Color="grey" />
+                        <span class="me-4">@item.LastEditTime.ToString("yyyy-MM-dd")</span>
 
-                    <i class="fa fa-commenting-o fa-fw"></i>
-                    <span class="article-home-infor-text">@(item.CommentCount)条评论&nbsp;&nbsp;&nbsp;</span>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Comment" Color="grey" />
+                        <span class="me-4">@(item.CommentCount)条评论</span>
 
-                    <i class="fa fa-eye fa-fw d-none d-sm-inline"></i>
-                    <span class="article-home-infor-text d-none d-sm-inline">@(item.ReaderCount)次阅读&nbsp;&nbsp;&nbsp;</span>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Read" Color="grey" />
+                        <span class="me-4">@(item.ReaderCount)次阅读</span>
 
-                    <i class="fa fa-thumbs-o-up fa-fw d-none d-sm-inline"></i>
-                    <span class="article-home-infor-text d-none d-sm-inline">@(item.ThumbsUpCount)人点赞&nbsp;&nbsp;&nbsp;</span>
-
-                    <i class="fa fa-user fa-fw"></i>
-                    <span class="article-home-infor-text">@item.CreateUserName&nbsp;&nbsp;&nbsp;</span>
+                        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.ThumbsUp" Color="grey" />
+                        <span class="me-4">@(item.ThumbsUpCount)人点赞</span>
+                        @if (string.IsNullOrWhiteSpace(item.CreateUserName) == false)
+                        {
+                            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.User" Color="grey" />
+                            <span>@item.CreateUserName</span>
+                        }
+                    </div>
                 </a>
             </MExpansionPanelContent>
         </MExpansionPanel>
