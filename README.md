@@ -237,7 +237,7 @@ QQ频道使用官方API，在 [.Net](https://github.com/microsoft/dotnet) 平台
 
 [点我](/Docs/AboutCode/BasicTutorial/HowToRun.md) 查看如何搭建运行环境并运行项目
 
-或者查看 [看板娘的自我介绍](/Docs/Kanban/Summany.md)
+或者查看 [看板娘的自我介绍](/Docs/Kanban/Summary.md)
 
 在参与项目之前，可以查看 [代码文档](/Docs/AboutCode/Summary.md) 了解代码结构，并阅读我们的 [代码规范]()
 
