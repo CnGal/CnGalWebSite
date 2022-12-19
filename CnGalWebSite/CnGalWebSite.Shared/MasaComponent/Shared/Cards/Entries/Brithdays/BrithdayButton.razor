@@ -58,8 +58,6 @@
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnAfterRenderAsync(firstRender);
-
         if (firstRender)
         {
 
@@ -74,7 +72,7 @@
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取角色生日失败");
+                ErrorHandler?.ProcessError(ex, "获取角色生日失败");
             }
         }
 
@@ -85,8 +83,15 @@
             menu = true;
             _dataCacheService.ThemeSetting.LastDisplayBrithdayTime = DateTime.Now.ToCstTime();
 
+            try
+            {
+                await _dataCacheService.SavaTheme.InvokeAsync();
+            }
+            catch
+            {
 
-            await _dataCacheService.SavaTheme.InvokeAsync();
+            }
+
             StateHasChanged();
 
         }

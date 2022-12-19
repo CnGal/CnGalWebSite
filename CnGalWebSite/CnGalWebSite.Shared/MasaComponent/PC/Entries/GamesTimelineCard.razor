@@ -28,7 +28,7 @@
                                 </OppositeContent>
                                 <ChildContent>
                                     <MCard Class="elevation-2" @onclick="@(() => NavigationManager.NavigateTo("entries/index/"+item.Infor.Id))">
-                                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.Infor" Outline ShowDetailNumber="(_dataCacheService.IsApp||TimelineModel.Count<3)" BigCardStyle="@(_dataCacheService.IsApp||TimelineModel.Count>=3)" AllowNav="false" />
+                                        <CnGalWebSite.Shared.Component.Search.NewVersion.EntryInforViewTip Model="item.Infor" Outline ShowType="false" ShowDetailNumber="(_dataCacheService.IsApp||TimelineModel.Count<3)" BigCardStyle="@(_dataCacheService.IsApp||TimelineModel.Count>=3)" AllowNav="false" />
                                     </MCard>
                                 </ChildContent>
                             </MTimelineItem>
