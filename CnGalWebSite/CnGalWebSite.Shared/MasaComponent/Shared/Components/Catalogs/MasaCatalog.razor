@@ -5,20 +5,27 @@
 
 @if (CatalogItems != null && CatalogItems.Any())
 {
-            <div class="overflow-x-auto pe-3" style="max-height: 500px">
-                <MTreeview OpenAll
-                           Color="@_dataCacheService.ThemeSetting.Theme"
-                           Items="CatalogItems"
-                           TItem="ArticleCatalogModel"
-                           TKey="string"
-                           Activatable
-                           ItemKey="u => u.Href"
-                           ItemChildren="u => u.Nodes"
-                           ItemText="u => u.Text"
-                           OnActiveUpdate="OnActiveUpdate">
-                </MTreeview>
-            </div> 
+    <div class="overflow-x-auto pe-3" style="max-height: 500px">
+        <MTreeview OpenAll
+                   Color="@_dataCacheService.ThemeSetting.Theme"
+                   Items="CatalogItems"
+                   TItem="ArticleCatalogModel"
+                   TKey="string"
+                   Activatable
+                   ItemKey="u => u.Href"
+                   ItemChildren="u => u.Nodes"
+                   ItemText="u => u.Text"
+                   OnActiveUpdate="OnActiveUpdate">
+        </MTreeview>
+    </div>
 }
+else
+{
+    <div class="text-center">
+        暂无目录
+    </div>
+}
+
 
 
 

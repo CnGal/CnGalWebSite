@@ -2606,7 +2606,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     model.VNDBId = item.Link.Replace("https://vndb.org/", "").Split('/').FirstOrDefault();
                 }
-                else if (item.Link.Contains("www.ymgal.com"))
+                else if (item.Link.Contains("www.ymgal.com") || item.Link.Contains("www.ymgal.games"))
                 {
                     model.YMGalId = item.Link.Split('/').LastOrDefault();
                 }
@@ -2953,7 +2953,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 model.others.Add(new RelevancesModel
                 {
                     DisplayName = "月幕Galgame",
-                    Link = "https://www.ymgal.com/" + model.YMGalId
+                    Link = "https://www.ymgal.games/" + model.YMGalId
                 });
             }
 
