@@ -193,6 +193,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //增加阅读人数
+            _tagRepository.Clear();
             await _tagRepository.GetAll().Where(s => s.Id == tag.Id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.ReaderCount, b => b.ReaderCount + 1));
 
             return model;

@@ -243,6 +243,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             //增加阅读人数
+            _peripheryRepository.Clear();
             await _peripheryRepository.GetAll().Where(s => s.Id == id).ExecuteUpdateAsync(s=>s.SetProperty(s => s.ReaderCount, b => b.ReaderCount + 1));
 
             return model;

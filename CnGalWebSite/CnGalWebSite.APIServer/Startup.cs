@@ -310,12 +310,13 @@ namespace CnGalWebSite.APIServer
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
 
-            app.UseCors(options =>
-            {
-                options.AllowAnyOrigin()
-                      .AllowAnyMethod()
-                      .AllowAnyHeader();
-            });
+            //跨域策略
+            //app.UseCors(options =>
+            //{
+            //    options.AllowAnyOrigin()
+            //          .AllowAnyMethod()
+            //          .AllowAnyHeader();
+            //});
 
             //添加身份验证中间件
             app.UseAuthentication();

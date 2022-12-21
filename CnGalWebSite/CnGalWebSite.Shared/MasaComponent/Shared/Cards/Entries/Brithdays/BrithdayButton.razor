@@ -58,43 +58,45 @@
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        try
         {
-
-            try
+            if (firstRender)
             {
-                var url = $"?month={DateTime.Now.ToCstTime().Month}";
 
-                Model = (await _dataCacheService.RoleBrithdaysDataCatche.GetCache(url)).Where(s => s.Brithday.Day == DateTime.Now.ToCstTime().Day).Select(s => s.Infor).ToList();
+                try
+                {
+                    var url = $"?month={DateTime.Now.ToCstTime().Month}";
+
+                    Model = (await _dataCacheService.RoleBrithdaysDataCatche.GetCache(url)).Where(s => s.Brithday.Day == DateTime.Now.ToCstTime().Day).Select(s => s.Infor).ToList();
+
+
+                    StateHasChanged();
+                }
+                catch (Exception ex)
+                {
+                    ErrorHandler?.ProcessError(ex, "获取角色生日失败");
+                }
+            }
+
+            await Task.Delay(500);
+
+            if (_dataCacheService.ThemeSetting.LastDisplayBrithdayTime.Date != DateTime.Now.ToCstTime().Date && Model.Any())
+            {
+                menu = true;
+                _dataCacheService.ThemeSetting.LastDisplayBrithdayTime = DateTime.Now.ToCstTime();
+
+                await _dataCacheService.SavaTheme.InvokeAsync();
 
 
                 StateHasChanged();
-            }
-            catch (Exception ex)
-            {
-                ErrorHandler?.ProcessError(ex, "获取角色生日失败");
+
             }
         }
-
-        await Task.Delay(500);
-
-        if ( _dataCacheService.ThemeSetting.LastDisplayBrithdayTime.Date != DateTime.Now.ToCstTime().Date&&Model.Any())
+        catch
         {
-            menu = true;
-            _dataCacheService.ThemeSetting.LastDisplayBrithdayTime = DateTime.Now.ToCstTime();
-
-            try
-            {
-                await _dataCacheService.SavaTheme.InvokeAsync();
-            }
-            catch
-            {
-
-            }
-
-            StateHasChanged();
 
         }
+
     }
     public async void RefreshRequsted(object sender, EventArgs args)
     {
