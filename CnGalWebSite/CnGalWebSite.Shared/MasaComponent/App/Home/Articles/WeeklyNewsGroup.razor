@@ -3,7 +3,7 @@
 @inject IDataCacheService _dataCacheService
 
 
-<CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout Title="CnGal每周速报" Icon="fa fa-fw fa-newspaper-o" Class="@Class" MoreUrl="/weeklynews">
+<CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout Title="CnGal每周速报" Icon="@IconType.News.ToIconString()" Class="@Class" MoreUrl="/weeklynews">
     <div class="row">
         @foreach (var item in _dataCacheService.WeeklyNewsOverviewCatche.Take(3))
         {

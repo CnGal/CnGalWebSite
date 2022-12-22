@@ -4,26 +4,26 @@
 
 <CnGalWebSite.Shared.AppComponent.Pages.Home.ListNews />
 
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeRecentIssuelGameView" Icon="fa fa-fw fa-send"
+<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeRecentIssuelGameView" Icon="@IconType.RecentlyPublish.ToIconString()"
                                                       Title="近期新作" Url="/search/?Types=Game&Sort=PubulishTime desc" />
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeNewestGameView" Icon="fa fa-fw  fa-send-o"
+<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeNewestGameView" Icon="@IconType.ComingSoon.ToIconString()"
                                                       Title="即将发售" Url="/search/?Types=Game&Sort=PubulishTime desc" />
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeArticlesView" Icon="fa fa-fw  fa-newspaper-o"
+<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeArticlesView" Icon="@IconType.Article.ToIconString()"
                                                       Title="文章" Url="/articles" />
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-    <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeVideosView" Icon="fa fa-fw  fa-video-camera"
+    <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeVideosView" Icon="@IconType.Video.ToIconString()"
                                                           Title="视频" Url="/search/?Types=Video" />
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
 
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeRecentEditView" Icon="fa fa-fw  fa-pencil"
+<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeRecentEditView" Icon="@IconType.RecentlyEdit.ToIconString()"
                                                       Title="最近编辑"  Url="/search/?Types=Game&Sort=LastEditTime desc" />
-<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeNoticesView" Icon="fa fa-fw  fa-sticky-note-o"
+<CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeNoticesView" Icon="@IconType.Notice.ToIconString()"
                                                       Title="公告" Url="/updatelog" />
 
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MiniModeContainer>
-    <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeFriendLinksView" Icon="fa fa-fw  fa-star"
+    <CnGalWebSite.Shared.AppComponent.Pages.Home.ListCrad API="api/home/GetHomeFriendLinksView" Icon="@IconType.Link.ToIconString()"
                                                           Title="友情链接" MaxCount="999" />
 
 
