@@ -2,7 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout Title="随机推荐" Icon="fa fa-fw fa-random" Class="@Class" MoreUrl="/search?Types=Article" RefreshText="换一组文章" OnClickRefresh="Refresh">
+<CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout Title="随机推荐" Icon="@IconType.Random.ToIconString()" Class="@Class" MoreUrl="/search?Types=Article" RefreshText="换一组文章" OnClickRefresh="Refresh">
     <div class="row">
         @foreach (var item in _dataCacheService.RandomArticlesCatche.Take(2))
         {

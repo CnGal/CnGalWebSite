@@ -18,7 +18,6 @@ using CnGalWebSite.Helper.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Nest;
 using Newtonsoft.Json;
-using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

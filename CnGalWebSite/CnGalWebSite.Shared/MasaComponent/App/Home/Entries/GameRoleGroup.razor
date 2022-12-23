@@ -2,7 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout Title="@(Model.Name+" 角色预览")" Icon="fa fa-fw fa-users" Class="@Class" MoreUrl="@("/entries/index/" + Model.Id)" RefreshText="换一个游戏" OnClickRefresh="Refresh">
+<CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout Title="@(Model.Name+" 角色预览")" Icon="@IconType.Role.ToIconString()" Class="@Class" MoreUrl="@("/entries/index/" + Model.Id)" RefreshText="换一个游戏" OnClickRefresh="Refresh">
     <div class="row">
         @foreach (var item in Model.Roles)
         {

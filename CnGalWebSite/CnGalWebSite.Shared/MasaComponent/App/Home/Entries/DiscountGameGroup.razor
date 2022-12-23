@@ -3,7 +3,7 @@
 @inject IDataCacheService _dataCacheService
 
 
-<CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout Title="打折游戏" Icon="fa fa-fw fa-dollar" Class="@Class" MoreUrl="/discount" RefreshText="换一组打折游戏" OnClickRefresh="Refresh">
+<CnGalWebSite.Shared.MasaComponent.App.Shared.RefreshableLayout Title="打折游戏" Icon="@IconType.Discount.ToIconString()" Class="@Class" MoreUrl="/discount" RefreshText="换一组打折游戏" OnClickRefresh="Refresh">
     <div class="row">
         @foreach (var item in _dataCacheService.DiscountPageCatcheHelper.Items.Take(2))
         {

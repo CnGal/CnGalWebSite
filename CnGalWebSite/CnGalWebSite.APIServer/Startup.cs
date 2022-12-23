@@ -1,5 +1,4 @@
-﻿using AspNetCoreRateLimit;
-using CnGalWebSite.APIServer.Application.BackgroundTasks;
+﻿using CnGalWebSite.APIServer.Application.BackgroundTasks;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Search;
@@ -182,28 +181,7 @@ namespace CnGalWebSite.APIServer
                 });
             });
             services.AddApplicationInsightsTelemetry();
-
-            //添加限流
-            // needed to load configuration from appsettings.json
-            services.AddOptions();
-
-            // needed to store rate limit counters and ip rules
-            services.AddMemoryCache();
-
-            //load general configuration from appsettings.json
-            services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
-
-            //load ip rules from appsettings.json
-            services.Configure<IpRateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
-
-            // inject counter and rules stores
-            services.AddInMemoryRateLimiting();
-            //services.AddDistributedRateLimiting<AsyncKeyLockProcessingStrategy>();
-            //services.AddDistributedRateLimiting<RedisProcessingStrategy>();
-            //services.AddRedisRateLimiting();
-
-            // configuration (resolvers, counter key builders)
-            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+           
             //添加后台定时任务
             services.AddHostedService<BackgroundTask>();
             //添加真实IP
@@ -272,8 +250,6 @@ namespace CnGalWebSite.APIServer
             #endregion
 
 
-            //添加限流中间件
-            app.UseIpRateLimiting();
             /*   if (env.IsDevelopment())
                {*/
             app.UseDeveloperExceptionPage();
@@ -311,12 +287,12 @@ namespace CnGalWebSite.APIServer
             });
 
             //跨域策略
-            //app.UseCors(options =>
-            //{
-            //    options.AllowAnyOrigin()
-            //          .AllowAnyMethod()
-            //          .AllowAnyHeader();
-            //});
+            app.UseCors(options =>
+            {
+                options.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
 
             //添加身份验证中间件
             app.UseAuthentication();

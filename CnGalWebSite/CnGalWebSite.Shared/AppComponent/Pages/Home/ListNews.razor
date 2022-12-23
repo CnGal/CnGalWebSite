@@ -2,7 +2,7 @@
 @inject HttpClient Http
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="fa fa-fw fa-newspaper-o" Class="mb-3" Outline Small>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="最新动态" Icon="@IconType.News.ToIconString()" Class="mb-3" Outline Small>
     <ButtonContent>
 
             <MButton XSmall Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>NavigationManager.NavigateTo("/articles/news"))">
