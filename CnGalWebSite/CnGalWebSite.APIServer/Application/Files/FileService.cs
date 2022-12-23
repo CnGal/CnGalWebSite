@@ -20,6 +20,7 @@ namespace CnGalWebSite.APIServer.Application.Files
         private readonly IRepository<UserFile, int> _userFileRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<Entry, int> _entryRepository;
+        private readonly IRepository<Video, long> _videoRepository;
         private readonly IAppHelper _appHelper;
         private readonly HttpClient _httpClient;
         private readonly IRepository<FileManager, int> _fileManagerRepository;
@@ -30,7 +31,7 @@ namespace CnGalWebSite.APIServer.Application.Files
 
 
         public FileService(IAppHelper appHelper, IRepository<UserFile, int> userFileRepository, HttpClient httpClient, IRepository<FileManager, int> fileManagerRepository, IConfiguration configuration,
-            IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, ILogger<FileService> logger)
+            IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, ILogger<FileService> logger, IRepository<Video, long> videoRepository)
         {
             _userFileRepository = userFileRepository;
             _appHelper = appHelper;
@@ -40,6 +41,7 @@ namespace CnGalWebSite.APIServer.Application.Files
             _entryRepository = entryRepository;
             _articleRepository = articleRepository;
             _logger = logger;
+            _videoRepository = videoRepository;
         }
 
         public async Task<PagedResultDto<ImageInforTipViewModel>> GetImagePaginatedResult(PagedSortedAndFilterInput input)
@@ -302,6 +304,11 @@ namespace CnGalWebSite.APIServer.Application.Files
 
         }
 
+        /// <summary>
+        /// 转存指定数量的主图到公共图仓
+        /// </summary>
+        /// <param name="maxCount"></param>
+        /// <returns></returns>
         public async Task TransferAllMainImages(int maxCount)
         {
             var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
@@ -347,6 +354,29 @@ namespace CnGalWebSite.APIServer.Application.Files
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "转存文章 - {Name}({Id}) 主图失败", item.Name, item.Id);
+                    throw;
+                }
+            }
+
+            var videos = await _videoRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
+              .OrderBy(s => s.Id)
+             .Take(maxCount).ToListAsync();
+
+            foreach (var item in videos)
+            {
+                try
+                {
+                    var temp = await TransferDepositFile(item.MainPicture);
+                    if (string.IsNullOrWhiteSpace(temp) == false)
+                    {
+                        item.MainPicture = temp;
+                        await _videoRepository.UpdateAsync(item);
+                        _logger.LogInformation("转存 视频 - {name}({id}) 主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "转存视频 - {Name}({Id}) 主图失败", item.Name, item.Id);
                     throw;
                 }
             }
