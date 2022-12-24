@@ -5,8 +5,7 @@
 {
     <span class="@(Class+" d-flex")" style=" align-items: center;">
 
-        <MIcon Small Color="@_dataCacheService.ThemeSetting.Theme" Class="me-2">@Icon</MIcon>
-
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" />
 
         @if (string.IsNullOrWhiteSpace(Title) == false)
         {
@@ -28,10 +27,10 @@ else
     {
         <span class="@(Class+" d-flex")" style=" word-break: break-all; align-items: center;">
 
-            <MIcon Small Color="@_dataCacheService.ThemeSetting.Theme" Class="me-2">@Icon</MIcon>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" />
 
             <span style="word-break: keep-all;">   @Text</span>
-         
+
 
             <a class="font-color" @onclick="OnClick" itemprop="@ItemProp">@Url</a>
 
@@ -42,10 +41,10 @@ else
     {
         <span class="@(Class+" d-flex")" style=" word-break: break-all; align-items: center;">
 
-            <MIcon Small Color="@_dataCacheService.ThemeSetting.Theme" Class="me-2">@Icon</MIcon>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" />
 
             <span style="word-break: keep-all;"> @Text</span>
-           
+
 
 
             <a href="@Url" target="_blank" itemprop="@ItemProp">@Url</a>
@@ -67,7 +66,7 @@ else
     [Parameter]
     public string Url { get; set; }
     [Parameter]
-    public string Icon { get; set; }
+    public IconType Icon { get; set; }
     [Parameter]
     public string ItemProp { get; set; }
     [Parameter]
