@@ -25,18 +25,18 @@
                     {
                         @if (item.DisplayValue.Contains("预计"))
                         {
-                            <BasicInforAloneTip Icon="@IconType.IndeterminateTime.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                            <BasicInforAloneTip Icon="@IconType.IndeterminateTime" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
 
                         }
                         else
                         {
-                            <BasicInforAloneTip Icon="@IconType.DeterminedTime.ToIconString()" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" ItemProp="datePublished" />
+                            <BasicInforAloneTip Icon="@IconType.DeterminedTime" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" ItemProp="datePublished" />
 
                         }
                     }
                     else if (item.DisplayName == "原作")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Article.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Article" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
                     else if (item.DisplayName == "官网" || item.DisplayName == "类型")
                     {
@@ -48,113 +48,113 @@
                         {
                             <meta itemprop="operatingSystem" content="@temp" />
                         }
-                        <BasicInforAloneTip Icon="@IconType.Game.ToIconString()" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Game" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" />
                     }
 
                     else if (item.DisplayName == "引擎")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Engine.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Engine" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
 
                     }
 
                     else if (item.DisplayName == "发行方式")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Publisher.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Publisher" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
 
                     else if (item.DisplayName == "QQ群")
                     {
-                        <BasicInforAloneTip Icon="@IconType.QQ.ToIconString()" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.QQ" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" />
                     }
 
                     else if (item.DisplayName == "声优")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Dub.ToIconString()" Text="@("配音："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Dub" Text="@("配音："+item.DisplayValue)" Class="col-12" />
                     }
 
                     else if (item.DisplayName == "性别")
                     {
                         @if (item.DisplayValue == "女")
                         {
-                            <BasicInforAloneTip Icon="@IconType.GenderFemale.ToIconString()" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" />
+                            <BasicInforAloneTip Icon="@IconType.GenderFemale" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" />
 
                         }
                         else if (item.DisplayValue == "男")
                         {
-                            <BasicInforAloneTip Icon="@IconType.GenderMale.ToIconString()" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" />
+                            <BasicInforAloneTip Icon="@IconType.GenderMale" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" />
 
 
                         }
                         else if (item.DisplayValue == "保密")
                         {
-                            <BasicInforAloneTip Icon="@IconType.Secret.ToIconString()" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" />
+                            <BasicInforAloneTip Icon="@IconType.Secret" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" />
                         }
                         else
                         {
-                            <BasicInforAloneTip Icon="@IconType.GenderNonBinary.ToIconString()" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" />
+                            <BasicInforAloneTip Icon="@IconType.GenderNonBinary" Title="@item.DisplayName" Text="@item.DisplayValue" Class="col-12" />
                         }
                     }
 
                     else if (item.DisplayName == "身材数据")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Data.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Data" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
 
                     else if (item.DisplayName == "身材(主观)")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Stature.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Stature" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
 
                     }
 
                     else if (item.DisplayName == "生日")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Birthday.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Birthday" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
 
                     else if (item.DisplayName == "发色")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Hair.ToIconString()" Title="发色" Text="@(item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Hair" Title="发色" Text="@(item.DisplayValue)" Class="col-12" />
                     }
                     else if (item.DisplayName == "瞳色")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Pupil.ToIconString()" Title="瞳色" Text="@(item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Pupil" Title="瞳色" Text="@(item.DisplayValue)" Class="col-12" />
 
                     }
                     else if (item.DisplayName == "服饰")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Clothes.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Clothes" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
                     else if (item.DisplayName == "性格")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Nature.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Nature" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
                     else if (item.DisplayName == "角色身份")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Identity.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Identity" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
                     else if (item.DisplayName == "血型")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Blood.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Blood" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
                     else if (item.DisplayName == "身高")
                     {
-                        <BasicInforAloneTip Icon="@IconType.HumanHeight.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.HumanHeight" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
                     else if (item.DisplayName == "兴趣")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Interest.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Interest" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
                     else if (item.DisplayName == "年龄")
                     {
-                        <BasicInforAloneTip Icon="@IconType.Age.ToIconString()" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.Age" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
                     else if (item.DisplayName == "姓名")
                     {
-                        <BasicInforAloneTip Icon="@IconType.RealName.ToIconString()" Text="@("姓名："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.RealName" Text="@("姓名："+item.DisplayValue)" Class="col-12" />
                     }
                     else if (item.DisplayName == "别称")
                     {
-                        <BasicInforAloneTip Icon="@IconType.AnotherName.ToIconString()" Text="@("别称："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.AnotherName" Text="@("别称："+item.DisplayValue)" Class="col-12" />
                     }
                     else if (item.DisplayName == "昵称（官方称呼）")
                     {
@@ -162,7 +162,7 @@
                     }
                     else
                     {
-                        <BasicInforAloneTip Icon="fa-circle" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
+                        <BasicInforAloneTip Icon="@IconType.SpecialThanks" Text="@(item.DisplayName+"："+item.DisplayValue)" Class="col-12" />
                     }
                 }
             </div>
@@ -185,31 +185,31 @@
                         {
                             @if (item.DisplayValue.Contains("bilibili.com"))
                             {
-                                <BasicInforAloneTip Icon="@IconType.Link.ToIconString()" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12  text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="@IconType.Link" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12  text-truncate-1" ItemProp="url" />
                             }
                             else if (item.DisplayValue.Contains("weibo.com"))
                             {
-                                <BasicInforAloneTip Icon="@IconType.Weibo.ToIconString()" Text="微博：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="@IconType.Weibo" Text="微博：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
                             }
                             else if (item.DisplayValue.Contains("youtube.com"))
                             {
-                                <BasicInforAloneTip Icon="@IconType.Youtube.ToIconString()" Text="YouTube：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="@IconType.Youtube" Text="YouTube：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
                             }
                             else if (item.DisplayValue.Contains("twitter.com"))
                             {
-                                <BasicInforAloneTip Icon="@IconType.Twitter.ToIconString()" Text="Twitter：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="@IconType.Twitter" Text="Twitter：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
                             }
                             else if (item.DisplayValue.Contains("facebook.com"))
                             {
-                                <BasicInforAloneTip Icon="@IconType.Facebook.ToIconString()" Text="Facebook：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="@IconType.Facebook" Text="Facebook：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
                             }
                             else if (item.DisplayValue.Contains("官方") || item.DisplayValue.Contains("官网"))
                             {
-                               <BasicInforAloneTip Icon="@IconType.Home.ToIconString()" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                               <BasicInforAloneTip Icon="@IconType.Home" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
                            }
                             else
                             {
-                                <BasicInforAloneTip Icon="@IconType.Link.ToIconString()" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
+                                <BasicInforAloneTip Icon="@IconType.Link" Text="@(item.DisplayName+"：")" Url="@item.DisplayValue" Class="col-12 text-truncate-1" ItemProp="url" />
                             }
                         }
                     }
@@ -219,7 +219,7 @@
                         @if (Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.Any(s => s.DisplayName == "官网"))
                         {
                             var item = Model.Information.FirstOrDefault(s => s.Modifier == "基本信息").Informations.FirstOrDefault(s => s.DisplayName == "官网");
-                            <BasicInforAloneTip Icon="@IconType.Home.ToIconString()" Text="官网：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
+                            <BasicInforAloneTip Icon="@IconType.Home" Text="官网：" Url="@item.DisplayValue" Class="col-12 text-truncate-1" />
                         }
                     }
                 </div>

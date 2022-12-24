@@ -29,7 +29,7 @@
                             @if (Model.EvaluationCount > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-thumbs-o-up"
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp"
                                                                                                          Text="@($"{Model.RecommendationRate}% 好评（{Model.EvaluationCount}条评测）")" />
 
                                 </div>
@@ -38,7 +38,7 @@
                             @if (Model.PublishTime != null)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-calendar-check-o"
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.DeterminedTime"
                                                                                                          Text="@(Model.PublishTime?.ToString("yyyy年M月d日"))" />
 
                                 </div>
@@ -48,7 +48,7 @@
                             @if (Model.CutLowest > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-area-chart"
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart"
                                                                                                          Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " - "+Model.CutLowest+"% OFF"))" />
 
                                 </div>
@@ -96,7 +96,7 @@
                             @if (Model.EvaluationCount > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-thumbs-o-up"
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp"
                                                                                                          Text="@($"{Model.RecommendationRate}% ({Model.EvaluationCount})")" />
 
                                 </div>
@@ -105,7 +105,7 @@
                             @if (Model.CutLowest > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-area-chart"
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart"
                                                                                                          Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " (-"+Model.CutLowest+"%)"))" />
                                 </div>
                             }
@@ -146,7 +146,7 @@
                                 @if (Model.EvaluationCount > 0)
                                 {
                                     <div class="col-6 col-xxl-4">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-thumbs-o-up"
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp"
                                                                                                              Text="@($"{Model.RecommendationRate}% 好评（{Model.EvaluationCount}条评测）")" />
 
                                     </div>
@@ -155,7 +155,7 @@
                                 @if (Model.PublishTime != null)
                                 {
                                     <div class="col-6 col-xxl-4">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-calendar-check-o"
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.DeterminedTime"
                                                                                                              Text="@(Model.PublishTime?.ToString("yyyy年M月d日"))" />
 
                                     </div>
@@ -165,7 +165,7 @@
                                 @if (Model.CutLowest > 0)
                                 {
                                     <div class="col-6 col-xxl-4">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="fa-area-chart"
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart"
                                                                                                              Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " - "+Model.CutLowest+"% OFF"))" />
 
                                     </div>

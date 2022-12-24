@@ -18,17 +18,17 @@
                 </span>
                 @if (SteamInfor.CutLowest > 0)
                 {
-                    <BasicInforAloneTip Icon="@IconType.Chart.ToIconString()" Text="@("历史最低：" + SteamInfor.PriceLowestString + (SteamInfor.CutLowest == 0 ? "" : " - 折扣 " + SteamInfor.CutLowest + "%"))" Class="col-12" />
+                    <BasicInforAloneTip Icon="@IconType.Chart" Text="@("历史最低：" + SteamInfor.PriceLowestString + (SteamInfor.CutLowest == 0 ? "" : " - 折扣 " + SteamInfor.CutLowest + "%"))" Class="col-12" />
                 }
             }
             else if (SteamInfor.PriceNow == 0)
             {
-                <BasicInforAloneTip Icon="@IconType.Free.ToIconString()" Text="当前价格：¥ 0.00 - Free" Class="col-12" />
+                <BasicInforAloneTip Icon="@IconType.Free" Text="当前价格：¥ 0.00 - Free" Class="col-12" />
 
             }
             else if (SteamInfor.PriceNow == -1)
             {
-                <BasicInforAloneTip Icon="@IconType.IndeterminateTime.ToIconString()" Text="未发售" Class="col-12" />
+                <BasicInforAloneTip Icon="@IconType.IndeterminateTime" Text="未发售" Class="col-12" />
                 <meta itemprop="availability" content="PreOrder" />
 
             }
@@ -37,7 +37,7 @@
                 @if (SteamInfor.OriginalPrice > 0)
                 {
                     <span class="col-12">
-                        <i class="@IconType.Price.ToIconString()"></i>&nbsp; &nbsp;
+                        <i class="@IconType.Price"></i>&nbsp; &nbsp;
                         <span>价格：¥</span>
 
                         <span>  @((SteamInfor.OriginalPrice / 100.0).ToString(" 0.00") + "（数据未更新）")</span>
@@ -46,22 +46,22 @@
                 }
                 else if (SteamInfor.OriginalPrice == 0)
                 {
-                    <BasicInforAloneTip Icon="@IconType.OutOfDate.ToIconString()" Text="价格：¥ 0.00 - Free（数据未更新）" Class="col-12" />
+                    <BasicInforAloneTip Icon="@IconType.OutOfDate" Text="价格：¥ 0.00 - Free（数据未更新）" Class="col-12" />
                 }
                 else
                 {
-                    <BasicInforAloneTip Icon="@IconType.OutOfDate.ToIconString()" Text="数据未更新" Class="col-12" />
+                    <BasicInforAloneTip Icon="@IconType.OutOfDate" Text="数据未更新" Class="col-12" />
                 }
                 <meta itemprop="availability" content="SoldOut" />
             }
             else if (SteamInfor.PriceNow == -3)
             {
-                <BasicInforAloneTip Icon="@IconType.Takedown.ToIconString()" Text="已下架" Class="col-12" />
+                <BasicInforAloneTip Icon="@IconType.Takedown" Text="已下架" Class="col-12" />
                 <meta itemprop="availability" content="SoldOut" />
             }
             @if (SteamInfor.EvaluationCount > 0)
             {
-                <BasicInforAloneTip Icon="@IconType.ThumbsUp.ToIconString()" Text="@($"{SteamInfor.RecommendationRate}% 好评（{SteamInfor.EvaluationCount}条评测）")" Class="col-12" />
+                <BasicInforAloneTip Icon="@IconType.ThumbsUp" Text="@($"{SteamInfor.RecommendationRate}% 好评（{SteamInfor.EvaluationCount}条评测）")" Class="col-12" />
 
             }
 
@@ -72,7 +72,7 @@
             }
         }
 
-        <BasicInforAloneTip Icon="@IconType.Link.ToIconString()" Text="商店页面：" Url="@("https://store.steampowered.com/app/" + Model.SteamId)" Class="col-12 text-truncate-1" ItemProp="url" />
+        <BasicInforAloneTip Icon="@IconType.Link" Text="商店页面：" Url="@("https://store.steampowered.com/app/" + Model.SteamId)" Class="col-12 text-truncate-1" ItemProp="url" />
     </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
