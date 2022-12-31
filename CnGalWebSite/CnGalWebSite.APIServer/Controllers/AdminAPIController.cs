@@ -46,6 +46,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -61,6 +62,7 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<Article, long> _articleRepository;
+        private readonly IRepository<Video, long> _videoRepository;
         private readonly IRepository<FriendLink, int> _friendLinkRepository;
         private readonly IRepository<Carousel, int> _carouselRepository;
         private readonly IRepository<UserFile, int> _userFileRepository;
@@ -131,7 +133,7 @@ namespace CnGalWebSite.APIServer.Controllers
         IVoteService voteService, IRepository<Vote, long> voteRepository, IRepository<SteamInfor, long> steamInforRepository, ILotteryService lotteryService, IRepository<RobotReply, long> robotReplyRepository,
         IRepository<WeeklyNews, long> weeklyNewsRepository, IConfiguration configuration, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, ILogger<AdminAPIController> logger,
         IRepository<LotteryAward, long> lotteryAwardRepository, ISearchHelper searchHelper, IChartService chartService, IOperationRecordService operationRecordService, IRepository<PlayedGame, long> playedGameRepository,
-        IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository)
+        IRepository<LotteryPrize, long> lotteryPrizeRepository, IRepository<OperationRecord, long> operationRecordRepository, IRepository<RankUser, long> rankUsersRepository, IRepository<Video, long> videoRepository)
         {
             _userManager = userManager;
             _entryRepository = entryRepository;
@@ -196,6 +198,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _entryStaffRepository = entryStaffRepository;
             _editRecordService = editRecordService;
             _videoService = videoService;
+            _videoRepository= videoRepository;
         }
 
         /// <summary>
@@ -717,8 +720,33 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var str= await _fileService.TransferDepositFile("https://image.cngal.org/images/2022/12/16/banner.jpg");
-                return new Result { Successful = true };
+                var lastYear = new DateTime(2021, 12, 31,23,59,59);
+
+                var sb = new StringBuilder();
+
+                var entries = await _entryRepository.GetAll().AsNoTracking()
+                    .Include(s => s.Examines)
+                    .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                    .Where(s => s.LastEditTime > lastYear)
+                    .Select(s => new
+                    {
+                        s.Type,
+                        s.DisplayName,
+                        s.Id,
+                        CreateTime = s.Examines.Where(s => s.IsPassed == true&&s.Note!= "补全审核记录").Min(s => s.PassedTime),
+                        Count=s.Examines.Count(s=>s.IsPassed==true && s.Note != "补全审核记录"&&s.PassedTime>lastYear),
+                        s.LastEditTime
+                    }).ToListAsync();
+
+                sb.AppendLine("类型,词条名称, 词条Id,编辑数, 创建时间,最后编辑时间");
+
+                foreach (var entry in entries)
+                {
+                    sb.AppendLine($"{entry.Type.GetDisplayName()},{entry.DisplayName}, {entry.Id},{entry.Count},{entry.CreateTime},{entry.LastEditTime}");
+                }
+
+
+                return new Result { Successful = true ,Error=sb.ToString()};
             }
             catch (Exception ex)
             {
