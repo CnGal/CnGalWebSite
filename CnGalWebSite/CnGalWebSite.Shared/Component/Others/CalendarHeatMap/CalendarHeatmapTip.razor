@@ -62,17 +62,17 @@
         DateTime begin = DateTime.Today.AddDays(-DateTime.Today.DayOfYear + 1);
         DateTime end = begin.AddDays(DateTime.IsLeapYear(DateTime.Now.Year) ? 365 : 364);
 
-        if (begin.DayOfWeek != DayOfWeek.Monday)
+        if (begin.DayOfWeek != DayOfWeek.Sunday)
         {
-            DateTime begin_ = begin.AddDays(-(int)begin.DayOfWeek + 1);
-            for (DateTime temp = begin_; temp.Date < begin.Date; temp = temp.AddDays(1))
+            DateTime begin_ = begin.AddDays(-(int)begin.DayOfWeek);
+            for (DateTime temp = begin_; temp.Date < begin_.Date; temp = temp.AddDays(1))
             {
                 AfterTreatmentDate.Add(new KeyValuePair<DateTime, int>(temp, -1));
             }
         }
-        if (end.DayOfWeek != DayOfWeek.Sunday)
+        if (end.DayOfWeek != DayOfWeek.Saturday)
         {
-            DateTime end_ = end.AddDays((7 - (int)end.DayOfWeek));
+            DateTime end_ = end.AddDays((6 - (int)end.DayOfWeek));
             for (DateTime temp = end.AddDays(1); temp.Date <= end_.Date; temp = temp.AddDays(1))
             {
                 AfterTreatmentDate.Add(new KeyValuePair<DateTime, int>(temp, -1));
