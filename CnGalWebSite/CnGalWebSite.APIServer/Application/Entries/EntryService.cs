@@ -2149,13 +2149,13 @@ namespace CnGalWebSite.APIServer.Application.Entries
                                 case "发行时间":
                                     try
                                     {
-                                        model.IssueTime = DateTime.ParseExact(item.DisplayValue, "yyyy年M月d日", null);
+                                        model.IssueTime = DateTime.ParseExact(item.DisplayValue, "yyyy年M月d日", null).AddHours(12);
                                     }
                                     catch
                                     {
                                         try
                                         {
-                                            model.IssueTime = DateTime.ParseExact(item.DisplayValue, "yyyy/M/d", null);
+                                            model.IssueTime = DateTime.ParseExact(item.DisplayValue, "yyyy/M/d", null).AddHours(12);
                                         }
                                         catch
                                         {
