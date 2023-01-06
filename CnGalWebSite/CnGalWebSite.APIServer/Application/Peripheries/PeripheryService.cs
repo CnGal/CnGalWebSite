@@ -638,6 +638,7 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
                 Category = periphery.Category,
                 SaleLink = periphery.SaleLink,
                 IsHidden = periphery.IsHidden,
+                DisplayName=periphery.DisplayName,
             };
 
             //读取词条信息

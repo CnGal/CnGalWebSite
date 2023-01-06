@@ -12,21 +12,21 @@
         @if (ForceSmall)
         {
             <div class="w-100 col-12 p-0" style="display: flex; justify-content: center;">
-                <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name" itemprop="image">
+                <img style="width:100%;" src="@Model.MainPicture" alt="@Model.DisplayName" itemprop="image">
             </div>
         }
         else
         {
             <div class="d-md-flex d-none col-auto ps-4 pt-4">
-                <img style="height:200px;" src="@Model.MainPicture" alt="@Model.Name" itemprop="image">
+                <img style="height:200px;" src="@Model.MainPicture" alt="@Model.DisplayName" itemprop="image">
             </div>
             <div class="w-100 d-md-none-co col-12 p-0" style="display: flex; justify-content: center;">
-                <img style="width:100%;" src="@Model.MainPicture" alt="@Model.Name">
+                <img style="width:100%;" src="@Model.MainPicture" alt="@Model.DisplayName">
             </div>
         }
 
         <div class="ps-4 pt-4 pe-4 col">
-            <h1 class="fw-bold h3">@Model.Name</h1>
+            <h1 class="fw-bold h3">@Model.DisplayName</h1>
             <div>
                 @if (ForceSmall)
                 {
