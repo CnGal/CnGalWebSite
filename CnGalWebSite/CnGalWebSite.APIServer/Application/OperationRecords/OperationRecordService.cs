@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.OperationRecords
 {
-    public class OperationRecordService : IOperationRecordService
+    public partial class OperationRecordService : IOperationRecordService
     {
         private readonly IRepository<OperationRecord, long> _operationRecordRepository;
         private readonly IConfiguration _configuration;
@@ -66,7 +66,7 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
             if (!string.IsNullOrWhiteSpace(options.SortName))
             {
 
-                items = items.OrderBy(s => s.Id).Sort(options.SortName, (BootstrapBlazor.Components.SortOrder)options.SortOrder);
+                items = items.OrderBy(s => s.Id).Sort(options.SortName, (SortOrder)options.SortOrder);
                 isSorted = true;
             }
 
@@ -153,12 +153,15 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
             }
 
             //判断是否本地调用
-            if ( Regex.IsMatch(ip, @"^(127\.0\.0\.1)|(localhost)|(10\.\d{1,3}\.\d{1,3}\.\d{1,3})|(172\.((1[6-9])|(2\d)|(3[01]))\.\d{1,3}\.\d{1,3})|(192\.168\.\d{1,3}\.\d{1,3})$"))
+            if (IpRegex().IsMatch(ip)||ip== "120.78.81.133")
             {
                 ip = userIp ?? "";
             }
 
             return ip.Split(',').FirstOrDefault();
         }
+
+        [GeneratedRegex("^(127\\.0\\.0\\.1)|(localhost)|(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01]))\\.\\d{1,3}\\.\\d{1,3})|(192\\.168\\.\\d{1,3}\\.\\d{1,3})$")]
+        private static partial Regex IpRegex();
     }
 }
