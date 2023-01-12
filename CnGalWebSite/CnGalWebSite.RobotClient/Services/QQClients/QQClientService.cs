@@ -63,10 +63,10 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
         {
             try
             {
-                MiraiClient = new($"ws://{_configuration["MiraiUrl"]}/all?verifyKey={_configuration["NormalVerifyKey"]}&qq={_configuration["QQ"]}",false,false);
+                MiraiClient = new($"ws://{_configuration["MiraiUrl"]}/all?verifyKey={_configuration["NormalVerifyKey"]}&qq={_configuration["QQ"]}");
                 if(await MiraiClient.ConnectAsync())
                 {
-                    _logger.LogInformation("成功初始化 Mirai 客户端");
+                    _logger.LogInformation("成功初始化 Mirai 客户端，SessionKey：{session}",MiraiClient.session);
                 }
                 else
                 {
@@ -441,7 +441,7 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
             }
             else if (model.Range == RobotReplyRange.Friend)
             {
-
+                
                 (bool isTimedOut, Newtonsoft.Json.Linq.JObject Return) j = model.MiraiMessage.SendToFriend(model.SendTo, MiraiClient);
                 if (j.isTimedOut)
                 {
