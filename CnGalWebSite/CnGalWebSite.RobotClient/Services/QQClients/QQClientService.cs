@@ -63,7 +63,7 @@ namespace CnGalWebSite.RobotClient.Services.QQClients
         {
             try
             {
-                MiraiClient = new($"ws://{_configuration["MiraiUrl"]}/all?verifyKey={_configuration["NormalVerifyKey"]}&qq={_configuration["QQ"]}");
+                MiraiClient = new($"ws://{_configuration["MiraiUrl"]}/all?verifyKey={_configuration["NormalVerifyKey"]}&qq={_configuration["QQ"]}",true);
                 if(await MiraiClient.ConnectAsync())
                 {
                     _logger.LogInformation("成功初始化 Mirai 客户端，SessionKey：{session}",MiraiClient.session);

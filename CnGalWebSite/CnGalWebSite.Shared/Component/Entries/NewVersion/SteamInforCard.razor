@@ -12,9 +12,9 @@
                     <span>当前价格：¥</span>
                     @if (SteamInfor.CutNow > 0)
                     {
-                        <s>@((SteamInfor.OriginalPrice/100.0).ToString(" 0.00"))</s>
+                        <s class="me-2">@((SteamInfor.OriginalPrice/100.0).ToString(" 0.00"))</s>
                     }
-                    <span> @(" "+(SteamInfor.PriceNow/100.0).ToString("0.00") + (SteamInfor.CutNow == 0 ? "" : " - 折扣 " + SteamInfor.CutNow + "%"))</span>
+                    <span> @((SteamInfor.PriceNow/100.0).ToString("0.00") + (SteamInfor.CutNow == 0 ? "" : " - 折扣 " + SteamInfor.CutNow + "%"))</span>
                 </span>
                 @if (SteamInfor.CutLowest > 0)
                 {
