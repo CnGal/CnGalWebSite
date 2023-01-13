@@ -2023,6 +2023,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 {
                     Url = item.Url,
                     BriefIntroduction = item.BriefIntroduction,
+                    Duration=item.Duration,
                     Name = item.Name,
                     Priority = item.Priority,
                     IsDelete = true

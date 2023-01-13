@@ -62,9 +62,25 @@
             await PopupService.ToastAsync($"这个音频已经添加过了哦~", AlertTypes.Error);
             return;
         }
+
+        string name = "音频" + (Model.Audio.Count + 1).ToString();
+        if (string.IsNullOrWhiteSpace(result.FileName) == false)
+        {
+            var temp = result.FileName.Split('.').LastOrDefault();
+            if (string.IsNullOrWhiteSpace(temp) == false)
+            {
+                name = result.FileName.Replace("." + temp, "");
+            }
+            else
+            {
+                name = result.FileName;
+            }
+
+        }
+
         Model.Audio.Add(new EditAudioAloneModel
         {
-            Name = result.FileName ?? "音频" + (Model.Audio.Count + 1).ToString(),
+            Name = name,
             Url = result.Url,
             Duration = result.Duration ?? new TimeSpan(0)
         });
