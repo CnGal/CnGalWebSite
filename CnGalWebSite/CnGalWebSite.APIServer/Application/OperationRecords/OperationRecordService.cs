@@ -153,7 +153,7 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
             }
 
             //判断是否本地调用
-            if (IpRegex().IsMatch(ip)||ip== "120.78.81.133")
+            if (IpRegex().IsMatch(ip)||ip.Contains( "120.78.81.133"))
             {
                 ip = userIp ?? "";
             }
