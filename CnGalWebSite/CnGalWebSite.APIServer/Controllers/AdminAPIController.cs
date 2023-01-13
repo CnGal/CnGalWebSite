@@ -720,33 +720,10 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                var lastYear = new DateTime(2021, 12, 31,23,59,59);
-
-                var sb = new StringBuilder();
-
-                var entries = await _entryRepository.GetAll().AsNoTracking()
-                    .Include(s => s.Examines)
-                    .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
-                    .Where(s => s.LastEditTime > lastYear)
-                    .Select(s => new
-                    {
-                        s.Type,
-                        s.DisplayName,
-                        s.Id,
-                        CreateTime = s.Examines.Where(s => s.IsPassed == true&&s.Note!= "补全审核记录").Min(s => s.PassedTime),
-                        Count=s.Examines.Count(s=>s.IsPassed==true && s.Note != "补全审核记录"&&s.PassedTime>lastYear),
-                        s.LastEditTime
-                    }).ToListAsync();
-
-                sb.AppendLine("类型,词条名称, 词条Id,编辑数, 创建时间,最后编辑时间");
-
-                foreach (var entry in entries)
-                {
-                    sb.AppendLine($"{entry.Type.GetDisplayName()},{entry.DisplayName}, {entry.Id},{entry.Count},{entry.CreateTime},{entry.LastEditTime}");
-                }
+                _logger.LogInformation("已删除 {n} 条记录", await _examineRepository.GetAll().Where(s => s.ApplicationUserId == _configuration["ExamineAdminId"] && s.Operation == Operation.EstablishAudio).ExecuteDeleteAsync());  
 
 
-                return new Result { Successful = true ,Error=sb.ToString()};
+                return new Result { Successful = true };
             }
             catch (Exception ex)
             {

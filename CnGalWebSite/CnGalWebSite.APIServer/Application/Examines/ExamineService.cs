@@ -5576,7 +5576,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task ExaminesCompletion()
         {
             //补全词条
-            var entryIds = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).Select(s => s.Id).ToListAsync();
+            var entryIds = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Name) == false).OrderBy(s => s.Id).Select(s => s.Id).ToListAsync();
             foreach (var entryId in entryIds)
             {
                 var entry = await _entryRepository.GetAll().AsNoTracking()
