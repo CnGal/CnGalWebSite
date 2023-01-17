@@ -315,7 +315,8 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            var dateTime = DateTime.Now.ToCstTime();
+            //转换成东八区
+            var dateTime = DateTime.Now.ToCstTime().AddHours(8);
             //计算连续签到天数和今天是否签到
             if (await _signInDayRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.Time.Date == dateTime.Date) == false)
             {
@@ -505,9 +506,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 //保存并尝试应用审核记录
                 await _editRecordService.SaveAndApplyEditRecord(user, user, userMain, Operation.EditUserMain, model.Note);
-
-
-
             }
 
             if (result.Succeeded)

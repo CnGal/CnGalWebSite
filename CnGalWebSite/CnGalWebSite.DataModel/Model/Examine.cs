@@ -130,13 +130,13 @@ namespace CnGalWebSite.DataModel.Model
         EstablishMainPage,
         [Display(Name = "编辑词条图片")]
         EstablishImages,
-        [Display(Name = "编辑词条相关链接")]
+        [Display(Name = "编辑词条关联信息")]
         EstablishRelevances,
         [Display(Name = "编辑词条标签")]
         EstablishTags,
         [Display(Name = "编辑文章主要信息")]
         EditArticleMain,
-        [Display(Name = "编辑文章关联词条")]
+        [Display(Name = "编辑文章关联信息")]
         EditArticleRelevanes,
         [Display(Name = "编辑文章内容")]
         EditArticleMainPage,
@@ -176,7 +176,7 @@ namespace CnGalWebSite.DataModel.Model
         EditVideoImages,
         [Display(Name = "编辑视频内容")]
         EditVideoMainPage,
-        [Display(Name = "编辑视频关联词条")]
+        [Display(Name = "编辑视频关联信息")]
         EditVideoRelevanes,
         [Display(Name = "编辑收藏夹")]
         EditFavoriteFolderMain,

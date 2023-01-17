@@ -152,7 +152,6 @@ namespace CnGalWebSite.APIServer.Application.Charts
         /// 获取文章图表
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
         public async Task<EChartsOptionModel> GetArticleLineChartAsync(DateTime afterTime, DateTime beforeTime)
         {
             var tempDateTimeNow = DateTime.Now.ToCstTime();
@@ -219,7 +218,6 @@ namespace CnGalWebSite.APIServer.Application.Charts
         /// 获取标签图表
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
         public async Task<EChartsOptionModel> GetTagLineChartAsync(DateTime afterTime, DateTime beforeTime)
         {
             var tempDateTimeNow = DateTime.Now.ToCstTime();
@@ -243,7 +241,6 @@ namespace CnGalWebSite.APIServer.Application.Charts
         /// 获取审核图表
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
         public async Task<EChartsOptionModel> GetExamineLineChartAsync(DateTime afterTime, DateTime beforeTime)
         {
             var tempDateTimeNow = DateTime.Now.ToCstTime();
@@ -277,7 +274,6 @@ namespace CnGalWebSite.APIServer.Application.Charts
         /// 获取评论图表
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
         public async Task<EChartsOptionModel> GetCommentLineChartAsync(DateTime afterTime, DateTime beforeTime)
         {
             var tempDateTimeNow = DateTime.Now.ToCstTime();
@@ -301,7 +297,6 @@ namespace CnGalWebSite.APIServer.Application.Charts
         /// 获取评论图表
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
         public async Task<EChartsOptionModel> GetMessageLineChartAsync(DateTime afterTime, DateTime beforeTime)
         {
             var tempDateTimeNow = DateTime.Now.ToCstTime();
@@ -324,7 +319,6 @@ namespace CnGalWebSite.APIServer.Application.Charts
         /// 获取文件图表
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
         public async Task<EChartsOptionModel> GetFileLineChartAsync(DateTime afterTime, DateTime beforeTime)
         {
             var tempDateTimeNow = DateTime.Now.ToCstTime();
@@ -358,7 +352,6 @@ namespace CnGalWebSite.APIServer.Application.Charts
         /// 获取备份图表
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
         public async Task<EChartsOptionModel> GetBackUpArchiveLineChartAsync(DateTime afterTime, DateTime beforeTime)
         {
             var tempDateTimeNow = DateTime.Now.ToCstTime();
@@ -399,14 +392,18 @@ namespace CnGalWebSite.APIServer.Application.Charts
             return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["成功"] = success, ["错误"] = errors, ["用时 秒"] = times }, "备份");
         }
 
+        /// <summary>
+        /// 获取编辑概览图表
+        /// </summary>
+        /// <param name="afterTime"></param>
+        /// <param name="beforeTime"></param>
+        /// <returns></returns>
         public async Task<EChartsOptionModel> GetEditLineChartAsync(DateTime afterTime, DateTime beforeTime)
         {
             var tempDateTimeNow = DateTime.Now.ToCstTime();
 
             //获取数据
-            var entryCounts = await _examineRepository.GetAll().Where(s => (s.Operation == Operation.EstablishMain || s.Operation == Operation.EstablishAddInfor || s.Operation == Operation.EstablishImages
-                                                                            || s.Operation == Operation.EstablishRelevances || s.Operation == Operation.EstablishTags || s.Operation == Operation.EstablishMainPage)
-                                                                           && s.IsPassed == true && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
+            var entryCounts = await _examineRepository.GetAll().Where(s => s.EntryId!=null&& s.IsPassed == true && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
                // 先进行了时间字段变更为String字段，切只保留到天
                // 采用拼接的方式
                .Select(n => new { Time = n.ApplyTime.Date })
@@ -417,8 +414,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
                .ToListAsync();
             //获取数据
-            var articleCounts = await _examineRepository.GetAll().Where(s => (s.Operation == Operation.EditArticleMain || s.Operation == Operation.EditArticleMainPage || s.Operation == Operation.EditArticleRelevanes)
-                                                                           && s.IsPassed == true && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
+            var articleCounts = await _examineRepository.GetAll().Where(s =>s.ArticleId!=null && s.IsPassed == true && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
                // 先进行了时间字段变更为String字段，切只保留到天
                // 采用拼接的方式
                .Select(n => new { Time = n.ApplyTime.Date })
@@ -429,8 +425,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
                .ToListAsync();
             //获取数据
-            var tagCounts = await _examineRepository.GetAll().Where(s => (s.Operation == Operation.EditTag || s.Operation == Operation.EditTagChildEntries || s.Operation == Operation.EditTagChildTags || s.Operation == Operation.EditTagMain)
-                                                                           && s.IsPassed == true && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
+            var tagCounts = await _examineRepository.GetAll().Where(s => s.TagId!=null && s.IsPassed == true && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
                // 先进行了时间字段变更为String字段，切只保留到天
                // 采用拼接的方式
                .Select(n => new { Time = n.ApplyTime.Date })
@@ -441,8 +436,7 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
                .ToListAsync();
             //获取数据
-            var peripheryCounts = await _examineRepository.GetAll().Where(s => (s.Operation == Operation.EditPeripheryMain || s.Operation == Operation.EditPeripheryImages || s.Operation == Operation.EditPeripheryRelatedEntries)
-                                                                           && s.IsPassed == true && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
+            var peripheryCounts = await _examineRepository.GetAll().Where(s => s.PeripheryId!=null && s.IsPassed == true && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
                // 先进行了时间字段变更为String字段，切只保留到天
                // 采用拼接的方式
                .Select(n => new { Time = n.ApplyTime.Date })
@@ -453,8 +447,21 @@ namespace CnGalWebSite.APIServer.Application.Charts
                .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
                .ToListAsync();
 
-            return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["词条"] = entryCounts, ["文章"] = articleCounts, ["标签"] = tagCounts, ["周边"] = peripheryCounts }, "编辑概览");
+            //获取数据
+            var videoCounts = await _examineRepository.GetAll().Where(s => s.VideoId!=null && s.IsPassed == true && s.ApplyTime <= beforeTime && s.ApplyTime >= afterTime)
+               // 先进行了时间字段变更为String字段，切只保留到天
+               // 采用拼接的方式
+               .Select(n => new { Time = n.ApplyTime.Date })
+               // 分类
+               .GroupBy(n => n.Time)
+               // 返回汇总样式
+               .Select(n => new LineChartSingleData { Time = n.Key, Count = n.Count() })
+               .Sort("Time", BootstrapBlazor.Components.SortOrder.Asc)
+               .ToListAsync();
+
+            return GetCountLine(new Dictionary<string, List<LineChartSingleData>> { ["词条"] = entryCounts, ["文章"] = articleCounts, ["标签"] = tagCounts, ["周边"] = peripheryCounts, ["视频"] = videoCounts }, "编辑概览");
         }
+
         /// <summary>
         /// 获取 统计数据 图表
         /// </summary>
