@@ -720,7 +720,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
-                _logger.LogInformation("已删除 {n} 条记录", await _examineRepository.GetAll().Where(s => s.ApplicationUserId == _configuration["ExamineAdminId"] && s.Operation == Operation.EstablishAudio).ExecuteDeleteAsync());  
+                _logger.LogInformation("已删除 {n} 条记录", await _examineRepository.GetAll().Where(s => s.ApplicationUserId == _configuration["ExamineAdminId"] &&( s.Operation == Operation.EstablishAudio||s.Operation== Operation.EditVideoRelevanes)).ExecuteDeleteAsync());  
 
 
                 return new Result { Successful = true };

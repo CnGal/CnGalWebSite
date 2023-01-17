@@ -627,7 +627,7 @@ namespace CnGalWebSite.APIServer.Application.Videos
             //创建审核数据模型
             var videoRelevances = new VideoRelevances();
 
-            //处理关联词条
+            //处理关联视频
 
             //遍历当前词条数据 打上删除标签
             foreach (var item in currentVideo.VideoRelationFromVideoNavigation.Select(s => s.ToVideoNavigation))
@@ -636,7 +636,7 @@ namespace CnGalWebSite.APIServer.Application.Videos
                 {
                     DisplayName = item.Id.ToString(),
                     DisplayValue = item.Name,
-                    Type = RelevancesType.Article,
+                    Type = RelevancesType.Video,
                     IsDelete = true,
                 });
             }
