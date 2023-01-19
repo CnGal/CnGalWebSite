@@ -1,7 +1,5 @@
 ﻿using Blazored.LocalStorage;
 using Blazored.SessionStorage;
-using CnGalWebSite.DataModel.Application.Examines;
-using CnGalWebSite.DataModel.Application.Helper;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
 using CnGalWebSite.PublicToolbox.DataRepositories;
@@ -55,8 +53,6 @@ namespace CnGalWebSite.WebAssembly
             builder.Services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
             builder.Services.AddScoped<IDataCacheService, DataCatcheService>();
 
-            builder.Services.AddScoped<IAppHelper, AppHelper>();
-            builder.Services.AddScoped(x => new ExamineService());
             builder.Services.AddScoped(x => new ImagesLargeViewService());
 
             builder.Services.AddMasaBlazor();
@@ -81,6 +77,12 @@ namespace CnGalWebSite.WebAssembly
             //设置Json格式化配置
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
             ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+
+            //添加空白MAUI服务 
+            builder.Services.AddScoped<IMauiService, MauiService>();
+
+            builder.Services.AddScoped<IFileUploadService, FileUploadService>();
+            builder.Services.AddScoped<IEventService, EventService>();
 
             var host = builder.Build();
 

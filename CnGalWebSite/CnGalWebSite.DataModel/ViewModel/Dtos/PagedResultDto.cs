@@ -1,4 +1,7 @@
-﻿namespace CnGalWebSite.DataModel.Application.Dtos
+﻿using System;
+using System.Collections.Generic;
+
+namespace CnGalWebSite.DataModel.ViewModel.Dtos
 {
     public class PagedResultDto<TEntity> : PagedSortedAndFilterInput
     {

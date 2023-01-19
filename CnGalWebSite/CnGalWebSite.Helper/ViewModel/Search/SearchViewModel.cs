@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.DataModel.Application.Dtos;
+﻿using CnGalWebSite.DataModel.ViewModel.Dtos;
 using CnGalWebSite.DataModel.ViewModel.Search;
 namespace CnGalWebSite.DataModel.ViewModel.Home
 {

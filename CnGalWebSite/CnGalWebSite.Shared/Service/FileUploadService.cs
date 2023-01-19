@@ -14,14 +14,15 @@ using Microsoft.Extensions.Logging;
 using System.IO;
 using CnGalWebSite.DataModel.ViewModel.Others;
 
-namespace CnGalWebSite.DataModel.Application.Helper
+
+namespace CnGalWebSite.Shared.Service
 {
-    public class AppHelper : IAppHelper
+    public class FileUploadService:IFileUploadService
     {
         private readonly HttpClient _httpClient;
-        private readonly ILogger<AppHelper> _logger;
+        private readonly ILogger<FileUploadService> _logger;
 
-        public AppHelper(HttpClient httpClient, ILogger<AppHelper> logger)
+        public FileUploadService(HttpClient httpClient, ILogger<FileUploadService> logger)
         {
             _httpClient = httpClient;
             _logger = logger;
@@ -30,17 +31,17 @@ namespace CnGalWebSite.DataModel.Application.Helper
         public async Task<UploadResult> UploadImagesAsync(IBrowserFile file, ImageAspectType type)
         {
             using var fileContent = new StreamContent(file.OpenReadStream(file.Size));
-            return await UploadImagesAsync(fileContent, file.Name, type,file.Size);
+            return await UploadImagesAsync(fileContent, file.Name, type, file.Size);
         }
 
         public async Task<UploadResult> UploadImagesAsync(byte[] bytes, string fileName, ImageAspectType type)
         {
             //复制数据
             using var fileContent = new StreamContent(new MemoryStream(bytes));
-            return await UploadImagesAsync(fileContent, fileName, type,bytes.LongLength);
+            return await UploadImagesAsync(fileContent, fileName, type, bytes.LongLength);
         }
 
-        public async Task<UploadResult> UploadImagesAsync(StreamContent steam, string fileName, ImageAspectType type,long size)
+        public async Task<UploadResult> UploadImagesAsync(StreamContent steam, string fileName, ImageAspectType type, long size)
         {
             using var content = new MultipartFormDataContent();
 
@@ -78,8 +79,8 @@ namespace CnGalWebSite.DataModel.Application.Helper
             var newUploadResults = await response.Content
                 .ReadFromJsonAsync<List<UploadResult>>();
 
-            var result= newUploadResults.FirstOrDefault();
-            if(result.Uploaded)
+            var result = newUploadResults.FirstOrDefault();
+            if (result.Uploaded)
             {
                 await AddUserLoadedFileInfor(result, UploadFileType.Image);
             }
@@ -125,7 +126,7 @@ namespace CnGalWebSite.DataModel.Application.Helper
                     FileSize = infor.FileSize,
                     Duration = infor.Duration,
                     Sha1 = infor.Sha1,
-                    Type= type
+                    Type = type
                 };
 
                 var result = await _httpClient.PostAsJsonAsync(ToolHelper.WebApiPath + "api/files/AddUserUploadFileInfor", model);
@@ -139,9 +140,8 @@ namespace CnGalWebSite.DataModel.Application.Helper
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"保存上传文件信息失败：{name}", infor.Url);
+                _logger.LogError(ex, "保存上传文件信息失败：{name}", infor.Url);
             }
         }
-
     }
 }

@@ -1,7 +1,7 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Users.Dtos;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.Application.Dtos;
+
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using Markdig;
 using Microsoft.EntityFrameworkCore;

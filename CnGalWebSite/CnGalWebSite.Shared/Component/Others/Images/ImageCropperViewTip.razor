@@ -1,5 +1,5 @@
 ﻿@inject IJSRuntime JSRuntime
-@inject IAppHelper _appHelper
+@inject IFileUploadService _fileUploadService
 @inject ToastService ToastService
 @inject IDataCacheService _dataCacheService
 
@@ -116,7 +116,7 @@
         try
         {
             //上传
-            var obj = await _appHelper.UploadImagesAsync(await args.GetDataAsync(), File.Name, Type);
+            var obj = await _fileUploadService.UploadImagesAsync(await args.GetDataAsync(), File.Name, Type);
             if (obj.Uploaded == true)
             {
 
@@ -145,7 +145,7 @@
     {
         try
         {
-            var obj = await _appHelper.UploadImagesAsync(File, Type);
+            var obj = await _fileUploadService.UploadImagesAsync(File, Type);
             if (obj.Uploaded == true)
             {
 

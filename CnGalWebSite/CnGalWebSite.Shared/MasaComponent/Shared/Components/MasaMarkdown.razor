@@ -1,6 +1,6 @@
 ﻿@inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
-@inject IAppHelper _appHelper
+@inject IFileUploadService _fileUploadService
 
 
 <MMarkdown Options="_options" Value="@Context" ValueChanged="ValueChanged" @ref="mMarkdown" Class="@Class">
@@ -90,7 +90,7 @@
                     await mMarkdown.InsertValueAsync($"\n![{item.FileName}]({item.Url})\n");
 
                     //向用户文件管理添加信息
-                    await _appHelper.AddUserLoadedFileInfor(item, UploadFileType.Image);
+                    await _fileUploadService.AddUserLoadedFileInfor(item, UploadFileType.Image);
                 }
             }
         }
@@ -113,7 +113,7 @@
                 await ContextChanged.InvokeAsync(Context);
 
                 //向用户文件管理添加信息
-                await _appHelper.AddUserLoadedFileInfor(model, UploadFileType.Image);
+                await _fileUploadService.AddUserLoadedFileInfor(model, UploadFileType.Image);
 
             }
         }

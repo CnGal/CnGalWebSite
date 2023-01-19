@@ -27,7 +27,7 @@
     ErrorLogger errorLogger;
     private DateTime LastErrorTime { get; set; } = DateTime.Now.ToCstTime().AddYears(-1);
 
-    public Task OnErrorHandleAsync(Exception ex)
+    public async Task<bool> OnErrorHandleAsync(Exception ex)
     {
         if (ex is OutOfMemoryException)
         {
@@ -46,7 +46,7 @@
         else
         {
             ProcessError(ex, "发生未经捕获的异常", "代码里有Bug");
-            return Task.CompletedTask;
+            return true;
         }
     }
 

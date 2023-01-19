@@ -1,6 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
+@inject IMauiService _mauiService
 @inject ILocalStorageService _localStorage
-
+@inject IEventService _eventService
 @inject IJSRuntime JS
 
 
@@ -126,9 +127,9 @@ else
             //读取本地主题配置
             await LoadTheme();
             //刷新
-            Refresh();
+            await Refresh();
             StateHasChanged();
-            await _dataCacheService.ThemeChanged.InvokeAsync(colorMain);
+            _mauiService.ChangeTheme(colorMain);
         }
     }
 
@@ -310,8 +311,8 @@ else
 
         if (theme != _dataCacheService.ThemeSetting.Theme || isDark != _dataCacheService.ThemeSetting.IsDark || isTransparent != _dataCacheService.ThemeSetting.IsTransparent || isExpand != _dataCacheService.ThemeSetting.IsExtendEntireScreen)
         {
-            await _dataCacheService.ThemeChanged.InvokeAsync(colorMain);
-            await _dataCacheService.RefreshApp.InvokeAsync();
+            _mauiService.ChangeTheme(colorMain);
+            _eventService.OnRefreshApp();
 
             theme = _dataCacheService.ThemeSetting.Theme;
             isDark = _dataCacheService.ThemeSetting.IsDark;

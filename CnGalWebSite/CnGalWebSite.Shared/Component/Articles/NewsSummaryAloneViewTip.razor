@@ -1,10 +1,11 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject IJSRuntime JS
+@inject IEventService _eventService
 
 <MExpansionPanels>
-    <MExpansionPanel @key="0"  Class="bg-opacity">
-        <MExpansionPanelHeader >
+    <MExpansionPanel @key="0" Class="bg-opacity">
+        <MExpansionPanelHeader>
             <div class="" style=" display: flex; align-items: center; ">
                 <img src="@Model.GroupImage" style="height:50px;width:50px;border-radius:50%;" />
                 <div class="ms-3" style="font-size: x-large; font-weight: bold;">@Model.GroupName</div>
@@ -38,7 +39,7 @@
 
     @foreach (var item in Model.Articles)
     {
-        <MExpansionPanel @key="@(Model.Articles.IndexOf(item)+1)"   Class="bg-opacity">
+        <MExpansionPanel @key="@(Model.Articles.IndexOf(item)+1)" Class="bg-opacity">
             <MExpansionPanelHeader>
                 @(item.DisplayName+" - "+item.LastEditTime.ToTimeFromNowString())
             </MExpansionPanelHeader>
@@ -48,7 +49,7 @@
                         <img loading="lazy" style=" width: 250px; " src="@item.MainImage" alt="@item.Name">
                     </a>
                     <div class="ps-3">
-                        <a href="@("/articles/index/" + item.Id)" class="a-font-color text-truncate-2 mb-1" style=" display: flex; align-items: flex-end;">                   
+                        <a href="@("/articles/index/" + item.Id)" class="a-font-color text-truncate-2 mb-1" style=" display: flex; align-items: flex-end;">
                             <h3 class="h5 mb-0 fw-bold" style=" display: inline;">@item.Name</h3>
                         </a>
                         <a href="@("/articles/index/" + item.Id)" class="text-truncate-3 a-font-color">
@@ -89,7 +90,7 @@
     #region 新建标签页
     public async void OpenNewPage(string url)
     {
-        await JS.InvokeAsync<string>("openNewPage", url);
+        await _eventService.OpenNewPage( url);
     }
     #endregion
 

@@ -1,8 +1,8 @@
 ﻿@inject ImagesLargeViewService ImagesLargeViewService
 @inject IDataCacheService _dataCatcheService
-
+@inject IEventService _eventService
 <div class="row">
-    @foreach (var item in Model.OrderByDescending(s=>s.Priority))
+    @foreach (var item in Model.OrderByDescending(s => s.Priority))
     {
         <div class="col-12 col-lg-6 pb-4 pointer" @onclick="()=>OnClickImage(Model.IndexOf(item))">
             <ImageCard Model="item" />
@@ -19,7 +19,7 @@
     {
         if (_dataCatcheService.IsApp)
         {
-            await _dataCatcheService.OpenNewPage.InvokeAsync(Model[index].Url);
+            await _eventService.OpenNewPage(Model[index].Url);
         }
         else
         {

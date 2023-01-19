@@ -1,6 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject ILocalStorageService _localStorage
-
+@inject IMauiService _mauiService
+@inject IEventService _eventService
 
 <MDialog @bind-Value="dialog"
          Persistent
@@ -31,10 +32,11 @@
     </MCard>
 </MDialog>
 
-@code {
-        bool dialog = false;
 
-    protected override async Task OnInitializedAsync()
+@code {
+    bool dialog = false;
+
+    protected override async Task OnParametersSetAsync()
     {
         try
         {
@@ -51,7 +53,7 @@
 
     public async Task Nav()
     {
-        await _dataCacheService.OpenNewPage.InvokeAsync("https://www.cngal.org/privacy");
+        await _eventService.OpenNewPage("https://www.cngal.org/privacy");
     }
 
     public async Task OnAgree()
@@ -60,8 +62,9 @@
         dialog = false;
     }
 
-    public async Task OnDisagree()
+    public Task OnDisagree()
     {
-        await _dataCacheService.Quit.InvokeAsync();
+        _mauiService.Quit();
+        return Task.CompletedTask;
     }
 }

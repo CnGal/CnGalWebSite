@@ -10,7 +10,7 @@ namespace CnGalWebSite.Maui.Services
 { 
     public partial class ApplicationService
     {
-        public void CloseApplication()
+        public static void CloseApplication()
         {
             var activity = Platform.CurrentActivity;
             activity.FinishAffinity();

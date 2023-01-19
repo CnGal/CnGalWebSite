@@ -55,7 +55,7 @@
     private Table<ListArticleAloneModel>? TableRows { get; set; }
     private List<ListArticleAloneModel> SelectedRows { get; set; } = new();
 
-    public PagedResultDto<Article> pagedResultDto = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<Article> { Data = new List<Article>(), CurrentPage = 1, TotalCount = 0 };
+    public PagedResultDto<Article> pagedResultDto = new PagedResultDto<Article> { Data = new List<Article>(), CurrentPage = 1, TotalCount = 0 };
 
     public ListArticlesViewModel ListModel { get; set; } = new ListArticlesViewModel { Articles = new List<ListArticleAloneModel>() };
 

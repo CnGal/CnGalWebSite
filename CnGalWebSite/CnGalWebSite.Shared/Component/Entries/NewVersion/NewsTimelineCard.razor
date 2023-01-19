@@ -1,6 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
+@inject IEventService _eventService
 
 
 @if (Model.RelevancesState == EditState.Preview)
@@ -81,7 +82,7 @@
                 await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.News, item.ArticleId.ToString(), item.Title);
             }
 
-            await _dataCacheService.OpenNewPage.InvokeAsync(item.Link);
+            await _eventService.OpenNewPage(item.Link);
 
         }
     }

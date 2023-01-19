@@ -2,6 +2,7 @@
 @inject IDataCacheService _dataCacheService
 @inject ImagesLargeViewService ImagesLargeViewService
 @inject IJSRuntime JS
+@inject IEventService _eventService
 
 @if (isReady)
 {
@@ -89,7 +90,7 @@ else
 
     public async void OpenNewPage(string url)
     {
-        await JS.InvokeAsync<string>("openNewPage", url);
+        await _eventService.OpenNewPage( url);
     }
 
     #endregion

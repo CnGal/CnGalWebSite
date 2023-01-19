@@ -1,7 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject HttpClient Http
-
+@inject IEventService _eventService
 @implements IDisposable
 
 @if (Model != null)
@@ -85,7 +85,7 @@
                 menu = true;
                 _dataCacheService.ThemeSetting.LastDisplayBrithdayTime = DateTime.Now.ToCstTime();
 
-                await _dataCacheService.SavaTheme.InvokeAsync();
+                _eventService.OnSavaTheme();
 
 
                 StateHasChanged();

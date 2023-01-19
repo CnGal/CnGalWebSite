@@ -5,7 +5,7 @@ using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Controllers;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.Application.Dtos;
+
 using CnGalWebSite.DataModel.ExamineModel.Entries;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Helper;

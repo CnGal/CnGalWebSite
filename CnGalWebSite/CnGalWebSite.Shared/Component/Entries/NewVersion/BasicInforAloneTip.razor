@@ -23,35 +23,18 @@
 }
 else
 {
-    @if (ToolHelper.IsMaui)
-    {
-        <span class="@(Class+" d-flex")" style=" word-break: break-all; align-items: center;">
 
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" />
+    <span class="@(Class+" d-flex")" style=" word-break: break-all; align-items: center;">
 
-            <span style="word-break: keep-all;">   @Text</span>
+        <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" />
 
-
-            <a class="font-color" @onclick="OnClick" itemprop="@ItemProp">@Url</a>
-
-
-        </span>
-    }
-    else
-    {
-        <span class="@(Class+" d-flex")" style=" word-break: break-all; align-items: center;">
-
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="@Icon" />
-
-            <span style="word-break: keep-all;"> @Text</span>
+        <span style="word-break: keep-all;"> @Text</span>
 
 
 
-            <a href="@Url" target="_blank" itemprop="@ItemProp">@Url</a>
+        <a href="@Url" target="_blank" itemprop="@ItemProp">@Url</a>
 
-        </span>
-
-    }
+    </span>
 
 }
 
@@ -71,12 +54,4 @@ else
     public string ItemProp { get; set; }
     [Parameter]
     public string Content { get; set; }
-
-
-    private async Task OnClick()
-    {
-
-        await _dataCacheService.OpenNewPage.InvokeAsync(Url);
-
-    }
 }

@@ -1,6 +1,6 @@
 ﻿@inject DialogService DialogService
 @inject ToastService ToastService
-@inject IAppHelper _appHelper;
+@inject IFileUploadService _fileUploadService
 
 <div>
     <InputFile class="form-control form-control-lg d-none" id="@Id" OnChange="OnInputFileChange"></InputFile>
@@ -112,7 +112,7 @@
     {
         try
         {
-            var obj = await _appHelper.UploadImagesAsync(file.File, Type);
+            var obj = await _fileUploadService.UploadImagesAsync(file.File, Type);
             if (obj.Uploaded == true)
             {
                 ImagePath = obj.Url;

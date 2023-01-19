@@ -1,4 +1,5 @@
-﻿
+﻿@inject IEventService _eventService
+
 <MResponsive AspectRatio="AspectRatio">
     <MCarousel Cycle Height="@("inherit")"
                HideDelimiterBackground
@@ -8,7 +9,7 @@
         @foreach (var item in Model.OrderByDescending(s => s.Priority))
         {
                 <MCarouselItem>
-                    <a href="@item.Link" target="_blank" @onclick="@(()=>OnClick.InvokeAsync(item))">
+                    <a  target="_blank" @onclick="@(()=>OnClickLink(item))">
                         <img src="@item.Image" alt="@item.Note" class="w-100" style="@($" aspect-ratio: {AspectRatio.ToDouble()};")" />
                     </a>
                 </MCarouselItem>
@@ -27,5 +28,11 @@
     public bool HideDelimiters { get; set; }
     [Parameter]
     public StringNumber AspectRatio { get; set; } = 1024 / 200D;
+
+    public async Task OnClickLink(CarouselViewModel model)
+    {
+       await _eventService.OpenNewPage(model.Link);
+        await OnClick.InvokeAsync(model);
+    }
 
 }

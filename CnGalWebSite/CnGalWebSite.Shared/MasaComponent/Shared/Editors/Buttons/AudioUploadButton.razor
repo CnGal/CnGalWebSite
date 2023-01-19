@@ -1,4 +1,4 @@
-﻿@inject IAppHelper _appHelper
+﻿@inject IFileUploadService _fileUploadService
 @inject IPopupService PopupService
 
 <div class="@Class">
@@ -59,7 +59,7 @@
         {
             try
             {
-                var obj = await _appHelper.UploadAudioAsync(item);
+                var obj = await _fileUploadService.UploadAudioAsync(item);
                 if (obj.Uploaded == true)
                 {
                     await OnUploaded.InvokeAsync(obj);

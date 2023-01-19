@@ -1,5 +1,6 @@
 ﻿@inject ImagesLargeViewService ImagesLargeViewService
 @inject IDataCacheService _dataCatcheService
+@inject IEventService _eventService
 
 <div class="@Class">
 
@@ -29,7 +30,7 @@
     }
 
     <div style="display:flex">
-        <ImageUpLoadButton OnUploadedImage="UpLoaded" Class="mb-3"/>
+        <ImageUpLoadButton OnUploadedImage="UpLoaded" Class="mb-3" />
         @ChildContent
 
     </div>
@@ -76,7 +77,7 @@
     {
         if (_dataCatcheService.IsApp)
         {
-            await _dataCatcheService.OpenNewPage.InvokeAsync(images[index].Image);
+            await _eventService.OpenNewPage(images[index].Image);
         }
         else
         {

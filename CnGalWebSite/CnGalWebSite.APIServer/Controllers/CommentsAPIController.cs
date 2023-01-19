@@ -4,7 +4,7 @@ using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
-using CnGalWebSite.DataModel.Application.Dtos;
+
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.ExamineModel.Comments;
 using CnGalWebSite.DataModel.Helper;
