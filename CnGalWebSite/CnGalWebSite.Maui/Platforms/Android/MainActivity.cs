@@ -1,12 +1,6 @@
 ﻿
 using Android.Content.PM;
 using Android.OS;
-using Android.Views;
-using Microsoft.Maui.Controls.Compatibility;
-using Android.Content;
-using Android.Runtime;
-using Plugin.CurrentActivity;
-using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using Android.App;
 
 namespace CnGalWebSite.Maui

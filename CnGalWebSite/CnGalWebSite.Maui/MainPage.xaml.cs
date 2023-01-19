@@ -22,7 +22,7 @@ namespace CnGalWebSite.Maui
             Loaded += MainPage_LoadedAsync;
         }
 
-        private async void MainPage_LoadedAsync(object sender, EventArgs e)
+        private void MainPage_LoadedAsync(object sender, EventArgs e)
         {
             //_alertService.ShowAlert("测试","弹窗测试");
             //await Browser.OpenAsync("https://www.cngal.org/", new BrowserLaunchOptions
@@ -30,11 +30,7 @@ namespace CnGalWebSite.Maui
             //    LaunchMode = BrowserLaunchMode.SystemPreferred,
             //    TitleMode = BrowserTitleMode.Show
             //});
-
-#if ANDROID
             ThemeService.SetStatusBarColor(Color.FromArgb("#FFFFFF"));
-#endif
-
         }
 
         public void HideOverviewGrid()
