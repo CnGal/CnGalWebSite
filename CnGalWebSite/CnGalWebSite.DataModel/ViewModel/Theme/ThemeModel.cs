@@ -11,8 +11,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
 
         public bool IsDark { get; set; }
 
-        public bool IsDebug { get; set; }
-
         /// <summary>
         /// 是否背景透明
         /// </summary>
@@ -30,6 +28,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
 
         public bool IsCommentUseMarkdown { get; set; }
 
+        /// <summary>
+        /// 游玩记录字数提醒次数
+        /// </summary>
         public int PlayedGameInforCount { get; set; } = 3;
 
         public DisplayMode ListDisplayMode { get; set; }
@@ -40,6 +41,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
 
         public string FontFamily { get; set; } = "Helvetica,Tahoma,Arial,PingFang SC,Hiragino Sans GB,Heiti SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif";
 
+        /// <summary>
+        /// 显示错误详细信息
+        /// </summary>
         public bool ShowDetailedErrorInfor { get; set; }
 
         public bool AllowAutoSave { get; set; } = true;
