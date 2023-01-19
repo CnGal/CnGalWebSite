@@ -1,4 +1,4 @@
-﻿@inject IAppHelper _appHelper
+﻿@inject IFileUploadService _fileUploadService
 @inject ToastService? ToastService
 @inject IJSRuntime JS
 @inject HttpClient Http
@@ -64,7 +64,7 @@
         catch { }
         url = url.Replace("local.host", "image.cngal.org").Replace("http://", "https://");
         //向用户文件管理添加信息
-        await _appHelper.AddUserLoadedFileInfor(new UploadResult
+        await _fileUploadService.AddUserLoadedFileInfor(new UploadResult
         {
             Url=url,
             FileSize=size

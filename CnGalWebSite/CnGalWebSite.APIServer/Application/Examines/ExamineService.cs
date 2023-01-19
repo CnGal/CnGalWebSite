@@ -15,7 +15,7 @@ using CnGalWebSite.APIServer.Application.Videos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.APIServer.Extentions;
-using CnGalWebSite.DataModel.Application.Dtos;
+
 using CnGalWebSite.DataModel.ExamineModel.Articles;
 using CnGalWebSite.DataModel.ExamineModel.Comments;
 using CnGalWebSite.DataModel.ExamineModel.Dismbigs;

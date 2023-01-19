@@ -1,5 +1,6 @@
 ﻿@inject ImagesLargeViewService ImagesLargeViewService
 @inject IDataCacheService _dataCatcheService
+@inject IEventService _eventService
 
 
 <div>
@@ -7,15 +8,15 @@
     <MWindow @bind-Value="Index" Reverse>
         @foreach (var item in Model)
         {
-            <MWindowItem Value="@Model.IndexOf(item)" >
+            <MWindowItem Value="@Model.IndexOf(item)">
                 <MResponsive AspectRatio="16/9D">
-                    <MCard Style=" display: contents; "  OnClick="OnClickImage">
+                    <MCard Style=" display: contents; " OnClick="OnClickImage">
                         <div style="@($"background-image: url({item.Image});")" class="image-contain">
 
                         </div>
                     </MCard>
                 </MResponsive>
-              
+
             </MWindowItem>
         }
     </MWindow>
@@ -45,7 +46,7 @@
     {
         if (_dataCatcheService.IsApp)
         {
-            await _dataCatcheService.OpenNewPage.InvokeAsync(Model[Index.ToInt32()].Image);
+            await _eventService.OpenNewPage(Model[Index.ToInt32()].Image);
         }
         else
         {

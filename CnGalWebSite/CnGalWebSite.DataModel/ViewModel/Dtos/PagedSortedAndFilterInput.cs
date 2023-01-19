@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CnGalWebSite.DataModel.Application.Dtos
+namespace CnGalWebSite.DataModel.ViewModel.Dtos
 {
     public class PagedSortedAndFilterInput
     {

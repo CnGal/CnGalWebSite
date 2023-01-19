@@ -1,6 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @implements IDisposable
+@inject IEventService _eventService
 
 
 <div style="position: fixed; z-index: 4; bottom: 125px; right: 50px; " class="@(_dataCacheService.IsApp?"d-none":"")">
@@ -49,7 +50,7 @@
 
     public async Task OnNav(string url)
     {
-        await _dataCacheService.OpenNewPage.InvokeAsync(url);
+        await _eventService.OpenNewPage(url);
     }
 
     public string ComputeIcon()

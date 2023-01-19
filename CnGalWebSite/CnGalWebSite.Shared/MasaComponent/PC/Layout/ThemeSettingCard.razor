@@ -44,7 +44,7 @@
             显示背景图会将卡片设置为半透明状态，目前建议使用明亮的图片作为背景
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="_show" ValueChanged="BackgroundValueChanged" Label="@(_show?"显示背景图":"隐藏背景图")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
+            <MSwitch Value="_show" TValue="bool" ValueChanged="BackgroundValueChanged" Label="@(_show?"显示背景图":"隐藏背景图")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
         </MCardText>
         <MCardTitle Class="text-h6">
             扩展显示范围
@@ -53,7 +53,7 @@
             选中后将把显示范围扩大到整个页面，也就是两边不再留白
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="_expand" ValueChanged="ExpandValueChanged" Label="@(_expand?"扩展显示范围":"限制显示范围")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
+            <MSwitch Value="_expand" TValue="bool" ValueChanged="ExpandValueChanged" Label="@(_expand?"扩展显示范围":"限制显示范围")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
         </MCardText>
         <MCardTitle Class="text-h6">
             字体
@@ -68,7 +68,7 @@
             在编辑页面时间隔10秒自动保存一次数据
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="@_dataCacheService.ThemeSetting.AllowAutoSave" ValueChanged="AllowAutoSaveValueChanged" Label="@(_dataCacheService.ThemeSetting.AllowAutoSave?"自动保存":"不自动保存")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
+            <MSwitch Value="@_dataCacheService.ThemeSetting.AllowAutoSave" TValue="bool" ValueChanged="AllowAutoSaveValueChanged" Label="@(_dataCacheService.ThemeSetting.AllowAutoSave?"自动保存":"不自动保存")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
         </MCardText>
         <MCardTitle Class="text-h6">
             显示错误详情
@@ -77,7 +77,7 @@
             展示网站发生错误时的详细信息
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" ValueChanged="ShowDetailedErrorInforValueChanged" Label="@(@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor?"显示":"不显示")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
+            <MSwitch Value="@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" TValue="bool" ValueChanged="ShowDetailedErrorInforValueChanged" Label="@(@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor?"显示":"不显示")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
         </MCardText>
         <MCardActions>
             <MSpacer></MSpacer>

@@ -3,7 +3,7 @@ using CnGalWebSite.APIServer.Application.Comments.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.Application.Dtos;
+
 using CnGalWebSite.DataModel.ExamineModel.Comments;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;

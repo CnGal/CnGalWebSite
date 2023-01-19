@@ -1,7 +1,7 @@
 ﻿using BootstrapBlazor.Components;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.Application.Dtos;
+
 using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;

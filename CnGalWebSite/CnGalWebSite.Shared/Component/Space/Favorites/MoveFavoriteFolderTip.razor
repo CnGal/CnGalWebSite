@@ -16,7 +16,7 @@
             <div style="display:flex;">
                 @foreach (var item in UserFavoriteInfor.Favorites)
                 {
-                    <MCheckbox Value="SelectedItemIds.Contains( item.Id)" ValueChanged="@((e) => { if (e) SelectedItemIds.Add(item.Id); else SelectedItemIds.RemoveAll(s => s == item.Id); })"
+                    <MCheckbox Value="SelectedItemIds.Contains( item.Id)" TValue="bool" ValueChanged="@((e) => { if (e) SelectedItemIds.Add(item.Id); else SelectedItemIds.RemoveAll(s => s == item.Id); })"
                                Label="@item.Name" Class="m-0 me-4"
                                HideDetails="true"
                                Color="@_dataCacheService.ThemeSetting.Theme"/>

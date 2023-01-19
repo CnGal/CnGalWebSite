@@ -1,7 +1,5 @@
 ﻿using BlazorComponent;
 using BootstrapBlazor.Components;
-using CnGalWebSite.DataModel.Application.Dtos;
-using CnGalWebSite.DataModel.Application.Examines.Dtos;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
@@ -57,31 +55,6 @@ namespace CnGalWebSite.Shared.Service
 
         public event EventHandler<EventArgs> RefreshRequsted;
 
-        /// <summary>
-        /// 刷新渲染框架方法
-        /// </summary>
-        public EventCallback RefreshApp { get; set; }
-        /// <summary>
-        /// 保存主题设置
-        /// </summary>
-        public EventCallback SavaTheme { get; set; }
-        /// <summary>
-        /// 新建标签页
-        /// </summary>
-        public EventCallback<string> OpenNewPage { get; set; }
-        /// <summary>
-        /// 主题更改 仅MAUI下生效
-        /// </summary>
-        public EventCallback<string> ThemeChanged { get; set; }
-        /// <summary>
-        /// 退出应用
-        /// </summary>
-        public EventCallback Quit { get; set; }
-
-        /// <summary>
-        /// 分享页面
-        /// </summary>
-        public EventCallback<ShareLinkModel> ShareLink { get; set; }
         /// <summary>
         /// 身份验证成功后获得的标识 有效期一小时
         /// </summary>

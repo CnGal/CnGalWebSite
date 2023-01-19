@@ -1,7 +1,5 @@
 ﻿using Blazored.LocalStorage;
 using Blazored.SessionStorage;
-using CnGalWebSite.DataModel.Application.Examines;
-using CnGalWebSite.DataModel.Application.Helper;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
 using CnGalWebSite.PublicToolbox.DataRepositories;
@@ -63,8 +61,6 @@ namespace CnGalWebSite.Server
                 .AddScoped<IAuthService, AuthService>()
                 .AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>))
                 .AddScoped<IDataCacheService, DataCatcheService>()
-                .AddScoped<IAppHelper, AppHelper>()
-                .AddScoped(x => new ExamineService())
                 .AddScoped(x => new ImagesLargeViewService())
                 .AddMasaBlazor();
 
@@ -92,6 +88,12 @@ namespace CnGalWebSite.Server
             _ = services.AddScoped<IStructuredDataService, StructuredDataService>();
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            //添加空白MAUI服务 
+            services.AddScoped<IMauiService, MauiService>();
+
+            services.AddScoped<IFileUploadService, FileUploadService>();
+            services.AddScoped<IEventService, EventService>();
 
         }
 

@@ -1,9 +1,9 @@
 ﻿@inject NavigationManager NavigationManager
-@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
 
 @if (Model.IsOutlink)
 {
-    <a href="@Model.Url" target="_blank" class="a-font-color">
+    <a @onclick="OnClick" target="_blank" class="a-font-color">
         <div class="rounded h-100 shadow-sm  bg-opacity" style="cursor: pointer ">
             <div>
                 <img loading="lazy" src="@Model.Image" class="card-img-top" style=" aspect-ratio: 460/215;" alt="@Model.Name" />
@@ -58,7 +58,7 @@ else
 
     public async Task OnClick()
     {
-            await _dataCacheService.OpenNewPage.InvokeAsync(Model.Url);
+            await _eventService.OpenNewPage(Model.Url);
 
     }
 }

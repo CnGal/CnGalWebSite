@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.DataModel.Application.Dtos;
+﻿using CnGalWebSite.DataModel.ViewModel.Dtos;
 using CnGalWebSite.Helper.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System.Text;

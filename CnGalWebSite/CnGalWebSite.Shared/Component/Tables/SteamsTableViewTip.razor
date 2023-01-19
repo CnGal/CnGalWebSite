@@ -1,6 +1,7 @@
 ﻿@inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
 
 
 @if (!isReady)
@@ -18,31 +19,31 @@
 }
 else
 {
-<Table TItem="SteamInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
-       OnQueryAsync="@OnQuerySteamAsync" SearchModel="@SearchModelSteam" ShowSearch="true" ShowLoading="true"
-       ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
-       ShowToolbar="true" ShowDefaultButtons="false" @ref="table">
-    <TableToolbarTemplate>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton TItem="SteamInforTableModel"  Columns="table.Columns"  Items="ModelSteam.SteamInfors" Name="Steam信息汇总表" />
-    </TableToolbarTemplate>
+    <Table TItem="SteamInforTableModel" IsPagination="true" PageItemsSource="@PageItems" IsStriped=true
+           OnQueryAsync="@OnQuerySteamAsync" SearchModel="@SearchModelSteam" ShowSearch="true" ShowLoading="true"
+           ShowExtendButtons="true" ExtendButtonColumnWidth="70" FixedExtendButtonsColumn="true"
+           ShowToolbar="true" ShowDefaultButtons="false" @ref="table">
+        <TableToolbarTemplate>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton TItem="SteamInforTableModel" Columns="table.Columns" Items="ModelSteam.SteamInfors" Name="Steam信息汇总表" />
+        </TableToolbarTemplate>
 
-    <TableColumns>
-        <TableColumn @bind-Field="@context.EntryId" Filterable="true" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="100" TextWrap="true" Fixed="true" />
-        <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.SteamId" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
-        <TableColumn @bind-Field="@context.OriginalPrice" Filterable="true" Sortable="true" Width="100" TextWrap="true" Formatter="PriceFormatter" />
-        <TableColumn @bind-Field="@context.PriceNow" Filterable="true" Sortable="true" Width="100" TextWrap="true" Formatter="PriceFormatter" />
-        <TableColumn @bind-Field="@context.CutNow" Filterable="true" Sortable="true" Width="150" TextWrap="true" Formatter="CutFormatter" />
-        <TableColumn @bind-Field="@context.PriceLowest" Filterable="true" Sortable="true" Width="150" TextWrap="true" Formatter="PriceLowestFormatter" />
-        <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="CutLowestFormatter" />
-        <TableColumn @bind-Field="@context.EvaluationCount" Filterable="true" Sortable="true" Width="170" TextWrap="true" />
-        <TableColumn @bind-Field="@context.RecommendationRate" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="RecommendationRateFormatter" />
-    </TableColumns>
-    <RowButtonTemplate>
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.SteamId))" />
-    </RowButtonTemplate>
+        <TableColumns>
+            <TableColumn @bind-Field="@context.EntryId" Filterable="true" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Asc" Width="100" TextWrap="true" Fixed="true" />
+            <TableColumn @bind-Field="@context.Name" Filterable="true" Sortable="true" Searchable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.SteamId" Filterable="true" Sortable="true" Width="150" TextWrap="true" />
+            <TableColumn @bind-Field="@context.OriginalPrice" Filterable="true" Sortable="true" Width="100" TextWrap="true" Formatter="PriceFormatter" />
+            <TableColumn @bind-Field="@context.PriceNow" Filterable="true" Sortable="true" Width="100" TextWrap="true" Formatter="PriceFormatter" />
+            <TableColumn @bind-Field="@context.CutNow" Filterable="true" Sortable="true" Width="150" TextWrap="true" Formatter="CutFormatter" />
+            <TableColumn @bind-Field="@context.PriceLowest" Filterable="true" Sortable="true" Width="150" TextWrap="true" Formatter="PriceLowestFormatter" />
+            <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="CutLowestFormatter" />
+            <TableColumn @bind-Field="@context.EvaluationCount" Filterable="true" Sortable="true" Width="170" TextWrap="true" />
+            <TableColumn @bind-Field="@context.RecommendationRate" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="RecommendationRateFormatter" />
+        </TableColumns>
+        <RowButtonTemplate>
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.SteamId))" />
+        </RowButtonTemplate>
 
-</Table>
+    </Table>
 }
 
 
@@ -67,7 +68,7 @@ else
     {
         try
         {
-            await _dataCacheService.OpenNewPage.InvokeAsync("https://store.steampowered.com/app/" + id);
+            await _eventService.OpenNewPage("https://store.steampowered.com/app/" + id);
         }
         catch { }
     }
@@ -89,7 +90,7 @@ else
     public async Task<string> PriceFormatter(object price)
     {
         int model = 0;
-        if(price is int)
+        if (price is int)
         {
             model = (Int32)price;
         }
@@ -199,7 +200,7 @@ else
         return model switch
         {
             0 => "无",
-            _=> model.ToString()
+            _ => model.ToString()
         };
     }
 

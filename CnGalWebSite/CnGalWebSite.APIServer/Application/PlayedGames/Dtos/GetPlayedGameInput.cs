@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.DataModel.Application.Dtos;
+﻿
 
 namespace CnGalWebSite.APIServer.Application.PlayedGames.Dtos
 {

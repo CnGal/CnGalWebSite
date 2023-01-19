@@ -32,8 +32,7 @@ namespace CnGalWebSite.Maui
             //});
 
 #if ANDROID
-            var themeService = new ThemeService();
-            themeService.SetStatusBarColor(Color.FromArgb("#FFFFFF"));
+            ThemeService.SetStatusBarColor(Color.FromArgb("#FFFFFF"));
 #endif
 
         }

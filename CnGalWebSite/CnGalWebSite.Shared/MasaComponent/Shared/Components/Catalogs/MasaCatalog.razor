@@ -65,12 +65,6 @@ else
         await OnNav.InvokeAsync();
     }
 
-    public async Task IsCollapsedChanged(bool value)
-    {
-        _dataCacheService.ThemeSetting.IsHiddeArticleCatalog = value;
-        await _dataCacheService.ThemeChanged.InvokeAsync();
-    }
-
     public async void RefreshRequsted(object sender, EventArgs args)
     {
         await InvokeAsync(StateHasChanged);

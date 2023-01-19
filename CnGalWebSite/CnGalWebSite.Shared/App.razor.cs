@@ -45,22 +45,21 @@ namespace CnGalWebSite.Shared
                 _dataCacheService.IsMiniMode = true;
             }
 
+            _eventService.RefreshApp -= _eventService_RefreshApp;
+            _eventService.RefreshApp += _eventService_RefreshApp;
 
-            _dataCacheService.RefreshApp = EventCallback.Factory.Create(this, async () => await OnRefresh());
-            _dataCacheService.OpenNewPage = EventCallback.Factory.Create(this, (string s) => OpenNewPage(s));
-            _dataCacheService.ThemeChanged = EventCallback.Factory.Create(this, (string s) => ThemeChanged(s));
-            _dataCacheService.SavaTheme = EventCallback.Factory.Create(this, async () =>await cngalRootTip?.SaveTheme());
-            _dataCacheService.ShareLink = EventCallback.Factory.Create(this, (ShareLinkModel s) => ShareLink(s));
-            _dataCacheService.Quit = EventCallback.Factory.Create(this, () => Quit());
-
-            //ShowAlert();
+            _eventService.SavaTheme -= _eventService_SavaTheme;
+            _eventService.SavaTheme += _eventService_SavaTheme;
         }
 
+        private async void _eventService_SavaTheme()
+        {
+            await cngalRootTip?.SaveTheme();
+        }
 
-        public async Task OnRefresh()
+        private async void _eventService_RefreshApp()
         {
             await _dataCacheService.OnRefreshRequsted(null);
-            //StateHasChanged();
         }
 
 
@@ -124,7 +123,7 @@ namespace CnGalWebSite.Shared
 
                 if (needRefresh)
                 {
-                    await OnRefresh();
+                     _eventService_RefreshApp();
                 }
 
                 //需要调用一次令牌刷新接口 确保登入没有过期
@@ -178,38 +177,11 @@ namespace CnGalWebSite.Shared
 
         }
 
-        public virtual void ShowAlert()
-        {
-
-        }
-        public virtual async void OpenNewPage(string url)
-        {
-            await JS.InvokeAsync<string>("openNewPage", url);
-        }
-
-        public virtual void Loaded()
-        {
-
-        }
-
-        public virtual void Quit()
-        {
-
-        }
-
-        public virtual async void ShareLink(ShareLinkModel mode)
-        {
-
-        }
-
-        public virtual void ThemeChanged(string theme)
-        {
-
-        }
-
         #region 释放实例
         public void Dispose()
         {
+            _eventService.RefreshApp -= _eventService_RefreshApp;
+            _eventService.SavaTheme -= _eventService_SavaTheme;
             if (mytimer != null)
             {
                 mytimer.Dispose();

@@ -8,7 +8,7 @@ using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Users.Dtos;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
-using CnGalWebSite.DataModel.Application.Dtos;
+
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.ExamineModel.Users;
 using CnGalWebSite.DataModel.Helper;

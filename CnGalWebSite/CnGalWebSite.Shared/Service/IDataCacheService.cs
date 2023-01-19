@@ -1,6 +1,5 @@
 ﻿using BlazorComponent;
 using BootstrapBlazor.Components;
-using CnGalWebSite.DataModel.Application.Dtos;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Accounts;
@@ -42,18 +41,6 @@ namespace CnGalWebSite.Shared.Service
         bool IsMiniMode { get; set; }
 
         event EventHandler<EventArgs> RefreshRequsted;
-
-        EventCallback RefreshApp { get; set; }
-
-        EventCallback<string> OpenNewPage { get; set; }
-
-        EventCallback<string> ThemeChanged { get; set; }
-
-        EventCallback Quit { get; set; }
-
-        EventCallback<ShareLinkModel> ShareLink { get; set; }
-
-        EventCallback SavaTheme { get; set; }
 
         string LoginKey { get; set; }
 

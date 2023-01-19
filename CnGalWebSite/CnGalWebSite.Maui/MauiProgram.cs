@@ -1,14 +1,16 @@
 ﻿using Blazored.LocalStorage;
-using CnGalWebSite.DataModel.Application.Examines;
-using CnGalWebSite.DataModel.Application.Helper;
+using Blazored.SessionStorage;
+using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.ViewModel.Files.Images;
 using CnGalWebSite.Maui.Services;
 using CnGalWebSite.PublicToolbox.DataRepositories;
 using CnGalWebSite.PublicToolbox.PostTools;
 using CnGalWebSite.Shared.DataRepositories;
+using CnGalWebSite.Shared.Extentions;
 using CnGalWebSite.Shared.Provider;
 using CnGalWebSite.Shared.Service;
 using Microsoft.AspNetCore.Components.Authorization;
+using MauiService = CnGalWebSite.Maui.Services.MauiService;
 
 namespace CnGalWebSite.Maui
 {
@@ -33,7 +35,8 @@ namespace CnGalWebSite.Maui
             //依赖注入主页
             builder.Services.AddSingleton<MainPage>();
             //本地储存服务
-            builder.Services.AddBlazoredLocalStorage();
+            builder.Services.AddBlazoredLocalStorage()
+                .AddBlazoredSessionStorage();
 
             //身份验证
             builder.Services.AddAuthorizationCore();
@@ -44,8 +47,6 @@ namespace CnGalWebSite.Maui
             builder.Services.AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>));
             builder.Services.AddScoped<IDataCacheService, DataCatcheService>();
 
-            builder.Services.AddScoped<IAppHelper, AppHelper>();
-            builder.Services.AddScoped(x => new ExamineService());
             builder.Services.AddScoped(x => new ImagesLargeViewService());
 
             //添加工具箱
@@ -67,6 +68,16 @@ namespace CnGalWebSite.Maui
             //弹窗服务类
             builder.Services.AddSingleton(typeof(IAlertService), typeof(AlertService));
             builder.Services.AddSingleton(typeof(IOverviewService), typeof(OverviewService));
+
+            //设置Json格式化配置
+            ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+            ToolHelper.options.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+
+            //添加MAUI与Blazor通信服务
+            builder.Services.AddScoped<IMauiService, MauiService>();
+
+            builder.Services.AddScoped<IFileUploadService, FileUploadService>();
+            builder.Services.AddScoped<IEventService, EventService>();
 
 
             return builder.Build();

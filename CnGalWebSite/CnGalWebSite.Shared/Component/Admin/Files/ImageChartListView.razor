@@ -3,6 +3,7 @@
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
+@inject IEventService _eventService
 
 <Table TItem="ListFileAloneModel" IsPagination="true" PageItemsSource="@PageItems" OnQueryAsync="@OnQueryBasicAsync" SearchModel="@searchModel" ShowSearch="true" @ref="TableRows"
        ShowExtendButtons="true" ExtendButtonColumnWidth="70" SelectedRows="@SelectedRows" IsMultipleSelect="true" IsStriped=true
@@ -95,9 +96,9 @@
         return Task.FromResult(res);
     }
 
-    private async Task LookFile(string Url)
+    private async Task LookFile(string url)
     {
-        await JS.InvokeAsync<string>("openNewPage", Url);
+       await _eventService.OpenNewPage(url);
     }
 
 }

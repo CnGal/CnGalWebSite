@@ -2,6 +2,7 @@
 @inject ToastService? ToastService
 @inject IDataCacheService _dataCacheService
 @inject NavigationManager NavigationManager
+@inject IMauiService _mauiService
 
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Fab Icon="mdi-share" Tooltip="分享" Class="@Class" OnClick="OnClickStar" />
@@ -19,7 +20,7 @@
 
     private async Task OnClickStar()
     {
-      await  _dataCacheService.ShareLink.InvokeAsync(new ShareLinkModel
+        await _mauiService.ShareLink(new ShareLinkModel
         {
             Link = NavigationManager.Uri.Replace(NavigationManager.BaseUri,"https://www.cngal.org"),
             Text = Text,

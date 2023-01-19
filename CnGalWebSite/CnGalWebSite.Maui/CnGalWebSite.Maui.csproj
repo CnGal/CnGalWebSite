@@ -19,8 +19,8 @@
     <ApplicationIdGuid>6B09C854-D216-4521-991B-3EEB85D890E6</ApplicationIdGuid>
 
     <!-- Versions -->
-    <ApplicationVersion>6</ApplicationVersion>
-    <ApplicationDisplayVersion>0.0.6</ApplicationDisplayVersion>
+    <ApplicationVersion>7</ApplicationVersion>
+    <ApplicationDisplayVersion>0.0.7</ApplicationDisplayVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
@@ -33,9 +33,6 @@
   <ItemGroup>
     <!-- App Icon -->
     <MauiIcon Include="Resources\AppIcon\appicon.png" />
-
-    <!-- Splash Screen -->
-    <MauiSplashScreen Include="Resources\Splash\splash.svg" />
 
     <!-- Images -->
     <MauiImage Include="Resources\Images\*" />
@@ -52,7 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Maui.Markup" Version="1.0.0" />
+    <PackageReference Include="CommunityToolkit.Maui.Markup" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>

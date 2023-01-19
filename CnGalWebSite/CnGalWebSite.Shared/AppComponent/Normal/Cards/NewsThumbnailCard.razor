@@ -2,7 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject IJSRuntime JS
-
+@inject IEventService _eventService
 
 <div @onclick="OnClickNews" style="cursor:pointer;">
     <div class="@(Model.IsNeedLayout?"rounded shadow-sm p-2 bg-opacity":"")" style="cursor: pointer;display:flex; ">
@@ -19,7 +19,7 @@
         </div>
     </div>
 </div>
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven"/>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent @ref="trackEven" />
 
 @code {
     [Parameter]
@@ -28,14 +28,14 @@
 
     public async Task OnClickNews()
     {
-        if(trackEven!=null)
+        if (trackEven != null)
         {
             await trackEven.SendTrackEvent(TrackEventType.Click, TrackEventDataType.News, Model.ArticleId.ToString(), Model.Text);
         }
 
         if (Model.IsOutLink)
         {
-            await _dataCacheService.OpenNewPage.InvokeAsync(Model.Url);
+            await _eventService.OpenNewPage(Model.Url);
         }
         else
         {

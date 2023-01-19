@@ -1,5 +1,5 @@
 ﻿@inject HttpClient Http
-@inject ExamineService _examineService
+
 @inject ToastService? ToastService
 @inject IServiceProvider Provider
 @inject NavigationManager NavigationManager
@@ -151,7 +151,7 @@ else
 
     public LotteryViewModel Model { get; set; } = new LotteryViewModel();
 
-    public PagedResultDto<CommentViewModel> ListComments = new CnGalWebSite.DataModel.Application.Dtos.PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
+    public PagedResultDto<CommentViewModel> ListComments = new PagedResultDto<CommentViewModel> { Data = new List<CommentViewModel>(), CurrentPage = 1, TotalCount = 0 };
     public bool IsAdmin { get; set; } = false;
     string LastLookName = "";
     bool isFrist = true;

@@ -3,6 +3,7 @@
 @inject IJSRuntime JS
 @inject IDataCacheService _dataCacheService
 @inject IStructuredDataService _structuredDataService
+@inject IEventService _eventService
 
 
 <TitleTip></TitleTip>
@@ -43,7 +44,7 @@
     #region 新建标签页
     public async void OpenNewPage(string url)
     {
-        await JS.InvokeAsync<string>("openNewPage", url);
+        await _eventService.OpenNewPage( url);
     }
     #endregion
 
