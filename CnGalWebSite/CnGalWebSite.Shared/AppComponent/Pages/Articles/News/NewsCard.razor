@@ -1,4 +1,7 @@
-﻿<TabLink Icon="fa fa-newspaper-o" Url="@(string.IsNullOrWhiteSpace(Model.Link) ? ("/articles/index/" + Model.Id) : Model.Link)" target="_blank" Text="@Model.Name" class="a-font-color">
+﻿@inject NavigationManager NavigationManager
+@inject IEventService _eventService
+
+<a @onclick="OnClick"  class="a-font-color">
     <div class="bg-opacity" style="cursor: pointer ">
         <div class="h-100">
             <img loading="lazy" src="@Model.MainImage" class="card-img-top" style=" width: 170px; height: auto;" alt="@Model.Name" />
@@ -7,8 +10,20 @@
             <span class="home-card-name-text" style="font-size:inherit">@Model.Name</span>
         </div>
     </div>
-</TabLink>
+</a>
 @code {
     [Parameter]
     public ArticleInforTipViewModel Model { get; set; }
+
+    public async Task OnClick()
+    {
+        if(string.IsNullOrWhiteSpace(Model.Link))
+        {
+            NavigationManager.NavigateTo("/articles/index/" + Model.Id);
+        }
+        else
+        {
+            await _eventService.OpenNewPage(Model.Link);
+        }
+    }
 }
