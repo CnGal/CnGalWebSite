@@ -166,7 +166,7 @@
                 return;
             }
 
-            var result = await Http.PostAsJsonAsync<DeleteCommentModel>(ToolHelper.WebApiPath + "api/comments/UserDeleteComment", new DeleteCommentModel { Ids = new long[] { Model.Id } });
+            var result = await Http.PostAsJsonAsync<HiddenCommentModel>(ToolHelper.WebApiPath + "api/comments/UserHiddenComment", new HiddenCommentModel { Ids = new long[] { Model.Id },IsHidden=true });
             string jsonContent = result.Content.ReadAsStringAsync().Result;
             var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
 

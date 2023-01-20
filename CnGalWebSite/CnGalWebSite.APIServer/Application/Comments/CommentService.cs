@@ -62,7 +62,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
 
             var query = _commentRepository.GetAll().AsNoTracking()
                 .Include(s => s.InverseParentCodeNavigation).Include(s => s.ApplicationUser)
-                .Where(s => s.ParentCodeNavigation == null);
+                .Where(s => s.ParentCodeNavigation == null&&s.IsHidden==false);
             long tempId = 0;
             if (type != CommentType.CommentUser)
             {
@@ -180,7 +180,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
             //递归初始化子评论
             if (comment.InverseParentCodeNavigation.Any())
             {
-                foreach (var item in await _commentRepository.GetAll().AsNoTracking().Include(s => s.InverseParentCodeNavigation).Include(s => s.ApplicationUser).Where(s => comment.InverseParentCodeNavigation.Select(s => s.Id).Contains(s.Id)).ToListAsync())
+                foreach (var item in await _commentRepository.GetAll().AsNoTracking().Include(s => s.InverseParentCodeNavigation).Include(s => s.ApplicationUser).Where(s =>s.IsHidden==false&& comment.InverseParentCodeNavigation.Select(s => s.Id).Contains(s.Id)).ToListAsync())
                 {
                     model.InverseParentCodeNavigation.Add(await CombinationDataAsync(item, rankName, ascriptionUserId, examineComments));
                 }

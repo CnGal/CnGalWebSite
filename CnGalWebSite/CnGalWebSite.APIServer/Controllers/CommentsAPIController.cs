@@ -406,39 +406,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        public async Task<ActionResult<Result>> DeleteCommentAsync(DeleteCommentModel model)
-        {
-            foreach (var item in model.Ids)
-            {
-                await _appHelper.DeleteComment(item);
-            }
-
-            return new Result { Successful = true };
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<Result>> UserDeleteCommentAsync(DeleteCommentModel model)
-        {
-            //获取当前用户ID
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-
-            foreach (var item in model.Ids)
-            {
-                if (await _appHelper.IsUserHavePermissionForCommmentAsync(item, user))
-                {
-                    //删除
-                    await _appHelper.DeleteComment(item);
-                }
-                else
-                {
-                    return new Result { Successful = false, Error = "该评论不存在，或你没有权限删除该评论" };
-                }
-            }
-            return new Result { Successful = true };
-        }
-
-        [HttpPost]
         public async Task<ActionResult<Result>> UserHiddenCommentAsync(HiddenCommentModel model)
         {
             //获取当前用户ID
@@ -448,7 +415,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 if (await _appHelper.IsUserHavePermissionForCommmentAsync(item, user))
                 {
-                    await _commentRepository.GetAll().Where(s => s.Id == item).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => model.IsHidden));
+                    await _commentRepository.GetAll().Where(s => s.Id == item).ExecuteUpdateAsync(s=>s.SetProperty(s => s.IsHidden, b => true));
                 }
                 else
                 {

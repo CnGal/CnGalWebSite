@@ -20,9 +20,6 @@
             <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Success" Icon="fa fa-unlink" Text="隐藏" OnClickCallback="OnHiddenClick" IsAsync="true" />
             <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Primary" Icon="fa fa-arrow-up" Text="增权重" OnClickCallback="OnPriorityUpClick" IsAsync="true" />
             <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Success" Icon="fa fa-arrow-down" Text="降权重" OnClickCallback="OnPriorityDownClick" IsAsync="true" />
-
-            <TableToolbarButton TItem="ListCommentAloneModel" Color="Color.Danger" Icon="fa fa-close" Text="删除" OnClickCallback="OnDeleteClick" IsAsync="true" />
-
         </TableToolbarTemplate>
         <TableColumns>
             <TableColumn @bind-Field="@context.Id" Sortable="true" DefaultSort="true" DefaultSortOrder="@SortOrder.Desc" Fixed="true" Width="80" />
@@ -43,8 +40,6 @@
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-comments-o" Text="切换显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, !context.IsHidden, true))" />
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new long[] { context.Id }, 1 , true))" />
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new long[] { context.Id }, - 1 , true))" />
-
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-close" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new long[] { context.Id } ,true))" />
         </RowButtonTemplate>
     </Table>
 </div>
@@ -156,52 +151,6 @@
         await OnRowEditIsHiddenClick(items.Select(s => s.Id).ToArray(), false, false);
 
         await ToastService.Success("显示评论成功", "显示评论成功");
-        await TableRows.QueryAsync();
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="item"></param>
-    private async Task OnRowDeleteClick(long[] ids, bool showMessage)
-    {
-        //调用API
-        try
-        {
-            var result = await Http.PostAsJsonAsync<DeleteCommentModel>(ToolHelper.WebApiPath + "api/comments/DeleteComment", new DeleteCommentModel { Ids = ids });
-            string jsonContent = result.Content.ReadAsStringAsync().Result;
-            var obj = JsonSerializer.Deserialize<Result>(jsonContent, ToolHelper.options);
-
-            if (obj.Successful == false)
-            {
-                await ToastService.Error("删除评论失败", obj.Error);
-            }
-            else
-            {
-                if (showMessage)
-                {
-                    await ToastService.Success("删除评论成功", "删除评论成功");
-                    await TableRows.QueryAsync();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorHandler.ProcessError(ex, "删除评论失败");
-        }
-    }
-
-    private async Task OnDeleteClick(IEnumerable<ListCommentAloneModel> items)
-    {
-        if (items.Count() == 0)
-        {
-            await ToastService.Information("没有删除评论", "请选中评论");
-            return;
-        }
-
-        await OnRowDeleteClick(items.Select(s => s.Id).ToArray(), false);
-
-        await ToastService.Success("删除评论成功", "删除评论成功");
         await TableRows.QueryAsync();
     }
 

@@ -1,4 +1,7 @@
-﻿namespace CnGalWebSite.Maui
+﻿using ObjCRuntime;
+using UIKit;
+
+namespace CnGalWebSite.Maui
 {
     public class Program
     {
