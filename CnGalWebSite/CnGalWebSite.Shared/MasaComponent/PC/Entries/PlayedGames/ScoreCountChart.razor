@@ -14,7 +14,7 @@
             <div class="d-flex align-center justify-center">
                 @if (isReady)
                 {
-                    <MECharts Option="model" Width="@("100%")" Height="300">
+                    <MECharts Option="model" Width="@("100%")" Height="300" @ref="echarts">
                     </MECharts>
                 }
 
@@ -44,16 +44,18 @@
 
     EChartsOptionModel model = new EChartsOptionModel();
 
+    MECharts echarts;
+
     bool isReady;
     PlayedGameScoreType type;
     PlayedGameCountScope scope;
 
     protected override async Task OnParametersSetAsync()
     {
-        Refresh();
+        await Refresh();
     }
 
-    public void Refresh()
+    public async Task Refresh()
     {
         if (model.XAxis.Data.Any() == false)
         {
@@ -119,7 +121,10 @@
             data.Count(s=>s==10),
         });
 
-
+        if (echarts != null)
+        {
+            await echarts.DisposeECharts();
+        }
         isReady = true;
     }
 
@@ -136,14 +141,12 @@
             return;
         }
         type = _type;
-        Refresh();
+        await Refresh();
 
     }
-    public Task ScopeValueChanged(PlayedGameCountScope _scope)
+    public async Task ScopeValueChanged(PlayedGameCountScope _scope)
     {
         scope = _scope;
-        Refresh();
-
-        return Task.CompletedTask;
+        await Refresh();
     }
 }
