@@ -286,7 +286,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 steam.CutNow = 0;
                 steam.PriceNowString = "¥ " + ((double)steam.PriceNow / 100).ToString("0.00");
             }
-            if (steamId is 1827680 or 1903370 or 1874810 or 1933640 or 1840590 or 1988630 or 1984350 or 2074780 or 1914940 or 2121360 or 2259740)
+            if (steamId is 1827680 or 1903370 or 1874810 or 1933640 or 1840590 or 1988630 or 1984350 or 2074780 or 1914940 or 2121360 or 2259740 or 2091630)
             {
                 steam.PriceNow = 0;
                 steam.CutNow = 0;
