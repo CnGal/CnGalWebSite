@@ -22,8 +22,8 @@
                     @if (string.IsNullOrWhiteSpace(Model.Outlink) == false)
                     {
                         <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickWeibo" Class="me-3">
-                            <MIcon Left>@IconType.Weibo.ToIconString()</MIcon>
-                            访问微博主页
+                            <MIcon Left>@((Model.Outlink.Contains("weibo") ? IconType.Weibo : IconType.Link).ToIconString())</MIcon>
+                           @((Model.Outlink.Contains("weibo") ? "访问微博主页" : "访问社交媒体主页")) 
                         </MButton>
                     }
 

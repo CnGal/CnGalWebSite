@@ -101,11 +101,11 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
         }
 
-        public async Task<SteamInfor> UpdateSteamInfor(int steamId, int entryId)
+        private async Task UpdateSteamInforByRemoteAPI(SteamInfor steam)
         {
             //获取信息
-            
-            var jsonContent = await _httpClient.GetStringAsync("https://api.isthereanydeal.com/v01/game/overview/?key=" + _configuration["IsthereanydealAPIToken"] + "&region=cn&country=CN&shop=steam&ids=app%2F" + steamId + "&allowed=steam");
+
+            var jsonContent = await _httpClient.GetStringAsync("https://api.isthereanydeal.com/v01/game/overview/?key=" + _configuration["IsthereanydealAPIToken"] + "&region=cn&country=CN&shop=steam&ids=app%2F" + steam.SteamId + "&allowed=steam");
             var thirdResult = JObject.Parse(jsonContent);
             var steamNowJson = new SteamNowJson
             {
@@ -117,40 +117,29 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 price = -1,
                 cut = -1
             };
-            if (thirdResult["data"]["app/" + steamId]["lowest"].Count() != 0)
+            if (thirdResult["data"]["app/" + steam.SteamId]["lowest"].Count() != 0)
             {
-                steamLowestJson = thirdResult["data"]["app/" + steamId]["lowest"].ToObject<SteamLowestJson>();
+                steamLowestJson = thirdResult["data"]["app/" + steam.SteamId]["lowest"].ToObject<SteamLowestJson>();
             }
             JObject officialResult = null;
             try
             {
                 //尝试使用官方api获取信息
-                jsonContent = await _httpClient.GetStringAsync("https://store.steampowered.com/api/appdetails/?appids=" + steamId + "&cc=cn&filters=price_overview");
+                jsonContent = await _httpClient.GetStringAsync("https://store.steampowered.com/api/appdetails/?appids=" + steam.SteamId + "&cc=cn&filters=price_overview");
                 officialResult = JObject.Parse(jsonContent);
-
-
             }
             catch (Exception ex)
             {
-                try
-                {
-                    jsonContent = await _httpClient.GetStringAsync("https://store.steampowered.com/api/appdetails/?appids=" + steamId + "&cc=cn&filters=price_overview");
-                    officialResult = JObject.Parse(jsonContent);
-
-                }
-                catch
-                {
-
-                }
+                _logger.LogError("Id:{id} 获取Steam官方API数据失败", steam.SteamId);
             }
 
-            if (officialResult != null && officialResult[steamId.ToString()]["success"].ToObject<bool>() == true)
+            if (officialResult != null && officialResult[steam.SteamId.ToString()]["success"].ToObject<bool>() == true)
             {
-                if (officialResult[steamId.ToString()]["data"].Count() != 0)
+                if (officialResult[steam.SteamId.ToString()]["data"].Count() != 0)
                 {
-                    var discount_percent = officialResult[steamId.ToString()]["data"]["price_overview"]["discount_percent"].ToObject<string>();
-                    var final = officialResult[steamId.ToString()]["data"]["price_overview"]["final"].ToObject<string>();
-                    var final_formatted = officialResult[steamId.ToString()]["data"]["price_overview"]["final_formatted"].ToObject<string>();
+                    var discount_percent = officialResult[steam.SteamId.ToString()]["data"]["price_overview"]["discount_percent"].ToObject<string>();
+                    var final = officialResult[steam.SteamId.ToString()]["data"]["price_overview"]["final"].ToObject<string>();
+                    var final_formatted = officialResult[steam.SteamId.ToString()]["data"]["price_overview"]["final_formatted"].ToObject<string>();
 
                     steamNowJson = new SteamNowJson
                     {
@@ -171,9 +160,9 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
             else
             {
-                if (thirdResult["data"]["app/" + steamId]["price"].Count() != 0)
+                if (thirdResult["data"]["app/" + steam.SteamId]["price"].Count() != 0)
                 {
-                    steamNowJson = thirdResult["data"]["app/" + steamId]["price"].ToObject<SteamNowJson>();
+                    steamNowJson = thirdResult["data"]["app/" + steam.SteamId]["price"].ToObject<SteamNowJson>();
                 }
             }
 
@@ -186,21 +175,6 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     cut = -1
                 };
             }
-
-            //获取已存在的信息
-            var steam = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
-            steam ??= new SteamInfor
-            {
-                EntryId = entryId,
-                SteamId = steamId,
-            };
-
-            //判断是否下架
-            if (steam.PriceNow == -3)
-            {
-                return steam;
-            }
-
             //更新数据 支持小数点 将真实价格*100储存 即1500表示15元
 
             //当前价格
@@ -275,23 +249,29 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     steam.PriceLowestString = "¥ 0";
                     steam.PriceLowest = -1;
                 }
-
-
             }
+        }
 
-            //临时补正
-            if (steamId == 1506340)
+        public async Task<SteamInfor> UpdateSteamInfor(int steamId, int entryId)
+        {
+            //获取已存在的信息
+            var steam = await _steamInforRepository.FirstOrDefaultAsync(s => s.SteamId == steamId);
+            steam ??= new SteamInfor
             {
-                steam.PriceNow = steam.OriginalPrice;
-                steam.CutNow = 0;
-                steam.PriceNowString = "¥ " + ((double)steam.PriceNow / 100).ToString("0.00");
+                EntryId = entryId,
+                SteamId = steamId,
+                OriginalPrice = -1
+            };
+
+            //判断是否下架
+            if (steam.PriceNow == -3)
+            {
+                return steam;
             }
-            if (steamId is 1827680 or 1903370 or 1874810 or 1933640 or 1840590 or 1988630 or 1984350 or 2074780 or 1914940 or 2121360 or 2259740 or 2091630)
+            //判断是否为免费游戏
+            if (steam.OriginalPrice != 0)
             {
-                steam.PriceNow = 0;
-                steam.CutNow = 0;
-                steam.OriginalPrice = 0;
-                steam.PriceNowString = "¥ 0.00";
+                await UpdateSteamInforByRemoteAPI(steam);
             }
 
 
@@ -306,7 +286,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 }
                 catch (Exception)
                 {
-
+                    _logger.LogError("Id:{id} 获取Steam评测数据失败", steamId);
                 }
             }
 
