@@ -734,16 +734,16 @@ namespace CnGalWebSite.APIServer.Controllers
             var vidoes = await _videoRepository.GetAll().Where(s => videoIds.Contains(s.Id)).ToListAsync();
 
 
-            var newVideo = new Video();
+            var newVideo = new Video
+            {
+                CreateTime = DateTime.Now.ToCstTime()
+            };
             _videoService.SetDataFromEditMain(newVideo, model.Main);
             _videoService.SetDataFromEditMainPage(newVideo, model.MainPage);
             _videoService.SetDataFromEditRelevances(newVideo, model.Relevances, entries, articles, vidoes);
             _videoService.SetDataFromEditImages(newVideo, model.Images);
 
-            var video = new Video
-            {
-                CreateTime = DateTime.Now.ToCstTime()
-            };
+            var video = new Video();
             //获取审核记录
             try
             {
