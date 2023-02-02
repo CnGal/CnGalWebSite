@@ -163,6 +163,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 if (thirdResult["data"]["app/" + steam.SteamId]["price"].Count() != 0)
                 {
                     steamNowJson = thirdResult["data"]["app/" + steam.SteamId]["price"].ToObject<SteamNowJson>();
+                    steamNowJson.price *= 100;
                 }
             }
 
