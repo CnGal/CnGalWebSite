@@ -102,7 +102,7 @@ namespace CnGalWebSite.APIServer.Application.Videos
                     IsHidden = item.IsHidden,
                     BriefIntroduction = _appHelper.GetStringAbbreviation(item.BriefIntroduction, 20),
                     Priority = item.Priority,
-                    Type = item.Type??"视频",
+                    Type = item.Type ?? "视频",
                     CreateTime = item.CreateTime,
                     LastEditTime = item.LastEditTime,
                     ReaderCount = item.ReaderCount,
