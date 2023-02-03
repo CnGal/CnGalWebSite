@@ -763,21 +763,25 @@ namespace CnGalWebSite.APIServer.Application.Users
             //计算连续签到天数和今天是否签到
             model.IsSignIn = false;
             model.SignInDays = 0;
+
+            //东八区转换
+            var now = DateTime.Now.ToCstTime().AddHours(8);
+
             if (user.SignInDays != null)
             {
-                if (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().Date))
+                if (user.SignInDays.Any(s => s.Time.Date == now.Date))
                 {
                     model.IsSignIn = true;
-                    while (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().AddDays(-model.SignInDays).Date))
+                    while (user.SignInDays.Any(s => s.Time.Date == now.AddDays(-model.SignInDays).Date))
                     {
                         model.SignInDays++;
                     }
                 }
                 else
                 {
-                    if (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().Date.AddDays(-1)))
+                    if (user.SignInDays.Any(s => s.Time.Date == now.Date.AddDays(-1)))
                     {
-                        while (user.SignInDays.Any(s => s.Time.Date == DateTime.Now.ToCstTime().AddDays(-model.SignInDays - 1).Date))
+                        while (user.SignInDays.Any(s => s.Time.Date == now.AddDays(-model.SignInDays - 1).Date))
                         {
                             model.SignInDays++;
                         }
