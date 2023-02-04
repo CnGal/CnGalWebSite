@@ -95,6 +95,9 @@ namespace CnGalWebSite.Server
             services.AddScoped<IFileUploadService, FileUploadService>();
             services.AddScoped<IEventService, EventService>();
 
+            //覆盖默认api地址
+            ToolHelper.WebApiPath = Configuration["WebApiPath"];
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
