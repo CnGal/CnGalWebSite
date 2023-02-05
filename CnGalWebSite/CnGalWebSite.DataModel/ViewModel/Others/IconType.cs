@@ -116,7 +116,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         UnPlayed,
         Random,
         Switch,
-        Timeline
+        Timeline,
+        Close
     }
 
     public static class IconTypeHelper
@@ -125,6 +126,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Close:
+                    return "mdi-close";
                 case IconType.Timeline:
                     return "mdi-timeline-text-outline ";
                 case IconType.Switch:

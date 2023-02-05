@@ -96,7 +96,10 @@ namespace CnGalWebSite.Server
             services.AddScoped<IEventService, EventService>();
 
             //覆盖默认api地址
-            ToolHelper.WebApiPath = Configuration["WebApiPath"];
+            if (string.IsNullOrWhiteSpace(Configuration["WebApiPath"]) == false)
+            {
+                ToolHelper.WebApiPath = Configuration["WebApiPath"];
+            }
 
         }
 
