@@ -3,10 +3,10 @@
 
 <MList Dense Shaped Style="@Style" Class="@Class">
     <MListItemGroup Value="selectedItem" ValueChanged="ValueChanged"
-                    Color="@_dataCacheService.ThemeSetting.Theme">
+                    >
         @foreach (var item in items)
         {
-            <MBorder Value="@(selectedItem == item.Text)" Offset="false" Width="4" Color="@_dataCacheService.ThemeSetting.Theme">
+            <MBorder Value="@(selectedItem == item.Text)" Offset="false" Width="4" >
                 <MListItem Value="@item.Text">
                     <MListItemIcon>
                         <MIcon>@item.Icon</MIcon>

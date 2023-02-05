@@ -55,7 +55,7 @@
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa-link" Title="包含的动态" Class="mb-4" Collapable Outline OutlineHead>
                     @foreach (var item in Model.News)
                     {
-                        <MCheckbox @bind-Value="item.IsSelected" Label="@($"{item.NewsId}. {item.NewsTitle}")" Class="m-0" Color="@_dataCacheService.ThemeSetting.Theme"></MCheckbox>
+                        <MCheckbox @bind-Value="item.IsSelected" Label="@($"{item.NewsId}. {item.NewsTitle}")" Class="m-0" ></MCheckbox>
                     }
 
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="重置" IsAsync="true" OnClick="OnReset" Icon="mdi-refresh" Color="error" />

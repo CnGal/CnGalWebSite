@@ -1,4 +1,5 @@
 ﻿@inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
 
 <MDialog @bind-Value="Dialog"
          MaxWidth="440">
@@ -44,7 +45,7 @@
             显示背景图会将卡片设置为半透明状态，目前建议使用明亮的图片作为背景
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="_show" TValue="bool" ValueChanged="BackgroundValueChanged" Label="@(_show?"显示背景图":"隐藏背景图")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
+            <MSwitch Value="_show" TValue="bool" ValueChanged="BackgroundValueChanged" Label="@(_show?"显示背景图":"隐藏背景图")"  Class="m-0"></MSwitch>
         </MCardText>
         <MCardTitle Class="text-h6">
             扩展显示范围
@@ -53,13 +54,13 @@
             选中后将把显示范围扩大到整个页面，也就是两边不再留白
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="_expand" TValue="bool" ValueChanged="ExpandValueChanged" Label="@(_expand?"扩展显示范围":"限制显示范围")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
+            <MSwitch Value="_expand" TValue="bool" ValueChanged="ExpandValueChanged" Label="@(_expand?"扩展显示范围":"限制显示范围")"  Class="m-0"></MSwitch>
         </MCardText>
         <MCardTitle Class="text-h6">
             字体
         </MCardTitle>
         <MCardText Class="pb-0">
-            <MTextField Label="自定义渲染的字体，具体参见更新日志" Value="@_dataCacheService.ThemeSetting.FontFamily" ValueChanged="FontFamilyValueChanged" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
+            <MTextField Label="自定义渲染的字体，具体参见更新日志" Value="@_dataCacheService.ThemeSetting.FontFamily" ValueChanged="FontFamilyValueChanged" TValue="string" ></MTextField>
         </MCardText>
         <MCardTitle Class="text-h6">
             自动保存编辑
@@ -68,7 +69,7 @@
             在编辑页面时间隔10秒自动保存一次数据
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="@_dataCacheService.ThemeSetting.AllowAutoSave" TValue="bool" ValueChanged="AllowAutoSaveValueChanged" Label="@(_dataCacheService.ThemeSetting.AllowAutoSave?"自动保存":"不自动保存")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
+            <MSwitch Value="@_dataCacheService.ThemeSetting.AllowAutoSave" TValue="bool" ValueChanged="AllowAutoSaveValueChanged" Label="@(_dataCacheService.ThemeSetting.AllowAutoSave?"自动保存":"不自动保存")"  Class="m-0"></MSwitch>
         </MCardText>
         <MCardTitle Class="text-h6">
             显示错误详情
@@ -77,16 +78,8 @@
             展示网站发生错误时的详细信息
         </MCardText>
         <MCardText Class="pb-0">
-            <MSwitch Value="@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" TValue="bool" ValueChanged="ShowDetailedErrorInforValueChanged" Label="@(@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor?"显示":"不显示")" Color="@_dataCacheService.ThemeSetting.Theme" Class="m-0"></MSwitch>
+            <MSwitch Value="@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor" TValue="bool" ValueChanged="ShowDetailedErrorInforValueChanged" Label="@(@_dataCacheService.ThemeSetting.ShowDetailedErrorInfor?"显示":"不显示")"  Class="m-0"></MSwitch>
         </MCardText>
-        <MCardActions>
-            <MSpacer></MSpacer>
-            <MButton Color="green darken-1"
-                     Text
-                     OnClick="()=> Dialog = false">
-                完成
-            </MButton>
-        </MCardActions>
     </MCard>
 </MDialog>
 
@@ -94,7 +87,7 @@
 
     StringNumber colorString = "pink lighten-2";
     bool _show = false;
-    bool _expand= false;
+    bool _expand = false;
     bool Dialog { get; set; }
 
     [CascadingParameter]
@@ -108,10 +101,7 @@
         {
             _dataCacheService.ThemeSetting.Theme = colorString.ToString();
             _dataCacheService.ThemeSetting.IsDark = false;
-            if (CnGalRootTip != null)
-            {
-                await CnGalRootTip.SaveTheme();
-            }
+            _eventService.OnSavaTheme();
             return;
         }
         colorString = _dataCacheService.ThemeSetting.Theme;
@@ -124,11 +114,11 @@
         return Task.CompletedTask;
     }
 
-    public async Task ColorValueChanged(StringNumber value)
+    public Task ColorValueChanged(StringNumber value)
     {
         if (value == null)
         {
-            value = colorString = "pink lighten-2";
+            value = ThemeModel.DefaultTheme ;
         }
         colorString = value;
         _dataCacheService.ThemeSetting.Theme = value?.ToString();
@@ -142,71 +132,50 @@
             _dataCacheService.ThemeSetting.IsDark = false;
         }
 
-        if (_dataCacheService.ThemeSetting.Theme == "pink lighten-2")
-        {
-            _dataCacheService.ThemeSetting.Type = ThemeType.Default;
-        }
-        else
-        {
-            _dataCacheService.ThemeSetting.Type = ThemeType.Custom;
-        }
-
-        if (CnGalRootTip != null)
-        {
-            await CnGalRootTip.SaveTheme();
-        }
+        _eventService.OnSavaTheme();
+        return Task.CompletedTask;
 
     }
 
-    public async Task BackgroundValueChanged(bool show)
+    public Task BackgroundValueChanged(bool show)
     {
         _show = show;
         _dataCacheService.ThemeSetting.IsTransparent = show;
 
-        if (CnGalRootTip != null)
-        {
-            await CnGalRootTip.SaveTheme();
-        }
+        _eventService.OnSavaTheme();
+        return Task.CompletedTask;
     }
-    public async Task ExpandValueChanged(bool expand)
+    public Task ExpandValueChanged(bool expand)
     {
         _expand = expand;
         _dataCacheService.ThemeSetting.IsExtendEntireScreen = expand;
 
-        if (CnGalRootTip != null)
-        {
-            await CnGalRootTip.SaveTheme();
-        }
+        _eventService.OnSavaTheme();
+        return Task.CompletedTask;
     }
 
-    public async Task FontFamilyValueChanged(string value)
+    public Task FontFamilyValueChanged(string value)
     {
         _dataCacheService.ThemeSetting.FontFamily = value;
 
-        if (CnGalRootTip != null)
-        {
-            await CnGalRootTip.SaveTheme();
-        }
+        _eventService.OnSavaTheme();
+        return Task.CompletedTask;
     }
 
-    public async Task AllowAutoSaveValueChanged(bool value)
+    public Task AllowAutoSaveValueChanged(bool value)
     {
         _dataCacheService.ThemeSetting.AllowAutoSave = value;
 
-        if (CnGalRootTip != null)
-        {
-            await CnGalRootTip.SaveTheme();
-        }
+        _eventService.OnSavaTheme();
+        return Task.CompletedTask;
     }
 
-    public async Task ShowDetailedErrorInforValueChanged(bool value)
+    public Task ShowDetailedErrorInforValueChanged(bool value)
     {
         _dataCacheService.ThemeSetting.ShowDetailedErrorInfor = value;
 
-        if (CnGalRootTip != null)
-        {
-            await CnGalRootTip.SaveTheme();
-        }
+        _eventService.OnSavaTheme();
+        return Task.CompletedTask;
     }
 }
 

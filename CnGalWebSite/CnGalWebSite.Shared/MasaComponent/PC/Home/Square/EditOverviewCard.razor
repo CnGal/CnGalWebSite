@@ -1,17 +1,8 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="@IconType.EditRecord.ToIconString()">
-    <ButtonContent>
-        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
-            <MIcon Left>mdi-share-all-outline  </MIcon>
-            查看编辑指引
-        </MButton>
-    </ButtonContent>
-    <ChildContent>
-        <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.Edit" AllowExtend="false" Stacked BaseUrl="@(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLineChart")" Outline />
-    </ChildContent>
-
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="编辑概览" Icon="@IconType.EditRecord.ToIconString()" ShowMoreButton OnClickMore="OnClickMore">
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Charts.MasaLineChart Type="LineChartType.Edit" AllowExtend="false" Stacked BaseUrl="@(ToolHelper.WebApiPath + "api/perfections/GetPerfectionLineChart")" Outline />
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {

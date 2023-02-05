@@ -8,10 +8,7 @@ namespace CnGalWebSite.Shared.Service
 {
     public interface IEventService
     {
-        event Action RefreshApp;
         event Action SavaTheme;
-
-        void OnRefreshApp();
 
         void OnSavaTheme();
 

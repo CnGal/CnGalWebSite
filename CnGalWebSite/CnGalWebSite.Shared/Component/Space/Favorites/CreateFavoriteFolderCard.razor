@@ -25,28 +25,28 @@
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="信息" Class="mb-4" Collapable Outline OutlineHead>
                     <div class="row">
                         <div class="col-12  col-sm-6">
-                            <MTextField @bind-Value="Model.Name" Label="名称" Color="@_dataCacheService.ThemeSetting.Theme" />
+                            <MTextField @bind-Value="Model.Name" Label="名称"  />
                         </div>
                         <div class="col-12">
-                            <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介" Color="@_dataCacheService.ThemeSetting.Theme" />
+                            <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介"  />
                         </div>
                         <div class="col-12 col-md-6">
                             <MCheckbox @bind-Value="Model.ShowPublicly"
                                        Label="公开" Class="m-0"
                                        HideDetails="true"
-                                       Color="@_dataCacheService.ThemeSetting.Theme"></MCheckbox>
+                                       ></MCheckbox>
                         </div>
                         <div class="col-12 col-md-6">
                             <MCheckbox @bind-Value="Model.IsDefault"
                                        Label="默认收藏夹" Class="m-0"
                                        HideDetails="true"
-                                       Color="@_dataCacheService.ThemeSetting.Theme"></MCheckbox>
+                                       ></MCheckbox>
                         </div>
                         <div class="col-12 col-md-6">
                             <MCheckbox @bind-Value="Model.IsHidden"
                                        Label="不展示在个人主页中" Class="m-0"
                                        HideDetails="true"
-                                       Color="@_dataCacheService.ThemeSetting.Theme"></MCheckbox>
+                                       ></MCheckbox>
                         </div>
                     </div>
                 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>

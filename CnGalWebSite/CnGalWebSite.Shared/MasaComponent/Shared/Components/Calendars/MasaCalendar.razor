@@ -1,6 +1,4 @@
 ﻿@inject IDataCacheService _dataCacheService
-@implements IDisposable
-
 
 
 <div style="display: flex; flex-direction: column;">
@@ -9,19 +7,19 @@
             @Month.ToString("yyyy年M月")
         </div>
         <div style="display: flex; flex-wrap: wrap; justify-content: flex-end;">
-            <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>ValueChanged(0))" Class="me-4">
+            <MButton Text  OnClick="@(()=>ValueChanged(0))" Class="me-4">
                 上一年
             </MButton>
-            <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>ValueChanged(1))" Class="me-4">
+            <MButton Text  OnClick="@(()=>ValueChanged(1))" Class="me-4">
                 上一月
             </MButton>
-            <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>ValueChanged(2))" Class="me-4">
+            <MButton Text  OnClick="@(()=>ValueChanged(2))" Class="me-4">
                 今天
             </MButton>
-            <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>ValueChanged(3))" Class="me-4">
+            <MButton Text  OnClick="@(()=>ValueChanged(3))" Class="me-4">
                 下一月
             </MButton>
-            <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="@(()=>ValueChanged(4))" Class="me-4">
+            <MButton Text  OnClick="@(()=>ValueChanged(4))" Class="me-4">
                 下一年
             </MButton>
         </div>
@@ -72,7 +70,7 @@
         //根据当前月份计算出显示范围
         var temp = Month.AddDays(-Month.Day + 1);
 
-        Begin = temp.AddDays(-(int)temp.DayOfWeek );
+        Begin = temp.AddDays(-(int)temp.DayOfWeek);
         End = Begin.AddDays(42);
 
         StateHasChanged();
@@ -80,37 +78,17 @@
         return Task.CompletedTask;
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-        _dataCacheService.RefreshRequsted += RefreshRequsted;
-    }
     protected override async Task OnParametersSetAsync()
     {
         await Refresh();
     }
 
-    public async void RefreshRequsted(object sender, EventArgs args)
-    {
-        await InvokeAsync(StateHasChanged);
-
-    }
-    #region 释放实例
-
-    public void Dispose()
-    {
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-
-        GC.SuppressFinalize(this);
-    }
-
     public async Task ValueChanged(StringNumber index)
     {
-        switch(index?.ToInt32())
+        switch (index?.ToInt32())
         {
             case 0:
-                Month= Month.AddYears(-1);
+                Month = Month.AddYears(-1);
                 break;
             case 1:
                 Month = Month.AddMonths(-1);
@@ -129,6 +107,4 @@
         await MonthChanged.InvokeAsync(Month);
         await Refresh();
     }
-
-    #endregion
 }

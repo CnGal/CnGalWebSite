@@ -18,7 +18,7 @@
 
         <div class="@(_dataCacheService.IsApp?"":"w-100")">
             <div class="mb-4">
-                <MBorder Color="@_dataCacheService.ThemeSetting.Theme" Style="border-radius:0;margin: auto 0;" Width="@("4px")">
+                <MBorder  Style="border-radius:0;margin: auto 0;" Width="@("4px")">
                     <div class="ms-4">
                         <div class="h6 fw-bold mb-0">@currentAudio.Name</div>
                         @if (string.IsNullOrWhiteSpace(currentAudio.BriefIntroduction) == false)

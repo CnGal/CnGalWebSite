@@ -1,5 +1,4 @@
 ﻿@inject IDataCacheService _dataCacheService
-@implements IDisposable
 @inject NavigationManager NavigationManager
 
 <MTooltip Top Color="white">
@@ -34,31 +33,8 @@
     [Parameter]
     public string Image { get; set; }
 
-
-    protected override async Task OnInitializedAsync()
-    {
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-        _dataCacheService.RefreshRequsted += RefreshRequsted;
-    }
-
     public void OnClick()
     {
         NavigationManager.NavigateTo($"/entries/index/{Model.Id}");
     }
-
-    public async void RefreshRequsted(object sender, EventArgs args)
-    {
-        await InvokeAsync(StateHasChanged);
-
-    }
-    #region 释放实例
-
-    public void Dispose()
-    {
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

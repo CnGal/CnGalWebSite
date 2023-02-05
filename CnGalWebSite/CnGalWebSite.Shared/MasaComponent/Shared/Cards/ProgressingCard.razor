@@ -1,9 +1,8 @@
 ﻿@inject IDataCacheService _dataCacheService
-@implements IDisposable
 
 <div class="@Class" style="@Style">
     <div class="d-flex" style="justify-content: center;">
-        <MProgressCircular Size="40" Indeterminate Color="@(Color??_dataCacheService.ThemeSetting.Theme)"></MProgressCircular>
+        <MProgressCircular Size="40" Indeterminate Color="@Color"></MProgressCircular>
     </div>
     <div class="mt-3 text-center">正在加载......</div>
 
@@ -15,29 +14,5 @@
     [Parameter]
     public string Style { get; set; }
     [Parameter]
-    public string Color { get; set; }
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-        _dataCacheService.RefreshRequsted += RefreshRequsted;
-
-    }
-
-    public async void RefreshRequsted(object sender, EventArgs args)
-    {
-        await InvokeAsync(StateHasChanged);
-
-    }
-    #region 释放实例
-
-    public void Dispose()
-    {
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-
-        GC.SuppressFinalize(this);
-    }
-    #endregion
+    public string Color { get; set; } = "primary";
 }

@@ -1,5 +1,4 @@
 ﻿@inject IDataCacheService _dataCacheService
-@implements IDisposable
 
 @if (_dataCacheService.ThemeSetting.IsDark)
 {
@@ -71,7 +70,7 @@ else
         {
             @if (string.IsNullOrWhiteSpace(Tooltip))
             {
-                <MButton Icon="!Fab" Fab="Fab" Dark Small="(!XSmall)&&Fab" Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
+                <MButton Icon="!Fab" Fab="Fab" Dark Small="(!XSmall)&&Fab"  Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" XSmall="XSmall" StopPropagation="StopPropagation" Plain="Plain" Text="TextStyle">
                     <MIcon XSmall="XSmall">@Icon</MIcon>
                 </MButton>
 
@@ -80,7 +79,7 @@ else
             {
                 <MTooltip Bottom>
                     <ActivatorContent>
-                        <MButton Icon="!Fab" Dark Small="(!XSmall)&&Fab" Fab="Fab" Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" XSmall="XSmall" Text="TextStyle" Plain="Plain" StopPropagation="StopPropagation">
+                        <MButton Icon="!Fab" Dark Small="(!XSmall)&&Fab" Fab="Fab"  Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" XSmall="XSmall" Text="TextStyle" Plain="Plain" StopPropagation="StopPropagation">
                             <MIcon XSmall="XSmall">@Icon</MIcon>
                         </MButton>
                     </ActivatorContent>
@@ -95,7 +94,7 @@ else
         {
             @if (string.IsNullOrWhiteSpace(Tooltip))
             {
-                <MButton Color="@_dataCacheService.ThemeSetting.Theme" Dark Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation" Text="TextStyle" Plain="Plain">
+                <MButton  Dark Class="@Class" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" StopPropagation="StopPropagation" Text="TextStyle" Plain="Plain">
                     @if (string.IsNullOrWhiteSpace(Icon) == false)
                     {
                         <MIcon XSmall="XSmall" Left="!string.IsNullOrWhiteSpace(Text)">@Icon</MIcon>
@@ -108,7 +107,7 @@ else
             {
                 <MTooltip Bottom>
                     <ActivatorContent>
-                        <MButton Color="@_dataCacheService.ThemeSetting.Theme" Dark Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" Text="TextStyle" Plain="Plain" StopPropagation="StopPropagation">
+                        <MButton  Dark Class="@Class" @attributes="@context.Attrs" OnClick="OnButtonClick" Loading="loading" Disabled="Disabled" Rounded="Rounded" Depressed="Depressed" XSmall="XSmall" Text="TextStyle" Plain="Plain" StopPropagation="StopPropagation">
                             @if (string.IsNullOrWhiteSpace(Icon) == false)
                             {
                                 <MIcon XSmall="XSmall" Left="!string.IsNullOrWhiteSpace(Text)">@Icon</MIcon>
@@ -208,7 +207,7 @@ else
     [Parameter]
     public string Tooltip { get; set; }
     [Parameter]
-    public string Color { get; set; }
+    public string Color { get; set; } = "primary";
     [Parameter]
     public bool Disabled { get; set; }
     [Parameter]
@@ -239,28 +238,4 @@ else
             await OnClick.InvokeAsync();
         }
     }
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-        _dataCacheService.RefreshRequsted += RefreshRequsted;
-
-    }
-
-    public async void RefreshRequsted(object sender, EventArgs args)
-    {
-        await InvokeAsync(StateHasChanged);
-
-    }
-    #region 释放实例
-
-    public void Dispose()
-    {
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

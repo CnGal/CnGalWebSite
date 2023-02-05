@@ -26,7 +26,7 @@
 
                 <div>
                     <div>
-                        <MTextField Label="用户名或邮箱" Color="@_dataCacheService.ThemeSetting.Theme"
+                        <MTextField Label="用户名或邮箱" 
                                     @bind-Value="Model.UserName"></MTextField>
 
                     </div>
@@ -41,7 +41,7 @@
                         <MCheckbox @bind-Value="Model.RememberMe"
                                    Label="记住我" Class="m-0"
                                    HideDetails="true"
-                                   Color="@_dataCacheService.ThemeSetting.Theme"></MCheckbox>
+                                   ></MCheckbox>
                         <a href="/account/forgetpassword">忘记密码？</a>
 
                     </div>

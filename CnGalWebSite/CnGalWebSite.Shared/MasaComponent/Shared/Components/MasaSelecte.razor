@@ -2,7 +2,7 @@
 @inject IDataCacheService _dataCacheService
 
 <MSelect Value="@Value" ValueChanged="ValueChanged" TValue="TValue" TItem="KeyValuePair<string, TValue>" TItemValue="TValue" Class="@Class"
-         Label="@Lable" Color="@_dataCacheService.ThemeSetting.Theme" ItemColor="@_dataCacheService.ThemeSetting.Theme"
+         Label="@Lable"  Item
          Items="@items"
          ItemText="u => u.Key"
          ItemValue="u => u.Value"

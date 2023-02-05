@@ -10,7 +10,7 @@
         {
             <div class="col-12 mb-4">
                 <MTabs @bind-Value="selected" IconsAndText Grow Class="shadow-sm bg-opacity rounded" CenterActive
-                       Color="@_dataCacheService.ThemeSetting.Theme">
+                       >
 
                     <MTab Value="0">
                         回复我的<MIcon>mdi-comment-text-multiple-outline</MIcon>
@@ -28,7 +28,7 @@
         {
             <div class="col-12 col-lg-3 mb-4">
                 <MList Class="p-0">
-                    <MListItemGroup @bind-Value="selected" Color="@_dataCacheService.ThemeSetting.Theme">
+                    <MListItemGroup @bind-Value="selected" >
                         <MListItem @key="0">
                             <MListItemIcon>
                                 <MIcon>mdi-comment-text-multiple-outline </MIcon>

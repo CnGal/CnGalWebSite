@@ -15,10 +15,10 @@
         <h1 class="login-h1-text mb-4 text-center">欢迎来到CnGal资料站</h1>
         <div>
             <MTextField @bind-Value="Model.Email"
-                        Color="@_dataCacheService.ThemeSetting.Theme"
+                        
                         Label="电子邮件"></MTextField>
 
-            <MTextField Dense Label="用户名" Color="@_dataCacheService.ThemeSetting.Theme"
+            <MTextField Dense Label="用户名" 
                         @bind-Value="Model.Name"></MTextField>
 
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPasswordInput Placeholder="请输入密码" Label="密码"

@@ -25,7 +25,7 @@
                          IsImageLocked="false"
                          OnLoad="OnLoad"
                          AnimeGifEnable></Cropper>
-                <MSlider @bind-Value="ImageRatio" TValue="double" Max="3" Step="0.01" Min="0.5" PrependIcon="mdi-fit-to-screen-outline " Color="@_dataCacheService.ThemeSetting.Theme" TrackColor="@_dataCacheService.ThemeSetting.Theme" Class="mt-3" OnPrependClick="OnReset"></MSlider>
+                <MSlider @bind-Value="ImageRatio" TValue="double" Max="3" Step="0.01" Min="0.5" PrependIcon="mdi-fit-to-screen-outline "  Track Class="mt-3" OnPrependClick="OnReset"></MSlider>
                 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Class="@(isReady?"d-none":"")" Color="white" Style="position: absolute; top: 0; bottom: 0;left: 0;right: 0; display: flex;justify-content: center;flex-direction: column;align-items: center;color:white;" />
             }
 

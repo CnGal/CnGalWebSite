@@ -9,7 +9,7 @@
 @inject IEventService _eventService
 @using BlazorComponent.I18n
 
-<MApp Dark="_dataCacheService.ThemeSetting.IsDark">
+<MApp>
     <BootstrapBlazorRoot>
         <CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip @ref="cngalRootTip">
             <CascadingValue Value="connectionInfo" IsFixed="true">
@@ -28,7 +28,6 @@
             </CascadingValue>
         </CnGalWebSite.Shared.MasaComponent.Shared.Tips.CnGalRootTip>
     </BootstrapBlazorRoot>
-
 </MApp>
 
 

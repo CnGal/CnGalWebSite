@@ -1,7 +1,7 @@
 ﻿@inject IDataCacheService _dataCacheService
 
 
-<MBorder Color="@_dataCacheService.ThemeSetting.Theme" Style="border-radius:0;height:50%;margin: auto 0;">
+<MBorder  Style="border-radius:0;height:50%;margin: auto 0;">
     <MCardTitle>@Title</MCardTitle>
     <MCardSubtitle>@(string.IsNullOrWhiteSpace(Text)?("关联的" + Title):Text)</MCardSubtitle>
 </MBorder>

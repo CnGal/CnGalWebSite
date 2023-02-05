@@ -13,7 +13,6 @@ namespace CnGalWebSite.Shared.Service
 {
     public class EventService : IEventService
     {
-        public event Action RefreshApp;
         public event Action SavaTheme;
 
         private readonly IMauiService _mauiService;
@@ -25,14 +24,6 @@ namespace CnGalWebSite.Shared.Service
             _mauiService = mauiService;
             JS = js;
             _logger = logger;
-        }
-
-        /// <summary>
-        /// 刷新渲染框架方法
-        /// </summary>
-        public void OnRefreshApp()
-        {
-            RefreshApp?.Invoke();
         }
 
         /// <summary>

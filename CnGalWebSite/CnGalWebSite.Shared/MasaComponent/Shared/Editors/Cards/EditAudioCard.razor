@@ -24,13 +24,13 @@
                 <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.AudioUploadButton Multiple="false" OnUploaded="OnUploaded" Class="mb-4" Text="重新上传音频" Icon="mdi-refresh" />
                 <div class="row">
                     <div class="col-12  col-sm-6">
-                        <MTextField @bind-Value="Model.Name" Label="名称" Color="@_dataCacheService.ThemeSetting.Theme" />
+                        <MTextField @bind-Value="Model.Name" Label="名称"  />
                     </div>
                     <div class="col-12  col-sm-6">
-                        <MTextField @bind-Value="Model.Priority" Label="优先级" Color="@_dataCacheService.ThemeSetting.Theme" />
+                        <MTextField @bind-Value="Model.Priority" Label="优先级"  />
                     </div>
                     <div class="col-12">
-                        <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介" Color="@_dataCacheService.ThemeSetting.Theme" />
+                        <MTextarea Rows="3" @bind-Value="Model.BriefIntroduction" Label="简介"  />
                     </div>
                 </div>
             </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>

@@ -21,13 +21,13 @@
                 <div style=" display: flex; flex-direction: row; ">
                     @if (string.IsNullOrWhiteSpace(Model.Outlink) == false)
                     {
-                        <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickWeibo" Class="me-3">
+                        <MButton Text  OnClick="OnClickWeibo" Class="me-3">
                             <MIcon Left>@((Model.Outlink.Contains("weibo") ? IconType.Weibo : IconType.Link).ToIconString())</MIcon>
                            @((Model.Outlink.Contains("weibo") ? "访问微博主页" : "访问社交媒体主页")) 
                         </MButton>
                     }
 
-                    <MButton Text Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMainPage">
+                    <MButton Text  OnClick="OnClickMainPage">
                         <MIcon Left>@IconType.Entry.ToIconString()</MIcon>
                         @(Model.GroupId>0?"查看词条":"查看个人空间")
                     </MButton>

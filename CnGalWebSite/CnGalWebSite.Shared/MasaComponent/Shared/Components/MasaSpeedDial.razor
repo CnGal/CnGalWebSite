@@ -1,12 +1,11 @@
 ﻿@inject IDataCacheService _dataCacheService
-
+@implements IDisposable
 
 <MSpeedDial @bind-Value="fab" Class="@Class"
             Bottom
             Right
             Direction="@Direction"
-            Style="right:0;bottom:0"
-            >
+            Style="right:0;bottom:0">
     <ActivatorContent Context="m">
         <MTooltip Bottom>
             <ActivatorContent Context="c">
@@ -15,22 +14,11 @@
                     m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                 }
-                @if (_dataCacheService.ThemeSetting.IsDark)
-                {
-                    <MButton Small Fab @attributes="@attrs" OnClick="OnClick">
-                        <MIcon>
-                            @Icon
-                        </MIcon>
-                    </MButton>
-                }
-                else
-                {
-                    <MButton Color="@_dataCacheService.ThemeSetting.Theme" Dark Small Fab @attributes="@attrs" OnClick="OnClick">
-                        <MIcon>
-                            @Icon
-                        </MIcon>
-                    </MButton>
-                }
+                <MButton Color="@(_dataCacheService.ThemeSetting.IsDark?"":"primary")" Dark Small Fab @attributes="@attrs" OnClick="OnClick">
+                    <MIcon>
+                        @Icon
+                    </MIcon>
+                </MButton>
             </ActivatorContent>
             <ChildContent>
                 <span>@Text</span>
@@ -38,7 +26,7 @@
         </MTooltip>
     </ActivatorContent>
     <ChildContent>
-       @ChildContent
+        @ChildContent
     </ChildContent>
 </MSpeedDial>
 
@@ -59,4 +47,25 @@
 
     private bool fab;
 
+    protected override async Task OnInitializedAsync()
+    {
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+        _dataCacheService.RefreshRequsted += RefreshRequsted;
+    }
+
+    public async void RefreshRequsted(object sender, EventArgs args)
+    {
+        await InvokeAsync(StateHasChanged);
+
+    }
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

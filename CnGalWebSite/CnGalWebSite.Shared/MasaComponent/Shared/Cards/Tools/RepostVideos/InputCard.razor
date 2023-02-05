@@ -9,16 +9,16 @@
     </div>
     <div class="row mb-4">
         <div class="col-12 col-sm-3">
-            <MTextField Label="类型（可不填，将自动获取）" @bind-Value="@InputModel.Type" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
+            <MTextField Label="类型（可不填，将自动获取）" @bind-Value="@InputModel.Type" TValue="string" ></MTextField>
         </div>
         <div class="col-12 col-sm-9">
-            <MTextField Label="标题（可不填，将自动获取）" @bind-Value="@InputModel.Title" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
+            <MTextField Label="标题（可不填，将自动获取）" @bind-Value="@InputModel.Title" TValue="string" ></MTextField>
         </div>
         <div class="col-12 ">
-            <MTextField Label="链接" @bind-Value="@InputModel.Url" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
+            <MTextField Label="链接" @bind-Value="@InputModel.Url" TValue="string" ></MTextField>
         </div>
         <div class="col-12 col-sm-6 mb-4">
-            <MCheckbox @bind-Value="InputModel.IsCreatedByCurrentUser" Label="本人创作" Color="@_dataCacheService.ThemeSetting.Theme" />
+            <MCheckbox @bind-Value="InputModel.IsCreatedByCurrentUser" Label="本人创作"  />
         </div>
         <div class="col-12 mb-2">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="@(async ()=> {await OnAdd(InputModel);InputModel = new RepostVideoModel(); })" Icon="mdi-plus" Class="me-4" />

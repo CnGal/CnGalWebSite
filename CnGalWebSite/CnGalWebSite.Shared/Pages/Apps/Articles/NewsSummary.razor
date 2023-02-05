@@ -6,7 +6,7 @@
 <TitleTip Title="动态汇总"></TitleTip>
 
 <MTabs @bind-Value="@_dataCacheService.NewsSummaryCache.TabIndex" IconsAndText Grow CenterActive Class="shadow-sm bg-opacity rounded mb-4"
-       Color="@_dataCacheService.ThemeSetting.Theme">
+       >
 
     <MTab Value="1" OnClick="@(() => OnCondited("本周"))">
         本周<MIcon>mdi-av-timer </MIcon>

@@ -1,6 +1,7 @@
 ﻿@inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
 
 <MDialog @bind-Value="Dialog"
          MaxWidth="550">
@@ -15,7 +16,7 @@
         <MCardText Class="pb-0">
             @if (isReady)
             {
-                <MButtonGroup Tile Group Value="(int)Model.Type" ValueChanged="ValueChanged" Color="@_dataCacheService.ThemeSetting.Theme" Class="pb-2 pt-4" Style=" display: flex; flex-wrap: wrap;">
+                <MButtonGroup Tile Group Value="(int)Model.Type" ValueChanged="ValueChanged"  Class="pb-2 pt-4" Style=" display: flex; flex-wrap: wrap;">
                     <MButton Class="m-0" Value="(int)PlayedGameType.WantToPlay">
                         想玩
                     </MButton>
@@ -44,7 +45,7 @@
                 }
                 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaRating @bind-Value="Model.TotalSocre" Lable="总评" />
 
-                <MTextarea Label="评语" Rows="5" Color="@_dataCacheService.ThemeSetting.Theme" Placeholder="@($"超过{ToolHelper.MinValidPlayImpressionsLength}字才会被年度游戏评选收录哦~")"
+                <MTextarea Label="评语" Rows="5"  Placeholder="@($"超过{ToolHelper.MinValidPlayImpressionsLength}字才会被年度游戏评选收录哦~")"
                            @bind-Value="Model.PlayImpressions" Counter="true">
 
                 </MTextarea>
@@ -53,19 +54,19 @@
                         <MCheckbox @bind-Value="Model.ShowPublicly"
                                    Label="公开（参与评选）" Class="m-0"
                                    HideDetails="true"
-                                   Color="@_dataCacheService.ThemeSetting.Theme"></MCheckbox>
+                                   ></MCheckbox>
                     </div>
                     <div class="col-12 col-md-6">
                         <MCheckbox @bind-Value="Model.IsHidden"
                                    Label="不展示在个人主页中" Class="m-0"
                                    HideDetails="true"
-                                   Color="@_dataCacheService.ThemeSetting.Theme"></MCheckbox>
+                                   ></MCheckbox>
                     </div>
                 </div>
             }
             else
             {
-                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Style="min-height:200px;" Class="mt-8"/>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Cards.ProgressingCard Style="min-height:200px;" Class="mt-8" />
 
             }
         </MCardText>
@@ -173,11 +174,7 @@
                         });
 
                         _dataCacheService.ThemeSetting.PlayedGameInforCount--;
-
-                        if (CnGalRootTip != null)
-                        {
-                            await CnGalRootTip.SaveTheme();
-                        }
+                        _eventService.OnSavaTheme();
 
                     }
                 }
@@ -227,13 +224,13 @@
         }
     }
 
-    public async Task Refresh(bool dialog, int id, GameRecordViewModel viewModel, bool _isDubbing=true)
+    public async Task Refresh(bool dialog, int id, GameRecordViewModel viewModel, bool _isDubbing = true)
     {
         Dialog = dialog;
         Id = id;
         ViewModel = viewModel;
         isDubbing = _isDubbing;
-        if(viewModel!=null)
+        if (viewModel != null)
         {
             isDubbing = viewModel.IsDubbing;
         }

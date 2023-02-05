@@ -1,13 +1,11 @@
 ﻿@inject IDataCacheService _dataCacheService
 @inject IJSRuntime JS
 
-@implements IDisposable
-
 @if (CatalogItems != null && CatalogItems.Any())
 {
     <div class="overflow-x-auto pe-3" style="max-height: 500px">
         <MTreeview OpenAll
-                   Color="@_dataCacheService.ThemeSetting.Theme"
+                   
                    Items="CatalogItems"
                    TItem="ArticleCatalogModel"
                    TKey="string"
@@ -31,29 +29,9 @@ else
 
 @code {
     [Parameter]
-    public string Model { get; set; }
-    [Parameter]
     public string Url { get; set; }
     [Parameter]
-    public EventCallback OnNav { get; set; }
-
-    List<ArticleCatalogModel> CatalogItems = new List<ArticleCatalogModel>();
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-        _dataCacheService.RefreshRequsted += RefreshRequsted;
-        await Refresh();
-
-    }
-
-    public Task Refresh()
-    {
-        CatalogItems = ArticleCatalogModel.GetCatalog(Model);
-
-        return Task.CompletedTask;
-    }
+    public List<ArticleCatalogModel> CatalogItems { get; set; }
 
     public async Task OnActiveUpdate(List<ArticleCatalogModel> model)
     {
@@ -62,22 +40,5 @@ else
             return;
         }
         await JS.InvokeAsync<string>("navigateTo", $"{Url}#{model.FirstOrDefault().Href}");
-        await OnNav.InvokeAsync();
     }
-
-    public async void RefreshRequsted(object sender, EventArgs args)
-    {
-        await InvokeAsync(StateHasChanged);
-
-    }
-    #region 释放实例
-
-    public void Dispose()
-    {
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

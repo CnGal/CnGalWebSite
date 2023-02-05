@@ -1,8 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
-@implements IDisposable
 
-@if (string.IsNullOrWhiteSpace(Text) == false && string.IsNullOrWhiteSpace(Url) == false)
+@if (CatalogItems!=null&& CatalogItems.Any() && string.IsNullOrWhiteSpace(Url) == false)
 {
     <MMenu OffsetY @bind-Value="menu" Top>
         <ActivatorContent Context="m">
@@ -13,7 +12,7 @@
                         m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                         c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     }
-                    <MButton Fab Small Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs" Dark>
+                    <MButton Fab Small  Class="@Class" @attributes="@attrs" Dark  Color="@(_dataCacheService.ThemeSetting.IsDark?"":"primary")">
                         <MIcon>mdi-format-list-bulleted-square </MIcon>
                     </MButton>
                 </ActivatorContent>
@@ -26,7 +25,7 @@
         <ChildContent>
             <div class="bg-theme p-3 pe-0" style="width:400px;">
                 <div class="w-100">
-                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalog Model="@Text" Url="@Url" @ref="masaCatalog"/>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalog CatalogItems="CatalogItems" Url="@Url" @ref="masaCatalog"/>
                 </div>
             </div>
         </ChildContent>
@@ -38,45 +37,19 @@
     [Parameter]
     public string Class { get; set; }
 
-    public string Text { get; set; }
     public string Url { get; set; }
 
     private bool menu { get; set; }
 
     CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalog masaCatalog;
+    List<ArticleCatalogModel> CatalogItems = new List<ArticleCatalogModel>();
 
-    public async Task Refresh(string text, string url)
+    public Task Refresh(string text, string url)
     {
-        Text = text;
         Url = url;
-        if(masaCatalog!=null)
-        {
-            await masaCatalog.Refresh();
-        }
+        CatalogItems = ArticleCatalogModel.GetCatalog(text);
 
         StateHasChanged();
+        return Task.CompletedTask;
     }
-
-    protected override async Task OnInitializedAsync()
-    {
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-        _dataCacheService.RefreshRequsted += RefreshRequsted;
-
-    }
-
-    public async void RefreshRequsted(object sender, EventArgs args)
-    {
-        await InvokeAsync(StateHasChanged);
-
-    }
-    #region 释放实例
-
-    public void Dispose()
-    {
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

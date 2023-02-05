@@ -3,23 +3,12 @@
 
 <MTooltip Left>
     <ActivatorContent>
-        @if (_dataCacheService.ThemeSetting.IsDark)
-        {
-            <MButton XSmall Fab @attributes="@context.Attrs">
-                <MIcon>
-                    @Icon
-                </MIcon>
-            </MButton>
-        }
-        else
-        {
-            <MButton Color="@_dataCacheService.ThemeSetting.Theme" Dark XSmall Fab @attributes="@context.Attrs">
-                <MIcon>
-                    @Icon
-                </MIcon>
-            </MButton>
 
-        }
+        <MButton Dark XSmall Fab @attributes="@context.Attrs" Color="@(_dataCacheService.ThemeSetting.IsDark?"":"primary")">
+            <MIcon>
+                @Icon
+            </MIcon>
+        </MButton>
     </ActivatorContent>
     <ChildContent>
         <img src="@Image" class="pt-3 pb-3" />
