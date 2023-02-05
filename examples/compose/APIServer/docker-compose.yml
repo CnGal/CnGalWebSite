@@ -1,0 +1,43 @@
+version: "3"
+services:
+  apiserver:
+    image: littlefishtentears/cngalwebsiteapiserver:latest
+    container_name: apiserver
+    environment:
+      - TZ=${TZ}
+      - CnGalDBConnection=${CnGalDBConnection}
+      - Password=${Password}
+      - WeiboAppKey=${WeiboAppKey}
+      - AppSecret=${AppSecret}
+      - ThirdPartyLoginQQ_client_id=${ThirdPartyLoginQQ_client_id}
+      - ThirdPartyLoginQQ_client_secret=${ThirdPartyLoginQQ_client_secret}
+      - TypesenseAPIKey=${TypesenseAPIKey}
+      - AccessKeyId=${AccessKeyId}
+      - AccessKeySecret=${AccessKeySecret}
+      - SliotsImageAPIToken=${SliotsImageAPIToken}
+      - SteamAPIToken=${SteamAPIToken}
+      - IsthereanydealAPIToken=${IsthereanydealAPIToken}
+      - GEETEST_ID=${GEETEST_ID}
+      - GEETEST_KEY=${GEETEST_KEY}
+      - JwtSecurityKey=${JwtSecurityKey}
+      - WeiXinToken=${WeiXinToken}
+      - WeiXinEncodingAESKey=${WeiXinEncodingAESKey}
+      - WeixinAppId=${WeixinAppId}
+      - WeiXinAppSecret=${WeiXinAppSecret}
+      - TucangCCAPIToken=${TucangCCAPIToken}
+      - BilibiliCookie=${BilibiliCookie}
+    hostname: apiserver
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/healthz"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1.2G
+    ports:
+      - "3001:443"
+      - "2001:80"
