@@ -11,7 +11,7 @@
             合并时会自动迁移关联信息
         </MCardText>
         <MStepper Value="_step" Vertical Elevation="0" Style="box-shadow: none;" Height="@("auto")">
-            <MStepperStep Step="1" Complete="_step>1" Color="@_dataCacheService.ThemeSetting.Theme">
+            <MStepperStep Step="1" Complete="_step>1" >
                 输入要合并的词条
             </MStepperStep>
             <MStepperContent Step="1">
@@ -22,7 +22,7 @@
             
 
             </MStepperContent>
-            <MStepperStep Step="2" Complete="_step>2" Color="@_dataCacheService.ThemeSetting.Theme">
+            <MStepperStep Step="2" Complete="_step>2" >
                 正在合并词条
             </MStepperStep>
             <MStepperContent Step="2">
@@ -31,7 +31,7 @@
                     <ProcCard Model="Model" @ref="procCard" />
                 }
             </MStepperContent>
-            <MStepperStep Step="3" Complete="_step>3" Color="@_dataCacheService.ThemeSetting.Theme">
+            <MStepperStep Step="3" Complete="_step>3" >
                 词条合并完成
             </MStepperStep>
             <MStepperContent Step="3">

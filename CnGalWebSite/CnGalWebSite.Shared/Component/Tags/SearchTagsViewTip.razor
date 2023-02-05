@@ -5,7 +5,7 @@
         <MTextField Value="_search" ValueChanged="OnSearch" TValue="string" Class="ps-3 pe-3"
                     Label="可以搜索标签哦~"
                     Clearable
-                    Color="@_dataCacheService.ThemeSetting.Theme"
+                    
                     ClearIcon="mdi-close-circle-outline"></MTextField>
     <MTreeview Items="Items"
                Search="@_search"
@@ -16,14 +16,14 @@
                ItemChildren="r => r.Children"
                Activatable
                Selectable="Model!=null"
-               SelectedColor="@_dataCacheService.ThemeSetting.Theme"
+               Selected
                ValueChanged="ValueChanged"
                Value="selectedItems"
-               Color="@_dataCacheService.ThemeSetting.Theme">
+               >
         <PrependContent>
             @if (string.IsNullOrWhiteSpace(context.Item.Icon) == false)
             {
-                <MIcon Color="@_dataCacheService.ThemeSetting.Theme">
+                <MIcon >
                     @context.Item.Icon
                 </MIcon>
             }

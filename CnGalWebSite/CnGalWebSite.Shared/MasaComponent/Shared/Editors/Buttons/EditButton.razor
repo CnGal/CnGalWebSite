@@ -3,6 +3,7 @@
 @inject DialogService DialogService
 @inject IDataCacheService _dataCacheService
 @inject ToastService ToastService
+@implements IDisposable
 
 <MMenu OffsetY CloseOnContentClick="false" Value="Menu" ValueChanged="ValueChanged">
     <ActivatorContent Context="m">
@@ -13,19 +14,9 @@
                     m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                 }
-                @if (_dataCacheService.ThemeSetting.IsDark)
-                {
-                    <MButton Fab Small @attributes="@attrs" Class="@Class">
-                        <MIcon>mdi-pencil</MIcon>
-                    </MButton>
-                }
-                else
-                {
-                    <MButton Fab Dark Small Color="@_dataCacheService.ThemeSetting.Theme" @attributes="@attrs" Class="@Class">
-                        <MIcon>mdi-pencil</MIcon>
-                    </MButton>
-                }
-
+                <MButton Fab Small @attributes="@attrs" Class="@Class" Dark Color="@(_dataCacheService.ThemeSetting.IsDark?"":"primary")">
+                    <MIcon>mdi-pencil</MIcon>
+                </MButton>
             </ActivatorContent>
             <ChildContent>
                 <span>编辑</span>
@@ -65,10 +56,10 @@
                                 }
                                 else
                                 {
-                            <MButton Text Block Color="warning" OnClick="@(()=>SetMonitor(true))">
-                                <MIcon Left>mdi-monitor</MIcon>
-                                关注词条
-                            </MButton>
+                                    <MButton Text Block Color="warning" OnClick="@(()=>SetMonitor(true))">
+                                        <MIcon Left>mdi-monitor</MIcon>
+                                        关注词条
+                                    </MButton>
                                 }
                             </Authorized>
                         </AuthorizeView>
@@ -94,7 +85,7 @@
                 else
                 {
                     <div class="w-100" style=" text-align: center;">
-                        <MProgressCircular Size="60" Width="6" Indeterminate Color="@_dataCacheService.ThemeSetting.Theme" Class="mt-4 mb-4"></MProgressCircular>
+                        <MProgressCircular Size="60" Width="6" Indeterminate Class="mt-4 mb-4"></MProgressCircular>
 
                     </div>
                 }
@@ -107,7 +98,7 @@
 
 @if (ShowExamines)
 {
-    <EditRecordListViewTip Id="Id" Model="Examines" Type="Type" OnClickClose="@(()=> { ShowExamines = false;StateHasChanged(); })"  />
+    <EditRecordListViewTip Id="Id" Model="Examines" Type="Type" OnClickClose="@(()=> { ShowExamines = false;StateHasChanged(); })" />
 }
 @code {
     [Parameter]
@@ -322,4 +313,26 @@
         StateHasChanged();
         return Task.CompletedTask;
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+        _dataCacheService.RefreshRequsted += RefreshRequsted;
+    }
+
+    public async void RefreshRequsted(object sender, EventArgs args)
+    {
+        await InvokeAsync(StateHasChanged);
+
+    }
+    #region 释放实例
+
+    public void Dispose()
+    {
+
+        _dataCacheService.RefreshRequsted -= RefreshRequsted;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

@@ -13,7 +13,7 @@ namespace CnGalWebSite.Shared
     /// <summary>
     /// 
     /// </summary>
-    public partial class App : IDisposable
+    public partial class App
     {
 
         private System.Threading.Timer mytimer;
@@ -45,21 +45,6 @@ namespace CnGalWebSite.Shared
                 _dataCacheService.IsMiniMode = true;
             }
 
-            _eventService.RefreshApp -= _eventService_RefreshApp;
-            _eventService.RefreshApp += _eventService_RefreshApp;
-
-            _eventService.SavaTheme -= _eventService_SavaTheme;
-            _eventService.SavaTheme += _eventService_SavaTheme;
-        }
-
-        private async void _eventService_SavaTheme()
-        {
-            await cngalRootTip?.SaveTheme();
-        }
-
-        private async void _eventService_RefreshApp()
-        {
-            await _dataCacheService.OnRefreshRequsted(null);
         }
 
 
@@ -123,15 +108,11 @@ namespace CnGalWebSite.Shared
 
                 if (needRefresh)
                 {
-                     _eventService_RefreshApp();
+                   await _dataCacheService.OnRefreshRequsted(null);
                 }
 
                 //需要调用一次令牌刷新接口 确保登入没有过期
                 var result = await _authService.Refresh();
-                if (result != null && result.Code != LoginResultCode.OK)
-                {
-                    StateHasChanged();
-                }
 
                 //启动定时器
                 mytimer = new System.Threading.Timer(new System.Threading.TimerCallback(Send), null, 0, 1000 * 60 * 10);
@@ -179,20 +160,5 @@ namespace CnGalWebSite.Shared
             }
 
         }
-
-        #region 释放实例
-        public void Dispose()
-        {
-            _eventService.RefreshApp -= _eventService_RefreshApp;
-            _eventService.SavaTheme -= _eventService_SavaTheme;
-            if (mytimer != null)
-            {
-                mytimer.Dispose();
-                mytimer = null;
-            }
-            GC.SuppressFinalize(this);
-        }
-        #endregion
-
     }
 }

@@ -16,7 +16,7 @@
         </MCardText>
 
         <MCardText>
-                <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）" Color="@_dataCacheService.ThemeSetting.Theme" />
+                <MTextField @bind-Value="Model.SteamId" Label="SteamID64（64位的数字Id，可用逗号分隔多个Id）"  />
         </MCardText>
         <MCardActions Class="pb-6 pe-6 ps-6 pt-6">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="如何获取SteamId" IsAsync="true" OnClick="OnClickQuestion" Icon="mdi-help-circle-outline" Color="error" TextStyle />

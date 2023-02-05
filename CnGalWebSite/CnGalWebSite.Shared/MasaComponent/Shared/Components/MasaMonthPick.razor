@@ -8,22 +8,22 @@
        MaxWidth="290"
        MinWidth="@("auto")">
     <ActivatorContent>
-        <MTextField @bind-Value="_str" Color="@_dataCacheService.ThemeSetting.Theme"
+        <MTextField @bind-Value="_str" 
                                 PrependIcon="mdi-calendar"
                     Readonly
                     @attributes="context.Attrs"></MTextField>
     </ActivatorContent>
     <ChildContent>
-        <MDatePicker @bind-Value="_date" Color="@_dataCacheService.ThemeSetting.Theme"
+        <MDatePicker @bind-Value="_date" 
                      Type="DatePickerType.Month"
                      NoTitle Locale="zh-CN"
                      Scrollable>
             <MSpacer></MSpacer>
-            <MButton Text Color="@_dataCacheService.ThemeSetting.Theme"
+            <MButton Text 
                      OnClick="MenuCancel">
                 取消
             </MButton>
-            <MButton Text Color="@_dataCacheService.ThemeSetting.Theme"
+            <MButton Text 
                      OnClick="MenuOk">
                确定
             </MButton>

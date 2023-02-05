@@ -13,13 +13,13 @@
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte @bind-Value="InputModel.Type" TValue="ArticleType" Lable="类型" />
         </div>
         <div class="col-12 col-sm-9">
-            <MTextField Label="标题（可不填，将自动获取）" @bind-Value="@InputModel.Title" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
+            <MTextField Label="标题（可不填，将自动获取）" @bind-Value="@InputModel.Title" TValue="string" ></MTextField>
         </div>
         <div class="col-12  mb-4">
-            <MTextField Label="链接" @bind-Value="@InputModel.Url" TValue="string" Color="@_dataCacheService.ThemeSetting.Theme"></MTextField>
+            <MTextField Label="链接" @bind-Value="@InputModel.Url" TValue="string" ></MTextField>
         </div>
         <div class="col-12 col-sm-6 mb-4">
-            <MCheckbox @bind-Value="InputModel.IsCreatedByCurrentUser" Label="本人创作" Color="@_dataCacheService.ThemeSetting.Theme" />
+            <MCheckbox @bind-Value="InputModel.IsCreatedByCurrentUser" Label="本人创作"  />
         </div>
         <div class="col-12 mb-2">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Depressed Text="添加" OnClick="@(async ()=> {await OnAdd(InputModel);InputModel = new RepostArticleModel(); })" Icon="mdi-plus" />

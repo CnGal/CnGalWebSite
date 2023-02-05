@@ -43,7 +43,7 @@
                     </div>
                 </a>
                 <div class="ms-3 me-3 mb-1 mt-1 pt-2">
-                    <MProgressLinear Value="@((int)((double)Model.Peripheries.Count(s=>s.IsCollected==true)*100/Model.Peripheries.Count))" BufferValue="0" Stream Color="@_dataCatcheService.ThemeSetting.Theme"/>
+                    <MProgressLinear Value="@((int)((double)Model.Peripheries.Count(s=>s.IsCollected==true)*100/Model.Peripheries.Count))" BufferValue="0" Stream />
                 </div>
                 <MSlideGroup ShowArrows="true" Class="ms-2 me-2 pb-2">
                     <ChildContent>

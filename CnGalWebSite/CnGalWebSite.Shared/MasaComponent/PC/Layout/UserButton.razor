@@ -5,7 +5,7 @@
 
 @if (string.IsNullOrWhiteSpace(_dataCacheService.UserInfor.PhotoPath) == false)
 {
-    <MBadge Content="messageCount" Value="messageCount!=0" Color="@_dataCacheService.ThemeSetting.Theme"  OffsetX="30" OffsetY="20">
+    <MBadge Content="messageCount" Value="messageCount!=0"   OffsetX="30" OffsetY="20">
         <MMenu OffsetY CloseOnContentClick="false" @bind-Value="menu">
             <ActivatorContent Context="m">
                 <MTooltip Bottom>
@@ -15,7 +15,7 @@
                             m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                             c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                         }
-                        <MButton Icon Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs">
+                        <MButton Icon  Class="@Class" @attributes="@attrs">
                             <img style="width: 35px; border-radius: 50%; aspect-ratio: 1" src="@_dataCacheService.UserInfor.PhotoPath" alt="@_dataCacheService.UserInfor.Name" />
                         </MButton>
                     </ActivatorContent>

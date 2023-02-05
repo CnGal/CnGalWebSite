@@ -316,7 +316,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //转换成东八区
-            var dateTime = DateTime.Now.ToCstTime().AddHours(8);
+            var dateTime = DateTime.Now.ToCstTime();//.AddHours(8);
             //计算连续签到天数和今天是否签到
             if (await _signInDayRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id && s.Time.Date == dateTime.Date) == false)
             {

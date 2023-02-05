@@ -28,7 +28,7 @@
                 @(level==10?Model.BasicInfor.Integral:(Model.BasicInfor.Integral+" / "+ToolHelper.GetLevelIntegral(level)))
             </span>
         </div>
-        <MProgressLinear Value="@(level==10?100:(100.0*Model.BasicInfor.Integral/ToolHelper.GetLevelIntegral(level)))" Color="@_dataCacheService.ThemeSetting.Theme"></MProgressLinear>
+        <MProgressLinear Value="@(level==10?100:(100.0*Model.BasicInfor.Integral/ToolHelper.GetLevelIntegral(level)))" ></MProgressLinear>
     </div>
     @if (Model.IsCurrentUser)
     {

@@ -3,7 +3,7 @@
 @inject ILocalStorageService _localStorage
 @inject IEventService _eventService
 @inject IJSRuntime JS
-
+@implements IDisposable
 
 <style>
     :root {
@@ -93,20 +93,19 @@ else
 
 
 @code {
-    public bool isDark = false;
-    public bool isTransparent = true;
-    public bool isExpand = false;
 
     public string colorMain;
     public string colorHover;
     public string colorActive;
-    public string theme;
+
     public string DefaultTheme = "pink lighten-2";
 
     [Parameter]
     public EventCallback OnTransparentChanged { get; set; }
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [Inject]
+    public MasaBlazor MasaBlazor { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -116,8 +115,16 @@ else
         }
 
         ProcColor(DefaultTheme);
-        _dataCacheService.ThemeSetting.Theme = theme = DefaultTheme;
+        _dataCacheService.ThemeSetting.Theme = DefaultTheme;
 
+        _eventService.SavaTheme -= OnSavaTheme;
+        _eventService.SavaTheme += OnSavaTheme;
+    }
+
+    public async void OnSavaTheme()
+    {
+        await SaveTheme();
+        await Refresh();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -128,8 +135,6 @@ else
             await LoadTheme();
             //刷新
             await Refresh();
-            StateHasChanged();
-            _mauiService.ChangeTheme(colorMain);
         }
     }
 
@@ -155,7 +160,7 @@ else
         }
 
         //若为默认主题 则设置主题色
-        if (_dataCacheService.ThemeSetting.Type == ThemeType.Default && _dataCacheService.ThemeSetting.IsDark == false)
+        if (ThemeModel.DefaultTheme==_dataCacheService.ThemeSetting.Theme && _dataCacheService.ThemeSetting.IsDark == false)
         {
             _dataCacheService.ThemeSetting.Theme = DefaultTheme;
         }
@@ -282,19 +287,6 @@ else
     public async Task SaveTheme()
     {
         await _localStorage.SetItemAsync("theme", _dataCacheService.ThemeSetting);
-        await Refresh();
-    }
-
-    private async Task InitMouse()
-    {
-        try
-        {
-            await JS.InvokeAsync<string>("InitMouse");
-        }
-        catch
-        {
-
-        }
     }
 
     /// <summary>
@@ -307,19 +299,38 @@ else
             return;
         }
 
-        ProcColor(_dataCacheService.ThemeSetting.Theme);
-
-        if (theme != _dataCacheService.ThemeSetting.Theme || isDark != _dataCacheService.ThemeSetting.IsDark || isTransparent != _dataCacheService.ThemeSetting.IsTransparent || isExpand != _dataCacheService.ThemeSetting.IsExtendEntireScreen)
+        //刷新默认主题色
+        if (MasaBlazor.Theme.Themes.Light.Primary != _dataCacheService.ThemeSetting.Theme)
         {
+            //重新生成颜色
+            ProcColor(_dataCacheService.ThemeSetting.Theme);
+            //重新赋值
+            var theme = MasaBlazor.Theme;
+            theme.Themes.Light.Primary = colorMain;
+            MasaBlazor.Theme = theme;
+            //通知MAUI
             _mauiService.ChangeTheme(colorMain);
-            _eventService.OnRefreshApp();
-
-            theme = _dataCacheService.ThemeSetting.Theme;
-            isDark = _dataCacheService.ThemeSetting.IsDark;
-            isTransparent = _dataCacheService.ThemeSetting.IsTransparent;
-            isExpand = _dataCacheService.ThemeSetting.IsExtendEntireScreen;
         }
 
-        StateHasChanged();
+        //通知主题模式切换
+        if(MasaBlazor.Theme.Dark != _dataCacheService.ThemeSetting.IsDark)
+        {
+            //重新赋值
+            var theme = MasaBlazor.Theme;
+            theme.Dark = _dataCacheService.ThemeSetting.IsDark;
+            MasaBlazor.Theme = theme;
+
+            await _dataCacheService.OnRefreshRequsted(null);
+        }
+
+        await InvokeAsync(StateHasChanged);
     }
+
+    #region 释放实例
+    public void Dispose()
+    {
+        _eventService.SavaTheme -= OnSavaTheme;
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

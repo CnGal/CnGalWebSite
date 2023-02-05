@@ -15,7 +15,7 @@
                         m.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                         c.Attrs.ToList().ForEach(item => attrs[item.Key] = item.Value);
                     }
-                    <MButton Fab Small Color="@_dataCacheService.ThemeSetting.Theme" Class="@Class" @attributes="@attrs" Dark>
+                    <MButton Fab Small  Class="@Class" @attributes="@attrs" Dark  Color="@(_dataCacheService.ThemeSetting.IsDark?"":"primary")">
                         <MIcon>mdi-cake-variant </MIcon>
                     </MButton>
                 </ActivatorContent>

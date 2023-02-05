@@ -5,9 +5,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Theme
 {
     public class ThemeModel
     {
-        public string Theme { get; set; } = "pink lighten-2";
-
-        public ThemeType Type { get; set; }
+        public static string DefaultTheme = "pink lighten-2";
+        public string Theme { get; set; } = DefaultTheme;
 
         public bool IsDark { get; set; }
 

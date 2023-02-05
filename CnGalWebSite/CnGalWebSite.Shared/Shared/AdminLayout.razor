@@ -94,10 +94,10 @@
             }
         }
 
-        public async Task OnRefreshLayout()
+        public Task OnRefreshLayout()
         {
             NavigationManager.NavigateTo("/");
-            await Task.Delay(1000);
-            _eventService.OnRefreshApp();
+
+            return Task.CompletedTask;
         }
     }

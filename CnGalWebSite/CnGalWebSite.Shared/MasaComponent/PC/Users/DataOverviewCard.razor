@@ -8,7 +8,7 @@
                 <span>
                     @($"编辑总数：{Model.PassedExamineCount} / {Model.TotalExamine}")
                 </span>
-                <MProgressLinear Value="@(Model.TotalExamine==0?0:(100.0*Model.PassedExamineCount/Model.TotalExamine))" Color="@_dataCacheService.ThemeSetting.Theme" Height="10"></MProgressLinear>
+                <MProgressLinear Value="@(Model.TotalExamine==0?0:(100.0*Model.PassedExamineCount/Model.TotalExamine))"  Height="10"></MProgressLinear>
             </div>
         </div>
 
@@ -21,7 +21,7 @@
                 <span>
                     @($"文件空间：{(Model.UsedFilesSpace/(1024*1024.0)).ToString("0.0")}MB / {(Model.TotalFilesSpace / (1024 * 1024.0)).ToString("0.0")}MB")
                 </span>
-                <MProgressLinear Value="@(Model.TotalFilesSpace==0?0:(100.0*Model.UsedFilesSpace/Model.TotalFilesSpace))" Color="@_dataCacheService.ThemeSetting.Theme" Height="10"></MProgressLinear>
+                <MProgressLinear Value="@(Model.TotalFilesSpace==0?0:(100.0*Model.UsedFilesSpace/Model.TotalFilesSpace))"  Height="10"></MProgressLinear>
             </div>
         </div>
 

@@ -9,8 +9,8 @@
             {
                 <div style="max-width:100px;">
 
-                    <MSelect Value="_days" ValueChanged="ValueChanged" TValue="int" TItem="KeyValuePair<string, int>" TItemValue="int" Color="@_dataCacheService.ThemeSetting.Theme"
-                             Items="@items" ItemColor="@_dataCacheService.ThemeSetting.Theme" Class="pe-4 pt-0"
+                    <MSelect Value="_days" ValueChanged="ValueChanged" TValue="int" TItem="KeyValuePair<string, int>" TItemValue="int" 
+                             Items="@items" Item Class="pe-4 pt-0"
                              ItemText="u => u.Key"
                              ItemValue="u => u.Value"
                              MenuProps="props => props.OffsetY = true">
@@ -22,8 +22,8 @@
             {
                 <div style="max-width:100px;">
 
-                    <MSelect Value="isExtend" ValueChanged="ExtendValueChanged" TValue="bool" TItem="KeyValuePair<string, bool>" TItemValue="bool" Color="@_dataCacheService.ThemeSetting.Theme"
-                             Items="@extendItems" ItemColor="@_dataCacheService.ThemeSetting.Theme" Class="pe-4 pt-0"
+                    <MSelect Value="isExtend" ValueChanged="ExtendValueChanged" TValue="bool" TItem="KeyValuePair<string, bool>" TItemValue="bool" 
+                             Items="@extendItems" Item Class="pe-4 pt-0"
                              ItemText="u => u.Key"
                              ItemValue="u => u.Value"
                              MenuProps="props => props.OffsetY = true">

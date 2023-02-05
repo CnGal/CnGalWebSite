@@ -1,15 +1,13 @@
 ﻿@inject ToastService ToastService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
-@implements IDisposable
-
 
 @if (IsTitile)
 {
     <MChip Class="@("rounded-lg ma-1"+ (IsTitile?" ms-0":""))"
            Color="@Color"
            Small
-           TextColor="white"
+           TextColor="@(_dataCacheService.ThemeSetting.IsDark?"dark":"white")"
            Outlined="!IsTitile">
         @Text
     </MChip>
@@ -67,7 +65,7 @@ else
     {
         get
         {
-            return color ?? _dataCacheService.ThemeSetting.Theme;
+            return color ?? "primary";
         }
         set
         {
@@ -103,27 +101,4 @@ else
 
 
     }
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-        _dataCacheService.RefreshRequsted += RefreshRequsted;
-    }
-
-    public async void RefreshRequsted(object sender, EventArgs args)
-    {
-        await InvokeAsync(StateHasChanged);
-
-    }
-    #region 释放实例
-
-    public void Dispose()
-    {
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

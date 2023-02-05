@@ -1,7 +1,6 @@
 ﻿@inject IDataCacheService _dataCacheService
-@implements IDisposable
 
-<MIcon Small="Large==false&&XSmall==false" Large="Large" XSmall="XSmall" Color="@(Color??_dataCacheService.ThemeSetting.Theme)" Class="@Class">@Type.ToIconString()</MIcon>
+<MIcon Small="Large==false&&XSmall==false" Large="Large" XSmall="XSmall" Color="@Color" Class="@Class">@Type.ToIconString()</MIcon>
 
 @code {
     [Parameter]
@@ -13,28 +12,5 @@
     [Parameter]
     public string Class { get; set; } = "me-2";
     [Parameter]
-    public string Color { get; set; }
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-        _dataCacheService.RefreshRequsted += RefreshRequsted;
-    }
-
-    public async void RefreshRequsted(object sender, EventArgs args)
-    {
-        await InvokeAsync(StateHasChanged);
-
-    }
-    #region 释放实例
-
-    public void Dispose()
-    {
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-
-        GC.SuppressFinalize(this);
-    }
-    #endregion
+    public string Color { get; set; } = "primary";
 }

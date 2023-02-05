@@ -11,14 +11,14 @@
                        OffsetY
                        MinWidth="@("auto")">
                     <ActivatorContent>
-                        <MTextField @bind-Value="_date" Color="@_dataCacheService.ThemeSetting.Theme"
+                        <MTextField @bind-Value="_date" 
                                     Label="@Lable"
                                     PrependIcon="mdi-calendar"
                                     Readonly
                                     @attributes="context.Attrs"/>
                     </ActivatorContent>
                     <ChildContent>
-                        <MDatePicker Value="_date" ValueChanged="OnDateChanged" TValue="DateOnly?" Color="@_dataCacheService.ThemeSetting.Theme"
+                        <MDatePicker Value="_date" ValueChanged="OnDateChanged" TValue="DateOnly?" 
                                      Locale="zh-CN"
                                      ActivePicker="_activePicker"
                                      OnActivePickerUpdate="val=>_activePicker=val"
@@ -39,7 +39,7 @@
                        MaxWidth="290"
                        MinWidth="290">
                     <ActivatorContent>
-                        <MTextField @bind-Value="_time" Color="@_dataCacheService.ThemeSetting.Theme"
+                        <MTextField @bind-Value="_time" 
                                     Label="@Lable"
                                     PrependIcon="mdi-clock-time-four-outline"
                                     Readonly
@@ -48,7 +48,7 @@
                     <ChildContent>
                         @if (_menu2)
                         {
-                            <MTimePicker Value="_time" ValueChanged="OnTimeChanged" Color="@_dataCacheService.ThemeSetting.Theme"
+                            <MTimePicker Value="_time" ValueChanged="OnTimeChanged" 
                                          FullWidth></MTimePicker>
                         }
                     </ChildContent>

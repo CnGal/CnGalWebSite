@@ -4,7 +4,7 @@
 {
     <div class="rounded  shadow-sm bg-opacity mb-4">
         <MTabs Value="TabIndex" ValueChanged="ValueChanged" IconsAndText Grow Class="rounded" CenterActive
-               Color="@_dataCacheService.ThemeSetting.Theme">
+               >
             @if (Model.Objects.Any(s => s.entry != null))
             {
                 <MTab Value="1">

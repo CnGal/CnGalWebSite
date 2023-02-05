@@ -3,31 +3,22 @@
 @inject IDataCacheService _dataCacheService
 
 
-<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="CnGal每周速报" Icon="@IconType.News.ToIconString()">
-    <ButtonContent>
-        <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickMore">
-            <MIcon Left>mdi-share-all-outline  </MIcon>
-            查看更多
-        </MButton>
-    </ButtonContent>
-    <ChildContent>
-        <MSlideGroup ShowArrows="true">
-            <ChildContent>
-                @foreach (var item in _dataCacheService.WeeklyNewsOverviewCatche)
-                {
-                    <MSlideItem>
-                        <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"
-                               OnClick="@context.Toggle"
-                               RefBack="@context.Ref">
-                            <WeeklyNewsViewTip Model="item" />
-                        </MCard>
-                    </MSlideItem>
-                }
-            </ChildContent>
+<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="CnGal每周速报" Icon="@IconType.News.ToIconString()" ShowMoreButton OnClickMore="OnClickMore">
+    <MSlideGroup ShowArrows="true">
+        <ChildContent>
+            @foreach (var item in _dataCacheService.WeeklyNewsOverviewCatche)
+            {
+                <MSlideItem>
+                    <MCard Width="300" Class="p-2" Outlined Style="border:0;background-color:transparent"
+                           OnClick="@context.Toggle"
+                           RefBack="@context.Ref">
+                        <WeeklyNewsViewTip Model="item" />
+                    </MCard>
+                </MSlideItem>
+            }
+        </ChildContent>
 
-        </MSlideGroup>
-    </ChildContent>
-
+    </MSlideGroup>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 
 @code {

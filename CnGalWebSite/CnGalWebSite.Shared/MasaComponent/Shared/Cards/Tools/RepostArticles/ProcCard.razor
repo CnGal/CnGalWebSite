@@ -5,11 +5,11 @@
 
 <div>
     <div>@($"{item.Url} ({index}/{Model.Count})")</div>
-    <MProgressLinear Value="index*100.0/Model.Count" Class="mb-2" Stream BufferValue="0" Color="@_dataCacheService.ThemeSetting.Theme"></MProgressLinear>
+    <MProgressLinear Value="index*100.0/Model.Count" Class="mb-2" Stream BufferValue="0" ></MProgressLinear>
 </div>
 <div>
     <div>@($"{infor} ({item.CompleteTaskCount}/{item.TotalTaskCount})")</div>
-    <MProgressLinear Value="item.CompleteTaskCount*100.0/item.TotalTaskCount" Stream BufferValue="0" Color="@_dataCacheService.ThemeSetting.Theme"></MProgressLinear>
+    <MProgressLinear Value="item.CompleteTaskCount*100.0/item.TotalTaskCount" Stream BufferValue="0" ></MProgressLinear>
 </div>
 
 @code {

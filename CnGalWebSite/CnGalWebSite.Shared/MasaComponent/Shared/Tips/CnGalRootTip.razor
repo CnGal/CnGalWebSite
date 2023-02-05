@@ -2,7 +2,7 @@
 @inject IServiceProvider _serviceProvider
 
 <ErrorHandler>
-    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip @ref="styleTip" />
+    <CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip/>
     <ImagesLargeViewTip />
     <FloatToolTip @ref="FloatTool" />
     <UserLicenseAgreementTip />
@@ -18,14 +18,5 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-    CnGalWebSite.Shared.MasaComponent.Shared.Tips.StyleTip styleTip;
     public FloatToolTip FloatTool { get; set; }
-
-    public async Task SaveTheme()
-    {
-        if (styleTip != null)
-        {
-            await styleTip.SaveTheme();
-        }
-    }
 }

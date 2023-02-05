@@ -62,7 +62,11 @@ namespace CnGalWebSite.Server
                 .AddScoped(typeof(IPageModelCatche<>), typeof(PageModelCatche<>))
                 .AddScoped<IDataCacheService, DataCatcheService>()
                 .AddScoped(x => new ImagesLargeViewService())
-                .AddMasaBlazor();
+                .AddMasaBlazor(s => s.ConfigureTheme(s =>
+                {
+                    s.Themes.Light.Primary = "#f06292";
+                    s.Themes.Dark.Primary = "#c9d1d9";
+                }));
 
             //添加状态检查
              _ = services.AddHealthChecks();
@@ -72,7 +76,7 @@ namespace CnGalWebSite.Server
                 .AddScoped<IEntryService, EntryService>()
                 .AddScoped<IArticleService, ArticleService>()
                 .AddScoped<IImageService, ImageService>()
-             .AddScoped<IVideoService, VideoService>();
+                .AddScoped<IVideoService, VideoService>();
             //services.AddScoped<IEventBase, EventBase>();
 
             //添加预渲染状态记录

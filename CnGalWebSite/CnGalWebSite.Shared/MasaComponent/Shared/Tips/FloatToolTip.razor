@@ -117,9 +117,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-        _dataCacheService.RefreshRequsted += RefreshRequsted;
-
         NavigationManager.LocationChanged -= LocationChanged;
         NavigationManager.LocationChanged += LocationChanged;
 
@@ -138,16 +135,10 @@
         }
     }
 
-    public async void RefreshRequsted(object sender, EventArgs args)
-    {
-        await InvokeAsync(StateHasChanged);
-    }
     #region 释放实例
 
     public void Dispose()
     {
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
         NavigationManager.LocationChanged -= LocationChanged;
         GC.SuppressFinalize(this);
     }

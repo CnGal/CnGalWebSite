@@ -1,6 +1,9 @@
 ﻿@inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
+@inject IEventService _eventService
+
+
 <style>
     .m-rating .m-icon {
         padding: 0.1rem;
@@ -10,7 +13,7 @@
     <div style="display: flex; justify-content: space-around; flex-wrap: wrap; " class="pt-4">
 
         <div class="ps-4 pe-4" style=" display: flex; max-width: 400px; width: 100%; align-items: center;">
-            <MTextField Placeholder="可以搜索哦~" TValue="string" Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.SearchString" ValueChanged="SearchValueChanged" Color="@_dataCacheService.ThemeSetting.Theme" OnKeyDown="OnKeyDown" Class="pt-0"></MTextField>
+            <MTextField Placeholder="可以搜索哦~" TValue="string" Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.SearchString" ValueChanged="SearchValueChanged"  OnKeyDown="OnKeyDown" Class="pt-0"></MTextField>
         </div>
         <div class="ps-4 pe-4" style="max-width: 400px; width: 100%;">
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaSelecte Value="_dataCacheService.ThemeSetting.AnniversariesSetting.SortType" ValueChanged="SortValueChanged" TValue="JudgableGamesSortType" Class="pt-0" />
@@ -30,7 +33,7 @@
 
 @if (_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages > 1)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage" Length="@_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages" ValueChanged="OnPageClick"/>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage" Length="@_dataCacheService.ThemeSetting.AnniversariesSetting.TotalPages" ValueChanged="OnPageClick" />
 }
 
 @if (Items.Any() == false && isReady)
@@ -107,19 +110,13 @@
     public async Task SortValueChanged(JudgableGamesSortType type)
     {
         _dataCacheService.ThemeSetting.AnniversariesSetting.SortType = type;
-        if (CnGalRootTip != null)
-        {
-            await CnGalRootTip.SaveTheme();
-        }
+        _eventService.OnSavaTheme();
         await Refresh();
     }
     public async Task DisplayValueChanged(JudgableGamesDisplayType type)
     {
         _dataCacheService.ThemeSetting.AnniversariesSetting.DisplayType = type;
-        if (CnGalRootTip != null)
-        {
-            await CnGalRootTip.SaveTheme();
-        }
+        _eventService.OnSavaTheme();
         await Refresh();
     }
 
@@ -127,10 +124,7 @@
     public async Task SearchValueChanged(string str)
     {
         _dataCacheService.ThemeSetting.AnniversariesSetting.SearchString = str;
-        if (CnGalRootTip != null)
-        {
-            await CnGalRootTip.SaveTheme();
-        }
+        _eventService.OnSavaTheme();
         await Refresh();
     }
 
@@ -162,14 +156,12 @@
         }
     }
 
-    private async Task OnPageClick(int pageIndex)
+    private Task OnPageClick(int pageIndex)
     {
         _dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage = pageIndex;
-        if (CnGalRootTip != null)
-        {
-            await CnGalRootTip.SaveTheme();
-        }
+        _eventService.OnSavaTheme();
         StateHasChanged();
+        return Task.CompletedTask;
     }
 
 }

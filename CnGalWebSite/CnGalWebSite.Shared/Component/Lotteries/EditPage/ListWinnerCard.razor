@@ -56,12 +56,12 @@ else
         <MCardText>
             @if (currentWinner.AwardType == LotteryAwardType.ActivationCode)
             {
-                <MTextField @bind-Value="tempStr" Label="激活码" Color="@_dataCacheService.ThemeSetting.Theme" />
+                <MTextField @bind-Value="tempStr" Label="激活码"  />
 
             }
             else
             {
-                <MTextField @bind-Value="tempStr" Label="快递单号" Color="@_dataCacheService.ThemeSetting.Theme" />
+                <MTextField @bind-Value="tempStr" Label="快递单号"  />
             }
         </MCardText>
         <MCardActions Class="pb-6 pe-6 ps-6 pt-6">

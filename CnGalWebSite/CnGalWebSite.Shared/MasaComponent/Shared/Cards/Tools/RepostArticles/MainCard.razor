@@ -10,13 +10,13 @@
             目前只支持知乎、B站专栏文章
         </MCardText>
         <MStepper Value="_step" Vertical Elevation="0" Style="box-shadow: none;" Height="@("auto")">
-            <MStepperStep Step="1" Complete="_step>1" Color="@_dataCacheService.ThemeSetting.Theme">
+            <MStepperStep Step="1" Complete="_step>1" >
                 输入要转载的文章链接
             </MStepperStep>
             <MStepperContent Step="1">
                     <InputDataCard Model="Model" OnFinshInput="OnStart" />
             </MStepperContent>
-            <MStepperStep Step="2" Complete="_step>2" Color="@_dataCacheService.ThemeSetting.Theme">
+            <MStepperStep Step="2" Complete="_step>2" >
                 正在处理文章
             </MStepperStep>
             <MStepperContent Step="2">
@@ -25,7 +25,7 @@
                     <ProcCard Model="Model" @ref="procCard"  ArticleItems="ArticleItems" EntryGameItems="EntryGameItems"/>
                 }
             </MStepperContent>
-            <MStepperStep Step="3" Complete="_step>3" Color="@_dataCacheService.ThemeSetting.Theme">
+            <MStepperStep Step="3" Complete="_step>3" >
                 文章处理完成
             </MStepperStep>
             <MStepperContent Step="3">

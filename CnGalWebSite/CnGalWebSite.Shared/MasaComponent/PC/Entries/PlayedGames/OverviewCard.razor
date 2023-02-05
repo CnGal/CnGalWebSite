@@ -7,37 +7,30 @@
     @if (Large)
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="@IconType.GameRecord.ToIconString()" Class="@Class" ShowMoreButton OnClickMore="OnClickMore">
-            <ChildContent>
-                <UserScoreGroup Model="Model" OnEdit="OnClickEditGameRecored" ShowBlankAction ShowChart MaxCount="10" />
-            </ChildContent>
-
+            <UserScoreGroup Model="Model" OnEdit="OnClickEditGameRecored" ShowBlankAction ShowChart MaxCount="10" />
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     }
     else
     {
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="游玩记录" Icon="@IconType.GameRecord.ToIconString()" Class="@Class" ShowMoreButton OnClickMore="OnClickMore">
-            <ChildContent>
-                <TotalScoreCard Model="Model" Outline />
-                <div>
+            <TotalScoreCard Model="Model" Outline />
+            <div>
 
-                    <AuthorizeView>
-                        <Authorized>
-                            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickEditGameRecored">
-                                <MIcon Left> @(Model.IsCurrentUserScoreExist? "mdi-pencil" : "mdi-plus")</MIcon>
-                                @(Model.IsCurrentUserScoreExist? "编辑游玩记录" : "添加游玩记录")
-                            </MButton>
-                        </Authorized>
-                        <NotAuthorized>
-                            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnLogin">
-                                <MIcon Left>mdi-login</MIcon>
-                                登入后添加游玩记录
-                            </MButton>
-                        </NotAuthorized>
-                    </AuthorizeView>
-                </div>
-
-            </ChildContent>
-
+                <AuthorizeView>
+                    <Authorized>
+                        <MButton Text Block OnClick="OnClickEditGameRecored">
+                            <MIcon Left> @(Model.IsCurrentUserScoreExist? "mdi-pencil" : "mdi-plus")</MIcon>
+                            @(Model.IsCurrentUserScoreExist? "编辑游玩记录" : "添加游玩记录")
+                        </MButton>
+                    </Authorized>
+                    <NotAuthorized>
+                        <MButton Text Block OnClick="OnLogin" Color="primary">
+                            <MIcon Left>mdi-login</MIcon>
+                            登入后添加游玩记录
+                        </MButton>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
         </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
     }
 

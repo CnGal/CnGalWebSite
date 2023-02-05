@@ -1,6 +1,4 @@
 ﻿@inject IDataCacheService _dataCacheService
-@implements IDisposable
-
 
 <div class="rounded shadow-sm p-2 bg-opacity">
     <div class="row">
@@ -52,27 +50,4 @@
 
         return $"{baseStr} {index switch { 0 => "darken-3", 1 => "darken-2", 2 => "darken-1", 3 => "lighten-1", 4 => "lighten-2", 5 => "lighten-1", 6 => "darken-1", _ => "darken-2" }}";
     }
-
-    protected override async Task OnInitializedAsync()
-    {
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-        _dataCacheService.RefreshRequsted += RefreshRequsted;
-
-    }
-
-    public async void RefreshRequsted(object sender, EventArgs args)
-    {
-        await InvokeAsync(StateHasChanged);
-
-    }
-    #region 释放实例
-
-    public void Dispose()
-    {
-
-        _dataCacheService.RefreshRequsted -= RefreshRequsted;
-
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

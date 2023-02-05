@@ -18,7 +18,7 @@
 
     <div style="display: flex; justify-content: flex-end;">
         <div>
-            <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickBind">
+            <MButton Text Block  OnClick="OnClickBind">
                 <MIcon Left>@(string.IsNullOrWhiteSpace(Model.GroupQQ) ? "mdi-link-variant" : "mdi-link-variant-plus ")</MIcon>
                 @(string.IsNullOrWhiteSpace(Model.GroupQQ) ? "绑定" : "更换绑定")
             </MButton>
@@ -26,7 +26,7 @@
         @if (string.IsNullOrWhiteSpace(Model.GroupQQ) == false)
         {
             <div>
-                <MButton Text Block Color="@_dataCacheService.ThemeSetting.Theme" OnClick="OnClickUnBind">
+                <MButton Text Block  OnClick="OnClickUnBind">
                     <MIcon Left>mdi-share-all-outline</MIcon>
                     解除绑定
                 </MButton>

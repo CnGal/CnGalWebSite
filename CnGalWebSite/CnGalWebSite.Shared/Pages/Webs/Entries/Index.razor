@@ -98,7 +98,7 @@ else
 
                     <div class="mb-4">
                         <MTabs @bind-Value="TabIndex" IconsAndText Grow Class="rounded shadow-sm bg-opacity "
-                               Color="@_dataCatcheService.ThemeSetting.Theme">
+                               >
 
                             <MTab Value="1">
                                 首页<MIcon>mdi-home</MIcon>
@@ -330,10 +330,10 @@ else
 @if (isFirstLoad==false)
 {
     <MSnackbar Timeout="-1" @bind-Value="isLoading" Text
-               Color="@_dataCatcheService.ThemeSetting.Theme" Style="min-width:180px;"
+                Style="min-width:180px;"
                Elevation="24">
         <div style="display: flex; justify-content: center; align-items: center;">
-            <MProgressCircular Size="@("20px")" Width="2" Class="me-4" Indeterminate Color="@_dataCatcheService.ThemeSetting.Theme">
+            <MProgressCircular Size="@("20px")" Width="2" Class="me-4" Indeterminate >
             </MProgressCircular>
             正在跳转......
         </div>

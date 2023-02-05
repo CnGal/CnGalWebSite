@@ -765,7 +765,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             model.SignInDays = 0;
 
             //东八区转换
-            var now = DateTime.Now.ToCstTime().AddHours(8);
+            var now = DateTime.Now.ToCstTime();//.AddHours(8);
 
             if (user.SignInDays != null)
             {
