@@ -2,11 +2,10 @@
 @inject IDataCacheService _dataCacheService
 
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="可选标签" Icon="fa fa-fw fa-search" Collapable Class="@Class">
-        <MTextField Value="_search" ValueChanged="OnSearch" TValue="string" Class="ps-3 pe-3"
-                    Label="可以搜索标签哦~"
-                    Clearable
-                    
-                    ClearIcon="mdi-close-circle-outline"></MTextField>
+    <MTextField Value="_search" ValueChanged="OnSearch" TValue="string" Class="ps-3 pe-3"
+                Label="可以搜索标签哦~"
+                Clearable
+                ClearIcon="mdi-close-circle-outline"></MTextField>
     <MTreeview Items="Items"
                Search="@_search"
                TItem="TagTreeModel"
@@ -16,14 +15,12 @@
                ItemChildren="r => r.Children"
                Activatable
                Selectable="Model!=null"
-               Selected
                ValueChanged="ValueChanged"
-               Value="selectedItems"
-               >
+               Value="selectedItems">
         <PrependContent>
             @if (string.IsNullOrWhiteSpace(context.Item.Icon) == false)
             {
-                <MIcon >
+                <MIcon Color="primary">
                     @context.Item.Icon
                 </MIcon>
             }
@@ -75,9 +72,9 @@
 
     public void AddLastTags(List<TagTreeModel> model)
     {
-        foreach(var item in model)
+        foreach (var item in model)
         {
-            if(item.Children.Any())
+            if (item.Children.Any())
             {
                 AddLastTags(item.Children);
             }

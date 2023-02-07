@@ -23,7 +23,7 @@
 
         <div style="display: flex; justify-content: flex-end;">
             <div>
-                <MButton Text Block  OnClick="OnOpenDialog">
+                <MButton Text Block  OnClick="OnOpenDialog" Color="primary">
                     <MIcon Left>@(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "mdi-link-variant" : "mdi-link-variant-plus ")</MIcon>
                     @(string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "认证" : "更换认证")
                 </MButton>
@@ -31,7 +31,7 @@
             @if (string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) == false)
             {
                 <div>
-                    <MButton Text Block  OnClick="OnClickUnBind">
+                    <MButton Text Block  OnClick="OnClickUnBind" Color="primary">
                         <MIcon Left>mdi-link-variant-off</MIcon>
                         取消认证
                     </MButton>

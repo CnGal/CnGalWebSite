@@ -7,7 +7,7 @@
 
         <div style="display: flex; justify-content: flex-end;">
             <div>
-                <MButton Text Block  OnClick="OnClick">
+                <MButton Text Block  OnClick="OnClick" Color="primary">
                     <MIcon Left>@(string.IsNullOrWhiteSpace(Model.Phone)? "mdi-link-variant" : "mdi-link-variant-plus ")</MIcon>
                     @(string.IsNullOrWhiteSpace(Model.Phone)? "绑定" : "更换绑定")
                 </MButton>

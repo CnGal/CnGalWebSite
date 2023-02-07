@@ -4,14 +4,7 @@
 
 @foreach (var item in _dataCacheService.RandomTagsCatche.Take(1))
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@item.Name" Icon="@IconType.Tag.ToIconString()">
-        <ButtonContent>
-            <MButton Text Block  OnClick="@(()=>OnClickMore("/tags/index/"+item.Id))">
-                <MIcon Left>mdi-share-all-outline  </MIcon>
-                查看标签详情
-            </MButton>
-        </ButtonContent>
-        <ChildContent>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="@item.Name" Icon="@IconType.Tag.ToIconString()" ShowMoreButton OnClickMore="@(()=>OnClickMore("/tags/index/"+item.Id))">
             <MSlideGroup ShowArrows="true">
                 <ChildContent>
                     @foreach (var temp in item.Entries)
@@ -27,8 +20,6 @@
                 </ChildContent>
 
             </MSlideGroup>
-        </ChildContent>
-
     </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>
 }
 
