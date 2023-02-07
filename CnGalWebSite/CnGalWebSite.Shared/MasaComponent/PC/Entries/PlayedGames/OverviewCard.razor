@@ -18,7 +18,7 @@
 
                 <AuthorizeView>
                     <Authorized>
-                        <MButton Text Block OnClick="OnClickEditGameRecored">
+                        <MButton Text Block OnClick="OnClickEditGameRecored" Color="primary">
                             <MIcon Left> @(Model.IsCurrentUserScoreExist? "mdi-pencil" : "mdi-plus")</MIcon>
                             @(Model.IsCurrentUserScoreExist? "编辑游玩记录" : "添加游玩记录")
                         </MButton>

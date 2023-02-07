@@ -4,18 +4,9 @@
 
 <div class="mb-4 rounded shadow-sm  bg-opacity d-flex p-3 ">
     <MSpacer></MSpacer>
-    <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard @ref="homeTitleCard" Min/>
+    <CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard @ref="homeTitleCard" Min />
     <MSpacer></MSpacer>
-    <MTooltip Bottom>
-        <ActivatorContent>
-            <MButton Icon Dark  Class="mr-6" OnClick="OnNavSearchClick">
-                <MIcon>mdi-magnify</MIcon>
-            </MButton>
-        </ActivatorContent>
-        <ChildContent>
-            <span>搜索</span>
-        </ChildContent>
-    </MTooltip>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Tooltip="搜索" Icon="mdi-magnify" Class="mr-6" OnClick="@(()=>NavigationManager.NavigateTo("/search"))" />
 
     <CnGalWebSite.Shared.MasaComponent.PC.Layout.LoginButton />
 </div>

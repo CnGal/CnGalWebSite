@@ -23,34 +23,34 @@
     <ChildContent>
         <div class="bg-theme p-3" style="width:200px;">
             <div class="w-100">
-                <MButton Text Block  OnClick="@(()=>OnClick("/entries/establishentry"))">
+                <MButton Text Block Color="primary" OnClick="@(()=>OnClick("/entries/establishentry"))">
                     <MIcon Left>@IconType.Entry.ToIconString()</MIcon>
                     创建词条
                 </MButton>
-                <MButton Text Block  OnClick="@(()=>OnClick("/articles/createarticle"))">
+                <MButton Text Block  Color="primary" OnClick="@(()=>OnClick("/articles/createarticle"))">
                     <MIcon Left>@IconType.Article.ToIconString()</MIcon>
                     发表文章
                 </MButton>
-                <MButton Text Block  OnClick="@(()=>OnClick("/videos/create"))">
+                <MButton Text Block  Color="primary" OnClick="@(()=>OnClick("/videos/create"))">
                     <MIcon Left>@IconType.Video.ToIconString()</MIcon>
                     发布视频
                 </MButton>
-                <MButton Text Block  OnClick="@(()=>OnClick("/tags/createtag"))">
+                <MButton Text Block  Color="primary" OnClick="@(()=>OnClick("/tags/createtag"))">
                     <MIcon Left>@IconType.Tag.ToIconString()</MIcon>
                     创建标签
                 </MButton>
-                <MButton Text Block  OnClick="@(()=>OnClick("/peripheries/createperiphery"))">
+                <MButton Text Block  Color="primary" OnClick="@(()=>OnClick("/peripheries/createperiphery"))">
                     <MIcon Left>@IconType.Periphery.ToIconString()</MIcon>
                     创建周边
                 </MButton>
 
                 <AuthorizeView Roles="Admin">
                     <Authorized>
-                        <MButton Text Block  OnClick="@(()=>OnClick("/lotteries/createlottery"))">
+                        <MButton Text Block  Color="primary" OnClick="@(()=>OnClick("/lotteries/createlottery"))">
                             <MIcon Left>@IconType.Lottery.ToIconString()</MIcon>
                             创建抽奖
                         </MButton>
-                        <MButton Text Block  OnClick="@(()=>OnClick("/votes/createvote"))">
+                        <MButton Text Block  Color="primary" OnClick="@(()=>OnClick("/votes/createvote"))">
                             <MIcon Left>@IconType.Vote.ToIconString()</MIcon>
                             发起投票
                         </MButton>
