@@ -11,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddSingleton<IUploadService, UploadService>();
 
 var app = builder.Build();
 
