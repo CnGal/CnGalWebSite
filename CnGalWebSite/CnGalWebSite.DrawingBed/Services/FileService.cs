@@ -4,6 +4,8 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Files;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.Helper.Helper;
+using COSXML;
+using COSXML.Auth;
 using FFmpeg.NET;
 using MediaInfo;
 using OneOf.Types;
@@ -12,6 +14,7 @@ using SixLabors.ImageSharp.Processing;
 using System.Security.Policy;
 using System.Text;
 using Tweetinvi.Security;
+using CnGalWebSite.Helper.Extensions;
 
 namespace CnGalWebSite.DrawingBed.Services
 {
@@ -24,13 +27,15 @@ namespace CnGalWebSite.DrawingBed.Services
         private readonly string _audioTempPath = "";
         private readonly string _fileTempPath = "";
         private readonly ILogger<FileService> _logger;
+        private readonly IUploadService _uploadService;
 
-        public FileService(HttpClient httpClient, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ILogger<FileService> logger)
+        public FileService(HttpClient httpClient, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ILogger<FileService> logger ,IUploadService uploadService)
         {
             _httpClient = httpClient;
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
             _logger = logger;
+            _uploadService = uploadService;
 
             _imageTempPath = Path.Combine(_webHostEnvironment.WebRootPath, "temp", "images");
             _fileTempPath = Path.Combine(_webHostEnvironment.WebRootPath, "temp", "files");
@@ -75,7 +80,7 @@ namespace CnGalWebSite.DrawingBed.Services
                     }
                     else
                     {
-                        uploadedFile = await UploadLocalFileToServer(pathCompressFile, type);
+                        uploadedFile = await UploadLocalFileToServer(pathCompressFile, sha1, type);
                     }
 
                 }
@@ -130,7 +135,7 @@ namespace CnGalWebSite.DrawingBed.Services
                 var uploadedFile = await CheckSameFileFromServer(sha1);
                 if (string.IsNullOrWhiteSpace(uploadedFile))
                 {
-                    uploadedFile = await UploadLocalFileToServer(pathCompressFile, type);
+                    uploadedFile = await UploadLocalFileToServer(pathCompressFile, sha1, type);
                 }
 
                 return new UploadResult
@@ -159,18 +164,18 @@ namespace CnGalWebSite.DrawingBed.Services
 
 
         #region 上传文件
-        private async Task<string> UploadLocalFileToServer(string filePath, UploadFileType type)
+        private async Task<string> UploadLocalFileToServer(string filePath,string shar1, UploadFileType type)
         {
             return type switch
             {
-                UploadFileType.Audio => UploadToAudioServer(filePath),
-                UploadFileType.Image => await UploadToImageServer(filePath),
+                UploadFileType.Audio => UploadToAudioServer(filePath, shar1),
+                UploadFileType.Image => await _uploadService.UploadToTencentOSS(filePath, shar1),
                 _ => null
 
             };
         }
 
-        private string UploadToAudioServer(string filePath)
+        private string UploadToAudioServer(string filePath, string shar1)
         {
             // yourEndpoint填写Bucket所在地域对应的Endpoint。以华东1（杭州）为例，Endpoint填写为https://oss-cn-hangzhou.aliyuncs.com
             var endpoint = _configuration["OSSEndpoint"];
@@ -184,7 +189,7 @@ namespace CnGalWebSite.DrawingBed.Services
             var client = new OssClient(endpoint, accessKeyId, accessKeySecret);
 
             // 填写Object完整路径，完整路径中不能包含Bucket名称，例如exampledir/exampleobject.txt
-            var objectName = $"audio/upload/{DateTime.UtcNow:yyyyMMdd}/{DateTime.UtcNow.ToBinary()}.mp3";
+            var objectName = $"audio/upload/{DateTime.UtcNow:yyyyMMdd}/{shar1}.mp3";
             try
             {
                 // 上传文件
@@ -201,32 +206,6 @@ namespace CnGalWebSite.DrawingBed.Services
 
         }
 
-        private async Task<string> UploadToImageServer(string filePath)
-        {
-            using var content = new MultipartFormDataContent();
-
-            content.Add(
-                content: new StringContent(GetFileBase64(filePath)),
-                name: "source");
-
-            var url = _configuration["SliotsImageUrl"] + "api/1/upload/?format=txt&key=" + _configuration["SliotsImageAPIToken"];
-
-            var response = await _httpClient.PostAsync(url, content);
-
-            var newUploadResults = await response.Content.ReadAsStringAsync();
-
-            if (response.StatusCode != System.Net.HttpStatusCode.OK || string.IsNullOrWhiteSpace(newUploadResults) || newUploadResults.Contains("http") == false)
-            {
-                _logger.LogError("上传文件到图床失败：{filePath}", filePath);
-                throw new Exception("图床内部传输错误");
-            }
-
-
-            var result = newUploadResults.Replace("local.host", "image.cngal.org").Replace("http://", "https://");
-            _logger.LogInformation("成功上传图片到图床：{url}", result);
-            return result;
-
-        }
         #endregion
 
         #region 处理文件
