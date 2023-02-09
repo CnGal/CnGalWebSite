@@ -4,13 +4,13 @@
 
     <div class="row">
         <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
-            <ImageCropperButton @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图"></ImageCropperButton>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainPicture" Type="ImageAspectType._16_9" Text="上传主图" />
         </div>
         <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
-            <ImageCropperButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图"></ImageCropperButton>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.BackgroundPicture" Type="ImageAspectType.None" Text="上传大背景图" />
         </div>
         <div class="col-12 col-md-6 col-lg-4 col-xl-4 mt-2">
-            <ImageCropperButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图"></ImageCropperButton>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SmallBackgroundPicture" Type="ImageAspectType.None" Text="上传小背景图" />
         </div>
     </div>
     <ValidateForm Model="@Model">

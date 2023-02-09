@@ -83,7 +83,7 @@ else
 
     public async Task OnLook(long id)
     {
-        await _eventService.OpenNewPage(ToolHelper.WebApiPath + "entries/index/" + id);
+        await _eventService.OpenNewPage("https://www.cngal.org/entries/index/" + id);
     }
     private Task<QueryData<BasicInforTableModel>> OnQueryBasicAsync(QueryPageOptions options)
     {

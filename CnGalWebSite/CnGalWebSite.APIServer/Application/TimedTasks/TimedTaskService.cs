@@ -222,7 +222,7 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                             maxNum = 2;
                         }
 
-                        await _fileService.TransferAllMainImages(maxNum);
+                        await _fileService.TransferMainImagesToPublic(maxNum);
                         break;
                     case TimedTaskType.UpdateRoleBrithdays:
                         await _entryService.UpdateRoleBrithday();
