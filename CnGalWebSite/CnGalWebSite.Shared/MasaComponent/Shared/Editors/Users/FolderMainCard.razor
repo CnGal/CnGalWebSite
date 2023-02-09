@@ -5,8 +5,7 @@
     <ValidateForm Model="@Model">
         <div class="row">
             <div class=" col-6 col-md-4 col-lg-3 mt-2">
-                <ImageCropperButton @bind-ImagePath="@Model.MainImage" EntryType_="EntryType.Game" IsMainImage="true"
-                                    Text="上传主图" IsMustCropper="true"></ImageCropperButton>
+                <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.MainImage" Text="上传主图" Type="ImageAspectType._16_9"/>
             </div>
         </div>
 

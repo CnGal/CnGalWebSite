@@ -1,16 +1,16 @@
 ﻿<CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="上传图片" Icon="fa fa-fw fa-image" Collapable Class="@Class">
     <div class="row">
         <div class=" col-12 col-md-6  col-lg-3 mb-2">
-            <ImageCropperButton @bind-ImagePath="@Model.PhotoName" Type="ImageAspectType._1_1" Text="上传头像"></ImageCropperButton>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.PhotoName" Type="ImageAspectType._1_1" Text="上传头像"/>
         </div>
         <div class=" col-12 col-md-6  col-lg-3 mb-2">
-            <ImageCropperButton @bind-ImagePath="@Model.BackgroundName" Type="ImageAspectType._4_1A2" Text="上传空间主图"></ImageCropperButton>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton ShowCropper @bind-ImagePath="@Model.BackgroundName" Type="ImageAspectType._4_1A2" Text="上传空间主图"/>
         </div>
         <div class=" col-12 col-md-6  col-lg-3 mb-2">
-            <ImageCropperButton @bind-ImagePath="@Model.MBgImageName" Type="ImageAspectType.None" Text="上传大背景"></ImageCropperButton>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.MBgImageName" Type="ImageAspectType.None" Text="上传大背景"/>
         </div>
         <div class=" col-12 col-md-6  col-lg-3 mb-2">
-            <ImageCropperButton @bind-ImagePath="@Model.SBgImageName" Type="ImageAspectType.None" Text="上传小背景"></ImageCropperButton>
+            <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.SBgImageName" Type="ImageAspectType.None" Text="上传小背景"/>
         </div>
     </div>
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer>

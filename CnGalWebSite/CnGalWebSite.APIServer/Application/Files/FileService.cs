@@ -10,6 +10,7 @@ using CnGalWebSite.DataModel.ViewModel.Files;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Linq.Dynamic.Core;
 using SortOrder = BootstrapBlazor.Components.SortOrder;
 
@@ -309,7 +310,7 @@ namespace CnGalWebSite.APIServer.Application.Files
         /// </summary>
         /// <param name="maxCount"></param>
         /// <returns></returns>
-        public async Task TransferAllMainImages(int maxCount)
+        public async Task TransferMainImagesToPublic(int maxCount)
         {
             var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
                 .OrderBy(s => s.Id)
@@ -360,7 +361,7 @@ namespace CnGalWebSite.APIServer.Application.Files
 
             var videos = await _videoRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
               .OrderBy(s => s.Id)
-             .Take(maxCount).ToListAsync();
+              .Take(maxCount).ToListAsync();
 
             foreach (var item in videos)
             {
@@ -377,6 +378,39 @@ namespace CnGalWebSite.APIServer.Application.Files
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "转存视频 - {Name}({Id}) 主图失败", item.Name, item.Id);
+                    throw;
+                }
+            }
+
+            var entryPictures = await _entryRepository.GetAll()
+                .Include(s => s.Pictures)
+                .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
+                .Where(s => s.Pictures.Any(s => s.Url.Contains("?") == false && s.Url.Contains("default") == false))
+                .OrderBy(s => s.Id)
+                .Take(maxCount)
+                .ToListAsync();
+
+            foreach (var item in entryPictures)
+            {
+                try
+                {
+                    var count = item.Pictures.Count(s => s.Url.Contains('?') == false && s.Url.Contains("default") == false);
+                    foreach (var infor in item.Pictures.Where(s => s.Url.Contains('?') == false && s.Url.Contains("default") == false))
+                    {
+                        var temp = await TransferDepositFile(infor.Url);
+                        if (string.IsNullOrWhiteSpace(temp) == false)
+                        {
+                            infor.Url = temp;
+                        }
+                    }
+
+                    await _entryRepository.UpdateAsync(item);
+                    _logger.LogInformation("转存 词条 - {name}({id}) 相册到 tucang.cc 图床，总计 {count} 张图片", item.Name, item.Id, count);
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "转存 词条 - {name}({id}) 相册失败", item.Name, item.Id);
                     throw;
                 }
             }

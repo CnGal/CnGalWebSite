@@ -117,7 +117,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Random,
         Switch,
         Timeline,
-        Close
+        Close,
+        Upload,
+        Loading,
+        CloudUpload
     }
 
     public static class IconTypeHelper
@@ -126,6 +129,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.CloudUpload:
+                    return "mdi-cloud-upload";
+                case IconType.Loading:
+                    return "mdi-loading";
+                case IconType.Upload:
+                    return "mdi-upload";
                 case IconType.Close:
                     return "mdi-close";
                 case IconType.Timeline:

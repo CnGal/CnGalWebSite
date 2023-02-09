@@ -33,7 +33,7 @@
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Icon="fa fa-fw fa fa-fw fa-home" Title="主要信息" Class="mb-4" Collapable Outline OutlineHead>
             <div class="row">
                 <div class="col-12 col-sm-6">
-                    <ImageCropperButton @bind-ImagePath="@Model.Image" Type="ImageAspectType.None" IsMustCropper Text="上传预览图"></ImageCropperButton>
+                    <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton @bind-ImagePath="@Model.Image" Type="ImageAspectType.None" ShowCropper Text="上传预览图"/>
                 </div>
             </div>
             <div class="row">
