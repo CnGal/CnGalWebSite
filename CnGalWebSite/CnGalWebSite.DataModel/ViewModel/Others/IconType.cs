@@ -120,7 +120,9 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         Close,
         Upload,
         Loading,
-        CloudUpload
+        CloudUpload,
+        Collapsed,
+        UnCollapsed,
     }
 
     public static class IconTypeHelper
@@ -129,6 +131,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Others
         {
             switch (type)
             {
+                case IconType.Collapsed:
+                    return "fa fa-chevron-right";
+                case IconType.UnCollapsed:
+                    return "fa fa-chevron-down";
                 case IconType.CloudUpload:
                     return "mdi-cloud-upload";
                 case IconType.Loading:

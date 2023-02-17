@@ -6,7 +6,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
     public class DiscountPageHelper
     {
         public List<SteamInforTipViewModel> Model = new List<SteamInforTipViewModel>();
-        public List<SteamInforTipViewModel> Items = new List<SteamInforTipViewModel>();
+        public IEnumerable<SteamInforTipViewModel> Items = new List<SteamInforTipViewModel>();
 
         public List<int> PurchasedGames=new List<int>();
 
@@ -14,7 +14,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
 
         public int MaxCount { get; set; } = 12;
 
-        public int TotalPages => ((Items.Count-1) / MaxCount) + 1;
+        public int TotalPages => ((Items.Count()-1) / MaxCount) + 1;
 
         public int CurrentPage { get; set; } = 1;
 
@@ -50,7 +50,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
             }
         }
 
-        public SteamSortType thenOrderType;
+        private SteamSortType thenOrderType;
         public SteamSortType ThenOrderType
         {
             get => thenOrderType;
@@ -61,7 +61,33 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
             }
         }
 
-        public SteamDisplayType steamDisplayType { get; set; }
+        public SteamDisplayType SteamDisplayType { get; set; }
+
+        public bool ShowAdvancedOptions { get; set; }
+
+        private bool showNoDiscountGames;
+        public bool ShowNoDiscountGames
+        {
+            get => showNoDiscountGames;
+            set
+            {
+                showNoDiscountGames = value;
+                SetItems();
+            }
+        }
+
+        public const double MaxOriginalPriceLimit= 55;
+
+        private double maxOriginalPrice = MaxOriginalPriceLimit;
+        public double MaxOriginalPrice
+        {
+            get => maxOriginalPrice;
+            set
+            {
+                maxOriginalPrice = value;
+                SetItems();
+            }
+        }
 
         public bool IsInit => Model.Count > 0;
 
@@ -78,16 +104,33 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
 
         public void SetItems()
         {
+            //显示未打折的游戏
+            if(ShowNoDiscountGames)
+            {
+                Items = Model;
+            }
+            else
+            {
+                Items = Model.Where(s => s.CutNow > 0);
+            }
+
+            //筛选价格区间
+            if (maxOriginalPrice < MaxOriginalPriceLimit && maxOriginalPrice >= 0)
+            {
+                Items = Items.Where(s => s.OriginalPrice <= maxOriginalPrice*100);
+            }
+
+
             switch (ScreenType)
             {
                 case ScreenSteamType.All:
-                    Items = Model;
+                    //Items = Items;
                     break;
                 case ScreenSteamType.NewHistoryLow:
-                    Items = Model.Where(s => s.CutNow > s.CutLowest && s.CutLowest > 0).ToList();
+                    Items = Items.Where(s => s.CutNow > s.CutLowest && s.CutLowest > 0);
                     break;
                 case ScreenSteamType.FlatHistoryLow:
-                    Items = Model.Where(s => s.CutNow == s.CutLowest && s.CutLowest > 0).ToList();
+                    Items = Items.Where(s => s.CutNow == s.CutLowest && s.CutLowest > 0);
                     break;
             };
 
@@ -97,10 +140,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
                     //Items = Items;
                     break;
                 case PurchasedSteamType.Purchased:
-                    Items = Items.Where(s => PurchasedGames.Contains(s.Id)).ToList();
+                    Items = Items.Where(s => PurchasedGames.Contains(s.Id));
                     break;
                 case PurchasedSteamType.UnPurchased:
-                    Items = Items.Where(s => PurchasedGames.Contains(s.Id)==false).ToList();
+                    Items = Items.Where(s => PurchasedGames.Contains(s.Id)==false);
                     break;
             };
 
@@ -112,19 +155,19 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
                     switch (ThenOrderType)
                     {
                         case SteamSortType.EvaluationCount:
-                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.EvaluationCount).ToList();
+                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.EvaluationCount);
                             break;
                         case SteamSortType.RecommendationRate:
-                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.RecommendationRate).ToList();
+                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.RecommendationRate);
                             break;
                         case SteamSortType.PublishTime:
-                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.PublishTime).ToList();
+                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.PublishTime);
                             break;
                         case SteamSortType.Discount:
-                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.CutNow).ToList();
+                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.CutNow);
                             break;
                         case SteamSortType.Price:
-                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.PriceNow).ToList();
+                            Items = Items.OrderByDescending(s => s.EvaluationCount).ThenByDescending(s => s.PriceNow);
                             break;
                     }
                     break;
@@ -132,19 +175,19 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
                     switch (ThenOrderType)
                     {
                         case SteamSortType.EvaluationCount:
-                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.EvaluationCount).ToList();
+                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.EvaluationCount);
                             break;
                         case SteamSortType.RecommendationRate:
-                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.RecommendationRate).ToList();
+                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.RecommendationRate);
                             break;
                         case SteamSortType.PublishTime:
-                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.PublishTime).ToList();
+                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.PublishTime);
                             break;
                         case SteamSortType.Discount:
-                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.CutNow).ToList();
+                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.CutNow);
                             break;
                         case SteamSortType.Price:
-                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.PriceNow).ToList();
+                            Items = Items.OrderByDescending(s => s.RecommendationRate).ThenByDescending(s => s.PriceNow);
                             break;
 
                     }
@@ -153,19 +196,19 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
                     switch (ThenOrderType)
                     {
                         case SteamSortType.EvaluationCount:
-                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.EvaluationCount).ToList();
+                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.EvaluationCount);
                             break;
                         case SteamSortType.RecommendationRate:
-                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.RecommendationRate).ToList();
+                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.RecommendationRate);
                             break;
                         case SteamSortType.PublishTime:
-                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.PublishTime).ToList();
+                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.PublishTime);
                             break;
                         case SteamSortType.Discount:
-                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.CutNow).ToList();
+                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.CutNow);
                             break;
                         case SteamSortType.Price:
-                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.PriceNow).ToList();
+                            Items = Items.OrderByDescending(s => s.PublishTime).ThenByDescending(s => s.PriceNow);
                             break;
 
                     }
@@ -174,19 +217,19 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
                     switch (ThenOrderType)
                     {
                         case SteamSortType.EvaluationCount:
-                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.EvaluationCount).ToList();
+                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.EvaluationCount);
                             break;
                         case SteamSortType.RecommendationRate:
-                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.RecommendationRate).ToList();
+                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.RecommendationRate);
                             break;
                         case SteamSortType.PublishTime:
-                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.PublishTime).ToList();
+                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.PublishTime);
                             break;
                         case SteamSortType.Discount:
-                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.CutNow).ToList();
+                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.CutNow);
                             break;
                         case SteamSortType.Price:
-                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.PriceNow).ToList();
+                            Items = Items.OrderByDescending(s => s.CutNow).ThenByDescending(s => s.PriceNow);
                             break;
 
                     }
@@ -195,19 +238,19 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
                     switch (ThenOrderType)
                     {
                         case SteamSortType.EvaluationCount:
-                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.EvaluationCount).ToList();
+                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.EvaluationCount);
                             break;
                         case SteamSortType.RecommendationRate:
-                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.RecommendationRate).ToList();
+                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.RecommendationRate);
                             break;
                         case SteamSortType.PublishTime:
-                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.PublishTime).ToList();
+                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.PublishTime);
                             break;
                         case SteamSortType.Discount:
-                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.CutNow).ToList();
+                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.CutNow);
                             break;
                         case SteamSortType.Price:
-                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.PriceNow).ToList();
+                            Items = Items.OrderByDescending(s => s.PriceNow).ThenByDescending(s => s.PriceNow);
                             break;
 
                     }

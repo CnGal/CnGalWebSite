@@ -53,17 +53,13 @@
     else
     {
         <div>
-            <CnGalWebSite.Shared.Component.Steam.ScreenGamesTip ScreenType="_dataCacheService.DiscountPageCatcheHelper.ScreenType"
-                                                                OrderType="_dataCacheService.DiscountPageCatcheHelper.OrderType"
-                                                                DisplayType="_dataCacheService.DiscountPageCatcheHelper.steamDisplayType"
-                                                                 PurchasedType="_dataCacheService.DiscountPageCatcheHelper.PurchasedType"
-                                                                ScreenTypeChanged="ScreenTypeChanged" OrderTypeChanged="OrderTypeChanged" DisplayTypeChanged="DisplayTypeChanged" PurchasedTypeChanged="PurchasedTypeChanged"/>
+            <CnGalWebSite.Shared.Component.Steam.ScreenGamesTip ValueChanged="ValueChanged"/>
         </div>
         <div class="row">
             @foreach (var item in _dataCacheService.DiscountPageCatcheHelper.Items.Skip((_dataCacheService.DiscountPageCatcheHelper.CurrentPage - 1) * _dataCacheService.DiscountPageCatcheHelper.MaxCount).Take(_dataCacheService.DiscountPageCatcheHelper.MaxCount))
             {
-                <div class="@("mb-3 "+(_dataCacheService.DiscountPageCatcheHelper.steamDisplayType== SteamDisplayType.LongCard?"col-12":"col-12 col-md-6 col-xxl-4"))">
-                    <CnGalWebSite.Shared.Component.Steam.SteamInforViewTip Model="item" Type="_dataCacheService.DiscountPageCatcheHelper.steamDisplayType" Purchased="_dataCacheService.DiscountPageCatcheHelper.PurchasedGames.Any(s=>s==item.Id)"/>
+                <div class="@("mb-3 "+(_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType== SteamDisplayType.LongCard?"col-12":"col-12 col-md-6 col-xxl-4"))">
+                    <CnGalWebSite.Shared.Component.Steam.SteamInforViewTip Model="item" Type="_dataCacheService.DiscountPageCatcheHelper.SteamDisplayType" Purchased="_dataCacheService.DiscountPageCatcheHelper.PurchasedGames.Any(s=>s==item.Id)"/>
                 </div>
             }
 
@@ -73,7 +69,7 @@
         {
             <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaPagination Value="@_dataCacheService.DiscountPageCatcheHelper.CurrentPage" Length="@_dataCacheService.DiscountPageCatcheHelper.TotalPages" ValueChanged="OnPageClick" />
         }
-        @if (_dataCacheService.DiscountPageCatcheHelper.Items.Count == 0)
+        @if (_dataCacheService.DiscountPageCatcheHelper.Items.Count() == 0)
         {
             <NotFoundTip IsNeedLayput="true" />
         }
@@ -101,7 +97,7 @@
             {
                 if (_dataCacheService.DiscountPageCatcheHelper.IsInit == false)
                 {
-                    _dataCacheService.DiscountPageCatcheHelper.Init(await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame", ToolHelper.options));
+                    _dataCacheService.DiscountPageCatcheHelper.Init(await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllGameSteamInfors", ToolHelper.options));
 
                     try
                     {
@@ -126,37 +122,8 @@
         }
     }
 
-    public Task ScreenTypeChanged(ScreenSteamType type)
+    public Task ValueChanged()
     {
-        _dataCacheService.DiscountPageCatcheHelper.ScreenType = type;
-        _dataCacheService.DiscountPageCatcheHelper.CurrentPage = 1;
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-
-    public Task OrderTypeChanged(SteamSortType type)
-    {
-        _dataCacheService.DiscountPageCatcheHelper.OrderType = type;
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-
-    public Task ThenOrderTypeChanged(SteamSortType type)
-    {
-        _dataCacheService.DiscountPageCatcheHelper.ThenOrderType = type;
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-    public Task DisplayTypeChanged(SteamDisplayType type)
-    {
-        _dataCacheService.DiscountPageCatcheHelper.steamDisplayType = type;
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-    public Task PurchasedTypeChanged(PurchasedSteamType type)
-    {
-        _dataCacheService.DiscountPageCatcheHelper.PurchasedType = type;
-        _dataCacheService.DiscountPageCatcheHelper.CurrentPage = 1;
         StateHasChanged();
         return Task.CompletedTask;
     }

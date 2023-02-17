@@ -596,7 +596,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                     {
                         filterString.Append(" && ");
                     }
-                    filterString.Append($"pubulishTime: [{item.AfterTime.ToBinary()}..{item.BeforeTime.ToBinary()}]");
+                    filterString.Append($"pubulishTime: [{item.AfterTime.ToUnixTimeMilliseconds()}..{item.BeforeTime.ToUnixTimeMilliseconds()}]");
                 }
             }
 

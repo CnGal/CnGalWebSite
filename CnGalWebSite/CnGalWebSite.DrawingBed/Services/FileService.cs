@@ -244,7 +244,7 @@ namespace CnGalWebSite.DrawingBed.Services
             var newPath = Path.Combine(type switch { UploadFileType.Image => _imageTempPath, UploadFileType.Audio => _audioTempPath, _ => _fileTempPath }, tempName);
             SaveFile(image, newPath);
 
-            _logger.LogInformation( "下载远程链接里的图片：{file}" ,url);
+            _logger.LogInformation( "下载远程链接里的文件：{file}" ,url);
 
             return newPath;
         }
@@ -344,9 +344,13 @@ namespace CnGalWebSite.DrawingBed.Services
         /// <param name="newPath"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-
         private async Task<CutFileResult> CutAudioAsync(string path)
         {
+           if( File.Exists(path)==false)
+            {
+                throw new Exception($"裁剪音频失败，文件不存在：{path}");
+            }
+
             var inputFile = new InputFile(path);
             var outputFile = new OutputFile(Path.Combine(_audioTempPath, Guid.NewGuid().ToString() + ".mp3"));
 
