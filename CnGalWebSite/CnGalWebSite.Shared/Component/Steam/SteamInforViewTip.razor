@@ -29,52 +29,43 @@
                             @if (Model.EvaluationCount > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp"
-                                                                                                         Text="@($"{Model.RecommendationRate}% 好评（{Model.EvaluationCount}条评测）")" />
-
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp" Text="@($"{Model.RecommendationRate}% 好评（{Model.EvaluationCount}条评测）")" />
                                 </div>
                             }
-
                             @if (Model.PublishTime != null)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.DeterminedTime"
-                                                                                                         Text="@(Model.PublishTime?.ToString("yyyy年M月d日"))" />
-
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.DeterminedTime" Text="@(Model.PublishTime?.ToString("yyyy年M月d日"))" />
                                 </div>
-
                             }
 
                             @if (Model.CutLowest > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart"
-                                                                                                         Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " - "+Model.CutLowest+"% OFF"))" />
-
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart" Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " - "+Model.CutLowest+"% OFF"))" />
                                 </div>
-
                             }
                         </div>
                         <div style=" display: flex; flex-direction: column; align-items: center; width: 100px; justify-content: center; color: var(--active-color);">
                             <span class="h4 m-0 fw-bold">
                                 @(Model.PriceNowString)
                             </span>
-                            <span>
-                                @(Model.CutNow+"% OFF")
-                            </span>
 
-                            <span class="h6" style=" color: gray; text-decoration: line-through; ">
-                                @("¥ "+((double)Model.OriginalPrice/100).ToString("0.00"))
-                            </span>
-
+                            @if (Model.CutNow > 0)
+                            {
+                                <span>
+                                    @(Model.CutNow+"% OFF")
+                                </span>
+                                <span class="h6" style=" color: gray; text-decoration: line-through; ">
+                                    @("¥ "+((double)Model.OriginalPrice/100).ToString("0.00"))
+                                </span>
+                            }
                         </div>
 
                     </div>
                 </div>
             </div>
         </div>
-
-
     }
     else
     {
@@ -91,22 +82,18 @@
                             }
                             <span class="text-truncate-1" style="font-size: larger;">@Model.Name</span>
                         </header>
-                       
+
                         <div style="display: flex; flex-direction: column;">
                             @if (Model.EvaluationCount > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp"
-                                                                                                         Text="@($"{Model.RecommendationRate}% ({Model.EvaluationCount})")" />
-
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp" Text="@($"{Model.RecommendationRate}% ({Model.EvaluationCount})")" />
                                 </div>
                             }
-
                             @if (Model.CutLowest > 0)
                             {
                                 <div>
-                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart"
-                                                                                                         Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " (-"+Model.CutLowest+"%)"))" />
+                                    <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart" Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " (-"+Model.CutLowest+"%)"))" />
                                 </div>
                             }
                         </div>
@@ -116,12 +103,17 @@
                     <span class="h5 m-0">
                         @(Model.PriceNowString)
                     </span>
-                    <span style="font-size:small ">
-                        @(Model.CutNow+"% OFF")
-                    </span>
-                    <span style=" color: gray; text-decoration: line-through; ">
-                        @("¥ "+((double)Model.OriginalPrice/100).ToString("0.00"))
-                    </span>
+
+                    @if (Model.CutNow > 0)
+                    {
+                        <span style="font-size:small ">
+                            @(Model.CutNow+"% OFF")
+                        </span>
+                        <span style=" color: gray; text-decoration: line-through; ">
+                            @("¥ "+((double)Model.OriginalPrice/100).ToString("0.00"))
+                        </span>
+                    }
+
                 </div>
             </div>
         }
@@ -146,30 +138,20 @@
                                 @if (Model.EvaluationCount > 0)
                                 {
                                     <div class="col-6 col-xxl-4">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp"
-                                                                                                             Text="@($"{Model.RecommendationRate}% 好评（{Model.EvaluationCount}条评测）")" />
-
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.ThumbsUp" Text="@($"{Model.RecommendationRate}% 好评（{Model.EvaluationCount}条评测）")" />
                                     </div>
                                 }
-
                                 @if (Model.PublishTime != null)
                                 {
                                     <div class="col-6 col-xxl-4">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.DeterminedTime"
-                                                                                                             Text="@(Model.PublishTime?.ToString("yyyy年M月d日"))" />
-
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.DeterminedTime" Text="@(Model.PublishTime?.ToString("yyyy年M月d日"))" />
                                     </div>
-
                                 }
-
                                 @if (Model.CutLowest > 0)
                                 {
                                     <div class="col-6 col-xxl-4">
-                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart"
-                                                                                                             Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " - "+Model.CutLowest+"% OFF"))" />
-
+                                        <CnGalWebSite.Shared.Component.Entries.NewVersion.BasicInforAloneTip Icon="@IconType.Chart" Text="@(Model.PriceLowestString+( Model.CutLowest==0?"": " - "+Model.CutLowest+"% OFF"))" />
                                     </div>
-
                                 }
                             </div>
                         </div>
@@ -179,15 +161,19 @@
                             <span class="h4 fw-bold">
                                 @(Model.PriceNowString)
                             </span>
-                            <span class="ms-1">
-                                @(Model.CutNow+"% OFF")
+                            @if (Model.CutNow > 0)
+                            {
+                                <span class="ms-1">
+                                    @(Model.CutNow + "% OFF")
+                                </span>
+                            }
+                        </span>
+                        @if (Model.CutNow > 0)
+                        {
+                            <span class="h6" style=" color: gray; text-decoration: line-through; ">
+                                @("¥ "+((double)Model.OriginalPrice/100).ToString("0.00"))
                             </span>
-                        </span>
-
-                        <span class="h6" style=" color: gray; text-decoration: line-through; ">
-                            @("¥ "+((double)Model.OriginalPrice/100).ToString("0.00"))
-                        </span>
-
+                        }
                     </div>
                 </div>
             </div>
@@ -205,5 +191,5 @@
     [Parameter]
     public SteamDisplayType Type { get; set; }
     [Parameter]
-    public bool Purchased{ get; set; }
+    public bool Purchased { get; set; }
 }

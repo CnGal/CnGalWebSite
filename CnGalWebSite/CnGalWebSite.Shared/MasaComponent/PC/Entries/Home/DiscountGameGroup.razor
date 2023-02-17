@@ -6,7 +6,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="打折游戏" Icon="@IconType.Price.ToIconString()" ShowMoreButton OnClickMore="OnClickMore">
     <MSlideGroup ShowArrows="true">
         <ChildContent>
-            @foreach (var item in _dataCacheService.DiscountPageCatcheHelper.Model.Take(12))
+            @foreach (var item in Model)
             {
                 <MSlideItem>
                     <MCard Width="350" Class="p-2" Outlined Style="border:0;background-color:transparent"
@@ -25,6 +25,9 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
+    public List<SteamInforTipViewModel> Model = new List<SteamInforTipViewModel>();
+
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -33,7 +36,7 @@
             {
                 if (_dataCacheService.DiscountPageCatcheHelper.IsInit == false)
                 {
-                    _dataCacheService.DiscountPageCatcheHelper.Init(await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame", ToolHelper.options));
+                    _dataCacheService.DiscountPageCatcheHelper.Init(await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllGameSteamInfors", ToolHelper.options));
 
                     try
                     {
@@ -45,14 +48,13 @@
                     }
 
                 }
-                _dataCacheService.DiscountPageCatcheHelper.Model.Random();
 
+                Model = _dataCacheService.DiscountPageCatcheHelper.Model.Random().Where(s => s.CutNow > 0).Take(12).ToList();
                 StateHasChanged();
-
             }
             catch (Exception ex)
             {
-                ErrorHandler.ProcessError(ex, "获取词条主页免费游戏列表失败");
+                ErrorHandler.ProcessError(ex, "获取词条主页打折游戏列表失败");
             }
         }
     }
