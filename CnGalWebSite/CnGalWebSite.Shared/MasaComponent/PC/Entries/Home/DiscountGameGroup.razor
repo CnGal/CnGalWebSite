@@ -6,7 +6,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaTitleContainer Title="打折游戏" Icon="@IconType.Price.ToIconString()" ShowMoreButton OnClickMore="OnClickMore">
     <MSlideGroup ShowArrows="true">
         <ChildContent>
-            @foreach (var item in Model)
+            @foreach (var item in _dataCacheService.DiscountGamesCatche.Take(12))
             {
                 <MSlideItem>
                     <MCard Width="350" Class="p-2" Outlined Style="border:0;background-color:transparent"
@@ -34,22 +34,12 @@
         {
             try
             {
-                if (_dataCacheService.DiscountPageCatcheHelper.IsInit == false)
+                if (_dataCacheService.DiscountGamesCatche.Any()==false)
                 {
-                    _dataCacheService.DiscountPageCatcheHelper.Init(await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllGameSteamInfors", ToolHelper.options));
-
-                    try
-                    {
-                        _dataCacheService.DiscountPageCatcheHelper.PurchasedGames = await Http.GetFromJsonAsync<List<int>>(ToolHelper.WebApiPath + "api/playedgame/GetUserInSteamGameIds", ToolHelper.options);
-                    }
-                    catch
-                    {
-
-                    }
-
+                    _dataCacheService.DiscountGamesCatche=await Http.GetFromJsonAsync<List<SteamInforTipViewModel>>(ToolHelper.WebApiPath + "api/steam/GetAllDiscountSteamGame", ToolHelper.options);
                 }
 
-                Model = _dataCacheService.DiscountPageCatcheHelper.Model.Random().Where(s => s.CutNow > 0).Take(12).ToList();
+                _dataCacheService.DiscountGamesCatche.Random();
                 StateHasChanged();
             }
             catch (Exception ex)

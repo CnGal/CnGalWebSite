@@ -136,6 +136,8 @@ namespace CnGalWebSite.Shared.Service
 
         List<RandomTagModel> RandomTagsCatche { get; set; }
 
+        List<SteamInforTipViewModel> DiscountGamesCatche { get; set; }
+
         List<ArticleInforTipViewModel> RandomArticlesCatche { get; set; }
 
         List<VoteCardViewModel> VoteCardsCatche { get; set; }

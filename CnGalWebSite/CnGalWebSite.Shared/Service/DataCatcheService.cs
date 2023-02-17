@@ -274,6 +274,10 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public DiscountPageHelper DiscountPageCatcheHelper { get; set; } = new DiscountPageHelper();
         /// <summary>
+        /// 词条主页 随机折扣游戏
+        /// </summary>
+        public List<SteamInforTipViewModel> DiscountGamesCatche { get; set; } = new List<SteamInforTipViewModel>();
+        /// <summary>
         /// 可评选游戏缓存
         /// </summary>
         public List<JudgableGameViewModel> JudgableGamesCatche { get; set; } = new List<JudgableGameViewModel>();
