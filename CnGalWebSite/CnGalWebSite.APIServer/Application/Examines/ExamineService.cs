@@ -1265,9 +1265,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
             return true;
         }
 
-        private static ExaminePreDataModel InitExamineViewEntryAudio(Entry entry)
+        private ExaminePreDataModel InitExamineViewEntryAudio(Entry entry)
         {
             var model = new ExaminePreDataModel();
+
+            var audioImage = entry.Audio.OrderByDescending(s => s.Priority).FirstOrDefault(s => string.IsNullOrWhiteSpace(s.Thumbnail) == false)?.Thumbnail;
+
             foreach (var item in entry.Audio)
             {
                 model.Audio.Add(new AudioViewModel
@@ -1277,7 +1280,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     Name = item.Name,
                     Priority = item.Priority,
                     Duration = item.Duration,
-                    Thumbnail = item.Thumbnail
+                    Thumbnail = _appHelper.GetImagePath(string.IsNullOrWhiteSpace(item.Thumbnail) ? audioImage : item.Thumbnail, "AudioThumbnail.png")
                 }) ;
             }
 
