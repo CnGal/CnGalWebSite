@@ -41,12 +41,12 @@ namespace CnGalWebSite.APIServer.Model
             Id = SearchCacheId.ToString();
             AnotherName = model.AnotherName ?? "";
             DisplayName = model.DisplayName ?? "";
-            LastEditTime = model.LastEditTime.ToBinary();
+            LastEditTime = model.LastEditTime.ToUnixTimeMilliseconds();
             Name = model.Name ?? "";
             Type = 0;
             OriginalType = (int)model.Type.ToSearchType();
             OriginalId = model.Id;
-            PubulishTime = model.PubulishTime?.ToBinary() ?? 0;
+            PubulishTime = model.PubulishTime?.ToUnixTimeMilliseconds() ?? 0;
             ReaderCount = model.ReaderCount;
             BriefIntroduction = model.BriefIntroduction ?? "";
             MainPage = model.MainPage ?? "";
@@ -57,7 +57,7 @@ namespace CnGalWebSite.APIServer.Model
             Id = SearchCacheId.ToString();
             AnotherName = "";
             DisplayName = model.DisplayName ?? "";
-            LastEditTime = model.LastEditTime.ToBinary();
+            LastEditTime = model.LastEditTime.ToUnixTimeMilliseconds();
             Name = model.Name ?? "";
             Type = 1;
             OriginalType = (int)model.Type.ToSearchType();
@@ -65,8 +65,8 @@ namespace CnGalWebSite.APIServer.Model
             ReaderCount = model.ReaderCount;
             BriefIntroduction = model.BriefIntroduction ?? "";
             MainPage = model.MainPage ?? "";
-            CreateTime = model.CreateTime.ToBinary();
-            PubulishTime = model.PubishTime.ToBinary();
+            CreateTime = model.CreateTime.ToUnixTimeMilliseconds();
+            PubulishTime = model.PubishTime.ToUnixTimeMilliseconds();
         }
 
         public void Copy(Periphery model)
@@ -74,7 +74,7 @@ namespace CnGalWebSite.APIServer.Model
             Id = SearchCacheId.ToString();
             AnotherName = "";
             DisplayName = model.DisplayName ?? "";
-            LastEditTime = model.LastEditTime.ToBinary();
+            LastEditTime = model.LastEditTime.ToUnixTimeMilliseconds();
             Name = model.Name ?? "";
             Type = 2;
             OriginalType = (int)model.Type.ToSearchType();
@@ -89,7 +89,7 @@ namespace CnGalWebSite.APIServer.Model
             Id = SearchCacheId.ToString();
             AnotherName = "";
             DisplayName = "";
-            LastEditTime = model.LastEditTime.ToBinary();
+            LastEditTime = model.LastEditTime.ToUnixTimeMilliseconds();
             Name = model.Name ?? "";
             Type = 3;
             OriginalId = model.Id;
@@ -103,7 +103,7 @@ namespace CnGalWebSite.APIServer.Model
             Id = SearchCacheId.ToString();
             AnotherName = "";
             DisplayName = model.DisplayName ?? "";
-            LastEditTime = model.LastEditTime.ToBinary();
+            LastEditTime = model.LastEditTime.ToUnixTimeMilliseconds();
             Name = model.Name ?? "";
             Type = 4;
             OriginalType = (int)SearchType.Video;
@@ -111,8 +111,8 @@ namespace CnGalWebSite.APIServer.Model
             ReaderCount = model.ReaderCount;
             BriefIntroduction = model.BriefIntroduction ?? "";
             MainPage = model.MainPage ?? "";
-            CreateTime = model.CreateTime.ToBinary();
-            PubulishTime = model.PubishTime.ToBinary();
+            CreateTime = model.CreateTime.ToUnixTimeMilliseconds();
+            PubulishTime = model.PubishTime.ToUnixTimeMilliseconds();
         }
 
 
