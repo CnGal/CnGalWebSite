@@ -572,13 +572,13 @@ namespace CnGalWebSite.APIServer.Application.News
             weeklyNews.News.Clear();
 
             //获取在这个星期的所有动态
-            var news = await _gameNewsRepository.GetAll().Include(s=>s.Article)
-                .Where(s => s.State == GameNewsState.Publish && weeklyNews.CreateTime.AddDays(7) > s.Article.PubishTime && weeklyNews.CreateTime.AddDays(-7) < s.Article.PubishTime)
+            var news = await _gameNewsRepository.GetAll()
+                .Where(s => s.State == GameNewsState.Publish && weeklyNews.CreateTime.AddDays(7) > s.PublishTime && weeklyNews.CreateTime.AddDays(-7) < s.PublishTime)
                 .ToListAsync();
 
-            news = news.Where(s => s.Article.PubishTime.IsInSameWeek(weeklyNews.CreateTime)).ToList();
+            news = news.Where(s => s.PublishTime.IsInSameWeek(weeklyNews.CreateTime)).ToList();
             weeklyNews.News.AddRange(news);
-            weeklyNews.News = weeklyNews.News.OrderBy(s => s.Article.PubishTime).ToList();
+            weeklyNews.News = weeklyNews.News.OrderBy(s => s.PublishTime).ToList();
 
             weeklyNews.Title = GenerateWeeklyNewsTitle(weeklyNews);
             weeklyNews.BriefIntroduction = GenerateWeeklyNewsBriefIntroduction(weeklyNews);
