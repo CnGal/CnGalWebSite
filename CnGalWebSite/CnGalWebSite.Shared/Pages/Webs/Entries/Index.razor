@@ -330,10 +330,10 @@ else
 @if (isFirstLoad==false)
 {
     <MSnackbar Timeout="-1" @bind-Value="isLoading" Text
-                Style="min-width:180px;"
+                Style="min-width:180px;" Color="primary"
                Elevation="24">
         <div style="display: flex; justify-content: center; align-items: center;">
-            <MProgressCircular Size="@("20px")" Width="2" Class="me-4" Indeterminate >
+            <MProgressCircular Size="@("20px")" Width="2" Class="me-4" Indeterminate Color="primary">
             </MProgressCircular>
             正在跳转......
         </div>

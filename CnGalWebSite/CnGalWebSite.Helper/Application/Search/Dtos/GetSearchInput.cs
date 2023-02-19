@@ -146,33 +146,39 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
             {
                new SearchTimeModel
                {
-                   AfterTime=DateTime.ParseExact("2018-01-01","yyyy-MM-dd",null),
-                   BeforeTime=DateTime.ParseExact("2019-01-01","yyyy-MM-dd",null),
+                   AfterTime=new DateTime(2018,1,1),
+                   BeforeTime=new DateTime(2019,1,1),
                    Note="2018"
                },
                 new SearchTimeModel
                {
-                   AfterTime=DateTime.ParseExact("2019-01-01","yyyy-MM-dd",null),
-                   BeforeTime=DateTime.ParseExact("2020-01-01","yyyy-MM-dd",null),
+                   AfterTime=new DateTime(2019,1,1),
+                   BeforeTime=new DateTime(2020,1,1),
                    Note="2019"
                },
                new SearchTimeModel
                {
-                   AfterTime=DateTime.ParseExact("2020-01-01","yyyy-MM-dd",null),
-                   BeforeTime=DateTime.ParseExact("2021-01-01","yyyy-MM-dd",null),
+                   AfterTime=new DateTime(2020,1,1),
+                   BeforeTime=new DateTime(2021,1,1),
                    Note="2020"
                },
                new SearchTimeModel
                {
-                   AfterTime=DateTime.ParseExact("2021-01-01","yyyy-MM-dd",null),
-                   BeforeTime=DateTime.ParseExact("2022-01-01","yyyy-MM-dd",null),
+                   AfterTime=new DateTime(2021,1,1),
+                   BeforeTime=new DateTime(2022,1,1),
                    Note="2021"
                },
                new SearchTimeModel
                {
-                   AfterTime=DateTime.ParseExact("2022-01-01","yyyy-MM-dd",null),
-                   BeforeTime=DateTime.ParseExact("2023-01-01","yyyy-MM-dd",null),
+                   AfterTime=new DateTime(2022,1,1),
+                   BeforeTime=new DateTime(2023,1,1),
                    Note="2022"
+               },
+                new SearchTimeModel
+               {
+                   AfterTime=new DateTime(2023,1,1),
+                   BeforeTime=new DateTime(2024,1,1),
+                   Note="2023"
                },
             };
         }
