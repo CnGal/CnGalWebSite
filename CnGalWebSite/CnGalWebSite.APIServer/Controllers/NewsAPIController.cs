@@ -365,8 +365,12 @@ namespace CnGalWebSite.APIServer.Controllers
             //选中的动态
             //获取在这个星期的所有动态
 
-            var news = await _gameNewsRepository.GetAll().Where(s => model.CreateTime.AddDays(7) > s.PublishTime && model.CreateTime.AddDays(-7) < s.PublishTime).ToListAsync();
-            news = news.Where(s => s.PublishTime.IsInSameWeek(model.CreateTime)).ToList();
+            var news = await _gameNewsRepository.GetAll().AsNoTracking()
+                .Include(s=>s.Article)
+                .Where(s => model.CreateTime.AddDays(7) > s.Article.PubishTime && model.CreateTime.AddDays(-7) < s.Article.PubishTime)
+                .ToListAsync();
+
+            news = news.Where(s => s.Article.PubishTime.IsInSameWeek(model.CreateTime)).ToList();
 
             foreach (var item in news)
             {

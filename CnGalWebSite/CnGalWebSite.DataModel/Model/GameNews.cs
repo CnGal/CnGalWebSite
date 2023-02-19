@@ -29,6 +29,9 @@ namespace CnGalWebSite.DataModel.Model
 
         public string NewsType { get; set; }
 
+        /// <summary>
+        /// 优先级比动态所关联的文章的发布时间更低，周报采用关联文章的发布时间
+        /// </summary>
         public DateTime PublishTime { get; set; }
 
         public string Author { get; set; }
