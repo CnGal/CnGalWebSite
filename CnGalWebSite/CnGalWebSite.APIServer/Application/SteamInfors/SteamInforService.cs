@@ -326,8 +326,9 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     steamGames.games.AddRange(temp.games);
                     steamGames.game_count += temp.game_count;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger.LogError(ex, "获取用户Steam游戏列表失败");
                     isError = true;
                 }
             }
@@ -369,12 +370,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                     LastEditTime = now
                 });
             }
-
-
             return !isError;
-
-
-
         }
 
         public async Task<SteamEvaluation> GetSteamEvaluationAsync(int id)

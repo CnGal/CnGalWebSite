@@ -29,9 +29,6 @@ namespace CnGalWebSite.DataModel.Model
 
         public string NewsType { get; set; }
 
-        /// <summary>
-        /// 优先级比动态所关联的文章的发布时间更低，周报采用关联文章的发布时间
-        /// </summary>
         public DateTime PublishTime { get; set; }
 
         public string Author { get; set; }
@@ -45,6 +42,10 @@ namespace CnGalWebSite.DataModel.Model
         public OriginalRSS RSS { get; set; }
 
         public long? ArticleId { get; set; }
+
+        /// <summary>
+        /// 周报生成不以关联文章的内容为模板 单向同步
+        /// </summary>
         public Article Article { get; set; }
 
         /// <summary>
