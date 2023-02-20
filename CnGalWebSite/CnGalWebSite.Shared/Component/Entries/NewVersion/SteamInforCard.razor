@@ -9,7 +9,7 @@
             {
                 <span class="col-12 d-flex">
                     <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaIcon Type="IconType.Price" />
-                    <span>当前价格：¥</span>
+                    <span class="me-2">当前价格：¥</span>
                     @if (SteamInfor.CutNow > 0)
                     {
                         <s class="me-2">@((SteamInfor.OriginalPrice/100.0).ToString(" 0.00"))</s>
@@ -59,11 +59,20 @@
                 <BasicInforAloneTip Icon="@IconType.Takedown" Text="已下架" Class="col-12" />
                 <meta itemprop="availability" content="SoldOut" />
             }
+            @if (SteamInfor.PlayTime > 0)
+            {
+                <BasicInforAloneTip Icon="@IconType.DeterminedTime" Text="@($"平均游玩时长：{SteamInfor.PlayTime:0.0} 小时")" Class="col-12" />
+            }
+            @if (SteamInfor.EstimationOwnersMax > 0)
+            {
+                <BasicInforAloneTip Icon="@IconType.Users" Text="@($"拥有人数（估计）：{ (SteamInfor.EstimationOwnersMin == 0 ? $"< {SteamInfor.EstimationOwnersMax:#,#}" : $"> {SteamInfor.EstimationOwnersMin:#,#}")}")" Class="col-12" />
+            }
             @if (SteamInfor.EvaluationCount > 0)
             {
                 <BasicInforAloneTip Icon="@IconType.ThumbsUp" Text="@($"{SteamInfor.RecommendationRate}% 好评（{SteamInfor.EvaluationCount}条评测）")" Class="col-12" />
 
             }
+
 
             @if (SteamInfor.OriginalPrice >= 0)
             {

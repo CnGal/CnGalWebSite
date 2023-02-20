@@ -161,6 +161,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     PriceNow = item.PriceNow,
                     PublishTime = item.Entry.PubulishTime,
                     RecommendationRate = item.RecommendationRate,
+                    PlayTime=item.PlayTime
                 });
             }
 
@@ -198,6 +199,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     PriceNow = item.PriceNow,
                     PublishTime = item.Entry.PubulishTime,
                     RecommendationRate = item.RecommendationRate,
+                    PlayTime=item.PlayTime
                 });
             }
 

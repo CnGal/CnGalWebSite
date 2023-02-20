@@ -15,6 +15,9 @@ namespace CnGalWebSite.DataModel.Model
         public string PriceNowString { get; set; }
         public int CutNow { get; set; }
 
+        /// <summary>
+        /// 平均游玩时长 小时 不用分钟是因为之前就是double
+        /// </summary>
         public double PlayTime { get; set; }
 
         public int PriceLowest { get; set; }
@@ -29,6 +32,15 @@ namespace CnGalWebSite.DataModel.Model
         /// 好评率
         /// </summary>
         public int RecommendationRate { get; set; }
+
+        /// <summary>
+        /// 估计拥有人数 上限
+        /// </summary>
+        public int EstimationOwnersMax { get; set; }
+        /// <summary>
+        /// 估计拥有人数 下限
+        /// </summary>
+        public int EstimationOwnersMin { get; set; }
 
         /// <summary>
         /// 关联的游戏

@@ -31,6 +31,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Tables
         public int EvaluationCount { get; set; }
         [Display(Name = "好评率")]
         public int RecommendationRate { get; set; }
+        [Display(Name = "拥有人数（估计）")]
+        public string EstimationOwners { get; set; }
+        [Display(Name = "游玩时长 h")]
+        public double PlayTime { get; set; }
         [Display(Name = "史低价格出现时间")]
         public DateTime LowestTime { get; set; }
     }
