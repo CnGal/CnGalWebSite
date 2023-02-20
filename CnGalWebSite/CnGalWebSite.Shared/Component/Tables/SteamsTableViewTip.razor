@@ -38,6 +38,8 @@ else
             <TableColumn @bind-Field="@context.CutLowest" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="CutLowestFormatter" />
             <TableColumn @bind-Field="@context.EvaluationCount" Filterable="true" Sortable="true" Width="170" TextWrap="true" />
             <TableColumn @bind-Field="@context.RecommendationRate" Filterable="true" Sortable="true" Width="170" TextWrap="true" Formatter="RecommendationRateFormatter" />
+            <TableColumn @bind-Field="@context.PlayTime" Filterable="true" Sortable="true" Width="170" TextWrap="true" FormatString="0.0" />
+            <TableColumn @bind-Field="@context.EstimationOwners" Filterable="true" Width="170" TextWrap="true" />
         </TableColumns>
         <RowButtonTemplate>
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>OnLook(context.SteamId))" />
@@ -66,11 +68,7 @@ else
 
     public async Task OnLook(int id)
     {
-        try
-        {
-            await _eventService.OpenNewPage("https://store.steampowered.com/app/" + id);
-        }
-        catch { }
+        await _eventService.OpenNewPage("https://store.steampowered.com/app/" + id);
     }
 
     protected override async Task OnInitializedAsync()

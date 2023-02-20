@@ -602,7 +602,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             //循环添加
             var steamList = await _steamInforRepository.GetAll().AsNoTracking()
                 .Include(s => s.Entry)
-                .Where(s=>s.Entry.IsHidden==false&&string.IsNullOrWhiteSpace(s.Entry.Name)==false)
+                .Where(s => s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false)
                 .Select(s => new SteamInforTableModel
                 {
                     SteamId = s.SteamId,
@@ -615,7 +615,9 @@ namespace CnGalWebSite.APIServer.Application.Tables
                     OriginalPrice = s.OriginalPrice,
                     PriceLowest = s.PriceLowest,
                     PriceNow = s.PriceNow,
-                    RecommendationRate = s.RecommendationRate
+                    RecommendationRate = s.RecommendationRate,
+                    EstimationOwners = s.EstimationOwnersMin == 0 ? $"< {s.EstimationOwnersMax}" : $"> {s.EstimationOwnersMin}",
+                    PlayTime=s.PlayTime
                 })
                 .ToListAsync();
 
@@ -642,7 +644,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
 
                 if (item.Name != temp.Name || item.EntryId != temp.EntryId || item.OriginalPrice != temp.OriginalPrice
                     || item.PriceNow != temp.PriceNow || item.CutNow != temp.CutNow || item.PriceLowest != temp.PriceLowest || item.CutLowest != temp.CutLowest
-                    || item.LowestTime != temp.LowestTime || item.EvaluationCount != temp.EvaluationCount || item.RecommendationRate != temp.RecommendationRate)
+                    || item.LowestTime != temp.LowestTime || item.EvaluationCount != temp.EvaluationCount || item.RecommendationRate != temp.RecommendationRate || item.EstimationOwners != temp.EstimationOwners || item.PlayTime != temp.PlayTime)
                 {
                     item.Name = temp.Name;
                     item.EntryId = temp.EntryId;
@@ -653,6 +655,8 @@ namespace CnGalWebSite.APIServer.Application.Tables
                     item.CutLowest = temp.CutLowest;
                     item.LowestTime = temp.LowestTime;
                     item.EvaluationCount = temp.EvaluationCount;
+                    item.EstimationOwners = temp.EstimationOwners;
+                    item.PlayTime = temp.PlayTime;
                     item.RecommendationRate = temp.RecommendationRate;
 
                     await _steamInforTableModelRepository.UpdateAsync(item);

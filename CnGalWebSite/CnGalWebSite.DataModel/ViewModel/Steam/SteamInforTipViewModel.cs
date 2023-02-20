@@ -25,6 +25,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Steam
         public string PriceLowestString { get; set; }
         public int CutLowest { get; set; }
 
+        public double PlayTime { get; set; }
+
         /// <summary>
         /// 评测数
         /// </summary>

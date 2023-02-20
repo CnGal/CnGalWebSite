@@ -72,6 +72,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
         }
 
+        [Obsolete("一次性更新所有信息负载过高")]
         public async Task BatchUpdateGameSteamInfor(int count)
         {
             var date = DateTime.Now.ToCstTime().Date;
@@ -90,7 +91,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
 
         }
 
-
+        [Obsolete("已迁移用户Steam信息")]
         public async Task UpdateAllUserSteamInfor()
         {
             var steamIds = await _steamUserInforRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.SteamId) == false).Select(s => s.SteamId).ToListAsync();
@@ -101,6 +102,51 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
         }
 
+        #region 获取Steam信息
+
+        /// <summary>
+        /// 获取Steam附加信息
+        /// </summary>
+        /// <param name="steam"></param>
+        /// <returns></returns>
+        public async Task GetSteamAdditionInformationAsync(SteamInfor steam)
+        {
+            try
+            {
+                var content = await _httpClient.GetStringAsync(_configuration["SteamspyUrl"] + "api.php?request=appdetails&appid=" + steam.SteamId);
+                var json = JObject.Parse(content);
+
+                steam.EvaluationCount = json["positive"].ToObject<int>() + json["negative"].ToObject<int>();
+                steam.RecommendationRate = json["positive"].ToObject<int>()*100 / steam.EvaluationCount;
+
+                var minutes = json["average_forever"].ToObject<double>();
+                if (minutes > 3000)
+                {
+                    steam.PlayTime = 0;
+                }
+                else
+                {
+                    steam.PlayTime = minutes / 60;
+                }
+            
+
+                var times = json["owners"].ToObject<string>().Split("..");
+
+                steam.EstimationOwnersMin = int.Parse(times[0].Replace(" ", "").Replace(",", ""));
+                steam.EstimationOwnersMax = int.Parse(times[1].Replace(" ", "").Replace(",", ""));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Id：{id} 获取Steam附加信息失败", steam.SteamId);
+            }
+
+        }
+
+        /// <summary>
+        /// 获取Steam价格
+        /// </summary>
+        /// <param name="steam"></param>
+        /// <returns></returns>
         private async Task UpdateSteamInforByRemoteAPI(SteamInfor steam)
         {
             //获取信息
@@ -130,7 +176,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
             catch (Exception ex)
             {
-                _logger.LogError("Id:{id} 获取Steam官方API数据失败", steam.SteamId);
+                _logger.LogError(ex,"Id:{id} 获取Steam官方API数据失败", steam.SteamId);
             }
 
             if (officialResult != null && officialResult[steam.SteamId.ToString()]["success"].ToObject<bool>() == true)
@@ -253,6 +299,12 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
         }
 
+        /// <summary>
+        /// 更新Steam信息
+        /// </summary>
+        /// <param name="steamId"></param>
+        /// <param name="entryId"></param>
+        /// <returns></returns>
         public async Task<SteamInfor> UpdateSteamInfor(int steamId, int entryId)
         {
             //获取已存在的信息
@@ -276,19 +328,10 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             }
 
 
-            //获取评测
+            //获取附加信息
             if (steam.PriceNow >= 0)
             {
-                try
-                {
-                    var item = await GetSteamEvaluationAsync(steamId);
-                    steam.EvaluationCount = item.EvaluationCount;
-                    steam.RecommendationRate = item.RecommendationRate;
-                }
-                catch (Exception)
-                {
-                    _logger.LogError("Id:{id} 获取Steam评测数据失败", steamId);
-                }
+                await GetSteamAdditionInformationAsync(steam);
             }
 
             //最后更新时间
@@ -303,6 +346,14 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             return steam;
         }
 
+
+        #endregion
+
+        /// <summary>
+        /// 更新用户Steam信息
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task<bool> UpdateUserSteam(ApplicationUser user)
         {
             var now = DateTime.Now.ToCstTime();
@@ -373,27 +424,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             return !isError;
         }
 
-        public async Task<SteamEvaluation> GetSteamEvaluationAsync(int id)
-        {
-
-            var content = await _httpClient.GetStringAsync("https://store.steampowered.com/app/" + id);
-
-            var document = new HtmlDocument();
-            document.LoadHtml(content);
-
-            var node = document.GetElementbyId("userReviews");
-            var text = node.ChildNodes.Count > 3
-                ? node.ChildNodes[3].ChildNodes[3].ChildNodes[5].InnerText
-                : node.ChildNodes[1].ChildNodes[3].ChildNodes[5].InnerText;
-            var countStr = ToolHelper.MidStrEx(text, "the ", " ").Replace(",", "");
-            var rateStr = ToolHelper.MidStrEx(text, " ", "% ");
-            return new SteamEvaluation
-            {
-                EvaluationCount = int.Parse(countStr),
-                RecommendationRate = int.Parse(rateStr),
-            };
-        }
-
+        [Obsolete("已迁移用户Steam信息")]
         public async Task<SteamUserInfor> UpdateSteamUserInfor(string SteamId)
         {
             var steamUser = new SteamUserInforJson();
