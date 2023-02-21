@@ -350,16 +350,17 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 //序列化审核数据
                 object examineData = null;
-                if (string.IsNullOrWhiteSpace(examine.Context))
-                {
-                    return new Result { Successful = false, Error = "审核内容为空" };
-                }
+
                 if (examine.Operation == Operation.UserMainPage || examine.Operation == Operation.EditArticleMainPage || examine.Operation == Operation.EstablishMainPage || examine.Operation == Operation.EditVideoMainPage)
                 {
                     examineData = examine.Context;
                 }
                 else
                 {
+                    if (string.IsNullOrWhiteSpace(examine.Context))
+                    {
+                        return new Result { Successful = false, Error = "审核内容为空" };
+                    }
                     using TextReader str = new StringReader(examine.Context);
                     var serializer = new JsonSerializer();
                     examineData = serializer.Deserialize(str, examine.Operation switch
@@ -391,12 +392,13 @@ namespace CnGalWebSite.APIServer.Controllers
                         Operation.EditVideoImages => typeof(VideoImages),
                         _ => throw new NotImplementedException("未知的操作")
                     });
+                    if (examineData == null)
+                    {
+                        return new Result { Successful = false, Error = "获取审核数据失败" };
+                    }
                 }
 
-                if (examineData == null)
-                {
-                    return new Result { Successful = false, Error = "获取审核数据失败" };
-                }
+              
                 //应用审核记录
                 try
                 {
