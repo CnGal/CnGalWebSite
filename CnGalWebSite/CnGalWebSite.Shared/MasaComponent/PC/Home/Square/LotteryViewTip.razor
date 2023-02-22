@@ -5,7 +5,7 @@
                 <img class="img-fluid" src="@Model.MainPicture">
             </div>
             <div class="p-3">
-                <header class="text-truncate-2">
+                <header style=" display: flex; align-items: center;" class="mb-2">
                     @if (DateTime.Now.ToCstTime() < Model.BeginTime)
                     {
                         <span class="bg-primary article-home-tag me-2" style=" border-radius: 5px; ">未开始</span>
@@ -20,7 +20,7 @@
                     }
 
 
-                    <h5 class="fw-bold" style=" display: inline;">@Model.Name</h5>
+                    <h5 class="fw-bold mb-0 text-truncate-2">@Model.Name</h5>
                 </header>
                 <span class="text-truncate-4">
                     @Model.BriefIntroduction

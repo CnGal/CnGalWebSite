@@ -33,9 +33,10 @@
             if (_dataCacheService.VoteCardsCatche.Count == 0)
             {
                 _dataCacheService.VoteCardsCatche = await Http.GetFromJsonAsync<List<VoteCardViewModel>>(ToolHelper.WebApiPath + "api/votes/GetVoteCards", ToolHelper.options);
+                _dataCacheService.VoteCardsCatche = _dataCacheService.VoteCardsCatche.OrderByDescending(s => s.EndTime).Take(12).ToList();
+
             }
 
-            _dataCacheService.VoteCardsCatche.Random();
         }
         catch (Exception ex)
         {
