@@ -22,9 +22,10 @@
         </MTextarea>
     }
 
-    <div>
+    <div class="d-flex">
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="发表评论" IsAsync="true" OnClick="OnComment" Icon="mdi-check" />
         <CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaButton Text="切换编辑器" OnClick="OnSwitch" Icon="mdi-circle-edit-outline " Class="ms-3" />
+        <CnGalWebSite.Shared.MasaComponent.Shared.Editors.Buttons.ImageUploadButton Text="上传图片"  Class="ms-3"  OnImageUploaded="OnImageUploaded" ShowPreview="false"/>
     </div>
 </div>
 @code {
@@ -92,5 +93,11 @@
 
         StateHasChanged();
         return Task.CompletedTask;
+    }
+
+    public void OnImageUploaded(string path)
+    {
+        Text +=$"![]({path})" ;
+        StateHasChanged();
     }
 }

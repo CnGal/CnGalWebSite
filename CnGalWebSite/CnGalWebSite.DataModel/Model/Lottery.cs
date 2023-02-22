@@ -121,6 +121,8 @@ namespace CnGalWebSite.DataModel.Model
         None,
         [Display(Name = "至少有一条游玩记录")]
         GameRecord,
+        [Display(Name = "评论该抽奖")]
+        CommentLottery,
     }
 
     public class LotteryUser

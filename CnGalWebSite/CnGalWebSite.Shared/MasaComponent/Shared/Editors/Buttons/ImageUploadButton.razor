@@ -22,7 +22,7 @@
             <img src="@(string.IsNullOrWhiteSpace(ImagePath)?"https://res.cngal.org/_content/CnGalWebSite.Shared/images/default/app.png":ImagePath)" class="card-img" alt="...">
             <div class="card-img-overlay d-flex">
 
-                <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark green pointer mb-3 me-3">
+                <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark primary pointer mb-3 me-3">
                     <span class="m-btn__content">
                         @if (isUploading)
                         {
@@ -48,7 +48,7 @@
     }
     else
     {
-        <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark green pointer mb-3 me-3">
+        <label for="@Id" class="m-btn m-btn--is-elevated m-btn--has-bg m-size--default theme--dark primary pointer mb-3 me-3">
             <span class="m-btn__content">
                 @if (isUploading)
                 {

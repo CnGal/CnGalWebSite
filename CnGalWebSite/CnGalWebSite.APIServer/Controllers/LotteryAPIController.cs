@@ -46,13 +46,14 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<LotteryAward, long> _lotteryAwardRepository;
         private readonly IRepository<LotteryPrize, long> _lotteryPrizeRepository;
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
+        private readonly IRepository<Comment, long> _commentRepository;
         private readonly ILogger<LotteryAPIController> _logger;
         private readonly IOperationRecordService _operationRecordService;
 
         public LotteryAPIController(IRepository<Vote, long> voteRepository, IRepository<VoteOption, long> voteOptionRepository, IRepository<VoteUser, long> voteUserRepository, IRankService rankService,
             IRepository<WeiboUserInfor, long> weiboUserInforRepository, IRepository<ApplicationUser, string> userRepository, ILogger<LotteryAPIController> logger, IOperationRecordService operationRecordService,
-        UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository,
-             IRepository<WeeklyNews, long> weeklyNewsRepository, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository,
+        UserManager<ApplicationUser> userManager, IAppHelper appHelper, IRepository<GameNews, long> gameNewsRepository, IRepository<Comment, long> commentRepository,
+        IRepository<WeeklyNews, long> weeklyNewsRepository, IRepository<Lottery, long> lotteryRepository, IRepository<LotteryUser, long> lotteryUserRepository, IRepository<LotteryAward, long> lotteryAwardRepository,
              IRepository<LotteryPrize, long> lotteryPrizeRepository, ILotteryService lotteryService, IRepository<PlayedGame, long> playedGameRepository)
         {
             _userManager = userManager;
@@ -73,6 +74,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _playedGameRepository = playedGameRepository;
             _logger = logger;
             _operationRecordService = operationRecordService;
+            _commentRepository= commentRepository;
         }
 
 
@@ -664,11 +666,19 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
+            //检查抽奖条件
             if (lottery.ConditionType == LotteryConditionType.GameRecord)
             {
                 if (await _playedGameRepository.GetAll().AnyAsync(s => s.ApplicationUserId == user.Id) == false)
                 {
                     return new Result { Successful = false, Error = "参加该抽奖需要至少有一条游玩记录" };
+                }
+            }
+            else if(lottery.ConditionType == LotteryConditionType.CommentLottery)
+            {
+                if(await _commentRepository.GetAll().AnyAsync(s=>s.ApplicationUserId==user.Id&&s.LotteryId==model.Id&&s.Type== CommentType.CommentLottery&&string.IsNullOrWhiteSpace(s.Text)==false)==false)
+                {
+                    return new Result { Successful = false, Error = "参加该抽奖需要评论该抽奖，并通过审核" };
                 }
             }
 
