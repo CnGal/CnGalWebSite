@@ -707,9 +707,16 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 var entryName = model.Infor.Replace("看板娘介绍一下", "").Replace("看板娘介绍", "").Trim();
 
-                var result = await _searchHelper.QueryAsync(SearchInputModel.Parse(new string[] { "Entry" }, null, entryName, null, 0)); 
+                if(string.IsNullOrWhiteSpace(entryName))
+                {
+                    return new Result { Successful = false, Error = "呜呜呜~~~ 看板娘找不到这个词条" };
+                }
 
-                var entry = result.Data.FirstOrDefault(s => s.entry != null)?.entry;
+                var entry = await _entryRepository.GetAll().AsNoTracking()
+                    .Where(s => entryName.Length < 2 ? (s.Name == entryName || s.AnotherName == entryName) : (s.Name.Contains(entryName) || s.AnotherName.Contains(entryName)|| entryName.Contains(s.AnotherName) || entryName.Contains(s.Name)))
+                    .Select(s => new { s.Id, s.Name })
+                    .FirstOrDefaultAsync();
+
                 if (entry == null)
                 {
                     return new Result { Successful = false, Error = "呜呜呜~~~ 看板娘找不到这个词条" };
