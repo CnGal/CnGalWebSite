@@ -714,7 +714,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 var entry = await _entryRepository.GetAll().AsNoTracking()
                     .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
-                    .Where(s => entryName.Length < 2 ? (s.Name == entryName || s.AnotherName == entryName) : (s.Name.Contains(entryName) || (s.AnotherName != null && s.AnotherName.Contains(entryName)) || (s.AnotherName != null && entryName.Contains(s.AnotherName)) || entryName.Contains(s.Name)))
+                    .Where(s => entryName.Length < 2 ? (s.Name == entryName || s.AnotherName == entryName) : (s.Name.Contains(entryName) || (s.AnotherName != null && s.AnotherName.Contains(entryName))))
                     .Select(s => new { s.Id, s.Name })
                     .FirstOrDefaultAsync();
 
