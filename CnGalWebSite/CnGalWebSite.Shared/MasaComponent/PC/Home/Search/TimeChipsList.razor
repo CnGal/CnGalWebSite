@@ -11,11 +11,11 @@
     }
 
 
-    @if (custom&&InputData.Any())
+    @if (customTime != null)
     {
         <MChip Class="ma-1" OnClick="OnClean" Small TextColor="white"
                Color="@Color">
-            @(InputData.FirstOrDefault().AfterTime.ToString("yyyy-MM-dd") + " ~ " + InputData.FirstOrDefault().BeforeTime.ToString("yyyy-MM-dd"))
+            @(customTime.AfterTime.ToString("yyyy-MM-dd") + " ~ " + customTime.BeforeTime.ToString("yyyy-MM-dd"))
         </MChip>
     }
     else
@@ -36,7 +36,7 @@
          Persistent
          MaxWidth="400">
 
-    <MDatePicker @bind-Value="_dates" Locale="zh-CN" 
+    <MDatePicker @bind-Value="_dates" Locale="zh-CN"
                  Range Scrollable>
         <MSpacer></MSpacer>
         <MButton Text
@@ -61,15 +61,15 @@
     [Parameter]
     public EventCallback OnChanged { get; set; }
 
-    bool custom = false;
+    SearchTimeModel customTime = null;
     bool dialog = false;
     private List<DateOnly> _predates = new List<DateOnly>
-{
+    {
          DateOnly.FromDateTime(DateTime.Now.ToCstTime().AddDays(-10)),
          DateOnly.FromDateTime(DateTime.Now.ToCstTime()),
     };
     private List<DateOnly> _dates = new List<DateOnly>
-{
+    {
          DateOnly.FromDateTime(DateTime.Now.ToCstTime().AddDays(-10)),
          DateOnly.FromDateTime(DateTime.Now.ToCstTime()),
     };
@@ -82,10 +82,8 @@
         }
         else
         {
-            InputData.Clear();
             InputData.Add(model);
         }
-        custom = false;
         StateHasChanged();
         await OnChanged.InvokeAsync();
     }
@@ -93,13 +91,12 @@
     public void OnAdd()
     {
         dialog = true;
-        
     }
 
     public async Task OnClean()
     {
-        custom = false;
-        InputData.Clear();
+        customTime = null;
+        InputData.Remove(customTime);
         await OnChanged.InvokeAsync();
     }
 
@@ -108,20 +105,25 @@
     {
         dialog = false;
         _dates = _predates;
-        
+
     }
 
     public async Task ModalOK()
     {
         dialog = false;
-        InputData.Clear();
-        InputData.Add(new SearchTimeModel
+
+        if (customTime != null)
+        {
+            InputData.Remove(customTime);
+        }
+
+        customTime = new SearchTimeModel
         {
             BeforeTime = _dates[1].ToDateTime(TimeOnly.MinValue),
             AfterTime = _dates[0].ToDateTime(TimeOnly.MinValue),
             Note = string.Join(" ~ ", _dates.Select(date => date.ToString("yyyy-MM-dd")))
-        });
-        custom = true;
+        };
+        InputData.Add(customTime);
 
         StateHasChanged();
         await OnChanged.InvokeAsync();

@@ -32,8 +32,9 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IExamineService _examineService;
         private readonly IAppHelper _appHelper;
         private readonly IHostApplicationLifetime _applicationLifetime;
+        private readonly ILogger<HomeAPIController> _logger;
 
-        public HomeAPIController(ISearchHelper searchHelper, IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime,
+        public HomeAPIController(ISearchHelper searchHelper, IAppHelper appHelper, IRepository<Article, long> articleRepository, IHostApplicationLifetime applicationLifetime, ILogger<HomeAPIController> logger,
         IRepository<Entry, int> entryRepository, IHomeService homeService, IExamineService examineService, IRepository<Examine, long> examineRepository)
         {
             _searchHelper = searchHelper;
@@ -43,6 +44,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _appHelper = appHelper;
             _examineRepository = examineRepository;
             _articleRepository = articleRepository;
+            _logger = logger;
             _applicationLifetime = applicationLifetime;
         }
 
@@ -167,6 +169,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "获取搜索结果失败");
                 return NotFound(ex.Message);
             }
         }

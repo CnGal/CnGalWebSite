@@ -40,6 +40,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Typesense.Setup;
 
 namespace CnGalWebSite.APIServer
 {
@@ -85,7 +86,12 @@ namespace CnGalWebSite.APIServer
             //添加ElasticSearch服务
             services.AddTransient(typeof(IElasticsearchBaseService<>), typeof(ElasticsearchBaseService<>));
             //添加搜索服务
-            services.AddScoped<ISearchHelper, TypesenseHelper>();
+            services.AddScoped<ISearchHelper, TypesenseHelper>()
+                .AddTypesenseClient(config =>
+                {
+                    config.ApiKey = Configuration["TypesenseAPIKey"];
+                    config.Nodes = new List<Node> { new Node(Configuration["TypesenseHost"], Configuration["TypesensePort"]) };
+                });
             //依赖注入仓储
             services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
             //自动注入服务到依赖注入容器

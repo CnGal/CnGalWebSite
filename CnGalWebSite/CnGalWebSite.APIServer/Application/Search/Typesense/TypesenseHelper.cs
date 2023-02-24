@@ -1,6 +1,5 @@
 ﻿using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Search;
-using CnGalWebSite.APIServer.Application.Search.Typesense;
 using CnGalWebSite.APIServer.Controllers;
 using CnGalWebSite.APIServer.CustomMiddlewares;
 using CnGalWebSite.APIServer.DataReositories;
@@ -30,15 +29,15 @@ namespace CnGalWebSite.APIServer.Application.Typesense
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<Video, long> _videoRepository;
         private readonly IRepository<SearchCache, long> _searchCacheRepository;
-
         private readonly ILogger<TypesenseHelper> _logger;
         private readonly IAppHelper _appHelper;
         private readonly string _collectionName = "SearchCache";
+        private readonly int _preMaxCount = 100;
 
-        public TypesenseHelper(ITypesenseProvider typesenseProvider, IRepository<Entry, int> entryRepository, IRepository<SearchCache, long> searchCacheRepository, IRepository<Video, long> videoRepository, ILogger<TypesenseHelper> logger,
+        public TypesenseHelper(ITypesenseClient typesenseClient, IRepository<Entry, int> entryRepository, IRepository<SearchCache, long> searchCacheRepository, IRepository<Video, long> videoRepository, ILogger<TypesenseHelper> logger,
         IRepository<Tag, int> tagRepository, IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository, IAppHelper appHelper)
         {
-            _typesenseClient = typesenseProvider.GetClient();
+            _typesenseClient = typesenseClient;
             _entryRepository = entryRepository;
 
             _tagRepository = tagRepository;
@@ -65,31 +64,31 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
         private async Task CreateCollection()
         {
-            var schema = new MySchema(
+            var schema = new Schema(
               _collectionName,
-              new List<MyField>
+              new List<Field>
               {
-                    new MyField("id", FieldType.String, false),
-                    new MyField("originalId", FieldType.Int64, false),
-                    new MyField("name", FieldType.String, false, true),
-                    new MyField("displayName", FieldType.String, false, true),
-                    new MyField("anotherName", FieldType.String, false, true),
-                    new MyField("briefIntroduction", FieldType.String, false),
-                    new MyField("mainPage", FieldType.String, false),
-                    new MyField("lastEditTime", FieldType.Int64, false),
-                    new MyField("pubulishTime", FieldType.Int64, false),
-                    new MyField("createTime", FieldType.Int64, false),
-                    new MyField("readerCount", FieldType.Int32, false),
-                    new MyField("type", FieldType.Int32, false),
-                    new MyField("originalType", FieldType.Int32, false),
+                    new Field("id", FieldType.String, false),
+                    new Field("originalId", FieldType.Int64, false),
+                    new Field("name", FieldType.String, false, true),
+                    new Field("displayName", FieldType.String, false, true),
+                    new Field("anotherName", FieldType.String, false, true),
+                    new Field("briefIntroduction", FieldType.String, false),
+                    new Field("mainPage", FieldType.String, false),
+                    new Field("lastEditTime", FieldType.Int64, false),
+                    new Field("pubulishTime", FieldType.Int64, false),
+                    new Field("createTime", FieldType.Int64, false),
+                    new Field("readerCount", FieldType.Int32, false),
+                    new Field("type", FieldType.Int32, false),
+                    new Field("originalType", FieldType.Int32, false),
               });
             try
             {
                 var createCollectionResponse = await _typesenseClient.CreateCollection(schema);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                //_logger.LogError(ex, "创建集合失败");
             }
         }
 
@@ -128,6 +127,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
                 }
 
+                //将数据发送到Typesence
                 var result = await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
 
                 var errors = result.Where(s => s.Success == false);
@@ -193,7 +193,9 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                     }
 
                 }
+                //将数据发送到Typesence
                 var result = await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+
                 var errors = result.Where(s => s.Success == false);
                 foreach (var item in errors)
                 {
@@ -256,7 +258,9 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                     }
 
                 }
+                //将数据发送到Typesence
                 var result = await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+
                 var errors = result.Where(s => s.Success == false);
                 foreach (var item in errors)
                 {
@@ -322,7 +326,9 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                     }
 
                 }
+                //将数据发送到Typesence
                 var result = await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+
                 var errors = result.Where(s => s.Success == false);
                 foreach (var item in errors)
                 {
@@ -388,7 +394,9 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                     }
 
                 }
+                //将数据发送到Typesence
                 var result = await _typesenseClient.ImportDocuments(_collectionName, documents, documents.Count, ImportType.Upsert);
+
                 var errors = result.Where(s => s.Success == false);
                 foreach (var item in errors)
                 {
@@ -547,10 +555,8 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             //初始化排序
             if (string.IsNullOrWhiteSpace(model.Sorting) == false)
             {
-
                 var f = model.Sorting[0].ToString();
                 sortString = f.ToLower() + model.Sorting[1..^0];
-
             }
             else
             {
@@ -584,20 +590,22 @@ namespace CnGalWebSite.APIServer.Application.Typesense
             }
 
             //页数
-            query.PerPage = model.MaxResultCount.ToString();
-            query.Page = model.CurrentPage.ToString();
+            query.PerPage = model.MaxResultCount;
+            query.Page = model.CurrentPage;
 
             //筛选时间
             if (model.Times.Any())
             {
+                filterString.Append("(");
                 foreach (var item in model.Times)
                 {
-                    if (filterString.Length != 0)
+                    if (model.Times.IndexOf(item)!=0)
                     {
-                        filterString.Append(" && ");
+                        filterString.Append(" || ");
                     }
                     filterString.Append($"pubulishTime: [{item.AfterTime.ToUnixTimeMilliseconds()}..{item.BeforeTime.ToUnixTimeMilliseconds()}]");
                 }
+                filterString.Append(")");
             }
 
             //筛选类别
@@ -628,7 +636,7 @@ namespace CnGalWebSite.APIServer.Application.Typesense
                     filterString.Append($"originalType: [");
                     foreach (var item in types)
                     {
-                        filterString.Append(item.ToString());
+                        filterString.Append(item);
 
                         if (types.IndexOf(item) != types.Count - 1)
                         {
