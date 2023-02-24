@@ -699,6 +699,7 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             try
             {
+                await _searchCacheRepository.GetAll().ExecuteDeleteAsync();
                 await _searchHelper.DeleteDataOfSearchService();
                 await _searchHelper.UpdateDataToSearchService(DateTime.Now, true);
 

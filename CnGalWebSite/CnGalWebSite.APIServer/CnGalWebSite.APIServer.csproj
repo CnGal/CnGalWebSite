@@ -51,9 +51,9 @@
     <PackageReference Include="Senparc.Weixin.MP" Version="16.18.9" />
     <PackageReference Include="Senparc.Weixin.MP.Middleware" Version="0.8.4" />
     <PackageReference Include="Senparc.Weixin.MP.MVC" Version="7.12.4" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
-    <PackageReference Include="Typesense" Version="4.0.1" />
+    <PackageReference Include="Typesense" Version="6.2.0" />
   </ItemGroup>
 
   <ItemGroup>
