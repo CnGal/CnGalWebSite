@@ -68,10 +68,10 @@
         return ColorExtensions.GetGradientColor(index, isText);
     }
 
-    public Task OnExport()
+    public void OnExport()
     {
         export = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

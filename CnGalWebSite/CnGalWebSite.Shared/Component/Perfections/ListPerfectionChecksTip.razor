@@ -18,7 +18,7 @@
             <TableColumn @bind-Field="@context.VictoryPercentage" Sortable Width="120" FormatString="0.0" />
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.Id ))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => OnLook(context.Id ))" />
         </RowButtonTemplate>
     </Table>
 </div>
@@ -68,9 +68,9 @@
     {
         await TableRows.QueryAsync();
     }
-    private Task OnLook(int id)
+    private void OnLook(int id)
     {
         NavigationManager.NavigateTo("/entries/index/" + id);
-        return Task.CompletedTask;
+        
     }
 }

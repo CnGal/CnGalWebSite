@@ -25,7 +25,7 @@
         <RowButtonTemplate>
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditWeeklyNews(context.Id))" />
 
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-up" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => EditArticle(context.ArticleId ))" IsShow="context.ArticleId != 0" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-up" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => EditArticle(context.ArticleId ))" IsShow="context.ArticleId != 0" />
         </RowButtonTemplate>
     </Table>
 </div>
@@ -78,10 +78,10 @@
     {
         await TableRows.QueryAsync();
     }
-    private Task EditArticle(long id)
+    private void EditArticle(long id)
     {
         NavigationManager.NavigateTo( "/articles/index/" + id);
-        return Task.CompletedTask;
+        
     }
 
     private async Task EditWeeklyNews(long id)

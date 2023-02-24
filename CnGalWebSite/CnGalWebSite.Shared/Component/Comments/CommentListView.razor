@@ -25,17 +25,17 @@
     [Parameter]
     public EventCallback OnRefrsh { get; set; }
 
-    private Task OnPageClick(int pageIndex)
+    private void OnPageClick(int pageIndex)
     {
         Model.CurrentPage = pageIndex;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
-    public Task PageToEnd()
+    public void PageToEnd()
     {
         Model.CurrentPage = Model.TotalPages;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

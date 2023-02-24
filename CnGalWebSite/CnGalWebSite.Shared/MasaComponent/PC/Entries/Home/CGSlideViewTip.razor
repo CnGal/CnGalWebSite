@@ -10,9 +10,9 @@
     public GameCGModel Model { get; set; }
 
 
-    public Task OnClickMore()
+    public void OnClickMore()
     {
         NavigationManager.NavigateTo("/entries/index/" + Model.Id);
-        return Task.CompletedTask;
+        
     }
 }

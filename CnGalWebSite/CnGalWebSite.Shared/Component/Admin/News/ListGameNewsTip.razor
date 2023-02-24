@@ -29,7 +29,7 @@
         <RowButtonTemplate>
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => EditGameNews(context.Id))" />
 
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => EditArticle(context.ArticleId ))" IsShow="context.ArticleId != 0" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => EditArticle(context.ArticleId ))" IsShow="context.ArticleId != 0" />
 
 
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-map-signs" Text="关注" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsIgnoredClick(new long[] { context.Id }, false, true))" IsShow="context.State == GameNewsState.Ignore" />
@@ -95,10 +95,10 @@
         await TableRows.QueryAsync();
     }
 
-    private Task EditArticle(long id)
+    private void EditArticle(long id)
     {
         NavigationManager.NavigateTo( "/articles/index/" + id);
-        return Task.CompletedTask;
+        
     }
 
     private async Task EditGameNews(long id)

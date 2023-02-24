@@ -126,14 +126,14 @@ else
         }
     }
 
-    private Task DataLoaded(EditAddInforViewModel model)
+    private void DataLoaded(EditAddInforViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 

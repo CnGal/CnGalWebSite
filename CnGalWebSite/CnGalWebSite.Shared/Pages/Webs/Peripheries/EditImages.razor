@@ -102,14 +102,14 @@
     }
 
 
-    private Task DataLoaded(EditPeripheryImagesViewModel model)
+    private void DataLoaded(EditPeripheryImagesViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

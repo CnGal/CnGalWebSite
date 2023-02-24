@@ -112,14 +112,14 @@
     }
 
 
-    private Task DataLoaded(CreatePeripheryViewModel model)
+    private void DataLoaded(CreatePeripheryViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

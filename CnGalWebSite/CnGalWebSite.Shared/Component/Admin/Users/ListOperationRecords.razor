@@ -20,7 +20,7 @@
 
     </TableColumns>
     <RowButtonTemplate>
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick(context.Type,context.ObjectId))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => OnRowLookClick(context.Type,context.ObjectId))" />
     </RowButtonTemplate>
 </Table>
 
@@ -58,7 +58,7 @@
     }
 
 
-    public Task OnRowLookClick( OperationRecordType? type,string id)
+    public void OnRowLookClick( OperationRecordType? type,string id)
     {
         if(type == OperationRecordType.Vote)
         {
@@ -75,7 +75,7 @@
             NavigationManager.NavigateTo("/entries/index/" + id);
         }
 
-        return Task.CompletedTask;
+        
     }
 
 

@@ -25,8 +25,8 @@
             <TableColumn @bind-Field="@context.IsDefault" Sortable="true" ComponentType="@typeof(Switch)" Width="80" />
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => OnRowManageClick(context.Id,context.UserId))" />
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick(context.Id))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(async () => OnRowManageClick(context.Id,context.UserId))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => OnRowLookClick(context.Id))" />
         </RowButtonTemplate>
     </Table>
 </div>
@@ -46,11 +46,6 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
-
 
     private async Task<QueryData<ListFavoriteFolderAloneModel>> OnQueryBasicAsync(QueryPageOptions options)
     {
@@ -67,16 +62,14 @@
         }
     }
 
-    private  Task OnRowManageClick(long folderId, string userId)
+    private void OnRowManageClick(long folderId, string userId)
     {
         NavigationManager.NavigateTo("/space/EditSpaceFavoriteObjects?UserId=" + userId + "&FolderId=" + folderId);
-        return Task.CompletedTask;
     }
 
-    private  Task OnRowLookClick(long folderId)
+    private void OnRowLookClick(long folderId)
     {
         NavigationManager.NavigateTo("/favoritefolders/index/" + folderId);
-        return Task.CompletedTask;
     }
 
 }

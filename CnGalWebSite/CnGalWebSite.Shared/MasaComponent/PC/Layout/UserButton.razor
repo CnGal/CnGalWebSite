@@ -109,17 +109,17 @@
 
     }
 
-    public Task MessageCountChanged(long count)
+    public void MessageCountChanged(long count)
     {
         messageCount = count;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
-    public Task OnClosed()
+    public void OnClosed()
     {
         menu = false;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

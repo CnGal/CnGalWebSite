@@ -111,14 +111,14 @@ else
     }
 
 
-    private Task DataLoaded(EditTagMainViewModel model)
+    private void DataLoaded(EditTagMainViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

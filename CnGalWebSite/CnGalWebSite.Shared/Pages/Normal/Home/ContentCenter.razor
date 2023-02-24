@@ -85,7 +85,7 @@
         StateHasChanged();
     }
 
-    public Task IndexChanged(StringNumber value)
+    public void IndexChanged(StringNumber value)
     {
         TabIndex = value;
 
@@ -97,7 +97,7 @@
             _ => "/contentcenter"
         });
 
-        return Task.CompletedTask;
+        
 
     }
 

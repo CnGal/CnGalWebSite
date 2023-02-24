@@ -65,25 +65,25 @@
         return ValueTask.CompletedTask;
     }
 
-    public Task OnMoveLeft()
+    public void OnMoveLeft()
     {
         Model.Index = (Model.Index - 1) < 0 ? (Model.Pictures.Count - 1) : (Model.Index - 1);
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
-    public Task OnMoveRight()
+    public void OnMoveRight()
     {
         Model.Index = (Model.Index + 1) >= Model.Pictures.Count ? 0 : (Model.Index + 1);
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
-    public Task OnClose()
+    public void OnClose()
     {
         isOpen = false;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     /// <summary>

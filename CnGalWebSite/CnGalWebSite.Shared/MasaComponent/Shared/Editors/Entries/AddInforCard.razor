@@ -178,7 +178,7 @@
 
     }
 
-    public Task GamePlatformsValueChanged(List<string> games)
+    public void GamePlatformsValueChanged(List<string> games)
     {
         GamePlatformsValue = games;
         //处理游戏平台数据
@@ -200,7 +200,7 @@
             });
         }
 
-        return Task.CompletedTask;
+        
     }
 
 }

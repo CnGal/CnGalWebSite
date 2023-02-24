@@ -46,11 +46,6 @@
             Title = "编辑自定义链接",
             Model = Model[i],
             Items = items,
-            OnCloseAsync = () =>
-            {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
             OnEditAsync = async context =>
             {
                 // Trace.Log("保存按钮被点击");
@@ -75,11 +70,6 @@
             Title = "添加自定义链接",
             Model = model,
             Items = items,
-            OnCloseAsync = () =>
-            {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
             OnEditAsync = async context =>
             {
                 // Trace.Log("保存按钮被点击");

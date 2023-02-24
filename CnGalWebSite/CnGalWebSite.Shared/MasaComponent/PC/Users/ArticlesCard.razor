@@ -45,10 +45,10 @@ else
         }
     }
 
-    private Task OnPageClick(int pageIndex)
+    private void OnPageClick(int pageIndex)
     {
         Model.CurrentPage = pageIndex;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

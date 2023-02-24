@@ -88,16 +88,16 @@
         }
 
     }
-    public Task OnClick(AudioViewModel model)
+    public void OnClick(AudioViewModel model)
     {
         if (currentAudio == model)
         {
-            return Task.CompletedTask;
+            
         }
         currentAudio = model;
         AutoPlay = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
 
     }
 

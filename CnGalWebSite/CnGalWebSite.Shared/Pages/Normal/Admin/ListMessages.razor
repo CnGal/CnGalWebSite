@@ -36,7 +36,7 @@
             <TableColumn @bind-Field="@context.IsReaded" Sortable="true" Searchable="true" ComponentType="@typeof(Switch)" Width="110" />
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookLink( context.Link , context.LinkTitle))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => LookLink( context.Link , context.LinkTitle))" />
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-comments-o" Text="切换状态" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsReadedClick(new long[] { context.Id }, !context.IsReaded, true))" />
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-close" Text="删除" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowDeleteClick(new long[] { context.Id },true))" />
         </RowButtonTemplate>
@@ -79,14 +79,14 @@
         }
     }
 
-    private Task LookLink(string link, string name)
+    private void LookLink(string link, string name)
     {
         if (string.IsNullOrWhiteSpace(link) == false)
         {
             NavigationManager.NavigateTo(Provider, link, name, "fa fa-star-o");
         }
 
-        return Task.CompletedTask;
+        
     }
 
     private async Task OnRowEditIsReadedClick(long[] ids, bool isReaded, bool showMessage)

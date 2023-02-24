@@ -28,11 +28,11 @@
     [Parameter]
     public List<DocumentViewModel> Items { get; set; } = new List<DocumentViewModel>();
 
-    public Task Refresh(long index)
+    public void Refresh(long index)
     {
         Index = index;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 

@@ -153,11 +153,11 @@
         await ProcUserCertification(null);
     }
 
-    public Task OnOpenDialog()
+    public void OnOpenDialog()
     {
         Dialog = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     public async Task OnVerficated(HumanMachineVerificationResult model)
@@ -206,12 +206,12 @@
         }
     }
 
-    public Task OnTypeChanged(UserCertificationType type)
+    public void OnTypeChanged(UserCertificationType type)
     {
         Model.UserCertificationModel.Type = type;
 
         StateHasChanged();
 
-        return Task.CompletedTask;
+        
     }
 }

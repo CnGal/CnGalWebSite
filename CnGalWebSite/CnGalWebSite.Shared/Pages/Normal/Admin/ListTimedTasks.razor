@@ -246,11 +246,6 @@
             Title = item.Id == 0 ? "添加定时任务" : "编辑定时任务",
             Model = item,
             Items = model,
-            OnCloseAsync = () =>
-            {
-                //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
             OnEditAsync = async context =>
             {
                 // Trace.Log("保存按钮被点击");

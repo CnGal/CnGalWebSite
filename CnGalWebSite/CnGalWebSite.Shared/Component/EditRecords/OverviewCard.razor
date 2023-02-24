@@ -25,10 +25,10 @@
         SelecteChanged(Model.Examines.FirstOrDefault(s => s.IsSelected));
     }
 
-    public Task SelecteChanged(EditRecordAloneViewModel item)
+    public void SelecteChanged(EditRecordAloneViewModel item)
     {
         Item = item;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

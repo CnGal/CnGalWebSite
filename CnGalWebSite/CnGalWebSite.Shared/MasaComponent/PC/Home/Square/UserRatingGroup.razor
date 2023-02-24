@@ -61,19 +61,19 @@
         }
     }
 
-    public Task OnClickMore()
+    public void OnClickMore()
     {
         _dataCacheService.RandomUserScoresCatche.Random();
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 
-    public async Task OnClickUser(PlayedGameUserScoreRandomModel model)
+    public void OnClickUser(PlayedGameUserScoreRandomModel model)
     {
         if (userScoreDialog != null)
         {
-            await userScoreDialog.Refresh(true, model, model.GameName, model.GameId, model.IsDubbing);
+            userScoreDialog.Refresh(true, model, model.GameName, model.GameId, model.IsDubbing);
         }
     }
 }

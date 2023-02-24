@@ -46,37 +46,37 @@
     CnGalWebSite.Shared.MasaComponent.PC.Layout.ThemeSettingCard themeSettingCard;
     bool isOpen;
 
-    public Task SetDrawer(bool drawer)
+    public void SetDrawer(bool drawer)
     {
         Drawer = drawer;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
-    private Task OnClickUrl(string url)
+    private void OnClickUrl(string url)
     {
         NavigationManager.NavigateTo(url);
         Drawer = false;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
-    private Task OnClose()
+    private void OnClose()
     {
         Drawer = false;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
-    public async Task OnOpenSetting()
+    public void OnOpenSetting()
     {
         isOpen = true;
         StateHasChanged();
-        await OnClose();
+        OnClose();
 
         if (themeSettingCard != null)
         {
-            await themeSettingCard.Refresh(true);
+            themeSettingCard.Refresh(true);
         }
     }
 }

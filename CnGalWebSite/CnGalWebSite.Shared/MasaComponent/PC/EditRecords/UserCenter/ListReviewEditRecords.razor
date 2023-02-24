@@ -37,7 +37,7 @@ else
             <TableColumn @bind-Field="@context.UserName" TextWrap Width="200" />
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-paper-plane" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.ExamineId ))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-paper-plane" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => OnLook(context.ExamineId ))" />
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-check" Text="已读" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditStateClick(new long[] { context.ExamineId },  EditRecordReviewState.Reviewed, true))" IsShow="context.State == EditRecordReviewState.UnRead" />
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-trash-o" Text="忽略" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditStateClick(new long[] { context.ExamineId },  EditRecordReviewState.Ignored, true))" IsShow="context.State == EditRecordReviewState.UnRead" />
 
@@ -101,10 +101,10 @@ else
     {
         await TableRows.QueryAsync();
     }
-    private Task OnLook(long id)
+    private void OnLook(long id)
     {
         NavigationManager.NavigateTo("/examine?Id=" + id);
-        return Task.CompletedTask;
+        
     }
 
     private async Task OnRowEditStateClick(long[] ids, EditRecordReviewState state, bool showMessage)

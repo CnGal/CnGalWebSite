@@ -61,9 +61,9 @@
         }
     }
 
-    private Task OnCreateLottery()
+    private void OnCreateLottery()
     {
         NavigationManager.NavigateTo(Provider, "/lotteries/createlottery", "创建抽奖", "fa fa-gift");
-        return Task.CompletedTask;
+        
     }
 }

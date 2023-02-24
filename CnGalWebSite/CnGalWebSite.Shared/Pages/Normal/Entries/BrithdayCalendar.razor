@@ -82,14 +82,14 @@
     }
 
 
-    public Task MonthChanged(DateTime month)
+    public void MonthChanged(DateTime month)
     {
         if (Date.Date == month.Date)
         {
-            return Task.CompletedTask;
+            
         }
         NavigationManager.NavigateTo($"/birthday?Year={month.Year}&Month={month.Month}&Day={month.Day}");
-        return Task.CompletedTask;
+        
 
     }
 

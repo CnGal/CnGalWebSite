@@ -107,14 +107,14 @@
         colorString = _dataCacheService.ThemeSetting.Theme;
 
     }
-    public Task Refresh(bool dialog)
+    public void Refresh(bool dialog)
     {
         Dialog = dialog;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
-    public Task ColorValueChanged(StringNumber value)
+    public void ColorValueChanged(StringNumber value)
     {
         if (value == null)
         {
@@ -133,49 +133,49 @@
         }
 
         _eventService.OnSavaTheme();
-        return Task.CompletedTask;
+        
 
     }
 
-    public Task BackgroundValueChanged(bool show)
+    public void BackgroundValueChanged(bool show)
     {
         _show = show;
         _dataCacheService.ThemeSetting.IsTransparent = show;
 
         _eventService.OnSavaTheme();
-        return Task.CompletedTask;
+        
     }
-    public Task ExpandValueChanged(bool expand)
+    public void ExpandValueChanged(bool expand)
     {
         _expand = expand;
         _dataCacheService.ThemeSetting.IsExtendEntireScreen = expand;
 
         _eventService.OnSavaTheme();
-        return Task.CompletedTask;
+        
     }
 
-    public Task FontFamilyValueChanged(string value)
+    public void FontFamilyValueChanged(string value)
     {
         _dataCacheService.ThemeSetting.FontFamily = value;
 
         _eventService.OnSavaTheme();
-        return Task.CompletedTask;
+        
     }
 
-    public Task AllowAutoSaveValueChanged(bool value)
+    public void AllowAutoSaveValueChanged(bool value)
     {
         _dataCacheService.ThemeSetting.AllowAutoSave = value;
 
         _eventService.OnSavaTheme();
-        return Task.CompletedTask;
+        
     }
 
-    public Task ShowDetailedErrorInforValueChanged(bool value)
+    public void ShowDetailedErrorInforValueChanged(bool value)
     {
         _dataCacheService.ThemeSetting.ShowDetailedErrorInfor = value;
 
         _eventService.OnSavaTheme();
-        return Task.CompletedTask;
+        
     }
 }
 

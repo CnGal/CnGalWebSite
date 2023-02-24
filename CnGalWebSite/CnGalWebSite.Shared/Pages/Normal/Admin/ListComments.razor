@@ -36,7 +36,7 @@
             <TableColumn @bind-Field="@context.IsHidden" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => LookComment( context.ArticleId,context.EntryId,context.UserSpaceCommentManagerId,context?.Type??CommentType.None))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-database" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => LookComment( context.ArticleId,context.EntryId,context.UserSpaceCommentManagerId,context?.Type??CommentType.None))" />
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-comments-o" Text="切换显示" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new long[] { context.Id }, !context.IsHidden, true))" />
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new long[] { context.Id }, 1 , true))" />
             <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Info" Icon="fa fa-arrow-down" Text="降权重" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new long[] { context.Id }, - 1 , true))" />
@@ -78,7 +78,7 @@
         }
     }
 
-    private Task LookComment(long? articleId, int? entryId, long? spaceId, CommentType type)
+    private void LookComment(long? articleId, int? entryId, long? spaceId, CommentType type)
     {
         switch (type)
         {
@@ -89,7 +89,7 @@
                 NavigationManager.NavigateTo(Provider, "/entries/index/" + entryId, "查看评论", "fa fa-comments-o");
                 break;
         }
-        return Task.CompletedTask;
+        
     }
 
     /// <summary>

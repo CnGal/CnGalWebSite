@@ -18,9 +18,9 @@
     public GameRoleModel Model { get; set; }
 
 
-    public Task OnClickArticle(long id)
+    public void OnClickArticle(long id)
     {
         NavigationManager.NavigateTo("/articles/index/" + id);
-        return Task.CompletedTask;
+        
     }
 }

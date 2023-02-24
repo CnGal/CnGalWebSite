@@ -119,14 +119,14 @@ else
         }
     }
 
-    private Task DataLoaded(EditMainPageViewModel model)
+    private void DataLoaded(EditMainPageViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

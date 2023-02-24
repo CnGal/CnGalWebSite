@@ -49,7 +49,7 @@
     CnGalWebSite.Shared.MasaComponent.Shared.Components.TrackEvent trackEven;
 
 
-    public Task OnClickImage(NewsModel item)
+    public void OnClickImage(NewsModel item)
     {
         if (item.GroupId != 0 && item.GroupId != Model.Id)
         {
@@ -62,7 +62,7 @@
             NavigationManager.NavigateTo("/space/index/" + item.UserId);
 
         }
-        return Task.CompletedTask;
+        
     }
 
     public async void ViewAt(NewsModel item)

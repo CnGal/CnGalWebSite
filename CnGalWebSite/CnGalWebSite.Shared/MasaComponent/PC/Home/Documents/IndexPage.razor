@@ -57,12 +57,12 @@
 
     }
 
-    public async Task IdChanged(long id)
+    public void IdChanged(long id)
     {
         if (mainGroupCard != null)
         {
             Id = id;
-            await mainGroupCard.Refresh(id);
+            mainGroupCard.Refresh(id);
 
         }
     }

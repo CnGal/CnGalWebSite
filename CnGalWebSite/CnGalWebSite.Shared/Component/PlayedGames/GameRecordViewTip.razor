@@ -137,11 +137,11 @@
     }
 
 
-    public Task Refresh(bool dialog, GameRecordViewModel model)
+    public void Refresh(bool dialog, GameRecordViewModel model)
     {
         Dialog = dialog;
         Model = model;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

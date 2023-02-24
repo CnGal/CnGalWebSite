@@ -35,24 +35,24 @@
     CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard homeTitleCard;
     CnGalWebSite.Shared.MasaComponent.App.Layout.NavButton navButton;
 
-    public async Task ChangeTitle(string title)
+    public void ChangeTitle(string title)
     {
         if (homeTitleCard != null)
         {
-            await homeTitleCard.ChangeTitle(title);
+            homeTitleCard.ChangeTitle(title);
         }
     }
-    public Task OnClickSearch()
+    public void OnClickSearch()
     {
         NavigationManager.NavigateTo("/search");
-        return Task.CompletedTask;
+        
     }
 
-    public async Task SetDrawer()
+    public void SetDrawer()
     {
         if (navButton != null)
         {
-            await navButton.SetDrawer(true);
+            navButton.SetDrawer(true);
         }
     }
 }

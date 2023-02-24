@@ -61,7 +61,7 @@
         selectedItem = item?.Text ?? "概览";
     }
 
-    public Task ValueChanged(StringNumber index)
+    public void ValueChanged(StringNumber index)
     {
         if(index!=null)
         {
@@ -74,7 +74,7 @@
             }
         }
 
-        return Task.CompletedTask;
+        
     }
 
 

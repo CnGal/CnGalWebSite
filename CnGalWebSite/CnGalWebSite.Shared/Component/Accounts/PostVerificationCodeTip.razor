@@ -177,12 +177,12 @@ else
     }
 
     [JSInvokable]
-    public Task OnCancel()
+    public void OnCancel()
     {
         IsFrist = false;
         isPost = false;
         IsSuccess = false;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

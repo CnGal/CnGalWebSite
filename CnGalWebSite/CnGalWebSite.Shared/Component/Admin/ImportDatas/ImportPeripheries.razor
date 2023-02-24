@@ -170,9 +170,9 @@
         return true;
     }
 
-    public Task OnCancel()
+    public void OnCancel()
     {
         isCancel = true;
-        return Task.CompletedTask;
+        
     }
 }

@@ -49,7 +49,7 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    public Task Refresh(List<KeyValuePair<FavoriteObjectType, long>> objectIds, FavoriteFoldersViewModel userFavoriteInfor)
+    public void Refresh(List<KeyValuePair<FavoriteObjectType, long>> objectIds, FavoriteFoldersViewModel userFavoriteInfor)
     {
         if(SelectedItemIds.Any())
         {
@@ -59,7 +59,7 @@
         ObjectIds = objectIds;
         Dialog = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     private async Task MoveFavoriteObjects(IEnumerable<long> folderIds, List<KeyValuePair<FavoriteObjectType, long>> objectIds)

@@ -198,10 +198,10 @@
         await TableRows.QueryAsync();
     }
 
-    public Task OnRowLookClick(long id)
+    public void OnRowLookClick(long id)
     {
         NavigationManager.NavigateTo("/videos/index/" + id);
-        return Task.CompletedTask;
+        
     }
 
 

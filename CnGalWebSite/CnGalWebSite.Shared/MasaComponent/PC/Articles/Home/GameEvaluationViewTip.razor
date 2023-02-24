@@ -40,14 +40,14 @@
     public GameEvaluationsModel Model { get; set; }
 
 
-    public Task OnClickMore()
+    public void OnClickMore()
     {
         NavigationManager.NavigateTo("/entries/index/" + Model.Id);
-        return Task.CompletedTask;
+        
     }
-    public Task OnClickArticle(long id)
+    public void OnClickArticle(long id)
     {
         NavigationManager.NavigateTo("/articles/index/" + id);
-        return Task.CompletedTask;
+        
     }
 }

@@ -35,7 +35,7 @@ else
                 <TableColumn @bind-Field="@context.CreateTime" Sortable="true" TextWrap="true" Width="180" />
             </TableColumns>
             <RowButtonTemplate>
-                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-paper-plane" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.EntryId ))" />
+                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-paper-plane" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => OnLook(context.EntryId ))" />
                 <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Danger" Icon="fa fa-trash" Text="移除" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditMonitorClick(new int[] { context.EntryId }, false, true))" />
 
             </RowButtonTemplate>
@@ -101,10 +101,10 @@ else
     {
         await TableRows.QueryAsync();
     }
-    private Task OnLook(int id)
+    private void OnLook(int id)
     {
         NavigationManager.NavigateTo("/entries/index/" + id);
-        return Task.CompletedTask;
+        
     }
 
     private async Task OnRowEditMonitorClick(int[] ids, bool inMonitor, bool showMessage)

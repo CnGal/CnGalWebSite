@@ -89,26 +89,26 @@
         return;
     }
 
-    public Task OnDelete(EditAudioAloneModel model)
+    public void OnDelete(EditAudioAloneModel model)
     {
         Model.Audio.Remove(model);
-        return Task.CompletedTask;
+        
     }
 
-    public Task OnEdit(EditAudioAloneModel model)
+    public void OnEdit(EditAudioAloneModel model)
     {
         if (editAudioCard != null)
         {
             editAudioCard.Refresh(model);
         }
 
-        return Task.CompletedTask;
+        
     }
 
-    public Task OnChanged()
+    public void OnChanged()
     {
         StateHasChanged();
 
-        return Task.CompletedTask;
+        
     }
 }

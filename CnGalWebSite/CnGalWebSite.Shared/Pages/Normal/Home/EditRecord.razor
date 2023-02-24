@@ -259,18 +259,18 @@ else
             ErrorHandler.ProcessError(ex, "获取编辑记录概览失败");
         }
     }
-    public async Task ContrastChanged(string conId)
+    public void ContrastChanged(string conId)
     {
         if (overviewCard != null)
         {
             int index = ExaminesOverview.Examines.FindIndex(s => s.IsSelected);
             if (index == ExaminesOverview.Examines.Count - 1)
             {
-                await overviewCard.SelecteChanged(ExaminesOverview.Examines[index]);
+                overviewCard.SelecteChanged(ExaminesOverview.Examines[index]);
             }
             else
             {
-                await overviewCard.SelecteChanged(ExaminesOverview.Examines[index + 1]);
+                overviewCard.SelecteChanged(ExaminesOverview.Examines[index + 1]);
             }
         }
 
@@ -278,11 +278,9 @@ else
 
 
     }
-    public async Task CurrentChanged(string curId)
+    public void CurrentChanged(string curId)
     {
-
         NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + ContrastId + "&CurrentId=" + curId);
-
     }
 
     public async Task OnRefreshContrastView(string conId, string curId)

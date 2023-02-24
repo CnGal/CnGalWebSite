@@ -132,10 +132,10 @@
         Model.Add(model);
     }
 
-    public Task OnDelete(RepostVideoModel model)
+    public void OnDelete(RepostVideoModel model)
     {
         Model.Remove(model);
-        return Task.CompletedTask;
+        
     }
 
     public async Task OnClickFinshInput()

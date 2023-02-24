@@ -80,7 +80,7 @@
         await editAwardCard.Refresh(true, item);
     }
 
-    public Task OnRefreshTable(EditLotteryAwardModel model)
+    public void OnRefreshTable(EditLotteryAwardModel model)
     {
         if(Awards.Any(s=>s==model)==false)
         {
@@ -88,7 +88,7 @@
         }
         StateHasChanged();
 
-        return Task.CompletedTask;
+        
     }
     public async Task AddAward()
     {
@@ -104,7 +104,7 @@
         };
         option.BodyTemplate = BootstrapDynamicComponent.CreateComponent<BatchImportPrizeTip>(new Dictionary<string, object>
         {
-            [nameof(BatchImportPrizeTip.OnAdd)] = EventCallback.Factory.Create<List<string>>(this, async (model) => await OnImported(model)),
+            [nameof(BatchImportPrizeTip.OnAdd)] = EventCallback.Factory.Create<List<string>>(this, (model) => OnImported(model)),
             [nameof(BatchImportPrizeTip.OnClickClose)] = EventCallback.Factory.Create(this, async () => await option.Dialog.Close()),
             [nameof(BatchImportPrizeTip.Title)] = "奖品"
 
@@ -112,7 +112,7 @@
         await DialogService.Show(option);
     }
 
-    public Task OnImported(List<string> model)
+    public void OnImported(List<string> model)
     {
         //检查是否符合要求
         foreach (var item in model)
@@ -124,6 +124,6 @@
             });
         }
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

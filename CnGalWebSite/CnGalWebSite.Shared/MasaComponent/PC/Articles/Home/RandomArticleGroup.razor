@@ -41,10 +41,10 @@
             ErrorHandler.ProcessError(ex, "获取文章主页随机文章列表失败");
         }
     }
-    public Task OnClickMore()
+    public void OnClickMore()
     {
         NavigationManager.NavigateTo("/search?Types=Article");
-        return Task.CompletedTask;
+        
     }
 
 }

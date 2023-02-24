@@ -192,10 +192,10 @@
         }
     }
 
-    public Task OnLogin()
+    public void OnLogin()
     {
         NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        return Task.CompletedTask;
+        
     }
 
     public async Task OnLookPrize()
@@ -234,12 +234,6 @@
             Model = model,
             Items = items,
             Size= Size.Large,
-
-            OnCloseAsync = () =>
-            {
-            //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
             OnEditAsync = async context =>
             {
             // Trace.Log("保存按钮被点击");

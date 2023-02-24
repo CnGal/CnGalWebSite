@@ -85,7 +85,7 @@
         }
     }
 
-    public Task Refresh()
+    public void Refresh()
     {
         if (Model != null)
         {
@@ -96,7 +96,7 @@
             selectedItems.Clear();
         }
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     public async Task ValueChanged(List<string> items)

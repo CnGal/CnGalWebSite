@@ -242,37 +242,37 @@
 
     }
 
-    public Task OnClickLeft()
+    public void OnClickLeft()
     {
         DateChanged(Date.AddMonths(-1));
-        return Task.CompletedTask;
+        
     }
 
-    public Task OnClickRight()
+    public void OnClickRight()
     {
         DateChanged(Date.AddMonths(1));
-        return Task.CompletedTask;
+        
     }
 
-    public async Task DateChanged(DateOnly date)
+    public void DateChanged(DateOnly date)
     {
         Date = date;
-        await Refresh();
+        Refresh();
     }
 
-    public async Task BeforeChanged(DateTime date)
+    public void BeforeChanged(DateTime date)
     {
         Before = date;
-        await Refresh();
+        Refresh();
     }
 
-    public async Task AfterChanged(DateTime date)
+    public void AfterChanged(DateTime date)
     {
         After = date;
-        await Refresh();
+        Refresh();
     }
 
-    public async Task OnSwitch()
+    public void OnSwitch()
     {
         if (Type == PublishGamesDisplayType.CardList)
         {
@@ -283,16 +283,16 @@
             Type = PublishGamesDisplayType.CardList;
         }
         isFirst = false;
-        await Refresh();
+        Refresh();
     }
 
-    public Task ViewAt(int id)
+    public void ViewAt(int id)
     {
         NavigationManager.NavigateTo("/entries/index/" + id);
-        return Task.CompletedTask;
+        
     }
 
-    public Task Refresh()
+    public void Refresh()
     {
         try
         {
@@ -322,6 +322,6 @@
 
         }
 
-        return Task.CompletedTask;
+        
     }
 }

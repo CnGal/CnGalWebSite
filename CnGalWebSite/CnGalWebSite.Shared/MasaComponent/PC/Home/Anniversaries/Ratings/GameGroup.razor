@@ -156,12 +156,12 @@
         }
     }
 
-    private Task OnPageClick(int pageIndex)
+    private void OnPageClick(int pageIndex)
     {
         _dataCacheService.ThemeSetting.AnniversariesSetting.CurrentPage = pageIndex;
         _eventService.OnSavaTheme();
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

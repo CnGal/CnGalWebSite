@@ -50,7 +50,7 @@
     {
 
     }
-    public Task Refresh(bool dialog, ArticleViewModel model)
+    public void Refresh(bool dialog, ArticleViewModel model)
     {
         Dialog = dialog;
         Model = model;
@@ -58,7 +58,7 @@
 
         StateHasChanged();
 
-        return Task.CompletedTask;
+        
     }
 
 }

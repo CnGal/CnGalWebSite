@@ -115,14 +115,14 @@
         }
     }
 
-    private Task DataLoaded(EditArticleRelevancesViewModel model)
+    private void DataLoaded(EditArticleRelevancesViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 

@@ -97,17 +97,17 @@
         }
     }
 
-    public Task OnClickQuestion()
+    public void OnClickQuestion()
     {
         NavigationManager.NavigateTo( "/articles/index/5");
-        return Task.CompletedTask;
+        
     }
 
-    public Task Refresh(bool dialog)
+    public void Refresh(bool dialog)
     {
         Dialog = dialog;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 

@@ -43,10 +43,10 @@
             ErrorHandler.ProcessError(ex, "获取广场投票列表失败");
         }
     }
-    public Task OnClickMore()
+    public void OnClickMore()
     {
         NavigationManager.NavigateTo("/votes/home");
-        return Task.CompletedTask;
+        
     }
 
 }

@@ -53,9 +53,9 @@
         }
     }
 
-    public Task OnEdit()
+    public void OnEdit()
     {
         NavigationManager.NavigateTo(Provider,"/votes/editvote/" + Model.Id, "编辑投票");
-        return Task.CompletedTask;
+        
     }
 }

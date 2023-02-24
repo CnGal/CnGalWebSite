@@ -127,14 +127,14 @@ else
     }
 
 
-    private Task DataLoaded(EditRelevancesViewModel model)
+    private void DataLoaded(EditRelevancesViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

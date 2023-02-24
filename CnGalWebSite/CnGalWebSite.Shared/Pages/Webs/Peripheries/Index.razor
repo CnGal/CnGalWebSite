@@ -180,11 +180,11 @@ else
 
     }
 
-    public Task OnPreEdit(bool value)
+    public void OnPreEdit(bool value)
     {
         Model.IsEdit = value;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     protected override async Task OnInitializedAsync()
@@ -222,15 +222,15 @@ else
 
     }
 
-    public async Task CollectionChanged(bool isCollected)
+    public void CollectionChanged(bool isCollected)
     {
         if (peripheryOverViewTip != null)
         {
-            await peripheryOverViewTip.CollectionChanged(isCollected, Model.Id);
+            peripheryOverViewTip.CollectionChanged(isCollected, Model.Id);
         }
         if (appPeripheryOverViewTip != null)
         {
-            await appPeripheryOverViewTip.CollectionChanged(isCollected, Model.Id);
+            appPeripheryOverViewTip.CollectionChanged(isCollected, Model.Id);
         }
     }
 

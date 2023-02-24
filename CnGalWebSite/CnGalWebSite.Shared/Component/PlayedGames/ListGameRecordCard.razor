@@ -40,17 +40,17 @@
 
     public bool IsCollapsed { get; set; } = true;
 
-    public Task OnChanged()
+    public void OnChanged()
     {
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     public async Task OnShow(GameRecordViewModel model)
     {
         if (gameRecordViewTip != null)
         {
-            await gameRecordViewTip.Refresh(true, model);
+            gameRecordViewTip.Refresh(true, model);
         }
     }
 

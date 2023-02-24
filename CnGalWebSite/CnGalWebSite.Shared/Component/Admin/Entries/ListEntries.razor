@@ -32,7 +32,7 @@
         <TableColumn @bind-Field="@context.CanComment" Sortable="true" ComponentType="@typeof(Switch)" Width="110" />
     </TableColumns>
     <RowButtonTemplate>
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Warning" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.Id))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Warning" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => OnRowLookClick( context.Id))" />
         <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-arrow-up" Text="增权" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new int[] { context.Id },1 , true))" />
         <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-arrow-down" Text="降权" IsAsync="true" OnClickWithoutRender="@(() => OnRowEditPriorityClick(new int[] { context.Id }, - 1 , true))" />
         <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-unlink" Text="隐藏" IsAsync="true" IsShow="!context.IsHidden" OnClickWithoutRender="@(() => OnRowEditIsHiddenClick(new int[] { context.Id }, true, true))" />
@@ -253,10 +253,9 @@
         await TableRows.QueryAsync();
     }
 
-    public Task OnRowLookClick(int id)
+    public void OnRowLookClick(int id)
     {
-        NavigationManager.NavigateTo( "/entries/index/" + id);
-        return Task.CompletedTask;
+        NavigationManager.NavigateTo( "/entries/index/" + id);     
     }
 
     private async Task OnRowEditCanCommentClick(int[] ids, bool canComment, bool showMessage)
@@ -344,11 +343,6 @@
             Title = "编辑词条",
             Model = items.First(),
             Items = model,
-            OnCloseAsync = () =>
-            {
-            //Trace.Log("关闭按钮被点击");
-                return Task.CompletedTask;
-            },
             OnEditAsync = async context =>
             {
             // Trace.Log("保存按钮被点击");

@@ -18,10 +18,10 @@ else
 
     private string Title { get; set; }
 
-    public Task ChangeTitle(string title)
+    public void ChangeTitle(string title)
     {
         Title = title;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

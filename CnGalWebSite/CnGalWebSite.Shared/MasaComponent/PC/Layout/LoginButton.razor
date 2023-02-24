@@ -18,20 +18,18 @@
     ThemeSettingCard themeSettingCard;
     bool isOpen;
 
-    private async void OnClickLogin()
+    private void OnClickLogin()
     {
-
         NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-
     }
 
-    public async Task OnOpenSetting()
+    public void OnOpenSetting()
     {
         isOpen = true;
         StateHasChanged();
         if (themeSettingCard != null)
         {
-            await themeSettingCard.Refresh(true);
+            themeSettingCard.Refresh(true);
         }
     }
 }

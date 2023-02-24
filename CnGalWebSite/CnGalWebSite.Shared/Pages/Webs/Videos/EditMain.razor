@@ -100,14 +100,14 @@
         }
     }
 
-    private Task DataLoaded(EditVideoMainViewModel model)
+    private void DataLoaded(EditVideoMainViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 

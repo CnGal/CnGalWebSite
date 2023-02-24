@@ -40,10 +40,10 @@
             ErrorHandler.ProcessError(ex, "获取文章主页周报列表失败");
         }
     }
-    public Task OnClickMore()
+    public void OnClickMore()
     {
         NavigationManager.NavigateTo("/weeklynews");
-        return Task.CompletedTask;
+        
     }
 
 }

@@ -50,22 +50,22 @@
 
     bool Dialog { get; set; }
 
-    public Task OnUploaded(UploadResult result)
+    public void OnUploaded(UploadResult result)
     {
         Model.Url = result.Url;
         Model.Duration = result.Duration??new TimeSpan(0);
 
 
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
-    public Task Refresh(EditAudioAloneModel model)
+    public void Refresh(EditAudioAloneModel model)
     {
         Model = model;
         Dialog = true;
 
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     public async Task ValueChanged(bool dialog)

@@ -62,7 +62,7 @@
         await Refresh();
         if (commentListView!=null)
         {
-            await commentListView.PageToEnd();
+            commentListView.PageToEnd();
         }
 
     }
@@ -78,9 +78,9 @@
             ErrorHandler.ProcessError(ex, "获取评论列表失败");
         }
     }
-    public Task OnLoginClick()
+    public void OnLoginClick()
     {
         NavigationManager.NavigateTo("/account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        return Task.CompletedTask;
+        
     }
 }

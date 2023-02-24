@@ -106,10 +106,10 @@
         }
     }
 
-    public Task OnChanged()
+    public void OnChanged()
     {
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     private async Task OnSubmit()
@@ -161,14 +161,14 @@
         }
     }
 
-    private Task DataLoaded(EditUserDataViewModel model)
+    private void DataLoaded(EditUserDataViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

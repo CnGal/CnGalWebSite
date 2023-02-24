@@ -94,15 +94,15 @@
     }
     #endregion
 
-    public Task OnClickWeibo()
+    public void OnClickWeibo()
     {
         OpenNewPage(Model.Outlink);
-        return Task.CompletedTask;
+        
     }
 
-    public Task OnClickMainPage()
+    public void OnClickMainPage()
     {
         NavigationManager.NavigateTo(Model.GroupId > 0 ? ("entries/index/" + Model.GroupId) : ("space/index/" + Model.UserId));
-        return Task.CompletedTask;
+        
     }
 }

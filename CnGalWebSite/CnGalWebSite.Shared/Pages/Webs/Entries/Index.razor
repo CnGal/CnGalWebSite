@@ -511,11 +511,11 @@ else
         }
     }
 
-    public Task OnPreEdit(bool value)
+    public void OnPreEdit(bool value)
     {
         EntryView.IsEdit = value;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 

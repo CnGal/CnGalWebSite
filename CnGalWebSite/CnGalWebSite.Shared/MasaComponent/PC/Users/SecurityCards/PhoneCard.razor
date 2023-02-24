@@ -22,7 +22,7 @@
     [Parameter]
     public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
 
-    public Task OnClick()
+    public void OnClick()
     {
         @if (string.IsNullOrWhiteSpace(Model.Phone))
         {
@@ -33,6 +33,6 @@
             NavigationManager.NavigateTo("/account/ChangePhoneNumber/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
 
         }
-        return Task.CompletedTask;
+        
     }
 }

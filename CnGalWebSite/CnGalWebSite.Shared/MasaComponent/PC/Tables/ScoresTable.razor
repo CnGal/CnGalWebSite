@@ -44,7 +44,7 @@ else
         <TableColumn @bind-Field="@context.FilterMusicSocre" Sortable Filterable Searchable FormatString="0.00000" Width="100" />
     </TableColumns>
     <RowButtonTemplate>
-        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnLook(context.GameId))" />
+        <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-share-square-o" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => OnLook(context.GameId))" />
     </RowButtonTemplate>
 
 </Table>
@@ -80,10 +80,10 @@ else
     [Parameter]
     public EventCallback<NavigateModel> OnClickUrl { get; set; }
 
-    public Task OnLook(long id)
+    public void OnLook(long id)
     {
         NavigationManager.NavigateTo("/entries/index/" + id);
-        return Task.CompletedTask;
+        
 
     }
 

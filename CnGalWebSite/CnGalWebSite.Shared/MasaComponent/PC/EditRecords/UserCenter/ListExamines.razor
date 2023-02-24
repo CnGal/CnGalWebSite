@@ -40,7 +40,7 @@ else
             <TableColumn @bind-Field="@context.Comments" Sortable="true" TextWrap="true" Searchable="true" Width="350" />
         </TableColumns>
         <RowButtonTemplate>
-            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(() => OnRowLookClick( context.Id))" />
+            <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-map-signs" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () => OnRowLookClick( context.Id))" />
         </RowButtonTemplate>
     </Table>
 }
@@ -108,10 +108,10 @@ else
             return new QueryData<ListExamineAloneModel>();
         }
     }
-    public Task OnRowLookClick(long id)
+    public void OnRowLookClick(long id)
     {
         NavigationManager.NavigateTo("/examine?Id=" + id);
-        return Task.CompletedTask;
+        
     }
     private async Task OnExamine(long examineId, bool isPassed, bool showMessage)
     {
@@ -171,10 +171,10 @@ else
         await ToastService.Information("发送批量审核请求成功", "不代表操作会真实生效，可能产生错误");
         // await TableRows.QueryAsync();
     }
-    private Task ClickIsAutoRefresh(IEnumerable<ListExamineAloneModel> items)
+    private void ClickIsAutoRefresh(IEnumerable<ListExamineAloneModel> items)
     {
         IsAutoRefresh = !IsAutoRefresh;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

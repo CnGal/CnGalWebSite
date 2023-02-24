@@ -142,11 +142,11 @@
         }
     }
 
-    public Task OnClickHistory()
+    public void OnClickHistory()
     {
         ShowExamines = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     public void ProcButtonList()
@@ -254,10 +254,10 @@
 
     }
 
-    private Task OnClickLogin()
+    private void OnClickLogin()
     {
         NavigationManager.NavigateTo("account/login/" + ToolHelper.Base64EncodeUrl(NavigationManager.Uri));
-        return Task.CompletedTask;
+        
     }
 
     int count = 0;
@@ -302,13 +302,13 @@
         }
     }
 
-    public Task OnClosed()
+    public void OnClosed()
     {
         Menu = false;
         //await IsEditChanged.InvokeAsync(IsEdit);
 
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     protected override async Task OnInitializedAsync()

@@ -41,10 +41,10 @@
     CnGalWebSite.Shared.MasaComponent.Shared.Cards.Tools.RepostVideos.MainCard repostVideosCard;
     CnGalWebSite.Shared.MasaComponent.Shared.Components.Catalogs.MasaCatalogButton masaCatalogButton;
 
-    public Task OnClickFly()
+    public void OnClickFly()
     {
         NavigationManager.NavigateTo(NavigationManager.Uri, false, true);
-        return Task.CompletedTask;
+        
     }
 
 
@@ -105,11 +105,11 @@
         }
     }
 
-    public async Task DisplayArticleCatalogButton(ArticleViewModel model)
+    public void DisplayArticleCatalogButton(ArticleViewModel model)
     {
         if (masaCatalogButton != null)
         {
-            await masaCatalogButton.Refresh(model.MainPage, $"/articles/index/{model.Id}");
+            masaCatalogButton.Refresh(model.MainPage, $"/articles/index/{model.Id}");
         }
 
         StateHasChanged();
@@ -122,14 +122,14 @@
 
     }
 
-    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    public void LocationChanged(object sender, LocationChangedEventArgs args)
     {
         if (NavigationManager.Uri.Contains("articles/index") == false)
         {
 
             if (masaCatalogButton != null)
             {
-                await masaCatalogButton.Refresh(null, null);
+                masaCatalogButton.Refresh(null, null);
             }
             StateHasChanged();
         }

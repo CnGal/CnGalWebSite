@@ -85,7 +85,7 @@
                 _dataCacheService.CVThematicPageCache = await Http.GetFromJsonAsync<CVThematicPageViewModel>(ToolHelper.WebApiPath + "api/tags/GetCVThematicPageViewModel", ToolHelper.options);
             }
 
-            await OnChanged(true);
+            OnChanged(true);
 
         }
         catch (Exception ex)
@@ -95,7 +95,7 @@
 
     }
 
-    public Task OnChanged(bool isInit = false)
+    public void OnChanged(bool isInit = false)
     {
         Model.Clear();
         Model.AddRange(_dataCacheService.CVThematicPageCache.CVInfors);
@@ -103,7 +103,7 @@
         if (_dataCacheService.CVThematicPageCache == null)
         {
 
-            return Task.CompletedTask;
+            
         }
 
         //先按选中的标签筛除
@@ -158,16 +158,16 @@
 
         StateHasChanged();
 
-        return Task.CompletedTask;
+        
     }
 
-    private Task OnPageClick(int pageIndex)
+    private void OnPageClick(int pageIndex)
     {
         _dataCacheService.CVThematicPageCache.CurrentPage = pageIndex;
 
         StateHasChanged();
 
-        return Task.CompletedTask;
+        
     }
 
 }

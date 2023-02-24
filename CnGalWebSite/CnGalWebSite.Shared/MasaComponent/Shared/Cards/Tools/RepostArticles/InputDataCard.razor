@@ -86,10 +86,10 @@
         }
     }
 
-    public Task ValueChanged(ArticleType type)
+    public void ValueChanged(ArticleType type)
     {
         InputModel.Type = type;
-        return Task.CompletedTask;
+        
     }
 
     public async Task OnImported(List<string> items)
@@ -133,10 +133,10 @@
         Model.Add(model);
     }
 
-    public Task OnDelete(RepostArticleModel model)
+    public void OnDelete(RepostArticleModel model)
     {
         Model.Remove(model);
-        return Task.CompletedTask;
+        
     }
 
     public async Task OnClickFinshInput()

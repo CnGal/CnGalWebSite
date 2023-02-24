@@ -109,14 +109,14 @@ else
         }
     }
 
-    private Task DataLoaded(EditImagesViewModel model)
+    private void DataLoaded(EditImagesViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

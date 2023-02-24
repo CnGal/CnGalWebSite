@@ -713,9 +713,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
 
                 var entry = await _entryRepository.GetAll().AsNoTracking()
-                    .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
-                    .Where(s => entryName.Length < 2 ? (s.Name == entryName || s.AnotherName == entryName) : (s.Name.Contains(entryName) || (s.AnotherName != null && s.AnotherName.Contains(entryName))))
-                    .Select(s => new { s.Id, s.Name })
+                    .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.DisplayName) == false)
+                    .Where(s => entryName.Length < 2 ? (s.DisplayName == entryName || s.AnotherName == entryName) : (s.DisplayName.Contains(entryName) || (s.AnotherName != null && s.AnotherName.Contains(entryName))))
+                    .Select(s => new { s.Id, s.DisplayName })
                     .FirstOrDefaultAsync();
 
                 if (entry == null)
@@ -724,7 +724,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 else
                 {
-                    if (entry.Name != entryName && entry.Name != entryName)
+                    if (entry.DisplayName != entryName && entry.DisplayName != entryName)
                     {
                         return new Result { Successful = true, Error = (await _weiXinService.GetEntryInfor(entry.Id, true, true,model.SenderId!=0)).DeleteHtmlLinks() + "\n（看板娘不太确定是不是这个词条哦~" };
                     }

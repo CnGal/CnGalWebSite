@@ -70,9 +70,9 @@
     private bool menu { get; set; }
 
 
-    public Task OnClick(string url)
+    public void OnClick(string url)
     {
         NavigationManager.NavigateTo(url);
-        return Task.CompletedTask;
+        
     }
 }

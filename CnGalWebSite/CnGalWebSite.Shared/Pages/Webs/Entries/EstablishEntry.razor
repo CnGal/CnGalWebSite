@@ -151,21 +151,21 @@
         }
     }
 
-    public Task TypeChanged(EntryType type)
+    public void TypeChanged(EntryType type)
     {
         Model.AddInfor.Type = Model.Relevances.Type = type;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
-    private Task DataLoaded(EstablishEntryViewModel model)
+    private void DataLoaded(EstablishEntryViewModel model)
     {
         isReady = false;
         StateHasChanged();
         Model = model;
         isReady = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

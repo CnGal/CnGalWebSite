@@ -21,10 +21,10 @@
     [Parameter]
     public EditUserDataViewModel Model { get; set; } = new EditUserDataViewModel();
 
-    public Task OnClick()
+    public void OnClick()
     {
         NavigationManager.NavigateTo(ToolHelper.GetThirdPartyLoginUrl(ToolHelper.Base64EncodeUrl(NavigationManager.Uri), ThirdPartyLoginType.QQ));
 
-        return Task.CompletedTask;
+        
     }
 }

@@ -122,16 +122,16 @@
         }
     }
 
-    public Task ValueChanged()
+    public void ValueChanged()
     {
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
-    private Task OnPageClick(int pageIndex)
+    private void OnPageClick(int pageIndex)
     {
         _dataCacheService.DiscountPageCatcheHelper.CurrentPage = pageIndex;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 }

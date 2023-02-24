@@ -203,11 +203,11 @@ else
         StateHasChanged();
     }
 
-    public Task HiddenStateChanged()
+    public void HiddenStateChanged()
     {
         Model.IsHidden = !Model.IsHidden;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
 }

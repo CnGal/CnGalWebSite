@@ -78,11 +78,11 @@
         }
     }
 
-    private Task LookLink(string userId, string name)
+    private void LookLink(string userId, string name)
     {
 
         NavigationManager.NavigateTo(Provider,"/space/index/" + userId, name, "fa fa-star-o");
-        return Task.CompletedTask;
+        
     }
 
 

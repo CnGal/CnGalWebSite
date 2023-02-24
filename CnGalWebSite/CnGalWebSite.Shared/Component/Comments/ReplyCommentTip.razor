@@ -86,13 +86,13 @@
     }
 
 
-    public Task OnSwitch()
+    public void OnSwitch()
     {
         _dataCacheService.ThemeSetting.IsCommentUseMarkdown = !_dataCacheService.ThemeSetting.IsCommentUseMarkdown;
         _eventService.OnSavaTheme();
 
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     public void OnImageUploaded(string path)

@@ -54,7 +54,7 @@
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
-    public Task Refresh( FavoriteFoldersViewModel userFavoriteInfor)
+    public void Refresh( FavoriteFoldersViewModel userFavoriteInfor)
     {
         if (SelectedItemIds.Any())
         {
@@ -63,7 +63,7 @@
         UserFavoriteInfor = userFavoriteInfor;
         Dialog = true;
         StateHasChanged();
-        return Task.CompletedTask;
+        
     }
 
     public async Task OnClickFavorited()

@@ -14,17 +14,17 @@
 @code {
     CnGalWebSite.Shared.MasaComponent.App.Layout.TitleCard homeTitleCard;
 
-    public async Task ChangeTitle(string title)
+    public void ChangeTitle(string title)
     {
         if (homeTitleCard != null)
         {
-            await homeTitleCard.ChangeTitle(title);
+            homeTitleCard.ChangeTitle(title);
         }
     }
 
-    public Task OnNavSearchClick()
+    public void OnNavSearchClick()
     {
         NavigationManager.NavigateTo("/search");
-        return Task.CompletedTask;
+        
     }
 }

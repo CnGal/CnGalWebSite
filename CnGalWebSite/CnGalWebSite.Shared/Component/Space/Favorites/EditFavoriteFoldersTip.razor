@@ -28,8 +28,8 @@
                 <TableColumn @bind-Field="@context.IsDefault" Sortable="true" ComponentType="@typeof(Switch)" Width="80" />
             </TableColumns>
             <RowButtonTemplate>
-                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(() => OnRowManageClick(context.Id))" />
-                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(() =>  OnRowLookClick(context.Id,context.Name))" />
+                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Success" Icon="fa fa-edit" Text="编辑" IsAsync="true" OnClickWithoutRender="@(async () => OnRowManageClick(context.Id))" />
+                <TableCellButton AutoSelectedRowWhenClick="false" Size="Size.ExtraSmall" Color="Color.Primary" Icon="fa fa-share" Text="查看" IsAsync="true" OnClickWithoutRender="@(async () =>  OnRowLookClick(context.Id,context.Name))" />
             </RowButtonTemplate>
         </Table>
     </div>
@@ -74,16 +74,16 @@
         }
     }
 
-    private Task OnRowManageClick(long id)
+    private void OnRowManageClick(long id)
     {
         NavigationManager.NavigateTo($"/space/EditSpaceFavoriteObjects?UserId={Id}&FolderId={id}");
-        return Task.CompletedTask;
+        
     }
 
-    private Task OnRowLookClick(long id, string name)
+    private void OnRowLookClick(long id, string name)
     {
         NavigationManager.NavigateTo($"/favoritefolders/index/{id}");
-        return Task.CompletedTask;
+        
     }
 
 
@@ -91,7 +91,7 @@
     {
         if (createFavoriteFolderCard != null)
         {
-            await createFavoriteFolderCard.Refrsh();
+            createFavoriteFolderCard.Refrsh();
         }
     }
 }

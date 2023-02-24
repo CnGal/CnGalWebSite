@@ -81,7 +81,7 @@
         }
     }
 
-    private Task LookComment(long? articleId, int? entryId, long? apsceId, CommentType type)
+    private void LookComment(long? articleId, int? entryId, long? apsceId, CommentType type)
     {
         switch (type)
         {
@@ -93,7 +93,7 @@
                 break;
 
         }
-        return Task.CompletedTask;
+        
     }
 
     /// <summary>
